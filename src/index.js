@@ -42,7 +42,10 @@ const init_page = () => {
         return btn;
     }
 
-    const btn_official_search = document.querySelector("button.style_search_btn__ZuOpx");
+    // const btn_official_search = document.querySelector("button.style_search_btn__ZuOpx");
+    const div_official_search = document.querySelector("div.style_search__7HKSe");
+    const div_insert = document.createElement("div");
+
 
     const btn_load_all = get_btn_style();
     btn_load_all.classList.add("btn-load-all");
@@ -66,9 +69,13 @@ const init_page = () => {
     span_filter_without_load.innerText = "絞り込み";
     btn_filter_without_load.appendChild(span_filter_without_load);
 
-    btn_official_search.after(btn_filter_safe);
-    btn_official_search.after(btn_load_all);
-    btn_official_search.after(btn_filter_without_load);
+    // btn_official_search.after(btn_filter_safe);
+    // btn_official_search.after(btn_load_all);
+    // btn_official_search.after(btn_filter_without_load);
+    div_insert.appendChild(btn_filter_safe);
+    div_insert.appendChild(btn_load_all);
+    div_insert.appendChild(btn_filter_without_load);
+    div_official_search.after(div_insert);
 
 
     const style = document.createElement("style");
