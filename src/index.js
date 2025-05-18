@@ -12,11 +12,12 @@
 
 const init_page = () => {
     
-    const load_more_auto = () => {
+    const load_more_auto = async () => {
         const arr_btn = document.querySelectorAll("button.style_more_btn__ymb22:not([disabled])");
         if (arr_btn.length > 0) {
             arr_btn[0].click();
             setTimeout(() => {
+                scrollTo(0, 0);
                 load_more_auto();
             }, 500)
         } else {
@@ -38,68 +39,77 @@ const init_page = () => {
         btn.style.padding = "0px 8px";
         btn.style.background = "rgb(0, 104, 33)";
         btn.style.color = "white";
+        btn.style.margin = "5px";
 
         return btn;
     }
 
-    // const btn_official_search = document.querySelector("button.style_search_btn__ZuOpx");
-    const div_official_search = document.querySelector("div.style_search__7HKSe");
-    const div_insert = document.createElement("div");
+    const insert_button = () => {
+        // const btn_official_search = document.querySelector("button.style_search_btn__ZuOpx");
+        const div_official_search = document.querySelector("div.style_search__7HKSe");
+        const div_insert = document.createElement("div");
 
 
-    const btn_load_all = get_btn_style();
-    btn_load_all.classList.add("btn-load-all");
-    const span_load_all = document.createElement("span");
-    span_load_all.classList.add("ext_ytomo");
-    span_load_all.innerText = "すべて読み込み";
-    btn_load_all.appendChild(span_load_all);
+        const btn_load_all = get_btn_style();
+        btn_load_all.classList.add("btn-load-all");
+        const span_load_all = document.createElement("span");
+        span_load_all.classList.add("ext_ytomo");
+        span_load_all.innerText = "すべて読み込み";
+        btn_load_all.appendChild(span_load_all);
 
 
-    const btn_filter_safe = get_btn_style();
-    btn_filter_safe.classList.add("btn-filter-safe");
-    const span_filter_safe = document.createElement("span");
-    span_filter_safe.classList.add("ext_ytomo");
-    span_filter_safe.innerText = "空きのみ";
-    btn_filter_safe.appendChild(span_filter_safe);
+        const btn_filter_safe = get_btn_style();
+        btn_filter_safe.classList.add("btn-filter-safe");
+        const span_filter_safe = document.createElement("span");
+        span_filter_safe.classList.add("ext_ytomo");
+        span_filter_safe.innerText = "空きのみ";
+        btn_filter_safe.appendChild(span_filter_safe);
 
-    const btn_filter_without_load = get_btn_style();
-    btn_filter_without_load.classList.add("btn-filter-without-load");
-    const span_filter_without_load = document.createElement("span");
-    span_filter_without_load.classList.add("ext_ytomo");
-    span_filter_without_load.innerText = "絞り込み";
-    btn_filter_without_load.appendChild(span_filter_without_load);
+        const btn_filter_without_load = get_btn_style();
+        btn_filter_without_load.classList.add("btn-filter-without-load");
+        const span_filter_without_load = document.createElement("span");
+        span_filter_without_load.classList.add("ext_ytomo");
+        span_filter_without_load.innerText = "絞り込み";
+        btn_filter_without_load.appendChild(span_filter_without_load);
 
-    // btn_official_search.after(btn_filter_safe);
-    // btn_official_search.after(btn_load_all);
-    // btn_official_search.after(btn_filter_without_load);
-    div_insert.appendChild(btn_filter_safe);
-    div_insert.appendChild(btn_load_all);
-    div_insert.appendChild(btn_filter_without_load);
-    div_official_search.after(div_insert);
+        // btn_official_search.after(btn_filter_safe);
+        // btn_official_search.after(btn_load_all);
+        // btn_official_search.after(btn_filter_without_load);
+        div_insert.appendChild(btn_filter_safe);
+        div_insert.appendChild(btn_load_all);
+        div_insert.appendChild(btn_filter_without_load);
+        div_official_search.after(div_insert);
 
 
-    const style = document.createElement("style");
-    style.innerHTML = `
-        button.ext_ytomo {
-            height: 40px;
-            width: auto;
-            min-width: 60px;
-            padding: 0px 8px;
-            background: rgb(0, 104, 33);
-            color: white;
-        }
-            button.no-after.ext_ytomo:after {
-                background: transparent none repeat 0 0 / auto auto padding-box border-box scroll;
+        const style = document.createElement("style");
+        style.innerHTML = `
+            button.ext_ytomo {
+                height: 40px;
+                width: auto;
+                min-width: 60px;
+                padding: 0px 8px;
+                background: rgb(0, 104, 33);
+                color: white;
             }
-        .ext_ytomo:hover {
-            background: rgb(0, 104, 33);
-        }
+                button.no-after.ext_ytomo:after {
+                    background: transparent none repeat 0 0 / auto auto padding-box border-box scroll;
+                }
+            .ext_ytomo:hover {
+                background: rgb(0, 104, 33);
+            }
 
-        .ytomo-none {
-            display: none;
-        }
-    `;
-    document.head.appendChild(style);
+            .ytomo-none {
+                display: none;
+            }
+        `;
+        document.head.appendChild(style);
+    }
+
+    // const refresh_btn_ = () => {
+
+    // }
+
+    insert_button();
 
     document.addEventListener("click", (event) => {
         if (event.target.matches("button.ext_ytomo, button.ext_ytomo *")) {
@@ -109,14 +119,17 @@ const init_page = () => {
             if (target.classList.contains("btn-load-all")) {
                 target.disabled = true;
                 // すべて読み込み
-                load_more_auto();
-                setTimeout(() => {
+                load_more_auto().then(()=>{
                     target.disabled = false;
-                }, 500)
+                });
+                // setTimeout(() => {
+                //     target.disabled = false;
+                // }, 500)
             }
             else if (target.classList.contains("btn-filter-safe")) {
                 target.disabled = true;
                 // 空きあり絞り込み
+                target.classList.toggle("btn-filtered");
                 document.querySelectorAll("div.style_search_item_row__moqWC:has(img[src*=\"/asset/img/calendar_none.svg\"])"
                     ).forEach((div) => {
                         div.classList.toggle("ytomo-none");
@@ -169,7 +182,7 @@ const judge_init = () => {
 
 const url = window.location.href;
 
-alert(url.includes("ticket.expo2025.or.jp/event_search/"));
+// alert(url.includes("ticket.expo2025.or.jp/event_search/"));
 
 try {
 if (url.includes("ticket.expo2025.or.jp/event_search/")) {
