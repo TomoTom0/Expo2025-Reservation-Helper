@@ -1,5 +1,5 @@
 // ==UserScript==
-// @name         ytomo
+// @name         yt_Expo2025_preserve
 // @namespace    http://staybrowser.com/
 // @version      0.1
 // @description  help expo2025 ticket site
@@ -38,7 +38,6 @@ const init_page = () => {
         btn.style.padding = "0px 8px";
         btn.style.background = "rgb(0, 104, 33)";
         btn.style.color = "white";
-
 
         return btn;
     }
@@ -149,7 +148,10 @@ const init_page = () => {
     })
 }
 
-
+const judge_init = () => {
+    const cand_btn = document.querySelector("button.style_search_btn__ZuOpx");
+    return cand_btn !== null;
+}
 
 // document.addEventListener("DOMContentLoaded", function() {
 //     init_page();
@@ -164,7 +166,14 @@ alert(url.includes("ticket.expo2025.or.jp/event_search/"));
 
 try {
 if (url.includes("ticket.expo2025.or.jp/event_search/")) {
-    init_page();
+    const interval_judge = setInterval(() => {
+        if (judge_init()) {
+            clearInterval(interval_judge);
+            init_page();
+            console.log("ytomo extension loaded");
+        }
+    }, 500);
+    // init_page();
     console.log("ytomo extension loaded");
 }
 }
