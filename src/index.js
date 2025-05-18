@@ -1,3 +1,14 @@
+// ==UserScript==
+// @name         ytomo
+// @namespace    http://staybrowser.com/
+// @version      0.1
+// @description  help expo2025 ticket site
+// @author       ytomo
+// @match        https://ticket.expo2025.or.jp/event_search/*
+// @grant       none
+// @run-at       document-end
+// ==/UserScript==
+
 
 const init_page = () => {
     
@@ -148,7 +159,16 @@ const init_page = () => {
 // https://ticket.expo2025.or.jp/event_search/
 
 const url = window.location.href;
+
+alert(url.includes("ticket.expo2025.or.jp/event_search/"));
+
+try {
 if (url.includes("ticket.expo2025.or.jp/event_search/")) {
     init_page();
     console.log("ytomo extension loaded");
+}
+}
+catch (e) {
+    console.error("ytomo extension error", e);
+    alert(e);
 }
