@@ -13,19 +13,28 @@ const init_page = () => {
         }
     }
 
-    const set_btn_style = (btn) => {
+    const get_btn_style = () => {
+        const btn = document.createElement("button")
         btn.classList.add("basic-btn");
         btn.classList.add("type2");
         btn.classList.add("no-after");
         btn.classList.add("ext_ytomo");
+
+        btn.style.height = "auto";
+        btn.style.minHeight = "40px";
+        btn.style.width = "auto";
+        btn.style.minWidth = "60px";
+        btn.style.padding = "0px 8px";
+        btn.style.background = "rgb(0, 104, 33)";
+        btn.style.color = "white";
+
 
         return btn;
     }
 
     const btn_official_search = document.querySelector("button.style_search_btn__ZuOpx");
 
-    const btn_load_all = document.createElement("button");
-    btn_load_all = set_btn_style(btn_load_all);
+    const btn_load_all = get_btn_style();
     btn_load_all.classList.add("btn-load-all");
     const span_load_all = document.createElement("span");
     span_load_all.classList.add("ext_ytomo");
@@ -33,16 +42,14 @@ const init_page = () => {
     btn_load_all.appendChild(span_load_all);
 
 
-    const btn_filter_safe = document.createElement("button");
-    btn_filter_safe = set_btn_style(btn_filter_safe);
+    const btn_filter_safe = get_btn_style();
     btn_filter_safe.classList.add("btn-filter-safe");
     const span_filter_safe = document.createElement("span");
     span_filter_safe.classList.add("ext_ytomo");
     span_filter_safe.innerText = "空きのみ";
     btn_filter_safe.appendChild(span_filter_safe);
 
-    const btn_filter_without_load = document.createElement("button");
-    btn_filter_without_load = set_btn_style(btn_filter_without_load);
+    const btn_filter_without_load = get_btn_style();
     btn_filter_without_load.classList.add("btn-filter-without-load");
     const span_filter_without_load = document.createElement("span");
     span_filter_without_load.classList.add("ext_ytomo");
@@ -133,7 +140,15 @@ const init_page = () => {
 
 
 
-document.addEventListener("DOMContentLoaded", function() {
+// document.addEventListener("DOMContentLoaded", function() {
+//     init_page();
+//     console.log("ytomo extension loaded");
+// })
+
+// https://ticket.expo2025.or.jp/event_search/
+
+const url = window.location.href;
+if (url.includes("ticket.expo2025.or.jp/event_search/")) {
     init_page();
     console.log("ytomo extension loaded");
-})
+}
