@@ -74,7 +74,6 @@ input.ext-tomo.search {
 
 
 const prepare_filter = (val_search) => {
-    
     // 空の検索文字列の場合は全てにマッチする正規表現を返す
     if (!val_search.trim()) {
         return { include: /(?:)/, exclude: null };
@@ -136,10 +135,11 @@ const prepare_filter = (val_search) => {
 
     const groupedIncludes = processParentheses(includeTokens);
 
-    // 正規表現の構築
+    // 正規表現の構築（順不同対応版）
     const buildRegex = (group) => {
         if (Array.isArray(group)) {
             const parts = group.map(item => Array.isArray(item) ? buildRegex(item) : item);
+            
             // ORマーカーがあるかチェック
             const orIndex = parts.findIndex(part => part === '\uFFFF');
             if (orIndex > -1) {
@@ -147,6 +147,7 @@ const prepare_filter = (val_search) => {
                 const right = buildRegex(parts.slice(orIndex + 1));
                 return `(?:${left}|${right})`;
             } else {
+                // AND条件の場合は順不同でマッチするように変更
                 return parts.map(part => `(?=.*${part})`).join('');
             }
         }
@@ -157,13 +158,14 @@ const prepare_filter = (val_search) => {
         .replace(/\uFFFF/g, '|')
         .replace(/\.\*/g, '[\\s\\S]*');
 
-    const excludePattern = excludeTokens.length
-        ? `^(?!.*(${excludeTokens.join('|').replace(/\.\*/g, '[\\s\\S]*')}))`
-        : null;
+    // Safari対応：除外条件を別々にチェックする方式に変更
+    const excludePatterns = excludeTokens.map(token => 
+        new RegExp(token.replace(/\.\*/g, '[\\s\\S]*'), 'i')
+    );
 
     return {
         include: new RegExp(includePattern, 'i'),
-        exclude: excludePattern ? new RegExp(excludePattern, 'i') : null
+        exclude: excludePatterns.length > 0 ? excludePatterns : null
     };
 };
 
@@ -315,7 +317,7 @@ const init_page = () => {
                         div.classList.remove("filter-none");
                         if (!(
                             (dic_regex_exp.include===null || dic_regex_exp.include.test(div.innerText))
-                            && (dic_regex_exp.exclude===null || dic_regex_exp.exclude.test(div.innerText))
+                            && (dic_regex_exp.exclude===null || !dic_regex_exp.exclude.some(d=>d.test(div.innerText)))
                         )
                     ) {
                             div.classList.add("filter-none");
