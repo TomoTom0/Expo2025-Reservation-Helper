@@ -349,11 +349,13 @@ const init_page = () => {
                 try {
                     navigator.clipboard.writeText(text);
                 } catch (e) {
-                    console.error("ytomo extension error", e);
-                    alert(e);
+                    alert(text);
+                    // console.error("ytomo extension error", e);
+                    // alert(e);
                 }
-                alert(text);
-                target.disabled = false;
+                setTimeout(() => {
+                    target.disabled = false;
+                }, 500)
             }
 
         }
