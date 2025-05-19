@@ -9,6 +9,7 @@
 // @run-at       document-end
 // ==/UserScript==
 
+// スタイルを挿入する関数
 const insert_style = () => {
     const style = document.createElement("style");
         style.innerHTML = `
@@ -59,6 +60,7 @@ input.ext-tomo.search {
     document.head.appendChild(style);
 }
 
+// 検索ワードを正規表現に変換する関数
 // val_searchには以下の3種類に大別されるワードが含まれる
 // 1. 通常の文字列
 // 2. マイナス検索用文字列 (`-`から始まる)
@@ -71,8 +73,6 @@ input.ext-tomo.search {
 // 2. or, OR (前後に全角または半角の空白を伴う): ORの意味
 
 // また、ANDやORを組み合わせる場合、半角括弧でその範囲を明示的にできる
-
-
 const prepare_filter = (val_search) => {
     // 空の検索文字列の場合は全てにマッチする正規表現を返す
     if (!val_search.trim()) {
@@ -169,13 +169,9 @@ const prepare_filter = (val_search) => {
     };
 };
 
-// const filter_div = (div, regex_exp) => {
-//     // 
-
-// }
-
+// ページ初期化処理
 const init_page = () => {
-    
+    // すべて読み込みボタンの自動クリック処理
     const load_more_auto = async () => {
         const scrollX = window.scrollX;
         const scrollY = window.scrollY;
@@ -191,6 +187,7 @@ const init_page = () => {
         }
     }
 
+    // ボタンのスタイルを生成する関数
     const get_btn_style = () => {
         const btn = document.createElement("button")
         btn.classList.add("basic-btn");
@@ -210,6 +207,7 @@ const init_page = () => {
         return btn;
     }
 
+    // 独自ボタン群を挿入する関数
     const insert_button = () => {
         // const btn_official_search = document.querySelector("button.style_search_btn__ZuOpx");
         const div_official_search = document.querySelector("div.style_search__7HKSe");
@@ -273,26 +271,24 @@ const init_page = () => {
     insert_style();
     insert_button();
 
+    // 独自ボタンのクリックイベントハンドラ
     document.addEventListener("click", (event) => {
         if (event.target.matches("button.ext-ytomo, button.ext-ytomo *")) {
             // event.preventDefault()
             // event.stopPropagation()
             const target = event.target.closest("button.ext-ytomo");
             if (target.classList.contains("btn-load-all")) {
-                target.disabled = true;
                 // すべて読み込み
+                target.disabled = true;
                 load_more_auto().then(()=>{
                     target.disabled = false;
                     target.classList.toggle("btn-done");
 
                 });
-                // setTimeout(() => {
-                //     target.disabled = false;
-                // }, 500)
             }
             else if (target.classList.contains("btn-filter-safe")) {
-                target.disabled = true;
                 // 空きあり絞り込み
+                target.disabled = true;
                 target.classList.toggle("btn-done");
                 document.querySelectorAll("div.style_search_item_row__moqWC:has(img[src*=\"/asset/img/calendar_none.svg\"])"
                     ).forEach((div) => {
@@ -304,9 +300,9 @@ const init_page = () => {
                 }, 500)
             }
             else if (target.classList.contains("btn-filter-without-load")) {
+                // 入力値で絞り込み
                 target.disabled = true;
 
-                // const input_official_search = document.querySelector("input[aria-labelledby='event_search_input']");
                 const input_another_search = document.querySelector("input.ext-tomo.search");
                 const arr_div_row = document.querySelectorAll("div.style_search_item_row__moqWC");
 
@@ -335,6 +331,7 @@ const init_page = () => {
                 // }, 500)
             }
             else if (target.classList.contains("btn-alert-to-copy")) {
+                // 一覧コピー
                 target.disabled = true;
                 // アラート起動
                 // filter-none, ytomo-none, safe-noneを除外して表示
@@ -364,21 +361,13 @@ const init_page = () => {
     })
 }
 
+// ページ初期化可能か判定
 const judge_init = () => {
     const cand_btn = document.querySelector("button.style_search_btn__ZuOpx");
     return cand_btn !== null;
 }
 
-// document.addEventListener("DOMContentLoaded", function() {
-//     init_page();
-//     console.log("ytomo extension loaded");
-// })
-
-// https://ticket.expo2025.or.jp/event_search/
-
-
-// alert(url.includes("ticket.expo2025.or.jp/event_search/"));
-
+// ページ遷移時の初期化トリガー
 const trigger_init = (url_record) => {
     if (url_record.includes("ticket.expo2025.or.jp/event_search/")) {
         const interval_judge = setInterval(() => {
@@ -393,7 +382,6 @@ const trigger_init = (url_record) => {
 }
 
 try {
-
 // urlの変更をMutationObserverで監視する
 
 
@@ -412,14 +400,9 @@ observer.observe(document, {
     childList: true,
     subtree: true
 });
-
-
-// if (url.includes("ticket.expo2025.or.jp/event_search/")) {
-//     // init_page();
-//     console.log("ytomo extension loaded");
-// }
 }
 catch (e) {
+    // エラー時の処理
     console.error("ytomo extension error", e);
     alert(e);
 }
