@@ -244,6 +244,13 @@ const init_page = () => {
         input_another_search.setAttribute("type", "text");
         input_another_search.setAttribute("placeholder", "読み込みなし絞込");
 
+        const btn_alert_to_copy = get_btn_style();
+        btn_alert_to_copy.classList.add("btn-alert-to-copy");
+        const span_alert_to_copy = document.createElement("span");
+        span_alert_to_copy.classList.add("ext-ytomo");
+        span_alert_to_copy.innerText = "一覧コピー";
+        btn_alert_to_copy.appendChild(span_alert_to_copy);
+
         // btn_official_search.after(btn_filter_safe);
         // btn_official_search.after(btn_load_all);
         // btn_official_search.after(btn_filter_without_load);
@@ -251,6 +258,7 @@ const init_page = () => {
         div_insert.appendChild(btn_filter_without_load);
         div_insert2.appendChild(btn_load_all);
         div_insert2.appendChild(btn_filter_safe);
+        div_insert2.appendChild(btn_alert_to_copy);
         div_official_search.after(div_insert);
         div_official_search.after(div_insert2);
         
@@ -320,10 +328,34 @@ const init_page = () => {
                     })
                 }
                 
-                setTimeout(() => {
+                // setTimeout(() => {
                     target.disabled = false;
-                }, 500)
+                // }, 500)
             }
+            else if (target.classList.contains("btn-alert-to-copy")) {
+                target.disabled = true;
+                // アラート起動
+                // filter-none, ytomo-none, safe-noneを除外して表示
+                const arr_div_row = document.querySelectorAll("div.style_search_item_row__moqWC:not(.filter-none):not(.ytomo-none):not(.safe-none)");
+                let arr_text = [];
+                // div > button > span のテキストを取得
+                arr_div_row.forEach((div) => {
+                    const span = div.querySelector("button>span");
+                    if (span) {
+                        arr_text.push(span.innerText);
+                    }
+                })
+                const text = arr_text.join("\n");
+                try {
+                    navigator.clipboard.writeText(text);
+                } catch (e) {
+                    console.error("ytomo extension error", e);
+                    alert(e);
+                }
+                alert(text);
+                target.disabled = false;
+            }
+
         }
     })
 }
