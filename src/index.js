@@ -42,7 +42,7 @@ div.div-flex {
 
 input.ext-tomo.search {
     height: 50px;
-    min-width: 120px;
+    min-width: 200px;
     max-width: min(300px, 100%);
     font-family: quicksand;
     font-size: 16px;
@@ -213,6 +213,8 @@ const init_page = () => {
         const div_official_search = document.querySelector("div.style_search__7HKSe");
         const div_insert = document.createElement("div");
         div_insert.classList.add("div-flex");
+        const div_insert2 = document.createElement("div");
+        div_insert2.classList.add("div-flex");
 
         const btn_load_all = get_btn_style();
         btn_load_all.classList.add("btn-load-all");
@@ -233,23 +235,24 @@ const init_page = () => {
         btn_filter_without_load.classList.add("btn-filter-without-load");
         const span_filter_without_load = document.createElement("span");
         span_filter_without_load.classList.add("ext-ytomo");
-        span_filter_without_load.innerText = "絞り込み";
+        span_filter_without_load.innerText = "絞込";
         btn_filter_without_load.appendChild(span_filter_without_load);
 
         const input_another_search = document.createElement("input");
         input_another_search.classList.add("ext-tomo");
         input_another_search.classList.add("search");
         input_another_search.setAttribute("type", "text");
-        input_another_search.setAttribute("placeholder", "読み込みなし絞り込み");
+        input_another_search.setAttribute("placeholder", "読み込みなし絞込");
 
         // btn_official_search.after(btn_filter_safe);
         // btn_official_search.after(btn_load_all);
         // btn_official_search.after(btn_filter_without_load);
         div_insert.appendChild(input_another_search);
         div_insert.appendChild(btn_filter_without_load);
-        div_insert.appendChild(btn_load_all);
-        div_insert.appendChild(btn_filter_safe);
+        div_insert2.appendChild(btn_load_all);
+        div_insert2.appendChild(btn_filter_safe);
         div_official_search.after(div_insert);
+        div_official_search.after(div_insert2);
         
     }
 
