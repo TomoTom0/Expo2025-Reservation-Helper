@@ -340,22 +340,48 @@ const judge_init = () => {
 
 // https://ticket.expo2025.or.jp/event_search/
 
-const url = window.location.href;
 
 // alert(url.includes("ticket.expo2025.or.jp/event_search/"));
 
-try {
-if (url.includes("ticket.expo2025.or.jp/event_search/")) {
-    const interval_judge = setInterval(() => {
-        if (judge_init()) {
-            clearInterval(interval_judge);
-            init_page();
+const trigger_init = (url_record) => {
+    if (url_record.includes("ticket.expo2025.or.jp/event_search/")) {
+        const interval_judge = setInterval(() => {
+            if (judge_init()) {
+                clearInterval(interval_judge);
+                init_page();
+                console.log("ytomo extension loaded");
+            }
+        }, 500);
             console.log("ytomo extension loaded");
         }
-    }, 500);
-    // init_page();
-    console.log("ytomo extension loaded");
 }
+
+try {
+
+// urlの変更をMutationObserverで監視する
+
+
+const url = window.location.href;
+trigger_init(url);
+
+let url_record = url;
+const observer = new MutationObserver(() => {
+    const new_url = window.location.href;
+    if (new_url !== url_record) {
+        url_record = new_url;
+        trigger_init(url_record);
+    }
+});
+observer.observe(document, {
+    childList: true,
+    subtree: true
+});
+
+
+// if (url.includes("ticket.expo2025.or.jp/event_search/")) {
+//     // init_page();
+//     console.log("ytomo extension loaded");
+// }
 }
 catch (e) {
     console.error("ytomo extension error", e);
