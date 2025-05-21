@@ -10,6 +10,9 @@ Safari on iOS, Chrome on Windowsで動作確認済みです。
   - [空きあり絞り込み](#空きあり絞り込み)
   - [検索結果コピー](#検索結果コピー)
   - [追加絞り込み](#追加絞り込み)
+- [Install](#install)
+  - [Safari on iOS](#safari-on-ios)
+  - [Chrome on Windows](#chrome-on-windows)
 
 ## Feature
 
