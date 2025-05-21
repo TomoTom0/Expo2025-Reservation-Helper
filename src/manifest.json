@@ -1,0 +1,26 @@
+{
+  "name": "Expo2025予約補助",
+  "author": "TomoTomo",
+  "version": "0.1",
+  "manifest_version": 3,
+  "icons": {
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://ticket.expo2025.or.jp/event_search/*"
+      ],
+      "js": [
+        "index.js"
+      ],
+      "css": [
+      ]
+    }
+  ],
+  "permissions": [
+  ],
+  "host_permissions": [
+        "https://www.db.yugioh-card.com/yugiohdb/*"
+    ],
+  "description": "大阪万博Expo2025の予約を補助します"
+}

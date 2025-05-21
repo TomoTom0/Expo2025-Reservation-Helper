@@ -3,7 +3,7 @@
 // @namespace    http://staybrowser.com/
 // @version      0.2
 // @description  help expo2025 ticket site
-// @author       ytomo
+// @author       TomoTom0 https://github.com/TomoTom0
 // @match        https://ticket.expo2025.or.jp/event_search/*
 // @grant       none
 // @run-at       document-end
@@ -12,7 +12,7 @@
 // スタイルを挿入する関数
 const insert_style = () => {
     const style = document.createElement("style");
-        style.innerHTML = `
+    style.innerHTML = `
 button.ext-ytomo {
     height: 40px;
     width: auto;
@@ -139,7 +139,7 @@ const prepare_filter = (val_search) => {
     const buildRegex = (group) => {
         if (Array.isArray(group)) {
             const parts = group.map(item => Array.isArray(item) ? buildRegex(item) : item);
-            
+
             // ORマーカーがあるかチェック
             const orIndex = parts.findIndex(part => part === '\uFFFF');
             if (orIndex > -1) {
@@ -159,7 +159,7 @@ const prepare_filter = (val_search) => {
         .replace(/\.\*/g, '[\\s\\S]*');
 
     // Safari対応：除外条件を別々にチェックする方式に変更
-    const excludePatterns = excludeTokens.map(token => 
+    const excludePatterns = excludeTokens.map(token =>
         new RegExp(token.replace(/\.\*/g, '[\\s\\S]*'), 'i')
     );
 
@@ -261,13 +261,13 @@ const init_page = () => {
         div_insert2.appendChild(btn_alert_to_copy);
         div_official_search.after(div_insert);
         div_official_search.after(div_insert2);
-        
+
     }
 
     // const refresh_btn_ = () => {
 
     // }
-    
+
     insert_style();
     insert_button();
 
@@ -280,7 +280,7 @@ const init_page = () => {
             if (target.classList.contains("btn-load-all")) {
                 // すべて読み込み
                 target.disabled = true;
-                load_more_auto().then(()=>{
+                load_more_auto().then(() => {
                     target.disabled = false;
                     target.classList.toggle("btn-done");
 
@@ -291,10 +291,10 @@ const init_page = () => {
                 target.disabled = true;
                 target.classList.toggle("btn-done");
                 document.querySelectorAll("div.style_search_item_row__moqWC:has(img[src*=\"/asset/img/calendar_none.svg\"])"
-                    ).forEach((div) => {
-                        div.classList.toggle("safe-none");
-                    })
-                
+                ).forEach((div) => {
+                    div.classList.toggle("safe-none");
+                })
+
                 setTimeout(() => {
                     target.disabled = false;
                 }, 500)
@@ -312,10 +312,10 @@ const init_page = () => {
                     arr_div_row.forEach((div) => {
                         div.classList.remove("filter-none");
                         if (!(
-                            (dic_regex_exp.include===null || dic_regex_exp.include.test(div.innerText))
-                            && (dic_regex_exp.exclude===null || !dic_regex_exp.exclude.some(d=>d.test(div.innerText)))
+                            (dic_regex_exp.include === null || dic_regex_exp.include.test(div.innerText))
+                            && (dic_regex_exp.exclude === null || !dic_regex_exp.exclude.some(d => d.test(div.innerText)))
                         )
-                    ) {
+                        ) {
                             div.classList.add("filter-none");
                         }
                     })
@@ -325,9 +325,9 @@ const init_page = () => {
                         div.classList.remove("filter-none");
                     })
                 }
-                
+
                 // setTimeout(() => {
-                    target.disabled = false;
+                target.disabled = false;
                 // }, 500)
             }
             else if (target.classList.contains("btn-alert-to-copy")) {
@@ -377,32 +377,30 @@ const trigger_init = (url_record) => {
                 console.log("ytomo extension loaded");
             }
         }, 500);
-            console.log("ytomo extension loaded");
-        }
+        console.log("ytomo extension loaded");
+    }
 }
 
 try {
-// urlの変更をMutationObserverで監視する
+    // urlの変更をMutationObserverで監視する
+    const url = window.location.href;
+    trigger_init(url);
 
-
-const url = window.location.href;
-trigger_init(url);
-
-let url_record = url;
-const observer = new MutationObserver(() => {
-    const new_url = window.location.href;
-    if (new_url !== url_record) {
-        url_record = new_url;
-        trigger_init(url_record);
-    }
-});
-observer.observe(document, {
-    childList: true,
-    subtree: true
-});
+    let url_record = url;
+    const observer = new MutationObserver(() => {
+        const new_url = window.location.href;
+        if (new_url !== url_record) {
+            url_record = new_url;
+            trigger_init(url_record);
+        }
+    });
+    observer.observe(document, {
+        childList: true,
+        subtree: true
+    });
 }
 catch (e) {
     // エラー時の処理
     console.error("ytomo extension error", e);
-    alert(e);
+    // alert(e);
 }
