@@ -1,7 +1,7 @@
 // ==UserScript==
-// @name         yt_Expo2025_preserve
+// @name         yt-Expo2025-Reservation-Helper
 // @namespace    http://staybrowser.com/
-// @version      0.2
+// @version      0.3
 // @description  help expo2025 ticket site
 // @author       TomoTom0 https://github.com/TomoTom0
 // @match        https://ticket.expo2025.or.jp/event_search/*
