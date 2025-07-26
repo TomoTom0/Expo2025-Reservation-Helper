@@ -8,7 +8,8 @@
   "content_scripts": [
     {
       "matches": [
-        "https://ticket.expo2025.or.jp/event_search/*"
+        "https://ticket.expo2025.or.jp/event_search/*",
+        "https://ticket.expo2025.or.jp/ticket_visiting_reservation/*"
       ],
       "js": [
         "index.js"

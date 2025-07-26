@@ -1,0 +1,25 @@
+## 現在の作業: 複数URL対応とアーキテクチャ分離
+
+### 課題
+現在のindex.jsは単一URL（パビリオン予約: event_search/*）専用の実装となっているが、入場予約（ticket_visiting_reservation/*）にも対応する必要がある。
+
+### 対象URL
+1. **パビリオン予約:** https://ticket.expo2025.or.jp/event_search/*
+2. **入場予約:** https://ticket.expo2025.or.jp/ticket_visiting_reservation/?screen_id=018%2C019&id=NCSQCZ9PC6&reserve_id=6267808&type=change
+
+### アーキテクチャ方針
+URL認識以降は完全に処理を分岐して独立させる:
+- パビリオン予約機能: 既存の絞り込み・検索機能
+- 入場予約機能: debug/entrance_reservation.jsベースの繰り返し予約try機能
+
+### 作業項目
+1. manifest.json修正: 入場予約URLパターン追加
+2. URL判定ロジック修正: 複数URL対応
+3. 初期化処理分離: パビリオン予約 vs 入場予約
+4. 入場予約機能統合: debug版をメインに統合
+5. 追加機能: 入場予約の前段階処理用繰り返しtry機能（詳細は後で確認）
+
+### 注意点
+- 各機能は完全独立で動作すること
+- 既存のパビリオン予約機能に影響を与えないこと
+- BAN対策として適切な待機時間を維持すること
