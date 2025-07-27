@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>万博予約補助 - オフラインテスト</title>
+    <style>
+        body {
+            font-family: 'Courier New', monospace;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .header {
+            background: linear-gradient(135deg, #006821, #02862b);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .test-section {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .test-button {
+            background: #006821;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+            font-family: inherit;
+        }
+        .test-button:hover {
+            background: #02862b;
+        }
+        .test-button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        .output {
+            background: #1e1e1e;
+            color: #00ff00;
+            padding: 15px;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            white-space: pre-wrap;
+            overflow-x: auto;
+            max-height: 400px;
+            overflow-y: auto;
+            margin-top: 10px;
+        }
+        .clear-btn {
+            background: #666;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 12px;
+            float: right;
+        }
+        .status {
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+        .status.pass { background: #d4edda; border-left: 5px solid #28a745; }
+        .status.fail { background: #f8d7da; border-left: 5px solid #dc3545; }
+        .status.warn { background: #fff3cd; border-left: 5px solid #ffc107; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🎡 万博予約補助システム</h1>
+        <h2>オフラインテストスイート</h2>
+        <p>ネットワーク接続不要で実行可能なテスト項目</p>
+    </div>
+
+    <div class="test-section">
+        <h3>🔍 URL判定ロジックテスト</h3>
+        <p>パビリオン予約と入場予約のURL自動判定機能をテストします。</p>
+        <button class="test-button" onclick="runUrlTests()">URL判定テスト実行</button>
+        <button class="clear-btn" onclick="clearOutput('url-output')">クリア</button>
+        <div id="url-output" class="output"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>⏱️ ランダム待機時間テスト</h3>
+        <p>BAN対策用のランダム待機時間生成ロジックをテストします。</p>
+        <button class="test-button" onclick="runTimingTests()">基本テスト実行</button>
+        <button class="test-button" onclick="runBanAnalysis()">BAN対策分析</button>
+        <button class="clear-btn" onclick="clearOutput('timing-output')">クリア</button>
+        <div id="timing-output" class="output"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>⚙️ 設定検証テスト</h3>
+        <p>設定オブジェクトの構造とセレクタの妥当性をチェックします。</p>
+        <button class="test-button" onclick="runConfigTests()">設定検証実行</button>
+        <button class="clear-btn" onclick="clearOutput('config-output')">クリア</button>
+        <div id="config-output" class="output"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>🔄 全テスト実行</h3>
+        <p>すべてのオフラインテストを順次実行します。</p>
+        <button class="test-button" onclick="runAllTests()">全テスト実行</button>
+        <button class="clear-btn" onclick="clearAllOutputs()">全クリア</button>
+        <div id="summary-output" class="output"></div>
+    </div>
+
+    <!-- テストスクリプトの読み込み -->
+    <script src="url-detection-test.js"></script>
+    <script src="random-timing-test.js"></script>
+    <script src="config-validation-test.js"></script>
+
+    <script>
+        // コンソール出力をページに表示する関数
+        function captureConsoleOutput(targetId, testFunction) {
+            const originalLog = console.log;
+            const output = document.getElementById(targetId);
+            let logBuffer = '';
+
+            console.log = function(...args) {
+                const message = args.join(' ') + '\n';
+                logBuffer += message;
+                output.textContent = logBuffer;
+                originalLog.apply(console, args);
+            };
+
+            try {
+                const result = testFunction();
+                return result;
+            } finally {
+                console.log = originalLog;
+            }
+        }
+
+        // 個別テスト実行関数
+        function runUrlTests() {
+            captureConsoleOutput('url-output', runUrlDetectionTests);
+        }
+
+        function runTimingTests() {
+            captureConsoleOutput('timing-output', runRandomTimingTests);
+        }
+
+        function runBanAnalysis() {
+            captureConsoleOutput('timing-output', analyzeBanProtection);
+        }
+
+        function runConfigTests() {
+            captureConsoleOutput('config-output', runConfigValidationTests);
+        }
+
+        // 全テスト実行
+        function runAllTests() {
+            const summaryOutput = document.getElementById('summary-output');
+            summaryOutput.textContent = 'テスト実行中...\n';
+
+            setTimeout(() => {
+                const results = {
+                    url: captureConsoleOutput('url-output', runUrlDetectionTests),
+                    timing: captureConsoleOutput('timing-output', runRandomTimingTests),
+                    config: captureConsoleOutput('config-output', runConfigValidationTests)
+                };
+
+                let summary = '=== 全テスト結果サマリー ===\n\n';
+                
+                if (results.url) {
+                    summary += `URL判定テスト: ${results.url.passCount}/${results.url.total} 成功 (${((results.url.passCount/results.url.total)*100).toFixed(1)}%)\n`;
+                }
+                
+                if (results.config) {
+                    summary += `設定検証: ${results.config.isValid ? '✅ 有効' : '❌ 無効'} (エラー${results.config.errors.length}件, 警告${results.config.warnings.length}件)\n`;
+                }
+                
+                summary += '\nランダム待機時間テスト: 完了\n';
+                summary += '\n全テスト実行完了！';
+
+                summaryOutput.textContent = summary;
+            }, 100);
+        }
+
+        // 出力クリア
+        function clearOutput(id) {
+            document.getElementById(id).textContent = '';
+        }
+
+        function clearAllOutputs() {
+            ['url-output', 'timing-output', 'config-output', 'summary-output'].forEach(clearOutput);
+        }
+
+        // ページ読み込み完了時の処理
+        window.onload = function() {
+            console.log('オフラインテストスイートが読み込まれました');
+            console.log('各ボタンをクリックしてテストを実行してください');
+        };
+    </script>
+</body>
+</html>
