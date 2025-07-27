@@ -1,0 +1,3 @@
+[tasks.rsync-src-to-win]
+description = "Chrome拡張としてWindows側にsrcフォルダを同期"
+run = "./rsync-src-to-win.sh"
