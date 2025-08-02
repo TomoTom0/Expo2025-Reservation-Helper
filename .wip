@@ -1,25 +1,220 @@
-## 現在の作業: 複数URL対応とアーキテクチャ分離
+## 現在の作業: 時間帯監視機能の根本的修正
 
-### 課題
-現在のindex.jsは単一URL（パビリオン予約: event_search/*）専用の実装となっているが、入場予約（ticket_visiting_reservation/*）にも対応する必要がある。
+### 課題分析
+現在の監視機能に以下の根本的問題が判明:
 
-### 対象URL
-1. **パビリオン予約:** https://ticket.expo2025.or.jp/event_search/*
-2. **入場予約:** https://ticket.expo2025.or.jp/ticket_visiting_reservation/?screen_id=018%2C019&id=NCSQCZ9PC6&reserve_id=6267808&type=change
+#### 問題1: DOM構造の理解不足
+- 設計書記載のDOM構造を適切に参照していない
+- 推測ベースの不正確なセレクタ使用
+- 実際の要素特定方法が曖昧
 
-### アーキテクチャ方針
-URL認識以降は完全に処理を分岐して独立させる:
-- パビリオン予約機能: 既存の絞り込み・検索機能
-- 入場予約機能: debug/entrance_reservation.jsベースの繰り返し予約try機能
+#### 問題2: 監視対象特定の論理的欠陥
+```
+監視対象: 9:00-の満員要素A (data-disabled="true")
+検索結果: 9:00-の利用可能要素B (data-disabled="false") ← 別要素！
+結果: 監視の意味がない
+```
 
-### 作業項目
-1. manifest.json修正: 入場予約URLパターン追加
-2. URL判定ロジック修正: 複数URL対応
-3. 初期化処理分離: パビリオン予約 vs 入場予約
-4. 入場予約機能統合: debug版をメインに統合
-5. 追加機能: 入場予約の前段階処理用繰り返しtry機能（詳細は後で確認）
+#### 問題3: リロード前提設計の無視
+- 30秒間隔リロードが要件にもかかわらず
+- DOM要素直接参照を提案（リロードで無効化）
+- 設計一貫性の欠如
 
-### 注意点
-- 各機能は完全独立で動作すること
-- 既存のパビリオン予約機能に影響を与えないこと
-- BAN対策として適切な待機時間を維持すること
+### 正しいDOM構造（設計書より）
+
+**満員時:**
+```html
+<td data-gray-out="">
+  <div role="button" class="style_main__button__Z4RWX" data-disabled="true" aria-pressed="false">
+    <dl><dt><span>9:00-</span></dt><dd><img src="/asset/img/calendar_ng.svg" alt="満員です(予約不可)"></dd></dl>
+  </div>
+</td>
+```
+
+**利用可能時:**
+```html
+<td data-gray-out="">
+  <div role="button" class="style_main__button__Z4RWX" aria-pressed="false">
+    <dl><dt><span>9:00-</span></dt><dd><img src="/asset/img/ico_scale_low.svg" alt="混雑が予想されます"></dd></dl>
+  </div>
+</td>
+```
+
+### 正しい監視ロジック設計
+
+#### 前提理解
+1. **同一要素の状態変化**: 満員要素A自体が利用可能に変化する
+2. **リロード前提**: DOM参照は毎回失われる
+3. **要素特定**: td要素の位置・属性による一意特定が必要
+
+#### 監視対象特定方法
+```javascript
+// 監視開始時: 満員要素の位置情報を保存
+const targetSlotInfo = {
+    timeText: "9:00-",
+    tdSelector: generateUniqueTdSelector(tdElement), // td要素の一意セレクタ
+    rowIndex: getTdRowIndex(tdElement),
+    cellIndex: getTdCellIndex(tdElement)
+};
+
+// リロード後: 同一td要素の状態確認
+function findSameTdElement(targetInfo) {
+    const sameElement = document.querySelector(targetInfo.tdSelector);
+    const currentStatus = extractTdStatus(sameElement);
+    return { element: sameElement, status: currentStatus };
+}
+```
+
+### 修正作業計画
+
+#### Phase 1: 調査・再設計
+- [x] 現在実装の問題分析
+- [x] 設計書のDOM構造確認
+- [x] 要素特定方法の設計
+- [x] 異常終了条件の定義
+
+#### Phase 2: セレクタ・判定ロジック修正
+- [x] 正しいDOM構造ベースのセレクタ修正
+- [x] td要素の一意特定機能実装
+- [x] 状態判定ロジック修正（data-disabled, アイコン）
+
+#### Phase 3: 監視機能修正
+- [x] 監視対象保存方法の修正
+- [x] リロード後の同一要素検索修正
+- [x] 異常終了処理の実装
+
+#### Phase 4: UI状態管理修正
+- [x] ボタン状態表示の修正
+- [x] 監視中断機能の修正
+- [x] エラー表示の実装
+
+## 修正完了サマリー
+
+### 実装した主要な修正点
+
+1. **DOM構造の正確な理解と実装**
+   - 設計書のDOM構造に基づくセレクタ修正
+   - `td[data-gray-out] div[role="button"]`による正確な要素特定
+
+2. **要素特定の根本的修正**
+   - `generateUniqueTdSelector()`: td要素の一意セレクタ生成
+   - `findSameTdElement()`: リロード後の同一要素検索
+   - `extractTdStatus()`: 正確な状態判定（data-disabled + アイコン）
+
+3. **監視ロジックの修正**
+   - 監視開始時にtd要素位置情報を保存
+   - リロード後に同一td要素の状態変化をチェック
+   - 時間テキストのみでの検索を廃止
+
+4. **異常終了処理の実装**
+   - `terminateMonitoring()`: 統一された異常終了処理
+   - バリデーション関数群による各種エラー検出
+   - エラー表示とUI状態リセット機能
+
+5. **UI状態管理の改善**
+   - 動的ボタン状態変化（監視中/予約中/利用可能検出時）
+   - 監視中断時の状態維持
+   - エラー表示機能
+
+### 技術的要件
+- セレクタ: `td[data-gray-out] div[role="button"]`
+- 満員判定: `data-disabled="true"` AND `img[src*="calendar_ng.svg"]`
+- 利用可能判定: `data-disabled` 未設定 AND (`ico_scale_low.svg` OR `ico_scale_high.svg`)
+- リロード間隔: 30秒（ランダム化）
+
+### 異常終了条件の詳細定義
+
+#### 1. 監視対象要素の消失
+```javascript
+// 監視開始時に保存した要素特定情報で要素が見つからない場合
+function checkTargetElementExists(targetInfo) {
+    const element = findSameTdElement(targetInfo);
+    if (!element) {
+        terminateMonitoring('ERROR_TARGET_NOT_FOUND', 
+            `監視対象の時間帯 ${targetInfo.timeText} が見つかりません`);
+        return false;
+    }
+    return true;
+}
+```
+
+#### 2. DOM構造の予期しない変化
+```javascript
+// 時間帯テーブル自体が存在しない場合
+function checkTimeSlotTableExists() {
+    const table = document.querySelector('table');
+    if (!table) {
+        terminateMonitoring('ERROR_TABLE_NOT_FOUND', 
+            '時間帯選択テーブルが見つかりません');
+        return false;
+    }
+    return true;
+}
+```
+
+#### 3. ネットワークエラー・ページ読み込み失敗
+```javascript
+// ページリロード後の状態確認
+function validatePageLoaded() {
+    // URL確認
+    if (!window.location.href.includes('ticket_visiting_reservation')) {
+        terminateMonitoring('ERROR_WRONG_PAGE', 
+            '予期しないページに遷移しました');
+        return false;
+    }
+    
+    // 基本要素の存在確認
+    const mainContent = document.querySelector('#__next');
+    if (!mainContent) {
+        terminateMonitoring('ERROR_PAGE_LOAD_FAILED', 
+            'ページの読み込みが完了していません');
+        return false;
+    }
+    
+    return true;
+}
+```
+
+#### 4. 最大試行回数の達成
+```javascript
+// リロード回数制限
+const MAX_RELOAD_COUNT = 100; // 50分間（30秒×100回）
+function checkMaxReloads(currentCount) {
+    if (currentCount >= MAX_RELOAD_COUNT) {
+        terminateMonitoring('ERROR_MAX_RETRIES_REACHED', 
+            `最大試行回数 ${MAX_RELOAD_COUNT} に達しました`);
+        return false;
+    }
+    return true;
+}
+```
+
+#### 5. 異常終了処理の統一
+```javascript
+function terminateMonitoring(errorCode, errorMessage) {
+    console.error(`[監視異常終了] ${errorCode}: ${errorMessage}`);
+    
+    // 状態クリア
+    cacheManager.clear('monitoringTarget');
+    cacheManager.clear('monitoringState');
+    
+    // インターバル停止
+    if (timeSlotState.monitoringInterval) {
+        clearInterval(timeSlotState.monitoringInterval);
+        timeSlotState.monitoringInterval = null;
+    }
+    
+    // UI状態リセット
+    resetMonitoringUI();
+    updateMainButtonDisplay('idle');
+    
+    // エラー表示
+    showErrorMessage(errorMessage);
+    
+    // 状態初期化
+    timeSlotState.mode = 'idle';
+    timeSlotState.isMonitoring = false;
+    timeSlotState.targetSlot = null;
+    timeSlotState.retryCount = 0;
+}
+```
