@@ -84,6 +84,14 @@
     </div>
 
     <div class="test-section">
+        <h3>🏛️ パビリオン検索テスト</h3>
+        <p>prepare_filter関数の正規表現生成機能（AND/OR/マイナス検索/フレーズ検索）をテストします。</p>
+        <button class="test-button" onclick="runPavilionTests()">パビリオン検索テスト実行</button>
+        <button class="clear-btn" onclick="clearOutput('pavilion-output')">クリア</button>
+        <div id="pavilion-output" class="output"></div>
+    </div>
+
+    <div class="test-section">
         <h3>🔍 URL判定ロジックテスト</h3>
         <p>パビリオン予約と入場予約のURL自動判定機能をテストします。</p>
         <button class="test-button" onclick="runUrlTests()">URL判定テスト実行</button>
@@ -98,6 +106,30 @@
         <button class="test-button" onclick="runBanAnalysis()">BAN対策分析</button>
         <button class="clear-btn" onclick="clearOutput('timing-output')">クリア</button>
         <div id="timing-output" class="output"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>🎨 FAB UI機能テスト</h3>
+        <p>右下固定FABボタンの作成・状態管理・監視対象表示機能をテストします。</p>
+        <button class="test-button" onclick="runFabTests()">FAB UIテスト実行</button>
+        <button class="clear-btn" onclick="clearOutput('fab-output')">クリア</button>
+        <div id="fab-output" class="output"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>📅 カレンダー変更監視テスト</h3>
+        <p>MutationObserverによるカレンダー変更検出・日付変更処理をテストします。</p>
+        <button class="test-button" onclick="runCalendarTests()">カレンダー監視テスト実行</button>
+        <button class="clear-btn" onclick="clearOutput('calendar-output')">クリア</button>
+        <div id="calendar-output" class="output"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>💾 キャッシュ・永続化テスト</h3>
+        <p>localStorage基盤のキャッシュ管理・監視対象保存復元機能をテストします。</p>
+        <button class="test-button" onclick="runCacheTests()">キャッシュシステムテスト実行</button>
+        <button class="clear-btn" onclick="clearOutput('cache-output')">クリア</button>
+        <div id="cache-output" class="output"></div>
     </div>
 
     <div class="test-section">
@@ -117,8 +149,12 @@
     </div>
 
     <!-- テストスクリプトの読み込み -->
+    <script src="pavilion-search-test.js"></script>
     <script src="url-detection-test.js"></script>
     <script src="random-timing-test.js"></script>
+    <script src="fab-ui-test.js"></script>
+    <script src="calendar-watcher-test.js"></script>
+    <script src="cache-system-test.js"></script>
     <script src="config-validation-test.js"></script>
 
     <script>
@@ -144,6 +180,10 @@
         }
 
         // 個別テスト実行関数
+        function runPavilionTests() {
+            captureConsoleOutput('pavilion-output', runPavilionSearchTests);
+        }
+
         function runUrlTests() {
             captureConsoleOutput('url-output', runUrlDetectionTests);
         }
@@ -154,6 +194,18 @@
 
         function runBanAnalysis() {
             captureConsoleOutput('timing-output', analyzeBanProtection);
+        }
+
+        function runFabTests() {
+            captureConsoleOutput('fab-output', runFabUITests);
+        }
+
+        function runCalendarTests() {
+            captureConsoleOutput('calendar-output', runCalendarWatcherTests);
+        }
+
+        function runCacheTests() {
+            captureConsoleOutput('cache-output', runCacheSystemTests);
         }
 
         function runConfigTests() {
@@ -167,15 +219,36 @@
 
             setTimeout(() => {
                 const results = {
+                    pavilion: captureConsoleOutput('pavilion-output', runPavilionSearchTests),
                     url: captureConsoleOutput('url-output', runUrlDetectionTests),
                     timing: captureConsoleOutput('timing-output', runRandomTimingTests),
+                    fab: captureConsoleOutput('fab-output', runFabUITests),
+                    calendar: captureConsoleOutput('calendar-output', runCalendarWatcherTests),
+                    cache: captureConsoleOutput('cache-output', runCacheSystemTests),
                     config: captureConsoleOutput('config-output', runConfigValidationTests)
                 };
 
                 let summary = '=== 全テスト結果サマリー ===\n\n';
                 
+                if (results.pavilion) {
+                    summary += `パビリオン検索テスト: ${results.pavilion.passed}/${results.pavilion.total} 成功 (${((results.pavilion.passed/results.pavilion.total)*100).toFixed(1)}%)\n`;
+                }
+                
                 if (results.url) {
                     summary += `URL判定テスト: ${results.url.passCount}/${results.url.total} 成功 (${((results.url.passCount/results.url.total)*100).toFixed(1)}%)\n`;
+                }
+                
+                if (results.fab) {
+                    summary += `FAB UIテスト: ${results.fab.passed}/${results.fab.total} 成功 (${((results.fab.passed/results.fab.total)*100).toFixed(1)}%)\n`;
+                }
+                
+                if (results.calendar) {
+                    // カレンダーテストは Promise を返すので特別扱い
+                    summary += `カレンダー監視テスト: 実行完了\n`;
+                }
+                
+                if (results.cache) {
+                    summary += `キャッシュシステムテスト: ${results.cache.passed}/${results.cache.total} 成功 (${((results.cache.passed/results.cache.total)*100).toFixed(1)}%)\n`;
                 }
                 
                 if (results.config) {
@@ -195,7 +268,7 @@
         }
 
         function clearAllOutputs() {
-            ['url-output', 'timing-output', 'config-output', 'summary-output'].forEach(clearOutput);
+            ['pavilion-output', 'url-output', 'timing-output', 'fab-output', 'calendar-output', 'cache-output', 'config-output', 'summary-output'].forEach(clearOutput);
         }
 
         // ページ読み込み完了時の処理

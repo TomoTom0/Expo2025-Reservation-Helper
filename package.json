@@ -1,0 +1,40 @@
+{
+  "name": "expo2025-extension",
+  "version": "0.1.0",
+  "description": "大阪万博Expo2025の予約を補助します",
+  "main": "src/index.js",
+  "scripts": {
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
+    "build": "npm run type-check && npm run build-js",
+    "build-js": "webpack --mode=production",
+    "type-check": "tsc --noEmit"
+  },
+  "keywords": [
+    "expo2025",
+    "osaka",
+    "reservation",
+    "chrome-extension"
+  ],
+  "author": "TomoTomo",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/jest": "^29.5.12",
+    "jest": "^29.7.0",
+    "jest-environment-jsdom": "^29.7.0",
+    "@jest/globals": "^29.7.0"
+  },
+  "jest": {
+    "testEnvironment": "jsdom",
+    "setupFilesAfterEnv": ["<rootDir>/tests/setup.js"],
+    "testMatch": [
+      "<rootDir>/tests/**/*.test.js"
+    ],
+    "collectCoverageFrom": [
+      "src/**/*.js",
+      "!src/manifest.json"
+    ],
+    "transform": {}
+  }
+}

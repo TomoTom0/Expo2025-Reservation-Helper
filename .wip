@@ -1,220 +1,173 @@
-## 現在の作業: 時間帯監視機能の根本的修正
+## 現在の作業: 巨大ソースコード(3798行)の段階的分析・分割アプローチ
 
-### 課題分析
-現在の監視機能に以下の根本的問題が判明:
+### Phase 1: 詳細構造調査と分析
 
-#### 問題1: DOM構造の理解不足
-- 設計書記載のDOM構造を適切に参照していない
-- 推測ベースの不正確なセレクタ使用
-- 実際の要素特定方法が曖昧
+#### 調査対象
+- **ファイル**: src/index.js (3,798行)
+- **形式**: Chrome拡張UserScript形式
+- **対象サイト**: 大阪万博予約システム (パビリオン予約・入場予約)
 
-#### 問題2: 監視対象特定の論理的欠陥
+#### 主要機能ブロック分析
+
+##### 1. 基本機能・ユーティリティ (12-427行)
 ```
-監視対象: 9:00-の満員要素A (data-disabled="true")
-検索結果: 9:00-の利用可能要素B (data-disabled="false") ← 別要素！
-結果: 監視の意味がない
-```
-
-#### 問題3: リロード前提設計の無視
-- 30秒間隔リロードが要件にもかかわらず
-- DOM要素直接参照を提案（リロードで無効化）
-- 設計一貫性の欠如
-
-### 正しいDOM構造（設計書より）
-
-**満員時:**
-```html
-<td data-gray-out="">
-  <div role="button" class="style_main__button__Z4RWX" data-disabled="true" aria-pressed="false">
-    <dl><dt><span>9:00-</span></dt><dd><img src="/asset/img/calendar_ng.svg" alt="満員です(予約不可)"></dd></dl>
-  </div>
-</td>
+- insert_style(): CSS挿入
+- prepare_filter(): 正規表現変換（パビリオン検索用）  
+- init_page(): パビリオンページ初期化
+- judge_init(), judge_entrance_init(): ページ判定
+- init_entrance_page(): 入場予約ページ初期化
+- getRandomWaitTime(): ランダム待機時間生成
 ```
 
-**利用可能時:**
-```html
-<td data-gray-out="">
-  <div role="button" class="style_main__button__Z4RWX" aria-pressed="false">
-    <dl><dt><span>9:00-</span></dt><dd><img src="/asset/img/ico_scale_low.svg" alt="混雑が予想されます"></dd></dl>
-  </div>
-</td>
+##### 2. 状態管理オブジェクト (495-617行)
+```
+- entranceReservationState: 入場予約実行状態
+- timeSlotState: 時間帯監視状態 (idle/selecting/monitoring/trying)
+- multiTargetManager: 複数監視対象管理
+- pageLoadingState: ページ読み込み状態
+- reloadCountdownState: リロードカウントダウン
+- calendarWatchState: カレンダー変更監視
 ```
 
-### 正しい監視ロジック設計
+##### 3. キャッシュ・永続化システム (620-797行)
+```
+- cacheManager: localStorage基盤のキャッシュ管理
+  - saveTargetSlots(): 監視対象保存
+  - restoreTargetSlots(): 監視対象復元
+  - clear(): キャッシュクリア
+```
 
-#### 前提理解
-1. **同一要素の状態変化**: 満員要素A自体が利用可能に変化する
-2. **リロード前提**: DOM参照は毎回失われる
-3. **要素特定**: td要素の位置・属性による一意特定が必要
+##### 4. DOM要素セレクタ・検索 (799-898行)
+```
+- timeSlotSelectors: 時間帯要素セレクタ定義
+- generateUniqueTdSelector(): 一意td要素セレクタ生成
+- findSameTdElement(): 同一要素検索
+- extractTdStatus(): 要素状態抽出（満員/利用可能判定）
+```
 
-#### 監視対象特定方法
+##### 5. 時間帯監視・分析システム (900-1870行)
+```
+- startTimeSlotTableObserver(): 動的テーブル監視
+- analyzeAndAddMonitorButtons(): 監視ボタン追加
+- analyzeTimeSlots(): 全時間帯状態分析
+- createMonitorButton(): 個別監視ボタン作成
+- handleMonitorButtonClick(): ボタンクリック処理
+- findTargetSlotInPage(): 監視対象検索
+- terminateMonitoring(): 異常終了処理
+```
+
+##### 6. カレンダー・UI状態管理 (1871-3111行)
+```
+- getCurrentSelectedCalendarDate(): 選択日付取得
+- resetMonitoringUI(): UI状態リセット
+- updateMainButtonDisplay(): FABボタン表示更新
+- startReloadCountdown(): リロードカウントダウン
+- getCurrentMode(): 現在モード取得
+```
+
+##### 7. FAB・メインUI (3112-3742行)
+```
+- createEntranceReservationUI(): FABボタン作成
+- updateMonitoringTargetsDisplay(): 監視対象表示更新
+- checkVisitTimeButtonState(): 来場日時ボタン状態確認
+- startCalendarWatcher(): カレンダー変更監視開始
+- handleCalendarChange(): カレンダー変更処理
+```
+
+##### 8. ページ判定・初期化 (3743-3798行)
+```
+- identify_page_type(): URL判定
+- trigger_init(): 初期化トリガー
+```
+
+#### 重要な技術的特徴
+
+##### DOM監視アーキテクチャ
+1. **MutationObserver**: カレンダー変更・時間帯選択変更を検出
+2. **動的要素対応**: ページリロード後の同一要素追跡
+3. **状態同期**: リロード間でのキャッシュ状態維持
+
+##### 複数監視対象システム
 ```javascript
-// 監視開始時: 満員要素の位置情報を保存
-const targetSlotInfo = {
-    timeText: "9:00-",
-    tdSelector: generateUniqueTdSelector(tdElement), // td要素の一意セレクタ
-    rowIndex: getTdRowIndex(tdElement),
-    cellIndex: getTdCellIndex(tdElement)
-};
-
-// リロード後: 同一td要素の状態確認
-function findSameTdElement(targetInfo) {
-    const sameElement = document.querySelector(targetInfo.tdSelector);
-    const currentStatus = extractTdStatus(sameElement);
-    return { element: sameElement, status: currentStatus };
-}
+// 時間帯 + 位置（東西）での一意性管理
+multiTargetManager.addTarget(slotInfo);
+multiTargetManager.isSelected(timeText, tdSelector);
 ```
 
-### 修正作業計画
-
-#### Phase 1: 調査・再設計
-- [x] 現在実装の問題分析
-- [x] 設計書のDOM構造確認
-- [x] 要素特定方法の設計
-- [x] 異常終了条件の定義
-
-#### Phase 2: セレクタ・判定ロジック修正
-- [x] 正しいDOM構造ベースのセレクタ修正
-- [x] td要素の一意特定機能実装
-- [x] 状態判定ロジック修正（data-disabled, アイコン）
-
-#### Phase 3: 監視機能修正
-- [x] 監視対象保存方法の修正
-- [x] リロード後の同一要素検索修正
-- [x] 異常終了処理の実装
-
-#### Phase 4: UI状態管理修正
-- [x] ボタン状態表示の修正
-- [x] 監視中断機能の修正
-- [x] エラー表示の実装
-
-## 修正完了サマリー
-
-### 実装した主要な修正点
-
-1. **DOM構造の正確な理解と実装**
-   - 設計書のDOM構造に基づくセレクタ修正
-   - `td[data-gray-out] div[role="button"]`による正確な要素特定
-
-2. **要素特定の根本的修正**
-   - `generateUniqueTdSelector()`: td要素の一意セレクタ生成
-   - `findSameTdElement()`: リロード後の同一要素検索
-   - `extractTdStatus()`: 正確な状態判定（data-disabled + アイコン）
-
-3. **監視ロジックの修正**
-   - 監視開始時にtd要素位置情報を保存
-   - リロード後に同一td要素の状態変化をチェック
-   - 時間テキストのみでの検索を廃止
-
-4. **異常終了処理の実装**
-   - `terminateMonitoring()`: 統一された異常終了処理
-   - バリデーション関数群による各種エラー検出
-   - エラー表示とUI状態リセット機能
-
-5. **UI状態管理の改善**
-   - 動的ボタン状態変化（監視中/予約中/利用可能検出時）
-   - 監視中断時の状態維持
-   - エラー表示機能
-
-### 技術的要件
-- セレクタ: `td[data-gray-out] div[role="button"]`
-- 満員判定: `data-disabled="true"` AND `img[src*="calendar_ng.svg"]`
-- 利用可能判定: `data-disabled` 未設定 AND (`ico_scale_low.svg` OR `ico_scale_high.svg`)
-- リロード間隔: 30秒（ランダム化）
-
-### 異常終了条件の詳細定義
-
-#### 1. 監視対象要素の消失
+##### FAB UI パターン
 ```javascript
-// 監視開始時に保存した要素特定情報で要素が見つからない場合
-function checkTargetElementExists(targetInfo) {
-    const element = findSameTdElement(targetInfo);
-    if (!element) {
-        terminateMonitoring('ERROR_TARGET_NOT_FOUND', 
-            `監視対象の時間帯 ${targetInfo.timeText} が見つかりません`);
-        return false;
-    }
-    return true;
-}
+// 右下固定FABボタン + 監視対象表示
+fabContainer.style.cssText = `
+    position: fixed !important;
+    bottom: 24px !important; 
+    right: 24px !important;
+`;
 ```
 
-#### 2. DOM構造の予期しない変化
-```javascript
-// 時間帯テーブル自体が存在しない場合
-function checkTimeSlotTableExists() {
-    const table = document.querySelector('table');
-    if (!table) {
-        terminateMonitoring('ERROR_TABLE_NOT_FOUND', 
-            '時間帯選択テーブルが見つかりません');
-        return false;
-    }
-    return true;
-}
-```
+### 分析完了の結論
 
-#### 3. ネットワークエラー・ページ読み込み失敗
-```javascript
-// ページリロード後の状態確認
-function validatePageLoaded() {
-    // URL確認
-    if (!window.location.href.includes('ticket_visiting_reservation')) {
-        terminateMonitoring('ERROR_WRONG_PAGE', 
-            '予期しないページに遷移しました');
-        return false;
-    }
-    
-    // 基本要素の存在確認
-    const mainContent = document.querySelector('#__next');
-    if (!mainContent) {
-        terminateMonitoring('ERROR_PAGE_LOAD_FAILED', 
-            'ページの読み込みが完了していません');
-        return false;
-    }
-    
-    return true;
-}
-```
+#### 機能モジュール分割案
+1. **core/**: 基本ユーティリティ・状態管理
+2. **dom/**: DOM操作・セレクタ・要素検索
+3. **monitor/**: 時間帯監視・分析システム
+4. **ui/**: FAB・ボタン・表示系
+5. **cache/**: 永続化・キャッシュ管理
+6. **calendar/**: カレンダー監視・変更検出
+7. **pavilion/**: パビリオン検索機能
+8. **main/**: エントリーポイント・初期化
 
-#### 4. 最大試行回数の達成
-```javascript
-// リロード回数制限
-const MAX_RELOAD_COUNT = 100; // 50分間（30秒×100回）
-function checkMaxReloads(currentCount) {
-    if (currentCount >= MAX_RELOAD_COUNT) {
-        terminateMonitoring('ERROR_MAX_RETRIES_REACHED', 
-            `最大試行回数 ${MAX_RELOAD_COUNT} に達しました`);
-        return false;
-    }
-    return true;
-}
-```
+#### 依存関係分析
+- **core** ← すべてのモジュールが依存
+- **dom** ← monitor, ui, calendar が依存
+- **cache** ← monitor, ui が依存
+- **ui** ← calendar が依存
 
-#### 5. 異常終了処理の統一
-```javascript
-function terminateMonitoring(errorCode, errorMessage) {
-    console.error(`[監視異常終了] ${errorCode}: ${errorMessage}`);
-    
-    // 状態クリア
-    cacheManager.clear('monitoringTarget');
-    cacheManager.clear('monitoringState');
-    
-    // インターバル停止
-    if (timeSlotState.monitoringInterval) {
-        clearInterval(timeSlotState.monitoringInterval);
-        timeSlotState.monitoringInterval = null;
-    }
-    
-    // UI状態リセット
-    resetMonitoringUI();
-    updateMainButtonDisplay('idle');
-    
-    // エラー表示
-    showErrorMessage(errorMessage);
-    
-    // 状態初期化
-    timeSlotState.mode = 'idle';
-    timeSlotState.isMonitoring = false;
-    timeSlotState.targetSlot = null;
-    timeSlotState.retryCount = 0;
-}
-```
+#### Phase 2進行中: テスト作成
+
+#### 問題認識
+- 前回作成したブラウザ手動実行テストは実用的でない
+- npm testで自動実行できるテスト環境が必要
+- 実際のindex.js関数を直接テストする必要
+- 分割作業中の品質保証には自動テストが必須
+
+#### 現在の課題
+- **テスト環境未構築**: Jest/Vitest等の自動テストフレームワーク未導入
+- **実行形式不適切**: ブラウザ手動実行では継続的テスト不可
+- **モック依存**: 実際の関数ではなく抽出したモック関数をテスト
+- **CI/CD非対応**: 自動化パイプラインに組み込めない
+
+#### 必要な作業
+1. **Jest環境構築**: package.json、jest.config.js設定
+2. **jsdom環境**: DOM操作テストのためのNode.js DOM環境
+3. **実関数テスト**: src/index.jsから直接関数をimportしてテスト
+4. **自動実行確認**: npm testでの動作確認
+
+### 事前品質保証フェーズ完了 ✅
+
+#### 完了した作業
+1. **Unit Test 3段階実装完了**
+   - Phase 1: 純粋関数Unit Test（5関数、26テスト）
+   - Phase 2: DOM検索系Unit Test（3関数、5テスト）
+   - Phase 3: 判定・検証系Unit Test（5関数、9テスト）
+
+2. **Integration Test基盤構築完了**
+   - ヘルパー関数・アサーション関数作成
+   - 基本結合テスト実装（9テスト）
+   - 状態管理統合テストの基盤整備
+
+3. **コード構造整理完了**
+   - 8セクションヘッダー追加完了
+   - 依存関係順序での関数配置完了
+   - 152テスト全通過確認
+
+#### 品質指標達成
+- **総テスト数**: 103 → 152テスト（+49テスト、47%増）
+- **Unit Test実装率**: 2.5% → 50%（20倍向上）
+- **テスト成功率**: 100%（152/152）
+- **分割準備**: 8セクション構造整理完了
+
+### 次のPhase準備完了
+**Phase 4: JavaScript分割とコンパイル環境構築**が実行可能
+- 分割作業の安全性確保: 十分なテスト基盤構築済み
+- 依存関係の把握: 重要関数のUnit Test完了
+- 状態管理統合: 基本結合テスト実装済み

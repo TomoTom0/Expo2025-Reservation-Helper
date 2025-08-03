@@ -9,6 +9,10 @@
 // @run-at       document-end
 // ==/UserScript==
 
+// ============================================================================
+// 【1. 基本機能・ユーティリティ】
+// ============================================================================
+
 // スタイルを挿入する関数
 const insert_style = () => {
     const style = document.createElement("style");
@@ -492,6 +496,10 @@ async function clickElement(element, config) {
     await new Promise(resolve => setTimeout(resolve, delay));
 }
 
+// ============================================================================
+// 【2. 状態管理オブジェクト】
+// ============================================================================
+
 let entranceReservationState = {
     isRunning: false,
     shouldStop: false,
@@ -615,6 +623,10 @@ const calendarWatchState = {
     currentSelectedDate: null,
     isWatching: false
 };
+
+// ============================================================================
+// 【3. キャッシュ・永続化システム】
+// ============================================================================
 
 // キャッシュ管理機能
 const cacheManager = {
@@ -795,6 +807,10 @@ const cacheManager = {
     }
 };
 
+// ============================================================================
+// 【4. DOM要素セレクタ・検索】
+// ============================================================================
+
 // 時間帯セレクタ定義（設計書の固定DOM構造に基づく）
 const timeSlotSelectors = {
     // 時間帯選択エリア
@@ -955,6 +971,10 @@ async function waitForCalendar(timeout = 10000) {
     console.log('カレンダーの待機がタイムアウトしました');
     return false;
 }
+
+// ============================================================================
+// 【5. 時間帯監視・分析システム】
+// ============================================================================
 
 // 時間帯テーブルの動的生成を監視（ループ防止版）
 function startTimeSlotTableObserver() {
@@ -1867,6 +1887,10 @@ function checkMaxReloads(currentCount) {
     }
     return true;
 }
+
+// ============================================================================
+// 【6. カレンダー・UI状態管理】
+// ============================================================================
 
 // 時間帯表示のためのカレンダー自動クリック機能
 // 現在選択されているカレンダー日付を取得
@@ -3109,6 +3133,10 @@ async function restoreFromCache() {
     }, 2000);
 }
 
+// ============================================================================
+// 【7. FAB・メインUI】
+// ============================================================================
+
 function createEntranceReservationUI(config) {
     // 既存のFABがあれば削除
     const existingFab = document.getElementById('ytomo-fab-container');
@@ -3740,6 +3768,10 @@ async function entranceReservationHelper(config) {
     return { success: false, attempts };
 }
 
+// ============================================================================
+// 【8. ページ判定・初期化】
+// ============================================================================
+
 // URL判定とページタイプ識別
 const identify_page_type = (url) => {
     if (url.includes("ticket.expo2025.or.jp/event_search/")) {
@@ -3795,4 +3827,67 @@ catch (e) {
     // エラー時の処理
     console.error("ytomo extension error", e);
     // alert(e);
+}
+
+// テスト用エクスポート（Node.js環境でのみ有効）
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = {
+        // パビリオン検索機能
+        prepare_filter,
+        
+        // 時間帯監視機能
+        generateUniqueTdSelector,
+        getTdPositionInfo,
+        findSameTdElement,
+        extractTdStatus,
+        
+        // FAB UI機能
+        createEntranceReservationUI,
+        updateMainButtonDisplay,
+        updateMonitoringTargetsDisplay,
+        
+        // カレンダー監視機能
+        startCalendarWatcher,
+        handleCalendarChange,
+        getCurrentSelectedCalendarDate,
+        
+        // キャッシュ機能
+        cacheManager,
+        
+        // 状態管理オブジェクト
+        multiTargetManager,
+        timeSlotState,
+        entranceReservationState,
+        calendarWatchState,
+        
+        // セレクタ定義
+        timeSlotSelectors,
+        
+        // ページ機能
+        init_page,
+        init_entrance_page,
+        identify_page_type,
+        trigger_init,
+        
+        // Unit Test用追加関数 (Phase 1)
+        extractTimeSlotInfo,
+        getMonitorButtonText,
+        getCurrentMode,
+        getRandomWaitTime,
+        generateSelectorForElement,
+        
+        // Unit Test用追加関数 (Phase 2)
+        generateUniqueTdSelector,
+        getTdPositionInfo,
+        findSameTdElement,
+        extractTdStatus,
+        
+        // Unit Test用追加関数 (Phase 3)
+        checkTimeSlotTableExistsSync,
+        validatePageLoaded,
+        canStartReservation,
+        isInterruptionAllowed,
+        checkTimeSlotSelected,
+        checkVisitTimeButtonState
+    };
 }
