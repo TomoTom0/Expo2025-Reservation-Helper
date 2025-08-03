@@ -173,15 +173,22 @@ fabContainer.style.cssText = `
    - 9個のモジュールフォルダ作成
    - 依存関係順序に基づく分割計画策定
 
-2. **基本モジュール作成完了** (3/9)
+2. **基本モジュール作成完了** (5/9)
    - ✅ core/utils.js: 基本機能・ユーティリティ (257行)
    - ✅ state/manager.js: 状態管理オブジェクト (125行)  
    - ✅ cache/manager.js: キャッシュ・永続化システム (150行)
+   - ✅ dom/selectors.js: DOM要素セレクタ・検索 (140行)
+   - ✅ pavilion/search.js: パビリオン検索機能 (180行)
 
 #### 進行中の作業
-- 残り6モジュールの作成: dom, pavilion, monitor, calendar, ui, main
+- 残り4モジュールの作成: monitor, calendar, ui, main
 - webpack設定によるコンパイル環境構築
 - 分割後の機能テスト・互換性確認
+
+#### 現在の進捗状況
+- **完了**: 5/9モジュール (55%完了)
+- **残作業**: 最も複雑な4モジュール + 環境構築
+- **課題**: monitor/timeSlot.jsは915行の大規模モジュール
 
 #### 技術的考慮事項
 - ES6 modules (import/export) 使用
