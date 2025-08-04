@@ -40,6 +40,54 @@ div.div-flex {
     margin: 5px;
 }
 
+/* FABボタンの状態管理用クラス */
+.ytomo-fab {
+    width: 56px !important;
+    height: 56px !important;
+    border-radius: 50% !important;
+    color: white !important;
+    border: none !important;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4), 0 2px 8px rgba(0, 0, 0, 0.2) !important;
+    border: 3px solid rgba(255, 255, 255, 0.2) !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    font-size: 14px !important;
+    font-weight: bold !important;
+    transition: all 0.3s ease !important;
+    position: relative !important;
+    overflow: hidden !important;
+    pointer-events: auto !important;
+}
+
+.ytomo-fab-enabled {
+    background: rgb(0, 104, 33) !important;
+    opacity: 0.9 !important;
+    cursor: pointer !important;
+    pointer-events: auto !important;
+}
+
+.ytomo-fab-disabled {
+    background: rgb(128, 128, 128) !important;
+    opacity: 0.6 !important;
+    cursor: not-allowed !important;
+    pointer-events: none !important;
+}
+
+.ytomo-fab-monitoring {
+    background: rgb(255, 140, 0) !important;
+    opacity: 0.9 !important;
+    cursor: pointer !important;
+    pointer-events: auto !important;
+}
+
+.ytomo-fab-running {
+    background: rgb(220, 53, 69) !important;
+    opacity: 0.6 !important;
+    cursor: not-allowed !important;
+    pointer-events: none !important;
+}
+
 input.ext-tomo.search {
     height: 50px;
     min-width: 200px;

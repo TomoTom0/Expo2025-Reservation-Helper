@@ -9,11 +9,11 @@ import {
     updateMainButtonDisplay, selectTimeSlotAndStartReservation, startReloadCountdown,
     resetMonitoringUI, showErrorMessage, tryClickCalendarForTimeSlot, setPageLoadingState,
     disableAllMonitorButtons, restoreFromCache, setCacheManagerForSection6, setEntranceReservationHelper,
-    setCanStartReservation, setUpdateMonitoringTargetsDisplay
+    setUpdateMonitoringTargetsDisplay
 } from './section6';
 import { 
     updateMonitoringTargetsDisplay, createEntranceReservationUI, setCacheManagerForSection7,
-    entranceReservationHelper, canStartReservation
+    entranceReservationHelper
 } from './section7';
 import { initTimeSlotMonitoring } from './section4';
 
@@ -35,7 +35,6 @@ setCacheManagerForSection7(cacheManager);
 
 // section6に必要な関数を注入
 setEntranceReservationHelper(entranceReservationHelper);
-setCanStartReservation(canStartReservation);
 setUpdateMonitoringTargetsDisplay(updateMonitoringTargetsDisplay);
 
 // section5.jsに外部関数を注入（showStatusは一時的に除外）

@@ -1328,7 +1328,6 @@ async function waitForCalendar(timeout = 10000) {
 // 依存注入用の参照
 let section6_cacheManager = null;
 let entranceReservationHelper = null;
-let canStartReservation = null;
 let updateMonitoringTargetsDisplayFn = null;
 // cacheManagerを設定するヘルパー関数
 const setCacheManagerForSection6 = (cm) => {
@@ -1337,10 +1336,6 @@ const setCacheManagerForSection6 = (cm) => {
 // entranceReservationHelperを設定するヘルパー関数
 const setEntranceReservationHelper = (helper) => {
     entranceReservationHelper = helper;
-};
-// canStartReservationを設定するヘルパー関数
-const setCanStartReservation = (fn) => {
-    canStartReservation = fn;
 };
 // updateMonitoringTargetsDisplayを設定するヘルパー関数
 const setUpdateMonitoringTargetsDisplay = (fn) => {
@@ -1888,9 +1883,11 @@ function updateMainButtonDisplay(forceMode = null) {
         const span = fabButton.querySelector('span');
         if (span) {
             const currentMode = forceMode || getCurrentMode();
+            // 予約開始可能かチェック（section7のcanStartReservation相当）
+            const canStart = checkReservationConditions();
             // デバッグ情報（必要に応じてコメントアウト解除）
             // const targetTexts = multiTargetManager.hasTargets() ? multiTargetManager.getTargets().map(t => t.timeText).join(', ') : 'なし';
-            // console.log(`🔄 FAB更新: mode=${currentMode}, targetSlots=${targetTexts}, stateMode=${timeSlotState.mode}, isMonitoring=${timeSlotState.isMonitoring}`);
+            console.log(`🔄 FAB更新: mode=${currentMode}, canStart=${canStart}, stateMode=${timeSlotState.mode}, isMonitoring=${timeSlotState.isMonitoring}`);
             // console.log(`🔍 getCurrentMode判定: loading=${pageLoadingState?.isLoading}, monitoring=${timeSlotState.isMonitoring}, reservationRunning=${entranceReservationState.isRunning}, hasTargets=${multiTargetManager.hasTargets()}, modeSelecting=${timeSlotState.mode === 'selecting'}`);
             switch (currentMode) {
                 case 'monitoring':
@@ -1965,32 +1962,32 @@ function updateMainButtonDisplay(forceMode = null) {
                     console.log(`🔄 idle ケース実行`);
                     // 監視対象が設定されている場合は selecting モードになるはずだが、
                     // 念のため idle でも監視対象の有無を確認
-                    if (section2_multiTargetManager.hasTargets()) {
-                        // 監視対象設定済み - selectingモードに移行すべき
-                        console.log(`✅ idle内で監視対象検出: 監視予約開始として有効化`);
-                        span.innerText = '監視予約\n開始';
-                        fabButton.style.background = 'rgb(0, 104, 33) !important'; // 緑色
-                        fabButton.style.opacity = '0.9 !important';
-                        fabButton.style.cursor = 'pointer !important';
-                        fabButton.title = '監視予約開始';
-                        fabButton.disabled = false; // 有効化
-                        fabButton.removeAttribute('disabled'); // HTML属性も削除
-                        fabButton.style.pointerEvents = 'auto !important'; // クリック有効化
-                        updateStatusBadge('selecting');
-                    }
-                    else {
+                    // 予約と監視の優先順位判定
+                    const reservationPossible = canStart;
+                    const hasMonitorTargets = section2_multiTargetManager.hasTargets();
+                    console.log(`🔍 優先順位判定: 予約可能=${reservationPossible}, 監視対象=${hasMonitorTargets}`);
+                    if (reservationPossible) {
+                        // 予約可能な場合は予約を優先（監視対象があっても無視）
+                        console.log(`✅ 予約優先: 通常の予約開始処理`);
+                        if (hasMonitorTargets) {
+                            console.log(`🗑️ 予約優先のため監視対象をクリア`);
+                            section2_multiTargetManager.clearAll();
+                            timeSlotState.mode = 'idle';
+                        }
                         // 通常の予約開始 - 条件に応じてdisabled状態を制御
                         span.innerText = '予約\n開始';
-                        const canStart = canStartReservation ? canStartReservation() : false;
+                        // 上部で設定したcanStart変数を使用
+                        console.log(`🔍 idle内でcanStart確認: ${canStart}`);
+                        console.log(`🔍 idle内でFABボタン確認:`, fabButton);
                         if (canStart) {
-                            // 予約開始可能
-                            fabButton.style.background = 'rgb(0, 104, 33) !important'; // 緑色
-                            fabButton.style.opacity = '0.9 !important';
-                            fabButton.style.cursor = 'pointer !important';
+                            console.log(`✅ canStart=true のため FAB有効化処理実行`);
+                            // 予約開始可能 - クラスで状態管理
+                            fabButton.className = fabButton.className.replace(/ytomo-fab-\w+/g, '');
+                            fabButton.classList.add('ytomo-fab-enabled');
                             fabButton.title = '予約開始';
-                            fabButton.disabled = false; // 有効化
-                            fabButton.removeAttribute('disabled'); // HTML属性も削除
-                            fabButton.style.pointerEvents = 'auto !important'; // クリック有効化
+                            fabButton.disabled = false;
+                            fabButton.removeAttribute('disabled');
+                            console.log('🔧 FAB有効化: 完了 - classes=', fabButton.className);
                             updateStatusBadge('idle');
                         }
                         else {
@@ -2005,14 +2002,34 @@ function updateMainButtonDisplay(forceMode = null) {
                                 // テーブルはあるが他の条件が満たされていない
                                 fabButton.title = '時間帯を選択し、来場日時設定ボタンが有効になるまでお待ちください';
                             }
-                            fabButton.style.background = 'rgb(128, 128, 128) !important'; // グレー色
-                            fabButton.style.opacity = '0.9 !important';
-                            fabButton.style.cursor = 'not-allowed !important';
-                            fabButton.disabled = true; // 無効化
-                            fabButton.setAttribute('disabled', 'disabled'); // HTML属性も設定
-                            fabButton.style.pointerEvents = 'none !important'; // CSS レベルでもクリック無効化
+                            // 無効状態 - クラスで状態管理
+                            fabButton.className = fabButton.className.replace(/ytomo-fab-\w+/g, '');
+                            fabButton.classList.add('ytomo-fab-disabled');
+                            fabButton.disabled = true;
+                            fabButton.setAttribute('disabled', 'disabled');
                             updateStatusBadge('waiting');
                         }
+                    }
+                    else if (hasMonitorTargets) {
+                        // 予約不可だが監視対象あり - 監視モード
+                        console.log(`✅ 監視モード: 監視予約開始として有効化`);
+                        span.innerText = '監視予約\n開始';
+                        fabButton.className = fabButton.className.replace(/ytomo-fab-\w+/g, '');
+                        fabButton.classList.add('ytomo-fab-enabled');
+                        fabButton.title = '監視予約開始';
+                        fabButton.disabled = false;
+                        fabButton.removeAttribute('disabled');
+                        updateStatusBadge('selecting');
+                    }
+                    else {
+                        // 予約不可 & 監視対象なし - 待機状態
+                        console.log(`⏳ 待機モード: 条件未満足`);
+                        span.innerText = '予約\n開始';
+                        fabButton.className = fabButton.className.replace(/ytomo-fab-\w+/g, '');
+                        fabButton.classList.add('ytomo-fab-disabled');
+                        fabButton.disabled = true;
+                        fabButton.title = '時間帯を選択し、来場日時設定ボタンが有効になるまでお待ちください';
+                        updateStatusBadge('waiting');
                     }
                     break;
             }
@@ -2474,6 +2491,37 @@ async function restoreFromCache() {
         }
     }, 2000);
 }
+// 予約開始条件のチェック（section7のcanStartReservation相当）
+function checkReservationConditions() {
+    // 1. 時間帯テーブルの存在確認
+    const hasTimeSlotTable = checkTimeSlotTableExistsSync();
+    // 2. 時間帯選択状態の確認
+    const selectedTimeSlot = document.querySelector(timeSlotSelectors.selectedSlot);
+    const isTimeSlotSelected = !!selectedTimeSlot;
+    // 3. 選択された時間帯が満員でないかチェック
+    let isSelectedSlotAvailable = true;
+    if (selectedTimeSlot) {
+        const tdElement = selectedTimeSlot.closest('td');
+        if (tdElement) {
+            const status = extractTdStatus(tdElement);
+            isSelectedSlotAvailable = !status?.isFull;
+        }
+    }
+    // 4. 来場日時設定ボタンの有効性確認
+    const visitTimeButton = document.querySelector('button.basic-btn.type2.style_full__ptzZq');
+    const isVisitTimeButtonEnabled = visitTimeButton && !visitTimeButton.disabled && !visitTimeButton.hasAttribute('disabled');
+    const canStart = hasTimeSlotTable && isTimeSlotSelected && isSelectedSlotAvailable && isVisitTimeButtonEnabled;
+    console.log(`📊 予約開始条件チェック (section6):`);
+    console.log(`  - 時間帯テーブル: ${hasTimeSlotTable ? '✅' : '❌'}`);
+    console.log(`  - 時間帯選択: ${isTimeSlotSelected ? '✅' : '❌'}`);
+    if (selectedTimeSlot) {
+        console.log(`  - 選択要素:`, selectedTimeSlot);
+    }
+    console.log(`  - 選択時間帯空き: ${isSelectedSlotAvailable ? '✅' : '❌'}`);
+    console.log(`  - 来場日時ボタン有効: ${isVisitTimeButtonEnabled ? '✅' : '❌'}`);
+    console.log(`  → 総合判定: ${canStart ? '✅予約開始可能' : '❌条件未満足'}`);
+    return canStart;
+}
 // エクスポート
 
 // ============================================================================
@@ -2511,6 +2559,54 @@ div.div-flex {
     display: flex;
     justify-content: center;
     margin: 5px;
+}
+
+/* FABボタンの状態管理用クラス */
+.ytomo-fab {
+    width: 56px !important;
+    height: 56px !important;
+    border-radius: 50% !important;
+    color: white !important;
+    border: none !important;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4), 0 2px 8px rgba(0, 0, 0, 0.2) !important;
+    border: 3px solid rgba(255, 255, 255, 0.2) !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    font-size: 14px !important;
+    font-weight: bold !important;
+    transition: all 0.3s ease !important;
+    position: relative !important;
+    overflow: hidden !important;
+    pointer-events: auto !important;
+}
+
+.ytomo-fab-enabled {
+    background: rgb(0, 104, 33) !important;
+    opacity: 0.9 !important;
+    cursor: pointer !important;
+    pointer-events: auto !important;
+}
+
+.ytomo-fab-disabled {
+    background: rgb(128, 128, 128) !important;
+    opacity: 0.6 !important;
+    cursor: not-allowed !important;
+    pointer-events: none !important;
+}
+
+.ytomo-fab-monitoring {
+    background: rgb(255, 140, 0) !important;
+    opacity: 0.9 !important;
+    cursor: pointer !important;
+    pointer-events: auto !important;
+}
+
+.ytomo-fab-running {
+    background: rgb(220, 53, 69) !important;
+    opacity: 0.6 !important;
+    cursor: not-allowed !important;
+    pointer-events: none !important;
 }
 
 input.ext-tomo.search {
@@ -2989,28 +3085,7 @@ function createEntranceReservationUI(config) {
     // メインFABボタンを作成
     const fabButton = document.createElement('button');
     fabButton.id = 'ytomo-main-fab';
-    fabButton.classList.add('ext-ytomo');
-    fabButton.style.cssText = `
-        width: 56px !important;
-        height: 56px !important;
-        border-radius: 50% !important;
-        background: rgb(0, 104, 33) !important;
-        color: white !important;
-        border: none !important;
-        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4), 0 2px 8px rgba(0, 0, 0, 0.2) !important;
-        border: 3px solid rgba(255, 255, 255, 0.2) !important;
-        cursor: pointer !important;
-        display: flex !important;
-        align-items: center !important;
-        justify-content: center !important;
-        font-size: 14px !important;
-        font-weight: bold !important;
-        transition: all 0.3s ease !important;
-        position: relative !important;
-        overflow: hidden !important;
-        pointer-events: auto !important;
-        opacity: 0.9 !important;
-    `;
+    fabButton.classList.add('ext-ytomo', 'ytomo-fab', 'ytomo-fab-disabled');
     // FABボタンのテキスト/アイコン
     const fabIcon = document.createElement('span');
     fabIcon.classList.add('ext-ytomo');
@@ -3023,10 +3098,7 @@ function createEntranceReservationUI(config) {
     `;
     fabIcon.innerText = '待機中';
     fabButton.appendChild(fabIcon);
-    // 初期状態で無効化
-    fabButton.disabled = true;
-    fabButton.style.opacity = '0.6';
-    fabButton.style.cursor = 'not-allowed';
+    // 初期状態は ytomo-fab-disabled クラスで制御
     // ホバー効果（強化版）
     fabButton.addEventListener('mouseenter', () => {
         fabButton.style.transform = 'scale(1.15)';
@@ -3282,7 +3354,7 @@ function checkTimeSlotSelected() {
     return true;
 }
 // 予約開始可能かどうかの総合判定
-function section7_canStartReservation() {
+function canStartReservation() {
     const hasTimeSlotTable = checkTimeSlotTableExistsSync();
     const isTimeSlotSelected = checkTimeSlotSelected();
     const isVisitTimeButtonEnabled = checkVisitTimeButtonState();
@@ -3302,7 +3374,7 @@ function checkInitialState() {
     console.log(`🗓️ 時間帯テーブル: ${hasTimeSlotTable ? 'あり' : 'なし'}`);
     if (selectedDate && hasTimeSlotTable) {
         // 時間帯テーブルがある場合、予約開始可能かチェック
-        const canStart = section7_canStartReservation();
+        const canStart = canStartReservation();
         console.log(`✅ 日付選択済み、時間帯テーブル表示中 - ${canStart ? '予約開始可能' : '条件未満'}`);
         // FABボタンの状態を設定
         const fabButton = document.querySelector('#ytomo-main-fab');
@@ -3362,6 +3434,7 @@ function startCalendarWatcher() {
                 mutation.attributeName === 'aria-pressed') {
                 const element = mutation.target;
                 if (element.matches && element.matches('td[data-gray-out] div[role="button"]')) {
+                    console.log(`🔄 時間帯選択変更検出: ${element.getAttribute('aria-pressed')}`);
                     shouldUpdate = true;
                 }
             }
@@ -3370,6 +3443,7 @@ function startCalendarWatcher() {
                 mutation.attributeName === 'disabled') {
                 const element = mutation.target;
                 if (element.matches && element.matches('button.basic-btn.type2.style_full__ptzZq')) {
+                    console.log(`🔄 来場日時ボタン状態変更検出: disabled=${element.hasAttribute('disabled')}`);
                     shouldUpdate = true;
                 }
             }
@@ -3535,7 +3609,6 @@ setCacheManagerForSection6(section8_cacheManager);
 setCacheManagerForSection7(section8_cacheManager);
 // section6に必要な関数を注入
 setEntranceReservationHelper(section7_entranceReservationHelper);
-setCanStartReservation(section7_canStartReservation);
 setUpdateMonitoringTargetsDisplay(updateMonitoringTargetsDisplay);
 // section5.jsに外部関数を注入（showStatusは一時的に除外）
 setExternalFunctions({

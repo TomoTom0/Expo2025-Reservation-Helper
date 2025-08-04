@@ -1,7 +1,6 @@
 import type { CacheManager } from '../types/index.js';
 export declare const setCacheManagerForSection6: (cm: CacheManager) => void;
 export declare const setEntranceReservationHelper: (helper: Function) => void;
-export declare const setCanStartReservation: (fn: Function) => void;
 export declare const setUpdateMonitoringTargetsDisplay: (fn: Function) => void;
 declare function getCurrentSelectedCalendarDate(): string | null;
 declare function clickCalendarDate(targetDate: string): Promise<boolean>;

@@ -101,28 +101,7 @@ function createEntranceReservationUI(config: ReservationConfig): void {
     // メインFABボタンを作成
     const fabButton = document.createElement('button');
     fabButton.id = 'ytomo-main-fab';
-    fabButton.classList.add('ext-ytomo');
-    fabButton.style.cssText = `
-        width: 56px !important;
-        height: 56px !important;
-        border-radius: 50% !important;
-        background: rgb(0, 104, 33) !important;
-        color: white !important;
-        border: none !important;
-        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4), 0 2px 8px rgba(0, 0, 0, 0.2) !important;
-        border: 3px solid rgba(255, 255, 255, 0.2) !important;
-        cursor: pointer !important;
-        display: flex !important;
-        align-items: center !important;
-        justify-content: center !important;
-        font-size: 14px !important;
-        font-weight: bold !important;
-        transition: all 0.3s ease !important;
-        position: relative !important;
-        overflow: hidden !important;
-        pointer-events: auto !important;
-        opacity: 0.9 !important;
-    `;
+    fabButton.classList.add('ext-ytomo', 'ytomo-fab', 'ytomo-fab-disabled');
 
     // FABボタンのテキスト/アイコン
     const fabIcon = document.createElement('span');
@@ -137,10 +116,7 @@ function createEntranceReservationUI(config: ReservationConfig): void {
     fabIcon.innerText = '待機中';
     fabButton.appendChild(fabIcon);
     
-    // 初期状態で無効化
-    fabButton.disabled = true;
-    fabButton.style.opacity = '0.6';
-    fabButton.style.cursor = 'not-allowed';
+    // 初期状態は ytomo-fab-disabled クラスで制御
 
     // ホバー効果（強化版）
     fabButton.addEventListener('mouseenter', () => {
@@ -529,6 +505,7 @@ function startCalendarWatcher(): void {
                 mutation.attributeName === 'aria-pressed') {
                 const element = mutation.target as HTMLElement;
                 if (element.matches && element.matches('td[data-gray-out] div[role="button"]')) {
+                    console.log(`🔄 時間帯選択変更検出: ${element.getAttribute('aria-pressed')}`);
                     shouldUpdate = true;
                 }
             }
@@ -538,6 +515,7 @@ function startCalendarWatcher(): void {
                 mutation.attributeName === 'disabled') {
                 const element = mutation.target as HTMLElement;
                 if (element.matches && element.matches('button.basic-btn.type2.style_full__ptzZq')) {
+                    console.log(`🔄 来場日時ボタン状態変更検出: disabled=${element.hasAttribute('disabled')}`);
                     shouldUpdate = true;
                 }
             }
