@@ -1,12 +1,12 @@
-/**
- * キャッシュ・永続化システムモジュール
- * localStorage基盤のキャッシュ管理機能を提供
- */
+// Section 2からのimport
+import { multiTargetManager, timeSlotState } from './section2.js';
 
-import { multiTargetManager, timeSlotState } from '../state/manager.js';
-
+// ============================================================================
 // キャッシュ管理機能
-export const cacheManager = {
+const createCacheManager = (dependencies = {}) => {
+const { getCurrentSelectedCalendarDateFn } = dependencies;
+
+return {
     // キー生成（URLベース）
     generateKey(suffix = '') {
         const url = new URL(window.location.href);
@@ -21,8 +21,7 @@ export const cacheManager = {
             if (targets.length === 0) return;
             
             // 現在選択されているカレンダー日付を取得
-            // Note: 実際の実装ではcalendar/watcherからimportする必要がある
-            const selectedCalendarDate = this.getCurrentSelectedCalendarDate();
+            const selectedCalendarDate = getCurrentSelectedCalendarDateFn ? getCurrentSelectedCalendarDateFn() : null;
             
             const data = {
                 targets: targets.map(target => ({
@@ -182,23 +181,13 @@ export const cacheManager = {
         } catch (error) {
             console.error('❌ 監視フラグクリアエラー:', error);
         }
-    },
-
-    // getCurrentSelectedCalendarDateの参照を解決するための一時的な実装
-    // 実際の実装では calendar/watcher から import する
-    getCurrentSelectedCalendarDate() {
-        try {
-            const selectedButton = document.querySelector('button[aria-pressed="true"]');
-            if (selectedButton) {
-                const timeElement = selectedButton.querySelector('time');
-                if (timeElement && timeElement.getAttribute('datetime')) {
-                    return timeElement.getAttribute('datetime');
-                }
-            }
-            return null;
-        } catch (error) {
-            console.error('getCurrentSelectedCalendarDate error:', error);
-            return null;
-        }
     }
 };
+}; // createCacheManager の終了
+
+// エクスポート
+export {
+    createCacheManager
+};
+
+// ============================================================================

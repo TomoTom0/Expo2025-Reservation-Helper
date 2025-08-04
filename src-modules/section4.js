@@ -1,10 +1,11 @@
-/**
- * DOM要素セレクタ・検索モジュール
- * DOM操作・セレクタ・要素検索機能を提供
- */
+// Section 5からのimport
+import { startTimeSlotTableObserver } from './section5.js';
+
+// 【4. DOM要素セレクタ・検索】
+// ============================================================================
 
 // 時間帯セレクタ定義（設計書の固定DOM構造に基づく）
-export const timeSlotSelectors = {
+const timeSlotSelectors = {
     // 時間帯選択エリア
     timeSlotContainer: "table",
     timeSlotCells: "td[data-gray-out] div[role='button']",
@@ -21,7 +22,7 @@ export const timeSlotSelectors = {
 };
 
 // td要素の一意特定機能
-export function generateUniqueTdSelector(tdElement) {
+function generateUniqueTdSelector(tdElement) {
     // td要素の親要素（tr）内での位置を取得
     const row = tdElement.parentElement;
     const rowIndex = Array.from(row.parentElement.children).indexOf(row);
@@ -31,7 +32,7 @@ export function generateUniqueTdSelector(tdElement) {
     return `table tr:nth-child(${rowIndex + 1}) td:nth-child(${cellIndex + 1})[data-gray-out]`;
 }
 
-export function getTdPositionInfo(tdElement) {
+function getTdPositionInfo(tdElement) {
     const row = tdElement.parentElement;
     const rowIndex = Array.from(row.parentElement.children).indexOf(row);
     const cellIndex = Array.from(row.children).indexOf(tdElement);
@@ -39,7 +40,7 @@ export function getTdPositionInfo(tdElement) {
     return { rowIndex, cellIndex };
 }
 
-export function findSameTdElement(targetInfo) {
+function findSameTdElement(targetInfo) {
     // 1. セレクタベースでの検索を優先
     if (targetInfo.tdSelector) {
         const element = document.querySelector(targetInfo.tdSelector);
@@ -67,7 +68,7 @@ export function findSameTdElement(targetInfo) {
     return null;
 }
 
-export function extractTdStatus(tdElement) {
+function extractTdStatus(tdElement) {
     if (!tdElement) return null;
     
     const buttonDiv = tdElement.querySelector('div[role="button"]');
@@ -106,7 +107,7 @@ export function extractTdStatus(tdElement) {
 }
 
 // 時間帯監視機能の初期化
-export async function initTimeSlotMonitoring() {
+async function initTimeSlotMonitoring() {
     console.log('時間帯監視機能を初期化中...');
     
     // カレンダーの存在確認
@@ -117,16 +118,13 @@ export async function initTimeSlotMonitoring() {
     }
     
     // DOM変化監視を開始（時間帯テーブルの動的生成を検出）
-    // Note: startTimeSlotTableObserverは monitor/timeSlot.js で定義される
-    if (typeof startTimeSlotTableObserver === 'function') {
-        startTimeSlotTableObserver();
-    }
+    startTimeSlotTableObserver();
     
     console.log('時間帯監視機能の初期化完了（カレンダー監視中）');
 }
 
 // カレンダーの動的待機
-export async function waitForCalendar(timeout = 10000) {
+async function waitForCalendar(timeout = 10000) {
     const startTime = Date.now();
     const checkInterval = 500;
     
@@ -166,3 +164,16 @@ export async function waitForCalendar(timeout = 10000) {
     console.log('カレンダーの待機がタイムアウトしました');
     return false;
 }
+
+// エクスポート
+export {
+    timeSlotSelectors,
+    generateUniqueTdSelector,
+    getTdPositionInfo,
+    findSameTdElement,
+    extractTdStatus,
+    initTimeSlotMonitoring,
+    waitForCalendar
+};
+
+// ============================================================================

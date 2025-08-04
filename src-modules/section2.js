@@ -1,10 +1,8 @@
-/**
- * 状態管理オブジェクトモジュール
- * アプリケーション全体の状態管理を提供
- */
+// ============================================================================
+// 【2. 状態管理オブジェクト】
+// ============================================================================
 
-// 入場予約実行状態
-export let entranceReservationState = {
+let entranceReservationState = {
     isRunning: false,
     shouldStop: false,
     startTime: null,
@@ -12,7 +10,7 @@ export let entranceReservationState = {
 };
 
 // 時間帯監視機能の状態管理
-export let timeSlotState = {
+let timeSlotState = {
     mode: 'idle',  // idle, selecting, monitoring, trying
     targetSlots: [],   // 複数選択対象の時間帯情報配列
     monitoringInterval: null,  // 監視用インターバル
@@ -23,7 +21,7 @@ export let timeSlotState = {
 };
 
 // 複数監視対象管理のヘルパー関数
-export const multiTargetManager = {
+const multiTargetManager = {
     // 監視対象を追加
     addTarget(slotInfo) {
         // 時間+位置（東西）で一意性を判定
@@ -108,13 +106,13 @@ export const multiTargetManager = {
 };
 
 // ページ読み込み状態管理
-export const pageLoadingState = {
+const pageLoadingState = {
     isLoading: false,
     startTime: null
 };
 
 // リロードカウントダウン状態管理
-export const reloadCountdownState = {
+const reloadCountdownState = {
     countdownInterval: null,
     secondsRemaining: null,
     startTime: null,
@@ -122,21 +120,21 @@ export const reloadCountdownState = {
 };
 
 // カレンダー監視状態管理
-export const calendarWatchState = {
+const calendarWatchState = {
     observer: null,
     currentSelectedDate: null,
     isWatching: false
 };
 
-// 状態操作用ヘルパー関数
-export function setPageLoadingState(isLoading) {
-    pageLoadingState.isLoading = isLoading;
-    pageLoadingState.startTime = isLoading ? Date.now() : null;
-}
+// エクスポート
+export {
+    entranceReservationState,
+    timeSlotState,
+    multiTargetManager,
+    pageLoadingState,
+    reloadCountdownState,
+    calendarWatchState
+};
 
-export function getCurrentMode() {
-    if (timeSlotState.isMonitoring) return 'monitoring';
-    if (timeSlotState.mode === 'trying') return 'trying';
-    if (multiTargetManager.hasTargets()) return 'targets-selected';
-    return 'idle';
-}
+// ============================================================================
+// 【3. キャッシュ・永続化システム】
