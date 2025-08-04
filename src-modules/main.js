@@ -31,12 +31,12 @@ import {
     pageLoadingState,
     reloadCountdownState,
     calendarWatchState
-} from './section2.js';
+} from './section2.ts';
 
 // Section 3からのimport
 import {
     createCacheManager
-} from './section3.js';
+} from './section3.ts';
 
 // Section 4からのimport
 import {

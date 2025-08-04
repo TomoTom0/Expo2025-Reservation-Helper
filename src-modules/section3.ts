@@ -1,21 +1,24 @@
 // Section 2からのimport
-import { multiTargetManager, timeSlotState } from './section2.ts';
+import { multiTargetManager, timeSlotState } from './section2.js';
+
+// 型定義のインポート
+import type { CacheManager, Dependencies, TimeSlotTarget } from '../types/index.js';
 
 // ============================================================================
 // キャッシュ管理機能
-const createCacheManager = (dependencies = {}) => {
+const createCacheManager = (dependencies: Dependencies = {}): CacheManager => {
 const { getCurrentSelectedCalendarDateFn } = dependencies;
 
 return {
     // キー生成（URLベース）
-    generateKey(suffix = '') {
+    generateKey(suffix: string = ''): string {
         const url = new URL(window.location.href);
         const baseKey = `expo2025_entrance_${url.searchParams.get('reserve_id') || 'default'}`;
         return suffix ? `${baseKey}_${suffix}` : baseKey;
     },
     
     // 複数監視対象を保存
-    saveTargetSlots() {
+    saveTargetSlots(): void {
         try {
             const targets = multiTargetManager.getTargets();
             if (targets.length === 0) return;
@@ -24,7 +27,7 @@ return {
             const selectedCalendarDate = getCurrentSelectedCalendarDateFn ? getCurrentSelectedCalendarDateFn() : null;
             
             const data = {
-                targets: targets.map(target => ({
+                targets: targets.map((target: TimeSlotTarget) => ({
                     timeText: target.timeText,
                     tdSelector: target.tdSelector,
                     positionInfo: target.positionInfo,
@@ -37,7 +40,7 @@ return {
             };
             
             localStorage.setItem(this.generateKey('target_slots'), JSON.stringify(data));
-            const targetTexts = targets.map(t => t.timeText).join(', ');
+            const targetTexts = targets.map((t: TimeSlotTarget) => t.timeText).join(', ');
             console.log(`✅ 複数監視対象をキャッシュに保存: ${targetTexts} (${targets.length}個)`);
         } catch (error) {
             console.error('❌ 複数監視対象保存エラー:', error);
@@ -45,12 +48,12 @@ return {
     },
     
     // 後方互換性のため残す
-    saveTargetSlot(slotInfo) {
+    saveTargetSlot(slotInfo: any): void {
         this.saveTargetSlots();
     },
     
     // 監視対象時間帯を読み込み
-    loadTargetSlot() {
+    loadTargetSlot(): any | null {
         try {
             const data = localStorage.getItem(this.generateKey('target_slot'));
             if (!data) return null;
@@ -71,7 +74,7 @@ return {
     },
     
     // 複数監視対象を読み込み（後方互換性あり）
-    loadTargetSlots() {
+    loadTargetSlots(): any | null {
         try {
             // 新形式の複数対象キャッシュを確認
             const newData = localStorage.getItem(this.generateKey('target_slots'));
@@ -83,7 +86,7 @@ return {
                     return null;
                 }
                 
-                const targetTexts = parsed.targets?.map(t => t.timeText).join(', ') || '不明';
+                const targetTexts = parsed.targets?.map((t: any) => t.timeText).join(', ') || '不明';
                 console.log(`📖 複数監視対象キャッシュを読み込み: ${targetTexts} (${parsed.targets?.length || 0}個)`);
                 return parsed;
             }
@@ -109,7 +112,7 @@ return {
     },
     
     // 複数監視対象をクリア
-    clearTargetSlots() {
+    clearTargetSlots(): void {
         try {
             localStorage.removeItem(this.generateKey('target_slots'));
             localStorage.removeItem(this.generateKey('target_slot')); // 古い形式もクリア
@@ -120,12 +123,12 @@ return {
     },
     
     // 後方互換性のため残す
-    clearTargetSlot() {
+    clearTargetSlot(): void {
         this.clearTargetSlots();
     },
     
     // 試行回数を更新
-    updateRetryCount(count) {
+    updateRetryCount(count: number): void {
         const cached = this.loadTargetSlot();
         if (cached) {
             cached.retryCount = count;
@@ -135,7 +138,7 @@ return {
     },
     
     // 監視継続フラグを設定（リロード前に呼び出し）
-    setMonitoringFlag(isActive = true) {
+    setMonitoringFlag(isActive: boolean = true): void {
         try {
             const data = {
                 isMonitoring: isActive,
@@ -149,7 +152,7 @@ return {
     },
     
     // 監視継続フラグを取得し、即座にfalseに設定（暴走防止）
-    getAndClearMonitoringFlag() {
+    getAndClearMonitoringFlag(): boolean {
         try {
             const data = localStorage.getItem(this.generateKey('monitoring_flag'));
             if (!data) return false;
@@ -174,7 +177,7 @@ return {
     },
     
     // 監視継続フラグをクリア
-    clearMonitoringFlag() {
+    clearMonitoringFlag(): void {
         try {
             localStorage.removeItem(this.generateKey('monitoring_flag'));
             console.log('🗑️ 監視継続フラグをクリア');

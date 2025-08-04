@@ -2,17 +2,20 @@
 description = "Chrome拡張としてWindows側にsrcフォルダを同期"
 run = "./rsync-src-to-win.sh"
 
-[tasks.build-ts]
-description = "TypeScriptテスト後にビルド実行"
+[tasks.build]
+description = "TypeScript静的チェック後に分割JSファイルを1つのファイルにビルド"
 run = [
-    "npm run type-check",
-    "npm run build"
+    "echo '🔍 TypeScript静的チェック実行中...'",
+    "npx tsc --noEmit",
+    "echo '✅ TypeScript静的チェック完了'",
+    "echo '🔨 webpack ビルド実行中...'",
+    "npm run build",
+    "echo '✅ ビルド完了'"
 ]
 
-[tasks.build-ts-rsync]
-description = "TypeScriptビルド後にWindows同期実行"
+[tasks.build-rsync]
+description = "ビルド後にWindows同期実行"
 run = [
-    "npm run type-check",
-    "npm run build", 
-    "./rsync-src-to-win.sh"
+    "mise run build", 
+    "mise run rsync-src-to-win"
 ]

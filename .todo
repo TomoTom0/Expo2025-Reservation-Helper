@@ -32,25 +32,41 @@
 - [x] 依存関係順序での関数配置（cut & paste のみ）
 - [x] 整理後テスト実行確認（152テスト全通過）
 
-### Phase 4: JavaScript分割とコンパイル環境構築
-- [ ] 8つのJSモジュールファイル作成
-  - [ ] core/utils.js (基本ユーティリティ・状態管理)
-  - [ ] dom/selectors.js (DOM操作・セレクタ・要素検索)
-  - [ ] monitor/timeSlot.js (時間帯監視・分析システム)
-  - [ ] ui/fab.js (FAB・ボタン・表示系)
-  - [ ] cache/manager.js (永続化・キャッシュ管理)
-  - [ ] calendar/watcher.js (カレンダー監視・変更検出)
-  - [ ] pavilion/search.js (パビリオン検索機能)
-  - [ ] main/init.js (エントリーポイント・初期化)
-- [ ] webpack/rollup設定によるコンパイル環境構築
-- [ ] 分割JSファイルの1ファイル結合テスト
-- [ ] 元の機能との完全互換性確認
+### Phase 4: JavaScript分割とコンパイル環境構築 ✅
+- [x] 8つのsectionモジュールファイル作成完了
+  - [x] section1.js (基本機能・ユーティリティ: 502行)
+  - [x] section2.js (状態管理オブジェクト: 137行)
+  - [x] section3.js (キャッシュ管理: 194行)
+  - [x] section4.js (DOMセレクタ・検索機能: 177行)
+  - [x] section5.js (時間帯監視システム: 965行)
+  - [x] section6.js (カレンダー・UI状態管理: 1,275行)
+  - [x] section7.js (FAB・メインUI: 651行)
+  - [x] section8.js (ページ初期化・セットアップ: 137行)
+- [x] webpack + Babel環境構築完了
+- [x] 循環参照解決・依存注入パターン実装完了
+- [x] コンパイル・結合テスト成功（241 KiB出力）
+- [x] TypeScript静的チェック: 未定義変数エラー0件達成
 
-### Phase 5: TypeScript移行（Phase 4完了後）
+### Phase 5: TypeScript移行（実行中）
+- [ ] TypeScript環境セットアップ
+  - [ ] TypeScript + 関連パッケージインストール
+  - [ ] tsconfig.json設定作成
+  - [ ] webpack設定のTypeScript対応
 - [ ] 型定義ファイル作成
-- [ ] JavaScript → TypeScript直接変換
-- [ ] TypeScriptコンパイル設定
-- [ ] 最終テスト・デプロイ
+  - [ ] Chrome拡張API型定義
+  - [ ] DOM関連型定義
+  - [ ] プロジェクト固有型定義
+- [ ] 段階的JavaScript → TypeScript変換
+  - [ ] section1.js → section1.ts
+  - [ ] section2.js → section2.ts
+  - [ ] section3.js → section3.ts
+  - [ ] section4.js → section4.ts
+  - [ ] section5.js → section5.ts
+  - [ ] section6.js → section6.ts
+  - [ ] section7.js → section7.ts
+  - [ ] section8.js → section8.ts
+- [ ] TypeScriptコンパイル確認
+- [ ] 最終テスト・デプロイ準備
 
 ## 将来のテスト拡張・改善項目
 

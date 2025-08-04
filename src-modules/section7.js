@@ -13,7 +13,7 @@ import {
     timeSlotState,
     reloadCountdownState,
     calendarWatchState
-} from './section2.js';
+} from './section2.ts';
 
 // Section 4からのimport
 import {

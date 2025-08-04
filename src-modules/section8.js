@@ -1,7 +1,7 @@
 // 各sectionからのimport
 import { init_page, judge_init, judge_entrance_init, init_entrance_page } from './section1.js';
-import { reloadCountdownState } from './section2.js';
-import { createCacheManager } from './section3.js';
+import { reloadCountdownState } from './section2.ts';
+import { createCacheManager } from './section3.ts';
 import { setCacheManager, setExternalFunctions } from './section5.js';
 import { 
     getCurrentSelectedCalendarDate, getCurrentTableContent, shouldUpdateMonitorButtons,

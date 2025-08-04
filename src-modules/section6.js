@@ -6,7 +6,7 @@ import {
     reloadCountdownState,
     calendarWatchState,
     pageLoadingState
-} from './section2.js';
+} from './section2.ts';
 
 // Section 4からのimport
 import {

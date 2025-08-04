@@ -1,7 +1,7 @@
 const path = require('path');
 
 module.exports = {
-  entry: './src-modules/main.js',
+  entry: './src-modules/main.js', // 段階的移行のため最初はJS
   output: {
     filename: 'index.js',
     path: path.resolve(__dirname, 'src'),
@@ -17,12 +17,17 @@ module.exports = {
     minimize: false, // UserScriptの可読性維持のため無効化
   },
   resolve: {
-    extensions: ['.js']
+    extensions: ['.ts', '.js'] // TypeScript優先で解決
   },
   target: 'web', // ブラウザ環境
   devtool: false, // ソースマップ無効化
   module: {
     rules: [
+      {
+        test: /\.ts$/,
+        exclude: /node_modules/,
+        use: 'ts-loader'
+      },
       {
         test: /\.js$/,
         exclude: /node_modules/,
