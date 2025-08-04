@@ -1,8 +1,8 @@
 // 各sectionからのimport
-import { init_page, judge_init, judge_entrance_init, init_entrance_page } from './section1.js';
-import { reloadCountdownState } from './section2.ts';
-import { createCacheManager } from './section3.ts';
-import { setCacheManager, setExternalFunctions } from './section5.js';
+import { init_page, judge_init, judge_entrance_init, init_entrance_page } from './section1';
+import { reloadCountdownState } from './section2';
+import { createCacheManager } from './section3';
+import { setCacheManager, setExternalFunctions } from './section5';
 import { 
     getCurrentSelectedCalendarDate, getCurrentTableContent, shouldUpdateMonitorButtons,
     restoreSelectionAfterUpdate, enableAllMonitorButtons,
@@ -10,12 +10,12 @@ import {
     resetMonitoringUI, showErrorMessage, tryClickCalendarForTimeSlot, setPageLoadingState,
     disableAllMonitorButtons, restoreFromCache, setCacheManagerForSection6, setEntranceReservationHelper,
     setCanStartReservation
-} from './section6.js';
+} from './section6';
 import { 
     updateMonitoringTargetsDisplay, createEntranceReservationUI, setCacheManagerForSection7,
     entranceReservationHelper, canStartReservation
-} from './section7.js';
-import { initTimeSlotMonitoring } from './section4.js';
+} from './section7';
+import { initTimeSlotMonitoring } from './section4';
 
 // 【8. ページ判定・初期化】
 // ============================================================================

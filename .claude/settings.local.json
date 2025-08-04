@@ -6,7 +6,13 @@
       "Bash(git add:*)",
       "Bash(git commit:*)",
       "Bash(node:*)",
-      "Bash(chmod:*)"
+      "Bash(chmod:*)",
+      "Bash(mise run:*)",
+      "Bash(sed:*)",
+      "Bash(npx eslint:*)",
+      "Bash(for func in getCurrentTableContent shouldUpdateMonitorButtons showStatus enableAllMonitorButtons updateMonitoringTargetsDisplay)",
+      "Bash(do echo \"=== $func ===\")",
+      "Bash(done)"
     ],
     "deny": []
   }

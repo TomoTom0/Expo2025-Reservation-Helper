@@ -31,7 +31,6 @@ export interface TimeSlotTarget {
 }
 
 export interface MultiTargetManager {
-  targets: TimeSlotTarget[];
   addTarget(target: TimeSlotTarget): boolean;
   removeTarget(timeText: string, tdSelector: string): boolean;
   clearAll(): void;
@@ -53,6 +52,11 @@ export interface ReloadCountdownState {
   timeLeft: number;
   intervalId: number | null;
   onComplete: (() => void) | null;
+  totalSeconds?: number;
+  secondsRemaining: number | null;
+  startTime: number | null;
+  countdownInterval: number | null;
+  reloadTimer: number | null;
 }
 
 export interface CalendarWatchState {
@@ -66,12 +70,14 @@ export interface CalendarWatchState {
 // =========================================================================
 
 export interface TimeSlotSelectors {
-  table: string;
-  slots: string;
+  timeSlotContainer: string;
+  timeSlotCells: string;
   selectedSlot: string;
-  fullSlot: string;
-  availableSlot: string;
-  timeSpan: string;
+  fullSlots: string;
+  availableSlots: string;
+  lowIcon: string;
+  highIcon: string;
+  fullIcon: string;
 }
 
 export interface TimeSlotInfo {
@@ -136,6 +142,8 @@ export interface ReservationConfig {
     clickRandomRange: number;
     minRetryDelay: number;
     retryRandomRange: number;
+    minCheckInterval: number;
+    checkRandomRange: number;
   };
 }
 

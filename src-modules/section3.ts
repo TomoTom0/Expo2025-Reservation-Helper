@@ -1,5 +1,5 @@
 // Section 2からのimport
-import { multiTargetManager, timeSlotState } from './section2.js';
+import { multiTargetManager, timeSlotState } from './section2';
 
 // 型定義のインポート
 import type { CacheManager, Dependencies, TimeSlotTarget } from '../types/index.js';

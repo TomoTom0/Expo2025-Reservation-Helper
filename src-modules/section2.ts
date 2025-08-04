@@ -32,8 +32,6 @@ let timeSlotState: TimeSlotState = {
 
 // 複数監視対象管理のヘルパー関数
 const multiTargetManager: MultiTargetManager = {
-    targets: timeSlotState.targetSlots,
-    
     // 監視対象を追加
     addTarget(slotInfo: TimeSlotTarget): boolean {
         // 時間+位置（東西）で一意性を判定
@@ -129,7 +127,12 @@ const reloadCountdownState: ReloadCountdownState = {
     isActive: false,
     timeLeft: 0,
     intervalId: null,
-    onComplete: null
+    onComplete: null,
+    totalSeconds: 30,
+    secondsRemaining: null,
+    startTime: null,
+    countdownInterval: null,
+    reloadTimer: null
 };
 
 // カレンダー監視状態管理

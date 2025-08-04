@@ -4,7 +4,7 @@ import {
     waitForElement,
     waitForAnyElement,
     clickElement
-} from './section1.js';
+} from './section1';
 
 // Section 2からのimport
 import { 
@@ -13,21 +13,21 @@ import {
     timeSlotState,
     reloadCountdownState,
     calendarWatchState
-} from './section2.ts';
+} from './section2';
 
 // Section 4からのimport
 import {
     timeSlotSelectors,
     generateUniqueTdSelector,
     extractTdStatus
-} from './section4.js';
+} from './section4';
 
 // Section 5からのimport
 import {
     checkTimeSlotTableExistsSync,
     analyzeAndAddMonitorButtons,
     startSlotMonitoring
-} from './section5.js';
+} from './section5';
 
 // Section 6からのimport  
 import {
@@ -37,7 +37,7 @@ import {
     stopSlotMonitoring,
     isInterruptionAllowed,
     showStatus
-} from './section6.js';
+} from './section6';
 
 // 【7. FAB・メインUI】
 // ============================================================================
