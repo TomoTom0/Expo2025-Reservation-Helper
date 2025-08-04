@@ -20,7 +20,6 @@ import {
 import {
     updateAllMonitorButtonPriorities,
     analyzeTimeSlots,
-    checkTimeSlotTableExistsSync,
     checkTimeSlotTableExistsAsync,
     waitForTimeSlotTable,
     startSlotMonitoring,
@@ -690,15 +689,22 @@ function updateMainButtonDisplay(forceMode: string | null = null): void {
     if (fabButton && statusBadge) {
         const span = fabButton.querySelector('span') as HTMLSpanElement;
         if (span) {
+            // 統一状態管理システムを取得
+            const unifiedStateManager = getExternalFunction('unifiedStateManager');
+            if (!unifiedStateManager) {
+                console.warn('⚠️ UnifiedStateManager が利用できないため、FAB更新を中止');
+                return;
+            }
+            
             const currentMode = forceMode || getCurrentMode();
             
-            // 予約開始可能かチェック（section7のcanStartReservation相当）
-            const canStart = checkReservationConditions();
+            // 統一状態管理システムから状態を取得
+            const preferredAction = unifiedStateManager.getPreferredAction();
+            const hasReservationTarget = unifiedStateManager.hasReservationTarget();
+            const hasMonitoringTargets = unifiedStateManager.hasMonitoringTargets();
+            const executionState = unifiedStateManager.getExecutionState();
             
-            // デバッグ情報（必要に応じてコメントアウト解除）
-            // const targetTexts = multiTargetManager.hasTargets() ? multiTargetManager.getTargets().map(t => t.timeText).join(', ') : 'なし';
-            console.log(`🔄 FAB更新: mode=${currentMode}, canStart=${canStart}, stateMode=${timeSlotState.mode}, isMonitoring=${timeSlotState.isMonitoring}`);
-            // console.log(`🔍 getCurrentMode判定: loading=${pageLoadingState?.isLoading}, monitoring=${timeSlotState.isMonitoring}, reservationRunning=${entranceReservationState.isRunning}, hasTargets=${multiTargetManager.hasTargets()}, modeSelecting=${timeSlotState.mode === 'selecting'}`);
+            console.log(`🔄 FAB更新: mode=${currentMode}, preferredAction=${preferredAction}, reservation=${hasReservationTarget}, monitoring=${hasMonitoringTargets}, execution=${executionState}`);
             
             switch (currentMode) {
                 case 'monitoring':
@@ -776,107 +782,34 @@ function updateMainButtonDisplay(forceMode: string | null = null): void {
                 default:
                     console.log(`🔄 idle ケース実行`);
                     
-                    // 統一状態管理システムを使用する場合
-                    const unifiedStateManager = getExternalFunction('unifiedStateManager');
-                    if (unifiedStateManager) {
-                        const preferredAction = unifiedStateManager.getPreferredAction();
-                        console.log(`🔍 統一状態管理 優先アクション: ${preferredAction}`);
-                        
-                        if (preferredAction === 'reservation') {
-                            span.innerText = '予約\n開始';
-                            // CSSクラスによる状態管理
-                            fabButton.className = fabButton.className.replace(/ytomo-fab-\w+/g, '');
-                            fabButton.classList.add('ytomo-fab-enabled');
-                            fabButton.title = '予約開始';
-                            fabButton.disabled = false;
-                        } else if (preferredAction === 'monitoring') {
-                            span.innerText = '監視予約\n開始';
-                            fabButton.className = fabButton.className.replace(/ytomo-fab-\w+/g, '');
-                            fabButton.classList.add('ytomo-fab-enabled');
-                            fabButton.title = '監視予約開始';
-                            fabButton.disabled = false;
-                        } else {
-                            span.innerText = '待機中';
-                            fabButton.className = fabButton.className.replace(/ytomo-fab-\w+/g, '');
-                            fabButton.classList.add('ytomo-fab-disabled');
-                            fabButton.title = '待機中（条件未満足）';
-                            fabButton.disabled = true;
-                        }
-                        return; // 統一状態管理での処理完了
-                    }
+                    // 統一状態管理システム経由での処理（既にunifiedStateManagerは取得済み）
+                    console.log(`🔍 統一状態管理 優先アクション: ${preferredAction}`);
                     
-                    // フォールバック: 既存ロジック（移行期間用）
-                    // 監視対象が設定されている場合は selecting モードになるはずだが、
-                    // 念のため idle でも監視対象の有無を確認
-                    // 予約と監視の優先順位判定
-                    const reservationPossible = canStart;
-                    const hasMonitorTargets = multiTargetManager.hasTargets();
-                    
-                    console.log(`🔍 優先順位判定: 予約可能=${reservationPossible}, 監視対象=${hasMonitorTargets}`);
-                    
-                    if (reservationPossible) {
-                        // 予約可能な場合は予約を優先（監視対象があっても無視）
-                        console.log(`✅ 予約優先: 通常の予約開始処理`);
-                        if (hasMonitorTargets) {
-                            console.log(`🗑️ 予約優先のため監視対象をクリア`);
-                            multiTargetManager.clearAll();
-                            timeSlotState.mode = 'idle';
-                        }
-                        // 通常の予約開始 - 条件に応じてdisabled状態を制御
+                    if (preferredAction === 'reservation') {
                         span.innerText = '予約\n開始';
-                        
-                        // 上部で設定したcanStart変数を使用
-                        console.log(`🔍 idle内でcanStart確認: ${canStart}`);
-                        console.log(`🔍 idle内でFABボタン確認:`, fabButton);
-                        
-                        if (canStart) {
-                            console.log(`✅ canStart=true のため FAB有効化処理実行`);
-                            // 予約開始可能 - クラスで状態管理
-                            fabButton.className = fabButton.className.replace(/ytomo-fab-\w+/g, '');
-                            fabButton.classList.add('ytomo-fab-enabled');
-                            fabButton.title = '予約開始';
-                            fabButton.disabled = false;
-                            fabButton.removeAttribute('disabled');
-                            console.log('🔧 FAB有効化: 完了 - classes=', fabButton.className);
-                            updateStatusBadge('idle');
-                        } else {
-                            // 条件未満足 - disabled状態
-                            const selectedDate = getCurrentSelectedCalendarDate();
-                            const hasTimeSlotTable = checkTimeSlotTableExistsSync();
-                            
-                            if (!selectedDate || !hasTimeSlotTable) {
-                                // カレンダー未選択または時間帯テーブル未表示
-                                fabButton.title = '待機中（カレンダーで日付を選択してください）';
-                            } else {
-                                // テーブルはあるが他の条件が満たされていない
-                                fabButton.title = '時間帯を選択し、来場日時設定ボタンが有効になるまでお待ちください';
-                            }
-                            
-                            // 無効状態 - クラスで状態管理
-                            fabButton.className = fabButton.className.replace(/ytomo-fab-\w+/g, '');
-                            fabButton.classList.add('ytomo-fab-disabled');
-                            fabButton.disabled = true;
-                            fabButton.setAttribute('disabled', 'disabled');
-                            updateStatusBadge('waiting');
-                        }
-                    } else if (hasMonitorTargets) {
-                        // 予約不可だが監視対象あり - 監視モード
-                        console.log(`✅ 監視モード: 監視予約開始として有効化`);
+                        // CSSクラスによる状態管理
+                        fabButton.className = fabButton.className.replace(/ytomo-fab-\w+/g, '');
+                        fabButton.classList.add('ytomo-fab-enabled');
+                        fabButton.title = '予約開始';
+                        fabButton.disabled = false;
+                    } else if (preferredAction === 'monitoring') {
                         span.innerText = '監視予約\n開始';
                         fabButton.className = fabButton.className.replace(/ytomo-fab-\w+/g, '');
                         fabButton.classList.add('ytomo-fab-enabled');
                         fabButton.title = '監視予約開始';
                         fabButton.disabled = false;
-                        fabButton.removeAttribute('disabled');
-                        updateStatusBadge('selecting');
                     } else {
-                        // 予約不可 & 監視対象なし - 待機状態
-                        console.log(`⏳ 待機モード: 条件未満足`);
-                        span.innerText = '予約\n開始';
+                        span.innerText = '待機中';
                         fabButton.className = fabButton.className.replace(/ytomo-fab-\w+/g, '');
                         fabButton.classList.add('ytomo-fab-disabled');
+                        fabButton.title = '待機中（条件未満足）';
                         fabButton.disabled = true;
-                        fabButton.title = '時間帯を選択し、来場日時設定ボタンが有効になるまでお待ちください';
+                    }
+                    
+                    // 統一状態管理システムでのステータスバッジ更新
+                    if (preferredAction === 'reservation' || preferredAction === 'monitoring') {
+                        updateStatusBadge('idle');
+                    } else {
                         updateStatusBadge('waiting');
                     }
                     break;
@@ -887,54 +820,40 @@ function updateMainButtonDisplay(forceMode: string | null = null): void {
 
 // 現在のモードを取得するヘルパー関数（予約優先ロジック組み込み）
 function getCurrentMode(): string {
-    // section5から注入された統一状態管理システムを取得
+    // 統一状態管理システムを取得（必須）
     const unifiedStateManager = getExternalFunction('unifiedStateManager');
     
-    if (unifiedStateManager) {
-        // 新しいロジック: UnifiedStateManagerの状態に基づく判定
-        const executionState = unifiedStateManager.getExecutionState();
-        
-        switch (executionState) {
-            case 'reservation_running':
-                return 'reservation-running';
-            case 'monitoring_running':
-                return 'monitoring';
-            case 'idle':
-                // ページローディング状態の確認
-                if (pageLoadingState?.isLoading) {
-                    return 'loading';
-                }
-                
-                // 推奨アクションを確認
-                const preferredAction = unifiedStateManager.getPreferredAction();
-                switch (preferredAction) {
-                    case 'reservation':
-                        return 'idle'; // 予約可能状態
-                    case 'monitoring':
-                        return 'selecting'; // 監視準備完了
-                    default:
-                        return 'idle';
-                }
-        }
+    if (!unifiedStateManager) {
+        console.warn('⚠️ UnifiedStateManager が利用できません');
+        return 'idle';
     }
     
-    // フォールバック: 既存ロジック（移行期間用）
-    if (pageLoadingState && pageLoadingState.isLoading) {
+    // ページローディング状態の確認
+    if (pageLoadingState?.isLoading) {
         return 'loading';
-    } else if (timeSlotState.isMonitoring) {
-        return 'monitoring';
-    } else if (entranceReservationState.isRunning) {
-        return 'reservation-running';
-    } else {
-        // 予約優先判定: 予約可能な場合は監視対象があってもidleを返す
-        const reservationPossible = checkReservationConditions();
-        if (reservationPossible) {
-            return 'idle'; // 予約優先
-        } else if (multiTargetManager.hasTargets() && timeSlotState.mode === 'selecting') {
-            return 'selecting'; // 予約不可の場合のみ監視モード
-        } else {
+    }
+    
+    // 統一状態管理システムの実行状態を確認
+    const executionState = unifiedStateManager.getExecutionState();
+    
+    switch (executionState) {
+        case 'reservation_running':
+            return 'reservation-running';
+        case 'monitoring_running':
+            return 'monitoring';
+        case 'idle':
+            // 推奨アクションを確認
+            const preferredAction = unifiedStateManager.getPreferredAction();
+            switch (preferredAction) {
+                case 'reservation':
+                    return 'idle'; // 予約可能状態
+                case 'monitoring':
+                    return 'selecting'; // 監視準備完了
+                default:
+                    return 'idle';
+            }
+        default:
             return 'idle';
-        }
     }
 }
 
@@ -1420,43 +1339,8 @@ async function restoreFromCache(): Promise<void> {
     }, 2000);
 }
 
-// 予約開始条件のチェック（section7のcanStartReservation相当）
-function checkReservationConditions(): boolean {
-    // 1. 時間帯テーブルの存在確認
-    const hasTimeSlotTable = checkTimeSlotTableExistsSync();
-    
-    // 2. 時間帯選択状態の確認
-    const selectedTimeSlot = document.querySelector(timeSlotSelectors.selectedSlot);
-    const isTimeSlotSelected = !!selectedTimeSlot;
-    
-    // 3. 選択された時間帯が満員でないかチェック
-    let isSelectedSlotAvailable = true;
-    if (selectedTimeSlot) {
-        const tdElement = selectedTimeSlot.closest('td') as HTMLTableCellElement;
-        if (tdElement) {
-            const status = extractTdStatus(tdElement);
-            isSelectedSlotAvailable = !status?.isFull;
-        }
-    }
-    
-    // 4. 来場日時設定ボタンの有効性確認
-    const visitTimeButton = document.querySelector('button.basic-btn.type2.style_full__ptzZq') as HTMLButtonElement;
-    const isVisitTimeButtonEnabled = visitTimeButton && !visitTimeButton.disabled && !visitTimeButton.hasAttribute('disabled');
-    
-    const canStart = hasTimeSlotTable && isTimeSlotSelected && isSelectedSlotAvailable && isVisitTimeButtonEnabled;
-    
-    console.log(`📊 予約開始条件チェック (section6):`);
-    console.log(`  - 時間帯テーブル: ${hasTimeSlotTable ? '✅' : '❌'}`);
-    console.log(`  - 時間帯選択: ${isTimeSlotSelected ? '✅' : '❌'}`);
-    if (selectedTimeSlot) {
-        console.log(`  - 選択要素:`, selectedTimeSlot);
-    }
-    console.log(`  - 選択時間帯空き: ${isSelectedSlotAvailable ? '✅' : '❌'}`);
-    console.log(`  - 来場日時ボタン有効: ${isVisitTimeButtonEnabled ? '✅' : '❌'}`);
-    console.log(`  → 総合判定: ${canStart ? '✅予約開始可能' : '❌条件未満足'}`);
-    
-    return canStart;
-}
+// 注意: checkReservationConditions関数は削除されました
+// 予約開始条件は統一状態管理システム（UnifiedStateManager.canStartReservation）で判定されます
 
 // エクスポート
 export {

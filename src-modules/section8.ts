@@ -109,7 +109,16 @@ const trigger_init = (url_record: string): void => {
                 // 入場予約ページ初期化後に統一状態管理システムを初期化
                 setTimeout(() => {
                     initializeUnifiedStateManager();
-                }, 1000);
+                }, 500);
+                
+                // 追加で定期的に状態同期を実行
+                setInterval(() => {
+                    const selectedSlot = document.querySelector('td[data-gray-out] div[role="button"][aria-pressed="true"]');
+                    if (selectedSlot && unifiedStateManager && !unifiedStateManager.hasReservationTarget()) {
+                        console.log('🔄 選択状態の後続同期を実行');
+                        initializeUnifiedStateManager();
+                    }
+                }, 2000);
                 
                 console.log("ytomo extension loaded (entrance reservation)");
             }

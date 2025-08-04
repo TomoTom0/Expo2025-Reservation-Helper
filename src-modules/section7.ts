@@ -514,7 +514,25 @@ function startCalendarWatcher(): void {
                 mutation.attributeName === 'aria-pressed') {
                 const element = mutation.target as HTMLElement;
                 if (element.matches && element.matches('td[data-gray-out] div[role="button"]')) {
-                    console.log(`🔄 時間帯選択変更検出: ${element.getAttribute('aria-pressed')}`);
+                    const ariaPressed = element.getAttribute('aria-pressed');
+                    console.log(`🔄 時間帯選択変更検出: ${ariaPressed}`);
+                    
+                    // 統一状態管理システムの同期
+                    const unifiedStateManager = getExternalFunction('unifiedStateManager');
+                    if (unifiedStateManager && ariaPressed === 'true') {
+                        // 新しい選択を検出した場合
+                        const tdElement = element.closest('td[data-gray-out]') as HTMLTableCellElement;
+                        if (tdElement) {
+                            const timeText = element.querySelector('dt span')?.textContent?.trim();
+                            const locationIndex = LocationHelper.getIndexFromElement(tdElement);
+                            
+                            if (timeText) {
+                                console.log(`🔄 統一状態管理に予約対象を同期: ${timeText}`);
+                                unifiedStateManager.setReservationTarget(timeText, locationIndex);
+                            }
+                        }
+                    }
+                    
                     shouldUpdate = true;
                 }
             }

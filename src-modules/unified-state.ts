@@ -371,6 +371,8 @@ export class UnifiedStateManager {
         
         // 手動選択された予約対象を検出
         const selectedSlot = document.querySelector(timeSlotSelectors.selectedSlot);
+        this.log(`🔍 選択されたスロット検索: セレクタ=${timeSlotSelectors.selectedSlot}, 結果=${selectedSlot ? 'あり' : 'なし'}`);
+        
         if (selectedSlot) {
             const tdElement = selectedSlot.closest('td[data-gray-out]') as HTMLTableCellElement;
             if (tdElement) {
@@ -378,13 +380,21 @@ export class UnifiedStateManager {
                 const locationIndex = LocationHelper.getIndexFromElement(tdElement);
                 const selector = generateUniqueTdSelector(tdElement);
                 
+                this.log(`🔍 予約対象詳細: 時間=${timeText}, 位置=${locationIndex}, セレクタ=${selector}`);
+                
                 this.reservationTarget = {
                     timeSlot: timeText,
                     locationIndex,
                     selector,
                     isValid: true
                 };
+                
+                this.log(`✅ 予約対象設定完了: ${LocationHelper.formatTargetInfo(timeText, locationIndex)}`);
+            } else {
+                this.log('⚠️ 選択スロットのtd要素が見つからない');
             }
+        } else {
+            this.log('🔍 現在選択されている時間帯なし');
         }
         
         // 実行状態の移行
