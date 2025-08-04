@@ -195,6 +195,13 @@ export class UnifiedStateManager {
         this.log(`✅ 予約対象設定: ${LocationHelper.formatTargetInfo(timeSlot, locationIndex)}`);
     }
     
+    // 指定した時間帯・位置が現在の予約対象かどうかを判定
+    isReservationTarget(timeSlot: string, locationIndex: number): boolean {
+        if (!this.reservationTarget) return false;
+        return this.reservationTarget.timeSlot === timeSlot && 
+               this.reservationTarget.locationIndex === locationIndex;
+    }
+    
     clearReservationTarget(): void {
         if (this.reservationTarget) {
             const info = LocationHelper.formatTargetInfo(

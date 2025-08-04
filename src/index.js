@@ -3087,6 +3087,397 @@ async function clickElement(element, config) {
 // エクスポート
 
 
+;// ./src-modules/unified-state.ts
+/**
+ * 統一状態管理システム
+ * 予約・監視の状態と対象を一元管理
+ */
+// 必要なimport
+
+
+
+// ============================================================================
+// 型定義
+// ============================================================================
+// 実行状態（排他的）
+var ExecutionState;
+(function (ExecutionState) {
+    ExecutionState["IDLE"] = "idle";
+    ExecutionState["RESERVATION_RUNNING"] = "reservation_running";
+    ExecutionState["MONITORING_RUNNING"] = "monitoring_running";
+})(ExecutionState || (ExecutionState = {}));
+// 優先実行モード
+var PriorityMode;
+(function (PriorityMode) {
+    PriorityMode["AUTO"] = "auto";
+    PriorityMode["FORCE_RESERVATION"] = "force_reservation";
+    PriorityMode["FORCE_MONITORING"] = "force_monitoring"; // 監視強制実行
+})(PriorityMode || (PriorityMode = {}));
+// 位置管理の定数
+const LOCATION_MAP = {
+    0: 'east', // 0番目のtd = 東
+    1: 'west' // 1番目のtd = 西
+};
+const LOCATION_TO_INDEX = {
+    'east': 0,
+    'west': 1
+};
+// ============================================================================
+// 位置管理ヘルパークラス
+// ============================================================================
+class LocationHelper {
+    // indexから東西を取得
+    static getLocationFromIndex(index) {
+        return LOCATION_MAP[index] || 'east';
+    }
+    // 東西からindexを取得
+    static getIndexFromLocation(location) {
+        return LOCATION_TO_INDEX[location];
+    }
+    // tdSelectorからindexを抽出
+    static getIndexFromSelector(selector) {
+        const cellMatch = selector.match(/td:nth-child\((\d+)\)/);
+        if (cellMatch && cellMatch[1]) {
+            return parseInt(cellMatch[1]) - 1; // nth-childは1ベース、indexは0ベース
+        }
+        return 0; // デフォルトは東
+    }
+    // DOM要素からindexを取得
+    static getIndexFromElement(tdElement) {
+        const row = tdElement.parentElement;
+        return Array.from(row.children).indexOf(tdElement);
+    }
+    // 同じ時間帯の比較用キー生成
+    static generateTimeLocationKey(timeSlot, locationIndex) {
+        return `${timeSlot}_${locationIndex}`;
+    }
+    // ログ表示用のヘルパー
+    static formatTargetInfo(timeSlot, locationIndex) {
+        const location = LocationHelper.getLocationFromIndex(locationIndex);
+        return `${location}${timeSlot}`; // 例: "east11:00-" or "west09:00-"
+    }
+}
+// ============================================================================
+// 統一状態管理クラス
+// ============================================================================
+class UnifiedStateManager {
+    constructor() {
+        // 実行状態
+        this.executionState = ExecutionState.IDLE;
+        // 対象管理
+        this.reservationTarget = null;
+        this.monitoringTargets = [];
+        // 優先度設定
+        this.priorityMode = PriorityMode.AUTO;
+        // デバッグフラグ
+        this.debugMode = true;
+    }
+    // ============================================================================
+    // 実行状態管理
+    // ============================================================================
+    getExecutionState() {
+        return this.executionState;
+    }
+    startReservation() {
+        if (this.executionState !== ExecutionState.IDLE) {
+            this.log('⚠️ 予約開始失敗: 他の処理が実行中');
+            return false;
+        }
+        if (!this.canStartReservation()) {
+            this.log('⚠️ 予約開始失敗: 条件未満足');
+            return false;
+        }
+        this.executionState = ExecutionState.RESERVATION_RUNNING;
+        this.log('🚀 予約処理を開始');
+        return true;
+    }
+    startMonitoring() {
+        if (this.executionState !== ExecutionState.IDLE) {
+            this.log('⚠️ 監視開始失敗: 他の処理が実行中');
+            return false;
+        }
+        if (!this.canStartMonitoring()) {
+            this.log('⚠️ 監視開始失敗: 監視対象なし');
+            return false;
+        }
+        this.executionState = ExecutionState.MONITORING_RUNNING;
+        this.log('👁️ 監視処理を開始');
+        return true;
+    }
+    stop() {
+        const prevState = this.executionState;
+        this.executionState = ExecutionState.IDLE;
+        switch (prevState) {
+            case ExecutionState.RESERVATION_RUNNING:
+                this.log('⏹️ 予約処理を停止');
+                break;
+            case ExecutionState.MONITORING_RUNNING:
+                this.log('⏹️ 監視処理を停止');
+                break;
+        }
+    }
+    // ============================================================================
+    // 対象管理
+    // ============================================================================
+    setReservationTarget(timeSlot, locationIndex, selector) {
+        // selectorが未指定の場合は生成
+        if (!selector) {
+            const selectedSlot = document.querySelector(timeSlotSelectors.selectedSlot);
+            if (selectedSlot) {
+                const tdElement = selectedSlot.closest('td[data-gray-out]');
+                selector = section4_generateUniqueTdSelector(tdElement);
+            }
+            else {
+                this.log('⚠️ 予約対象設定失敗: DOM要素が見つからない');
+                return;
+            }
+        }
+        this.reservationTarget = {
+            timeSlot,
+            locationIndex,
+            selector,
+            isValid: true
+        };
+        this.log(`✅ 予約対象設定: ${LocationHelper.formatTargetInfo(timeSlot, locationIndex)}`);
+    }
+    // 指定した時間帯・位置が現在の予約対象かどうかを判定
+    isReservationTarget(timeSlot, locationIndex) {
+        if (!this.reservationTarget)
+            return false;
+        return this.reservationTarget.timeSlot === timeSlot &&
+            this.reservationTarget.locationIndex === locationIndex;
+    }
+    clearReservationTarget() {
+        if (this.reservationTarget) {
+            const info = LocationHelper.formatTargetInfo(this.reservationTarget.timeSlot, this.reservationTarget.locationIndex);
+            this.reservationTarget = null;
+            this.log(`🗑️ 予約対象クリア: ${info}`);
+        }
+    }
+    addMonitoringTarget(timeSlot, locationIndex, selector) {
+        const key = LocationHelper.generateTimeLocationKey(timeSlot, locationIndex);
+        const existing = this.monitoringTargets.find(target => LocationHelper.generateTimeLocationKey(target.timeSlot, target.locationIndex) === key);
+        if (existing) {
+            this.log(`⚠️ 監視対象は既に存在: ${LocationHelper.formatTargetInfo(timeSlot, locationIndex)}`);
+            return false;
+        }
+        const newTarget = {
+            timeSlot,
+            locationIndex,
+            selector,
+            priority: this.monitoringTargets.length + 1,
+            status: 'full' // 通常満員の時間帯を監視対象にする
+        };
+        this.monitoringTargets.push(newTarget);
+        this.log(`✅ 監視対象追加: ${LocationHelper.formatTargetInfo(timeSlot, locationIndex)} (優先度: ${newTarget.priority})`);
+        return true;
+    }
+    removeMonitoringTarget(timeSlot, locationIndex) {
+        const key = LocationHelper.generateTimeLocationKey(timeSlot, locationIndex);
+        const initialLength = this.monitoringTargets.length;
+        this.monitoringTargets = this.monitoringTargets.filter(target => LocationHelper.generateTimeLocationKey(target.timeSlot, target.locationIndex) !== key);
+        if (this.monitoringTargets.length < initialLength) {
+            // 優先度を再計算
+            this.monitoringTargets.forEach((target, index) => {
+                target.priority = index + 1;
+            });
+            this.log(`✅ 監視対象削除: ${LocationHelper.formatTargetInfo(timeSlot, locationIndex)} (残り: ${this.monitoringTargets.length})`);
+            return true;
+        }
+        return false;
+    }
+    clearMonitoringTargets() {
+        const count = this.monitoringTargets.length;
+        this.monitoringTargets = [];
+        this.log(`🗑️ 全監視対象クリア (${count}個)`);
+    }
+    // ============================================================================
+    // 状態判定
+    // ============================================================================
+    canStartReservation() {
+        // 1. 予約対象の存在確認
+        if (!this.reservationTarget || !this.reservationTarget.isValid) {
+            return false;
+        }
+        // 2. 時間帯選択状態の確認
+        const selectedSlot = document.querySelector(timeSlotSelectors.selectedSlot);
+        if (!selectedSlot) {
+            return false;
+        }
+        // 3. 選択時間帯の満員状態確認
+        const tdElement = selectedSlot.closest('td[data-gray-out]');
+        if (tdElement) {
+            const status = extractTdStatus(tdElement);
+            if (status?.isFull) {
+                return false;
+            }
+        }
+        // 4. 来場日時ボタンの有効性確認
+        const visitTimeButton = document.querySelector('button.basic-btn.type2.style_full__ptzZq');
+        if (!visitTimeButton || visitTimeButton.disabled) {
+            return false;
+        }
+        // 5. カレンダー選択確認
+        const selectedDate = getCurrentSelectedCalendarDate();
+        if (!selectedDate) {
+            return false;
+        }
+        return true;
+    }
+    canStartMonitoring() {
+        return this.monitoringTargets.length > 0;
+    }
+    canInterrupt() {
+        return this.executionState !== ExecutionState.IDLE;
+    }
+    // ============================================================================
+    // 優先度判定
+    // ============================================================================
+    getPreferredAction() {
+        const canReserve = this.canStartReservation();
+        const canMonitor = this.canStartMonitoring();
+        switch (this.priorityMode) {
+            case PriorityMode.FORCE_RESERVATION:
+                return canReserve ? 'reservation' : 'none';
+            case PriorityMode.FORCE_MONITORING:
+                return canMonitor ? 'monitoring' : 'none';
+            case PriorityMode.AUTO:
+            default:
+                // 予約優先（両方可能な場合は予約を選択）
+                if (canReserve) {
+                    // 予約優先のため監視対象をクリア
+                    if (canMonitor) {
+                        this.log('🔄 予約優先のため監視対象をクリア');
+                        this.clearMonitoringTargets();
+                    }
+                    return 'reservation';
+                }
+                if (canMonitor)
+                    return 'monitoring';
+                return 'none';
+        }
+    }
+    setPriorityMode(mode) {
+        this.priorityMode = mode;
+        this.log(`🔧 優先度モード変更: ${mode}`);
+    }
+    // ============================================================================
+    // 既存システムとの互換性
+    // ============================================================================
+    // 既存のmultiTargetManagerから監視対象を移行
+    migrateFromExisting() {
+        this.log('🔄 既存システムから状態を移行中...');
+        // 監視対象の移行
+        const existingTargets = section2_multiTargetManager.getTargets();
+        existingTargets.forEach((target, index) => {
+            const locationIndex = LocationHelper.getIndexFromSelector(target.tdSelector);
+            this.monitoringTargets.push({
+                timeSlot: target.timeText,
+                locationIndex,
+                selector: target.tdSelector,
+                priority: index + 1,
+                status: 'full'
+            });
+        });
+        // 手動選択された予約対象を検出
+        const selectedSlot = document.querySelector(timeSlotSelectors.selectedSlot);
+        if (selectedSlot) {
+            const tdElement = selectedSlot.closest('td[data-gray-out]');
+            if (tdElement) {
+                const timeText = this.extractTimeTextFromElement(selectedSlot);
+                const locationIndex = LocationHelper.getIndexFromElement(tdElement);
+                const selector = section4_generateUniqueTdSelector(tdElement);
+                this.reservationTarget = {
+                    timeSlot: timeText,
+                    locationIndex,
+                    selector,
+                    isValid: true
+                };
+            }
+        }
+        // 実行状態の移行
+        if (entranceReservationState.isRunning) {
+            this.executionState = ExecutionState.RESERVATION_RUNNING;
+        }
+        else if (timeSlotState.isMonitoring) {
+            this.executionState = ExecutionState.MONITORING_RUNNING;
+        }
+        this.log(`✅ 移行完了: 予約対象=${this.reservationTarget ? '1' : '0'}, 監視対象=${this.monitoringTargets.length}`);
+    }
+    // ============================================================================
+    // UI連携用メソッド
+    // ============================================================================
+    getFabButtonState() {
+        switch (this.executionState) {
+            case ExecutionState.RESERVATION_RUNNING:
+                return 'running';
+            case ExecutionState.MONITORING_RUNNING:
+                return 'monitoring';
+            case ExecutionState.IDLE:
+                const preferredAction = this.getPreferredAction();
+                return preferredAction !== 'none' ? 'enabled' : 'disabled';
+        }
+    }
+    getFabButtonText() {
+        switch (this.executionState) {
+            case ExecutionState.RESERVATION_RUNNING:
+                return '予約\n中断';
+            case ExecutionState.MONITORING_RUNNING:
+                return '監視\n中断';
+            case ExecutionState.IDLE:
+                const preferredAction = this.getPreferredAction();
+                switch (preferredAction) {
+                    case 'reservation': return '予約\n開始';
+                    case 'monitoring': return '監視\n開始';
+                    default: return '待機中';
+                }
+        }
+    }
+    // ============================================================================
+    // ゲッター
+    // ============================================================================
+    getReservationTarget() {
+        return this.reservationTarget;
+    }
+    getMonitoringTargets() {
+        return [...this.monitoringTargets];
+    }
+    hasReservationTarget() {
+        return this.reservationTarget !== null && this.reservationTarget.isValid;
+    }
+    hasMonitoringTargets() {
+        return this.monitoringTargets.length > 0;
+    }
+    getMonitoringTargetCount() {
+        return this.monitoringTargets.length;
+    }
+    // ============================================================================
+    // デバッグ・ログ
+    // ============================================================================
+    log(message) {
+        if (this.debugMode) {
+            console.log(`[UnifiedState] ${message}`);
+        }
+    }
+    // DOM要素から時間テキストを抽出
+    extractTimeTextFromElement(element) {
+        const timeSpan = element.querySelector('dt span');
+        return timeSpan?.textContent?.trim() || 'unknown';
+    }
+    // デバッグ情報の出力
+    debugInfo() {
+        console.group('[UnifiedState] デバッグ情報');
+        console.log('実行状態:', this.executionState);
+        console.log('優先度モード:', this.priorityMode);
+        console.log('予約対象:', this.reservationTarget);
+        console.log('監視対象:', this.monitoringTargets);
+        console.log('予約可能:', this.canStartReservation());
+        console.log('監視可能:', this.canStartMonitoring());
+        console.log('推奨アクション:', this.getPreferredAction());
+        console.groupEnd();
+    }
+}
+
 ;// ./src-modules/section7.ts
 // Section 1からのimport
 
@@ -3095,6 +3486,8 @@ async function clickElement(element, config) {
 // Section 4からのimport
 
 // Section 5からのimport
+
+// unified-stateからのimport
 
 // Section 6からのimport  
 
@@ -3330,6 +3723,10 @@ function createEntranceReservationUI(config) {
     }, 500);
     // カレンダー変更監視を開始
     startCalendarWatcher();
+    // 時間帯クリックハンドラーを設定（選択解除機能付き）
+    setTimeout(() => {
+        setupTimeSlotClickHandlers();
+    }, 1000);
 }
 // 監視対象表示を更新
 function updateMonitoringTargetsDisplay() {
@@ -3569,6 +3966,74 @@ function removeAllMonitorButtons() {
     existingButtons.forEach(button => button.remove());
     console.log(`🗑️ 既存の監視ボタンを${existingButtons.length}個削除しました`);
 }
+// 時間帯tdの直接クリック処理を設定（選択解除機能付き）
+function setupTimeSlotClickHandlers() {
+    // 既存のハンドラーをクリア
+    const existingHandler = window.timeSlotClickHandler;
+    if (existingHandler) {
+        document.removeEventListener('click', existingHandler, true);
+    }
+    // 新しいハンドラーを設定
+    const timeSlotClickHandler = (event) => {
+        const target = event.target;
+        // 時間帯のdiv[role="button"]がクリックされた場合
+        if (target.matches && target.matches('td[data-gray-out] div[role="button"]')) {
+            const tdElement = target.closest('td[data-gray-out]');
+            if (!tdElement)
+                return;
+            const timeText = target.querySelector('dt span')?.textContent?.trim();
+            if (!timeText)
+                return;
+            // 統一状態管理システムを取得
+            const unifiedStateManager = getExternalFunction('unifiedStateManager');
+            const locationIndex = LocationHelper.getIndexFromElement(tdElement);
+            console.log(`🖱️ 時間帯クリック検出: ${timeText} (位置: ${locationIndex})`);
+            if (unifiedStateManager) {
+                // 統一状態管理で現在の選択状態を確認
+                const isCurrentlyReservationTarget = unifiedStateManager.isReservationTarget(timeText, locationIndex);
+                console.log(`🔍 現在の予約対象状態: ${isCurrentlyReservationTarget}`);
+                if (isCurrentlyReservationTarget) {
+                    // 既に予約対象として設定済みの場合は選択解除
+                    console.log(`🔄 選択解除: ${timeText}`);
+                    // 統一状態管理から予約対象を削除
+                    unifiedStateManager.clearReservationTarget();
+                    console.log('✅ 統一状態管理から予約対象をクリア');
+                    // FABボタンの状態更新
+                    setTimeout(() => {
+                        updateMainButtonDisplay();
+                        console.log('🔄 選択解除後のFABボタン更新完了');
+                    }, 100);
+                }
+                else {
+                    // 新規選択または別の時間帯への変更
+                    console.log(`✅ 新規選択: ${timeText}`);
+                    // 統一状態管理に予約対象を設定（既存の予約対象は自動的に置き換え）
+                    setTimeout(() => {
+                        unifiedStateManager.setReservationTarget(timeText, locationIndex);
+                        updateMainButtonDisplay();
+                        console.log(`✅ 統一状態管理に予約対象設定: ${timeText} (位置: ${locationIndex})`);
+                    }, 100);
+                }
+            }
+            else {
+                // 統一状態管理が利用できない場合はDOMベースの判定
+                const isCurrentlySelected = target.getAttribute('aria-pressed') === 'true';
+                console.log(`⚠️ 統一状態管理なし、DOM判定: ${isCurrentlySelected}`);
+                if (!isCurrentlySelected) {
+                    // 通常の選択処理（何もしない、デフォルト動作に任せる）
+                    setTimeout(() => {
+                        updateMainButtonDisplay();
+                    }, 100);
+                }
+            }
+        }
+    };
+    // グローバルに保存（後でremoveするため）
+    window.timeSlotClickHandler = timeSlotClickHandler;
+    // 捕獲フェーズでイベントをキャッチ
+    document.addEventListener('click', timeSlotClickHandler, true);
+    console.log('✅ 時間帯クリックハンドラーを設定しました');
+}
 async function section7_entranceReservationHelper(config) {
     const { selectors, selectorTexts, timeouts } = config;
     let attempts = 0;
@@ -3650,390 +4115,6 @@ async function section7_entranceReservationHelper(config) {
 // エクスポート
 
 // ============================================================================
-
-;// ./src-modules/unified-state.ts
-/**
- * 統一状態管理システム
- * 予約・監視の状態と対象を一元管理
- */
-// 必要なimport
-
-
-
-// ============================================================================
-// 型定義
-// ============================================================================
-// 実行状態（排他的）
-var ExecutionState;
-(function (ExecutionState) {
-    ExecutionState["IDLE"] = "idle";
-    ExecutionState["RESERVATION_RUNNING"] = "reservation_running";
-    ExecutionState["MONITORING_RUNNING"] = "monitoring_running";
-})(ExecutionState || (ExecutionState = {}));
-// 優先実行モード
-var PriorityMode;
-(function (PriorityMode) {
-    PriorityMode["AUTO"] = "auto";
-    PriorityMode["FORCE_RESERVATION"] = "force_reservation";
-    PriorityMode["FORCE_MONITORING"] = "force_monitoring"; // 監視強制実行
-})(PriorityMode || (PriorityMode = {}));
-// 位置管理の定数
-const LOCATION_MAP = {
-    0: 'east', // 0番目のtd = 東
-    1: 'west' // 1番目のtd = 西
-};
-const LOCATION_TO_INDEX = {
-    'east': 0,
-    'west': 1
-};
-// ============================================================================
-// 位置管理ヘルパークラス
-// ============================================================================
-class LocationHelper {
-    // indexから東西を取得
-    static getLocationFromIndex(index) {
-        return LOCATION_MAP[index] || 'east';
-    }
-    // 東西からindexを取得
-    static getIndexFromLocation(location) {
-        return LOCATION_TO_INDEX[location];
-    }
-    // tdSelectorからindexを抽出
-    static getIndexFromSelector(selector) {
-        const cellMatch = selector.match(/td:nth-child\((\d+)\)/);
-        if (cellMatch && cellMatch[1]) {
-            return parseInt(cellMatch[1]) - 1; // nth-childは1ベース、indexは0ベース
-        }
-        return 0; // デフォルトは東
-    }
-    // DOM要素からindexを取得
-    static getIndexFromElement(tdElement) {
-        const row = tdElement.parentElement;
-        return Array.from(row.children).indexOf(tdElement);
-    }
-    // 同じ時間帯の比較用キー生成
-    static generateTimeLocationKey(timeSlot, locationIndex) {
-        return `${timeSlot}_${locationIndex}`;
-    }
-    // ログ表示用のヘルパー
-    static formatTargetInfo(timeSlot, locationIndex) {
-        const location = LocationHelper.getLocationFromIndex(locationIndex);
-        return `${location}${timeSlot}`; // 例: "east11:00-" or "west09:00-"
-    }
-}
-// ============================================================================
-// 統一状態管理クラス
-// ============================================================================
-class UnifiedStateManager {
-    constructor() {
-        // 実行状態
-        this.executionState = ExecutionState.IDLE;
-        // 対象管理
-        this.reservationTarget = null;
-        this.monitoringTargets = [];
-        // 優先度設定
-        this.priorityMode = PriorityMode.AUTO;
-        // デバッグフラグ
-        this.debugMode = true;
-    }
-    // ============================================================================
-    // 実行状態管理
-    // ============================================================================
-    getExecutionState() {
-        return this.executionState;
-    }
-    startReservation() {
-        if (this.executionState !== ExecutionState.IDLE) {
-            this.log('⚠️ 予約開始失敗: 他の処理が実行中');
-            return false;
-        }
-        if (!this.canStartReservation()) {
-            this.log('⚠️ 予約開始失敗: 条件未満足');
-            return false;
-        }
-        this.executionState = ExecutionState.RESERVATION_RUNNING;
-        this.log('🚀 予約処理を開始');
-        return true;
-    }
-    startMonitoring() {
-        if (this.executionState !== ExecutionState.IDLE) {
-            this.log('⚠️ 監視開始失敗: 他の処理が実行中');
-            return false;
-        }
-        if (!this.canStartMonitoring()) {
-            this.log('⚠️ 監視開始失敗: 監視対象なし');
-            return false;
-        }
-        this.executionState = ExecutionState.MONITORING_RUNNING;
-        this.log('👁️ 監視処理を開始');
-        return true;
-    }
-    stop() {
-        const prevState = this.executionState;
-        this.executionState = ExecutionState.IDLE;
-        switch (prevState) {
-            case ExecutionState.RESERVATION_RUNNING:
-                this.log('⏹️ 予約処理を停止');
-                break;
-            case ExecutionState.MONITORING_RUNNING:
-                this.log('⏹️ 監視処理を停止');
-                break;
-        }
-    }
-    // ============================================================================
-    // 対象管理
-    // ============================================================================
-    setReservationTarget(timeSlot, locationIndex, selector) {
-        // selectorが未指定の場合は生成
-        if (!selector) {
-            const selectedSlot = document.querySelector(timeSlotSelectors.selectedSlot);
-            if (selectedSlot) {
-                const tdElement = selectedSlot.closest('td[data-gray-out]');
-                selector = section4_generateUniqueTdSelector(tdElement);
-            }
-            else {
-                this.log('⚠️ 予約対象設定失敗: DOM要素が見つからない');
-                return;
-            }
-        }
-        this.reservationTarget = {
-            timeSlot,
-            locationIndex,
-            selector,
-            isValid: true
-        };
-        this.log(`✅ 予約対象設定: ${LocationHelper.formatTargetInfo(timeSlot, locationIndex)}`);
-    }
-    clearReservationTarget() {
-        if (this.reservationTarget) {
-            const info = LocationHelper.formatTargetInfo(this.reservationTarget.timeSlot, this.reservationTarget.locationIndex);
-            this.reservationTarget = null;
-            this.log(`🗑️ 予約対象クリア: ${info}`);
-        }
-    }
-    addMonitoringTarget(timeSlot, locationIndex, selector) {
-        const key = LocationHelper.generateTimeLocationKey(timeSlot, locationIndex);
-        const existing = this.monitoringTargets.find(target => LocationHelper.generateTimeLocationKey(target.timeSlot, target.locationIndex) === key);
-        if (existing) {
-            this.log(`⚠️ 監視対象は既に存在: ${LocationHelper.formatTargetInfo(timeSlot, locationIndex)}`);
-            return false;
-        }
-        const newTarget = {
-            timeSlot,
-            locationIndex,
-            selector,
-            priority: this.monitoringTargets.length + 1,
-            status: 'full' // 通常満員の時間帯を監視対象にする
-        };
-        this.monitoringTargets.push(newTarget);
-        this.log(`✅ 監視対象追加: ${LocationHelper.formatTargetInfo(timeSlot, locationIndex)} (優先度: ${newTarget.priority})`);
-        return true;
-    }
-    removeMonitoringTarget(timeSlot, locationIndex) {
-        const key = LocationHelper.generateTimeLocationKey(timeSlot, locationIndex);
-        const initialLength = this.monitoringTargets.length;
-        this.monitoringTargets = this.monitoringTargets.filter(target => LocationHelper.generateTimeLocationKey(target.timeSlot, target.locationIndex) !== key);
-        if (this.monitoringTargets.length < initialLength) {
-            // 優先度を再計算
-            this.monitoringTargets.forEach((target, index) => {
-                target.priority = index + 1;
-            });
-            this.log(`✅ 監視対象削除: ${LocationHelper.formatTargetInfo(timeSlot, locationIndex)} (残り: ${this.monitoringTargets.length})`);
-            return true;
-        }
-        return false;
-    }
-    clearMonitoringTargets() {
-        const count = this.monitoringTargets.length;
-        this.monitoringTargets = [];
-        this.log(`🗑️ 全監視対象クリア (${count}個)`);
-    }
-    // ============================================================================
-    // 状態判定
-    // ============================================================================
-    canStartReservation() {
-        // 1. 予約対象の存在確認
-        if (!this.reservationTarget || !this.reservationTarget.isValid) {
-            return false;
-        }
-        // 2. 時間帯選択状態の確認
-        const selectedSlot = document.querySelector(timeSlotSelectors.selectedSlot);
-        if (!selectedSlot) {
-            return false;
-        }
-        // 3. 選択時間帯の満員状態確認
-        const tdElement = selectedSlot.closest('td[data-gray-out]');
-        if (tdElement) {
-            const status = extractTdStatus(tdElement);
-            if (status?.isFull) {
-                return false;
-            }
-        }
-        // 4. 来場日時ボタンの有効性確認
-        const visitTimeButton = document.querySelector('button.basic-btn.type2.style_full__ptzZq');
-        if (!visitTimeButton || visitTimeButton.disabled) {
-            return false;
-        }
-        // 5. カレンダー選択確認
-        const selectedDate = getCurrentSelectedCalendarDate();
-        if (!selectedDate) {
-            return false;
-        }
-        return true;
-    }
-    canStartMonitoring() {
-        return this.monitoringTargets.length > 0;
-    }
-    canInterrupt() {
-        return this.executionState !== ExecutionState.IDLE;
-    }
-    // ============================================================================
-    // 優先度判定
-    // ============================================================================
-    getPreferredAction() {
-        const canReserve = this.canStartReservation();
-        const canMonitor = this.canStartMonitoring();
-        switch (this.priorityMode) {
-            case PriorityMode.FORCE_RESERVATION:
-                return canReserve ? 'reservation' : 'none';
-            case PriorityMode.FORCE_MONITORING:
-                return canMonitor ? 'monitoring' : 'none';
-            case PriorityMode.AUTO:
-            default:
-                // 予約優先（両方可能な場合は予約を選択）
-                if (canReserve) {
-                    // 予約優先のため監視対象をクリア
-                    if (canMonitor) {
-                        this.log('🔄 予約優先のため監視対象をクリア');
-                        this.clearMonitoringTargets();
-                    }
-                    return 'reservation';
-                }
-                if (canMonitor)
-                    return 'monitoring';
-                return 'none';
-        }
-    }
-    setPriorityMode(mode) {
-        this.priorityMode = mode;
-        this.log(`🔧 優先度モード変更: ${mode}`);
-    }
-    // ============================================================================
-    // 既存システムとの互換性
-    // ============================================================================
-    // 既存のmultiTargetManagerから監視対象を移行
-    migrateFromExisting() {
-        this.log('🔄 既存システムから状態を移行中...');
-        // 監視対象の移行
-        const existingTargets = section2_multiTargetManager.getTargets();
-        existingTargets.forEach((target, index) => {
-            const locationIndex = LocationHelper.getIndexFromSelector(target.tdSelector);
-            this.monitoringTargets.push({
-                timeSlot: target.timeText,
-                locationIndex,
-                selector: target.tdSelector,
-                priority: index + 1,
-                status: 'full'
-            });
-        });
-        // 手動選択された予約対象を検出
-        const selectedSlot = document.querySelector(timeSlotSelectors.selectedSlot);
-        if (selectedSlot) {
-            const tdElement = selectedSlot.closest('td[data-gray-out]');
-            if (tdElement) {
-                const timeText = this.extractTimeTextFromElement(selectedSlot);
-                const locationIndex = LocationHelper.getIndexFromElement(tdElement);
-                const selector = section4_generateUniqueTdSelector(tdElement);
-                this.reservationTarget = {
-                    timeSlot: timeText,
-                    locationIndex,
-                    selector,
-                    isValid: true
-                };
-            }
-        }
-        // 実行状態の移行
-        if (entranceReservationState.isRunning) {
-            this.executionState = ExecutionState.RESERVATION_RUNNING;
-        }
-        else if (timeSlotState.isMonitoring) {
-            this.executionState = ExecutionState.MONITORING_RUNNING;
-        }
-        this.log(`✅ 移行完了: 予約対象=${this.reservationTarget ? '1' : '0'}, 監視対象=${this.monitoringTargets.length}`);
-    }
-    // ============================================================================
-    // UI連携用メソッド
-    // ============================================================================
-    getFabButtonState() {
-        switch (this.executionState) {
-            case ExecutionState.RESERVATION_RUNNING:
-                return 'running';
-            case ExecutionState.MONITORING_RUNNING:
-                return 'monitoring';
-            case ExecutionState.IDLE:
-                const preferredAction = this.getPreferredAction();
-                return preferredAction !== 'none' ? 'enabled' : 'disabled';
-        }
-    }
-    getFabButtonText() {
-        switch (this.executionState) {
-            case ExecutionState.RESERVATION_RUNNING:
-                return '予約\n中断';
-            case ExecutionState.MONITORING_RUNNING:
-                return '監視\n中断';
-            case ExecutionState.IDLE:
-                const preferredAction = this.getPreferredAction();
-                switch (preferredAction) {
-                    case 'reservation': return '予約\n開始';
-                    case 'monitoring': return '監視\n開始';
-                    default: return '待機中';
-                }
-        }
-    }
-    // ============================================================================
-    // ゲッター
-    // ============================================================================
-    getReservationTarget() {
-        return this.reservationTarget;
-    }
-    getMonitoringTargets() {
-        return [...this.monitoringTargets];
-    }
-    hasReservationTarget() {
-        return this.reservationTarget !== null && this.reservationTarget.isValid;
-    }
-    hasMonitoringTargets() {
-        return this.monitoringTargets.length > 0;
-    }
-    getMonitoringTargetCount() {
-        return this.monitoringTargets.length;
-    }
-    // ============================================================================
-    // デバッグ・ログ
-    // ============================================================================
-    log(message) {
-        if (this.debugMode) {
-            console.log(`[UnifiedState] ${message}`);
-        }
-    }
-    // DOM要素から時間テキストを抽出
-    extractTimeTextFromElement(element) {
-        const timeSpan = element.querySelector('dt span');
-        return timeSpan?.textContent?.trim() || 'unknown';
-    }
-    // デバッグ情報の出力
-    debugInfo() {
-        console.group('[UnifiedState] デバッグ情報');
-        console.log('実行状態:', this.executionState);
-        console.log('優先度モード:', this.priorityMode);
-        console.log('予約対象:', this.reservationTarget);
-        console.log('監視対象:', this.monitoringTargets);
-        console.log('予約可能:', this.canStartReservation());
-        console.log('監視可能:', this.canStartMonitoring());
-        console.log('推奨アクション:', this.getPreferredAction());
-        console.groupEnd();
-    }
-}
 
 ;// ./src-modules/section8.ts
 // 各sectionからのimport

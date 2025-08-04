@@ -44,6 +44,7 @@ export declare class UnifiedStateManager {
     startMonitoring(): boolean;
     stop(): void;
     setReservationTarget(timeSlot: string, locationIndex: number, selector?: string): void;
+    isReservationTarget(timeSlot: string, locationIndex: number): boolean;
     clearReservationTarget(): void;
     addMonitoringTarget(timeSlot: string, locationIndex: number, selector: string): boolean;
     removeMonitoringTarget(timeSlot: string, locationIndex: number): boolean;

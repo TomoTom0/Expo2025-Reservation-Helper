@@ -25,8 +25,12 @@ import {
 import {
     checkTimeSlotTableExistsSync,
     analyzeAndAddMonitorButtons,
-    startSlotMonitoring
+    startSlotMonitoring,
+    getExternalFunction
 } from './section5';
+
+// unified-stateからのimport
+import { LocationHelper } from './unified-state';
 
 // Section 6からのimport  
 import {
@@ -305,6 +309,11 @@ function createEntranceReservationUI(config: ReservationConfig): void {
     
     // カレンダー変更監視を開始
     startCalendarWatcher();
+    
+    // 時間帯クリックハンドラーを設定（選択解除機能付き）
+    setTimeout(() => {
+        setupTimeSlotClickHandlers();
+    }, 1000);
 }
 
 // 監視対象表示を更新
@@ -588,6 +597,87 @@ function removeAllMonitorButtons(): void {
     const existingButtons = document.querySelectorAll('.monitor-btn.ext-ytomo');
     existingButtons.forEach(button => button.remove());
     console.log(`🗑️ 既存の監視ボタンを${existingButtons.length}個削除しました`);
+}
+
+// 時間帯tdの直接クリック処理を設定（選択解除機能付き）
+function setupTimeSlotClickHandlers(): void {
+    // 既存のハンドラーをクリア
+    const existingHandler = (window as any).timeSlotClickHandler;
+    if (existingHandler) {
+        document.removeEventListener('click', existingHandler, true);
+    }
+    
+    // 新しいハンドラーを設定
+    const timeSlotClickHandler = (event: Event) => {
+        const target = event.target as HTMLElement;
+        
+        // 時間帯のdiv[role="button"]がクリックされた場合
+        if (target.matches && target.matches('td[data-gray-out] div[role="button"]')) {
+            const tdElement = target.closest('td[data-gray-out]') as HTMLTableCellElement;
+            if (!tdElement) return;
+            
+            const timeText = target.querySelector('dt span')?.textContent?.trim();
+            if (!timeText) return;
+            
+            // 統一状態管理システムを取得
+            const unifiedStateManager = getExternalFunction('unifiedStateManager');
+            const locationIndex = LocationHelper.getIndexFromElement(tdElement);
+            
+            console.log(`🖱️ 時間帯クリック検出: ${timeText} (位置: ${locationIndex})`);
+            
+            if (unifiedStateManager) {
+                // 統一状態管理で現在の選択状態を確認
+                const isCurrentlyReservationTarget = unifiedStateManager.isReservationTarget(timeText, locationIndex);
+                
+                console.log(`🔍 現在の予約対象状態: ${isCurrentlyReservationTarget}`);
+                
+                if (isCurrentlyReservationTarget) {
+                    // 既に予約対象として設定済みの場合は選択解除
+                    console.log(`🔄 選択解除: ${timeText}`);
+                    
+                    // 統一状態管理から予約対象を削除
+                    unifiedStateManager.clearReservationTarget();
+                    console.log('✅ 統一状態管理から予約対象をクリア');
+                    
+                    // FABボタンの状態更新
+                    setTimeout(() => {
+                        updateMainButtonDisplay();
+                        console.log('🔄 選択解除後のFABボタン更新完了');
+                    }, 100);
+                    
+                } else {
+                    // 新規選択または別の時間帯への変更
+                    console.log(`✅ 新規選択: ${timeText}`);
+                    
+                    // 統一状態管理に予約対象を設定（既存の予約対象は自動的に置き換え）
+                    setTimeout(() => {
+                        unifiedStateManager.setReservationTarget(timeText, locationIndex);
+                        updateMainButtonDisplay();
+                        console.log(`✅ 統一状態管理に予約対象設定: ${timeText} (位置: ${locationIndex})`);
+                    }, 100);
+                }
+            } else {
+                // 統一状態管理が利用できない場合はDOMベースの判定
+                const isCurrentlySelected = target.getAttribute('aria-pressed') === 'true';
+                console.log(`⚠️ 統一状態管理なし、DOM判定: ${isCurrentlySelected}`);
+                
+                if (!isCurrentlySelected) {
+                    // 通常の選択処理（何もしない、デフォルト動作に任せる）
+                    setTimeout(() => {
+                        updateMainButtonDisplay();
+                    }, 100);
+                }
+            }
+        }
+    };
+    
+    // グローバルに保存（後でremoveするため）
+    (window as any).timeSlotClickHandler = timeSlotClickHandler;
+    
+    // 捕獲フェーズでイベントをキャッチ
+    document.addEventListener('click', timeSlotClickHandler, true);
+    
+    console.log('✅ 時間帯クリックハンドラーを設定しました');
 }
 
 async function entranceReservationHelper(config: ReservationConfig): Promise<ReservationResult> {
