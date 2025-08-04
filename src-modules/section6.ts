@@ -23,7 +23,8 @@ import {
     checkTimeSlotTableExistsSync,
     checkTimeSlotTableExistsAsync,
     waitForTimeSlotTable,
-    startSlotMonitoring
+    startSlotMonitoring,
+    getExternalFunction
 } from './section5';
 
 // 型定義のインポート
@@ -774,6 +775,37 @@ function updateMainButtonDisplay(forceMode: string | null = null): void {
                 case 'idle':
                 default:
                     console.log(`🔄 idle ケース実行`);
+                    
+                    // 統一状態管理システムを使用する場合
+                    const unifiedStateManager = getExternalFunction('unifiedStateManager');
+                    if (unifiedStateManager) {
+                        const preferredAction = unifiedStateManager.getPreferredAction();
+                        console.log(`🔍 統一状態管理 優先アクション: ${preferredAction}`);
+                        
+                        if (preferredAction === 'reservation') {
+                            span.innerText = '予約\n開始';
+                            // CSSクラスによる状態管理
+                            fabButton.className = fabButton.className.replace(/ytomo-fab-\w+/g, '');
+                            fabButton.classList.add('ytomo-fab-enabled');
+                            fabButton.title = '予約開始';
+                            fabButton.disabled = false;
+                        } else if (preferredAction === 'monitoring') {
+                            span.innerText = '監視予約\n開始';
+                            fabButton.className = fabButton.className.replace(/ytomo-fab-\w+/g, '');
+                            fabButton.classList.add('ytomo-fab-enabled');
+                            fabButton.title = '監視予約開始';
+                            fabButton.disabled = false;
+                        } else {
+                            span.innerText = '待機中';
+                            fabButton.className = fabButton.className.replace(/ytomo-fab-\w+/g, '');
+                            fabButton.classList.add('ytomo-fab-disabled');
+                            fabButton.title = '待機中（条件未満足）';
+                            fabButton.disabled = true;
+                        }
+                        return; // 統一状態管理での処理完了
+                    }
+                    
+                    // フォールバック: 既存ロジック（移行期間用）
                     // 監視対象が設定されている場合は selecting モードになるはずだが、
                     // 念のため idle でも監視対象の有無を確認
                     // 予約と監視の優先順位判定
@@ -855,6 +887,38 @@ function updateMainButtonDisplay(forceMode: string | null = null): void {
 
 // 現在のモードを取得するヘルパー関数（予約優先ロジック組み込み）
 function getCurrentMode(): string {
+    // section5から注入された統一状態管理システムを取得
+    const unifiedStateManager = getExternalFunction('unifiedStateManager');
+    
+    if (unifiedStateManager) {
+        // 新しいロジック: UnifiedStateManagerの状態に基づく判定
+        const executionState = unifiedStateManager.getExecutionState();
+        
+        switch (executionState) {
+            case 'reservation_running':
+                return 'reservation-running';
+            case 'monitoring_running':
+                return 'monitoring';
+            case 'idle':
+                // ページローディング状態の確認
+                if (pageLoadingState?.isLoading) {
+                    return 'loading';
+                }
+                
+                // 推奨アクションを確認
+                const preferredAction = unifiedStateManager.getPreferredAction();
+                switch (preferredAction) {
+                    case 'reservation':
+                        return 'idle'; // 予約可能状態
+                    case 'monitoring':
+                        return 'selecting'; // 監視準備完了
+                    default:
+                        return 'idle';
+                }
+        }
+    }
+    
+    // フォールバック: 既存ロジック（移行期間用）
     if (pageLoadingState && pageLoadingState.isLoading) {
         return 'loading';
     } else if (timeSlotState.isMonitoring) {

@@ -1,5 +1,6 @@
 import type { TimeSlotInfo, TimeSlotTarget, CacheManager } from '../types/index.js';
 export declare const setExternalFunctions: (funcs: Record<string, any>) => void;
+export declare const getExternalFunction: (name: string) => any;
 export declare const setCacheManager: (cm: CacheManager) => void;
 declare global {
     interface Window {

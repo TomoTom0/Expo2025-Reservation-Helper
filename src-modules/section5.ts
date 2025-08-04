@@ -44,7 +44,8 @@ const REQUIRED_FUNCTIONS: string[] = [
     'reloadCountdownState',
     'resetMonitoringUI',
     'showErrorMessage',
-    'tryClickCalendarForTimeSlot'
+    'tryClickCalendarForTimeSlot',
+    'unifiedStateManager' // 統一状態管理システムを追加
 ];
 
 // 外部関数を設定するヘルパー関数
@@ -72,16 +73,13 @@ const safeCall: SafeCallFunction = (funcName: string, ...args: any[]): any => {
 };
 
 // 安全な外部オブジェクト参照
-// 現在未使用のため一時的にコメントアウト
-// function safeRef(objName: string): any {
-//     if (!isInitialized) {
-//         throw new Error('External functions not initialized in Section 5');
-//     }
-//     if (!externalFunctions[objName]) {
-//         throw new Error(`Object ${objName} not available in Section 5`);
-//     }
-//     return externalFunctions[objName];
-// }
+export const getExternalFunction = (name: string): any => {
+    if (!isInitialized) {
+        console.warn('External functions not initialized in Section 5');
+        return null;
+    }
+    return externalFunctions[name] || null;
+};
 
 // 依存注入用のcacheManager参照
 let cacheManager: CacheManager | null = null;

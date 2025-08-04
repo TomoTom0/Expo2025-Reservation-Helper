@@ -17,6 +17,9 @@ import {
 } from './section7';
 import { initTimeSlotMonitoring } from './section4';
 
+// 統一状態管理システムのimport
+import { UnifiedStateManager } from './unified-state';
+
 // 型定義のインポート
 import type { CacheManager } from '../types/index.js';
 
@@ -27,6 +30,20 @@ import type { CacheManager } from '../types/index.js';
 const cacheManager: CacheManager = createCacheManager({
     getCurrentSelectedCalendarDateFn: getCurrentSelectedCalendarDate
 });
+
+// 統一状態管理システムの初期化
+const unifiedStateManager = new UnifiedStateManager();
+
+// ページ初期化時に既存データを移行
+const initializeUnifiedStateManager = (): void => {
+    try {
+        // 既存システムからの状態移行
+        unifiedStateManager.migrateFromExisting();
+        console.log('✅ 統一状態管理システム初期化完了');
+    } catch (error) {
+        console.error('⚠️ 統一状態管理システム初期化エラー:', error);
+    }
+};
 
 // section5、section6、section7にcacheManagerを設定
 setCacheManager(cacheManager);
@@ -52,7 +69,8 @@ setExternalFunctions({
     reloadCountdownState,
     resetMonitoringUI,
     showErrorMessage,
-    tryClickCalendarForTimeSlot
+    tryClickCalendarForTimeSlot,
+    unifiedStateManager // 統一状態管理システムを外部関数に注入
 });
 
 // URL判定とページタイプ識別
@@ -87,6 +105,12 @@ const trigger_init = (url_record: string): void => {
                     initTimeSlotMonitoringFn: initTimeSlotMonitoring,
                     restoreFromCacheFn: restoreFromCache
                 });
+                
+                // 入場予約ページ初期化後に統一状態管理システムを初期化
+                setTimeout(() => {
+                    initializeUnifiedStateManager();
+                }, 1000);
+                
                 console.log("ytomo extension loaded (entrance reservation)");
             }
         }, 500);
