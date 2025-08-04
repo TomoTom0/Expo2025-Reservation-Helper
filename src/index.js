@@ -3954,9 +3954,35 @@ function handleCalendarChange() {
         }, 1000); // 時間帯テーブル更新を待つ
     }
     else {
-        // 日付は変わっていない - 監視ボタンの再設置は不要
-        console.log('📅 日付変更なし - FABボタンの状態のみ更新');
-        // FABボタンの状態のみ更新（監視ボタンは再設置しない）
+        // 日付は変わっていない - 同じ日付をクリックした場合の処理
+        console.log('📅 日付変更なし - 同じ日付再クリックによる選択解除を検討');
+        // 統一状態管理システムを取得
+        const unifiedStateManager = getExternalFunction('unifiedStateManager');
+        // 現在時間帯が選択されている場合は選択解除
+        const selectedSlot = document.querySelector(timeSlotSelectors.selectedSlot);
+        if (selectedSlot && unifiedStateManager) {
+            const tdElement = selectedSlot.closest('td[data-gray-out]');
+            if (tdElement) {
+                const timeText = selectedSlot.querySelector('dt span')?.textContent?.trim();
+                const locationIndex = LocationHelper.getIndexFromElement(tdElement);
+                if (timeText && unifiedStateManager.isReservationTarget(timeText, locationIndex)) {
+                    console.log(`🔄 同じ日付再クリック - 時間帯選択を解除: ${timeText}`);
+                    // 統一状態管理から予約対象を削除
+                    unifiedStateManager.clearReservationTarget();
+                    // DOM上の選択状態もクリア
+                    selectedSlot.setAttribute('aria-pressed', 'false');
+                    selectedSlot.removeAttribute('aria-pressed');
+                    console.log('✅ 時間帯選択を解除しました');
+                }
+                else {
+                    console.log('📅 時間帯選択なし、または統一状態管理に未登録');
+                }
+            }
+        }
+        else {
+            console.log('📅 選択済み時間帯なし、または統一状態管理なし');
+        }
+        // FABボタンの状態を更新（監視ボタンは再設置しない）
         updateMainButtonDisplay();
     }
 }
@@ -3966,16 +3992,49 @@ function removeAllMonitorButtons() {
     existingButtons.forEach(button => button.remove());
     console.log(`🗑️ 既存の監視ボタンを${existingButtons.length}個削除しました`);
 }
-// 時間帯tdの直接クリック処理を設定（選択解除機能付き）
+// カレンダーと時間帯の包括的クリック処理を設定
 function setupTimeSlotClickHandlers() {
     // 既存のハンドラーをクリア
-    const existingHandler = window.timeSlotClickHandler;
+    const existingHandler = window.comprehensiveClickHandler;
     if (existingHandler) {
         document.removeEventListener('click', existingHandler, true);
     }
-    // 新しいハンドラーを設定
-    const timeSlotClickHandler = (event) => {
+    // 包括的なクリックハンドラーを設定
+    const comprehensiveClickHandler = (event) => {
         const target = event.target;
+        // カレンダー日付のクリック処理
+        const calendarButton = target.closest('[role="button"]');
+        const timeElement = calendarButton?.querySelector('time[datetime]');
+        if (calendarButton && timeElement && target.closest('[role="group"]')) {
+            // カレンダーエリア内のボタンクリック
+            const clickedDate = timeElement.getAttribute('datetime');
+            const currentDate = getCurrentSelectedCalendarDate();
+            console.log(`📅 カレンダークリック検出: ${clickedDate}, 現在選択: ${currentDate}`);
+            if (clickedDate === currentDate && calendarButton.getAttribute('aria-pressed') === 'true') {
+                // 同じ日付で既に選択済みをクリック - 時間帯選択を解除
+                console.log('🔄 同じ日付再クリック - 時間帯選択解除を実行');
+                const unifiedStateManager = getExternalFunction('unifiedStateManager');
+                if (unifiedStateManager && unifiedStateManager.hasReservationTarget()) {
+                    // 統一状態管理から予約対象を削除
+                    unifiedStateManager.clearReservationTarget();
+                    // DOM上の選択状態もクリア
+                    const selectedSlot = document.querySelector(timeSlotSelectors.selectedSlot);
+                    if (selectedSlot) {
+                        selectedSlot.setAttribute('aria-pressed', 'false');
+                        selectedSlot.removeAttribute('aria-pressed');
+                    }
+                    console.log('✅ 同じ日付クリックによる時間帯選択解除完了');
+                    // FABボタン更新
+                    setTimeout(() => {
+                        updateMainButtonDisplay();
+                    }, 200);
+                }
+                else {
+                    console.log('📅 予約対象なし、または統一状態管理なし');
+                }
+            }
+            // カレンダークリック処理は、時間帯処理と重複しないためここで終了はしない
+        }
         // 時間帯のdiv[role="button"]がクリックされた場合
         if (target.matches && target.matches('td[data-gray-out] div[role="button"]')) {
             const tdElement = target.closest('td[data-gray-out]');
@@ -4029,10 +4088,10 @@ function setupTimeSlotClickHandlers() {
         }
     };
     // グローバルに保存（後でremoveするため）
-    window.timeSlotClickHandler = timeSlotClickHandler;
+    window.comprehensiveClickHandler = comprehensiveClickHandler;
     // 捕獲フェーズでイベントをキャッチ
-    document.addEventListener('click', timeSlotClickHandler, true);
-    console.log('✅ 時間帯クリックハンドラーを設定しました');
+    document.addEventListener('click', comprehensiveClickHandler, true);
+    console.log('✅ カレンダーと時間帯の包括的クリックハンドラーを設定しました');
 }
 async function section7_entranceReservationHelper(config) {
     const { selectors, selectorTexts, timeouts } = config;
