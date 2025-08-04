@@ -9,7 +9,7 @@ import {
     updateMainButtonDisplay, selectTimeSlotAndStartReservation, startReloadCountdown,
     resetMonitoringUI, showErrorMessage, tryClickCalendarForTimeSlot, setPageLoadingState,
     disableAllMonitorButtons, restoreFromCache, setCacheManagerForSection6, setEntranceReservationHelper,
-    setCanStartReservation
+    setCanStartReservation, setUpdateMonitoringTargetsDisplay
 } from './section6';
 import { 
     updateMonitoringTargetsDisplay, createEntranceReservationUI, setCacheManagerForSection7,
@@ -17,11 +17,14 @@ import {
 } from './section7';
 import { initTimeSlotMonitoring } from './section4';
 
+// 型定義のインポート
+import type { CacheManager } from '../types/index.js';
+
 // 【8. ページ判定・初期化】
 // ============================================================================
 
 // cacheManagerの初期化
-const cacheManager = createCacheManager({
+const cacheManager: CacheManager = createCacheManager({
     getCurrentSelectedCalendarDateFn: getCurrentSelectedCalendarDate
 });
 
@@ -33,6 +36,7 @@ setCacheManagerForSection7(cacheManager);
 // section6に必要な関数を注入
 setEntranceReservationHelper(entranceReservationHelper);
 setCanStartReservation(canStartReservation);
+setUpdateMonitoringTargetsDisplay(updateMonitoringTargetsDisplay);
 
 // section5.jsに外部関数を注入（showStatusは一時的に除外）
 setExternalFunctions({
@@ -53,7 +57,7 @@ setExternalFunctions({
 });
 
 // URL判定とページタイプ識別
-const identify_page_type = (url) => {
+const identify_page_type = (url: string): string | null => {
     if (url.includes("ticket.expo2025.or.jp/event_search/")) {
         return "pavilion_reservation";
     } else if (url.includes("ticket.expo2025.or.jp/ticket_visiting_reservation/")) {
@@ -63,7 +67,7 @@ const identify_page_type = (url) => {
 }
 
 // ページ遷移時の初期化トリガー
-const trigger_init = (url_record) => {
+const trigger_init = (url_record: string): void => {
     const page_type = identify_page_type(url_record);
     
     if (page_type === "pavilion_reservation") {
@@ -114,68 +118,8 @@ catch (e) {
     // alert(e);
 }
 
-// テスト用エクスポート（Node.js環境でのみ有効）
-if (typeof module !== 'undefined' && module.exports) {
-    module.exports = {
-        // パビリオン検索機能
-        prepare_filter,
-        
-        // 時間帯監視機能
-        generateUniqueTdSelector,
-        getTdPositionInfo,
-        findSameTdElement,
-        extractTdStatus,
-        
-        // FAB UI機能
-        createEntranceReservationUI,
-        updateMainButtonDisplay,
-        updateMonitoringTargetsDisplay,
-        
-        // カレンダー監視機能
-        startCalendarWatcher,
-        handleCalendarChange,
-        getCurrentSelectedCalendarDate,
-        
-        // キャッシュ機能
-        cacheManager,
-        
-        // 状態管理オブジェクト
-        multiTargetManager,
-        timeSlotState,
-        entranceReservationState,
-        calendarWatchState,
-        
-        // セレクタ定義
-        timeSlotSelectors,
-        
-        // ページ機能
-        init_page,
-        init_entrance_page,
-        identify_page_type,
-        trigger_init,
-        
-        // Unit Test用追加関数 (Phase 1)
-        extractTimeSlotInfo,
-        getMonitorButtonText,
-        getCurrentMode,
-        getRandomWaitTime,
-        generateSelectorForElement,
-        
-        // Unit Test用追加関数 (Phase 2)
-        generateUniqueTdSelector,
-        getTdPositionInfo,
-        findSameTdElement,
-        extractTdStatus,
-        
-        // Unit Test用追加関数 (Phase 3)
-        checkTimeSlotTableExistsSync,
-        validatePageLoaded,
-        canStartReservation,
-        isInterruptionAllowed,
-        checkTimeSlotSelected,
-        checkVisitTimeButtonState
-    };
-}
+// TypeScript環境では module.exports は使用しない
+// 必要に応じてES6のexportを使用する
 
 
 

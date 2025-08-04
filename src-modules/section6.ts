@@ -39,6 +39,7 @@ import type {
 let cacheManager: CacheManager | null = null;
 let entranceReservationHelper: Function | null = null;
 let canStartReservation: Function | null = null;
+let updateMonitoringTargetsDisplayFn: Function | null = null;
 
 // cacheManagerを設定するヘルパー関数
 export const setCacheManagerForSection6 = (cm: CacheManager): void => {
@@ -53,6 +54,11 @@ export const setEntranceReservationHelper = (helper: Function): void => {
 // canStartReservationを設定するヘルパー関数
 export const setCanStartReservation = (fn: Function): void => {
     canStartReservation = fn;
+};
+
+// updateMonitoringTargetsDisplayを設定するヘルパー関数
+export const setUpdateMonitoringTargetsDisplay = (fn: Function): void => {
+    updateMonitoringTargetsDisplayFn = fn;
 };
 
 // 時間帯表示のためのカレンダー自動クリック機能
@@ -972,9 +978,8 @@ function startReloadCountdown(seconds: number = 30): void {
             
             if (reloadCountdownState.secondsRemaining <= 0) {
                 stopReloadCountdown();
-                // カウントダウン完了でリロード実行
-                console.log('🔄 カウントダウン完了によりページをリロードします...');
-                window.location.reload();
+                // リロード実行はreloadTimerに任せる（重複実行を防ぐ）
+                console.log('🔄 カウントダウン完了（リロードはreloadTimerが実行）');
             }
         }
     }, 1000);
@@ -990,7 +995,7 @@ function stopReloadCountdown(): void {
     if (reloadCountdownState.reloadTimer) {
         clearTimeout(reloadCountdownState.reloadTimer);
         reloadCountdownState.reloadTimer = null;
-        console.log('🛑 リロードタイマーを停止しました');
+        console.log('🛑 リロードタイマーを停止しました（中断による停止）');
     }
     reloadCountdownState.secondsRemaining = null;
     reloadCountdownState.startTime = null;
@@ -1221,6 +1226,11 @@ async function restoreFromCache(): Promise<void> {
             
             // メインボタンの表示更新
             updateMainButtonDisplay();
+            
+            // FAB監視対象表示の更新
+            if (updateMonitoringTargetsDisplayFn) {
+                updateMonitoringTargetsDisplayFn();
+            }
             
             console.log(`✅ ${restoredCount}個の監視状態を復元完了 (試行回数: ${cached.retryCount})`);
             

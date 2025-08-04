@@ -1,20 +1,14 @@
-export function setCacheManagerForSection7(cm: any): void;
-export function createEntranceReservationUI(config: any): void;
-export function updateMonitoringTargetsDisplay(): void;
-export function getCurrentReservationTarget(): string;
-export function checkVisitTimeButtonState(): boolean;
-export function checkTimeSlotSelected(): boolean;
-export function canStartReservation(): boolean;
-export function checkInitialState(): void;
-export function startCalendarWatcher(): void;
-export function handleCalendarChange(): void;
-export function removeAllMonitorButtons(): void;
-export function entranceReservationHelper(config: any): Promise<{
-    success: boolean;
-    attempts: number;
-    cancelled?: undefined;
-} | {
-    success: boolean;
-    attempts: number;
-    cancelled: boolean;
-}>;
+import type { ReservationConfig, CacheManager, ReservationResult } from '../types/index.js';
+export declare const setCacheManagerForSection7: (cm: CacheManager) => void;
+declare function createEntranceReservationUI(config: ReservationConfig): void;
+declare function updateMonitoringTargetsDisplay(): void;
+declare function getCurrentReservationTarget(): string | null;
+declare function checkVisitTimeButtonState(): boolean;
+declare function checkTimeSlotSelected(): boolean;
+declare function canStartReservation(): boolean;
+declare function checkInitialState(): void;
+declare function startCalendarWatcher(): void;
+declare function handleCalendarChange(): void;
+declare function removeAllMonitorButtons(): void;
+declare function entranceReservationHelper(config: ReservationConfig): Promise<ReservationResult>;
+export { createEntranceReservationUI, updateMonitoringTargetsDisplay, getCurrentReservationTarget, checkVisitTimeButtonState, checkTimeSlotSelected, canStartReservation, checkInitialState, startCalendarWatcher, handleCalendarChange, removeAllMonitorButtons, entranceReservationHelper };

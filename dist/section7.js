@@ -1,13 +1,13 @@
 // Section 1からのimport
-import { getRandomWaitTime, waitForElement, waitForAnyElement, clickElement } from './section1.ts';
+import { getRandomWaitTime, waitForElement, waitForAnyElement, clickElement } from './section1';
 // Section 2からのimport
-import { multiTargetManager, entranceReservationState, timeSlotState, reloadCountdownState, calendarWatchState } from './section2.ts';
+import { multiTargetManager, entranceReservationState, timeSlotState, calendarWatchState } from './section2';
 // Section 4からのimport
-import { timeSlotSelectors, generateUniqueTdSelector, extractTdStatus } from './section4.js';
+import { timeSlotSelectors, generateUniqueTdSelector, extractTdStatus } from './section4';
 // Section 5からのimport
-import { checkTimeSlotTableExistsSync, analyzeAndAddMonitorButtons, startSlotMonitoring } from './section5.js';
+import { checkTimeSlotTableExistsSync, analyzeAndAddMonitorButtons, startSlotMonitoring } from './section5';
 // Section 6からのimport  
-import { getCurrentSelectedCalendarDate, updateMainButtonDisplay, updateStatusBadge, stopSlotMonitoring, isInterruptionAllowed, showStatus } from './section6.js';
+import { getCurrentSelectedCalendarDate, updateMainButtonDisplay, updateStatusBadge, stopSlotMonitoring, isInterruptionAllowed } from './section6';
 // 【7. FAB・メインUI】
 // ============================================================================
 // 依存注入用のcacheManager参照
@@ -16,6 +16,25 @@ let cacheManager = null;
 export const setCacheManagerForSection7 = (cm) => {
     cacheManager = cm;
 };
+// ステータス表示用のヘルパー関数
+function showStatus(message, color = 'white') {
+    const statusBadge = document.querySelector('#ytomo-status-badge');
+    if (!statusBadge)
+        return;
+    statusBadge.innerText = message;
+    statusBadge.style.background = color === 'green' ? 'rgba(0, 128, 0, 0.9)' :
+        color === 'red' ? 'rgba(255, 0, 0, 0.9)' :
+            color === 'orange' ? 'rgba(255, 140, 0, 0.9)' :
+                color === 'blue' ? 'rgba(0, 104, 33, 0.9)' :
+                    'rgba(0, 0, 0, 0.8)';
+    statusBadge.style.display = 'block';
+    // 一定時間後に自動で隠す（エラー、成功、中断メッセージ以外）
+    if (color !== 'red' && color !== 'green' && color !== 'orange') {
+        setTimeout(() => {
+            statusBadge.style.display = 'none';
+        }, 3000);
+    }
+}
 function createEntranceReservationUI(config) {
     // 既存のFABがあれば削除
     const existingFab = document.getElementById('ytomo-fab-container');
@@ -227,22 +246,6 @@ function createEntranceReservationUI(config) {
             return false;
         }
     }, true); // useCapture = true
-    // ステータス表示用のヘルパー関数
-    function showStatus(message, color = 'white') {
-        statusBadge.innerText = message;
-        statusBadge.style.background = color === 'green' ? 'rgba(0, 128, 0, 0.9)' :
-            color === 'red' ? 'rgba(255, 0, 0, 0.9)' :
-                color === 'orange' ? 'rgba(255, 140, 0, 0.9)' :
-                    color === 'blue' ? 'rgba(0, 104, 33, 0.9)' :
-                        'rgba(0, 0, 0, 0.8)';
-        statusBadge.style.display = 'block';
-        // 一定時間後に自動で隠す（エラー、成功、中断メッセージ以外）
-        if (color !== 'red' && color !== 'green' && color !== 'orange') {
-            setTimeout(() => {
-                statusBadge.style.display = 'none';
-            }, 3000);
-        }
-    }
     // FABコンテナに要素を追加（上から順：監視対象→ステータス→ボタン）
     fabContainer.appendChild(monitoringTargetsDisplay);
     fabContainer.appendChild(statusBadge);
@@ -410,7 +413,7 @@ function startCalendarWatcher() {
                 (mutation.attributeName === 'aria-pressed' ||
                     mutation.attributeName === 'class')) {
                 const element = mutation.target;
-                if (element.matches('[role="button"][aria-pressed]') &&
+                if (element.matches && element.matches('[role="button"][aria-pressed]') &&
                     element.querySelector('time[datetime]')) {
                     shouldUpdate = true;
                 }
@@ -419,7 +422,7 @@ function startCalendarWatcher() {
             if (mutation.type === 'attributes' &&
                 mutation.attributeName === 'aria-pressed') {
                 const element = mutation.target;
-                if (element.matches('td[data-gray-out] div[role="button"]')) {
+                if (element.matches && element.matches('td[data-gray-out] div[role="button"]')) {
                     shouldUpdate = true;
                 }
             }
@@ -427,7 +430,7 @@ function startCalendarWatcher() {
             if (mutation.type === 'attributes' &&
                 mutation.attributeName === 'disabled') {
                 const element = mutation.target;
-                if (element.matches('button.basic-btn.type2.style_full__ptzZq')) {
+                if (element.matches && element.matches('button.basic-btn.type2.style_full__ptzZq')) {
                     shouldUpdate = true;
                 }
             }

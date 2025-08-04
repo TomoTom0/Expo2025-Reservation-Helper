@@ -1,5 +1,5 @@
 // Section 5からのimport
-import { startTimeSlotTableObserver } from './section5.js';
+import { startTimeSlotTableObserver } from './section5';
 // 【4. DOM要素セレクタ・検索】
 // ============================================================================
 // 時間帯セレクタ定義（設計書の固定DOM構造に基づく）

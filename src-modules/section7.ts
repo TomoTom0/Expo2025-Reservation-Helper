@@ -35,22 +35,49 @@ import {
     updateMainButtonDisplay,
     updateStatusBadge,
     stopSlotMonitoring,
-    isInterruptionAllowed,
-    showStatus
+    isInterruptionAllowed
 } from './section6';
+
+// 型定義のインポート
+import type { 
+    ReservationConfig,
+    CacheManager,
+    ReservationResult
+} from '../types/index.js';
 
 // 【7. FAB・メインUI】
 // ============================================================================
 
 // 依存注入用のcacheManager参照
-let cacheManager = null;
+let cacheManager: CacheManager | null = null;
 
 // cacheManagerを設定するヘルパー関数
-export const setCacheManagerForSection7 = (cm) => {
+export const setCacheManagerForSection7 = (cm: CacheManager): void => {
     cacheManager = cm;
 };
 
-function createEntranceReservationUI(config) {
+// ステータス表示用のヘルパー関数
+function showStatus(message: string, color: string = 'white'): void {
+    const statusBadge = document.querySelector('#ytomo-status-badge') as HTMLElement;
+    if (!statusBadge) return;
+    
+    statusBadge.innerText = message;
+    statusBadge.style.background = color === 'green' ? 'rgba(0, 128, 0, 0.9)' :
+                                  color === 'red' ? 'rgba(255, 0, 0, 0.9)' :
+                                  color === 'orange' ? 'rgba(255, 140, 0, 0.9)' :
+                                  color === 'blue' ? 'rgba(0, 104, 33, 0.9)' :
+                                  'rgba(0, 0, 0, 0.8)';
+    statusBadge.style.display = 'block';
+    
+    // 一定時間後に自動で隠す（エラー、成功、中断メッセージ以外）
+    if (color !== 'red' && color !== 'green' && color !== 'orange') {
+        setTimeout(() => {
+            statusBadge.style.display = 'none';
+        }, 3000);
+    }
+}
+
+function createEntranceReservationUI(config: ReservationConfig): void {
     // 既存のFABがあれば削除
     const existingFab = document.getElementById('ytomo-fab-container');
     if (existingFab) {
@@ -278,23 +305,6 @@ function createEntranceReservationUI(config) {
         }
     }, true); // useCapture = true
 
-    // ステータス表示用のヘルパー関数
-    function showStatus(message, color = 'white') {
-        statusBadge.innerText = message;
-        statusBadge.style.background = color === 'green' ? 'rgba(0, 128, 0, 0.9)' :
-                                      color === 'red' ? 'rgba(255, 0, 0, 0.9)' :
-                                      color === 'orange' ? 'rgba(255, 140, 0, 0.9)' :
-                                      color === 'blue' ? 'rgba(0, 104, 33, 0.9)' :
-                                      'rgba(0, 0, 0, 0.8)';
-        statusBadge.style.display = 'block';
-        
-        // 一定時間後に自動で隠す（エラー、成功、中断メッセージ以外）
-        if (color !== 'red' && color !== 'green' && color !== 'orange') {
-            setTimeout(() => {
-                statusBadge.style.display = 'none';
-            }, 3000);
-        }
-    }
 
     // FABコンテナに要素を追加（上から順：監視対象→ステータス→ボタン）
     fabContainer.appendChild(monitoringTargetsDisplay);
@@ -316,8 +326,8 @@ function createEntranceReservationUI(config) {
 }
 
 // 監視対象表示を更新
-function updateMonitoringTargetsDisplay() {
-    const targetsDisplay = document.querySelector('#ytomo-monitoring-targets');
+function updateMonitoringTargetsDisplay(): void {
+    const targetsDisplay = document.querySelector('#ytomo-monitoring-targets') as HTMLElement;
     if (!targetsDisplay) return;
 
     // 予約実行中の対象を取得
@@ -361,7 +371,7 @@ function updateMonitoringTargetsDisplay() {
 }
 
 // 現在の予約対象時間帯を取得
-function getCurrentReservationTarget() {
+function getCurrentReservationTarget(): string | null {
     // 選択された時間帯を探す
     const selectedSlot = document.querySelector('td[data-gray-out] div[role="button"][aria-pressed="true"]');
     if (!selectedSlot) return null;
@@ -372,7 +382,7 @@ function getCurrentReservationTarget() {
     const timeText = timeSpan.textContent.trim();
     
     // 東西判定
-    const tdElement = selectedSlot.closest('td[data-gray-out]');
+    const tdElement = selectedSlot.closest('td[data-gray-out]') as HTMLTableCellElement;
     const tdSelector = generateUniqueTdSelector(tdElement);
     const location = multiTargetManager.getLocationFromSelector(tdSelector);
     
@@ -380,8 +390,8 @@ function getCurrentReservationTarget() {
 }
 
 // 来場日時設定ボタンの状態をチェック
-function checkVisitTimeButtonState() {
-    const visitTimeButton = document.querySelector('button.basic-btn.type2.style_full__ptzZq');
+function checkVisitTimeButtonState(): boolean {
+    const visitTimeButton = document.querySelector('button.basic-btn.type2.style_full__ptzZq') as HTMLButtonElement;
     
     if (!visitTimeButton) {
         console.log('⚠️ 来場日時設定ボタンが見つかりません');
@@ -395,7 +405,7 @@ function checkVisitTimeButtonState() {
 }
 
 // 時間帯が選択されているかチェック
-function checkTimeSlotSelected() {
+function checkTimeSlotSelected(): boolean {
     // 選択された時間帯（aria-pressed="true"）をチェック
     const selectedTimeSlot = document.querySelector(timeSlotSelectors.selectedSlot);
     
@@ -416,7 +426,7 @@ function checkTimeSlotSelected() {
 }
 
 // 予約開始可能かどうかの総合判定
-function canStartReservation() {
+function canStartReservation(): boolean {
     const hasTimeSlotTable = checkTimeSlotTableExistsSync();
     const isTimeSlotSelected = checkTimeSlotSelected();
     const isVisitTimeButtonEnabled = checkVisitTimeButtonState();
@@ -430,7 +440,7 @@ function canStartReservation() {
 }
 
 // 初期状態をチェックしてFABを適切に設定
-function checkInitialState() {
+function checkInitialState(): void {
     console.log('🔍 初期状態をチェック中...');
     
     // カレンダーで日付が選択されているかチェック
@@ -447,8 +457,8 @@ function checkInitialState() {
         console.log(`✅ 日付選択済み、時間帯テーブル表示中 - ${canStart ? '予約開始可能' : '条件未満'}`);
         
         // FABボタンの状態を設定
-        const fabButton = document.querySelector('#ytomo-main-fab');
-        const fabIcon = fabButton?.querySelector('span');
+        const fabButton = document.querySelector('#ytomo-main-fab') as HTMLButtonElement;
+        const fabIcon = fabButton?.querySelector('span') as HTMLSpanElement;
         
         if (fabButton && fabIcon) {
             // 常に「予約開始」と表示
@@ -482,7 +492,7 @@ function checkInitialState() {
 }
 
 // カレンダー変更を監視して監視ボタンを再設置
-function startCalendarWatcher() {
+function startCalendarWatcher(): void {
     if (calendarWatchState.isWatching) return;
     
     calendarWatchState.isWatching = true;
@@ -499,8 +509,8 @@ function startCalendarWatcher() {
             if (mutation.type === 'attributes' && 
                 (mutation.attributeName === 'aria-pressed' || 
                  mutation.attributeName === 'class')) {
-                const element = mutation.target;
-                if (element.matches('[role="button"][aria-pressed]') && 
+                const element = mutation.target as HTMLElement;
+                if (element.matches && element.matches('[role="button"][aria-pressed]') && 
                     element.querySelector('time[datetime]')) {
                     shouldUpdate = true;
                 }
@@ -509,8 +519,8 @@ function startCalendarWatcher() {
             // 2. 時間帯選択の変更を検出
             if (mutation.type === 'attributes' && 
                 mutation.attributeName === 'aria-pressed') {
-                const element = mutation.target;
-                if (element.matches('td[data-gray-out] div[role="button"]')) {
+                const element = mutation.target as HTMLElement;
+                if (element.matches && element.matches('td[data-gray-out] div[role="button"]')) {
                     shouldUpdate = true;
                 }
             }
@@ -518,8 +528,8 @@ function startCalendarWatcher() {
             // 3. 来場日時設定ボタンのdisabled属性変更を検出
             if (mutation.type === 'attributes' && 
                 mutation.attributeName === 'disabled') {
-                const element = mutation.target;
-                if (element.matches('button.basic-btn.type2.style_full__ptzZq')) {
+                const element = mutation.target as HTMLElement;
+                if (element.matches && element.matches('button.basic-btn.type2.style_full__ptzZq')) {
                     shouldUpdate = true;
                 }
             }
@@ -543,7 +553,7 @@ function startCalendarWatcher() {
 }
 
 // カレンダー変更・状態変更時の処理
-function handleCalendarChange() {
+function handleCalendarChange(): void {
     const newSelectedDate = getCurrentSelectedCalendarDate();
     const calendarDateChanged = newSelectedDate !== calendarWatchState.currentSelectedDate;
     
@@ -586,13 +596,13 @@ function handleCalendarChange() {
 }
 
 // 既存の監視ボタンをすべて削除
-function removeAllMonitorButtons() {
+function removeAllMonitorButtons(): void {
     const existingButtons = document.querySelectorAll('.monitor-btn.ext-ytomo');
     existingButtons.forEach(button => button.remove());
     console.log(`🗑️ 既存の監視ボタンを${existingButtons.length}個削除しました`);
 }
 
-async function entranceReservationHelper(config) {
+async function entranceReservationHelper(config: ReservationConfig): Promise<ReservationResult> {
     const { selectors, selectorTexts, timeouts } = config;
     let attempts = 0;
     const maxAttempts = 100;

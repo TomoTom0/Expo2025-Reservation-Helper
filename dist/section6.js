@@ -1,15 +1,16 @@
 // Section 2からのimport
-import { multiTargetManager, entranceReservationState, timeSlotState, reloadCountdownState, pageLoadingState } from './section2.js';
+import { multiTargetManager, entranceReservationState, timeSlotState, reloadCountdownState, pageLoadingState } from './section2';
 // Section 4からのimport
-import { generateUniqueTdSelector, extractTdStatus, waitForCalendar, findSameTdElement } from './section4.js';
+import { generateUniqueTdSelector, extractTdStatus, waitForCalendar, findSameTdElement } from './section4';
 // Section 5からのimport
-import { updateAllMonitorButtonPriorities, analyzeTimeSlots, checkTimeSlotTableExistsSync, checkTimeSlotTableExistsAsync, waitForTimeSlotTable, startSlotMonitoring } from './section5.js';
+import { updateAllMonitorButtonPriorities, analyzeTimeSlots, checkTimeSlotTableExistsSync, checkTimeSlotTableExistsAsync, waitForTimeSlotTable, startSlotMonitoring } from './section5';
 // 【6. カレンダー・UI状態管理】
 // ============================================================================
 // 依存注入用の参照
 let cacheManager = null;
 let entranceReservationHelper = null;
 let canStartReservation = null;
+let updateMonitoringTargetsDisplayFn = null;
 // cacheManagerを設定するヘルパー関数
 export const setCacheManagerForSection6 = (cm) => {
     cacheManager = cm;
@@ -21,6 +22,10 @@ export const setEntranceReservationHelper = (helper) => {
 // canStartReservationを設定するヘルパー関数
 export const setCanStartReservation = (fn) => {
     canStartReservation = fn;
+};
+// updateMonitoringTargetsDisplayを設定するヘルパー関数
+export const setUpdateMonitoringTargetsDisplay = (fn) => {
+    updateMonitoringTargetsDisplayFn = fn;
 };
 // 時間帯表示のためのカレンダー自動クリック機能
 // 現在選択されているカレンダー日付を取得
@@ -826,9 +831,8 @@ function startReloadCountdown(seconds = 30) {
             updateMainButtonDisplay();
             if (reloadCountdownState.secondsRemaining <= 0) {
                 stopReloadCountdown();
-                // カウントダウン完了でリロード実行
-                console.log('🔄 カウントダウン完了によりページをリロードします...');
-                window.location.reload();
+                // リロード実行はreloadTimerに任せる（重複実行を防ぐ）
+                console.log('🔄 カウントダウン完了（リロードはreloadTimerが実行）');
             }
         }
     }, 1000);
@@ -843,7 +847,7 @@ function stopReloadCountdown() {
     if (reloadCountdownState.reloadTimer) {
         clearTimeout(reloadCountdownState.reloadTimer);
         reloadCountdownState.reloadTimer = null;
-        console.log('🛑 リロードタイマーを停止しました');
+        console.log('🛑 リロードタイマーを停止しました（中断による停止）');
     }
     reloadCountdownState.secondsRemaining = null;
     reloadCountdownState.startTime = null;
@@ -1049,6 +1053,10 @@ async function restoreFromCache() {
             timeSlotState.mode = 'selecting';
             // メインボタンの表示更新
             updateMainButtonDisplay();
+            // FAB監視対象表示の更新
+            if (updateMonitoringTargetsDisplayFn) {
+                updateMonitoringTargetsDisplayFn();
+            }
             console.log(`✅ ${restoredCount}個の監視状態を復元完了 (試行回数: ${cached.retryCount})`);
             // 監視継続フラグをチェックして監視を再開
             const shouldContinueMonitoring = cacheManager?.getAndClearMonitoringFlag();

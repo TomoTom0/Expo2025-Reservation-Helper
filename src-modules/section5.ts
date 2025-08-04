@@ -1,7 +1,8 @@
 // Section 2からのimport
 import {
     multiTargetManager,
-    timeSlotState
+    timeSlotState,
+    reloadCountdownState
 } from './section2';
 
 // Section 4からのimport
@@ -883,10 +884,10 @@ async function checkSlotAvailabilityAndReload(): Promise<void> {
     safeCall('startReloadCountdown', displaySeconds);
     
     // リロードタイマーを保存（中断時に停止するため）
-    safeRef('reloadCountdownState').reloadTimer = setTimeout(() => {
+    reloadCountdownState.reloadTimer = window.setTimeout(() => {
         console.log('🔄 監視継続のためページをリロードします...');
         window.location.reload();
-    }, totalWaitTime);
+    }, totalWaitTime) as any;
 }
 
 // ページ内で対象時間帯を検索（複数対象の状態変化をチェック）

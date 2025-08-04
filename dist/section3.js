@@ -1,5 +1,5 @@
 // Section 2からのimport
-import { multiTargetManager, timeSlotState } from './section2.js';
+import { multiTargetManager, timeSlotState } from './section2';
 // ============================================================================
 // キャッシュ管理機能
 const createCacheManager = (dependencies = {}) => {

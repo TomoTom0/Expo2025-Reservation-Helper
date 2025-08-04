@@ -176,6 +176,39 @@ export interface ElementSearchResult {
 // グローバル変数拡張
 // =========================================================================
 
+// =========================================================================
+// UI・FAB関連の型定義
+// =========================================================================
+
+export interface ReservationUIConfig {
+  selectors: {
+    submit: string;
+    change: string;
+    success: string;
+    failure: string;
+    close: string;
+  };
+  selectorTexts: {
+    change: string;
+    success?: string;
+    failure?: string;
+  };
+  timeouts: {
+    waitForSubmit: number;
+    waitForResponse: number;
+    waitForClose: number;
+    retryInterval?: number;
+  };
+  randomSettings: {
+    minCheckInterval: number;
+    checkRandomRange: number;
+    minClickDelay: number;
+    clickRandomRange: number;
+    minRetryDelay: number;
+    retryRandomRange: number;
+  };
+}
+
 declare global {
   interface Window {
     // Chrome拡張のUserScript環境での拡張

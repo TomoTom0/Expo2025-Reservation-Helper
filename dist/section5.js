@@ -1,7 +1,7 @@
 // Section 2からのimport
-import { multiTargetManager, timeSlotState } from './section2.js';
+import { multiTargetManager, timeSlotState, reloadCountdownState } from './section2';
 // Section 4からのimport
-import { timeSlotSelectors, generateUniqueTdSelector, getTdPositionInfo, findSameTdElement, extractTdStatus } from './section4.js';
+import { timeSlotSelectors, generateUniqueTdSelector, getTdPositionInfo, findSameTdElement, extractTdStatus } from './section4';
 // 【5. 時間帯監視・分析システム】
 // ============================================================================
 // 依存注入用の外部関数参照
@@ -719,7 +719,7 @@ async function checkSlotAvailabilityAndReload() {
     // カウントダウン開始（即座にUI更新）
     safeCall('startReloadCountdown', displaySeconds);
     // リロードタイマーを保存（中断時に停止するため）
-    safeRef('reloadCountdownState').reloadTimer = setTimeout(() => {
+    reloadCountdownState.reloadTimer = window.setTimeout(() => {
         console.log('🔄 監視継続のためページをリロードします...');
         window.location.reload();
     }, totalWaitTime);

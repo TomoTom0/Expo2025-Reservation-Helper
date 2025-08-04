@@ -1,11 +1,11 @@
 // 各sectionからのimport
-import { init_page, judge_init, judge_entrance_init, init_entrance_page } from './section1.ts';
-import { reloadCountdownState } from './section2.ts';
-import { createCacheManager } from './section3.ts';
-import { setCacheManager, setExternalFunctions } from './section5.js';
-import { getCurrentSelectedCalendarDate, getCurrentTableContent, shouldUpdateMonitorButtons, restoreSelectionAfterUpdate, enableAllMonitorButtons, updateMainButtonDisplay, selectTimeSlotAndStartReservation, startReloadCountdown, resetMonitoringUI, showErrorMessage, tryClickCalendarForTimeSlot, setPageLoadingState, disableAllMonitorButtons, restoreFromCache, setCacheManagerForSection6, setEntranceReservationHelper, setCanStartReservation } from './section6.js';
-import { updateMonitoringTargetsDisplay, createEntranceReservationUI, setCacheManagerForSection7, entranceReservationHelper, canStartReservation } from './section7.js';
-import { initTimeSlotMonitoring } from './section4.js';
+import { init_page, judge_init, judge_entrance_init, init_entrance_page } from './section1';
+import { reloadCountdownState } from './section2';
+import { createCacheManager } from './section3';
+import { setCacheManager, setExternalFunctions } from './section5';
+import { getCurrentSelectedCalendarDate, getCurrentTableContent, shouldUpdateMonitorButtons, restoreSelectionAfterUpdate, enableAllMonitorButtons, updateMainButtonDisplay, selectTimeSlotAndStartReservation, startReloadCountdown, resetMonitoringUI, showErrorMessage, tryClickCalendarForTimeSlot, setPageLoadingState, disableAllMonitorButtons, restoreFromCache, setCacheManagerForSection6, setEntranceReservationHelper, setCanStartReservation, setUpdateMonitoringTargetsDisplay } from './section6';
+import { updateMonitoringTargetsDisplay, createEntranceReservationUI, setCacheManagerForSection7, entranceReservationHelper, canStartReservation } from './section7';
+import { initTimeSlotMonitoring } from './section4';
 // 【8. ページ判定・初期化】
 // ============================================================================
 // cacheManagerの初期化
@@ -19,6 +19,7 @@ setCacheManagerForSection7(cacheManager);
 // section6に必要な関数を注入
 setEntranceReservationHelper(entranceReservationHelper);
 setCanStartReservation(canStartReservation);
+setUpdateMonitoringTargetsDisplay(updateMonitoringTargetsDisplay);
 // section5.jsに外部関数を注入（showStatusは一時的に除外）
 setExternalFunctions({
     getCurrentTableContent,
@@ -95,56 +96,6 @@ catch (e) {
     console.error("ytomo extension error", e);
     // alert(e);
 }
-// テスト用エクスポート（Node.js環境でのみ有効）
-if (typeof module !== 'undefined' && module.exports) {
-    module.exports = {
-        // パビリオン検索機能
-        prepare_filter,
-        // 時間帯監視機能
-        generateUniqueTdSelector,
-        getTdPositionInfo,
-        findSameTdElement,
-        extractTdStatus,
-        // FAB UI機能
-        createEntranceReservationUI,
-        updateMainButtonDisplay,
-        updateMonitoringTargetsDisplay,
-        // カレンダー監視機能
-        startCalendarWatcher,
-        handleCalendarChange,
-        getCurrentSelectedCalendarDate,
-        // キャッシュ機能
-        cacheManager,
-        // 状態管理オブジェクト
-        multiTargetManager,
-        timeSlotState,
-        entranceReservationState,
-        calendarWatchState,
-        // セレクタ定義
-        timeSlotSelectors,
-        // ページ機能
-        init_page,
-        init_entrance_page,
-        identify_page_type,
-        trigger_init,
-        // Unit Test用追加関数 (Phase 1)
-        extractTimeSlotInfo,
-        getMonitorButtonText,
-        getCurrentMode,
-        getRandomWaitTime,
-        generateSelectorForElement,
-        // Unit Test用追加関数 (Phase 2)
-        generateUniqueTdSelector,
-        getTdPositionInfo,
-        findSameTdElement,
-        extractTdStatus,
-        // Unit Test用追加関数 (Phase 3)
-        checkTimeSlotTableExistsSync,
-        validatePageLoaded,
-        canStartReservation,
-        isInterruptionAllowed,
-        checkTimeSlotSelected,
-        checkVisitTimeButtonState
-    };
-}
+// TypeScript環境では module.exports は使用しない
+// 必要に応じてES6のexportを使用する
 //# sourceMappingURL=section8.js.map
