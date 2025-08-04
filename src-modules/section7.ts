@@ -11,7 +11,6 @@ import {
     multiTargetManager, 
     entranceReservationState, 
     timeSlotState,
-    reloadCountdownState,
     calendarWatchState
 } from './section2';
 
@@ -286,7 +285,8 @@ function createEntranceReservationUI(config: ReservationConfig): void {
             }
         } catch (error) {
             console.error('予約処理エラー:', error);
-            showStatus(`エラー: ${error.message}`, 'red');
+            const errorMessage = error instanceof Error ? error.message : String(error);
+            showStatus(`エラー: ${errorMessage}`, 'red');
         } finally {
             entranceReservationState.isRunning = false;
             entranceReservationState.startTime = null;
@@ -294,6 +294,8 @@ function createEntranceReservationUI(config: ReservationConfig): void {
             updateMainButtonDisplay();
             updateMonitoringTargetsDisplay(); // 予約終了時に表示更新
         }
+        
+        return; // 明示的なreturnを追加
     });
     
     // disabled状態でのクリックを確実に防ぐため、キャプチャーフェーズでも処理
@@ -305,6 +307,8 @@ function createEntranceReservationUI(config: ReservationConfig): void {
             event.stopImmediatePropagation();
             return false;
         }
+        
+        return; // 明示的なreturnを追加
     }, true); // useCapture = true
 
 
@@ -682,7 +686,8 @@ async function entranceReservationHelper(config: ReservationConfig): Promise<Res
             }
             
         } catch (error) {
-            console.error(`エラーが発生しました (試行 ${attempts}):`, error.message);
+            const errorMessage = error instanceof Error ? error.message : String(error);
+            console.error(`エラーが発生しました (試行 ${attempts}):`, errorMessage);
             if (entranceReservationState.shouldStop) break;
             await new Promise(resolve => setTimeout(resolve, getRandomWaitTime(config.randomSettings.minRetryDelay, config.randomSettings.retryRandomRange, config)));
         }

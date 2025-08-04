@@ -48,7 +48,7 @@ return {
     },
     
     // 後方互換性のため残す
-    saveTargetSlot(slotInfo: any): void {
+    saveTargetSlot(_slotInfo: any): void {
         this.saveTargetSlots();
     },
     

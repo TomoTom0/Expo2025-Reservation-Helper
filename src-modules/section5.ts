@@ -72,15 +72,16 @@ const safeCall: SafeCallFunction = (funcName: string, ...args: any[]): any => {
 };
 
 // 安全な外部オブジェクト参照
-function safeRef(objName: string): any {
-    if (!isInitialized) {
-        throw new Error('External functions not initialized in Section 5');
-    }
-    if (!externalFunctions[objName]) {
-        throw new Error(`Object ${objName} not available in Section 5`);
-    }
-    return externalFunctions[objName];
-}
+// 現在未使用のため一時的にコメントアウト
+// function safeRef(objName: string): any {
+//     if (!isInitialized) {
+//         throw new Error('External functions not initialized in Section 5');
+//     }
+//     if (!externalFunctions[objName]) {
+//         throw new Error(`Object ${objName} not available in Section 5`);
+//     }
+//     return externalFunctions[objName];
+// }
 
 // 依存注入用のcacheManager参照
 let cacheManager: CacheManager | null = null;
@@ -453,7 +454,6 @@ function extractTimeSlotInfo(buttonElement: HTMLElement): TimeSlotInfo | null {
     // デバッグ用：要素の状態を詳細表示
     const dataDisabled = buttonElement.getAttribute('data-disabled');
     const ariaPressed = buttonElement.getAttribute('aria-pressed');
-    const hasActiveClass = Array.from(buttonElement.classList).some(className => className.includes('style_active__'));
     
     // アイコンによる満員判定（calendar_ng.svgが最も確実）
     const fullIcon = buttonElement.querySelector('img[src*="calendar_ng.svg"]');

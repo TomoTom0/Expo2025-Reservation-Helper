@@ -4,17 +4,16 @@ import {
     entranceReservationState, 
     timeSlotState,
     reloadCountdownState,
-    calendarWatchState,
     pageLoadingState
 } from './section2';
 
 // Section 4からのimport
 import {
-    timeSlotSelectors,
     generateUniqueTdSelector,
     extractTdStatus,
     waitForCalendar,
-    findSameTdElement
+    findSameTdElement,
+    timeSlotSelectors
 } from './section4';
 
 // Section 5からのimport
@@ -401,13 +400,16 @@ async function selectTimeSlotAndStartReservation(slotInfo: any): Promise<void> {
     setTimeout(async () => {
         console.log('🚀 予約処理を開始します');
         
-        // 予約開始前に時間帯選択を最終確認
-        const finalButtonElement = slotInfo.element.querySelector('div[role="button"]') as HTMLElement;
-        const finalCheck = finalButtonElement && (
-            Array.from(finalButtonElement.classList).some(className => className.includes('style_active__')) || 
-            finalButtonElement.getAttribute('aria-pressed') === 'true'
-        );
+        // 予約開始前に時間帯選択を最終確認（timeSlotSelectorsを使用）
+        const selectedTimeSlot = document.querySelector(timeSlotSelectors.selectedSlot);
+        const finalCheck = !!selectedTimeSlot;
+        
         console.log(`🔍 予約開始前最終確認: 時間帯選択=${finalCheck ? '✅選択済み' : '❌未選択'}`);
+        if (selectedTimeSlot) {
+            const tdElement = selectedTimeSlot.closest('td');
+            const status = extractTdStatus(tdElement as HTMLTableCellElement);
+            console.log(`🔍 選択された時間帯: ${status?.timeText || 'unknown'} (満員: ${status?.isFull ? 'はい' : 'いいえ'})`);
+        }
         
         if (!finalCheck) {
             console.error(`❌ 時間帯が選択されていないため予約処理を中止します`);
@@ -694,8 +696,8 @@ function updateMainButtonDisplay(forceMode: string | null = null): void {
         if (span) {
             const currentMode = forceMode || getCurrentMode();
             
-            // デバッグ情報
-            const targetTexts = multiTargetManager.hasTargets() ? multiTargetManager.getTargets().map(t => t.timeText).join(', ') : 'なし';
+            // デバッグ情報（必要に応じてコメントアウト解除）
+            // const targetTexts = multiTargetManager.hasTargets() ? multiTargetManager.getTargets().map(t => t.timeText).join(', ') : 'なし';
             // console.log(`🔄 FAB更新: mode=${currentMode}, targetSlots=${targetTexts}, stateMode=${timeSlotState.mode}, isMonitoring=${timeSlotState.isMonitoring}`);
             // console.log(`🔍 getCurrentMode判定: loading=${pageLoadingState?.isLoading}, monitoring=${timeSlotState.isMonitoring}, reservationRunning=${entranceReservationState.isRunning}, hasTargets=${multiTargetManager.hasTargets()}, modeSelecting=${timeSlotState.mode === 'selecting'}`);
             

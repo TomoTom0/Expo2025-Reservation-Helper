@@ -12,7 +12,8 @@
       "Bash(npx eslint:*)",
       "Bash(for func in getCurrentTableContent shouldUpdateMonitorButtons showStatus enableAllMonitorButtons updateMonitoringTargetsDisplay)",
       "Bash(do echo \"=== $func ===\")",
-      "Bash(done)"
+      "Bash(done)",
+      "Bash(mv:*)"
     ],
     "deny": []
   }
