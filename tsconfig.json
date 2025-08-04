@@ -25,11 +25,11 @@
     // Chrome拡張固有設定
     "types": ["chrome", "node"],
     
-    // 厳密な型チェック（一時的に緩和）
-    "noImplicitAny": false,
+    // 厳密な型チェック（段階的に強化）
+    "noImplicitAny": true,
     "noImplicitReturns": false,
     "noImplicitThis": false,
-    "strictNullChecks": false,
+    "strictNullChecks": true,
     "strictFunctionTypes": false,
     "strictBindCallApply": false,
     "strictPropertyInitialization": false,

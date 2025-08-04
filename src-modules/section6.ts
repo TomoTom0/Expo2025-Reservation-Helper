@@ -1016,7 +1016,7 @@ function setPageLoadingState(isLoading: boolean): void {
 function isInterruptionAllowed(): boolean {
     // リロード直前3秒間は中断不可（時間を短縮して中断可能期間を延長）
     const isCountdownActive = reloadCountdownState.secondsRemaining !== null && reloadCountdownState.secondsRemaining !== undefined;
-    const isNearReload = isCountdownActive && reloadCountdownState.secondsRemaining <= 3;
+    const isNearReload = isCountdownActive && reloadCountdownState.secondsRemaining !== null && reloadCountdownState.secondsRemaining <= 3;
     
     // console.log(`🔍 中断可否チェック: countdown=${reloadCountdownState.secondsRemaining}, active=${isCountdownActive}, nearReload=${isNearReload}`);
     
@@ -1156,9 +1156,9 @@ async function restoreFromCache(): Promise<void> {
                     
                     // 複数監視対象マネージャーに追加
                     const added = multiTargetManager.addTarget(restoredSlotInfo);
-                    if (added) {
+                    if (added && targetButton) {
                         // ボタンの表示を更新
-                        const span = targetButton.querySelector('span') as HTMLSpanElement;
+                        const span = (targetButton as Element).querySelector('span') as HTMLSpanElement;
                         if (span) {
                             // 監視対象での優先順位を取得
                             const allTargets = multiTargetManager.getTargets();
@@ -1277,6 +1277,7 @@ async function restoreFromCache(): Promise<void> {
                             
                             cached.targets?.forEach((targetData: any) => {
                                 const retryTargetElement = findSameTdElement(targetData);
+                                if (!retryTargetElement) return;
                                 const retryStatus = extractTdStatus(retryTargetElement);
                                 
                                 if (retryStatus) {

@@ -867,7 +867,7 @@ function setPageLoadingState(isLoading) {
 function isInterruptionAllowed() {
     // リロード直前3秒間は中断不可（時間を短縮して中断可能期間を延長）
     const isCountdownActive = reloadCountdownState.secondsRemaining !== null && reloadCountdownState.secondsRemaining !== undefined;
-    const isNearReload = isCountdownActive && reloadCountdownState.secondsRemaining <= 3;
+    const isNearReload = isCountdownActive && reloadCountdownState.secondsRemaining !== null && reloadCountdownState.secondsRemaining <= 3;
     // console.log(`🔍 中断可否チェック: countdown=${reloadCountdownState.secondsRemaining}, active=${isCountdownActive}, nearReload=${isNearReload}`);
     return !isNearReload;
 }
@@ -992,7 +992,7 @@ async function restoreFromCache() {
                     };
                     // 複数監視対象マネージャーに追加
                     const added = multiTargetManager.addTarget(restoredSlotInfo);
-                    if (added) {
+                    if (added && targetButton) {
                         // ボタンの表示を更新
                         const span = targetButton.querySelector('span');
                         if (span) {
@@ -1098,6 +1098,8 @@ async function restoreFromCache() {
                                 let retryRestoredCount = 0;
                                 cached.targets?.forEach((targetData) => {
                                     const retryTargetElement = findSameTdElement(targetData);
+                                    if (!retryTargetElement)
+                                        return;
                                     const retryStatus = extractTdStatus(retryTargetElement);
                                     if (retryStatus) {
                                         const retrySlotInfo = {

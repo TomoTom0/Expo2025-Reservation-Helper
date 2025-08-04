@@ -44,9 +44,13 @@
       "<rootDir>/tests/**/*.test.js"
     ],
     "collectCoverageFrom": [
-      "src/**/*.js",
+      "dist/**/*.js",
+      "src-modules/**/*.ts",
       "!src/manifest.json"
     ],
+    "moduleNameMapper": {
+      "^../src/index.js$": "<rootDir>/dist/test-exports-real.js"
+    },
     "transform": {}
   }
 }

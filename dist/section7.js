@@ -217,8 +217,10 @@ function createEntranceReservationUI(config) {
             const result = await entranceReservationHelper(config);
             if (result.success) {
                 showStatus(`🎉 予約成功！(${result.attempts}回試行)`, 'green');
-                cacheManager.clearTargetSlots(); // 成功時はキャッシュクリア
-                cacheManager.clearMonitoringFlag(); // 監視継続フラグもクリア
+                if (cacheManager) {
+                    cacheManager.clearTargetSlots(); // 成功時はキャッシュクリア
+                    cacheManager.clearMonitoringFlag(); // 監視継続フラグもクリア
+                }
             }
             else {
                 showStatus(`予約失敗 (${result.attempts}回試行)`, 'red');
@@ -334,7 +336,10 @@ function checkTimeSlotSelected() {
         return false;
     }
     // 選択された時間帯が満員でないかチェック
-    const status = extractTdStatus(selectedTimeSlot.closest('td'));
+    const tdElement = selectedTimeSlot.closest('td');
+    if (!tdElement)
+        return false;
+    const status = extractTdStatus(tdElement);
     if (status && status.isFull) {
         console.log('⚠️ 選択された時間帯は満員です');
         return false;
@@ -467,7 +472,9 @@ function handleCalendarChange() {
             console.log('📅 日付変更により監視対象をクリア');
             multiTargetManager.clearAll();
             timeSlotState.mode = 'idle';
-            cacheManager.clearTargetSlots();
+            if (cacheManager) {
+                cacheManager.clearTargetSlots();
+            }
         }
         // 監視ボタンを再設置
         setTimeout(() => {

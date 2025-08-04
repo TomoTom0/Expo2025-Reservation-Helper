@@ -100,7 +100,6 @@ const prepare_filter = (val_search) => {
     phrases.forEach(phrase => {
         includeTokens.push(phrase);
     });
-    // 括弧の処理（簡易的な実装）
     const processParentheses = (tokens) => {
         const stack = [[]];
         for (const token of tokens) {
@@ -125,7 +124,7 @@ const prepare_filter = (val_search) => {
         if (Array.isArray(group)) {
             const parts = group.map(item => Array.isArray(item) ? buildRegex(item) : item);
             // ORマーカーがあるかチェック
-            const orIndex = parts.findIndex(part => part === '\uFFFF');
+            const orIndex = parts.findIndex((part) => part === '\uFFFF');
             if (orIndex > -1) {
                 const left = buildRegex(parts.slice(0, orIndex));
                 const right = buildRegex(parts.slice(orIndex + 1));
@@ -228,8 +227,10 @@ const init_page = () => {
         div_insert2.appendChild(btn_load_all);
         div_insert2.appendChild(btn_filter_safe);
         div_insert2.appendChild(btn_alert_to_copy);
-        div_official_search.after(div_insert);
-        div_official_search.after(div_insert2);
+        if (div_official_search) {
+            div_official_search.after(div_insert);
+            div_official_search.after(div_insert2);
+        }
     };
     // const refresh_btn_ = () => {
     // }
@@ -241,15 +242,17 @@ const init_page = () => {
             // event.preventDefault()
             // event.stopPropagation()
             const target = event.target?.closest?.("button.ext-ytomo");
-            if (target.classList.contains("btn-load-all")) {
+            if (target && target.classList.contains("btn-load-all")) {
                 // すべて読み込み
                 target.disabled = true;
                 load_more_auto().then(() => {
-                    target.disabled = false;
-                    target.classList.toggle("btn-done");
+                    if (target) {
+                        target.disabled = false;
+                        target.classList.toggle("btn-done");
+                    }
                 });
             }
-            else if (target.classList.contains("btn-filter-safe")) {
+            else if (target && target.classList.contains("btn-filter-safe")) {
                 // 空きあり絞り込み
                 target.disabled = true;
                 target.classList.toggle("btn-done");
@@ -257,10 +260,12 @@ const init_page = () => {
                     div.classList.toggle("safe-none");
                 });
                 setTimeout(() => {
-                    target.disabled = false;
+                    if (target) {
+                        target.disabled = false;
+                    }
                 }, 500);
             }
-            else if (target.classList.contains("btn-filter-without-load")) {
+            else if (target && target.classList.contains("btn-filter-without-load")) {
                 // 入力値で絞り込み
                 target.disabled = true;
                 const input_another_search = document.querySelector("input.ext-tomo.search");
@@ -282,10 +287,12 @@ const init_page = () => {
                     });
                 }
                 // setTimeout(() => {
-                target.disabled = false;
+                if (target) {
+                    target.disabled = false;
+                }
                 // }, 500)
             }
-            else if (target.classList.contains("btn-alert-to-copy")) {
+            else if (target && target.classList.contains("btn-alert-to-copy")) {
                 // 一覧コピー
                 target.disabled = true;
                 // アラート起動

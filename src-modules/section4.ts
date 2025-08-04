@@ -94,10 +94,29 @@ function extractTdStatus(tdElement: HTMLTableCellElement): TdStatus | null {
     const hasHighIcon = buttonDiv.querySelector('img[src*="ico_scale_high.svg"]');
     const isAvailable = !isDisabled && !!(hasLowIcon || hasHighIcon);
     
+    // 選択状態判定
+    const isSelected = buttonDiv.classList.contains('selected') || 
+                      buttonDiv.hasAttribute('aria-selected') ||
+                      buttonDiv.getAttribute('aria-pressed') === 'true';
+    
+    // ステータス判定
+    let status: 'full' | 'available' | 'selected' | 'unknown';
+    if (isSelected) {
+        status = 'selected';
+    } else if (isFull) {
+        status = 'full';
+    } else if (isAvailable) {
+        status = 'available';
+    } else {
+        status = 'unknown';
+    }
+    
     return {
         timeText,
         isFull,
         isAvailable,
+        isSelected,
+        status,
         element: buttonDiv,
         tdElement
     };

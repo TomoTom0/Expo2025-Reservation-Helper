@@ -93,6 +93,8 @@ export interface TdStatus {
   timeText: string;
   isAvailable: boolean;
   isFull: boolean;
+  isSelected?: boolean;
+  status: 'full' | 'available' | 'selected' | 'unknown';
   element: HTMLElement;
   tdElement: HTMLTableCellElement;
 }
