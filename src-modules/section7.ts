@@ -641,13 +641,31 @@ function setupTimeSlotClickHandlers(): void {
     const timeSlotClickHandler = (event: Event) => {
         const target = event.target as HTMLElement;
         
+        console.log(`🖱️ クリックハンドラー呼び出し: ${target.tagName}.${target.className}, id="${target.id}"`);
+        
+        // 時間帯のdiv[role="button"]または子要素がクリックされた場合
+        const actualTarget = target.closest('td[data-gray-out] div[role="button"]') as HTMLElement;
+        
+        if (!actualTarget) {
+            console.log(`🔍 時間帯要素なし、処理終了`);
+            return;
+        }
+        
+        console.log(`✅ 時間帯クリック判定成功: ${actualTarget.tagName}.${actualTarget.className}`);
+        
         // 時間帯のdiv[role="button"]がクリックされた場合
-        if (target.matches && target.matches('td[data-gray-out] div[role="button"]')) {
-            const tdElement = target.closest('td[data-gray-out]') as HTMLTableCellElement;
-            if (!tdElement) return;
-            
-            const timeText = target.querySelector('dt span')?.textContent?.trim();
-            if (!timeText) return;
+        const tdElement = actualTarget.closest('td[data-gray-out]') as HTMLTableCellElement;
+        if (!tdElement) {
+            console.log('❌ td要素が見つからない');
+            return;
+        }
+        
+        // actualTargetから時間テキストを取得
+        const timeText = actualTarget.querySelector('dt span')?.textContent?.trim();
+        if (!timeText) {
+            console.log('❌ 時間テキストが見つからない');
+            return;
+        }
             
             // 統一状態管理システムを取得
             const unifiedStateManager = getExternalFunction('unifiedStateManager');
@@ -701,17 +719,16 @@ function setupTimeSlotClickHandlers(): void {
                         console.log(`✅ 統一状態管理に予約対象設定: ${timeText} (位置: ${locationIndex})`);
                     }, 100);
                 }
-            } else {
-                // 統一状態管理が利用できない場合はDOMベースの判定
-                const isCurrentlySelected = target.getAttribute('aria-pressed') === 'true';
-                console.log(`⚠️ 統一状態管理なし、DOM判定: ${isCurrentlySelected}`);
-                
-                if (!isCurrentlySelected) {
-                    // 通常の選択処理（何もしない、デフォルト動作に任せる）
-                    setTimeout(() => {
-                        updateMainButtonDisplay();
-                    }, 100);
-                }
+        } else {
+            // 統一状態管理が利用できない場合はDOMベースの判定
+            const isCurrentlySelected = actualTarget.getAttribute('aria-pressed') === 'true';
+            console.log(`⚠️ 統一状態管理なし、DOM判定: ${isCurrentlySelected}`);
+            
+            if (!isCurrentlySelected) {
+                // 通常の選択処理（何もしない、デフォルト動作に任せる）
+                setTimeout(() => {
+                    updateMainButtonDisplay();
+                }, 100);
             }
         }
     };

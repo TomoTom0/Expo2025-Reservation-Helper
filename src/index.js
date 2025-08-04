@@ -3899,70 +3899,81 @@ function setupTimeSlotClickHandlers() {
     // 時間帯クリックハンドラーを設定
     const timeSlotClickHandler = (event) => {
         const target = event.target;
+        console.log(`🖱️ クリックハンドラー呼び出し: ${target.tagName}.${target.className}, id="${target.id}"`);
+        // 時間帯のdiv[role="button"]または子要素がクリックされた場合
+        const actualTarget = target.closest('td[data-gray-out] div[role="button"]');
+        if (!actualTarget) {
+            console.log(`🔍 時間帯要素なし、処理終了`);
+            return;
+        }
+        console.log(`✅ 時間帯クリック判定成功: ${actualTarget.tagName}.${actualTarget.className}`);
         // 時間帯のdiv[role="button"]がクリックされた場合
-        if (target.matches && target.matches('td[data-gray-out] div[role="button"]')) {
-            const tdElement = target.closest('td[data-gray-out]');
-            if (!tdElement)
-                return;
-            const timeText = target.querySelector('dt span')?.textContent?.trim();
-            if (!timeText)
-                return;
-            // 統一状態管理システムを取得
-            const unifiedStateManager = getExternalFunction('unifiedStateManager');
-            const locationIndex = LocationHelper.getIndexFromElement(tdElement);
-            console.log(`🖱️ 時間帯クリック検出: ${timeText} (位置: ${locationIndex})`);
-            if (unifiedStateManager) {
-                // 統一状態管理で現在の選択状態を確認
-                const isCurrentlyReservationTarget = unifiedStateManager.isReservationTarget(timeText, locationIndex);
-                console.log(`🔍 現在の予約対象状態: ${isCurrentlyReservationTarget}`);
-                if (isCurrentlyReservationTarget) {
-                    // 既に予約対象として設定済みの場合は選択解除
-                    console.log(`🔄 選択解除: ${timeText} - 公式サイト仕様を利用`);
-                    // イベントを停止（デフォルト動作を防ぐ）
-                    event.preventDefault();
-                    event.stopPropagation();
-                    // 公式サイトの仕様を利用：現在選択中のカレンダー日付ボタンをクリック
-                    const currentSelectedCalendarButton = document.querySelector('[role="button"][aria-pressed="true"]');
-                    if (currentSelectedCalendarButton && currentSelectedCalendarButton.querySelector('time[datetime]')) {
-                        console.log('📅 カレンダー日付ボタンをプログラムでクリックして選択解除');
-                        currentSelectedCalendarButton.click();
-                        // 統一状態管理からも予約対象を削除
-                        setTimeout(() => {
-                            unifiedStateManager.clearReservationTarget();
-                            updateMainButtonDisplay();
-                            console.log('✅ 公式サイト仕様による選択解除完了');
-                        }, 100);
-                    }
-                    else {
-                        console.log('⚠️ カレンダー日付ボタンが見つからないため、直接削除');
-                        // フォールバック: 直接削除
+        const tdElement = actualTarget.closest('td[data-gray-out]');
+        if (!tdElement) {
+            console.log('❌ td要素が見つからない');
+            return;
+        }
+        // actualTargetから時間テキストを取得
+        const timeText = actualTarget.querySelector('dt span')?.textContent?.trim();
+        if (!timeText) {
+            console.log('❌ 時間テキストが見つからない');
+            return;
+        }
+        // 統一状態管理システムを取得
+        const unifiedStateManager = getExternalFunction('unifiedStateManager');
+        const locationIndex = LocationHelper.getIndexFromElement(tdElement);
+        console.log(`🖱️ 時間帯クリック検出: ${timeText} (位置: ${locationIndex})`);
+        if (unifiedStateManager) {
+            // 統一状態管理で現在の選択状態を確認
+            const isCurrentlyReservationTarget = unifiedStateManager.isReservationTarget(timeText, locationIndex);
+            console.log(`🔍 現在の予約対象状態: ${isCurrentlyReservationTarget}`);
+            if (isCurrentlyReservationTarget) {
+                // 既に予約対象として設定済みの場合は選択解除
+                console.log(`🔄 選択解除: ${timeText} - 公式サイト仕様を利用`);
+                // イベントを停止（デフォルト動作を防ぐ）
+                event.preventDefault();
+                event.stopPropagation();
+                // 公式サイトの仕様を利用：現在選択中のカレンダー日付ボタンをクリック
+                const currentSelectedCalendarButton = document.querySelector('[role="button"][aria-pressed="true"]');
+                if (currentSelectedCalendarButton && currentSelectedCalendarButton.querySelector('time[datetime]')) {
+                    console.log('📅 カレンダー日付ボタンをプログラムでクリックして選択解除');
+                    currentSelectedCalendarButton.click();
+                    // 統一状態管理からも予約対象を削除
+                    setTimeout(() => {
                         unifiedStateManager.clearReservationTarget();
-                        setTimeout(() => {
-                            updateMainButtonDisplay();
-                        }, 100);
-                    }
+                        updateMainButtonDisplay();
+                        console.log('✅ 公式サイト仕様による選択解除完了');
+                    }, 100);
                 }
                 else {
-                    // 新規選択または別の時間帯への変更
-                    console.log(`✅ 新規選択: ${timeText}`);
-                    // 統一状態管理に予約対象を設定（既存の予約対象は自動的に置き換え）
+                    console.log('⚠️ カレンダー日付ボタンが見つからないため、直接削除');
+                    // フォールバック: 直接削除
+                    unifiedStateManager.clearReservationTarget();
                     setTimeout(() => {
-                        unifiedStateManager.setReservationTarget(timeText, locationIndex);
                         updateMainButtonDisplay();
-                        console.log(`✅ 統一状態管理に予約対象設定: ${timeText} (位置: ${locationIndex})`);
                     }, 100);
                 }
             }
             else {
-                // 統一状態管理が利用できない場合はDOMベースの判定
-                const isCurrentlySelected = target.getAttribute('aria-pressed') === 'true';
-                console.log(`⚠️ 統一状態管理なし、DOM判定: ${isCurrentlySelected}`);
-                if (!isCurrentlySelected) {
-                    // 通常の選択処理（何もしない、デフォルト動作に任せる）
-                    setTimeout(() => {
-                        updateMainButtonDisplay();
-                    }, 100);
-                }
+                // 新規選択または別の時間帯への変更
+                console.log(`✅ 新規選択: ${timeText}`);
+                // 統一状態管理に予約対象を設定（既存の予約対象は自動的に置き換え）
+                setTimeout(() => {
+                    unifiedStateManager.setReservationTarget(timeText, locationIndex);
+                    updateMainButtonDisplay();
+                    console.log(`✅ 統一状態管理に予約対象設定: ${timeText} (位置: ${locationIndex})`);
+                }, 100);
+            }
+        }
+        else {
+            // 統一状態管理が利用できない場合はDOMベースの判定
+            const isCurrentlySelected = actualTarget.getAttribute('aria-pressed') === 'true';
+            console.log(`⚠️ 統一状態管理なし、DOM判定: ${isCurrentlySelected}`);
+            if (!isCurrentlySelected) {
+                // 通常の選択処理（何もしない、デフォルト動作に任せる）
+                setTimeout(() => {
+                    updateMainButtonDisplay();
+                }, 100);
             }
         }
     };
