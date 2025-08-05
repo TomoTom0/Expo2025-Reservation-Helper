@@ -908,6 +908,24 @@ function updateMainButtonDisplay(forceMode = null) {
             const hasMonitoringTargets = unifiedStateManager.hasMonitoringTargets();
             const executionState = unifiedStateManager.getExecutionState();
             console.log(`🔄 FAB更新: mode=${currentMode}, preferredAction=${preferredAction}, reservation=${hasReservationTarget}, monitoring=${hasMonitoringTargets}, execution=${executionState}`);
+            // デバッグ用: 予約対象設定の詳細情報
+            if (unifiedStateManager.hasReservationTarget()) {
+                const target = unifiedStateManager.getReservationTarget();
+                console.log(`📍 予約対象詳細: ${target?.timeSlot} (位置: ${target?.locationIndex}, 有効: ${target?.isValid})`);
+                // canStartReservation()の各条件をチェック
+                const canStart = unifiedStateManager.canStartReservation();
+                console.log(`🔍 予約開始可能性: ${canStart}`);
+                if (!canStart) {
+                    // DOM状態を詳細確認
+                    const selectedSlot = document.querySelector(timeSlotSelectors.selectedSlot);
+                    const visitTimeButton = document.querySelector('button.basic-btn.type2.style_full__ptzZq');
+                    const selectedDate = getCurrentSelectedCalendarDate();
+                    console.log(`🔍 DOM状態確認:`);
+                    console.log(`  - 選択スロット: ${selectedSlot ? 'あり' : 'なし'}`);
+                    console.log(`  - 来場日時ボタン: ${visitTimeButton ? (visitTimeButton.disabled ? '無効' : '有効') : 'なし'}`);
+                    console.log(`  - 選択日付: ${selectedDate || 'なし'}`);
+                }
+            }
             switch (currentMode) {
                 case 'monitoring':
                     // 監視実行中 - 中断可能かどうかで表示を区別
@@ -3927,6 +3945,8 @@ function startCalendarWatcher() {
                             if (timeText) {
                                 console.log(`🔄 統一状態管理に予約対象を同期: ${timeText}`);
                                 unifiedStateManager.setReservationTarget(timeText, locationIndex);
+                                // FABボタン表示を更新
+                                updateMainButtonDisplay();
                             }
                         }
                     }

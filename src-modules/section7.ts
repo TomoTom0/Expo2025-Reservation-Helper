@@ -552,6 +552,8 @@ function startCalendarWatcher(): void {
                             if (timeText) {
                                 console.log(`🔄 統一状態管理に予約対象を同期: ${timeText}`);
                                 unifiedStateManager.setReservationTarget(timeText, locationIndex);
+                                // FABボタン表示を更新
+                                updateMainButtonDisplay();
                             }
                         }
                     }
