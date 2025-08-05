@@ -213,8 +213,18 @@ export class UnifiedStateManager {
             
             // 解除後の状態復帰ログ出力
             const hasMonitoringTargets = this.hasMonitoringTargets();
+            const canMonitor = this.canStartMonitoring();
             const preferredAction = this.getPreferredAction();
-            this.log(`🔄 予約対象解除後の状態: 監視対象=${hasMonitoringTargets}, 推奨アクション=${preferredAction}`);
+            this.log(`🔄 予約対象解除後の状態:`);
+            this.log(`  - 監視対象数: ${this.monitoringTargets.length}`);
+            this.log(`  - 監視開始可能: ${canMonitor}`);
+            this.log(`  - 推奨アクション: ${preferredAction}`);
+            
+            if (hasMonitoringTargets && preferredAction === 'monitoring') {
+                this.log(`✅ 監視対象が残っているため「監視予約開始」状態に復帰`);
+            } else if (hasMonitoringTargets && preferredAction !== 'monitoring') {
+                this.log(`⚠️ 監視対象があるが推奨アクションが${preferredAction}になっています`);
+            }
         }
     }
     
@@ -336,11 +346,6 @@ export class UnifiedStateManager {
             default:
                 // 予約優先（両方可能な場合は予約を選択）
                 if (canReserve) {
-                    // 予約優先のため監視対象をクリア
-                    if (canMonitor) {
-                        this.log('🔄 予約優先のため監視対象をクリア');
-                        this.clearMonitoringTargets();
-                    }
                     return 'reservation';
                 }
                 if (canMonitor) return 'monitoring';

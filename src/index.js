@@ -892,6 +892,7 @@ function updateMainButtonDisplay(forceMode = null) {
     lastUpdateCall = now;
     const fabButton = document.querySelector('#ytomo-main-fab');
     const statusBadge = document.querySelector('#ytomo-status-badge');
+    const reservationTargetDisplay = document.querySelector('#ytomo-reservation-target');
     if (fabButton && statusBadge) {
         const span = fabButton.querySelector('span');
         if (span) {
@@ -900,6 +901,20 @@ function updateMainButtonDisplay(forceMode = null) {
             if (!unifiedStateManager) {
                 console.warn('⚠️ UnifiedStateManager が利用できないため、FAB更新を中止');
                 return;
+            }
+            // 予約対象情報の表示更新
+            if (reservationTargetDisplay) {
+                const targetInfo = unifiedStateManager.getFabTargetDisplayInfo();
+                console.log(`🔍 FAB対象情報: hasTarget=${targetInfo.hasTarget}, type=${targetInfo.targetType}, text="${targetInfo.displayText}"`);
+                if (targetInfo.hasTarget && targetInfo.targetType === 'reservation') {
+                    reservationTargetDisplay.style.display = 'block';
+                    reservationTargetDisplay.innerHTML = `予約対象\n${targetInfo.displayText}`;
+                    console.log(`✅ 予約対象情報を表示: ${targetInfo.displayText}`);
+                }
+                else {
+                    reservationTargetDisplay.style.display = 'none';
+                    console.log(`🔄 予約対象情報を非表示`);
+                }
             }
             const currentMode = forceMode || getCurrentMode();
             // 統一状態管理システムから状態を取得
@@ -1708,6 +1723,10 @@ class UnifiedStateManager {
             const info = LocationHelper.formatTargetInfo(this.reservationTarget.timeSlot, this.reservationTarget.locationIndex);
             this.reservationTarget = null;
             this.log(`🗑️ 予約対象クリア: ${info}`);
+            // 解除後の状態復帰ログ出力
+            const hasMonitoringTargets = this.hasMonitoringTargets();
+            const preferredAction = this.getPreferredAction();
+            this.log(`🔄 予約対象解除後の状態: 監視対象=${hasMonitoringTargets}, 推奨アクション=${preferredAction}`);
         }
     }
     addMonitoringTarget(timeSlot, locationIndex, selector) {
@@ -1882,6 +1901,38 @@ class UnifiedStateManager {
                 const preferredAction = this.getPreferredAction();
                 return preferredAction !== 'none' ? 'enabled' : 'disabled';
         }
+    }
+    // FAB部分での予約対象情報表示用
+    getFabTargetDisplayInfo() {
+        // 予約対象がある場合は予約情報を優先表示
+        if (this.hasReservationTarget() && this.reservationTarget) {
+            const location = LocationHelper.getLocationFromIndex(this.reservationTarget.locationIndex);
+            const locationText = location === 'east' ? '東' : '西';
+            return {
+                hasTarget: true,
+                displayText: `${locationText}${this.reservationTarget.timeSlot}`,
+                targetType: 'reservation'
+            };
+        }
+        // 監視対象がある場合は最優先の監視対象を表示
+        if (this.hasMonitoringTargets() && this.monitoringTargets.length > 0) {
+            // 優先度順にソート（priority昇順）
+            const sortedTargets = [...this.monitoringTargets].sort((a, b) => a.priority - b.priority);
+            const firstTarget = sortedTargets[0];
+            const location = LocationHelper.getLocationFromIndex(firstTarget.locationIndex);
+            const locationText = location === 'east' ? '東' : '西';
+            return {
+                hasTarget: true,
+                displayText: `${locationText}${firstTarget.timeSlot}` +
+                    (this.monitoringTargets.length > 1 ? ` 他${this.monitoringTargets.length - 1}件` : ''),
+                targetType: 'monitoring'
+            };
+        }
+        return {
+            hasTarget: false,
+            displayText: '',
+            targetType: 'none'
+        };
     }
     getFabButtonText() {
         switch (this.executionState) {
@@ -3579,6 +3630,30 @@ function createEntranceReservationUI(config) {
         fabButton.style.boxShadow = '0 6px 20px rgba(0, 0, 0, 0.4), 0 2px 8px rgba(0, 0, 0, 0.2)';
         fabButton.style.borderWidth = '3px';
     });
+    // 予約対象情報表示エリア（新規追加）
+    const reservationTargetDisplay = document.createElement('div');
+    reservationTargetDisplay.id = 'ytomo-reservation-target';
+    reservationTargetDisplay.style.cssText = `
+        background: linear-gradient(135deg, rgba(0, 123, 255, 0.95), rgba(0, 86, 179, 0.95)) !important;
+        color: white !important;
+        padding: 8px 12px !important;
+        border-radius: 12px !important;
+        font-size: 12px !important;
+        font-weight: bold !important;
+        text-align: center !important;
+        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3) !important;
+        border: 2px solid rgba(255, 255, 255, 0.3) !important;
+        min-width: 120px !important;
+        max-width: 200px !important;
+        display: none !important;
+        white-space: pre-line !important;
+        overflow: visible !important;
+        text-overflow: clip !important;
+        pointer-events: auto !important;
+        cursor: pointer !important;
+        transition: all 0.3s ease !important;
+    `;
+    reservationTargetDisplay.title = '予約対象（クリックで詳細表示）';
     // 監視対象表示エリア（目立つ表示）
     const monitoringTargetsDisplay = document.createElement('div');
     monitoringTargetsDisplay.id = 'ytomo-monitoring-targets';
@@ -3748,7 +3823,8 @@ function createEntranceReservationUI(config) {
         }
         return; // 明示的なreturnを追加
     }, true); // useCapture = true
-    // FABコンテナに要素を追加（上から順：監視対象→ステータス→ボタン）
+    // FABコンテナに要素を追加（上から順：予約対象→監視対象→ステータス→ボタン）
+    fabContainer.appendChild(reservationTargetDisplay);
     fabContainer.appendChild(monitoringTargetsDisplay);
     fabContainer.appendChild(statusBadge);
     fabContainer.appendChild(fabButton);
@@ -4020,6 +4096,8 @@ function handleCalendarChange() {
                 // DOM上に選択がないが統一状態管理に予約対象がある場合はクリア
                 console.log('🔄 公式サイトによる選択解除を検出 - 統一状態管理を同期');
                 unifiedStateManager.clearReservationTarget();
+                // UI更新を確実に実行
+                updateMainButtonDisplay();
             }
         }
         // FABボタンの状態を更新（監視ボタンは再設置しない）
@@ -4116,9 +4194,8 @@ function setupTimeSlotClickHandlers() {
                     console.log('⚠️ カレンダー日付ボタンが見つからないため、直接削除');
                     // フォールバック: 直接削除
                     unifiedStateManager.clearReservationTarget();
-                    setTimeout(() => {
-                        updateMainButtonDisplay();
-                    }, 100);
+                    updateMainButtonDisplay();
+                    console.log('✅ フォールバック予約対象解除完了');
                 }
             }
             else {

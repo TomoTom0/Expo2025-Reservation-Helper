@@ -56,6 +56,11 @@ export declare class UnifiedStateManager {
     setPriorityMode(mode: PriorityMode): void;
     migrateFromExisting(): void;
     getFabButtonState(): 'enabled' | 'disabled' | 'running' | 'monitoring';
+    getFabTargetDisplayInfo(): {
+        hasTarget: boolean;
+        displayText: string;
+        targetType: 'reservation' | 'monitoring' | 'none';
+    };
     getFabButtonText(): string;
     getReservationTarget(): ReservationTarget | null;
     getMonitoringTargets(): MonitoringTarget[];
