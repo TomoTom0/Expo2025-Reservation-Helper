@@ -303,17 +303,17 @@ function createEntranceReservationUI(config: ReservationConfig): void {
     console.log('✅ FAB形式の予約UIを作成しました');
     
     // 初期状態を判定してFABを更新
-    setTimeout(() => {
+    waitForTimeSlotTable(() => {
         checkInitialState();
-    }, 500);
+    });
     
     // カレンダー変更監視を開始
     startCalendarWatcher();
     
     // 時間帯クリックハンドラーを設定（選択解除機能付き）
-    setTimeout(() => {
+    waitForTimeSlotTable(() => {
         setupTimeSlotClickHandlers();
-    }, 1000);
+    });
 }
 
 // 監視対象表示を更新
@@ -549,10 +549,10 @@ function startCalendarWatcher(): void {
         });
         
         if (shouldUpdate) {
-            // 少し遅延して処理（DOM更新完了を待つ）
-            setTimeout(() => {
+            // DOM更新完了を待ってから処理
+            waitForTimeSlotTable(() => {
                 handleCalendarChange();
-            }, 500);
+            });
         }
     });
     
@@ -627,6 +627,33 @@ function removeAllMonitorButtons(): void {
     const existingButtons = document.querySelectorAll('.monitor-btn.ext-ytomo');
     existingButtons.forEach(button => button.remove());
     console.log(`🗑️ 既存の監視ボタンを${existingButtons.length}個削除しました`);
+}
+
+// 時間帯テーブルの準備を待つ
+function waitForTimeSlotTable(callback: () => void): void {
+    const checkInterval = 200; // 200ms間隔でチェック
+    const maxAttempts = 25; // 最大5秒待機
+    let attempts = 0;
+    
+    const checkTableReady = () => {
+        attempts++;
+        
+        // 時間帯テーブルの存在確認
+        const timeSlotButtons = document.querySelectorAll('td[data-gray-out] div[role="button"]');
+        
+        if (timeSlotButtons.length > 0) {
+            console.log(`✅ 時間帯テーブル準備完了 (${timeSlotButtons.length}個の時間帯を検出)`);
+            callback();
+        } else if (attempts >= maxAttempts) {
+            console.log('⚠️ 時間帯テーブルの準備がタイムアウト - 強制実行');
+            callback();
+        } else {
+            console.log(`🔍 時間帯テーブル待機中... (${attempts}/${maxAttempts})`);
+            setTimeout(checkTableReady, checkInterval);
+        }
+    };
+    
+    checkTableReady();
 }
 
 // 時間帯tdクリック処理を設定（公式サイト仕様を利用した選択解除機能付き）
