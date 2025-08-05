@@ -180,9 +180,11 @@ async function tryClickCalendarForTimeSlot(): Promise<boolean> {
     console.log('📅 時間帯表示のためのカレンダークリックを試行中...');
     
     // 監視対象確認（情報表示のみ）
-    if (multiTargetManager.hasTargets()) {
-        const targetTexts = multiTargetManager.getTargets().map(t => t.timeText).join(', ');
-        console.log(`🎯 監視対象: ${targetTexts} (${multiTargetManager.getCount()}個)`);
+    const unifiedStateManager = getExternalFunction('unifiedStateManager');
+    if (unifiedStateManager && unifiedStateManager.hasMonitoringTargets()) {
+        const targets = unifiedStateManager.getMonitoringTargets();
+        const targetTexts = targets.map((t: any) => t.timeSlot).join(', ');
+        console.log(`🎯 監視対象: ${targetTexts} (${targets.length}個)`);
     }
     
     // 1. カレンダー要素を検索
@@ -331,7 +333,7 @@ function resetMonitoringUI(): void {
 
 // 時間帯を自動選択して予約開始
 async function selectTimeSlotAndStartReservation(slotInfo: any): Promise<void> {
-    const location = multiTargetManager.getLocationFromSelector(slotInfo.targetInfo.tdSelector);
+    const location = LocationHelper.getLocationFromIndex(LocationHelper.getIndexFromSelector(slotInfo.targetInfo.tdSelector));
     console.log(`🎯 時間帯を自動選択します: ${location}${slotInfo.timeText}`);
     
     // クリック対象のdl要素を探す
@@ -445,7 +447,8 @@ function stopSlotMonitoring(): void {
     stopReloadCountdown();
     
     // 監視対象が設定されている場合は選択状態に戻す
-    if (multiTargetManager.hasTargets()) {
+    const unifiedStateManager = getExternalFunction('unifiedStateManager');
+    if (unifiedStateManager && unifiedStateManager.hasMonitoringTargets()) {
         timeSlotState.mode = 'selecting';
     } else {
         timeSlotState.mode = 'idle';
@@ -499,7 +502,10 @@ function getCurrentEntranceConfig(): any {
 // 前の選択をリセット
 function resetPreviousSelection(): void {
     // すべての監視対象をクリア
-    multiTargetManager.clearAll();
+    const unifiedStateManager = getExternalFunction('unifiedStateManager');
+    if (unifiedStateManager) {
+        unifiedStateManager.clearAllTargets();
+    }
     
     // ボタンの表示を「満員」に戻す
     updateAllMonitorButtonPriorities();
@@ -630,42 +636,34 @@ function shouldUpdateMonitorButtons(): boolean {
 
 // 日付変更後の選択状態復元
 function restoreSelectionAfterUpdate(): void {
-    if (!multiTargetManager.hasTargets()) return;
+    const unifiedStateManager = getExternalFunction('unifiedStateManager');
+    if (!unifiedStateManager || !unifiedStateManager.hasMonitoringTargets()) return;
     
-    const targets = multiTargetManager.getTargets();
-    const targetTexts = targets.map(t => t.timeText).join(', ');
+    const targets = unifiedStateManager.getMonitoringTargets();
+    const targetTexts = targets.map((t: any) => t.timeSlot).join(', ');
     console.log(`選択状態を復元中: ${targetTexts}`);
     
     // 該当する時間帯の監視ボタンを探して選択状態にする
     const monitorButtons = document.querySelectorAll('.monitor-btn');
     let restoredCount = 0;
     
-    targets.forEach(target => {
+    targets.forEach((target: any) => {
         monitorButtons.forEach(button => {
             const buttonTargetTime = button.getAttribute('data-target-time') || '';
             const buttonTdElement = button.closest('td[data-gray-out]') as HTMLTableCellElement;
             const buttonTdSelector = buttonTdElement ? generateUniqueTdSelector(buttonTdElement) : '';
             
             // 時間+位置で一致するかチェック
-            if (buttonTargetTime === target.timeText && buttonTdSelector === target.tdSelector) {
+            if (buttonTargetTime === target.timeSlot && buttonTdSelector === target.selector) {
                 const span = button.querySelector('span') as HTMLSpanElement;
                 if (span) {
-                    // 監視対象リストでの位置を取得
-                    const allTargets = multiTargetManager.getTargets();
-                    const targetIndex = allTargets.findIndex(
-                        t => t.timeText === target.timeText && t.tdSelector === target.tdSelector
-                    );
-                    
-                    if (targetIndex >= 0) {
-                        const priority = targetIndex + 1;
-                        span.innerText = `監視${priority}`;
-                    } else {
-                        span.innerText = '監視1'; // フォールバック
-                    }
+                    // 監視対象リストでの位置を取得（統一状態管理の優先度を使用）
+                    const priority = target.priority;
+                    span.innerText = `監視${priority}`;
                     (button as HTMLElement).style.background = 'rgb(0, 104, 33)';
                     restoredCount++;
                     
-                    console.log(`✅ 選択状態を復元しました: ${target.timeText}`);
+                    console.log(`✅ 選択状態を復元しました: ${target.timeSlot}`);
                 }
             }
         });
@@ -674,7 +672,9 @@ function restoreSelectionAfterUpdate(): void {
     if (restoredCount === 0) {
         console.log(`⚠️ 対象時間帯が見つからないため選択状態をリセット: ${targetTexts}`);
         // 対象時間帯がない場合は状態をリセット
-        multiTargetManager.clearAll();
+        if (unifiedStateManager) {
+            unifiedStateManager.clearAllTargets();
+        }
         timeSlotState.mode = 'idle';
         if (cacheManager) {
             cacheManager.clearTargetSlots();
@@ -685,7 +685,26 @@ function restoreSelectionAfterUpdate(): void {
 }
 
 // メインボタンの表示更新（FAB形式対応）
+// 無限ループ防止用の変数
+let updateMainButtonDisplayCallCount = 0;
+const UPDATE_MAIN_BUTTON_DISPLAY_MAX_CALLS = 10;
+let lastUpdateCall = 0;
+
 function updateMainButtonDisplay(forceMode: string | null = null): void {
+    const now = Date.now();
+    
+    // 無限ループ防止: 短時間での連続呼び出しを制限
+    if (now - lastUpdateCall < 100) { // 100ms以内の連続呼び出しを制限
+        updateMainButtonDisplayCallCount++;
+        if (updateMainButtonDisplayCallCount > UPDATE_MAIN_BUTTON_DISPLAY_MAX_CALLS) {
+            console.warn('⚠️ updateMainButtonDisplay: 無限ループを検出しました。実行を中断します。');
+            return;
+        }
+    } else {
+        updateMainButtonDisplayCallCount = 0; // リセット
+    }
+    lastUpdateCall = now;
+    
     const fabButton = document.querySelector('#ytomo-main-fab') as HTMLButtonElement;
     const statusBadge = document.querySelector('#ytomo-status-badge') as HTMLElement;
     
@@ -1166,37 +1185,37 @@ async function restoreFromCache(): Promise<void> {
                     console.log(`📍 復元対象の監視ボタンを発見: ${location}${targetData.timeText}`);
                     
                     // 状態復元（複数監視対象対応）
-                    const restoredSlotInfo = {
-                        timeText: targetData.timeText,
-                        tdSelector: targetData.tdSelector,
-                        positionInfo: targetData.positionInfo,
-                        status: targetData.status
-                    };
+                    // const restoredSlotInfo = {
+                    //     timeText: targetData.timeText,
+                    //     tdSelector: targetData.tdSelector,
+                    //     positionInfo: targetData.positionInfo,
+                    //     status: targetData.status
+                    // };
                     
-                    // 複数監視対象マネージャーに追加
-                    const added = multiTargetManager.addTarget(restoredSlotInfo);
-                    
-                    // 統一状態管理システムにも追加
+                    // 統一状態管理システムに追加（一元管理）
                     const unifiedStateManager = getExternalFunction('unifiedStateManager');
+                    let added = false;
                     if (unifiedStateManager) {
                         const locationIndex = LocationHelper.getIndexFromSelector(targetData.tdSelector);
-                        const unifiedAdded = unifiedStateManager.addMonitoringTarget(targetData.timeText, locationIndex, targetData.tdSelector);
-                        console.log(`📡 統一状態管理への復元: ${unifiedAdded ? '成功' : '失敗'} - ${location}${targetData.timeText}`);
+                        added = unifiedStateManager.addMonitoringTarget(targetData.timeText, locationIndex, targetData.tdSelector);
+                        console.log(`📡 統一状態管理への復元: ${added ? '成功' : '失敗'} - ${location}${targetData.timeText}`);
                     }
                     
                     if (added && targetButton) {
                         // ボタンの表示を更新
                         const span = (targetButton as Element).querySelector('span') as HTMLSpanElement;
                         if (span) {
-                            // 監視対象での優先順位を取得
-                            const allTargets = multiTargetManager.getTargets();
-                            const targetIndex = allTargets.findIndex(
-                                t => t.timeText === targetData.timeText && t.tdSelector === targetData.tdSelector
-                            );
-                            
-                            if (targetIndex >= 0) {
-                                const priority = targetIndex + 1;
-                                span.innerText = `監視${priority}`;
+                            // 監視対象での優先順位を取得（統一状態管理から）
+                            if (unifiedStateManager) {
+                                const targets = unifiedStateManager.getMonitoringTargets();
+                                const target = targets.find((t: any) => 
+                                    t.timeSlot === targetData.timeText && t.selector === targetData.tdSelector
+                                );
+                                if (target) {
+                                    span.innerText = `監視${target.priority}`;
+                                } else {
+                                    span.innerText = '監視1'; // フォールバック
+                                }
                             } else {
                                 span.innerText = '監視1'; // フォールバック
                             }
@@ -1363,21 +1382,23 @@ async function restoreFromCache(): Promise<void> {
             }
         }
         
-        // キャッシュ復元処理完了後、統一状態管理システムの状態を最終確認・同期
+        // キャッシュ復元処理完了後、統一状態管理システムの状態を最終確認
         setTimeout(() => {
             const unifiedStateManager = getExternalFunction('unifiedStateManager');
             if (unifiedStateManager) {
-                console.log('🔄 キャッシュ復元後の統一状態管理同期チェック');
-                unifiedStateManager.syncState();
+                console.log('🔄 キャッシュ復元後の統一状態管理状態確認');
                 
                 const hasTargets = unifiedStateManager.hasMonitoringTargets();
                 const preferredAction = unifiedStateManager.getPreferredAction();
                 console.log(`📡 復元後状態: hasTargets=${hasTargets}, preferredAction=${preferredAction}`);
                 
-                // FABボタン表示を強制更新
+                // FABボタン表示を最終更新（1回のみ）
+                if (hasTargets && preferredAction === 'none') {
+                    console.log('⚠️ 監視対象があるのにpreferredAction=noneのため、状態不整合を検出');
+                }
                 updateMainButtonDisplay();
             }
-        }, 100); // 追加の同期チェック
+        }, 100); // 状態確認チェック
         
     }, 500); // キャッシュ復元UI更新の高速化
 }

@@ -12,7 +12,6 @@ import { LocationHelper } from './unified-state';
 import {
     timeSlotSelectors,
     generateUniqueTdSelector,
-    getTdPositionInfo,
     findSameTdElement,
     extractTdStatus
 } from './section4';
@@ -757,34 +756,32 @@ function handleMonitorButtonClick(slotInfo: TimeSlotInfo, buttonElement: HTMLBut
         console.log(`監視対象を追加します: ${location}${slotInfo.timeText}`);
         
         // 選択状態を設定（td要素の一意特定情報を追加）
-        const targetSlotInfo: TimeSlotTarget = {
-            ...slotInfo,
-            // td要素の一意特定情報を追加
-            tdSelector: generateUniqueTdSelector(tdElement),
-            positionInfo: getTdPositionInfo(tdElement)
-        };
+        // TypeScript用の変数（削除予定）
+        // const targetSlotInfo: TimeSlotTarget = {
+        //     ...slotInfo,
+        //     // td要素の一意特定情報を追加
+        //     tdSelector: generateUniqueTdSelector(tdElement),
+        //     positionInfo: getTdPositionInfo(tdElement)
+        // };
         
-        // 複数対象管理に追加
-        const added = multiTargetManager.addTarget(targetSlotInfo);
-        if (!added) {
-            console.log('⚠️ 既に選択済みの時間帯です');
-            return;
-        }
-        
-        // 統一状態管理システムにも追加
+        // 統一状態管理システムに追加（一元管理）
         const unifiedStateManager = getExternalFunction('unifiedStateManager');
+        let added = false;
         if (unifiedStateManager) {
             const locationIndex = LocationHelper.getIndexFromSelector(tdSelector);
-            
-            const unifiedAdded = unifiedStateManager.addMonitoringTarget(slotInfo.timeText, locationIndex, tdSelector);
-            if (unifiedAdded) {
-                console.log(`✅ 統一状態管理にも監視対象を追加: ${location}${slotInfo.timeText}`);
+            added = unifiedStateManager.addMonitoringTarget(slotInfo.timeText, locationIndex, tdSelector);
+            if (added) {
+                console.log(`✅ 統一状態管理に監視対象を追加: ${location}${slotInfo.timeText}`);
             } else {
-                console.log(`⚠️ 統一状態管理への追加失敗: ${location}${slotInfo.timeText}`);
+                console.log(`⚠️ 統一状態管理への追加失敗（既に選択済み）: ${location}${slotInfo.timeText}`);
+                return;
             }
         } else {
             console.log('⚠️ 統一状態管理システムが利用できません');
+            return;
         }
+        
+        if (!added) return; // 追加失敗時は処理を中止
         
         timeSlotState.mode = 'selecting';
         timeSlotState.retryCount = 0;
@@ -795,15 +792,24 @@ function handleMonitorButtonClick(slotInfo: TimeSlotInfo, buttonElement: HTMLBut
         }
         
         // ボタンの表示を変更（優先順位表示）
-        const priority = multiTargetManager.getCount(); // 追加後の順位
-        buttonSpan.innerText = `監視${priority}`;
+        if (unifiedStateManager) {
+            const targets = unifiedStateManager.getMonitoringTargets();
+            const target = targets.find((t: any) => t.timeSlot === slotInfo.timeText && t.selector === tdSelector);
+            const priority = target ? target.priority : targets.length;
+            buttonSpan.innerText = `監視${priority}`;
+        } else {
+            buttonSpan.innerText = '監視1'; // フォールバック
+        }
         buttonElement.style.background = 'rgb(0, 104, 33)';
         buttonElement.style.opacity = '1';
         buttonElement.style.cursor = 'pointer';
         buttonElement.disabled = false; // クリックで解除できるように
         
         // メインボタンの表示を更新
-        console.log(`🔄 監視対象設定後のFAB更新を実行: targetSlots=${multiTargetManager.getCount()}個, mode=${timeSlotState.mode}`);
+        if (unifiedStateManager) {
+            const targetCount = unifiedStateManager.getMonitoringTargets().length;
+            console.log(`🔄 監視対象設定後のFAB更新を実行: targetSlots=${targetCount}個, mode=${timeSlotState.mode}`);
+        }
         safeCall('updateMainButtonDisplay');
         
         // 監視対象表示も更新

@@ -440,9 +440,11 @@ async function clickCalendarDate(targetDate) {
 async function tryClickCalendarForTimeSlot() {
     console.log('📅 時間帯表示のためのカレンダークリックを試行中...');
     // 監視対象確認（情報表示のみ）
-    if (section2_multiTargetManager.hasTargets()) {
-        const targetTexts = section2_multiTargetManager.getTargets().map(t => t.timeText).join(', ');
-        console.log(`🎯 監視対象: ${targetTexts} (${section2_multiTargetManager.getCount()}個)`);
+    const unifiedStateManager = section5_getExternalFunction('unifiedStateManager');
+    if (unifiedStateManager && unifiedStateManager.hasMonitoringTargets()) {
+        const targets = unifiedStateManager.getMonitoringTargets();
+        const targetTexts = targets.map((t) => t.timeSlot).join(', ');
+        console.log(`🎯 監視対象: ${targetTexts} (${targets.length}個)`);
     }
     // 1. カレンダー要素を検索
     const calendarSelectors = [
@@ -573,7 +575,7 @@ function resetMonitoringUI() {
 }
 // 時間帯を自動選択して予約開始
 async function selectTimeSlotAndStartReservation(slotInfo) {
-    const location = section2_multiTargetManager.getLocationFromSelector(slotInfo.targetInfo.tdSelector);
+    const location = LocationHelper.getLocationFromIndex(LocationHelper.getIndexFromSelector(slotInfo.targetInfo.tdSelector));
     console.log(`🎯 時間帯を自動選択します: ${location}${slotInfo.timeText}`);
     // クリック対象のdl要素を探す
     let clickTarget = null;
@@ -668,7 +670,8 @@ function stopSlotMonitoring() {
     // リロードカウントダウンも確実に停止
     stopReloadCountdown();
     // 監視対象が設定されている場合は選択状態に戻す
-    if (section2_multiTargetManager.hasTargets()) {
+    const unifiedStateManager = section5_getExternalFunction('unifiedStateManager');
+    if (unifiedStateManager && unifiedStateManager.hasMonitoringTargets()) {
         timeSlotState.mode = 'selecting';
     }
     else {
@@ -717,7 +720,10 @@ function getCurrentEntranceConfig() {
 // 前の選択をリセット
 function resetPreviousSelection() {
     // すべての監視対象をクリア
-    multiTargetManager.clearAll();
+    const unifiedStateManager = getExternalFunction('unifiedStateManager');
+    if (unifiedStateManager) {
+        unifiedStateManager.clearAllTargets();
+    }
     // ボタンの表示を「満員」に戻す
     updateAllMonitorButtonPriorities();
 }
@@ -824,36 +830,30 @@ function shouldUpdateMonitorButtons() {
 }
 // 日付変更後の選択状態復元
 function restoreSelectionAfterUpdate() {
-    if (!section2_multiTargetManager.hasTargets())
+    const unifiedStateManager = section5_getExternalFunction('unifiedStateManager');
+    if (!unifiedStateManager || !unifiedStateManager.hasMonitoringTargets())
         return;
-    const targets = section2_multiTargetManager.getTargets();
-    const targetTexts = targets.map(t => t.timeText).join(', ');
+    const targets = unifiedStateManager.getMonitoringTargets();
+    const targetTexts = targets.map((t) => t.timeSlot).join(', ');
     console.log(`選択状態を復元中: ${targetTexts}`);
     // 該当する時間帯の監視ボタンを探して選択状態にする
     const monitorButtons = document.querySelectorAll('.monitor-btn');
     let restoredCount = 0;
-    targets.forEach(target => {
+    targets.forEach((target) => {
         monitorButtons.forEach(button => {
             const buttonTargetTime = button.getAttribute('data-target-time') || '';
             const buttonTdElement = button.closest('td[data-gray-out]');
             const buttonTdSelector = buttonTdElement ? section4_generateUniqueTdSelector(buttonTdElement) : '';
             // 時間+位置で一致するかチェック
-            if (buttonTargetTime === target.timeText && buttonTdSelector === target.tdSelector) {
+            if (buttonTargetTime === target.timeSlot && buttonTdSelector === target.selector) {
                 const span = button.querySelector('span');
                 if (span) {
-                    // 監視対象リストでの位置を取得
-                    const allTargets = section2_multiTargetManager.getTargets();
-                    const targetIndex = allTargets.findIndex(t => t.timeText === target.timeText && t.tdSelector === target.tdSelector);
-                    if (targetIndex >= 0) {
-                        const priority = targetIndex + 1;
-                        span.innerText = `監視${priority}`;
-                    }
-                    else {
-                        span.innerText = '監視1'; // フォールバック
-                    }
+                    // 監視対象リストでの位置を取得（統一状態管理の優先度を使用）
+                    const priority = target.priority;
+                    span.innerText = `監視${priority}`;
                     button.style.background = 'rgb(0, 104, 33)';
                     restoredCount++;
-                    console.log(`✅ 選択状態を復元しました: ${target.timeText}`);
+                    console.log(`✅ 選択状態を復元しました: ${target.timeSlot}`);
                 }
             }
         });
@@ -861,7 +861,9 @@ function restoreSelectionAfterUpdate() {
     if (restoredCount === 0) {
         console.log(`⚠️ 対象時間帯が見つからないため選択状態をリセット: ${targetTexts}`);
         // 対象時間帯がない場合は状態をリセット
-        section2_multiTargetManager.clearAll();
+        if (unifiedStateManager) {
+            unifiedStateManager.clearAllTargets();
+        }
         timeSlotState.mode = 'idle';
         if (cacheManager) {
             cacheManager.clearTargetSlots();
@@ -870,14 +872,31 @@ function restoreSelectionAfterUpdate() {
     updateMainButtonDisplay();
 }
 // メインボタンの表示更新（FAB形式対応）
+// 無限ループ防止用の変数
+let updateMainButtonDisplayCallCount = 0;
+const UPDATE_MAIN_BUTTON_DISPLAY_MAX_CALLS = 10;
+let lastUpdateCall = 0;
 function updateMainButtonDisplay(forceMode = null) {
+    const now = Date.now();
+    // 無限ループ防止: 短時間での連続呼び出しを制限
+    if (now - lastUpdateCall < 100) { // 100ms以内の連続呼び出しを制限
+        updateMainButtonDisplayCallCount++;
+        if (updateMainButtonDisplayCallCount > UPDATE_MAIN_BUTTON_DISPLAY_MAX_CALLS) {
+            console.warn('⚠️ updateMainButtonDisplay: 無限ループを検出しました。実行を中断します。');
+            return;
+        }
+    }
+    else {
+        updateMainButtonDisplayCallCount = 0; // リセット
+    }
+    lastUpdateCall = now;
     const fabButton = document.querySelector('#ytomo-main-fab');
     const statusBadge = document.querySelector('#ytomo-status-badge');
     if (fabButton && statusBadge) {
         const span = fabButton.querySelector('span');
         if (span) {
             // 統一状態管理システムを取得
-            const unifiedStateManager = getExternalFunction('unifiedStateManager');
+            const unifiedStateManager = section5_getExternalFunction('unifiedStateManager');
             if (!unifiedStateManager) {
                 console.warn('⚠️ UnifiedStateManager が利用できないため、FAB更新を中止');
                 return;
@@ -998,7 +1017,7 @@ function updateMainButtonDisplay(forceMode = null) {
 // 現在のモードを取得するヘルパー関数（予約優先ロジック組み込み）
 function getCurrentMode() {
     // 統一状態管理システムを取得（必須）
-    const unifiedStateManager = getExternalFunction('unifiedStateManager');
+    const unifiedStateManager = section5_getExternalFunction('unifiedStateManager');
     if (!unifiedStateManager) {
         console.warn('⚠️ UnifiedStateManager が利用できません');
         return 'idle';
@@ -1302,31 +1321,34 @@ async function restoreFromCache() {
                 if (targetButton) {
                     console.log(`📍 復元対象の監視ボタンを発見: ${location}${targetData.timeText}`);
                     // 状態復元（複数監視対象対応）
-                    const restoredSlotInfo = {
-                        timeText: targetData.timeText,
-                        tdSelector: targetData.tdSelector,
-                        positionInfo: targetData.positionInfo,
-                        status: targetData.status
-                    };
-                    // 複数監視対象マネージャーに追加
-                    const added = section2_multiTargetManager.addTarget(restoredSlotInfo);
-                    // 統一状態管理システムにも追加
-                    const unifiedStateManager = getExternalFunction('unifiedStateManager');
+                    // const restoredSlotInfo = {
+                    //     timeText: targetData.timeText,
+                    //     tdSelector: targetData.tdSelector,
+                    //     positionInfo: targetData.positionInfo,
+                    //     status: targetData.status
+                    // };
+                    // 統一状態管理システムに追加（一元管理）
+                    const unifiedStateManager = section5_getExternalFunction('unifiedStateManager');
+                    let added = false;
                     if (unifiedStateManager) {
                         const locationIndex = LocationHelper.getIndexFromSelector(targetData.tdSelector);
-                        const unifiedAdded = unifiedStateManager.addMonitoringTarget(targetData.timeText, locationIndex, targetData.tdSelector);
-                        console.log(`📡 統一状態管理への復元: ${unifiedAdded ? '成功' : '失敗'} - ${location}${targetData.timeText}`);
+                        added = unifiedStateManager.addMonitoringTarget(targetData.timeText, locationIndex, targetData.tdSelector);
+                        console.log(`📡 統一状態管理への復元: ${added ? '成功' : '失敗'} - ${location}${targetData.timeText}`);
                     }
                     if (added && targetButton) {
                         // ボタンの表示を更新
                         const span = targetButton.querySelector('span');
                         if (span) {
-                            // 監視対象での優先順位を取得
-                            const allTargets = section2_multiTargetManager.getTargets();
-                            const targetIndex = allTargets.findIndex(t => t.timeText === targetData.timeText && t.tdSelector === targetData.tdSelector);
-                            if (targetIndex >= 0) {
-                                const priority = targetIndex + 1;
-                                span.innerText = `監視${priority}`;
+                            // 監視対象での優先順位を取得（統一状態管理から）
+                            if (unifiedStateManager) {
+                                const targets = unifiedStateManager.getMonitoringTargets();
+                                const target = targets.find((t) => t.timeSlot === targetData.timeText && t.selector === targetData.tdSelector);
+                                if (target) {
+                                    span.innerText = `監視${target.priority}`;
+                                }
+                                else {
+                                    span.innerText = '監視1'; // フォールバック
+                                }
                             }
                             else {
                                 span.innerText = '監視1'; // フォールバック
@@ -1469,7 +1491,7 @@ async function restoreFromCache() {
                 }
                 section2_multiTargetManager.clearAll();
                 // 統一状態管理システムもクリア
-                const unifiedStateManager = getExternalFunction('unifiedStateManager');
+                const unifiedStateManager = section5_getExternalFunction('unifiedStateManager');
                 if (unifiedStateManager) {
                     unifiedStateManager.clearAllTargets();
                     console.log('📡 統一状態管理システムもクリアしました');
@@ -1480,19 +1502,21 @@ async function restoreFromCache() {
                 console.log('✅ キャッシュクリア完了');
             }
         }
-        // キャッシュ復元処理完了後、統一状態管理システムの状態を最終確認・同期
+        // キャッシュ復元処理完了後、統一状態管理システムの状態を最終確認
         setTimeout(() => {
-            const unifiedStateManager = getExternalFunction('unifiedStateManager');
+            const unifiedStateManager = section5_getExternalFunction('unifiedStateManager');
             if (unifiedStateManager) {
-                console.log('🔄 キャッシュ復元後の統一状態管理同期チェック');
-                unifiedStateManager.syncState();
+                console.log('🔄 キャッシュ復元後の統一状態管理状態確認');
                 const hasTargets = unifiedStateManager.hasMonitoringTargets();
                 const preferredAction = unifiedStateManager.getPreferredAction();
                 console.log(`📡 復元後状態: hasTargets=${hasTargets}, preferredAction=${preferredAction}`);
-                // FABボタン表示を強制更新
+                // FABボタン表示を最終更新（1回のみ）
+                if (hasTargets && preferredAction === 'none') {
+                    console.log('⚠️ 監視対象があるのにpreferredAction=noneのため、状態不整合を検出');
+                }
                 updateMainButtonDisplay();
             }
-        }, 100); // 追加の同期チェック
+        }, 100); // 状態確認チェック
     }, 500); // キャッシュ復元UI更新の高速化
 }
 // 注意: checkReservationConditions関数は削除されました
@@ -1954,7 +1978,7 @@ const safeCall = (funcName, ...args) => {
     return externalFunctions[funcName](...args);
 };
 // 安全な外部オブジェクト参照
-const getExternalFunction = (name) => {
+const section5_getExternalFunction = (name) => {
     if (!isInitialized) {
         console.warn('External functions not initialized in Section 5');
         return null;
@@ -2470,7 +2494,7 @@ function handleMonitorButtonClick(slotInfo, buttonElement) {
         // 複数対象管理から削除（時間+位置で特定）
         section2_multiTargetManager.removeTarget(slotInfo.timeText, tdSelector);
         // 統一状態管理システムからも削除
-        const unifiedStateManager = getExternalFunction('unifiedStateManager');
+        const unifiedStateManager = section5_getExternalFunction('unifiedStateManager');
         if (unifiedStateManager) {
             const locationIndex = LocationHelper.getIndexFromSelector(tdSelector);
             const unifiedRemoved = unifiedStateManager.removeMonitoringTarget(slotInfo.timeText, locationIndex);
@@ -2520,33 +2544,33 @@ function handleMonitorButtonClick(slotInfo, buttonElement) {
         // 現在未選択の場合は選択
         console.log(`監視対象を追加します: ${location}${slotInfo.timeText}`);
         // 選択状態を設定（td要素の一意特定情報を追加）
-        const targetSlotInfo = {
-            ...slotInfo,
-            // td要素の一意特定情報を追加
-            tdSelector: section4_generateUniqueTdSelector(tdElement),
-            positionInfo: getTdPositionInfo(tdElement)
-        };
-        // 複数対象管理に追加
-        const added = section2_multiTargetManager.addTarget(targetSlotInfo);
-        if (!added) {
-            console.log('⚠️ 既に選択済みの時間帯です');
-            return;
-        }
-        // 統一状態管理システムにも追加
-        const unifiedStateManager = getExternalFunction('unifiedStateManager');
+        // TypeScript用の変数（削除予定）
+        // const targetSlotInfo: TimeSlotTarget = {
+        //     ...slotInfo,
+        //     // td要素の一意特定情報を追加
+        //     tdSelector: generateUniqueTdSelector(tdElement),
+        //     positionInfo: getTdPositionInfo(tdElement)
+        // };
+        // 統一状態管理システムに追加（一元管理）
+        const unifiedStateManager = section5_getExternalFunction('unifiedStateManager');
+        let added = false;
         if (unifiedStateManager) {
             const locationIndex = LocationHelper.getIndexFromSelector(tdSelector);
-            const unifiedAdded = unifiedStateManager.addMonitoringTarget(slotInfo.timeText, locationIndex, tdSelector);
-            if (unifiedAdded) {
-                console.log(`✅ 統一状態管理にも監視対象を追加: ${location}${slotInfo.timeText}`);
+            added = unifiedStateManager.addMonitoringTarget(slotInfo.timeText, locationIndex, tdSelector);
+            if (added) {
+                console.log(`✅ 統一状態管理に監視対象を追加: ${location}${slotInfo.timeText}`);
             }
             else {
-                console.log(`⚠️ 統一状態管理への追加失敗: ${location}${slotInfo.timeText}`);
+                console.log(`⚠️ 統一状態管理への追加失敗（既に選択済み）: ${location}${slotInfo.timeText}`);
+                return;
             }
         }
         else {
             console.log('⚠️ 統一状態管理システムが利用できません');
+            return;
         }
+        if (!added)
+            return; // 追加失敗時は処理を中止
         timeSlotState.mode = 'selecting';
         timeSlotState.retryCount = 0;
         // キャッシュに保存（すべての監視対象を保存）
@@ -2554,14 +2578,24 @@ function handleMonitorButtonClick(slotInfo, buttonElement) {
             section5_cacheManager.saveTargetSlots();
         }
         // ボタンの表示を変更（優先順位表示）
-        const priority = section2_multiTargetManager.getCount(); // 追加後の順位
-        buttonSpan.innerText = `監視${priority}`;
+        if (unifiedStateManager) {
+            const targets = unifiedStateManager.getMonitoringTargets();
+            const target = targets.find((t) => t.timeSlot === slotInfo.timeText && t.selector === tdSelector);
+            const priority = target ? target.priority : targets.length;
+            buttonSpan.innerText = `監視${priority}`;
+        }
+        else {
+            buttonSpan.innerText = '監視1'; // フォールバック
+        }
         buttonElement.style.background = 'rgb(0, 104, 33)';
         buttonElement.style.opacity = '1';
         buttonElement.style.cursor = 'pointer';
         buttonElement.disabled = false; // クリックで解除できるように
         // メインボタンの表示を更新
-        console.log(`🔄 監視対象設定後のFAB更新を実行: targetSlots=${section2_multiTargetManager.getCount()}個, mode=${timeSlotState.mode}`);
+        if (unifiedStateManager) {
+            const targetCount = unifiedStateManager.getMonitoringTargets().length;
+            console.log(`🔄 監視対象設定後のFAB更新を実行: targetSlots=${targetCount}個, mode=${timeSlotState.mode}`);
+        }
         safeCall('updateMainButtonDisplay');
         // 監視対象表示も更新
         safeCall('updateMonitoringTargetsDisplay');
@@ -3619,7 +3653,7 @@ function createEntranceReservationUI(config) {
             return;
         }
         // 統一状態管理システムを使用した監視開始判定
-        const unifiedStateManager = getExternalFunction('unifiedStateManager');
+        const unifiedStateManager = section5_getExternalFunction('unifiedStateManager');
         if (unifiedStateManager) {
             const preferredAction = unifiedStateManager.getPreferredAction();
             console.log(`🔧 FABクリック: preferredAction=${preferredAction}`);
@@ -3883,7 +3917,7 @@ function startCalendarWatcher() {
                     const ariaPressed = element.getAttribute('aria-pressed');
                     console.log(`🔄 時間帯選択変更検出: ${ariaPressed}`);
                     // 統一状態管理システムの同期
-                    const unifiedStateManager = getExternalFunction('unifiedStateManager');
+                    const unifiedStateManager = section5_getExternalFunction('unifiedStateManager');
                     if (unifiedStateManager && ariaPressed === 'true') {
                         // 新しい選択を検出した場合
                         const tdElement = element.closest('td[data-gray-out]');
@@ -3958,7 +3992,7 @@ function handleCalendarChange() {
         // 日付は変わっていない - FABボタンの状態のみ更新
         console.log('📅 日付変更なし - FABボタンの状態のみ更新');
         // 統一状態管理システムを取得して状態同期
-        const unifiedStateManager = getExternalFunction('unifiedStateManager');
+        const unifiedStateManager = section5_getExternalFunction('unifiedStateManager');
         if (unifiedStateManager) {
             // 公式サイトによる選択解除があった場合の状態同期
             const selectedSlot = document.querySelector(timeSlotSelectors.selectedSlot);
@@ -4033,7 +4067,7 @@ function setupTimeSlotClickHandlers() {
             return;
         }
         // 統一状態管理システムを取得
-        const unifiedStateManager = getExternalFunction('unifiedStateManager');
+        const unifiedStateManager = section5_getExternalFunction('unifiedStateManager');
         const locationIndex = LocationHelper.getIndexFromElement(tdElement);
         console.log(`🖱️ 時間帯クリック検出: ${timeText} (位置: ${locationIndex})`);
         if (unifiedStateManager) {
