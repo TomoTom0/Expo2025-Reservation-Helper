@@ -707,6 +707,7 @@ function updateMainButtonDisplay(forceMode: string | null = null): void {
     
     const fabButton = document.querySelector('#ytomo-main-fab') as HTMLButtonElement;
     const statusBadge = document.querySelector('#ytomo-status-badge') as HTMLElement;
+    const reservationTargetDisplay = document.querySelector('#ytomo-reservation-target') as HTMLElement;
     
     if (fabButton && statusBadge) {
         const span = fabButton.querySelector('span') as HTMLSpanElement;
@@ -716,6 +717,21 @@ function updateMainButtonDisplay(forceMode: string | null = null): void {
             if (!unifiedStateManager) {
                 console.warn('⚠️ UnifiedStateManager が利用できないため、FAB更新を中止');
                 return;
+            }
+            
+            // 予約対象情報の表示更新
+            if (reservationTargetDisplay) {
+                const targetInfo = unifiedStateManager.getFabTargetDisplayInfo();
+                console.log(`🔍 FAB対象情報: hasTarget=${targetInfo.hasTarget}, type=${targetInfo.targetType}, text="${targetInfo.displayText}"`);
+                
+                if (targetInfo.hasTarget && targetInfo.targetType === 'reservation') {
+                    reservationTargetDisplay.style.display = 'block';
+                    reservationTargetDisplay.innerHTML = `予約対象\n${targetInfo.displayText}`;
+                    console.log(`✅ 予約対象情報を表示: ${targetInfo.displayText}`);
+                } else {
+                    reservationTargetDisplay.style.display = 'none';
+                    console.log(`🔄 予約対象情報を非表示`);
+                }
             }
             
             const currentMode = forceMode || getCurrentMode();

@@ -210,6 +210,11 @@ export class UnifiedStateManager {
             );
             this.reservationTarget = null;
             this.log(`🗑️ 予約対象クリア: ${info}`);
+            
+            // 解除後の状態復帰ログ出力
+            const hasMonitoringTargets = this.hasMonitoringTargets();
+            const preferredAction = this.getPreferredAction();
+            this.log(`🔄 予約対象解除後の状態: 監視対象=${hasMonitoringTargets}, 推奨アクション=${preferredAction}`);
         }
     }
     
@@ -421,6 +426,42 @@ export class UnifiedStateManager {
                 const preferredAction = this.getPreferredAction();
                 return preferredAction !== 'none' ? 'enabled' : 'disabled';
         }
+    }
+    
+    // FAB部分での予約対象情報表示用
+    getFabTargetDisplayInfo(): { hasTarget: boolean; displayText: string; targetType: 'reservation' | 'monitoring' | 'none' } {
+        // 予約対象がある場合は予約情報を優先表示
+        if (this.hasReservationTarget() && this.reservationTarget) {
+            const location = LocationHelper.getLocationFromIndex(this.reservationTarget.locationIndex);
+            const locationText = location === 'east' ? '東' : '西';
+            return {
+                hasTarget: true,
+                displayText: `${locationText}${this.reservationTarget.timeSlot}`,
+                targetType: 'reservation'
+            };
+        }
+        
+        // 監視対象がある場合は最優先の監視対象を表示
+        if (this.hasMonitoringTargets() && this.monitoringTargets.length > 0) {
+            // 優先度順にソート（priority昇順）
+            const sortedTargets = [...this.monitoringTargets].sort((a, b) => a.priority - b.priority);
+            const firstTarget = sortedTargets[0];
+            const location = LocationHelper.getLocationFromIndex(firstTarget.locationIndex);
+            const locationText = location === 'east' ? '東' : '西';
+            
+            return {
+                hasTarget: true,
+                displayText: `${locationText}${firstTarget.timeSlot}` + 
+                            (this.monitoringTargets.length > 1 ? ` 他${this.monitoringTargets.length - 1}件` : ''),
+                targetType: 'monitoring'
+            };
+        }
+        
+        return {
+            hasTarget: false,
+            displayText: '',
+            targetType: 'none'
+        };
     }
     
     getFabButtonText(): string {
