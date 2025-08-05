@@ -633,8 +633,21 @@ function handleCalendarChange(): void {
         calendarWatchState.currentSelectedDate = newSelectedDate;
         
         // 既存の監視状態をクリア（日付が変わったため）
+        // 統一状態管理システムからもクリア
+        const unifiedStateManager = getExternalFunction('unifiedStateManager');
+        if (unifiedStateManager) {
+            const hasReservationTarget = unifiedStateManager.hasReservationTarget();
+            const hasMonitoringTargets = unifiedStateManager.hasMonitoringTargets();
+            
+            if (hasReservationTarget || hasMonitoringTargets) {
+                console.log('📅 日付変更により統一状態管理システムの対象をクリア');
+                unifiedStateManager.clearReservationTarget();
+                unifiedStateManager.clearMonitoringTargets();
+            }
+        }
+        
         if (multiTargetManager.hasTargets() && !timeSlotState.isMonitoring) {
-            console.log('📅 日付変更により監視対象をクリア');
+            console.log('📅 日付変更により従来システムの監視対象をクリア');
             multiTargetManager.clearAll();
             timeSlotState.mode = 'idle';
             if (cacheManager) {
@@ -642,12 +655,15 @@ function handleCalendarChange(): void {
             }
         }
         
+        // 予約対象がクリアされたため、即座にFAB表示を更新
+        updateMainButtonDisplay();
+        
         // 監視ボタンを再設置
         setTimeout(() => {
             removeAllMonitorButtons();
             analyzeAndAddMonitorButtons();
             
-            // FABボタンの状態も更新
+            // 監視ボタン設置後も再度FABボタンの状態を更新
             updateMainButtonDisplay();
             
             console.log('🔄 監視ボタンとFABを再設置しました');
