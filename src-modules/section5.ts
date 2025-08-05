@@ -5,6 +5,9 @@ import {
     reloadCountdownState
 } from './section2';
 
+// 統一状態管理システムからのimport
+import { LocationHelper } from './unified-state';
+
 // Section 4からのimport
 import {
     timeSlotSelectors,
@@ -697,6 +700,21 @@ function handleMonitorButtonClick(slotInfo: TimeSlotInfo, buttonElement: HTMLBut
         // 複数対象管理から削除（時間+位置で特定）
         multiTargetManager.removeTarget(slotInfo.timeText, tdSelector);
         
+        // 統一状態管理システムからも削除
+        const unifiedStateManager = getExternalFunction('unifiedStateManager');
+        if (unifiedStateManager) {
+            const locationIndex = LocationHelper.getIndexFromSelector(tdSelector);
+            
+            const unifiedRemoved = unifiedStateManager.removeMonitoringTarget(slotInfo.timeText, locationIndex);
+            if (unifiedRemoved) {
+                console.log(`✅ 統一状態管理からも監視対象を削除: ${location}${slotInfo.timeText}`);
+            } else {
+                console.log(`⚠️ 統一状態管理からの削除失敗: ${location}${slotInfo.timeText}`);
+            }
+        } else {
+            console.log('⚠️ 統一状態管理システムが利用できません');
+        }
+        
         // ボタンの表示を元に戻す
         buttonSpan.innerText = '満員';
         buttonElement.style.background = 'rgb(255, 140, 0)';
@@ -751,6 +769,21 @@ function handleMonitorButtonClick(slotInfo: TimeSlotInfo, buttonElement: HTMLBut
         if (!added) {
             console.log('⚠️ 既に選択済みの時間帯です');
             return;
+        }
+        
+        // 統一状態管理システムにも追加
+        const unifiedStateManager = getExternalFunction('unifiedStateManager');
+        if (unifiedStateManager) {
+            const locationIndex = LocationHelper.getIndexFromSelector(tdSelector);
+            
+            const unifiedAdded = unifiedStateManager.addMonitoringTarget(slotInfo.timeText, locationIndex, tdSelector);
+            if (unifiedAdded) {
+                console.log(`✅ 統一状態管理にも監視対象を追加: ${location}${slotInfo.timeText}`);
+            } else {
+                console.log(`⚠️ 統一状態管理への追加失敗: ${location}${slotInfo.timeText}`);
+            }
+        } else {
+            console.log('⚠️ 統一状態管理システムが利用できません');
         }
         
         timeSlotState.mode = 'selecting';
