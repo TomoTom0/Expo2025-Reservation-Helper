@@ -26,6 +26,9 @@ import {
     getExternalFunction
 } from './section5';
 
+// 統一状態管理からのimport
+import { LocationHelper } from './unified-state';
+
 // 型定義のインポート
 import type { 
     CacheManager
@@ -1172,6 +1175,15 @@ async function restoreFromCache(): Promise<void> {
                     
                     // 複数監視対象マネージャーに追加
                     const added = multiTargetManager.addTarget(restoredSlotInfo);
+                    
+                    // 統一状態管理システムにも追加
+                    const unifiedStateManager = getExternalFunction('unifiedStateManager');
+                    if (unifiedStateManager) {
+                        const locationIndex = LocationHelper.getIndexFromSelector(targetData.tdSelector);
+                        const unifiedAdded = unifiedStateManager.addMonitoringTarget(targetData.timeText, locationIndex, targetData.tdSelector);
+                        console.log(`📡 統一状態管理への復元: ${unifiedAdded ? '成功' : '失敗'} - ${location}${targetData.timeText}`);
+                    }
+                    
                     if (added && targetButton) {
                         // ボタンの表示を更新
                         const span = (targetButton as Element).querySelector('span') as HTMLSpanElement;
@@ -1336,12 +1348,37 @@ async function restoreFromCache(): Promise<void> {
                     cacheManager.clearTargetSlots();
                 }
                 multiTargetManager.clearAll();
+                
+                // 統一状態管理システムもクリア
+                const unifiedStateManager = getExternalFunction('unifiedStateManager');
+                if (unifiedStateManager) {
+                    unifiedStateManager.clearAllTargets();
+                    console.log('📡 統一状態管理システムもクリアしました');
+                }
+                
                 timeSlotState.mode = 'idle';
                 timeSlotState.retryCount = 0;
                 updateMainButtonDisplay();
                 console.log('✅ キャッシュクリア完了');
             }
         }
+        
+        // キャッシュ復元処理完了後、統一状態管理システムの状態を最終確認・同期
+        setTimeout(() => {
+            const unifiedStateManager = getExternalFunction('unifiedStateManager');
+            if (unifiedStateManager) {
+                console.log('🔄 キャッシュ復元後の統一状態管理同期チェック');
+                unifiedStateManager.syncState();
+                
+                const hasTargets = unifiedStateManager.hasMonitoringTargets();
+                const preferredAction = unifiedStateManager.getPreferredAction();
+                console.log(`📡 復元後状態: hasTargets=${hasTargets}, preferredAction=${preferredAction}`);
+                
+                // FABボタン表示を強制更新
+                updateMainButtonDisplay();
+            }
+        }, 100); // 追加の同期チェック
+        
     }, 500); // キャッシュ復元UI更新の高速化
 }
 
