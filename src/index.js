@@ -4072,19 +4072,32 @@ function handleCalendarChange() {
         }
         calendarWatchState.currentSelectedDate = newSelectedDate;
         // 既存の監視状態をクリア（日付が変わったため）
+        // 統一状態管理システムからもクリア
+        const unifiedStateManager = section5_getExternalFunction('unifiedStateManager');
+        if (unifiedStateManager) {
+            const hasReservationTarget = unifiedStateManager.hasReservationTarget();
+            const hasMonitoringTargets = unifiedStateManager.hasMonitoringTargets();
+            if (hasReservationTarget || hasMonitoringTargets) {
+                console.log('📅 日付変更により統一状態管理システムの対象をクリア');
+                unifiedStateManager.clearReservationTarget();
+                unifiedStateManager.clearMonitoringTargets();
+            }
+        }
         if (section2_multiTargetManager.hasTargets() && !timeSlotState.isMonitoring) {
-            console.log('📅 日付変更により監視対象をクリア');
+            console.log('📅 日付変更により従来システムの監視対象をクリア');
             section2_multiTargetManager.clearAll();
             timeSlotState.mode = 'idle';
             if (section7_cacheManager) {
                 section7_cacheManager.clearTargetSlots();
             }
         }
+        // 予約対象がクリアされたため、即座にFAB表示を更新
+        updateMainButtonDisplay();
         // 監視ボタンを再設置
         setTimeout(() => {
             removeAllMonitorButtons();
             analyzeAndAddMonitorButtons();
-            // FABボタンの状態も更新
+            // 監視ボタン設置後も再度FABボタンの状態を更新
             updateMainButtonDisplay();
             console.log('🔄 監視ボタンとFABを再設置しました');
         }, 1000); // 時間帯テーブル更新を待つ

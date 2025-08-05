@@ -708,6 +708,7 @@ function updateMainButtonDisplay(forceMode: string | null = null): void {
     const fabButton = document.querySelector('#ytomo-main-fab') as HTMLButtonElement;
     const statusBadge = document.querySelector('#ytomo-status-badge') as HTMLElement;
     const reservationTargetDisplay = document.querySelector('#ytomo-reservation-target') as HTMLElement;
+    const monitoringTargetsDisplay = document.querySelector('#ytomo-monitoring-targets') as HTMLElement;
     
     if (fabButton && statusBadge) {
         const span = fabButton.querySelector('span') as HTMLSpanElement;
@@ -719,11 +720,12 @@ function updateMainButtonDisplay(forceMode: string | null = null): void {
                 return;
             }
             
+            // 対象情報の表示更新
+            const targetInfo = unifiedStateManager.getFabTargetDisplayInfo();
+            console.log(`🔍 FAB対象情報: hasTarget=${targetInfo.hasTarget}, type=${targetInfo.targetType}, text="${targetInfo.displayText}"`);
+            
             // 予約対象情報の表示更新
             if (reservationTargetDisplay) {
-                const targetInfo = unifiedStateManager.getFabTargetDisplayInfo();
-                console.log(`🔍 FAB対象情報: hasTarget=${targetInfo.hasTarget}, type=${targetInfo.targetType}, text="${targetInfo.displayText}"`);
-                
                 if (targetInfo.hasTarget && targetInfo.targetType === 'reservation') {
                     reservationTargetDisplay.style.display = 'block';
                     reservationTargetDisplay.innerHTML = `予約対象\n${targetInfo.displayText}`;
@@ -731,6 +733,18 @@ function updateMainButtonDisplay(forceMode: string | null = null): void {
                 } else {
                     reservationTargetDisplay.style.display = 'none';
                     console.log(`🔄 予約対象情報を非表示`);
+                }
+            }
+            
+            // 監視対象情報の表示更新
+            if (monitoringTargetsDisplay) {
+                if (targetInfo.hasTarget && targetInfo.targetType === 'monitoring') {
+                    monitoringTargetsDisplay.style.display = 'block';
+                    monitoringTargetsDisplay.innerHTML = `監視対象\n${targetInfo.displayText}`;
+                    console.log(`✅ 監視対象情報を表示: ${targetInfo.displayText}`);
+                } else {
+                    monitoringTargetsDisplay.style.display = 'none';
+                    console.log(`🔄 監視対象情報を非表示`);
                 }
             }
             
