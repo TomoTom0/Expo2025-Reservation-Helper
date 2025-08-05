@@ -253,7 +253,7 @@ function startTimeSlotTableObserver(): void {
 // 時間帯テーブルの動的待機
 async function waitForTimeSlotTable(timeout: number = 10000): Promise<boolean> {
     const startTime = Date.now();
-    const checkInterval = 500;
+    const checkInterval = 50; // 50msで高速チェック
     
     console.log('時間帯テーブルの出現を待機中...');
     
@@ -917,6 +917,8 @@ async function checkSlotAvailabilityAndReload(): Promise<void> {
     // リロードタイマーを保存（中断時に停止するため）
     reloadCountdownState.reloadTimer = window.setTimeout(() => {
         console.log('🔄 監視継続のためページをリロードします...');
+        // カウントダウンを停止してからリロード実行
+        safeCall('stopReloadCountdown');
         window.location.reload();
     }, totalWaitTime) as any;
 }

@@ -235,12 +235,35 @@ function createEntranceReservationUI(config: ReservationConfig): void {
             return;
         }
         
-        // 監視対象が設定されている場合は監視開始
-        if (multiTargetManager.hasTargets() && timeSlotState.mode === 'selecting') {
-            // 即座にUI更新してから監視開始
-            updateMainButtonDisplay();
-            await startSlotMonitoring();
-            return;
+        // 統一状態管理システムを使用した監視開始判定
+        const unifiedStateManager = getExternalFunction('unifiedStateManager');
+        if (unifiedStateManager) {
+            const preferredAction = unifiedStateManager.getPreferredAction();
+            console.log(`🔧 FABクリック: preferredAction=${preferredAction}`);
+            
+            if (preferredAction === 'monitoring') {
+                console.log('📡 統一状態管理システムによる監視開始');
+                // 実行状態を監視中に変更
+                unifiedStateManager.startMonitoring();
+                // 即座にUI更新してから監視開始
+                updateMainButtonDisplay();
+                await startSlotMonitoring();
+                return;
+            } else if (preferredAction === 'reservation') {
+                console.log('🚀 統一状態管理システムによる予約開始');
+                // 予約処理は下の通常処理で実行
+            } else {
+                console.log('⚠️ 統一状態管理システム: 実行可能なアクションなし');
+                return;
+            }
+        } else {
+            // フォールバック: 従来の判定
+            if (multiTargetManager.hasTargets() && timeSlotState.mode === 'selecting') {
+                console.log('📡 従来システムによる監視開始');
+                updateMainButtonDisplay();
+                await startSlotMonitoring();
+                return;
+            }
         }
         
         // 通常の予約処理
@@ -631,8 +654,8 @@ function removeAllMonitorButtons(): void {
 
 // 時間帯テーブルの準備を待つ
 function waitForTimeSlotTable(callback: () => void): void {
-    const checkInterval = 200; // 200ms間隔でチェック
-    const maxAttempts = 25; // 最大5秒待機
+    const checkInterval = 50; // 50ms間隔で高速チェック
+    const maxAttempts = 100; // 最大5秒待機（50ms × 100 = 5000ms）
     let attempts = 0;
     
     const checkTableReady = () => {

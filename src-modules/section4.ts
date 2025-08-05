@@ -142,7 +142,7 @@ async function initTimeSlotMonitoring(): Promise<void> {
 // カレンダーの動的待機
 async function waitForCalendar(timeout: number = 10000): Promise<boolean> {
     const startTime = Date.now();
-    const checkInterval = 500;
+    const checkInterval = 50; // 50msで高速チェック
     
     console.log('カレンダーの出現を待機中...');
     

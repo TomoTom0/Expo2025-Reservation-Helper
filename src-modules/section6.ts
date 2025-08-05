@@ -151,8 +151,8 @@ async function clickCalendarDate(targetDate: string): Promise<boolean> {
         
         targetElement.dispatchEvent(clickEvent);
         
-        // クリック結果を待機
-        await new Promise(resolve => setTimeout(resolve, 1500));
+        // クリック結果を待機（短縮）
+        await new Promise(resolve => setTimeout(resolve, 300));
         
         // クリック成功確認
         const isNowSelected = targetElement.getAttribute('aria-pressed') === 'true' ||
@@ -249,8 +249,8 @@ async function tryClickCalendarForTimeSlot(): Promise<boolean> {
         
         clickableDate.dispatchEvent(clickEvent);
         
-        // 少し待機してクリック結果を確認
-        await new Promise(resolve => setTimeout(resolve, 1000));
+        // 少し待機してクリック結果を確認（短縮）
+        await new Promise(resolve => setTimeout(resolve, 200));
         
         console.log('✅ カレンダー日付のクリックを実行しました');
         return true;
@@ -373,8 +373,8 @@ async function selectTimeSlotAndStartReservation(slotInfo: any): Promise<void> {
         console.error(`❌ dl要素クリックエラー:`, error);
     }
     
-    // 選択状態確認のため少し待つ
-    await new Promise(resolve => setTimeout(resolve, 500));
+    // 選択状態確認のため少し待つ（短縮）
+    await new Promise(resolve => setTimeout(resolve, 100));
     
     // 選択状態を確認（ボタン要素の状態をチェック）
     const buttonElement = slotInfo.element.querySelector('div[role="button"]') as HTMLElement;
@@ -388,7 +388,7 @@ async function selectTimeSlotAndStartReservation(slotInfo: any): Promise<void> {
         console.warn(`⚠️ 時間帯が選択されていません。再試行します`);
         // 再試行 - dl要素を再度クリック
         clickTarget.click();
-        await new Promise(resolve => setTimeout(resolve, 300));
+        await new Promise(resolve => setTimeout(resolve, 100));
     }
     
     // 少し待ってから予約処理開始
@@ -744,15 +744,17 @@ function updateMainButtonDisplay(forceMode: string | null = null): void {
                     // 監視対象設定済み、開始待ち
                     console.log(`✅ selecting ケース実行: 監視予約開始として有効化`);
                     span.innerText = '監視予約\n開始';
-                    fabButton.style.setProperty('background', 'rgb(0, 104, 33)', 'important'); // 強制適用
-                    fabButton.style.setProperty('opacity', '0.9', 'important');
-                    fabButton.style.setProperty('cursor', 'pointer', 'important');
-                    fabButton.style.setProperty('pointer-events', 'auto', 'important');
+                    
+                    // CSSクラスベースでの管理に統一
+                    fabButton.className = fabButton.className.replace(/ytomo-fab-\w+/g, '');
+                    fabButton.classList.add('ytomo-fab-enabled');
+                    
                     fabButton.title = '監視予約開始';
                     fabButton.disabled = false; // 有効化
                     fabButton.removeAttribute('disabled'); // HTML属性も削除
-                    // クラスによる干渉も除去
-                    fabButton.classList.remove('disabled');
+                    
+                    // デバッグ: 実際の状態をログ出力
+                    console.log(`🔧 FABボタン状態確認: text="${span.innerText}", class="${fabButton.className}", disabled=${fabButton.disabled}, title="${fabButton.title}"`);
                     updateStatusBadge('selecting');
                     break;
                     
@@ -1042,8 +1044,8 @@ async function restoreFromCache(): Promise<void> {
     
     console.log('🔄 キャッシュから複数監視状態を復元中...');
     
-    // カレンダー読み込み完了を待機
-    const hasCalendar = await waitForCalendar();
+    // カレンダー読み込み完了を待機（短縮: 5秒）
+    const hasCalendar = await waitForCalendar(5000);
     if (!hasCalendar) {
         console.log('❌ カレンダーの読み込みがタイムアウトしました');
         cacheManager.clearTargetSlots();
@@ -1066,9 +1068,9 @@ async function restoreFromCache(): Promise<void> {
                 return;
             }
             
-            // 日付クリック後、テーブル表示を待機
+            // 日付クリック後、テーブル表示を待機（短縮: 3秒）
             console.log('⏰ 日付変更後の時間帯テーブル表示を待機中...');
-            const tableAppeared = await waitForTimeSlotTable(8000);
+            const tableAppeared = await waitForTimeSlotTable(3000);
             if (!tableAppeared) {
                 console.log('❌ 日付変更後もテーブルが表示されませんでした');
                 console.log('🗑️ 復元不可のためキャッシュをクリアします');
@@ -1082,14 +1084,18 @@ async function restoreFromCache(): Promise<void> {
         console.log('⚠️ キャッシュに日付情報がありません（古いキャッシュ）');
     }
     
-    // 時間帯テーブルの存在確認と必要に応じてカレンダークリック
-    const hasTable = await checkTimeSlotTableExistsAsync();
+    // 時間帯テーブルの存在確認を短縮実行
+    const hasTable = await Promise.race([
+        checkTimeSlotTableExistsAsync(),
+        new Promise<boolean>(resolve => setTimeout(() => resolve(false), 200)) // 200msでタイムアウト
+    ]);
+    
     if (!hasTable) {
         console.log('⏰ 時間帯テーブルが見つからないため、現在選択中の日付をクリックします');
         const calendarClicked = await tryClickCalendarForTimeSlot();
         if (calendarClicked) {
-            // カレンダークリック後、テーブル表示を待機
-            const tableAppeared = await waitForTimeSlotTable(5000);
+            // カレンダークリック後、テーブル表示を待機（短縮: 2秒）
+            const tableAppeared = await waitForTimeSlotTable(2000);
             if (!tableAppeared) {
                 console.log('❌ カレンダークリック後もテーブルが表示されませんでした');
                 console.log('🗑️ 復元不可のためキャッシュをクリアします');
@@ -1104,7 +1110,7 @@ async function restoreFromCache(): Promise<void> {
         }
     }
     
-    // UI更新を遅延実行（DOM完成後）
+    // UI更新を最短遅延実行（DOM完成後）
     setTimeout(() => {
         // 該当する監視ボタンを探して復元
         let restoredCount = 0;
@@ -1314,7 +1320,7 @@ async function restoreFromCache(): Promise<void> {
                                 console.log('❌ 再試行でも監視対象が見つかりません。キャッシュをクリアします');
                                 clearTargetAndState();
                             }
-                        }, 2000);
+                        }, 800); // 再試行待機時間を短縮
                         } else {
                             console.log('❌ カレンダー自動クリック失敗。キャッシュをクリアします');
                             clearTargetAndState();
@@ -1336,7 +1342,7 @@ async function restoreFromCache(): Promise<void> {
                 console.log('✅ キャッシュクリア完了');
             }
         }
-    }, 2000);
+    }, 500); // キャッシュ復元UI更新の高速化
 }
 
 // 注意: checkReservationConditions関数は削除されました
