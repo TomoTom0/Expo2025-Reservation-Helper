@@ -446,20 +446,35 @@ export class UnifiedStateManager {
             };
         }
         
-        // 監視対象がある場合は最優先の監視対象を表示
+        // 監視対象がある場合は監視対象を表示
         if (this.hasMonitoringTargets() && this.monitoringTargets.length > 0) {
             // 優先度順にソート（priority昇順）
             const sortedTargets = [...this.monitoringTargets].sort((a, b) => a.priority - b.priority);
-            const firstTarget = sortedTargets[0];
-            const location = LocationHelper.getLocationFromIndex(firstTarget.locationIndex);
-            const locationText = location === 'east' ? '東' : '西';
             
-            return {
-                hasTarget: true,
-                displayText: `${locationText}${firstTarget.timeSlot}` + 
-                            (this.monitoringTargets.length > 1 ? ` 他${this.monitoringTargets.length - 1}件` : ''),
-                targetType: 'monitoring'
-            };
+            if (this.monitoringTargets.length === 1) {
+                // 単一の監視対象の場合
+                const target = sortedTargets[0];
+                const location = LocationHelper.getLocationFromIndex(target.locationIndex);
+                const locationText = location === 'east' ? '東' : '西';
+                return {
+                    hasTarget: true,
+                    displayText: `${locationText}${target.timeSlot}`,
+                    targetType: 'monitoring'
+                };
+            } else {
+                // 複数の監視対象の場合 - 改行で表示
+                const targetTexts = sortedTargets.map(target => {
+                    const location = LocationHelper.getLocationFromIndex(target.locationIndex);
+                    const locationText = location === 'east' ? '東' : '西';
+                    return `${locationText}${target.timeSlot}`;
+                });
+                
+                return {
+                    hasTarget: true,
+                    displayText: targetTexts.join('\n'),
+                    targetType: 'monitoring'
+                };
+            }
         }
         
         return {
