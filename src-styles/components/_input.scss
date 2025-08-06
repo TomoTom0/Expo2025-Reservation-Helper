@@ -1,0 +1,16 @@
+// 入力フィールドスタイル
+input.ext-tomo.search {
+  height: 50px;
+  min-width: 200px;
+  max-width: min(300px, 100%);
+  font-family: quicksand;
+  font-size: 16px;
+  -webkit-appearance: textfield;
+  -moz-appearance: textfield;
+  appearance: textfield;
+  border: 1px solid #222426;
+  border-radius: 25px;
+  box-shadow: 0 1px 0 0 #ccc;
+  padding: 0 0 0 10px;
+  flex: 1 1;
+}

@@ -675,7 +675,7 @@ function createMonitorButton(slotInfo: TimeSlotInfo): void {
     // dt要素内に追加（spanの後）
     dtElement.appendChild(monitorButton);
     
-    console.log(`満員時間帯に監視ボタンを追加しました: ${timeText}`);
+    // 満員時間帯に監視ボタンを追加完了
 }
 
 // 監視ボタンクリック処理（選択・解除切り替え）
@@ -685,11 +685,11 @@ function handleMonitorButtonClick(slotInfo: TimeSlotInfo, buttonElement: HTMLBut
     const locationIndex = LocationHelper.getIndexFromSelector(tdSelector);
     const location = LocationHelper.getLocationFromIndex(locationIndex);
     const locationText = location === 'east' ? '東' : '西';
-    console.log(`監視ボタンがクリックされました: ${locationText}${slotInfo.timeText}`);
+    // 監視ボタンがクリックされました
     
     // 監視実行中は操作不可
     if (timeSlotState.isMonitoring) {
-        console.log('⚠️ 監視実行中のため操作できません');
+        // 監視実行中のため操作不可
         return;
     }
     
@@ -697,11 +697,11 @@ function handleMonitorButtonClick(slotInfo: TimeSlotInfo, buttonElement: HTMLBut
     const currentText = buttonSpan.innerText;
     const isCurrentlySelected = currentText.startsWith('監視'); // '監視1', '監視2' etc.
     
-    console.log(`現在の状態: ${isCurrentlySelected ? '選択中' : '未選択'} (テキスト: "${currentText}")`);
+    // 現在の状態確認完了
     
     if (isCurrentlySelected) {
         // 現在選択中の場合は解除
-        console.log(`監視対象を解除します: ${locationText}${slotInfo.timeText}`);
+        // 監視対象を解除
         
         // 統一状態管理システムから削除
         const unifiedStateManager = getExternalFunction('unifiedStateManager');
@@ -713,7 +713,7 @@ function handleMonitorButtonClick(slotInfo: TimeSlotInfo, buttonElement: HTMLBut
                 console.log(`⚠️ 統一状態管理からの削除失敗: ${locationText}${slotInfo.timeText}`);
             }
         } else {
-            console.log('⚠️ 統一状態管理システムが利用できません');
+            // 統一状態管理システムが利用できません
         }
         
         // ボタンの表示を元に戻す
@@ -752,10 +752,10 @@ function handleMonitorButtonClick(slotInfo: TimeSlotInfo, buttonElement: HTMLBut
         // 監視対象表示も更新
         safeCall('updateMonitoringTargetsDisplay');
         
-        console.log(`✅ 監視対象を解除しました: ${locationText}${slotInfo.timeText}`);
+        // 監視対象を解除完了
     } else {
         // 現在未選択の場合は選択
-        console.log(`監視対象を追加します: ${locationText}${slotInfo.timeText}`);
+        // 監視対象を追加
         
         // 選択状態を設定（td要素の一意特定情報を追加）
         // TypeScript用の変数（削除予定）
@@ -778,7 +778,7 @@ function handleMonitorButtonClick(slotInfo: TimeSlotInfo, buttonElement: HTMLBut
                 return;
             }
         } else {
-            console.log('⚠️ 統一状態管理システムが利用できません');
+            // 統一状態管理システムが利用できません
             return;
         }
         
@@ -824,7 +824,7 @@ function handleMonitorButtonClick(slotInfo: TimeSlotInfo, buttonElement: HTMLBut
             console.log(`🔍 FAB更新後の状態: disabled=${fabButton?.disabled}, hasDisabledAttr=${fabButton?.hasAttribute('disabled')}, text="${fabButton?.textContent?.trim()}"`);
         }, 100);
         
-        console.log(`✅ 時間帯 ${locationText}${slotInfo.timeText} を監視対象に設定しました`);
+        // 時間帯を監視対象に設定完了
     }
 }
 

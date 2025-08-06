@@ -13,7 +13,9 @@
       "Bash(for func in getCurrentTableContent shouldUpdateMonitorButtons showStatus enableAllMonitorButtons updateMonitoringTargetsDisplay)",
       "Bash(do echo \"=== $func ===\")",
       "Bash(done)",
-      "Bash(mv:*)"
+      "Bash(mv:*)",
+      "Bash(npm install:*)",
+      "Bash(git restore:*)"
     ],
     "deny": []
   }

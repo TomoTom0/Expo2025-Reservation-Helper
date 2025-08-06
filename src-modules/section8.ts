@@ -127,7 +127,13 @@ const trigger_init = (url_record: string): void => {
         const existingFab = document.getElementById('ytomo-fab-container');
         if (existingFab) {
             existingFab.remove();
-            console.log('🗑️ ページ遷移により既存のFABボタンを削除しました');
+            console.log('🗑️ ページ遷移により既存の入場予約FABボタンを削除しました');
+        }
+        
+        const existingPavilionFab = document.getElementById('ytomo-pavilion-fab-container');
+        if (existingPavilionFab) {
+            existingPavilionFab.remove();
+            console.log('🗑️ ページ遷移により既存のパビリオンFABボタンを削除しました');
         }
     }
     

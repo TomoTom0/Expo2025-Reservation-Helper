@@ -103,8 +103,15 @@
 - [ ] テストデータ管理改善
 
 ## 現在の状況
-**Phase 1-3完了済み**: 分割作業の事前品質保証完了
+**Phase 1-5完了済み**: TypeScript移行・SCSS導入完了
 - 総テスト数: 152テスト（47%増加）
 - Unit Test実装率: 50%達成
-- 分割準備: 8セクション構造整理完了
-- 次のアクション: Phase 4（JavaScript分割）実行可能
+- TypeScript完全移行: 全8セクション完了
+- SCSS導入完了: CSSをJavaScriptから分離
+- webpack統合: index.js一つにコンパイル
+
+## 未解決の問題
+- [ ] 実行中の「すべて読み込み」ボタンが緑色（enabled状態）のまま
+  - 問題: SCSS導入後もCSS優先度の問題が残存
+  - 状況: disabled=true, btn-loading/btn-disabledクラス付与済みだが、緑色のまま表示
+  - 対応: CSS specificity をさらに強化する必要

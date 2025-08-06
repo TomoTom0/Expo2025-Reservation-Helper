@@ -225,7 +225,7 @@ function createEntranceReservationUI(config: ReservationConfig): void {
     fabButton.addEventListener('click', async (event) => {
         // disabled状態の場合はクリックを完全に無視
         if (fabButton.disabled || fabButton.hasAttribute('disabled')) {
-            console.log('⚠️ ボタンがdisabledのためクリックを無視します');
+            // ボタンdisabledのためクリック無視
             event.preventDefault();
             event.stopPropagation();
             event.stopImmediatePropagation();
@@ -234,7 +234,7 @@ function createEntranceReservationUI(config: ReservationConfig): void {
         
         // 追加のstyle確認（CSS disabled状態もチェック）
         if (fabButton.style.pointerEvents === 'none') {
-            console.log('⚠️ pointer-events:noneのためクリックを無視します');
+            // pointer-events:noneのためクリック無視
             event.preventDefault();
             event.stopPropagation();
             event.stopImmediatePropagation();
@@ -243,14 +243,14 @@ function createEntranceReservationUI(config: ReservationConfig): void {
         
         // 中断不可期間のチェック
         if (!isInterruptionAllowed()) {
-            console.log('⚠️ リロード直前のため中断できません');
+            // リロード直前のため中断不可
             showStatus('リロード直前のため中断できません', 'red');
             return;
         }
         
         // 実行中の場合は中断処理
         if (timeSlotState.isMonitoring) {
-            console.log('監視を中断します');
+            // 監視を中断
             stopSlotMonitoring();
             // ステータスは中断を示すメッセージを表示（消さない）
             showStatus('監視中断', 'orange');
@@ -259,7 +259,7 @@ function createEntranceReservationUI(config: ReservationConfig): void {
         }
         
         if (entranceReservationState.isRunning) {
-            console.log('予約処理を中断します');
+            // 予約処理を中断
             entranceReservationState.shouldStop = true;
             showStatus('予約処理を中断中...', 'orange');
             return;
@@ -269,7 +269,7 @@ function createEntranceReservationUI(config: ReservationConfig): void {
         const unifiedStateManager = getExternalFunction('unifiedStateManager');
         if (unifiedStateManager) {
             const preferredAction = unifiedStateManager.getPreferredAction();
-            console.log(`🔧 FABクリック: preferredAction=${preferredAction}`);
+            // FABクリック処理開始
             
             if (preferredAction === 'monitoring') {
                 console.log('📡 統一状態管理システムによる監視開始');
@@ -765,21 +765,17 @@ function setupTimeSlotClickHandlers(): void {
             return;
         }
         
-        console.log(`🖱️ 時間帯クリック検出: ${actualTarget.tagName}.${actualTarget.className}`);
-        
-        console.log(`✅ 時間帯クリック判定成功: ${actualTarget.tagName}.${actualTarget.className}`);
+        // 時間帯クリック判定成功
         
         // 時間帯のdiv[role="button"]がクリックされた場合
         const tdElement = actualTarget.closest('td[data-gray-out]') as HTMLTableCellElement;
         if (!tdElement) {
-            console.log('❌ td要素が見つからない');
             return;
         }
         
         // actualTargetから時間テキストを取得
         const timeText = actualTarget.querySelector('dt span')?.textContent?.trim();
         if (!timeText) {
-            console.log('❌ 時間テキストが見つからない');
             return;
         }
             
@@ -787,17 +783,12 @@ function setupTimeSlotClickHandlers(): void {
             const unifiedStateManager = getExternalFunction('unifiedStateManager');
             const locationIndex = LocationHelper.getIndexFromElement(tdElement);
             
-            console.log(`🖱️ 時間帯クリック検出: ${timeText} (位置: ${locationIndex})`);
-            
             if (unifiedStateManager) {
                 // 統一状態管理で現在の選択状態を確認
                 const isCurrentlyReservationTarget = unifiedStateManager.isReservationTarget(timeText, locationIndex);
                 
-                console.log(`🔍 現在の予約対象状態: ${isCurrentlyReservationTarget}`);
-                
                 if (isCurrentlyReservationTarget) {
                     // 既に予約対象として設定済みの場合は選択解除
-                    console.log(`🔄 選択解除: ${timeText} - 公式サイト仕様を利用`);
                     
                     // イベントを停止（デフォルト動作を防ぐ）
                     event.preventDefault();
@@ -806,26 +797,21 @@ function setupTimeSlotClickHandlers(): void {
                     // 公式サイトの仕様を利用：現在選択中のカレンダー日付ボタンをクリック
                     const currentSelectedCalendarButton = document.querySelector('[role="button"][aria-pressed="true"]') as HTMLElement;
                     if (currentSelectedCalendarButton && currentSelectedCalendarButton.querySelector('time[datetime]')) {
-                        console.log('📅 カレンダー日付ボタンをプログラムでクリックして選択解除');
                         currentSelectedCalendarButton.click();
                         
                         // 統一状態管理からも予約対象を削除
                         setTimeout(() => {
                             unifiedStateManager.clearReservationTarget();
                             updateMainButtonDisplay();
-                            console.log('✅ 公式サイト仕様による選択解除完了');
                         }, 100);
                     } else {
-                        console.log('⚠️ カレンダー日付ボタンが見つからないため、直接削除');
                         // フォールバック: 直接削除
                         unifiedStateManager.clearReservationTarget();
                         updateMainButtonDisplay();
-                        console.log('✅ フォールバック予約対象解除完了');
                     }
                     
                 } else {
                     // 新規選択または別の時間帯への変更
-                    console.log(`✅ 新規選択: ${timeText}`);
                     
                     // DOM上の選択状態から予約対象を同期
                     setTimeout(() => {

@@ -44,6 +44,14 @@ module.exports = {
             ]
           }
         }
+      },
+      {
+        test: /\.s[ac]ss$/i,
+        use: [
+          'style-loader', // JSに埋め込んでDOMに注入
+          'css-loader',   // CSSをJSモジュールとして読み込み
+          'sass-loader',  // SCSSをCSSにコンパイル
+        ],
       }
     ]
   }

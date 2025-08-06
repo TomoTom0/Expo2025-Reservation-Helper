@@ -12,6 +12,379 @@ return /******/ (() => { // webpackBootstrap
 /******/ 	"use strict";
 /******/ 	var __webpack_modules__ = ({
 
+/***/ 56:
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+
+
+/* istanbul ignore next  */
+function setAttributesWithoutAttributes(styleElement) {
+  var nonce =  true ? __webpack_require__.nc : 0;
+  if (nonce) {
+    styleElement.setAttribute("nonce", nonce);
+  }
+}
+module.exports = setAttributesWithoutAttributes;
+
+/***/ }),
+
+/***/ 72:
+/***/ ((module) => {
+
+
+
+var stylesInDOM = [];
+function getIndexByIdentifier(identifier) {
+  var result = -1;
+  for (var i = 0; i < stylesInDOM.length; i++) {
+    if (stylesInDOM[i].identifier === identifier) {
+      result = i;
+      break;
+    }
+  }
+  return result;
+}
+function modulesToDom(list, options) {
+  var idCountMap = {};
+  var identifiers = [];
+  for (var i = 0; i < list.length; i++) {
+    var item = list[i];
+    var id = options.base ? item[0] + options.base : item[0];
+    var count = idCountMap[id] || 0;
+    var identifier = "".concat(id, " ").concat(count);
+    idCountMap[id] = count + 1;
+    var indexByIdentifier = getIndexByIdentifier(identifier);
+    var obj = {
+      css: item[1],
+      media: item[2],
+      sourceMap: item[3],
+      supports: item[4],
+      layer: item[5]
+    };
+    if (indexByIdentifier !== -1) {
+      stylesInDOM[indexByIdentifier].references++;
+      stylesInDOM[indexByIdentifier].updater(obj);
+    } else {
+      var updater = addElementStyle(obj, options);
+      options.byIndex = i;
+      stylesInDOM.splice(i, 0, {
+        identifier: identifier,
+        updater: updater,
+        references: 1
+      });
+    }
+    identifiers.push(identifier);
+  }
+  return identifiers;
+}
+function addElementStyle(obj, options) {
+  var api = options.domAPI(options);
+  api.update(obj);
+  var updater = function updater(newObj) {
+    if (newObj) {
+      if (newObj.css === obj.css && newObj.media === obj.media && newObj.sourceMap === obj.sourceMap && newObj.supports === obj.supports && newObj.layer === obj.layer) {
+        return;
+      }
+      api.update(obj = newObj);
+    } else {
+      api.remove();
+    }
+  };
+  return updater;
+}
+module.exports = function (list, options) {
+  options = options || {};
+  list = list || [];
+  var lastIdentifiers = modulesToDom(list, options);
+  return function update(newList) {
+    newList = newList || [];
+    for (var i = 0; i < lastIdentifiers.length; i++) {
+      var identifier = lastIdentifiers[i];
+      var index = getIndexByIdentifier(identifier);
+      stylesInDOM[index].references--;
+    }
+    var newLastIdentifiers = modulesToDom(newList, options);
+    for (var _i = 0; _i < lastIdentifiers.length; _i++) {
+      var _identifier = lastIdentifiers[_i];
+      var _index = getIndexByIdentifier(_identifier);
+      if (stylesInDOM[_index].references === 0) {
+        stylesInDOM[_index].updater();
+        stylesInDOM.splice(_index, 1);
+      }
+    }
+    lastIdentifiers = newLastIdentifiers;
+  };
+};
+
+/***/ }),
+
+/***/ 113:
+/***/ ((module) => {
+
+
+
+/* istanbul ignore next  */
+function styleTagTransform(css, styleElement) {
+  if (styleElement.styleSheet) {
+    styleElement.styleSheet.cssText = css;
+  } else {
+    while (styleElement.firstChild) {
+      styleElement.removeChild(styleElement.firstChild);
+    }
+    styleElement.appendChild(document.createTextNode(css));
+  }
+}
+module.exports = styleTagTransform;
+
+/***/ }),
+
+/***/ 270:
+/***/ ((module, __webpack_exports__, __webpack_require__) => {
+
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   A: () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _node_modules_css_loader_dist_runtime_noSourceMaps_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(601);
+/* harmony import */ var _node_modules_css_loader_dist_runtime_noSourceMaps_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_css_loader_dist_runtime_noSourceMaps_js__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(314);
+/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1__);
+// Imports
+
+
+var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1___default()((_node_modules_css_loader_dist_runtime_noSourceMaps_js__WEBPACK_IMPORTED_MODULE_0___default()));
+// Module
+___CSS_LOADER_EXPORT___.push([module.id, `button.ext-ytomo{height:40px;width:auto;min-width:60px;padding:0px 8px;background:#006821 !important;color:#fff}button.ext-ytomo.no-after:after{background:rgba(0,0,0,0) none repeat 0 0/auto auto padding-box border-box scroll}button.ext-ytomo.btn-done{background:#4a4c4a !important}button.ext-ytomo:hover{background:#02862b}.pavilion-sub-btn.btn-enabled{background:#006821 !important;cursor:pointer !important;opacity:1 !important}.pavilion-sub-btn.btn-enabled:hover{background:#02862b !important;transform:scale(1.05) !important}.pavilion-sub-btn.btn-disabled,.pavilion-sub-btn.btn-loading{background:gray !important;cursor:not-allowed !important;opacity:.6 !important}.pavilion-sub-btn.btn-disabled:hover,.pavilion-sub-btn.btn-loading:hover{background:gray !important;transform:scale(1) !important}button.ext-ytomo.pavilion-sub-btn.btn-disabled,button.ext-ytomo.pavilion-sub-btn.btn-loading{background:gray !important;cursor:not-allowed !important;opacity:.6 !important}button.ext-ytomo.pavilion-sub-btn.btn-disabled:hover,button.ext-ytomo.pavilion-sub-btn.btn-loading:hover{background:gray !important;transform:scale(1) !important}.safe-none,.ytomo-none,.filter-none{display:none}div.div-flex{display:flex;justify-content:center;margin:5px}.ytomo-fab{width:56px !important;height:56px !important;border-radius:50% !important;color:#fff !important;border:none !important;box-shadow:0 6px 20px rgba(0,0,0,.4),0 2px 8px rgba(0,0,0,.2) !important;border:3px solid hsla(0,0%,100%,.2) !important;display:flex !important;align-items:center !important;justify-content:center !important;font-size:14px !important;font-weight:bold !important;transition:all .3s ease !important;position:relative !important;overflow:hidden !important;pointer-events:auto !important}.ytomo-fab-enabled{background:#006821 !important;opacity:.9 !important;cursor:pointer !important;pointer-events:auto !important}.ytomo-fab-disabled{background:gray !important;opacity:.6 !important;cursor:not-allowed !important;pointer-events:none !important}.ytomo-fab-monitoring{background:#ff8c00 !important;opacity:.9 !important;cursor:pointer !important;pointer-events:auto !important}.ytomo-fab-running{background:#dc3545 !important;opacity:.6 !important;cursor:not-allowed !important;pointer-events:none !important}input.ext-tomo.search{height:50px;min-width:200px;max-width:min(300px,100%);font-family:quicksand;font-size:16px;-webkit-appearance:textfield;-moz-appearance:textfield;appearance:textfield;border:1px solid #222426;border-radius:25px;box-shadow:0 1px 0 0 #ccc;padding:0 0 0 10px;flex:1 1}`, ""]);
+// Exports
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
+
+
+/***/ }),
+
+/***/ 314:
+/***/ ((module) => {
+
+
+
+/*
+  MIT License http://www.opensource.org/licenses/mit-license.php
+  Author Tobias Koppers @sokra
+*/
+module.exports = function (cssWithMappingToString) {
+  var list = [];
+
+  // return the list of modules as css string
+  list.toString = function toString() {
+    return this.map(function (item) {
+      var content = "";
+      var needLayer = typeof item[5] !== "undefined";
+      if (item[4]) {
+        content += "@supports (".concat(item[4], ") {");
+      }
+      if (item[2]) {
+        content += "@media ".concat(item[2], " {");
+      }
+      if (needLayer) {
+        content += "@layer".concat(item[5].length > 0 ? " ".concat(item[5]) : "", " {");
+      }
+      content += cssWithMappingToString(item);
+      if (needLayer) {
+        content += "}";
+      }
+      if (item[2]) {
+        content += "}";
+      }
+      if (item[4]) {
+        content += "}";
+      }
+      return content;
+    }).join("");
+  };
+
+  // import a list of modules into the list
+  list.i = function i(modules, media, dedupe, supports, layer) {
+    if (typeof modules === "string") {
+      modules = [[null, modules, undefined]];
+    }
+    var alreadyImportedModules = {};
+    if (dedupe) {
+      for (var k = 0; k < this.length; k++) {
+        var id = this[k][0];
+        if (id != null) {
+          alreadyImportedModules[id] = true;
+        }
+      }
+    }
+    for (var _k = 0; _k < modules.length; _k++) {
+      var item = [].concat(modules[_k]);
+      if (dedupe && alreadyImportedModules[item[0]]) {
+        continue;
+      }
+      if (typeof layer !== "undefined") {
+        if (typeof item[5] === "undefined") {
+          item[5] = layer;
+        } else {
+          item[1] = "@layer".concat(item[5].length > 0 ? " ".concat(item[5]) : "", " {").concat(item[1], "}");
+          item[5] = layer;
+        }
+      }
+      if (media) {
+        if (!item[2]) {
+          item[2] = media;
+        } else {
+          item[1] = "@media ".concat(item[2], " {").concat(item[1], "}");
+          item[2] = media;
+        }
+      }
+      if (supports) {
+        if (!item[4]) {
+          item[4] = "".concat(supports);
+        } else {
+          item[1] = "@supports (".concat(item[4], ") {").concat(item[1], "}");
+          item[4] = supports;
+        }
+      }
+      list.push(item);
+    }
+  };
+  return list;
+};
+
+/***/ }),
+
+/***/ 540:
+/***/ ((module) => {
+
+
+
+/* istanbul ignore next  */
+function insertStyleElement(options) {
+  var element = document.createElement("style");
+  options.setAttributes(element, options.attributes);
+  options.insert(element, options.options);
+  return element;
+}
+module.exports = insertStyleElement;
+
+/***/ }),
+
+/***/ 601:
+/***/ ((module) => {
+
+
+
+module.exports = function (i) {
+  return i[1];
+};
+
+/***/ }),
+
+/***/ 659:
+/***/ ((module) => {
+
+
+
+var memo = {};
+
+/* istanbul ignore next  */
+function getTarget(target) {
+  if (typeof memo[target] === "undefined") {
+    var styleTarget = document.querySelector(target);
+
+    // Special case to return head of iframe instead of iframe itself
+    if (window.HTMLIFrameElement && styleTarget instanceof window.HTMLIFrameElement) {
+      try {
+        // This will throw an exception if access to iframe is blocked
+        // due to cross-origin restrictions
+        styleTarget = styleTarget.contentDocument.head;
+      } catch (e) {
+        // istanbul ignore next
+        styleTarget = null;
+      }
+    }
+    memo[target] = styleTarget;
+  }
+  return memo[target];
+}
+
+/* istanbul ignore next  */
+function insertBySelector(insert, style) {
+  var target = getTarget(insert);
+  if (!target) {
+    throw new Error("Couldn't find a style target. This probably means that the value for the 'insert' parameter is invalid.");
+  }
+  target.appendChild(style);
+}
+module.exports = insertBySelector;
+
+/***/ }),
+
+/***/ 825:
+/***/ ((module) => {
+
+
+
+/* istanbul ignore next  */
+function apply(styleElement, options, obj) {
+  var css = "";
+  if (obj.supports) {
+    css += "@supports (".concat(obj.supports, ") {");
+  }
+  if (obj.media) {
+    css += "@media ".concat(obj.media, " {");
+  }
+  var needLayer = typeof obj.layer !== "undefined";
+  if (needLayer) {
+    css += "@layer".concat(obj.layer.length > 0 ? " ".concat(obj.layer) : "", " {");
+  }
+  css += obj.css;
+  if (needLayer) {
+    css += "}";
+  }
+  if (obj.media) {
+    css += "}";
+  }
+  if (obj.supports) {
+    css += "}";
+  }
+  var sourceMap = obj.sourceMap;
+  if (sourceMap && typeof btoa !== "undefined") {
+    css += "\n/*# sourceMappingURL=data:application/json;base64,".concat(btoa(unescape(encodeURIComponent(JSON.stringify(sourceMap)))), " */");
+  }
+
+  // For old IE
+  /* istanbul ignore if  */
+  options.styleTagTransform(css, styleElement, options.options);
+}
+function removeStyleElement(styleElement) {
+  // istanbul ignore if
+  if (styleElement.parentNode === null) {
+    return false;
+  }
+  styleElement.parentNode.removeChild(styleElement);
+}
+
+/* istanbul ignore next  */
+function domAPI(options) {
+  if (typeof document === "undefined") {
+    return {
+      update: function update() {},
+      remove: function remove() {}
+    };
+  }
+  var styleElement = options.insertStyleElement(options);
+  return {
+    update: function update(obj) {
+      apply(styleElement, options, obj);
+    },
+    remove: function remove() {
+      removeStyleElement(styleElement);
+    }
+  };
+}
+module.exports = domAPI;
+
+/***/ }),
+
 /***/ 897:
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
@@ -262,7 +635,7 @@ function createFABToggleButton() {
 /******/ 		}
 /******/ 		// Create a new module (and put it into the cache)
 /******/ 		var module = __webpack_module_cache__[moduleId] = {
-/******/ 			// no module.id needed
+/******/ 			id: moduleId,
 /******/ 			// no module.loaded needed
 /******/ 			exports: {}
 /******/ 		};
@@ -275,6 +648,18 @@ function createFABToggleButton() {
 /******/ 	}
 /******/ 	
 /************************************************************************/
+/******/ 	/* webpack/runtime/compat get default export */
+/******/ 	(() => {
+/******/ 		// getDefaultExport function for compatibility with non-harmony modules
+/******/ 		__webpack_require__.n = (module) => {
+/******/ 			var getter = module && module.__esModule ?
+/******/ 				() => (module['default']) :
+/******/ 				() => (module);
+/******/ 			__webpack_require__.d(getter, { a: getter });
+/******/ 			return getter;
+/******/ 		};
+/******/ 	})();
+/******/ 	
 /******/ 	/* webpack/runtime/define property getters */
 /******/ 	(() => {
 /******/ 		// define getter functions for harmony exports
@@ -303,8 +688,786 @@ function createFABToggleButton() {
 /******/ 		};
 /******/ 	})();
 /******/ 	
+/******/ 	/* webpack/runtime/nonce */
+/******/ 	(() => {
+/******/ 		__webpack_require__.nc = undefined;
+/******/ 	})();
+/******/ 	
 /************************************************************************/
 var __webpack_exports__ = {};
+
+// EXTERNAL MODULE: ./node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js
+var injectStylesIntoStyleTag = __webpack_require__(72);
+var injectStylesIntoStyleTag_default = /*#__PURE__*/__webpack_require__.n(injectStylesIntoStyleTag);
+// EXTERNAL MODULE: ./node_modules/style-loader/dist/runtime/styleDomAPI.js
+var styleDomAPI = __webpack_require__(825);
+var styleDomAPI_default = /*#__PURE__*/__webpack_require__.n(styleDomAPI);
+// EXTERNAL MODULE: ./node_modules/style-loader/dist/runtime/insertBySelector.js
+var insertBySelector = __webpack_require__(659);
+var insertBySelector_default = /*#__PURE__*/__webpack_require__.n(insertBySelector);
+// EXTERNAL MODULE: ./node_modules/style-loader/dist/runtime/setAttributesWithoutAttributes.js
+var setAttributesWithoutAttributes = __webpack_require__(56);
+var setAttributesWithoutAttributes_default = /*#__PURE__*/__webpack_require__.n(setAttributesWithoutAttributes);
+// EXTERNAL MODULE: ./node_modules/style-loader/dist/runtime/insertStyleElement.js
+var insertStyleElement = __webpack_require__(540);
+var insertStyleElement_default = /*#__PURE__*/__webpack_require__.n(insertStyleElement);
+// EXTERNAL MODULE: ./node_modules/style-loader/dist/runtime/styleTagTransform.js
+var styleTagTransform = __webpack_require__(113);
+var styleTagTransform_default = /*#__PURE__*/__webpack_require__.n(styleTagTransform);
+// EXTERNAL MODULE: ./node_modules/css-loader/dist/cjs.js!./node_modules/sass-loader/dist/cjs.js!./src-styles/main.scss
+var main = __webpack_require__(270);
+;// ./src-styles/main.scss
+
+      
+      
+      
+      
+      
+      
+      
+      
+      
+
+var options = {};
+
+options.styleTagTransform = (styleTagTransform_default());
+options.setAttributes = (setAttributesWithoutAttributes_default());
+options.insert = insertBySelector_default().bind(null, "head");
+options.domAPI = (styleDomAPI_default());
+options.insertStyleElement = (insertStyleElement_default());
+
+var update = injectStylesIntoStyleTag_default()(main/* default */.A, options);
+
+
+
+
+       /* harmony default export */ const src_styles_main = (main/* default */.A && main/* default */.A.locals ? main/* default */.A.locals : undefined);
+
+;// ./src-modules/section1.ts
+// 【1. 基本機能・ユーティリティ】
+// ============================================================================
+// スタイルのインポート
+
+// SCSSファイルからスタイルが自動的にインポートされるため、insert_style関数は不要
+// 検索ワードを正規表現に変換する関数
+// val_searchには以下の3種類に大別されるワードが含まれる
+// 1. 通常の文字列
+// 2. マイナス検索用文字列 (`-`から始まる)
+// 3. phrase検索用文字列 (`"`で囲まれた文字列)
+// また、*は0文字以上のワイルドカードとして扱う
+// 区切り文字は以下の通り
+// 1. 全角スペース, 半角スペース: ANDの意味
+// 2. or, OR (前後に全角または半角の空白を伴う): ORの意味
+// また、ANDやORを組み合わせる場合、半角括弧でその範囲を明示的にできる
+const prepare_filter = (val_search) => {
+    // 空の検索文字列の場合は全てにマッチする正規表現を返す
+    if (!val_search.trim()) {
+        return { include: /(?:)/, exclude: null };
+    }
+    // OR条件を一時的に特別なマーカーに置換（後で処理するため）
+    const orReplaced = val_search.replace(/(?:\s+|^)(or|OR)(?:\s+|$)/g, ' \uFFFF ');
+    // フレーズ検索（引用符で囲まれた部分）を抽出
+    const phraseMatches = orReplaced.match(/"[^"]*"/g) || [];
+    let remainingStr = orReplaced;
+    const phrases = phraseMatches.map(phrase => {
+        remainingStr = remainingStr.replace(phrase, '');
+        return phrase.slice(1, -1).replace(/\*/g, '.*');
+    });
+    // 残りの部分から通常の単語とマイナス検索を抽出
+    const tokens = remainingStr.split(/\s+/).filter(token => token);
+    const includeTokens = [];
+    const excludeTokens = [];
+    tokens.forEach(token => {
+        if (token === '\uFFFF') {
+            // ORマーカー
+            includeTokens.push(token);
+        }
+        else if (token.startsWith('-')) {
+            // マイナス検索
+            const cleaned = token.slice(1).replace(/\*/g, '.*');
+            if (cleaned)
+                excludeTokens.push(cleaned);
+        }
+        else {
+            // 通常の検索
+            const cleaned = token.replace(/\*/g, '.*');
+            if (cleaned)
+                includeTokens.push(cleaned);
+        }
+    });
+    // フレーズをincludeTokensに追加
+    phrases.forEach(phrase => {
+        includeTokens.push(phrase);
+    });
+    const processParentheses = (tokens) => {
+        const stack = [[]];
+        for (const token of tokens) {
+            if (token === '(') {
+                stack.push([]);
+            }
+            else if (token === ')') {
+                if (stack.length > 1) {
+                    const group = stack.pop();
+                    stack[stack.length - 1].push(group);
+                }
+            }
+            else {
+                stack[stack.length - 1].push(token);
+            }
+        }
+        return stack[0];
+    };
+    const groupedIncludes = processParentheses(includeTokens);
+    // 正規表現の構築（順不同対応版）
+    const buildRegex = (group) => {
+        if (Array.isArray(group)) {
+            const parts = group.map(item => Array.isArray(item) ? buildRegex(item) : item);
+            // ORマーカーがあるかチェック
+            const orIndex = parts.findIndex((part) => part === '\uFFFF');
+            if (orIndex > -1) {
+                const left = buildRegex(parts.slice(0, orIndex));
+                const right = buildRegex(parts.slice(orIndex + 1));
+                return `(?:${left}|${right})`;
+            }
+            else {
+                // AND条件の場合は順不同でマッチするように変更
+                return parts.map((part) => `(?=.*${part})`).join('');
+            }
+        }
+        return group;
+    };
+    const includePattern = buildRegex(groupedIncludes)
+        .replace(/\uFFFF/g, '|')
+        .replace(/\.\*/g, '[\\s\\S]*');
+    // Safari対応：除外条件を別々にチェックする方式に変更
+    const excludePatterns = excludeTokens.map(token => new RegExp(token.replace(/\.\*/g, '[\\s\\S]*'), 'i'));
+    return {
+        include: new RegExp(includePattern, 'i'),
+        exclude: excludePatterns.length > 0 ? excludePatterns : null
+    };
+};
+// ページ初期化処理
+const init_page = () => {
+    // ヘッダーにFAB切替ボタンを追加（DOM構築完了を待つ）
+    setTimeout(() => {
+        Promise.resolve(/* import() */).then(__webpack_require__.bind(__webpack_require__, 897)).then((section2) => {
+            section2.createFABToggleButton();
+        });
+    }, 1000);
+    // すべて読み込みボタンの自動クリック処理
+    const load_more_auto = async () => {
+        const scrollX = window.scrollX;
+        const scrollY = window.scrollY;
+        const arr_btn = document.querySelectorAll("button.style_more_btn__ymb22:not([disabled])");
+        console.log(`🔄 load_more_auto実行: もっと見るボタン${arr_btn.length}個`);
+        if (arr_btn.length > 0) {
+            // 件数変化をログ出力
+            const beforeCounts = getItemCounts();
+            console.log(`📊 クリック前の件数: ${beforeCounts.visible}/${beforeCounts.total}`);
+            arr_btn[0].click();
+            // 件数表示を継続的に更新（読み込み速度に影響しない）
+            const updateInterval = setInterval(() => {
+                if (window.updatePavilionCounts) {
+                    window.updatePavilionCounts();
+                }
+            }, 200);
+            setTimeout(() => {
+                scrollTo(scrollX, scrollY);
+                // 件数変化をログ出力
+                const afterCounts = getItemCounts();
+                console.log(`📊 クリック後の件数: ${afterCounts.visible}/${afterCounts.total}`);
+                // 次の読み込みを即座に実行
+                clearInterval(updateInterval);
+                load_more_auto();
+            }, 500);
+        }
+        else {
+            console.log(`✅ load_more_auto完了: もっと見るボタンがありません`);
+            // 完了時にも件数表示を更新
+            if (window.updatePavilionCounts) {
+                window.updatePavilionCounts();
+                console.log(`📊 完了時の件数表示を更新`);
+            }
+        }
+    };
+    // 件数をカウントする関数
+    const getItemCounts = () => {
+        const allItems = document.querySelectorAll("div.style_search_item_row__moqWC");
+        const visibleItems = document.querySelectorAll("div.style_search_item_row__moqWC:not(.safe-none):not(.ytomo-none):not(.filter-none)");
+        return {
+            total: allItems.length,
+            visible: visibleItems.length
+        };
+    };
+    // 「もっと見る」ボタンの存在をチェックする関数
+    const hasMoreButton = () => {
+        // 全ての「もっと見る」ボタンをチェック（disabled含む）
+        const allMoreButtons = document.querySelectorAll("button.style_more_btn__ymb22");
+        const enabledMoreButtons = document.querySelectorAll("button.style_more_btn__ymb22:not([disabled])");
+        console.log(`🔍 もっと見るボタンチェック: 全体${allMoreButtons.length}個, 有効${enabledMoreButtons.length}個`);
+        allMoreButtons.forEach((btn, index) => {
+            console.log(`  ボタン${index + 1}: disabled=${btn.hasAttribute('disabled')}, text="${btn.textContent?.trim()}"`);
+        });
+        // 有効な「もっと見る」ボタンがある場合のみtrue
+        return enabledMoreButtons.length > 0;
+    };
+    // 「すべて読み込み」ボタンの状態を更新する関数
+    const updateLoadAllButtonState = () => {
+        const loadAllButtons = document.querySelectorAll("button.btn-load-all");
+        const hasMore = hasMoreButton();
+        const isLoading = document.querySelectorAll("button.btn-load-all.btn-loading").length > 0;
+        console.log(`🔧 すべて読み込みボタン状態更新: もっと見るボタン=${hasMore ? 'あり' : 'なし'}, 実行中=${isLoading}`);
+        loadAllButtons.forEach((btn, index) => {
+            const button = btn;
+            console.log(`  ボタン${index + 1}: 更新前 disabled=${button.disabled}, classes=${button.className}`);
+            // 実行中の場合は強制的にdisabled状態にする
+            if (isLoading) {
+                button.disabled = true;
+                button.classList.remove("btn-enabled");
+                button.classList.add("btn-disabled");
+                console.log(`  → 実行中のため無効化: disabled=${button.disabled}, classes=${button.className}`);
+                return;
+            }
+            if (hasMore) {
+                button.disabled = false;
+                button.classList.remove("btn-done", "btn-disabled", "btn-loading");
+                button.classList.add("btn-enabled");
+                console.log(`  → 有効化: disabled=${button.disabled}, classes=${button.className}`);
+            }
+            else {
+                button.disabled = true;
+                button.classList.remove("btn-enabled", "btn-loading");
+                button.classList.add("btn-done", "btn-disabled");
+                console.log(`  → 無効化: disabled=${button.disabled}, classes=${button.className}`);
+            }
+        });
+    };
+    // パビリオン用FABボタンを作成する関数
+    const createPavilionFAB = () => {
+        // 既存のFABがあるかチェック
+        const existingFab = document.getElementById('ytomo-pavilion-fab-container');
+        if (existingFab) {
+            return; // 既に存在する場合は何もしない
+        }
+        // FABコンテナを作成（右下固定、入場予約FABと同じスタイル）
+        const fabContainer = document.createElement('div');
+        fabContainer.id = 'ytomo-pavilion-fab-container';
+        fabContainer.style.cssText = `
+            position: fixed !important;
+            bottom: 24px !important;
+            right: 24px !important;
+            z-index: 10000 !important;
+            display: flex !important;
+            flex-direction: column !important;
+            gap: 12px !important;
+            align-items: flex-end !important;
+            pointer-events: auto !important;
+        `;
+        // メインFABボタンを作成（入場予約FABと同じスタイル）
+        const fabButton = document.createElement('button');
+        fabButton.id = 'ytomo-pavilion-fab-button';
+        fabButton.classList.add('ext-ytomo', 'ytomo-fab', 'ytomo-fab-enabled');
+        // FABボタンの内容構造（縦配置）
+        const fabContent = document.createElement('div');
+        fabContent.style.cssText = `
+            display: flex !important;
+            flex-direction: column !important;
+            align-items: center !important;
+            justify-content: center !important;
+            height: 100% !important;
+            pointer-events: none !important;
+        `;
+        // 展開/縮小アイコン（上部）
+        const expandIcon = document.createElement('div');
+        expandIcon.style.cssText = `
+            font-size: 8px !important;
+            line-height: 1 !important;
+            margin-bottom: 1px !important;
+            opacity: 0.8 !important;
+        `;
+        expandIcon.innerHTML = '▲'; // 初期は縮小状態（展開可能）
+        // YTomoテキスト（中央）- 小さく控えめに
+        const brandText = document.createElement('div');
+        brandText.style.cssText = `
+            font-size: 7px !important;
+            font-weight: normal !important;
+            line-height: 1 !important;
+            margin-bottom: 2px !important;
+            opacity: 0.7 !important;
+        `;
+        brandText.innerText = 'YTomo';
+        // 件数表示（下部）- 大きく目立つように
+        const countsText = document.createElement('div');
+        countsText.style.cssText = `
+            font-size: 12px !important;
+            font-weight: bold !important;
+            line-height: 1 !important;
+        `;
+        countsText.innerText = '0/0'; // 初期値、後で更新
+        // DOM構築
+        fabContent.appendChild(expandIcon);
+        fabContent.appendChild(brandText);
+        fabContent.appendChild(countsText);
+        fabButton.appendChild(fabContent);
+        // FABボタンにrelative positionを設定
+        fabButton.style.position = 'relative';
+        // ホバー効果（入場予約FABと同じ）
+        fabButton.addEventListener('mouseenter', () => {
+            fabButton.style.transform = 'scale(1.15)';
+            fabButton.style.boxShadow = '0 8px 25px rgba(0, 0, 0, 0.5), 0 4px 12px rgba(0, 0, 0, 0.3)';
+            fabButton.style.borderWidth = '4px';
+        });
+        fabButton.addEventListener('mouseleave', () => {
+            fabButton.style.transform = 'scale(1.0)';
+            fabButton.style.boxShadow = '0 6px 20px rgba(0, 0, 0, 0.4), 0 2px 8px rgba(0, 0, 0, 0.2)';
+            fabButton.style.borderWidth = '3px';
+        });
+        // 件数表示を更新する関数（FABボタン内に表示）
+        const updateCountsDisplay = () => {
+            const counts = getItemCounts();
+            countsText.innerText = `${counts.visible}/${counts.total}`;
+            console.log(`📊 件数表示更新: ${counts.visible}/${counts.total}`);
+        };
+        // サブアクションボタンコンテナ
+        const subActionsContainer = document.createElement('div');
+        subActionsContainer.id = 'pavilion-sub-actions';
+        subActionsContainer.style.cssText = `
+            display: none !important;
+            flex-direction: column !important;
+            gap: 8px !important;
+            align-items: flex-end !important;
+            margin-bottom: 8px !important;
+        `;
+        // サブアクションボタンの作成
+        const createSubButton = (text, className) => {
+            const btn = document.createElement('button');
+            btn.classList.add('ext-ytomo', 'pavilion-sub-btn', className, 'btn-enabled');
+            btn.textContent = text;
+            btn.style.cssText = `
+                color: white !important;
+                border: none !important;
+                border-radius: 20px !important;
+                padding: 8px 16px !important;
+                font-size: 12px !important;
+                white-space: nowrap !important;
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3) !important;
+                transition: all 0.2s ease !important;
+            `;
+            return btn;
+        };
+        const btnLoadAll = createSubButton('すべて読み込み', 'btn-load-all');
+        const btnFilterSafe = createSubButton('空きのみ', 'btn-filter-safe');
+        const btnAlertToCopy = createSubButton('一覧コピー', 'btn-alert-to-copy');
+        // DOM構築
+        subActionsContainer.appendChild(btnLoadAll);
+        subActionsContainer.appendChild(btnFilterSafe);
+        subActionsContainer.appendChild(btnAlertToCopy);
+        fabContainer.appendChild(subActionsContainer);
+        fabContainer.appendChild(fabButton);
+        // FABの開閉制御（デフォルトで展開）
+        let isExpanded = true; // デフォルトで展開状態
+        // 初期状態を展開に設定
+        subActionsContainer.style.display = 'flex';
+        expandIcon.innerHTML = '▼'; // 展開状態（縮小可能）
+        fabButton.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            isExpanded = !isExpanded;
+            if (isExpanded) {
+                subActionsContainer.style.display = 'flex';
+                expandIcon.innerHTML = '▼'; // 展開状態（縮小可能）
+            }
+            else {
+                subActionsContainer.style.display = 'none';
+                expandIcon.innerHTML = '▲'; // 縮小状態（展開可能）
+                updateCountsDisplay(); // 閉じる時に件数を更新して表示
+            }
+        });
+        // 初期件数表示
+        updateCountsDisplay();
+        document.body.appendChild(fabContainer);
+        // FABに件数更新関数を公開
+        window.updatePavilionCounts = updateCountsDisplay;
+        // DOMの変化を監視してボタンの状態を自動更新
+        const observer = new MutationObserver((mutations) => {
+            let shouldUpdate = false;
+            mutations.forEach((mutation) => {
+                // 「もっと見る」ボタンの変化を検知
+                if (mutation.type === 'attributes' &&
+                    mutation.attributeName === 'disabled' &&
+                    mutation.target instanceof Element &&
+                    mutation.target.classList.contains('style_more_btn__ymb22')) {
+                    shouldUpdate = true;
+                    console.log('📍 もっと見るボタンのdisabled属性変化を検知');
+                }
+                // 新しい「もっと見る」ボタンの追加/削除を検知
+                if (mutation.type === 'childList') {
+                    let shouldUpdateCounts = false;
+                    mutation.addedNodes.forEach((node) => {
+                        if (node instanceof Element) {
+                            const moreButtons = node.querySelectorAll('button.style_more_btn__ymb22');
+                            if (moreButtons.length > 0) {
+                                shouldUpdate = true;
+                                console.log('📍 新しいもっと見るボタンの追加を検知');
+                            }
+                            // 検索アイテムの追加を検知
+                            const searchItems = node.querySelectorAll('div.style_search_item_row__moqWC');
+                            if (searchItems.length > 0) {
+                                shouldUpdateCounts = true;
+                                console.log('📍 新しい検索アイテムの追加を検知');
+                            }
+                        }
+                    });
+                    mutation.removedNodes.forEach((node) => {
+                        if (node instanceof Element) {
+                            const moreButtons = node.querySelectorAll('button.style_more_btn__ymb22');
+                            if (moreButtons.length > 0) {
+                                shouldUpdate = true;
+                                console.log('📍 もっと見るボタンの削除を検知');
+                            }
+                        }
+                    });
+                    if (shouldUpdateCounts) {
+                        setTimeout(() => {
+                            updateCountsDisplay();
+                        }, 100);
+                    }
+                }
+                // class属性の変化を検知（フィルタリング用）
+                if (mutation.type === 'attributes' &&
+                    mutation.attributeName === 'class' &&
+                    mutation.target instanceof Element &&
+                    mutation.target.classList.contains('style_search_item_row__moqWC')) {
+                    setTimeout(() => {
+                        updateCountsDisplay();
+                    }, 50);
+                }
+            });
+            if (shouldUpdate) {
+                // 少し遅延を入れてDOM更新完了を待つ
+                setTimeout(() => {
+                    updateLoadAllButtonState();
+                }, 100);
+            }
+        });
+        // 監視開始
+        observer.observe(document.body, {
+            childList: true,
+            subtree: true,
+            attributes: true,
+            attributeFilter: ['disabled']
+        });
+        // 初期状態で「すべて読み込み」ボタンの状態を設定
+        setTimeout(() => {
+            updateLoadAllButtonState();
+        }, 1000);
+    };
+    // const refresh_btn_ = () => {
+    // }
+    // 元の検索入力欄を追加する関数
+    const insert_search_input = () => {
+        const div_official_search = document.querySelector("div.style_search__7HKSe");
+        const div_insert = document.createElement("div");
+        div_insert.classList.add("div-flex");
+        const input_another_search = document.createElement("input");
+        input_another_search.classList.add("ext-tomo");
+        input_another_search.classList.add("search");
+        input_another_search.setAttribute("type", "text");
+        input_another_search.setAttribute("placeholder", "読み込みなし絞込");
+        const btn_filter_without_load = document.createElement("button");
+        btn_filter_without_load.classList.add("basic-btn", "type2", "no-after", "ext-ytomo", "btn-filter-without-load");
+        btn_filter_without_load.style.cssText = `
+            height: auto;
+            min-height: 40px;
+            width: auto;
+            min-width: 60px;
+            padding: 0px 8px;
+            color: white;
+            margin: 5px;
+            background: rgb(0, 104, 33) !important;
+        `;
+        const span_filter_without_load = document.createElement("span");
+        span_filter_without_load.classList.add("ext-ytomo");
+        span_filter_without_load.innerText = "絞込";
+        btn_filter_without_load.appendChild(span_filter_without_load);
+        div_insert.appendChild(input_another_search);
+        div_insert.appendChild(btn_filter_without_load);
+        if (div_official_search) {
+            div_official_search.after(div_insert);
+        }
+    };
+    insert_search_input();
+    createPavilionFAB();
+    // 状態更新関数をグローバルに公開
+    window.updateLoadAllButtonState = updateLoadAllButtonState;
+    // ページ読み込み完了後に状態をチェック（複数回、より頻繁に）
+    const checkIntervals = [500, 1000, 2000, 3000, 5000];
+    checkIntervals.forEach((delay, index) => {
+        setTimeout(() => {
+            console.log(`🕐 状態チェック${index + 1} (${delay}ms後)`);
+            updateLoadAllButtonState();
+            // 件数表示も更新
+            if (window.updatePavilionCounts) {
+                window.updatePavilionCounts();
+            }
+        }, delay);
+    });
+    // DOM Content Loadedイベント後にもチェック
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('📋 DOMContentLoaded後の状態チェック');
+            setTimeout(() => {
+                updateLoadAllButtonState();
+            }, 100);
+        });
+    }
+    // 独自ボタンのクリックイベントハンドラ
+    document.addEventListener("click", (event) => {
+        if (event.target?.matches?.("button.ext-ytomo, button.ext-ytomo *, button.pavilion-sub-btn, button.pavilion-sub-btn *")) {
+            const target = event.target?.closest?.("button.ext-ytomo, button.pavilion-sub-btn");
+            if (target && target.classList.contains("btn-load-all")) {
+                // すべて読み込み
+                const button = target;
+                console.log('🚀 すべて読み込み開始');
+                console.log(`🔧 クリック対象ボタン:`, button);
+                console.log(`🔧 実行前の状態: disabled=${button.disabled}, classes=${button.className}`);
+                // 既に実行中の場合は何もしない
+                if (button.classList.contains("btn-loading")) {
+                    console.log('⚠️ すでに実行中のため無視');
+                    return;
+                }
+                // 実行中は強制的にdisabled & 専用クラス設定
+                button.disabled = true;
+                button.classList.remove("btn-enabled");
+                button.classList.add("btn-disabled", "btn-loading");
+                console.log(`🔧 実行開始時の状態設定完了: disabled=${button.disabled}, classes=${button.className}`);
+                console.log(`🔧 実際のHTML disabled属性:`, button.hasAttribute('disabled'));
+                console.log(`🔧 computedStyle background:`, window.getComputedStyle(button).backgroundColor);
+                // 強制的にCSS再適用
+                button.style.background = 'rgb(128, 128, 128)';
+                button.style.cursor = 'not-allowed';
+                console.log(`🔧 強制スタイル適用後:`, button.style.cssText);
+                // 他の「すべて読み込み」ボタンも同時に無効化
+                document.querySelectorAll("button.btn-load-all").forEach((btn) => {
+                    if (btn !== button) {
+                        const otherBtn = btn;
+                        otherBtn.disabled = true;
+                        btn.classList.remove("btn-enabled");
+                        btn.classList.add("btn-disabled", "btn-loading");
+                    }
+                });
+                load_more_auto().then(() => {
+                    console.log('✅ すべて読み込み完了');
+                    // 全ての「すべて読み込み」ボタンのloading状態を解除
+                    document.querySelectorAll("button.btn-load-all").forEach((btn) => {
+                        const loadBtn = btn;
+                        btn.classList.remove("btn-loading");
+                        // loading解除と同時にdisabledも一旦解除
+                        loadBtn.disabled = false;
+                    });
+                    // 処理完了後に正しい状態をチェック
+                    setTimeout(() => {
+                        updateLoadAllButtonState();
+                    }, 100);
+                });
+            }
+            else if (target && target.classList.contains("btn-filter-safe")) {
+                // 空きあり絞り込み
+                target.disabled = true;
+                target.classList.toggle("btn-done");
+                document.querySelectorAll("div.style_search_item_row__moqWC:has(img[src*=\"/asset/img/calendar_none.svg\"])").forEach((div) => {
+                    div.classList.toggle("safe-none");
+                });
+                setTimeout(() => {
+                    if (target) {
+                        target.disabled = false;
+                    }
+                }, 500);
+            }
+            else if (target && target.classList.contains("btn-filter-without-load")) {
+                // 入力値で絞り込み
+                target.disabled = true;
+                const input_another_search = document.querySelector("input.ext-tomo.search");
+                const arr_div_row = document.querySelectorAll("div.style_search_item_row__moqWC");
+                const val_search = input_another_search?.value || '';
+                const dic_regex_exp = prepare_filter(val_search);
+                if (val_search.length > 0) {
+                    arr_div_row.forEach((div) => {
+                        div.classList.remove("filter-none");
+                        if (!((dic_regex_exp.include === null || dic_regex_exp.include.test(div.innerText))
+                            && (dic_regex_exp.exclude === null || !dic_regex_exp.exclude.some((d) => d.test(div.innerText))))) {
+                            div.classList.add("filter-none");
+                        }
+                    });
+                }
+                else {
+                    arr_div_row.forEach((div) => {
+                        div.classList.remove("filter-none");
+                    });
+                }
+                if (target) {
+                    target.disabled = false;
+                }
+            }
+            else if (target && target.classList.contains("btn-alert-to-copy")) {
+                // 一覧コピー
+                target.disabled = true;
+                // アラート起動
+                // filter-none, ytomo-none, safe-noneを除外して表示
+                const arr_div_row = document.querySelectorAll("div.style_search_item_row__moqWC:not(.filter-none):not(.ytomo-none):not(.safe-none)");
+                let arr_text = [];
+                // div > button > span のテキストを取得
+                arr_div_row.forEach((div) => {
+                    const span = div.querySelector("button>span");
+                    if (span) {
+                        arr_text.push(span.innerText);
+                    }
+                });
+                const text = arr_text.join("\n");
+                try {
+                    navigator.clipboard.writeText(text);
+                }
+                catch (e) {
+                    alert(text);
+                    // console.error("ytomo extension error", e);
+                    // alert(e);
+                }
+                setTimeout(() => {
+                    target.disabled = false;
+                }, 500);
+            }
+        }
+    });
+};
+// ページ初期化可能か判定
+const judge_init = () => {
+    const cand_btn = document.querySelector("button.style_search_btn__ZuOpx");
+    return cand_btn !== null;
+};
+// 入場予約ページ初期化可能か判定
+const judge_entrance_init = () => {
+    const target_div = document.querySelector('#__next > div > div > main > div > div.style_main__prev_button__gJ5ZR');
+    return target_div !== null;
+};
+// 入場予約ページ初期化処理
+const init_entrance_page = (dependencies = {}) => {
+    const { setPageLoadingStateFn, createEntranceReservationUIFn, initTimeSlotMonitoringFn, restoreFromCacheFn } = dependencies;
+    // ヘッダーにFAB切替ボタンを追加（DOM構築完了を待つ）
+    setTimeout(() => {
+        Promise.resolve(/* import() */).then(__webpack_require__.bind(__webpack_require__, 897)).then((section2) => {
+            section2.createFABToggleButton();
+        });
+    }, 1000);
+    // 入場予約機能の設定
+    const entranceReservationConfig = {
+        selectors: {
+            submit: "#__next > div > div > main > div > div.style_main__add_cart_button__DCOw8 > button",
+            change: "body > div > div > div > div > div > div > button",
+            success: "#reservation_modal_title",
+            failure: "#reservation_fail_modal_title",
+            close: "body > div.style_buy-modal__1JZtS > div > div > div > div > ul > li > a"
+        },
+        selectorTexts: {
+            change: "来場日時を変更する"
+        },
+        timeouts: {
+            waitForSubmit: 5000,
+            waitForResponse: 10000,
+            waitForClose: 3000,
+            retryInterval: 1000
+        },
+        randomSettings: {
+            minCheckInterval: 500,
+            checkRandomRange: 200,
+            minClickDelay: 500,
+            clickRandomRange: 200,
+            minRetryDelay: 1000,
+            retryRandomRange: 300
+        }
+    };
+    // 初期化開始時に即座に読み込み状態を設定
+    if (setPageLoadingStateFn)
+        setPageLoadingStateFn(true);
+    // UIを即座に作成（読み込み状態表示のため）
+    if (createEntranceReservationUIFn)
+        createEntranceReservationUIFn(entranceReservationConfig);
+    // 時間帯監視機能の初期化（動的待機）
+    (async () => {
+        if (initTimeSlotMonitoringFn)
+            await initTimeSlotMonitoringFn();
+        // キャッシュからの状態復元（カレンダー読み込み完了後に実行）
+        if (restoreFromCacheFn)
+            await restoreFromCacheFn();
+        // 初期化完了時に読み込み状態を解除
+        if (setPageLoadingStateFn)
+            setPageLoadingStateFn(false);
+    })();
+    console.log("入場予約機能の初期化完了");
+};
+// 入場予約関連のヘルパー関数
+function getRandomWaitTime(minTime, randomRange, config) {
+    const { randomSettings } = config;
+    const actualMinTime = minTime !== undefined ? minTime : randomSettings.minCheckInterval;
+    const actualRandomRange = randomRange !== undefined ? randomRange : randomSettings.checkRandomRange;
+    return actualMinTime + Math.floor(Math.random() * actualRandomRange);
+}
+async function waitForElement(selector, timeout = 5000, config) {
+    return new Promise((resolve, reject) => {
+        const startTime = Date.now();
+        const checkElement = () => {
+            const element = document.querySelector(selector);
+            if (element) {
+                resolve(element);
+            }
+            else if (Date.now() - startTime > timeout) {
+                reject(new Error(`要素が見つかりません: ${selector}`));
+            }
+            else {
+                setTimeout(checkElement, getRandomWaitTime(config.randomSettings.minCheckInterval, config.randomSettings.checkRandomRange, config));
+            }
+        };
+        checkElement();
+    });
+}
+async function waitForAnyElement(selectors, timeout = 10000, selectorTexts = {}, config) {
+    return new Promise((resolve, reject) => {
+        const startTime = Date.now();
+        const checkElements = () => {
+            for (const [key, selector] of Object.entries(selectors)) {
+                const elements = document.querySelectorAll(selector);
+                for (let i = 0; i < elements.length; i++) {
+                    const element = elements[i];
+                    if (selectorTexts[key]) {
+                        if (element.textContent && element.textContent.includes(selectorTexts[key])) {
+                            resolve({ key, element: element });
+                            return;
+                        }
+                    }
+                    else {
+                        if (element) {
+                            resolve({ key, element: element });
+                            return;
+                        }
+                    }
+                }
+            }
+            if (Date.now() - startTime > timeout) {
+                reject(new Error(`いずれの要素も見つかりません: ${Object.keys(selectors).join(', ')}`));
+            }
+            else {
+                setTimeout(checkElements, getRandomWaitTime(config.randomSettings.minCheckInterval, config.randomSettings.checkRandomRange, config));
+            }
+        };
+        checkElements();
+    });
+}
+async function clickElement(element, config) {
+    element.click();
+    const delay = getRandomWaitTime(config.randomSettings.minClickDelay, config.randomSettings.clickRandomRange, config);
+    await new Promise(resolve => setTimeout(resolve, delay));
+}
+// エクスポート
+
 
 // EXTERNAL MODULE: ./src-modules/section2.ts
 var section2 = __webpack_require__(897);
@@ -2970,7 +4133,7 @@ function createMonitorButton(slotInfo) {
     });
     // dt要素内に追加（spanの後）
     dtElement.appendChild(monitorButton);
-    console.log(`満員時間帯に監視ボタンを追加しました: ${timeText}`);
+    // 満員時間帯に監視ボタンを追加完了
 }
 // 監視ボタンクリック処理（選択・解除切り替え）
 function handleMonitorButtonClick(slotInfo, buttonElement) {
@@ -2979,19 +4142,19 @@ function handleMonitorButtonClick(slotInfo, buttonElement) {
     const locationIndex = unified_state_LocationHelper.getIndexFromSelector(tdSelector);
     const location = unified_state_LocationHelper.getLocationFromIndex(locationIndex);
     const locationText = location === 'east' ? '東' : '西';
-    console.log(`監視ボタンがクリックされました: ${locationText}${slotInfo.timeText}`);
+    // 監視ボタンがクリックされました
     // 監視実行中は操作不可
     if (section2.timeSlotState.isMonitoring) {
-        console.log('⚠️ 監視実行中のため操作できません');
+        // 監視実行中のため操作不可
         return;
     }
     const buttonSpan = buttonElement.querySelector('span');
     const currentText = buttonSpan.innerText;
     const isCurrentlySelected = currentText.startsWith('監視'); // '監視1', '監視2' etc.
-    console.log(`現在の状態: ${isCurrentlySelected ? '選択中' : '未選択'} (テキスト: "${currentText}")`);
+    // 現在の状態確認完了
     if (isCurrentlySelected) {
         // 現在選択中の場合は解除
-        console.log(`監視対象を解除します: ${locationText}${slotInfo.timeText}`);
+        // 監視対象を解除
         // 統一状態管理システムから削除
         const unifiedStateManager = section5_getExternalFunction('unifiedStateManager');
         if (unifiedStateManager) {
@@ -3004,7 +4167,7 @@ function handleMonitorButtonClick(slotInfo, buttonElement) {
             }
         }
         else {
-            console.log('⚠️ 統一状態管理システムが利用できません');
+            // 統一状態管理システムが利用できません
         }
         // ボタンの表示を元に戻す
         buttonSpan.innerText = '満員';
@@ -3036,11 +4199,11 @@ function handleMonitorButtonClick(slotInfo, buttonElement) {
         safeCall('updateMainButtonDisplay');
         // 監視対象表示も更新
         safeCall('updateMonitoringTargetsDisplay');
-        console.log(`✅ 監視対象を解除しました: ${locationText}${slotInfo.timeText}`);
+        // 監視対象を解除完了
     }
     else {
         // 現在未選択の場合は選択
-        console.log(`監視対象を追加します: ${locationText}${slotInfo.timeText}`);
+        // 監視対象を追加
         // 選択状態を設定（td要素の一意特定情報を追加）
         // TypeScript用の変数（削除予定）
         // const targetSlotInfo: TimeSlotTarget = {
@@ -3063,7 +4226,7 @@ function handleMonitorButtonClick(slotInfo, buttonElement) {
             }
         }
         else {
-            console.log('⚠️ 統一状態管理システムが利用できません');
+            // 統一状態管理システムが利用できません
             return;
         }
         if (!added)
@@ -3103,7 +4266,7 @@ function handleMonitorButtonClick(slotInfo, buttonElement) {
             const fabButton = document.querySelector('#ytomo-main-fab');
             console.log(`🔍 FAB更新後の状態: disabled=${fabButton?.disabled}, hasDisabledAttr=${fabButton?.hasAttribute('disabled')}, text="${fabButton?.textContent?.trim()}"`);
         }, 100);
-        console.log(`✅ 時間帯 ${locationText}${slotInfo.timeText} を監視対象に設定しました`);
+        // 時間帯を監視対象に設定完了
     }
 }
 // 満員時間帯の可用性監視を開始
@@ -3553,513 +4716,6 @@ const createCacheManager = (dependencies = {}) => {
 
 // ============================================================================
 
-;// ./src-modules/section1.ts
-// 【1. 基本機能・ユーティリティ】
-// ============================================================================
-// スタイルを挿入する関数
-const insert_style = () => {
-    const style = document.createElement("style");
-    style.innerHTML = `
-button.ext-ytomo {
-    height: 40px;
-    width: auto;
-    min-width: 60px;
-    padding: 0px 8px;
-    background: rgb(0, 104, 33) !important;
-    color: white;
-}
-button.no-after.ext-ytomo:after {
-    background: transparent none repeat 0 0 / auto auto padding-box border-box scroll;
-}
-button.ext-ytomo.btn-done {
-    background: rgb(74, 76, 74) !important;
-}
-.ext-ytomo:hover {
-    background: rgb(2, 134, 43);
-}
-
-.safe-none, .ytomo-none, .filter-none {
-    display: none;
-}
-
-div.div-flex {
-    display: flex;
-    justify-content: center;
-    margin: 5px;
-}
-
-/* FABボタンの状態管理用クラス */
-.ytomo-fab {
-    width: 56px !important;
-    height: 56px !important;
-    border-radius: 50% !important;
-    color: white !important;
-    border: none !important;
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4), 0 2px 8px rgba(0, 0, 0, 0.2) !important;
-    border: 3px solid rgba(255, 255, 255, 0.2) !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    font-size: 14px !important;
-    font-weight: bold !important;
-    transition: all 0.3s ease !important;
-    position: relative !important;
-    overflow: hidden !important;
-    pointer-events: auto !important;
-}
-
-.ytomo-fab-enabled {
-    background: rgb(0, 104, 33) !important;
-    opacity: 0.9 !important;
-    cursor: pointer !important;
-    pointer-events: auto !important;
-}
-
-.ytomo-fab-disabled {
-    background: rgb(128, 128, 128) !important;
-    opacity: 0.6 !important;
-    cursor: not-allowed !important;
-    pointer-events: none !important;
-}
-
-.ytomo-fab-monitoring {
-    background: rgb(255, 140, 0) !important;
-    opacity: 0.9 !important;
-    cursor: pointer !important;
-    pointer-events: auto !important;
-}
-
-.ytomo-fab-running {
-    background: rgb(220, 53, 69) !important;
-    opacity: 0.6 !important;
-    cursor: not-allowed !important;
-    pointer-events: none !important;
-}
-
-input.ext-tomo.search {
-    height: 50px;
-    min-width: 200px;
-    max-width: min(300px, 100%);
-    font-family: quicksand;
-    font-size: 16px;
-    -webkit-appearance: textfield;
-    -moz-appearance: textfield;
-    appearance: textfield;
-    border: 1px solid #222426;
-    border-radius: 25px;
-    box-shadow: 0 1px 0 0 #ccc;
-    padding: 0 0 0 10px;
-    flex: 1 1;
-}
-    `;
-    document.head.appendChild(style);
-};
-// 検索ワードを正規表現に変換する関数
-// val_searchには以下の3種類に大別されるワードが含まれる
-// 1. 通常の文字列
-// 2. マイナス検索用文字列 (`-`から始まる)
-// 3. phrase検索用文字列 (`"`で囲まれた文字列)
-// また、*は0文字以上のワイルドカードとして扱う
-// 区切り文字は以下の通り
-// 1. 全角スペース, 半角スペース: ANDの意味
-// 2. or, OR (前後に全角または半角の空白を伴う): ORの意味
-// また、ANDやORを組み合わせる場合、半角括弧でその範囲を明示的にできる
-const prepare_filter = (val_search) => {
-    // 空の検索文字列の場合は全てにマッチする正規表現を返す
-    if (!val_search.trim()) {
-        return { include: /(?:)/, exclude: null };
-    }
-    // OR条件を一時的に特別なマーカーに置換（後で処理するため）
-    const orReplaced = val_search.replace(/(?:\s+|^)(or|OR)(?:\s+|$)/g, ' \uFFFF ');
-    // フレーズ検索（引用符で囲まれた部分）を抽出
-    const phraseMatches = orReplaced.match(/"[^"]*"/g) || [];
-    let remainingStr = orReplaced;
-    const phrases = phraseMatches.map(phrase => {
-        remainingStr = remainingStr.replace(phrase, '');
-        return phrase.slice(1, -1).replace(/\*/g, '.*');
-    });
-    // 残りの部分から通常の単語とマイナス検索を抽出
-    const tokens = remainingStr.split(/\s+/).filter(token => token);
-    const includeTokens = [];
-    const excludeTokens = [];
-    tokens.forEach(token => {
-        if (token === '\uFFFF') {
-            // ORマーカー
-            includeTokens.push(token);
-        }
-        else if (token.startsWith('-')) {
-            // マイナス検索
-            const cleaned = token.slice(1).replace(/\*/g, '.*');
-            if (cleaned)
-                excludeTokens.push(cleaned);
-        }
-        else {
-            // 通常の検索
-            const cleaned = token.replace(/\*/g, '.*');
-            if (cleaned)
-                includeTokens.push(cleaned);
-        }
-    });
-    // フレーズをincludeTokensに追加
-    phrases.forEach(phrase => {
-        includeTokens.push(phrase);
-    });
-    const processParentheses = (tokens) => {
-        const stack = [[]];
-        for (const token of tokens) {
-            if (token === '(') {
-                stack.push([]);
-            }
-            else if (token === ')') {
-                if (stack.length > 1) {
-                    const group = stack.pop();
-                    stack[stack.length - 1].push(group);
-                }
-            }
-            else {
-                stack[stack.length - 1].push(token);
-            }
-        }
-        return stack[0];
-    };
-    const groupedIncludes = processParentheses(includeTokens);
-    // 正規表現の構築（順不同対応版）
-    const buildRegex = (group) => {
-        if (Array.isArray(group)) {
-            const parts = group.map(item => Array.isArray(item) ? buildRegex(item) : item);
-            // ORマーカーがあるかチェック
-            const orIndex = parts.findIndex((part) => part === '\uFFFF');
-            if (orIndex > -1) {
-                const left = buildRegex(parts.slice(0, orIndex));
-                const right = buildRegex(parts.slice(orIndex + 1));
-                return `(?:${left}|${right})`;
-            }
-            else {
-                // AND条件の場合は順不同でマッチするように変更
-                return parts.map((part) => `(?=.*${part})`).join('');
-            }
-        }
-        return group;
-    };
-    const includePattern = buildRegex(groupedIncludes)
-        .replace(/\uFFFF/g, '|')
-        .replace(/\.\*/g, '[\\s\\S]*');
-    // Safari対応：除外条件を別々にチェックする方式に変更
-    const excludePatterns = excludeTokens.map(token => new RegExp(token.replace(/\.\*/g, '[\\s\\S]*'), 'i'));
-    return {
-        include: new RegExp(includePattern, 'i'),
-        exclude: excludePatterns.length > 0 ? excludePatterns : null
-    };
-};
-// ページ初期化処理
-const init_page = () => {
-    // ヘッダーにFAB切替ボタンを追加（DOM構築完了を待つ）
-    setTimeout(() => {
-        Promise.resolve(/* import() */).then(__webpack_require__.bind(__webpack_require__, 897)).then((section2) => {
-            section2.createFABToggleButton();
-        });
-    }, 1000);
-    // すべて読み込みボタンの自動クリック処理
-    const load_more_auto = async () => {
-        const scrollX = window.scrollX;
-        const scrollY = window.scrollY;
-        const arr_btn = document.querySelectorAll("button.style_more_btn__ymb22:not([disabled])");
-        if (arr_btn.length > 0) {
-            arr_btn[0].click();
-            setTimeout(() => {
-                scrollTo(scrollX, scrollY);
-                load_more_auto();
-            }, 500);
-        }
-    };
-    // ボタンのスタイルを生成する関数
-    const get_btn_style = () => {
-        const btn = document.createElement("button");
-        btn.classList.add("basic-btn");
-        btn.classList.add("type2");
-        btn.classList.add("no-after");
-        btn.classList.add("ext-ytomo");
-        btn.style.height = "auto";
-        btn.style.minHeight = "40px";
-        btn.style.width = "auto";
-        btn.style.minWidth = "60px";
-        btn.style.padding = "0px 8px";
-        // btn.style.background = "rgb(0, 104, 33)";
-        btn.style.color = "white";
-        btn.style.margin = "5px";
-        return btn;
-    };
-    // 独自ボタン群を挿入する関数
-    const insert_button = () => {
-        // const btn_official_search = document.querySelector("button.style_search_btn__ZuOpx");
-        const div_official_search = document.querySelector("div.style_search__7HKSe");
-        const div_insert = document.createElement("div");
-        div_insert.classList.add("div-flex");
-        const div_insert2 = document.createElement("div");
-        div_insert2.classList.add("div-flex");
-        const btn_load_all = get_btn_style();
-        btn_load_all.classList.add("btn-load-all");
-        const span_load_all = document.createElement("span");
-        span_load_all.classList.add("ext-ytomo");
-        span_load_all.innerText = "すべて読み込み";
-        btn_load_all.appendChild(span_load_all);
-        const btn_filter_safe = get_btn_style();
-        btn_filter_safe.classList.add("btn-filter-safe");
-        const span_filter_safe = document.createElement("span");
-        span_filter_safe.classList.add("ext-ytomo");
-        span_filter_safe.innerText = "空きのみ";
-        btn_filter_safe.appendChild(span_filter_safe);
-        const btn_filter_without_load = get_btn_style();
-        btn_filter_without_load.classList.add("btn-filter-without-load");
-        const span_filter_without_load = document.createElement("span");
-        span_filter_without_load.classList.add("ext-ytomo");
-        span_filter_without_load.innerText = "絞込";
-        btn_filter_without_load.appendChild(span_filter_without_load);
-        const input_another_search = document.createElement("input");
-        input_another_search.classList.add("ext-tomo");
-        input_another_search.classList.add("search");
-        input_another_search.setAttribute("type", "text");
-        input_another_search.setAttribute("placeholder", "読み込みなし絞込");
-        const btn_alert_to_copy = get_btn_style();
-        btn_alert_to_copy.classList.add("btn-alert-to-copy");
-        const span_alert_to_copy = document.createElement("span");
-        span_alert_to_copy.classList.add("ext-ytomo");
-        span_alert_to_copy.innerText = "一覧コピー";
-        btn_alert_to_copy.appendChild(span_alert_to_copy);
-        // btn_official_search.after(btn_filter_safe);
-        // btn_official_search.after(btn_load_all);
-        // btn_official_search.after(btn_filter_without_load);
-        div_insert.appendChild(input_another_search);
-        div_insert.appendChild(btn_filter_without_load);
-        div_insert2.appendChild(btn_load_all);
-        div_insert2.appendChild(btn_filter_safe);
-        div_insert2.appendChild(btn_alert_to_copy);
-        if (div_official_search) {
-            div_official_search.after(div_insert);
-            div_official_search.after(div_insert2);
-        }
-    };
-    // const refresh_btn_ = () => {
-    // }
-    insert_style();
-    insert_button();
-    // 独自ボタンのクリックイベントハンドラ
-    document.addEventListener("click", (event) => {
-        if (event.target?.matches?.("button.ext-ytomo, button.ext-ytomo *")) {
-            // event.preventDefault()
-            // event.stopPropagation()
-            const target = event.target?.closest?.("button.ext-ytomo");
-            if (target && target.classList.contains("btn-load-all")) {
-                // すべて読み込み
-                target.disabled = true;
-                load_more_auto().then(() => {
-                    if (target) {
-                        target.disabled = false;
-                        target.classList.toggle("btn-done");
-                    }
-                });
-            }
-            else if (target && target.classList.contains("btn-filter-safe")) {
-                // 空きあり絞り込み
-                target.disabled = true;
-                target.classList.toggle("btn-done");
-                document.querySelectorAll("div.style_search_item_row__moqWC:has(img[src*=\"/asset/img/calendar_none.svg\"])").forEach((div) => {
-                    div.classList.toggle("safe-none");
-                });
-                setTimeout(() => {
-                    if (target) {
-                        target.disabled = false;
-                    }
-                }, 500);
-            }
-            else if (target && target.classList.contains("btn-filter-without-load")) {
-                // 入力値で絞り込み
-                target.disabled = true;
-                const input_another_search = document.querySelector("input.ext-tomo.search");
-                const arr_div_row = document.querySelectorAll("div.style_search_item_row__moqWC");
-                const val_search = input_another_search?.value || '';
-                const dic_regex_exp = prepare_filter(val_search);
-                if (val_search.length > 0) {
-                    arr_div_row.forEach((div) => {
-                        div.classList.remove("filter-none");
-                        if (!((dic_regex_exp.include === null || dic_regex_exp.include.test(div.innerText))
-                            && (dic_regex_exp.exclude === null || !dic_regex_exp.exclude.some((d) => d.test(div.innerText))))) {
-                            div.classList.add("filter-none");
-                        }
-                    });
-                }
-                else {
-                    arr_div_row.forEach((div) => {
-                        div.classList.remove("filter-none");
-                    });
-                }
-                // setTimeout(() => {
-                if (target) {
-                    target.disabled = false;
-                }
-                // }, 500)
-            }
-            else if (target && target.classList.contains("btn-alert-to-copy")) {
-                // 一覧コピー
-                target.disabled = true;
-                // アラート起動
-                // filter-none, ytomo-none, safe-noneを除外して表示
-                const arr_div_row = document.querySelectorAll("div.style_search_item_row__moqWC:not(.filter-none):not(.ytomo-none):not(.safe-none)");
-                let arr_text = [];
-                // div > button > span のテキストを取得
-                arr_div_row.forEach((div) => {
-                    const span = div.querySelector("button>span");
-                    if (span) {
-                        arr_text.push(span.innerText);
-                    }
-                });
-                const text = arr_text.join("\n");
-                try {
-                    navigator.clipboard.writeText(text);
-                }
-                catch (e) {
-                    alert(text);
-                    // console.error("ytomo extension error", e);
-                    // alert(e);
-                }
-                setTimeout(() => {
-                    target.disabled = false;
-                }, 500);
-            }
-        }
-    });
-};
-// ページ初期化可能か判定
-const judge_init = () => {
-    const cand_btn = document.querySelector("button.style_search_btn__ZuOpx");
-    return cand_btn !== null;
-};
-// 入場予約ページ初期化可能か判定
-const judge_entrance_init = () => {
-    const target_div = document.querySelector('#__next > div > div > main > div > div.style_main__prev_button__gJ5ZR');
-    return target_div !== null;
-};
-// 入場予約ページ初期化処理
-const init_entrance_page = (dependencies = {}) => {
-    const { setPageLoadingStateFn, createEntranceReservationUIFn, initTimeSlotMonitoringFn, restoreFromCacheFn } = dependencies;
-    insert_style();
-    // ヘッダーにFAB切替ボタンを追加（DOM構築完了を待つ）
-    setTimeout(() => {
-        Promise.resolve(/* import() */).then(__webpack_require__.bind(__webpack_require__, 897)).then((section2) => {
-            section2.createFABToggleButton();
-        });
-    }, 1000);
-    // 入場予約機能の設定
-    const entranceReservationConfig = {
-        selectors: {
-            submit: "#__next > div > div > main > div > div.style_main__add_cart_button__DCOw8 > button",
-            change: "body > div > div > div > div > div > div > button",
-            success: "#reservation_modal_title",
-            failure: "#reservation_fail_modal_title",
-            close: "body > div.style_buy-modal__1JZtS > div > div > div > div > ul > li > a"
-        },
-        selectorTexts: {
-            change: "来場日時を変更する"
-        },
-        timeouts: {
-            waitForSubmit: 5000,
-            waitForResponse: 10000,
-            waitForClose: 3000,
-            retryInterval: 1000
-        },
-        randomSettings: {
-            minCheckInterval: 500,
-            checkRandomRange: 200,
-            minClickDelay: 500,
-            clickRandomRange: 200,
-            minRetryDelay: 1000,
-            retryRandomRange: 300
-        }
-    };
-    // 初期化開始時に即座に読み込み状態を設定
-    if (setPageLoadingStateFn)
-        setPageLoadingStateFn(true);
-    // UIを即座に作成（読み込み状態表示のため）
-    if (createEntranceReservationUIFn)
-        createEntranceReservationUIFn(entranceReservationConfig);
-    // 時間帯監視機能の初期化（動的待機）
-    (async () => {
-        if (initTimeSlotMonitoringFn)
-            await initTimeSlotMonitoringFn();
-        // キャッシュからの状態復元（カレンダー読み込み完了後に実行）
-        if (restoreFromCacheFn)
-            await restoreFromCacheFn();
-        // 初期化完了時に読み込み状態を解除
-        if (setPageLoadingStateFn)
-            setPageLoadingStateFn(false);
-    })();
-    console.log("入場予約機能の初期化完了");
-};
-// 入場予約関連のヘルパー関数
-function getRandomWaitTime(minTime, randomRange, config) {
-    const { randomSettings } = config;
-    const actualMinTime = minTime !== undefined ? minTime : randomSettings.minCheckInterval;
-    const actualRandomRange = randomRange !== undefined ? randomRange : randomSettings.checkRandomRange;
-    return actualMinTime + Math.floor(Math.random() * actualRandomRange);
-}
-async function waitForElement(selector, timeout = 5000, config) {
-    return new Promise((resolve, reject) => {
-        const startTime = Date.now();
-        const checkElement = () => {
-            const element = document.querySelector(selector);
-            if (element) {
-                resolve(element);
-            }
-            else if (Date.now() - startTime > timeout) {
-                reject(new Error(`要素が見つかりません: ${selector}`));
-            }
-            else {
-                setTimeout(checkElement, getRandomWaitTime(config.randomSettings.minCheckInterval, config.randomSettings.checkRandomRange, config));
-            }
-        };
-        checkElement();
-    });
-}
-async function waitForAnyElement(selectors, timeout = 10000, selectorTexts = {}, config) {
-    return new Promise((resolve, reject) => {
-        const startTime = Date.now();
-        const checkElements = () => {
-            for (const [key, selector] of Object.entries(selectors)) {
-                const elements = document.querySelectorAll(selector);
-                for (let i = 0; i < elements.length; i++) {
-                    const element = elements[i];
-                    if (selectorTexts[key]) {
-                        if (element.textContent && element.textContent.includes(selectorTexts[key])) {
-                            resolve({ key, element: element });
-                            return;
-                        }
-                    }
-                    else {
-                        if (element) {
-                            resolve({ key, element: element });
-                            return;
-                        }
-                    }
-                }
-            }
-            if (Date.now() - startTime > timeout) {
-                reject(new Error(`いずれの要素も見つかりません: ${Object.keys(selectors).join(', ')}`));
-            }
-            else {
-                setTimeout(checkElements, getRandomWaitTime(config.randomSettings.minCheckInterval, config.randomSettings.checkRandomRange, config));
-            }
-        };
-        checkElements();
-    });
-}
-async function clickElement(element, config) {
-    element.click();
-    const delay = getRandomWaitTime(config.randomSettings.minClickDelay, config.randomSettings.clickRandomRange, config);
-    await new Promise(resolve => setTimeout(resolve, delay));
-}
-// エクスポート
-
-
 ;// ./src-modules/section7.ts
 // Section 1からのimport
 
@@ -4230,7 +4886,7 @@ function createEntranceReservationUI(config) {
     fabButton.addEventListener('click', async (event) => {
         // disabled状態の場合はクリックを完全に無視
         if (fabButton.disabled || fabButton.hasAttribute('disabled')) {
-            console.log('⚠️ ボタンがdisabledのためクリックを無視します');
+            // ボタンdisabledのためクリック無視
             event.preventDefault();
             event.stopPropagation();
             event.stopImmediatePropagation();
@@ -4238,7 +4894,7 @@ function createEntranceReservationUI(config) {
         }
         // 追加のstyle確認（CSS disabled状態もチェック）
         if (fabButton.style.pointerEvents === 'none') {
-            console.log('⚠️ pointer-events:noneのためクリックを無視します');
+            // pointer-events:noneのためクリック無視
             event.preventDefault();
             event.stopPropagation();
             event.stopImmediatePropagation();
@@ -4246,13 +4902,13 @@ function createEntranceReservationUI(config) {
         }
         // 中断不可期間のチェック
         if (!isInterruptionAllowed()) {
-            console.log('⚠️ リロード直前のため中断できません');
+            // リロード直前のため中断不可
             showStatus('リロード直前のため中断できません', 'red');
             return;
         }
         // 実行中の場合は中断処理
         if (section2.timeSlotState.isMonitoring) {
-            console.log('監視を中断します');
+            // 監視を中断
             stopSlotMonitoring();
             // ステータスは中断を示すメッセージを表示（消さない）
             showStatus('監視中断', 'orange');
@@ -4260,7 +4916,7 @@ function createEntranceReservationUI(config) {
             return;
         }
         if (section2.entranceReservationState.isRunning) {
-            console.log('予約処理を中断します');
+            // 予約処理を中断
             section2.entranceReservationState.shouldStop = true;
             showStatus('予約処理を中断中...', 'orange');
             return;
@@ -4269,7 +4925,7 @@ function createEntranceReservationUI(config) {
         const unifiedStateManager = section5_getExternalFunction('unifiedStateManager');
         if (unifiedStateManager) {
             const preferredAction = unifiedStateManager.getPreferredAction();
-            console.log(`🔧 FABクリック: preferredAction=${preferredAction}`);
+            // FABクリック処理開始
             if (preferredAction === 'monitoring') {
                 console.log('📡 統一状態管理システムによる監視開始');
                 // 実行状態を監視中に変更
@@ -4696,57 +5352,46 @@ function setupTimeSlotClickHandlers() {
             // 時間帯要素でない場合は処理しない（ログも出力しない）
             return;
         }
-        console.log(`🖱️ 時間帯クリック検出: ${actualTarget.tagName}.${actualTarget.className}`);
-        console.log(`✅ 時間帯クリック判定成功: ${actualTarget.tagName}.${actualTarget.className}`);
+        // 時間帯クリック判定成功
         // 時間帯のdiv[role="button"]がクリックされた場合
         const tdElement = actualTarget.closest('td[data-gray-out]');
         if (!tdElement) {
-            console.log('❌ td要素が見つからない');
             return;
         }
         // actualTargetから時間テキストを取得
         const timeText = actualTarget.querySelector('dt span')?.textContent?.trim();
         if (!timeText) {
-            console.log('❌ 時間テキストが見つからない');
             return;
         }
         // 統一状態管理システムを取得
         const unifiedStateManager = section5_getExternalFunction('unifiedStateManager');
         const locationIndex = unified_state_LocationHelper.getIndexFromElement(tdElement);
-        console.log(`🖱️ 時間帯クリック検出: ${timeText} (位置: ${locationIndex})`);
         if (unifiedStateManager) {
             // 統一状態管理で現在の選択状態を確認
             const isCurrentlyReservationTarget = unifiedStateManager.isReservationTarget(timeText, locationIndex);
-            console.log(`🔍 現在の予約対象状態: ${isCurrentlyReservationTarget}`);
             if (isCurrentlyReservationTarget) {
                 // 既に予約対象として設定済みの場合は選択解除
-                console.log(`🔄 選択解除: ${timeText} - 公式サイト仕様を利用`);
                 // イベントを停止（デフォルト動作を防ぐ）
                 event.preventDefault();
                 event.stopPropagation();
                 // 公式サイトの仕様を利用：現在選択中のカレンダー日付ボタンをクリック
                 const currentSelectedCalendarButton = document.querySelector('[role="button"][aria-pressed="true"]');
                 if (currentSelectedCalendarButton && currentSelectedCalendarButton.querySelector('time[datetime]')) {
-                    console.log('📅 カレンダー日付ボタンをプログラムでクリックして選択解除');
                     currentSelectedCalendarButton.click();
                     // 統一状態管理からも予約対象を削除
                     setTimeout(() => {
                         unifiedStateManager.clearReservationTarget();
                         updateMainButtonDisplay();
-                        console.log('✅ 公式サイト仕様による選択解除完了');
                     }, 100);
                 }
                 else {
-                    console.log('⚠️ カレンダー日付ボタンが見つからないため、直接削除');
                     // フォールバック: 直接削除
                     unifiedStateManager.clearReservationTarget();
                     updateMainButtonDisplay();
-                    console.log('✅ フォールバック予約対象解除完了');
                 }
             }
             else {
                 // 新規選択または別の時間帯への変更
-                console.log(`✅ 新規選択: ${timeText}`);
                 // DOM上の選択状態から予約対象を同期
                 setTimeout(() => {
                     syncReservationTargetFromDOM();
@@ -4943,7 +5588,12 @@ const trigger_init = (url_record) => {
         const existingFab = document.getElementById('ytomo-fab-container');
         if (existingFab) {
             existingFab.remove();
-            console.log('🗑️ ページ遷移により既存のFABボタンを削除しました');
+            console.log('🗑️ ページ遷移により既存の入場予約FABボタンを削除しました');
+        }
+        const existingPavilionFab = document.getElementById('ytomo-pavilion-fab-container');
+        if (existingPavilionFab) {
+            existingPavilionFab.remove();
+            console.log('🗑️ ページ遷移により既存のパビリオンFABボタンを削除しました');
         }
     }
     if (page_type === "pavilion_reservation") {
