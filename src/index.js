@@ -1,3 +1,18 @@
+// ==UserScript==
+// @name         yt-Expo2025-Reservation-Helper
+// @namespace    http://staybrowser.com/
+// @version      0.3
+// @description  help expo2025 ticket site
+// @author       TomoTom0 https://github.com/TomoTom0
+// @match        https://ticket.expo2025.or.jp/event_search/*
+// @match        https://ticket.expo2025.or.jp/ticket_selection/*
+// @match        https://ticket.expo2025.or.jp/agent_ticket/*
+// @match        https://ticket.expo2025.or.jp/ticket_visiting_reservation/*
+// @grant       none
+// @run-at       document-end
+// ==/UserScript==
+
+
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
 		module.exports = factory();
