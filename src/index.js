@@ -10,9 +10,25 @@
 })(this, () => {
 return /******/ (() => { // webpackBootstrap
 /******/ 	"use strict";
-var __webpack_exports__ = {};
+/******/ 	var __webpack_modules__ = ({
 
-;// ./src-modules/section2.ts
+/***/ 897:
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   calendarWatchState: () => (/* binding */ calendarWatchState),
+/* harmony export */   createFABToggleButton: () => (/* binding */ createFABToggleButton),
+/* harmony export */   entranceReservationState: () => (/* binding */ entranceReservationState),
+/* harmony export */   fabVisibilityState: () => (/* binding */ fabVisibilityState),
+/* harmony export */   loadFABVisibility: () => (/* binding */ loadFABVisibility),
+/* harmony export */   pageLoadingState: () => (/* binding */ pageLoadingState),
+/* harmony export */   reloadCountdownState: () => (/* binding */ reloadCountdownState),
+/* harmony export */   saveFABVisibility: () => (/* binding */ saveFABVisibility),
+/* harmony export */   timeSlotState: () => (/* binding */ timeSlotState),
+/* harmony export */   toggleFABVisibility: () => (/* binding */ toggleFABVisibility),
+/* harmony export */   updateFABVisibility: () => (/* binding */ updateFABVisibility)
+/* harmony export */ });
 // ============================================================================
 // 【2. 状態管理オブジェクト】
 // ============================================================================
@@ -56,9 +72,242 @@ const calendarWatchState = {
     observer: null,
     currentSelectedDate: null
 };
+const fabVisibilityState = {
+    isVisible: true, // デフォルトは表示
+    cacheKey: 'ytomo-fab-visibility'
+};
+// FAB表示状態管理機能
+function loadFABVisibility() {
+    try {
+        const saved = localStorage.getItem(fabVisibilityState.cacheKey);
+        if (saved !== null) {
+            fabVisibilityState.isVisible = JSON.parse(saved);
+        }
+    }
+    catch (e) {
+        console.warn('FAB表示状態の読み込みに失敗しました:', e);
+    }
+}
+function saveFABVisibility(isVisible) {
+    try {
+        fabVisibilityState.isVisible = isVisible;
+        localStorage.setItem(fabVisibilityState.cacheKey, JSON.stringify(isVisible));
+    }
+    catch (e) {
+        console.warn('FAB表示状態の保存に失敗しました:', e);
+    }
+}
+function toggleFABVisibility() {
+    const newVisibility = !fabVisibilityState.isVisible;
+    saveFABVisibility(newVisibility);
+    updateFABVisibility();
+}
+function updateFABVisibility() {
+    const fabContainer = document.getElementById('ytomo-fab-container');
+    if (fabContainer) {
+        fabContainer.style.display = fabVisibilityState.isVisible ? 'flex' : 'none';
+    }
+}
+// ヘッダーにFAB表示切替ボタンを追加
+function createFABToggleButton() {
+    // 既存のボタンがあるかチェック
+    const existingButton = document.getElementById('ytomo-fab-toggle-btn');
+    if (existingButton) {
+        return; // 既に存在する場合は何もしない
+    }
+    // 買い物アイコンを探す（HTMLから判明した安定セレクタ使用）
+    const shoppingIcon = document.querySelector('li[data-type="cart"]');
+    // 買い物アイコンが見つからない場合、ヘッダー内の右端要素を探す
+    let targetElement = shoppingIcon;
+    if (!targetElement) {
+        console.log('🛒 買い物アイコンが見つかりません。ヘッダー右端要素を探索中...');
+        // ヘッダー要素を探す
+        const headerSelectors = [
+            '.style_sp_title_box__oK11Q',
+            '.pc-none',
+            'div[class*="style_sp_title_box"]',
+            'div[class*="title_box"]',
+            'header',
+            'div:has(.style_site_heading__W80I0)',
+            '.style_site_heading__W80I0'
+        ];
+        let headerElement = null;
+        for (const selector of headerSelectors) {
+            try {
+                headerElement = document.querySelector(selector);
+                if (headerElement) {
+                    console.log(`📋 ヘッダー要素発見: ${selector}`);
+                    break;
+                }
+            }
+            catch (e) {
+                continue;
+            }
+        }
+        if (headerElement) {
+            // ヘッダー内の右端にありそうな要素を探す
+            const rightElements = headerElement.querySelectorAll('a, button, span, div');
+            for (let i = rightElements.length - 1; i >= 0; i--) {
+                const el = rightElements[i];
+                const rect = el.getBoundingClientRect();
+                if (rect.width > 20 && rect.height > 20) {
+                    targetElement = el;
+                    console.log(`🎯 右端要素を買い物アイコン候補として使用: ${el.tagName}`);
+                    break;
+                }
+            }
+        }
+    }
+    if (!targetElement) {
+        console.warn('買い物アイコンまたは配置基準要素が見つかりません');
+        return;
+    }
+    // 既存のアイコンデザインに合わせたli要素を作成
+    const toggleLi = document.createElement('li');
+    toggleLi.id = 'ytomo-fab-toggle-li';
+    const toggleButton = document.createElement('button');
+    toggleButton.id = 'ytomo-fab-toggle-btn';
+    toggleButton.type = 'button';
+    toggleButton.tabIndex = 0;
+    const toggleFigure = document.createElement('div');
+    toggleFigure.className = 'style_header_shortcut__figure__gNkUJ';
+    // 既存のヘッダーアイコン構造に合わせてDOM要素を作成
+    // 既存のヘッダーアイコンのスタイルを継承
+    toggleLi.style.cssText = `
+        display: inline-block !important;
+        margin-right: 8px !important;
+    `;
+    toggleButton.style.cssText = `
+        background: none !important;
+        border: none !important;
+        cursor: pointer !important;
+        padding: 0 !important;
+        color: white !important;
+        transition: all 0.2s ease !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+    `;
+    toggleFigure.style.cssText = `
+        width: auto !important;
+        height: 24px !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        padding: 0 4px !important;
+    `;
+    // DOM構造を組み立て
+    toggleFigure.appendChild(toggleButton);
+    toggleLi.appendChild(toggleFigure);
+    // YT背景 + 前景アイコンの重ね表示
+    function updateButtonIcon() {
+        const iconSvg = fabVisibilityState.isVisible
+            ? `<svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+                 <path d="M12,9A3,3 0 0,0 9,12A3,3 0 0,0 12,15A3,3 0 0,0 15,12A3,3 0 0,0 12,9M12,17A5,5 0 0,1 7,12A5,5 0 0,1 12,7A5,5 0 0,1 17,12A5,5 0 0,1 12,17M12,4.5C7,4.5 2.73,7.61 1,12C2.73,16.39 7,19.5 12,19.5C17,19.5 21.27,16.39 23,12C21.27,7.61 17,4.5 12,4.5Z" />
+               </svg>` // eye
+            : `<svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+                 <path d="M11.83,9L15,12.16C15,12.11 15,12.05 15,12A3,3 0 0,0 12,9C11.94,9 11.89,9 11.83,9M7.53,9.8L9.08,11.35C9.03,11.56 9,11.77 9,12A3,3 0 0,0 12,15C12.22,15 12.44,14.97 12.65,14.92L14.2,16.47C13.53,16.8 12.79,17 12,17A5,5 0 0,1 7,12C7,11.21 7.2,10.47 7.53,9.8M2,4.27L4.28,6.55L4.73,7C3.08,8.3 1.78,10 1,12C2.73,16.39 7,19.5 12,19.5C13.55,19.5 15.03,19.2 16.38,18.66L16.81,19.09L19.73,22L21,20.73L3.27,3M12,7A5,5 0 0,1 17,12C17,12.64 16.87,13.26 16.64,13.82L19.57,16.75C21.07,15.5 22.27,13.86 23,12C21.27,7.61 17,4.5 12,4.5C10.6,4.5 9.26,4.75 8,5.2L10.17,7.35C10.76,7.13 11.37,7 12,7Z" />
+               </svg>`; // eye-off
+        toggleButton.innerHTML = `
+            <div style="display: flex; flex-direction: column; align-items: center;">
+                ${iconSvg}
+                <span style="font-size: 8px; font-weight: bold; margin-top: 2px;">YTomo</span>
+            </div>
+        `;
+        toggleButton.title = fabVisibilityState.isVisible ? 'FABを非表示にする' : 'FABを表示する';
+    }
+    updateButtonIcon();
+    // ホバー効果（既存のアイコンに合わせて控えめに）
+    toggleButton.addEventListener('mouseenter', () => {
+        toggleButton.style.color = '#ddd';
+    });
+    toggleButton.addEventListener('mouseleave', () => {
+        toggleButton.style.color = 'white';
+    });
+    // クリックイベント
+    toggleButton.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        toggleFABVisibility();
+        updateButtonIcon();
+    });
+    // 買い物アイコンの親ul要素を取得してその中に挿入
+    const parentUl = targetElement.parentElement;
+    if (parentUl && parentUl.tagName.toLowerCase() === 'ul') {
+        // 買い物アイコンの直前に挿入
+        parentUl.insertBefore(toggleLi, targetElement);
+    }
+    else {
+        console.warn('ul要素が見つかりません。body直下に追加します');
+        document.body.appendChild(toggleLi);
+    }
+}
 // エクスポート
 
 
+
+/***/ })
+
+/******/ 	});
+/************************************************************************/
+/******/ 	// The module cache
+/******/ 	var __webpack_module_cache__ = {};
+/******/ 	
+/******/ 	// The require function
+/******/ 	function __webpack_require__(moduleId) {
+/******/ 		// Check if module is in cache
+/******/ 		var cachedModule = __webpack_module_cache__[moduleId];
+/******/ 		if (cachedModule !== undefined) {
+/******/ 			return cachedModule.exports;
+/******/ 		}
+/******/ 		// Create a new module (and put it into the cache)
+/******/ 		var module = __webpack_module_cache__[moduleId] = {
+/******/ 			// no module.id needed
+/******/ 			// no module.loaded needed
+/******/ 			exports: {}
+/******/ 		};
+/******/ 	
+/******/ 		// Execute the module function
+/******/ 		__webpack_modules__[moduleId](module, module.exports, __webpack_require__);
+/******/ 	
+/******/ 		// Return the exports of the module
+/******/ 		return module.exports;
+/******/ 	}
+/******/ 	
+/************************************************************************/
+/******/ 	/* webpack/runtime/define property getters */
+/******/ 	(() => {
+/******/ 		// define getter functions for harmony exports
+/******/ 		__webpack_require__.d = (exports, definition) => {
+/******/ 			for(var key in definition) {
+/******/ 				if(__webpack_require__.o(definition, key) && !__webpack_require__.o(exports, key)) {
+/******/ 					Object.defineProperty(exports, key, { enumerable: true, get: definition[key] });
+/******/ 				}
+/******/ 			}
+/******/ 		};
+/******/ 	})();
+/******/ 	
+/******/ 	/* webpack/runtime/hasOwnProperty shorthand */
+/******/ 	(() => {
+/******/ 		__webpack_require__.o = (obj, prop) => (Object.prototype.hasOwnProperty.call(obj, prop))
+/******/ 	})();
+/******/ 	
+/******/ 	/* webpack/runtime/make namespace object */
+/******/ 	(() => {
+/******/ 		// define __esModule on exports
+/******/ 		__webpack_require__.r = (exports) => {
+/******/ 			if(typeof Symbol !== 'undefined' && Symbol.toStringTag) {
+/******/ 				Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
+/******/ 			}
+/******/ 			Object.defineProperty(exports, '__esModule', { value: true });
+/******/ 		};
+/******/ 	})();
+/******/ 	
+/************************************************************************/
+var __webpack_exports__ = {};
+
+// EXTERNAL MODULE: ./src-modules/section2.ts
+var section2 = __webpack_require__(897);
 ;// ./src-modules/section4.ts
 // Section 5からのimport
 
@@ -591,7 +840,7 @@ async function selectTimeSlotAndStartReservation(slotInfo) {
         // 通常の予約処理を開始
         const config = getCurrentEntranceConfig();
         if (config && entranceReservationHelper) {
-            entranceReservationState.isRunning = true;
+            section2.entranceReservationState.isRunning = true;
             const result = await entranceReservationHelper(config);
             if (result.success) {
                 // 統一状態管理に予約成功情報を設定
@@ -614,7 +863,7 @@ async function selectTimeSlotAndStartReservation(slotInfo) {
 }
 // 監視停止（監視対象選択は維持）
 function stopSlotMonitoring() {
-    timeSlotState.isMonitoring = false;
+    section2.timeSlotState.isMonitoring = false;
     // 統一状態管理システムの実行状態を停止
     const unifiedStateManager = section5_getExternalFunction('unifiedStateManager');
     if (unifiedStateManager) {
@@ -628,14 +877,14 @@ function stopSlotMonitoring() {
     stopReloadCountdown();
     // 監視対象が設定されている場合は選択状態に戻す
     if (unifiedStateManager && unifiedStateManager.hasMonitoringTargets()) {
-        timeSlotState.mode = 'selecting';
+        section2.timeSlotState.mode = 'selecting';
     }
     else {
-        timeSlotState.mode = 'idle';
+        section2.timeSlotState.mode = 'idle';
     }
-    if (timeSlotState.monitoringInterval) {
-        clearInterval(timeSlotState.monitoringInterval);
-        timeSlotState.monitoringInterval = null;
+    if (section2.timeSlotState.monitoringInterval) {
+        clearInterval(section2.timeSlotState.monitoringInterval);
+        section2.timeSlotState.monitoringInterval = null;
     }
     // 監視ボタンを有効化（操作可能に戻す）
     enableAllMonitorButtons();
@@ -820,7 +1069,7 @@ function restoreSelectionAfterUpdate() {
         if (unifiedStateManager) {
             unifiedStateManager.clearAllTargets();
         }
-        timeSlotState.mode = 'idle';
+        section2.timeSlotState.mode = 'idle';
         if (cacheManager) {
             cacheManager.clearTargetSlots();
         }
@@ -1039,7 +1288,7 @@ function getCurrentMode() {
         return 'idle';
     }
     // ページローディング状態の確認
-    if (pageLoadingState?.isLoading) {
+    if (section2.pageLoadingState?.isLoading) {
         return 'loading';
     }
     // 統一状態管理システムの実行状態を確認
@@ -1074,13 +1323,13 @@ function updateStatusBadge(mode) {
     switch (mode) {
         case 'monitoring':
             message = '監視実行中';
-            if (reloadCountdownState.secondsRemaining !== null && reloadCountdownState.secondsRemaining !== undefined) {
-                if (reloadCountdownState.secondsRemaining <= 3) {
-                    message = `監視中\nリロード: ${reloadCountdownState.secondsRemaining}秒`;
+            if (section2.reloadCountdownState.secondsRemaining !== null && section2.reloadCountdownState.secondsRemaining !== undefined) {
+                if (section2.reloadCountdownState.secondsRemaining <= 3) {
+                    message = `監視中\nリロード: ${section2.reloadCountdownState.secondsRemaining}秒`;
                     bgColor = 'rgba(255, 0, 0, 0.9)'; // 赤色（中断不可）
                 }
                 else {
-                    message = `監視中\nリロード: ${reloadCountdownState.secondsRemaining}秒`;
+                    message = `監視中\nリロード: ${section2.reloadCountdownState.secondsRemaining}秒`;
                     bgColor = 'rgba(255, 140, 0, 0.9)'; // オレンジ色
                 }
             }
@@ -1090,9 +1339,9 @@ function updateStatusBadge(mode) {
             break;
         case 'reservation-running':
             // 経過時間と回数を表示
-            const elapsedMinutes = entranceReservationState.startTime ?
-                Math.floor((Date.now() - entranceReservationState.startTime) / 60000) : 0;
-            const attempts = entranceReservationState.attempts;
+            const elapsedMinutes = section2.entranceReservationState.startTime ?
+                Math.floor((Date.now() - section2.entranceReservationState.startTime) / 60000) : 0;
+            const attempts = section2.entranceReservationState.attempts;
             message = `予約実行中\n${elapsedMinutes}分 ${attempts}回`;
             bgColor = 'rgba(255, 140, 0, 0.9)'; // オレンジ色
             break;
@@ -1174,18 +1423,18 @@ function getTargetDisplayInfo() {
 // 統一されたリロードスケジュール関数
 function scheduleReload(seconds = 30) {
     // 既存のタイマーを個別にクリア（stopReloadCountdown()は使わない）
-    if (reloadCountdownState.countdownInterval) {
-        clearInterval(reloadCountdownState.countdownInterval);
-        reloadCountdownState.countdownInterval = null;
+    if (section2.reloadCountdownState.countdownInterval) {
+        clearInterval(section2.reloadCountdownState.countdownInterval);
+        section2.reloadCountdownState.countdownInterval = null;
     }
-    if (reloadCountdownState.reloadTimer) {
-        clearTimeout(reloadCountdownState.reloadTimer);
-        reloadCountdownState.reloadTimer = null;
+    if (section2.reloadCountdownState.reloadTimer) {
+        clearTimeout(section2.reloadCountdownState.reloadTimer);
+        section2.reloadCountdownState.reloadTimer = null;
         console.log('🔄 既存のリロードタイマーをクリア（新規スケジュール開始）');
     }
-    reloadCountdownState.totalSeconds = seconds;
-    reloadCountdownState.secondsRemaining = seconds;
-    reloadCountdownState.startTime = Date.now();
+    section2.reloadCountdownState.totalSeconds = seconds;
+    section2.reloadCountdownState.secondsRemaining = seconds;
+    section2.reloadCountdownState.startTime = Date.now();
     console.log(`🔄 統一リロードスケジュール開始: ${seconds}秒`);
     // 統一状態管理システムの状態をログ出力
     const unifiedStateManager = section5_getExternalFunction('unifiedStateManager');
@@ -1201,24 +1450,24 @@ function scheduleReload(seconds = 30) {
         }
     }, flagDelay);
     // 実際のリロード実行タイマー
-    reloadCountdownState.reloadTimer = window.setTimeout(() => {
+    section2.reloadCountdownState.reloadTimer = window.setTimeout(() => {
         console.log('🔄 統一リロード実行');
         window.location.reload();
     }, seconds * 1000);
     // 即座に一度UI更新
     updateMainButtonDisplay();
-    reloadCountdownState.countdownInterval = window.setInterval(() => {
-        if (reloadCountdownState.secondsRemaining !== null) {
-            reloadCountdownState.secondsRemaining--;
+    section2.reloadCountdownState.countdownInterval = window.setInterval(() => {
+        if (section2.reloadCountdownState.secondsRemaining !== null) {
+            section2.reloadCountdownState.secondsRemaining--;
             // UI更新（カウントダウン表示のみ）
             updateMainButtonDisplay(null, true);
-            if (reloadCountdownState.secondsRemaining <= 0) {
+            if (section2.reloadCountdownState.secondsRemaining <= 0) {
                 // カウントダウン表示のみ停止（リロードタイマーは停止しない）
-                if (reloadCountdownState.countdownInterval) {
-                    clearInterval(reloadCountdownState.countdownInterval);
-                    reloadCountdownState.countdownInterval = null;
+                if (section2.reloadCountdownState.countdownInterval) {
+                    clearInterval(section2.reloadCountdownState.countdownInterval);
+                    section2.reloadCountdownState.countdownInterval = null;
                 }
-                reloadCountdownState.secondsRemaining = null;
+                section2.reloadCountdownState.secondsRemaining = null;
                 console.log('🔄 カウントダウン完了（リロード実行待機中）');
             }
         }
@@ -1234,35 +1483,35 @@ function stopReloadCountdown() {
     const stack = new Error().stack;
     const caller = stack?.split('\n')[2]?.trim() || 'unknown';
     console.log(`🛑 stopReloadCountdown() 呼び出し元: ${caller}`);
-    if (reloadCountdownState.countdownInterval) {
-        clearInterval(reloadCountdownState.countdownInterval);
-        reloadCountdownState.countdownInterval = null;
+    if (section2.reloadCountdownState.countdownInterval) {
+        clearInterval(section2.reloadCountdownState.countdownInterval);
+        section2.reloadCountdownState.countdownInterval = null;
     }
     // リロードタイマーも停止
-    if (reloadCountdownState.reloadTimer) {
-        clearTimeout(reloadCountdownState.reloadTimer);
-        reloadCountdownState.reloadTimer = null;
+    if (section2.reloadCountdownState.reloadTimer) {
+        clearTimeout(section2.reloadCountdownState.reloadTimer);
+        section2.reloadCountdownState.reloadTimer = null;
         console.log('🛑 リロードタイマーを停止しました（中断による停止）');
     }
-    reloadCountdownState.secondsRemaining = null;
-    reloadCountdownState.startTime = null;
+    section2.reloadCountdownState.secondsRemaining = null;
+    section2.reloadCountdownState.startTime = null;
 }
 // ページ読み込み状態を設定
 function setPageLoadingState(isLoading) {
-    pageLoadingState.isLoading = isLoading;
+    section2.pageLoadingState.isLoading = isLoading;
     if (isLoading) {
-        pageLoadingState.startTime = Date.now();
+        section2.pageLoadingState.startTime = Date.now();
     }
     else {
-        pageLoadingState.startTime = null;
+        section2.pageLoadingState.startTime = null;
     }
     updateMainButtonDisplay();
 }
 // 中断操作が許可されているかチェック
 function isInterruptionAllowed() {
     // リロード直前3秒間は中断不可（時間を短縮して中断可能期間を延長）
-    const isCountdownActive = reloadCountdownState.secondsRemaining !== null && reloadCountdownState.secondsRemaining !== undefined;
-    const isNearReload = isCountdownActive && reloadCountdownState.secondsRemaining !== null && reloadCountdownState.secondsRemaining <= 3;
+    const isCountdownActive = section2.reloadCountdownState.secondsRemaining !== null && section2.reloadCountdownState.secondsRemaining !== undefined;
+    const isNearReload = isCountdownActive && section2.reloadCountdownState.secondsRemaining !== null && section2.reloadCountdownState.secondsRemaining <= 3;
     // console.log(`🔍 中断可否チェック: countdown=${reloadCountdownState.secondsRemaining}, active=${isCountdownActive}, nearReload=${isNearReload}`);
     return !isNearReload;
 }
@@ -1461,7 +1710,7 @@ async function restoreFromCache() {
                 console.log('✅ 予約対象に設定完了');
             }
             // 予約処理を自動開始
-            timeSlotState.mode = 'trying';
+            section2.timeSlotState.mode = 'trying';
             updateMainButtonDisplay();
             // 時間帯を選択して予約開始（監視対象から予約対象に移行した正当な処理）
             if (selectTimeSlotAndStartReservation) {
@@ -1489,8 +1738,8 @@ async function restoreFromCache() {
         }
         // 復元結果の処理
         if (restoredCount > 0) {
-            timeSlotState.retryCount = cached.retryCount || 0;
-            timeSlotState.mode = 'selecting';
+            section2.timeSlotState.retryCount = cached.retryCount || 0;
+            section2.timeSlotState.mode = 'selecting';
             // メインボタンの表示更新
             updateMainButtonDisplay();
             // FAB監視対象表示の更新
@@ -1513,8 +1762,8 @@ async function restoreFromCache() {
                     console.log('📡 統一状態管理システム: 監視実行状態に設定');
                 }
                 // timeSlotStateも監視中に設定
-                timeSlotState.mode = 'monitoring';
-                timeSlotState.isMonitoring = true;
+                section2.timeSlotState.mode = 'monitoring';
+                section2.timeSlotState.isMonitoring = true;
                 console.log('🎯 timeSlotState: 監視モードに設定');
                 // FABボタン表示を即座に更新
                 updateMainButtonDisplay();
@@ -1527,15 +1776,15 @@ async function restoreFromCache() {
                 // 手動リロード時: 監視対象が復元されている場合は selecting状態に設定
                 if (restoredCount > 0) {
                     console.log('🔄 手動リロード後: 監視対象が復元されているため selecting状態に設定');
-                    timeSlotState.mode = 'selecting';
-                    timeSlotState.isMonitoring = false;
+                    section2.timeSlotState.mode = 'selecting';
+                    section2.timeSlotState.isMonitoring = false;
                     // FABボタン表示を更新
                     updateMainButtonDisplay();
                 }
                 else {
                     // 監視対象がない場合は idle状態
-                    timeSlotState.mode = 'idle';
-                    timeSlotState.isMonitoring = false;
+                    section2.timeSlotState.mode = 'idle';
+                    section2.timeSlotState.isMonitoring = false;
                 }
             }
         }
@@ -1555,8 +1804,8 @@ async function restoreFromCache() {
                     if (unifiedStateManager) {
                         unifiedStateManager.clearAllTargets();
                     }
-                    timeSlotState.mode = 'idle';
-                    timeSlotState.retryCount = 0;
+                    section2.timeSlotState.mode = 'idle';
+                    section2.timeSlotState.retryCount = 0;
                     updateMainButtonDisplay();
                     console.log('✅ キャッシュクリア完了');
                 };
@@ -1587,7 +1836,7 @@ async function restoreFromCache() {
                                     }
                                 });
                                 if (retryRestoredCount > 0) {
-                                    timeSlotState.mode = 'selecting';
+                                    section2.timeSlotState.mode = 'selecting';
                                     console.log(`✅ ${retryRestoredCount}個の監視対象を再試行で復元成功`);
                                     updateMainButtonDisplay();
                                     startSlotMonitoring();
@@ -1620,8 +1869,8 @@ async function restoreFromCache() {
                     unifiedStateManager.clearAllTargets();
                     console.log('📡 統一状態管理システムもクリアしました');
                 }
-                timeSlotState.mode = 'idle';
-                timeSlotState.retryCount = 0;
+                section2.timeSlotState.mode = 'idle';
+                section2.timeSlotState.retryCount = 0;
                 updateMainButtonDisplay();
                 console.log('✅ キャッシュクリア完了');
             }
@@ -2732,7 +2981,7 @@ function handleMonitorButtonClick(slotInfo, buttonElement) {
     const locationText = location === 'east' ? '東' : '西';
     console.log(`監視ボタンがクリックされました: ${locationText}${slotInfo.timeText}`);
     // 監視実行中は操作不可
-    if (timeSlotState.isMonitoring) {
+    if (section2.timeSlotState.isMonitoring) {
         console.log('⚠️ 監視実行中のため操作できません');
         return;
     }
@@ -2765,8 +3014,8 @@ function handleMonitorButtonClick(slotInfo, buttonElement) {
         buttonElement.disabled = false;
         // 監視対象がすべてなくなった場合の処理
         if (!unifiedStateManager || !unifiedStateManager.hasMonitoringTargets()) {
-            timeSlotState.mode = 'idle';
-            timeSlotState.retryCount = 0;
+            section2.timeSlotState.mode = 'idle';
+            section2.timeSlotState.retryCount = 0;
             // キャッシュをクリア
             if (section5_cacheManager) {
                 section5_cacheManager.clearTargetSlots();
@@ -2819,8 +3068,8 @@ function handleMonitorButtonClick(slotInfo, buttonElement) {
         }
         if (!added)
             return; // 追加失敗時は処理を中止
-        timeSlotState.mode = 'selecting';
-        timeSlotState.retryCount = 0;
+        section2.timeSlotState.mode = 'selecting';
+        section2.timeSlotState.retryCount = 0;
         // キャッシュに保存（すべての監視対象を保存）
         if (section5_cacheManager) {
             section5_cacheManager.saveTargetSlots();
@@ -2843,7 +3092,7 @@ function handleMonitorButtonClick(slotInfo, buttonElement) {
         if (unifiedStateManager) {
             const targets = unifiedStateManager.getMonitoringTargets();
             const targetCount = targets.length;
-            console.log(`🔄 監視対象設定後のFAB更新を実行: targetSlots=${targetCount}個, mode=${timeSlotState.mode}`);
+            console.log(`🔄 監視対象設定後のFAB更新を実行: targetSlots=${targetCount}個, mode=${section2.timeSlotState.mode}`);
             console.log('📊 統一状態管理の監視対象一覧:', targets.map((t) => `${unified_state_LocationHelper.getLocationFromIndex(t.locationIndex) === 'east' ? '東' : '西'}${t.timeSlot}`));
         }
         safeCall('updateMainButtonDisplay');
@@ -2865,8 +3114,8 @@ async function startSlotMonitoring() {
         return;
     }
     // 即座に状態更新（UI応答性向上）
-    timeSlotState.mode = 'monitoring';
-    timeSlotState.isMonitoring = true;
+    section2.timeSlotState.mode = 'monitoring';
+    section2.timeSlotState.isMonitoring = true;
     // 統一状態管理で監視開始
     if (unifiedStateManager.startMonitoring()) {
         console.log('✅ 統一状態管理で監視を開始しました');
@@ -2907,14 +3156,14 @@ async function checkSlotAvailabilityAndReload() {
         if (!checkMonitoringTargetExists(target))
             return;
     }
-    if (!checkMaxReloads(timeSlotState.retryCount))
+    if (!checkMaxReloads(section2.timeSlotState.retryCount))
         return;
-    timeSlotState.retryCount++;
+    section2.timeSlotState.retryCount++;
     if (section5_cacheManager) {
-        section5_cacheManager.updateRetryCount(timeSlotState.retryCount);
+        section5_cacheManager.updateRetryCount(section2.timeSlotState.retryCount);
     }
     const targetTexts = targets.map((t) => t.timeSlot).join(', ');
-    console.log(`🔍 可用性チェック (${timeSlotState.retryCount}回目): ${targetTexts}`);
+    console.log(`🔍 可用性チェック (${section2.timeSlotState.retryCount}回目): ${targetTexts}`);
     // 現在の時間帯をチェック
     const currentSlot = findTargetSlotInPageUnified();
     console.log(`📊 監視チェック結果: currentSlot=${!!currentSlot}, status=${currentSlot?.status}`);
@@ -2932,7 +3181,7 @@ async function checkSlotAvailabilityAndReload() {
     // まだ満員の場合はページリロード
     console.log('⏳ すべての監視対象がまだ満員です。ページを再読み込みします...');
     // BAN対策：設定されたリロード間隔にランダム要素を追加
-    const baseInterval = timeSlotState.reloadInterval; // 30000ms (30秒)
+    const baseInterval = section2.timeSlotState.reloadInterval; // 30000ms (30秒)
     const randomVariation = Math.random() * 5000; // 0-5秒のランダム要素
     const totalWaitTime = baseInterval + randomVariation;
     const displaySeconds = Math.ceil(totalWaitTime / 1000);
@@ -3017,9 +3266,9 @@ function terminateMonitoring(errorCode, errorMessage) {
         section5_cacheManager.clearMonitoringFlag(); // 監視継続フラグもクリア
     }
     // インターバル停止
-    if (timeSlotState.monitoringInterval) {
-        clearInterval(timeSlotState.monitoringInterval);
-        timeSlotState.monitoringInterval = null;
+    if (section2.timeSlotState.monitoringInterval) {
+        clearInterval(section2.timeSlotState.monitoringInterval);
+        section2.timeSlotState.monitoringInterval = null;
     }
     // UI状態リセット
     safeCall('resetMonitoringUI');
@@ -3027,8 +3276,8 @@ function terminateMonitoring(errorCode, errorMessage) {
     // エラー表示
     safeCall('showErrorMessage', errorMessage);
     // 状態初期化
-    timeSlotState.mode = 'idle';
-    timeSlotState.isMonitoring = false;
+    section2.timeSlotState.mode = 'idle';
+    section2.timeSlotState.isMonitoring = false;
     // 統一状態管理で監視停止
     const unifiedStateManager = section5_getExternalFunction('unifiedStateManager');
     if (unifiedStateManager) {
@@ -3039,7 +3288,7 @@ function terminateMonitoring(errorCode, errorMessage) {
     if (unifiedStateManager) {
         unifiedStateManager.clearAllTargets();
     }
-    timeSlotState.retryCount = 0;
+    section2.timeSlotState.retryCount = 0;
 }
 // 監視バリデーション関数群
 function checkTargetElementExists(targetInfo) {
@@ -3147,7 +3396,7 @@ const createCacheManager = (dependencies = {}) => {
                     selectedDate: selectedCalendarDate,
                     timestamp: Date.now(),
                     url: window.location.href,
-                    retryCount: timeSlotState.retryCount || 0
+                    retryCount: section2.timeSlotState.retryCount || 0
                 };
                 localStorage.setItem(this.generateKey('target_slots'), JSON.stringify(data));
                 const targetTexts = targets.map((t) => t.timeSlot).join(', ');
@@ -3504,6 +3753,12 @@ const prepare_filter = (val_search) => {
 };
 // ページ初期化処理
 const init_page = () => {
+    // ヘッダーにFAB切替ボタンを追加（DOM構築完了を待つ）
+    setTimeout(() => {
+        Promise.resolve(/* import() */).then(__webpack_require__.bind(__webpack_require__, 897)).then((section2) => {
+            section2.createFABToggleButton();
+        });
+    }, 1000);
     // すべて読み込みボタンの自動クリック処理
     const load_more_auto = async () => {
         const scrollX = window.scrollX;
@@ -3515,9 +3770,6 @@ const init_page = () => {
                 scrollTo(scrollX, scrollY);
                 load_more_auto();
             }, 500);
-        }
-        else {
-            console.log("No more load more button");
         }
     };
     // ボタンのスタイルを生成する関数
@@ -3691,6 +3943,12 @@ const judge_entrance_init = () => {
 const init_entrance_page = (dependencies = {}) => {
     const { setPageLoadingStateFn, createEntranceReservationUIFn, initTimeSlotMonitoringFn, restoreFromCacheFn } = dependencies;
     insert_style();
+    // ヘッダーにFAB切替ボタンを追加（DOM構築完了を待つ）
+    setTimeout(() => {
+        Promise.resolve(/* import() */).then(__webpack_require__.bind(__webpack_require__, 897)).then((section2) => {
+            section2.createFABToggleButton();
+        });
+    }, 1000);
     // 入場予約機能の設定
     const entranceReservationConfig = {
         selectors: {
@@ -3993,7 +4251,7 @@ function createEntranceReservationUI(config) {
             return;
         }
         // 実行中の場合は中断処理
-        if (timeSlotState.isMonitoring) {
+        if (section2.timeSlotState.isMonitoring) {
             console.log('監視を中断します');
             stopSlotMonitoring();
             // ステータスは中断を示すメッセージを表示（消さない）
@@ -4001,9 +4259,9 @@ function createEntranceReservationUI(config) {
             updateMainButtonDisplay();
             return;
         }
-        if (entranceReservationState.isRunning) {
+        if (section2.entranceReservationState.isRunning) {
             console.log('予約処理を中断します');
-            entranceReservationState.shouldStop = true;
+            section2.entranceReservationState.shouldStop = true;
             showStatus('予約処理を中断中...', 'orange');
             return;
         }
@@ -4033,7 +4291,7 @@ function createEntranceReservationUI(config) {
         else {
             // フォールバック: 統一状態管理による判定
             const unifiedStateManager = section5_getExternalFunction('unifiedStateManager');
-            if (unifiedStateManager && unifiedStateManager.hasMonitoringTargets() && timeSlotState.mode === 'selecting') {
+            if (unifiedStateManager && unifiedStateManager.hasMonitoringTargets() && section2.timeSlotState.mode === 'selecting') {
                 console.log('📡 統一状態管理による監視開始');
                 updateMainButtonDisplay();
                 await startSlotMonitoring();
@@ -4041,10 +4299,10 @@ function createEntranceReservationUI(config) {
             }
         }
         // 通常の予約処理
-        entranceReservationState.isRunning = true;
-        entranceReservationState.shouldStop = false;
-        entranceReservationState.startTime = Date.now();
-        entranceReservationState.attempts = 0;
+        section2.entranceReservationState.isRunning = true;
+        section2.entranceReservationState.shouldStop = false;
+        section2.entranceReservationState.startTime = Date.now();
+        section2.entranceReservationState.attempts = 0;
         showStatus('予約処理実行中...', 'blue');
         updateMainButtonDisplay();
         updateMonitoringTargetsDisplay(); // 予約対象を表示
@@ -4076,9 +4334,9 @@ function createEntranceReservationUI(config) {
             showStatus(`エラー: ${errorMessage}`, 'red');
         }
         finally {
-            entranceReservationState.isRunning = false;
-            entranceReservationState.startTime = null;
-            entranceReservationState.attempts = 0;
+            section2.entranceReservationState.isRunning = false;
+            section2.entranceReservationState.startTime = null;
+            section2.entranceReservationState.attempts = 0;
             updateMainButtonDisplay();
             updateMonitoringTargetsDisplay(); // 予約終了時に表示更新
         }
@@ -4102,7 +4360,9 @@ function createEntranceReservationUI(config) {
     fabContainer.appendChild(fabButton);
     // DOMに追加（body直下）
     document.body.appendChild(fabContainer);
-    console.log('✅ FAB形式の予約UIを作成しました');
+    // FAB表示状態を初期化・適用
+    (0,section2.loadFABVisibility)();
+    (0,section2.updateFABVisibility)();
     // 初期状態を判定してFABを更新
     section7_waitForTimeSlotTable(() => {
         checkInitialState();
@@ -4226,13 +4486,13 @@ function checkInitialState() {
 }
 // カレンダー変更を監視して監視ボタンを再設置
 function startCalendarWatcher() {
-    if (calendarWatchState.isWatching)
+    if (section2.calendarWatchState.isWatching)
         return;
-    calendarWatchState.isWatching = true;
-    calendarWatchState.currentSelectedDate = getCurrentSelectedCalendarDate();
+    section2.calendarWatchState.isWatching = true;
+    section2.calendarWatchState.currentSelectedDate = getCurrentSelectedCalendarDate();
     console.log('📅 カレンダー変更監視を開始');
     // MutationObserverでカレンダー変更・時間帯選択・ボタン状態変更を検出
-    calendarWatchState.observer = new MutationObserver((mutations) => {
+    section2.calendarWatchState.observer = new MutationObserver((mutations) => {
         let shouldUpdate = false;
         mutations.forEach((mutation) => {
             // 1. カレンダーのaria-pressed属性の変更を検出
@@ -4254,7 +4514,7 @@ function startCalendarWatcher() {
                     console.log(`🔄 時間帯選択変更検出: ${ariaPressed}`);
                     // 統一状態管理システムの同期（初期化中は除外）
                     const unifiedStateManager = section5_getExternalFunction('unifiedStateManager');
-                    if (unifiedStateManager && ariaPressed === 'true' && !calendarWatchState.isInitializing) {
+                    if (unifiedStateManager && ariaPressed === 'true' && !section2.calendarWatchState.isInitializing) {
                         // 選択状態変更を検出 - DOM状態から予約対象を同期
                         console.log(`🔄 時間帯選択状態を検出`);
                         setTimeout(() => {
@@ -4284,7 +4544,7 @@ function startCalendarWatcher() {
     });
     // カレンダー要素全体を監視
     const observeTarget = document.body;
-    calendarWatchState.observer.observe(observeTarget, {
+    section2.calendarWatchState.observer.observe(observeTarget, {
         attributes: true,
         subtree: true,
         attributeFilter: ['aria-pressed', 'class', 'disabled']
@@ -4293,15 +4553,15 @@ function startCalendarWatcher() {
 // カレンダー変更・状態変更時の処理
 function handleCalendarChange() {
     const newSelectedDate = getCurrentSelectedCalendarDate();
-    const calendarDateChanged = newSelectedDate !== calendarWatchState.currentSelectedDate;
+    const calendarDateChanged = newSelectedDate !== section2.calendarWatchState.currentSelectedDate;
     if (calendarDateChanged) {
-        console.log(`📅 カレンダー日付変更を検出: ${calendarWatchState.currentSelectedDate} → ${newSelectedDate}`);
+        console.log(`📅 カレンダー日付変更を検出: ${section2.calendarWatchState.currentSelectedDate} → ${newSelectedDate}`);
         // 監視実行中は日付変更を無視
-        if (timeSlotState.isMonitoring) {
+        if (section2.timeSlotState.isMonitoring) {
             console.log('⚠️ 監視実行中のため日付変更を無視します');
             return;
         }
-        calendarWatchState.currentSelectedDate = newSelectedDate;
+        section2.calendarWatchState.currentSelectedDate = newSelectedDate;
         // 統一状態管理にも日付を設定
         const unifiedStateManager = section5_getExternalFunction('unifiedStateManager');
         if (unifiedStateManager && newSelectedDate) {
@@ -4506,7 +4766,7 @@ async function section7_entranceReservationHelper(config) {
     let attempts = 0;
     const maxAttempts = 100;
     console.log('入場予約補助機能を開始します...');
-    while (attempts < maxAttempts && !entranceReservationState.shouldStop) {
+    while (attempts < maxAttempts && !section2.entranceReservationState.shouldStop) {
         attempts++;
         console.log(`試行回数: ${attempts}`);
         const statusDiv = document.getElementById('reservation-status');
@@ -4516,11 +4776,11 @@ async function section7_entranceReservationHelper(config) {
         try {
             console.log('1. submitボタンを待機中...');
             const submitButton = await waitForElement(selectors.submit, timeouts.waitForSubmit, config);
-            if (entranceReservationState.shouldStop)
+            if (section2.entranceReservationState.shouldStop)
                 break;
             console.log('submitボタンが見つかりました。クリックします。');
             // submit押下時に回数を更新
-            entranceReservationState.attempts = attempts;
+            section2.entranceReservationState.attempts = attempts;
             await clickElement(submitButton, config);
             console.log('2. レスポンスを待機中...');
             const responseSelectors = {
@@ -4530,7 +4790,7 @@ async function section7_entranceReservationHelper(config) {
             };
             const response = await waitForAnyElement(responseSelectors, timeouts.waitForResponse, selectorTexts, config);
             console.log(`レスポンス検出: ${response.key}`);
-            if (entranceReservationState.shouldStop)
+            if (section2.entranceReservationState.shouldStop)
                 break;
             if (response.key === 'change') {
                 console.log('changeボタンをクリックします。');
@@ -4567,12 +4827,12 @@ async function section7_entranceReservationHelper(config) {
         catch (error) {
             const errorMessage = error instanceof Error ? error.message : String(error);
             console.error(`エラーが発生しました (試行 ${attempts}):`, errorMessage);
-            if (entranceReservationState.shouldStop)
+            if (section2.entranceReservationState.shouldStop)
                 break;
             await new Promise(resolve => setTimeout(resolve, getRandomWaitTime(config.randomSettings.minRetryDelay, config.randomSettings.retryRandomRange, config)));
         }
     }
-    if (entranceReservationState.shouldStop) {
+    if (section2.entranceReservationState.shouldStop) {
         console.log('ユーザーによってキャンセルされました。');
         return { success: false, attempts, cancelled: true };
     }
@@ -4642,7 +4902,7 @@ setExternalFunctions({
     scheduleReload: scheduleReload,
     startReloadCountdown: startReloadCountdown,
     stopReloadCountdown: stopReloadCountdown,
-    reloadCountdownState: reloadCountdownState,
+    reloadCountdownState: section2.reloadCountdownState,
     resetMonitoringUI: resetMonitoringUI,
     showErrorMessage: showErrorMessage,
     tryClickCalendarForTimeSlot: tryClickCalendarForTimeSlot,

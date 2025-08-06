@@ -219,6 +219,13 @@ const prepare_filter = (val_search: string): { include: RegExp, exclude: RegExp[
 
 // ページ初期化処理
 const init_page = (): void => {
+    // ヘッダーにFAB切替ボタンを追加（DOM構築完了を待つ）
+    setTimeout(() => {
+        import('./section2').then((section2) => {
+            section2.createFABToggleButton();
+        });
+    }, 1000);
+    
     // すべて読み込みボタンの自動クリック処理
     const load_more_auto = async () => {
         const scrollX = window.scrollX;
@@ -230,8 +237,6 @@ const init_page = (): void => {
                 scrollTo(scrollX, scrollY);
                 load_more_auto();
             }, 500)
-        } else {
-            console.log("No more load more button");
         }
     }
 
@@ -438,6 +443,13 @@ const init_entrance_page = (dependencies: Dependencies = {}): void => {
         restoreFromCacheFn
     } = dependencies;
     insert_style();
+    
+    // ヘッダーにFAB切替ボタンを追加（DOM構築完了を待つ）
+    setTimeout(() => {
+        import('./section2').then((section2) => {
+            section2.createFABToggleButton();
+        });
+    }, 1000);
     
     // 入場予約機能の設定
     const entranceReservationConfig = {

@@ -10,7 +10,9 @@ import {
 import { 
     entranceReservationState, 
     timeSlotState,
-    calendarWatchState
+    calendarWatchState,
+    loadFABVisibility,
+    updateFABVisibility
 } from './section2';
 
 // Section 4からのimport
@@ -364,7 +366,10 @@ function createEntranceReservationUI(config: ReservationConfig): void {
     // DOMに追加（body直下）
     document.body.appendChild(fabContainer);
 
-    console.log('✅ FAB形式の予約UIを作成しました');
+    
+    // FAB表示状態を初期化・適用
+    loadFABVisibility();
+    updateFABVisibility();
     
     // 初期状態を判定してFABを更新
     waitForTimeSlotTable(() => {
