@@ -16,6 +16,7 @@ import {
     entranceReservationHelper, waitForTimeSlotTable
 } from './section7';
 import { initTimeSlotMonitoring } from './section4';
+import { initCompanionTicketFeature } from './section9'; // 同行者追加機能
 
 // 統一状態管理システムのimport
 import { UnifiedStateManager } from './unified-state';
@@ -101,6 +102,12 @@ const identify_page_type = (url: string): string | null => {
     } else if (url.includes("ticket.expo2025.or.jp/event_search/")) {
         console.log(`✅ パビリオン予約ページとして識別`);
         return "pavilion_reservation";
+    } else if (url.includes("ticket_selection") && url.includes("lottery=4")) {
+        console.log(`✅ チケット選択画面として識別`);
+        return "ticket_selection";
+    } else if (url.includes("agent_ticket") && url.includes("lottery=4")) {
+        console.log(`✅ 同行者追加画面として識別`);
+        return "agent_ticket";
     }
     
     console.log(`❌ 対象外ページ`);
@@ -134,6 +141,12 @@ const trigger_init = (url_record: string): void => {
         if (existingPavilionFab) {
             existingPavilionFab.remove();
             console.log('🗑️ ページ遷移により既存のパビリオンFABボタンを削除しました');
+        }
+        
+        const existingCompanionFab = document.getElementById('ytomo-companion-fab-container');
+        if (existingCompanionFab) {
+            existingCompanionFab.remove();
+            console.log('🗑️ ページ遷移により既存の同行者追加FABボタンを削除しました');
         }
     }
     
@@ -184,6 +197,19 @@ const trigger_init = (url_record: string): void => {
                 
                 isPageInitializing = false;
                 console.log("ytomo extension loaded (entrance reservation)");
+            }
+        }, 500);
+    } else if (page_type === "ticket_selection" || page_type === "agent_ticket") {
+        if (isPageInitializing) return;
+        isPageInitializing = true;
+        
+        // 同行者追加機能の初期化（DOM準備完了を待機）
+        const interval_companion = setInterval(() => {
+            if (document.body && document.readyState === 'complete') {
+                clearInterval(interval_companion);
+                initCompanionTicketFeature();
+                isPageInitializing = false;
+                console.log(`ytomo extension loaded (${page_type})`);
             }
         }, 500);
     } else {
