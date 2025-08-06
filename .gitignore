@@ -35,3 +35,14 @@ coverage/
 
 # ログファイル
 *.log
+
+# 開発時のバックアップファイル（devブランチでは不要）
+backup/
+tmp/
+dist-ts/
+
+# 開発用一時ファイル
+*.orig
+*.backup
+*-backup.*
+*-temp.*
