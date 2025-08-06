@@ -617,7 +617,7 @@ function createMonitorButton(slotInfo: TimeSlotInfo): void {
         display: inline-block;
         vertical-align: middle;
         position: relative;
-        z-index: 9999 !important;
+        z-index: 1000 !important;
         pointer-events: auto !important;
         opacity: 1 !important;
         visibility: visible !important;

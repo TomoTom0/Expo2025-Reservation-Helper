@@ -39,6 +39,10 @@ const cacheManager: CacheManager = createCacheManager({
 const unifiedStateManager = new UnifiedStateManager();
 let isUnifiedStateManagerInitialized = false; // 重複初期化防止フラグ
 
+// ページ初期化の重複実行防止
+let currentPageType: string | null = null;
+let isPageInitializing = false;
+
 // ページ初期化時に既存データを移行
 const initializeUnifiedStateManager = (): void => {
     if (isUnifiedStateManagerInitialized) {
@@ -88,11 +92,18 @@ setExternalFunctions({
 
 // URL判定とページタイプ識別
 const identify_page_type = (url: string): string | null => {
-    if (url.includes("ticket.expo2025.or.jp/event_search/")) {
-        return "pavilion_reservation";
-    } else if (url.includes("ticket.expo2025.or.jp/ticket_visiting_reservation/")) {
+    console.log(`🔍 ページタイプ識別中: ${url}`);
+    
+    // より厳密なURL判定
+    if (url.includes("ticket.expo2025.or.jp/ticket_visiting_reservation/")) {
+        console.log(`✅ 入場予約ページとして識別`);
         return "entrance_reservation";
+    } else if (url.includes("ticket.expo2025.or.jp/event_search/")) {
+        console.log(`✅ パビリオン予約ページとして識別`);
+        return "pavilion_reservation";
     }
+    
+    console.log(`❌ 対象外ページ`);
     return null;
 }
 
@@ -100,22 +111,42 @@ const identify_page_type = (url: string): string | null => {
 const trigger_init = (url_record: string): void => {
     const page_type = identify_page_type(url_record);
     
-    // ページ遷移時に既存のFABボタンをクリーンアップ
-    const existingFab = document.getElementById('ytomo-fab-container');
-    if (existingFab) {
-        existingFab.remove();
-        console.log('🗑️ ページ遷移により既存のFABボタンを削除しました');
+    // 同じページタイプで初期化中の場合はスキップ
+    if (currentPageType === page_type && isPageInitializing) {
+        console.log(`⏸️ 同じページタイプ (${page_type}) で初期化中のためスキップします`);
+        return;
+    }
+    
+    // 前回と異なるページタイプの場合は状態をリセット
+    if (currentPageType !== page_type) {
+        console.log(`🔄 ページタイプ変更: ${currentPageType} -> ${page_type}`);
+        currentPageType = page_type;
+        isPageInitializing = false;
+        
+        // ページ遷移時に既存のFABボタンをクリーンアップ
+        const existingFab = document.getElementById('ytomo-fab-container');
+        if (existingFab) {
+            existingFab.remove();
+            console.log('🗑️ ページ遷移により既存のFABボタンを削除しました');
+        }
     }
     
     if (page_type === "pavilion_reservation") {
+        if (isPageInitializing) return;
+        isPageInitializing = true;
+        
         const interval_judge = setInterval(() => {
             if (judge_init()) {
                 clearInterval(interval_judge);
                 init_page();
+                isPageInitializing = false;
                 console.log("ytomo extension loaded (pavilion reservation)");
             }
         }, 500);
     } else if (page_type === "entrance_reservation") {
+        if (isPageInitializing) return;
+        isPageInitializing = true;
+        
         const interval_judge = setInterval(() => {
             if (judge_entrance_init()) {
                 clearInterval(interval_judge);
@@ -145,6 +176,7 @@ const trigger_init = (url_record: string): void => {
                     }
                 }, 5000); // 頻度を2秒から5秒に下げる
                 
+                isPageInitializing = false;
                 console.log("ytomo extension loaded (entrance reservation)");
             }
         }, 500);
@@ -152,6 +184,8 @@ const trigger_init = (url_record: string): void => {
         // 対象外のページの場合はログ出力のみ
         console.log(`🔍 対象外ページ: ${url_record}`);
         console.log("ytomo extension: no action needed for this page");
+        currentPageType = null;
+        isPageInitializing = false;
     }
 }
 
