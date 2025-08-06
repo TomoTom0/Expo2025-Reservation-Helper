@@ -185,6 +185,30 @@ const init_page = (): void => {
         };
     };
 
+    // 空きありパビリオン数をカウントする関数
+    const getAvailableItemCounts = () => {
+        const allItems = document.querySelectorAll("div.style_search_item_row__moqWC");
+        // 空きありのパビリオン（calendar_none.svgがないもの）
+        const availableItems = document.querySelectorAll("div.style_search_item_row__moqWC:not(:has(img[src*=\"/asset/img/calendar_none.svg\"]))");
+        return {
+            total: allItems.length,
+            available: availableItems.length
+        };
+    };
+
+    // 「空きのみ」ボタンのテキストを更新する関数
+    const updateFilterSafeButtonText = () => {
+        const filterSafeButtons = document.querySelectorAll("button.btn-filter-safe");
+        const counts = getAvailableItemCounts();
+        
+        filterSafeButtons.forEach((btn) => {
+            const button = btn as HTMLButtonElement;
+            const baseText = '空きのみ';
+            const newText = `${baseText}(${counts.available})`;
+            button.textContent = newText;
+        });
+    };
+
     // 「もっと見る」ボタンの存在をチェックする関数
     const hasMoreButton = () => {
         // 全ての「もっと見る」ボタンをチェック（disabled含む）
@@ -331,6 +355,9 @@ const init_page = (): void => {
             const counts = getItemCounts();
             countsText.innerText = `${counts.visible}/${counts.total}`;
             console.log(`📊 件数表示更新: ${counts.visible}/${counts.total}`);
+            
+            // 「空きのみ」ボタンのテキストも更新
+            updateFilterSafeButtonText();
         };
 
         // サブアクションボタンコンテナ

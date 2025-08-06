@@ -476,9 +476,15 @@ function toggleFABVisibility() {
     updateFABVisibility();
 }
 function updateFABVisibility() {
+    // 入場予約FAB
     const fabContainer = document.getElementById('ytomo-fab-container');
     if (fabContainer) {
         fabContainer.style.display = fabVisibilityState.isVisible ? 'flex' : 'none';
+    }
+    // パビリオン予約FAB
+    const pavilionFabContainer = document.getElementById('ytomo-pavilion-fab-container');
+    if (pavilionFabContainer) {
+        pavilionFabContainer.style.display = fabVisibilityState.isVisible ? 'flex' : 'none';
     }
 }
 // ヘッダーにFAB表示切替ボタンを追加
@@ -899,6 +905,27 @@ const init_page = () => {
             visible: visibleItems.length
         };
     };
+    // 空きありパビリオン数をカウントする関数
+    const getAvailableItemCounts = () => {
+        const allItems = document.querySelectorAll("div.style_search_item_row__moqWC");
+        // 空きありのパビリオン（calendar_none.svgがないもの）
+        const availableItems = document.querySelectorAll("div.style_search_item_row__moqWC:not(:has(img[src*=\"/asset/img/calendar_none.svg\"]))");
+        return {
+            total: allItems.length,
+            available: availableItems.length
+        };
+    };
+    // 「空きのみ」ボタンのテキストを更新する関数
+    const updateFilterSafeButtonText = () => {
+        const filterSafeButtons = document.querySelectorAll("button.btn-filter-safe");
+        const counts = getAvailableItemCounts();
+        filterSafeButtons.forEach((btn) => {
+            const button = btn;
+            const baseText = '空きのみ';
+            const newText = `${baseText}(${counts.available})`;
+            button.textContent = newText;
+        });
+    };
     // 「もっと見る」ボタンの存在をチェックする関数
     const hasMoreButton = () => {
         // 全ての「もっと見る」ボタンをチェック（disabled含む）
@@ -1027,6 +1054,8 @@ const init_page = () => {
             const counts = getItemCounts();
             countsText.innerText = `${counts.visible}/${counts.total}`;
             console.log(`📊 件数表示更新: ${counts.visible}/${counts.total}`);
+            // 「空きのみ」ボタンのテキストも更新
+            updateFilterSafeButtonText();
         };
         // サブアクションボタンコンテナ
         const subActionsContainer = document.createElement('div');

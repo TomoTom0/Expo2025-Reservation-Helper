@@ -95,9 +95,16 @@ function toggleFABVisibility(): void {
 }
 
 function updateFABVisibility(): void {
+    // 入場予約FAB
     const fabContainer = document.getElementById('ytomo-fab-container');
     if (fabContainer) {
         fabContainer.style.display = fabVisibilityState.isVisible ? 'flex' : 'none';
+    }
+    
+    // パビリオン予約FAB
+    const pavilionFabContainer = document.getElementById('ytomo-pavilion-fab-container');
+    if (pavilionFabContainer) {
+        pavilionFabContainer.style.display = fabVisibilityState.isVisible ? 'flex' : 'none';
     }
 }
 
