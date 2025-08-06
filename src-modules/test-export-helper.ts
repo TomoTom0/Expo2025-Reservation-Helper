@@ -4,7 +4,7 @@
  */
 
 // 必要なモジュールをインポート
-import { multiTargetManager, timeSlotState } from './section2';
+import { timeSlotState } from './section2';
 import { generateUniqueTdSelector, getTdPositionInfo, findSameTdElement, extractTdStatus, timeSlotSelectors } from './section4';
 import { checkTimeSlotTableExistsSync, validatePageLoaded } from './section5';
 import { isInterruptionAllowed } from './section6';
@@ -13,7 +13,6 @@ import { checkVisitTimeButtonState, canStartReservation } from './section7';
 // CommonJS形式でエクスポート
 module.exports = {
     // Section 2からの状態オブジェクト
-    multiTargetManager,
     timeSlotState,
     
     // Section 4からの関数

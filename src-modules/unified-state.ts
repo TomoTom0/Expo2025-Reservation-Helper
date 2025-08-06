@@ -5,7 +5,6 @@
 
 // 必要なimport
 import { timeSlotSelectors, generateUniqueTdSelector, extractTdStatus } from './section4';
-import { multiTargetManager, entranceReservationState, timeSlotState } from './section2';
 import { getCurrentSelectedCalendarDate } from './section6';
 
 // ============================================================================
@@ -45,6 +44,13 @@ export interface ReservationTarget {
     isValid: boolean;
 }
 
+// 予約成功情報
+export interface ReservationSuccess {
+    timeSlot: string;        // '11:00-'
+    locationIndex: number;   // 0 or 1
+    successTime: Date;       // 成功時刻
+}
+
 // 監視対象（複数可能）
 export interface MonitoringTarget {
     timeSlot: string;        // '09:00-'
@@ -71,6 +77,11 @@ export class LocationHelper {
     
     // tdSelectorからindexを抽出
     static getIndexFromSelector(selector: string): number {
+        if (!selector || typeof selector !== 'string') {
+            console.warn('⚠️ LocationHelper.getIndexFromSelector: 無効なselector:', selector);
+            return 0; // デフォルトは東
+        }
+        
         const cellMatch = selector.match(/td:nth-child\((\d+)\)/);
         if (cellMatch && cellMatch[1]) {
             return parseInt(cellMatch[1]) - 1; // nth-childは1ベース、indexは0ベース
@@ -108,10 +119,16 @@ export class UnifiedStateManager {
     private reservationTarget: ReservationTarget | null = null;
     private monitoringTargets: MonitoringTarget[] = [];
     
+    // 予約成功情報
+    private reservationSuccess: ReservationSuccess | null = null;
+    
+    // 選択されたカレンダー日付
+    private selectedCalendarDate: string | null = null;
+    
     // 優先度設定
     private priorityMode: PriorityMode = PriorityMode.AUTO;
     
-    // デバッグフラグ
+    // デバッグフラグ（本番環境では詳細ログを抑制）
     private debugMode: boolean = true;
     
     // ============================================================================
@@ -202,6 +219,13 @@ export class UnifiedStateManager {
                this.reservationTarget.locationIndex === locationIndex;
     }
     
+    // 指定した時間帯・位置が現在の監視対象かどうかを判定
+    isMonitoringTarget(timeSlot: string, locationIndex: number): boolean {
+        return this.monitoringTargets.some(target => 
+            target.timeSlot === timeSlot && target.locationIndex === locationIndex
+        );
+    }
+    
     clearReservationTarget(): void {
         if (this.reservationTarget) {
             const info = LocationHelper.formatTargetInfo(
@@ -249,6 +273,9 @@ export class UnifiedStateManager {
         
         this.monitoringTargets.push(newTarget);
         this.log(`✅ 監視対象追加: ${LocationHelper.formatTargetInfo(timeSlot, locationIndex)} (優先度: ${newTarget.priority})`);
+        
+        // キャッシュに同期
+        this.syncToCache();
         return true;
     }
     
@@ -267,6 +294,9 @@ export class UnifiedStateManager {
             });
             
             this.log(`✅ 監視対象削除: ${LocationHelper.formatTargetInfo(timeSlot, locationIndex)} (残り: ${this.monitoringTargets.length})`);
+            
+            // キャッシュに同期
+            this.syncToCache();
             return true;
         }
         
@@ -277,6 +307,9 @@ export class UnifiedStateManager {
         const count = this.monitoringTargets.length;
         this.monitoringTargets = [];
         this.log(`🗑️ 全監視対象クリア (${count}個)`);
+        
+        // キャッシュに同期
+        this.syncToCache();
     }
     
     // ============================================================================
@@ -304,10 +337,12 @@ export class UnifiedStateManager {
             }
         }
         
-        // 4. 来場日時ボタンの有効性確認
+        // 4. 来場日時ボタンの有効性確認（一時的に緩和）
         const visitTimeButton = document.querySelector('button.basic-btn.type2.style_full__ptzZq') as HTMLButtonElement;
         if (!visitTimeButton || visitTimeButton.disabled) {
-            return false;
+            console.log(`⚠️ 来場日時ボタンが無効: exists=${!!visitTimeButton}, disabled=${visitTimeButton?.disabled}`);
+            // 時間帯選択直後は来場日時ボタンの更新が遅延することがあるため、一時的に許可
+            // return false;
         }
         
         // 5. カレンダー選択確認
@@ -320,7 +355,11 @@ export class UnifiedStateManager {
     }
     
     canStartMonitoring(): boolean {
-        return this.monitoringTargets.length > 0;
+        const result = this.monitoringTargets.length > 0;
+        if (!result) {
+            this.log(`❌ 監視開始不可: 監視対象数=${this.monitoringTargets.length}`);
+        }
+        return result;
     }
     
     canInterrupt(): boolean {
@@ -362,60 +401,11 @@ export class UnifiedStateManager {
     // 既存システムとの互換性
     // ============================================================================
     
-    // 既存のmultiTargetManagerから監視対象を移行
+    // 既存のmultiTargetManagerから監視対象を移行（現在は不要）
     migrateFromExisting(): void {
-        this.log('🔄 既存システムから状態を移行中...');
-        
-        // 監視対象の移行
-        const existingTargets = multiTargetManager.getTargets();
-        existingTargets.forEach((target, index) => {
-            const locationIndex = LocationHelper.getIndexFromSelector(target.tdSelector);
-            this.monitoringTargets.push({
-                timeSlot: target.timeText,
-                locationIndex,
-                selector: target.tdSelector,
-                priority: index + 1,
-                status: 'full'
-            });
-        });
-        
-        // 手動選択された予約対象を検出
-        const selectedSlot = document.querySelector(timeSlotSelectors.selectedSlot);
-        this.log(`🔍 選択されたスロット検索: セレクタ=${timeSlotSelectors.selectedSlot}, 結果=${selectedSlot ? 'あり' : 'なし'}`);
-        
-        if (selectedSlot) {
-            const tdElement = selectedSlot.closest('td[data-gray-out]') as HTMLTableCellElement;
-            if (tdElement) {
-                const timeText = this.extractTimeTextFromElement(selectedSlot);
-                const locationIndex = LocationHelper.getIndexFromElement(tdElement);
-                const selector = generateUniqueTdSelector(tdElement);
-                
-                this.log(`🔍 予約対象詳細: 時間=${timeText}, 位置=${locationIndex}, セレクタ=${selector}`);
-                
-                this.reservationTarget = {
-                    timeSlot: timeText,
-                    locationIndex,
-                    selector,
-                    isValid: true
-                };
-                
-                this.log(`✅ 予約対象設定完了: ${LocationHelper.formatTargetInfo(timeText, locationIndex)}`);
-            } else {
-                this.log('⚠️ 選択スロットのtd要素が見つからない');
-            }
-        } else {
-            this.log('🔍 現在選択されている時間帯なし');
-        }
-        
-        // 実行状態の移行
-        if (entranceReservationState.isRunning) {
-            this.executionState = ExecutionState.RESERVATION_RUNNING;
-        } else if (timeSlotState.isMonitoring) {
-            this.executionState = ExecutionState.MONITORING_RUNNING;
-        }
-        
-        this.log(`✅ 移行完了: 予約対象=${this.reservationTarget ? '1' : '0'}, 監視対象=${this.monitoringTargets.length}`);
+        this.log('🔄 既存システムから状態を移行中... (スキップ - 既にmultiTargetManagerは削除済み)');
     }
+    
     
     // ============================================================================
     // UI連携用メソッド
@@ -435,46 +425,77 @@ export class UnifiedStateManager {
     
     // FAB部分での予約対象情報表示用
     getFabTargetDisplayInfo(): { hasTarget: boolean; displayText: string; targetType: 'reservation' | 'monitoring' | 'none' } {
+        console.log(`[UnifiedState] getFabTargetDisplayInfo 呼び出し - 予約対象: ${this.hasReservationTarget()}, 監視対象: ${this.hasMonitoringTargets()}`);
+        // カレンダー選択日付を取得（MM/DD形式）
+        const getDisplayDate = (): string => {
+            if (this.selectedCalendarDate) {
+                // YYYY-MM-DD形式からMM/DD形式に変換
+                const parts = this.selectedCalendarDate.split('-');
+                if (parts.length === 3) {
+                    return `${parts[1]}/${parts[2]}`;
+                }
+            }
+            // フォールバック: 現在日付
+            const today = new Date();
+            const month = (today.getMonth() + 1).toString().padStart(2, '0');
+            const day = today.getDate().toString().padStart(2, '0');
+            return `${month}/${day}`;
+        };
+
+        // 予約成功がある場合は成功情報を最優先表示
+        if (this.hasReservationSuccess() && this.reservationSuccess) {
+            const location = LocationHelper.getLocationFromIndex(this.reservationSuccess.locationIndex);
+            const locationText = location === 'east' ? '東' : '西';
+            const dateText = getDisplayDate();
+            const displayText = `予約成功🎉(${dateText})\n${locationText}${this.reservationSuccess.timeSlot}`;
+            console.log(`[UnifiedState] FAB予約成功表示テキスト: "${displayText}"`);
+            return {
+                hasTarget: true,
+                displayText: displayText,
+                targetType: 'reservation'
+            };
+        }
+
         // 予約対象がある場合は予約情報を優先表示
         if (this.hasReservationTarget() && this.reservationTarget) {
             const location = LocationHelper.getLocationFromIndex(this.reservationTarget.locationIndex);
             const locationText = location === 'east' ? '東' : '西';
+            const dateText = getDisplayDate();
+            const displayText = `予約対象(${dateText})\n${locationText}${this.reservationTarget.timeSlot}`;
+            console.log(`[UnifiedState] FAB予約対象表示テキスト: "${displayText}"`);
             return {
                 hasTarget: true,
-                displayText: `${locationText}${this.reservationTarget.timeSlot}`,
+                displayText: displayText,
                 targetType: 'reservation'
             };
         }
         
         // 監視対象がある場合は監視対象を表示
         if (this.hasMonitoringTargets() && this.monitoringTargets.length > 0) {
+            console.log(`[UnifiedState] getFabTargetDisplayInfo: 監視対象数=${this.monitoringTargets.length}`);
+            console.log(`[UnifiedState] 監視対象詳細:`, this.monitoringTargets);
+            
             // 優先度順にソート（priority昇順）
             const sortedTargets = [...this.monitoringTargets].sort((a, b) => a.priority - b.priority);
+            const dateText = getDisplayDate();
             
-            if (this.monitoringTargets.length === 1) {
-                // 単一の監視対象の場合
-                const target = sortedTargets[0];
+            // 監視対象の表示（1件でも複数件でも統一形式）
+            const targetTexts = sortedTargets.map(target => {
                 const location = LocationHelper.getLocationFromIndex(target.locationIndex);
                 const locationText = location === 'east' ? '東' : '西';
-                return {
-                    hasTarget: true,
-                    displayText: `${locationText}${target.timeSlot}`,
-                    targetType: 'monitoring'
-                };
-            } else {
-                // 複数の監視対象の場合 - 改行で表示
-                const targetTexts = sortedTargets.map(target => {
-                    const location = LocationHelper.getLocationFromIndex(target.locationIndex);
-                    const locationText = location === 'east' ? '東' : '西';
-                    return `${locationText}${target.timeSlot}`;
-                });
-                
-                return {
-                    hasTarget: true,
-                    displayText: targetTexts.join('\n'),
-                    targetType: 'monitoring'
-                };
-            }
+                const result = `${locationText}${target.timeSlot}`;
+                console.log(`[UnifiedState] 監視対象→表示: ${JSON.stringify(target)} → "${result}"`);
+                return result;
+            });
+            
+            console.log(`[UnifiedState] targetTexts配列:`, targetTexts);
+            const displayText = `監視対象(${dateText})\n${targetTexts.join('\n')}`;
+            console.log(`[UnifiedState] FAB表示テキスト: "${displayText}"`);
+            return {
+                hasTarget: true,
+                displayText: displayText,
+                targetType: 'monitoring'
+            };
         }
         
         return {
@@ -524,6 +545,61 @@ export class UnifiedStateManager {
         return this.monitoringTargets.length;
     }
     
+    // 全ての対象をクリア（監視・予約両方）
+    clearAllTargets(): void {
+        const reservationCount = this.reservationTarget ? 1 : 0;
+        const monitoringCount = this.monitoringTargets.length;
+        
+        this.reservationTarget = null;
+        this.monitoringTargets = [];
+        
+        this.log(`🗑️ 全対象クリア - 予約: ${reservationCount}個, 監視: ${monitoringCount}個`);
+    }
+    
+    // カレンダー日付の設定・取得
+    setSelectedCalendarDate(date: string): void {
+        this.selectedCalendarDate = date;
+        this.log(`📅 カレンダー日付設定: ${date}`);
+    }
+    
+    getSelectedCalendarDate(): string | null {
+        return this.selectedCalendarDate;
+    }
+    
+    // 予約成功情報の設定・取得
+    setReservationSuccess(timeSlot: string, locationIndex: number): void {
+        this.reservationSuccess = {
+            timeSlot,
+            locationIndex,
+            successTime: new Date()
+        };
+        this.log(`🎉 予約成功情報設定: ${LocationHelper.formatTargetInfo(timeSlot, locationIndex)}`);
+        
+        // 成功時は予約対象と監視対象をクリア
+        this.reservationTarget = null;
+        this.monitoringTargets = [];
+        this.log(`✅ 予約成功により対象をクリア`);
+    }
+    
+    getReservationSuccess(): ReservationSuccess | null {
+        return this.reservationSuccess;
+    }
+    
+    hasReservationSuccess(): boolean {
+        return this.reservationSuccess !== null;
+    }
+    
+    clearReservationSuccess(): void {
+        if (this.reservationSuccess) {
+            const info = LocationHelper.formatTargetInfo(
+                this.reservationSuccess.timeSlot, 
+                this.reservationSuccess.locationIndex
+            );
+            this.reservationSuccess = null;
+            this.log(`🗑️ 予約成功情報クリア: ${info}`);
+        }
+    }
+    
     // ============================================================================
     // デバッグ・ログ
     // ============================================================================
@@ -534,10 +610,28 @@ export class UnifiedStateManager {
         }
     }
     
-    // DOM要素から時間テキストを抽出
-    private extractTimeTextFromElement(element: Element): string {
-        const timeSpan = element.querySelector('dt span');
-        return timeSpan?.textContent?.trim() || 'unknown';
+    
+    // キャッシュ同期
+    private syncToCache(): void {
+        try {
+            // cacheManagerが利用可能な場合のみ同期
+            if (typeof window !== 'undefined' && (window as any).cacheManager) {
+                const cacheManager = (window as any).cacheManager;
+                
+                // 現在の監視対象をキャッシュに保存
+                const cacheData = this.monitoringTargets.map(target => ({
+                    timeText: target.timeSlot,
+                    tdSelector: target.selector,
+                    locationIndex: target.locationIndex,
+                    priority: target.priority
+                }));
+                
+                cacheManager.saveTargetSlots(cacheData);
+                this.log(`🔄 キャッシュ同期完了: ${cacheData.length}個の監視対象`);
+            }
+        } catch (error) {
+            console.warn('⚠️ キャッシュ同期に失敗:', error);
+        }
     }
     
     // デバッグ情報の出力

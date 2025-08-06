@@ -18,6 +18,11 @@ export interface ReservationTarget {
     selector: string;
     isValid: boolean;
 }
+export interface ReservationSuccess {
+    timeSlot: string;
+    locationIndex: number;
+    successTime: Date;
+}
 export interface MonitoringTarget {
     timeSlot: string;
     locationIndex: number;
@@ -37,6 +42,8 @@ export declare class UnifiedStateManager {
     private executionState;
     private reservationTarget;
     private monitoringTargets;
+    private reservationSuccess;
+    private selectedCalendarDate;
     private priorityMode;
     private debugMode;
     getExecutionState(): ExecutionState;
@@ -45,6 +52,7 @@ export declare class UnifiedStateManager {
     stop(): void;
     setReservationTarget(timeSlot: string, locationIndex: number, selector?: string): void;
     isReservationTarget(timeSlot: string, locationIndex: number): boolean;
+    isMonitoringTarget(timeSlot: string, locationIndex: number): boolean;
     clearReservationTarget(): void;
     addMonitoringTarget(timeSlot: string, locationIndex: number, selector: string): boolean;
     removeMonitoringTarget(timeSlot: string, locationIndex: number): boolean;
@@ -67,7 +75,14 @@ export declare class UnifiedStateManager {
     hasReservationTarget(): boolean;
     hasMonitoringTargets(): boolean;
     getMonitoringTargetCount(): number;
+    clearAllTargets(): void;
+    setSelectedCalendarDate(date: string): void;
+    getSelectedCalendarDate(): string | null;
+    setReservationSuccess(timeSlot: string, locationIndex: number): void;
+    getReservationSuccess(): ReservationSuccess | null;
+    hasReservationSuccess(): boolean;
+    clearReservationSuccess(): void;
     private log;
-    private extractTimeTextFromElement;
+    private syncToCache;
     debugInfo(): void;
 }

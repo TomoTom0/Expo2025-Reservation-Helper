@@ -10,5 +10,6 @@ declare function checkInitialState(): void;
 declare function startCalendarWatcher(): void;
 declare function handleCalendarChange(): void;
 declare function removeAllMonitorButtons(): void;
+declare function waitForTimeSlotTable(callback: () => void): void;
 declare function entranceReservationHelper(config: ReservationConfig): Promise<ReservationResult>;
-export { createEntranceReservationUI, updateMonitoringTargetsDisplay, getCurrentReservationTarget, checkVisitTimeButtonState, checkTimeSlotSelected, canStartReservation, checkInitialState, startCalendarWatcher, handleCalendarChange, removeAllMonitorButtons, entranceReservationHelper };
+export { createEntranceReservationUI, updateMonitoringTargetsDisplay, getCurrentReservationTarget, checkVisitTimeButtonState, checkTimeSlotSelected, canStartReservation, checkInitialState, startCalendarWatcher, handleCalendarChange, removeAllMonitorButtons, waitForTimeSlotTable, entranceReservationHelper };

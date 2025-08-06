@@ -1,12 +1,10 @@
 // Section 2からのimport
 import {
-    multiTargetManager,
-    timeSlotState,
-    reloadCountdownState
+    timeSlotState
 } from './section2';
 
 // 統一状態管理システムからのimport
-import { LocationHelper } from './unified-state';
+import { LocationHelper, ExecutionState } from './unified-state';
 
 // Section 4からのimport
 import {
@@ -43,7 +41,6 @@ const REQUIRED_FUNCTIONS: string[] = [
     'disableAllMonitorButtons',
     'selectTimeSlotAndStartReservation',
     'startReloadCountdown',
-    'reloadCountdownState',
     'resetMonitoringUI',
     'showErrorMessage',
     'tryClickCalendarForTimeSlot',
@@ -323,7 +320,9 @@ function analyzeAndAddMonitorButtons(): void {
         const tdSelector = tdElement ? generateUniqueTdSelector(tdElement) : '';
         
         // 監視対象として設定済みの場合は削除しない（状態変化を追跡するため）
-        const isMonitoringTarget = multiTargetManager.isSelected(timeText, tdSelector);
+        const unifiedStateManager = getExternalFunction('unifiedStateManager');
+        const locationIndex = LocationHelper.getIndexFromSelector(tdSelector);
+        const isMonitoringTarget = unifiedStateManager?.isMonitoringTarget(timeText, locationIndex) || false;
         
         if (isMonitoringTarget) {
             console.log(`🎯 監視対象のため保持: ${timeText} (状態変化を追跡中)`);
@@ -515,13 +514,15 @@ function getMonitorButtonText(slotInfo: TimeSlotInfo): string {
     const tdSelector = generateUniqueTdSelector(tdElement);
     
     // 既に監視対象として選択されているかチェック
-    const isSelected = multiTargetManager.isSelected(slotInfo.timeText, tdSelector);
+    const unifiedStateManager = getExternalFunction('unifiedStateManager');
+    const locationIndex = LocationHelper.getIndexFromSelector(tdSelector);
+    const isSelected = unifiedStateManager?.isMonitoringTarget(slotInfo.timeText, locationIndex) || false;
     
     if (isSelected) {
         // 監視対象リストでの位置を取得（1ベース）
-        const targets = multiTargetManager.getTargets();
+        const targets = unifiedStateManager?.getMonitoringTargets() || [];
         const targetIndex = targets.findIndex(
-            target => target.timeText === slotInfo.timeText && target.tdSelector === tdSelector
+            (target: any) => target.timeSlot === slotInfo.timeText && target.locationIndex === locationIndex
         );
         
         if (targetIndex >= 0) {
@@ -536,7 +537,8 @@ function getMonitorButtonText(slotInfo: TimeSlotInfo): string {
 // すべての監視ボタンの優先順位を更新
 function updateAllMonitorButtonPriorities(): void {
     const allMonitorButtons = document.querySelectorAll('.monitor-btn');
-    const targets = multiTargetManager.getTargets();
+    const unifiedStateManager = getExternalFunction('unifiedStateManager');
+    const targets = unifiedStateManager?.getMonitoringTargets() || [];
     
     allMonitorButtons.forEach(button => {
         const span = button.querySelector('span') as HTMLSpanElement;
@@ -549,8 +551,9 @@ function updateAllMonitorButtonPriorities(): void {
                 const tdSelector = generateUniqueTdSelector(tdElement);
                 
                 // 監視対象リストでの位置を検索
+                const locationIndex = LocationHelper.getIndexFromSelector(tdSelector);
                 const targetIndex = targets.findIndex(
-                    target => target.timeText === timeText && target.tdSelector === tdSelector
+                    (target: any) => target.timeSlot === timeText && target.locationIndex === locationIndex
                 );
                 
                 if (targetIndex >= 0) {
@@ -637,8 +640,10 @@ function createMonitorButton(slotInfo: TimeSlotInfo): void {
         
         const tdElement = slotInfo.element.closest('td[data-gray-out]') as HTMLTableCellElement;
         const tdSelector = generateUniqueTdSelector(tdElement);
-        const location = multiTargetManager.getLocationFromSelector(tdSelector);
-        console.log(`🖱️ 監視ボタンクリック検出: ${location}${slotInfo.timeText}`);
+        const locationIndex = LocationHelper.getIndexFromSelector(tdSelector);
+        const location = LocationHelper.getLocationFromIndex(locationIndex);
+        const locationText = location === 'east' ? '東' : '西';
+        console.log(`🖱️ 監視ボタンクリック検出: ${locationText}${slotInfo.timeText}`);
         
         // ボタン要素の確認
         const span = monitorButton.querySelector('span') as HTMLSpanElement;
@@ -677,8 +682,10 @@ function createMonitorButton(slotInfo: TimeSlotInfo): void {
 function handleMonitorButtonClick(slotInfo: TimeSlotInfo, buttonElement: HTMLButtonElement): void {
     const tdElement = slotInfo.element.closest('td[data-gray-out]') as HTMLTableCellElement;
     const tdSelector = generateUniqueTdSelector(tdElement);
-    const location = multiTargetManager.getLocationFromSelector(tdSelector);
-    console.log(`監視ボタンがクリックされました: ${location}${slotInfo.timeText}`);
+    const locationIndex = LocationHelper.getIndexFromSelector(tdSelector);
+    const location = LocationHelper.getLocationFromIndex(locationIndex);
+    const locationText = location === 'east' ? '東' : '西';
+    console.log(`監視ボタンがクリックされました: ${locationText}${slotInfo.timeText}`);
     
     // 監視実行中は操作不可
     if (timeSlotState.isMonitoring) {
@@ -694,21 +701,16 @@ function handleMonitorButtonClick(slotInfo: TimeSlotInfo, buttonElement: HTMLBut
     
     if (isCurrentlySelected) {
         // 現在選択中の場合は解除
-        console.log(`監視対象を解除します: ${location}${slotInfo.timeText}`);
+        console.log(`監視対象を解除します: ${locationText}${slotInfo.timeText}`);
         
-        // 複数対象管理から削除（時間+位置で特定）
-        multiTargetManager.removeTarget(slotInfo.timeText, tdSelector);
-        
-        // 統一状態管理システムからも削除
+        // 統一状態管理システムから削除
         const unifiedStateManager = getExternalFunction('unifiedStateManager');
         if (unifiedStateManager) {
-            const locationIndex = LocationHelper.getIndexFromSelector(tdSelector);
-            
             const unifiedRemoved = unifiedStateManager.removeMonitoringTarget(slotInfo.timeText, locationIndex);
             if (unifiedRemoved) {
-                console.log(`✅ 統一状態管理からも監視対象を削除: ${location}${slotInfo.timeText}`);
+                console.log(`✅ 統一状態管理から監視対象を削除: ${locationText}${slotInfo.timeText}`);
             } else {
-                console.log(`⚠️ 統一状態管理からの削除失敗: ${location}${slotInfo.timeText}`);
+                console.log(`⚠️ 統一状態管理からの削除失敗: ${locationText}${slotInfo.timeText}`);
             }
         } else {
             console.log('⚠️ 統一状態管理システムが利用できません');
@@ -722,7 +724,7 @@ function handleMonitorButtonClick(slotInfo: TimeSlotInfo, buttonElement: HTMLBut
         buttonElement.disabled = false;
         
         // 監視対象がすべてなくなった場合の処理
-        if (!multiTargetManager.hasTargets()) {
+        if (!unifiedStateManager || !unifiedStateManager.hasMonitoringTargets()) {
             timeSlotState.mode = 'idle';
             timeSlotState.retryCount = 0;
             
@@ -750,10 +752,10 @@ function handleMonitorButtonClick(slotInfo: TimeSlotInfo, buttonElement: HTMLBut
         // 監視対象表示も更新
         safeCall('updateMonitoringTargetsDisplay');
         
-        console.log(`✅ 監視対象を解除しました: ${location}${slotInfo.timeText}`);
+        console.log(`✅ 監視対象を解除しました: ${locationText}${slotInfo.timeText}`);
     } else {
         // 現在未選択の場合は選択
-        console.log(`監視対象を追加します: ${location}${slotInfo.timeText}`);
+        console.log(`監視対象を追加します: ${locationText}${slotInfo.timeText}`);
         
         // 選択状態を設定（td要素の一意特定情報を追加）
         // TypeScript用の変数（削除予定）
@@ -768,12 +770,11 @@ function handleMonitorButtonClick(slotInfo: TimeSlotInfo, buttonElement: HTMLBut
         const unifiedStateManager = getExternalFunction('unifiedStateManager');
         let added = false;
         if (unifiedStateManager) {
-            const locationIndex = LocationHelper.getIndexFromSelector(tdSelector);
             added = unifiedStateManager.addMonitoringTarget(slotInfo.timeText, locationIndex, tdSelector);
             if (added) {
-                console.log(`✅ 統一状態管理に監視対象を追加: ${location}${slotInfo.timeText}`);
+                console.log(`✅ 統一状態管理に監視対象を追加: ${locationText}${slotInfo.timeText}`);
             } else {
-                console.log(`⚠️ 統一状態管理への追加失敗（既に選択済み）: ${location}${slotInfo.timeText}`);
+                console.log(`⚠️ 統一状態管理への追加失敗（既に選択済み）: ${locationText}${slotInfo.timeText}`);
                 return;
             }
         } else {
@@ -807,8 +808,10 @@ function handleMonitorButtonClick(slotInfo: TimeSlotInfo, buttonElement: HTMLBut
         
         // メインボタンの表示を更新
         if (unifiedStateManager) {
-            const targetCount = unifiedStateManager.getMonitoringTargets().length;
+            const targets = unifiedStateManager.getMonitoringTargets();
+            const targetCount = targets.length;
             console.log(`🔄 監視対象設定後のFAB更新を実行: targetSlots=${targetCount}個, mode=${timeSlotState.mode}`);
+            console.log('📊 統一状態管理の監視対象一覧:', targets.map((t: any) => `${LocationHelper.getLocationFromIndex(t.locationIndex) === 'east' ? '東' : '西'}${t.timeSlot}`));
         }
         safeCall('updateMainButtonDisplay');
         
@@ -821,13 +824,14 @@ function handleMonitorButtonClick(slotInfo: TimeSlotInfo, buttonElement: HTMLBut
             console.log(`🔍 FAB更新後の状態: disabled=${fabButton?.disabled}, hasDisabledAttr=${fabButton?.hasAttribute('disabled')}, text="${fabButton?.textContent?.trim()}"`);
         }, 100);
         
-        console.log(`✅ 時間帯 ${location}${slotInfo.timeText} を監視対象に設定しました`);
+        console.log(`✅ 時間帯 ${locationText}${slotInfo.timeText} を監視対象に設定しました`);
     }
 }
 
 // 満員時間帯の可用性監視を開始
 async function startSlotMonitoring(): Promise<void> {
-    if (!multiTargetManager.hasTargets()) {
+    const unifiedStateManager = getExternalFunction('unifiedStateManager');
+    if (!unifiedStateManager || !unifiedStateManager.hasMonitoringTargets()) {
         console.log('❌ 監視対象時間帯が設定されていません');
         return;
     }
@@ -835,24 +839,29 @@ async function startSlotMonitoring(): Promise<void> {
     // 即座に状態更新（UI応答性向上）
     timeSlotState.mode = 'monitoring';
     timeSlotState.isMonitoring = true;
+    
+    // 統一状態管理で監視開始
+    if (unifiedStateManager.startMonitoring()) {
+        console.log('✅ 統一状態管理で監視を開始しました');
+    } else {
+        console.log('⚠️ 統一状態管理での監視開始に失敗しました (状態確認が必要)');
+    }
+    
     safeCall('updateMainButtonDisplay'); // 即座にボタン表示を更新
     
     // 監視実行中は全ての監視ボタンを無効化
     safeCall('disableAllMonitorButtons');
     
-    const targetCount = multiTargetManager.getCount();
-    const targetTexts = multiTargetManager.getTargets().map(t => {
-        const location = multiTargetManager.getLocationFromSelector(t.tdSelector);
-        return `${location}${t.timeText}`;
+    const targets = unifiedStateManager.getMonitoringTargets();
+    const targetTexts = targets.map((t: any) => {
+        const location = LocationHelper.getLocationFromIndex(t.locationIndex);
+        const locationText = location === 'east' ? '東' : '西';
+        return `${locationText}${t.timeSlot}`;
     }).join(', ');
-    console.log(`🔄 時間帯監視を開始: ${targetTexts} (${targetCount}個)`);
+    console.log(`🔄 時間帯監視を開始: ${targetTexts} (${targets.length}個)`);
     
-    // 定期的な可用性チェック
-    timeSlotState.monitoringInterval = window.setInterval(async () => {
-        await checkSlotAvailabilityAndReload();
-    }, timeSlotState.reloadInterval + Math.random() * 5000); // ランダム性追加
-    
-    // 即座に一回チェック（短縮）
+    // 監視は一回のチェック→リロード→新しいページで再開のサイクル
+    // 定期インターバルは不要（リロード間隔と同じため無意味）
     setTimeout(() => {
         checkSlotAvailabilityAndReload();
     }, 500);
@@ -860,7 +869,8 @@ async function startSlotMonitoring(): Promise<void> {
 
 // 時間帯の可用性チェックとページ再読み込み
 async function checkSlotAvailabilityAndReload(): Promise<void> {
-    if (!timeSlotState.isMonitoring || !multiTargetManager.hasTargets()) {
+    const unifiedStateManager = getExternalFunction('unifiedStateManager');
+    if (!unifiedStateManager || unifiedStateManager.getExecutionState() !== ExecutionState.MONITORING_RUNNING) {
         return;
     }
     
@@ -869,9 +879,9 @@ async function checkSlotAvailabilityAndReload(): Promise<void> {
     if (!(await checkTimeSlotTableExistsAsync())) return;
     
     // 複数監視対象の存在チェック
-    const targets = multiTargetManager.getTargets();
+    const targets = unifiedStateManager.getMonitoringTargets();
     for (const target of targets) {
-        if (!checkTargetElementExists(target)) return;
+        if (!checkMonitoringTargetExists(target)) return;
     }
     if (!checkMaxReloads(timeSlotState.retryCount)) return;
     
@@ -880,17 +890,18 @@ async function checkSlotAvailabilityAndReload(): Promise<void> {
         cacheManager.updateRetryCount(timeSlotState.retryCount);
     }
     
-    const targetTexts = targets.map(t => t.timeText).join(', ');
+    const targetTexts = targets.map((t: any) => t.timeSlot).join(', ');
     console.log(`🔍 可用性チェック (${timeSlotState.retryCount}回目): ${targetTexts}`);
     
     // 現在の時間帯をチェック
-    const currentSlot = findTargetSlotInPage();
+    const currentSlot = findTargetSlotInPageUnified();
     
     console.log(`📊 監視チェック結果: currentSlot=${!!currentSlot}, status=${currentSlot?.status}`);
     
     if (currentSlot && currentSlot.status === 'available') {
-        const location = multiTargetManager.getLocationFromSelector(currentSlot.targetInfo.tdSelector);
-        console.log(`🎉🎉 対象時間帯が利用可能になりました！: ${location}${currentSlot.targetInfo.timeText}`);
+        const location = LocationHelper.getLocationFromIndex(currentSlot.targetInfo.locationIndex);
+        const locationText = location === 'east' ? '東' : '西';
+        console.log(`🎉🎉 対象時間帯が利用可能になりました！: ${locationText}${currentSlot.targetInfo.timeSlot}`);
         console.log(`  → 監視を終了し、自動選択+予約を開始します`);
         
         // ボタン表示を更新（見つかりましたモード）
@@ -904,45 +915,54 @@ async function checkSlotAvailabilityAndReload(): Promise<void> {
     // まだ満員の場合はページリロード
     console.log('⏳ すべての監視対象がまだ満員です。ページを再読み込みします...');
     
-    // リロード前に監視継続フラグを設定
-    const flagTimestamp = Date.now();
-    if (cacheManager) {
-        cacheManager.setMonitoringFlag(true);
-    }
-    console.log(`🏃 監視継続フラグ設定時刻: ${new Date(flagTimestamp).toLocaleTimeString()}`);
-    
     // BAN対策：設定されたリロード間隔にランダム要素を追加
     const baseInterval = timeSlotState.reloadInterval; // 30000ms (30秒)
     const randomVariation = Math.random() * 5000; // 0-5秒のランダム要素
     const totalWaitTime = baseInterval + randomVariation;
     const displaySeconds = Math.ceil(totalWaitTime / 1000);
     
-    // カウントダウン開始（即座にUI更新）
-    safeCall('startReloadCountdown', displaySeconds);
-    
-    // リロードタイマーを保存（中断時に停止するため）
-    reloadCountdownState.reloadTimer = window.setTimeout(() => {
-        console.log('🔄 監視継続のためページをリロードします...');
-        // カウントダウンを停止してからリロード実行
-        safeCall('stopReloadCountdown');
-        window.location.reload();
-    }, totalWaitTime) as any;
+    // カウントダウンとリロードを統一実行
+    safeCall('scheduleReload', displaySeconds);
 }
 
-// ページ内で対象時間帯を検索（複数対象の状態変化をチェック）
-function findTargetSlotInPage(): any {
-    const targets = multiTargetManager.getTargets();
-    if (targets.length === 0) return null;
+
+// 統一状態管理対応版の監視対象検索関数
+function findTargetSlotInPageUnified(): any {
+    const unifiedStateManager = getExternalFunction('unifiedStateManager');
+    if (!unifiedStateManager || !unifiedStateManager.hasMonitoringTargets()) {
+        return null;
+    }
+    
+    const targets = unifiedStateManager.getMonitoringTargets();
     
     // 複数監視対象をチェック
     for (const target of targets) {
-        // 監視開始時に保存した要素特定情報を使用して同一td要素を検索
-        const targetTd = findSameTdElement(target);
+        // selectorが保存されている場合はそれを使用、ない場合は検索
+        let targetTd: HTMLTableCellElement | null = null;
+        if (target.selector) {
+            targetTd = document.querySelector(target.selector) as HTMLTableCellElement;
+        } else {
+            // selectorがない場合は、時間帯とlocationIndexから要素を検索
+            const timeElements = document.querySelectorAll('.time-text');
+            for (const timeEl of timeElements) {
+                if (timeEl.textContent?.includes(target.timeSlot)) {
+                    const tdElement = timeEl.closest('td[data-gray-out]') as HTMLTableCellElement;
+                    if (tdElement) {
+                        const elementIndex = LocationHelper.getIndexFromElement(tdElement);
+                        if (elementIndex === target.locationIndex) {
+                            targetTd = tdElement;
+                            break;
+                        }
+                    }
+                }
+            }
+        }
         
         if (targetTd) {
             // 同一td要素の現在の状態を取得
             const currentStatus = extractTdStatus(targetTd);
-            const location = multiTargetManager.getLocationFromSelector(target.tdSelector);
+            const location = LocationHelper.getLocationFromIndex(target.locationIndex);
+            const locationText = location === 'east' ? '東' : '西';
             
             // 詳細なデバッグ情報を出力
             const buttonElement = targetTd.querySelector('div[role="button"]');
@@ -951,25 +971,26 @@ function findTargetSlotInPage(): any {
             const lowIcon = buttonElement?.querySelector('img[src*="ico_scale_low.svg"]');
             const highIcon = buttonElement?.querySelector('img[src*="ico_scale_high.svg"]');
             
-            console.log(`🔍 監視対象要素を発見: ${location}${target.timeText}`);
+            console.log(`🔍 監視対象要素を発見: ${locationText}${target.timeSlot}`);
             console.log(`  - 現在状態: isAvailable=${currentStatus?.isAvailable}, isFull=${currentStatus?.isFull}`);
             console.log(`  - data-disabled: ${dataDisabled}`);
             console.log(`  - 満員アイコン: ${!!fullIcon}, 低混雑: ${!!lowIcon}, 高空き: ${!!highIcon}`);
             
             // 利用可能になったかチェック
             if (currentStatus && currentStatus.isAvailable) {
-                console.log(`🎉 監視対象要素が利用可能になりました！: ${location}${target.timeText}`);
+                console.log(`🎉 監視対象要素が利用可能になりました！: ${locationText}${target.timeSlot}`);
                 console.log(`  → 監視を終了して自動選択を開始します`);
                 return { ...currentStatus, targetInfo: target, status: 'available' };
             } else if (currentStatus && currentStatus.isFull) {
-                console.log(`⏳ 監視対象要素はまだ満員: ${location}${target.timeText}`);
+                console.log(`⏳ 監視対象要素はまだ満員: ${locationText}${target.timeSlot}`);
             } else {
-                console.log(`❓ 監視対象要素の状態が不明: ${location}${target.timeText} (isAvailable: ${currentStatus?.isAvailable}, isFull: ${currentStatus?.isFull})`);
+                console.log(`❓ 監視対象要素の状態が不明: ${locationText}${target.timeSlot} (isAvailable: ${currentStatus?.isAvailable}, isFull: ${currentStatus?.isFull})`);
             }
         } else {
             // 要素が見つからない場合
-            const location = multiTargetManager.getLocationFromSelector(target.tdSelector);
-            console.log(`❌ 監視対象要素が見つかりません: ${location}${target.timeText}`);
+            const location = LocationHelper.getLocationFromIndex(target.locationIndex);
+            const locationText = location === 'east' ? '東' : '西';
+            console.log(`❌ 監視対象要素が見つかりません: ${locationText}${target.timeSlot}`);
         }
     }
     
@@ -1004,7 +1025,19 @@ function terminateMonitoring(errorCode: string, errorMessage: string): void {
     // 状態初期化
     timeSlotState.mode = 'idle';
     timeSlotState.isMonitoring = false;
-    multiTargetManager.clearAll();
+    
+    // 統一状態管理で監視停止
+    const unifiedStateManager = getExternalFunction('unifiedStateManager');
+    if (unifiedStateManager) {
+        unifiedStateManager.stop();
+        console.log('🛑 統一状態管理で監視を停止しました');
+    }
+    
+    // 統一状態管理をクリア
+    if (unifiedStateManager) {
+        unifiedStateManager.clearAllTargets();
+    }
+    
     timeSlotState.retryCount = 0;
 }
 
@@ -1014,6 +1047,23 @@ function checkTargetElementExists(targetInfo: TimeSlotTarget): boolean {
     if (!element) {
         terminateMonitoring('ERROR_TARGET_NOT_FOUND', 
             `監視対象の時間帯 ${targetInfo.timeText} が見つかりません`);
+        return false;
+    }
+    return true;
+}
+
+// 統一状態管理用の監視対象存在チェック
+function checkMonitoringTargetExists(target: any): boolean {
+    // MonitoringTargetをTimeSlotTarget形式に変換
+    const targetInfo = {
+        timeText: target.timeSlot,
+        tdSelector: target.selector
+    };
+    
+    const element = findSameTdElement(targetInfo);
+    if (!element) {
+        terminateMonitoring('ERROR_TARGET_NOT_FOUND', 
+            `監視対象の時間帯 ${target.timeSlot} が見つかりません`);
         return false;
     }
     return true;
@@ -1086,9 +1136,10 @@ export {
     handleMonitorButtonClick,
     startSlotMonitoring,
     checkSlotAvailabilityAndReload,
-    findTargetSlotInPage,
+    findTargetSlotInPageUnified,
     terminateMonitoring,
     checkTargetElementExists,
+    checkMonitoringTargetExists,
     checkTimeSlotTableExistsAsync,
     validatePageLoaded,
     checkMaxReloads

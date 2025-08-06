@@ -1,8 +1,12 @@
 // Section 2からのimport
-import { multiTargetManager, timeSlotState } from './section2';
+import { timeSlotState } from './section2';
+
+
+// getExternalFunctionのimport（section5から）
+import { getExternalFunction } from './section5';
 
 // 型定義のインポート
-import type { CacheManager, Dependencies, TimeSlotTarget } from '../types/index.js';
+import type { CacheManager, Dependencies } from '../types/index.js';
 
 // ============================================================================
 // キャッシュ管理機能
@@ -20,18 +24,22 @@ return {
     // 複数監視対象を保存
     saveTargetSlots(): void {
         try {
-            const targets = multiTargetManager.getTargets();
+            const unifiedStateManager = getExternalFunction('unifiedStateManager');
+            if (!unifiedStateManager) return;
+            
+            const targets = unifiedStateManager.getMonitoringTargets();
             if (targets.length === 0) return;
             
             // 現在選択されているカレンダー日付を取得
             const selectedCalendarDate = getCurrentSelectedCalendarDateFn ? getCurrentSelectedCalendarDateFn() : null;
             
             const data = {
-                targets: targets.map((target: TimeSlotTarget) => ({
-                    timeText: target.timeText,
-                    tdSelector: target.tdSelector,
-                    positionInfo: target.positionInfo,
-                    status: target.status
+                targets: targets.map((target: any) => ({
+                    timeText: target.timeSlot,
+                    tdSelector: target.selector,
+                    positionInfo: target.positionInfo || {},
+                    status: target.status || 'unknown',
+                    locationIndex: target.locationIndex
                 })),
                 selectedDate: selectedCalendarDate,
                 timestamp: Date.now(),
@@ -40,7 +48,7 @@ return {
             };
             
             localStorage.setItem(this.generateKey('target_slots'), JSON.stringify(data));
-            const targetTexts = targets.map((t: TimeSlotTarget) => t.timeText).join(', ');
+            const targetTexts = targets.map((t: any) => t.timeSlot).join(', ');
             console.log(`✅ 複数監視対象をキャッシュに保存: ${targetTexts} (${targets.length}個)`);
         } catch (error) {
             console.error('❌ 複数監視対象保存エラー:', error);
@@ -144,8 +152,15 @@ return {
                 isMonitoring: isActive,
                 timestamp: Date.now()
             };
-            localStorage.setItem(this.generateKey('monitoring_flag'), JSON.stringify(data));
+            const key = 'expo2025_monitoring_flag';
+            localStorage.setItem(key, JSON.stringify(data));
             console.log(`🏃 監視継続フラグを設定: ${isActive}`);
+            console.log(`🔑 フラグ保存キー: ${key}`);
+            console.log(`💾 フラグ保存データ: ${JSON.stringify(data)}`);
+            
+            // 保存確認
+            const saved = localStorage.getItem(key);
+            console.log(`✅ フラグ保存確認: ${saved ? '成功' : '失敗'}`);
         } catch (error) {
             console.error('❌ 監視フラグ設定エラー:', error);
         }
@@ -154,8 +169,15 @@ return {
     // 監視継続フラグを取得し、即座にfalseに設定（暴走防止）
     getAndClearMonitoringFlag(): boolean {
         try {
-            const data = localStorage.getItem(this.generateKey('monitoring_flag'));
-            if (!data) return false;
+            const key = 'expo2025_monitoring_flag';
+            const data = localStorage.getItem(key);
+            console.log(`🔑 フラグ取得キー: ${key}`);
+            console.log(`📥 フラグ取得データ: ${data || 'null'}`);
+            
+            if (!data) {
+                console.log('❌ 監視継続フラグが見つかりません');
+                return false;
+            }
             
             const parsed = JSON.parse(data);
             // 60秒以内のフラグのみ有効（リロード直後でないと無効）
@@ -179,7 +201,7 @@ return {
     // 監視継続フラグをクリア
     clearMonitoringFlag(): void {
         try {
-            localStorage.removeItem(this.generateKey('monitoring_flag'));
+            localStorage.removeItem('expo2025_monitoring_flag');
             console.log('🗑️ 監視継続フラグをクリア');
         } catch (error) {
             console.error('❌ 監視フラグクリアエラー:', error);

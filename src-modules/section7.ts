@@ -8,7 +8,6 @@ import {
 
 // Section 2からのimport
 import { 
-    multiTargetManager, 
     entranceReservationState, 
     timeSlotState,
     calendarWatchState
@@ -102,6 +101,7 @@ function createEntranceReservationUI(config: ReservationConfig): void {
         pointer-events: auto !important;
     `;
 
+
     // メインFABボタンを作成
     const fabButton = document.createElement('button');
     fabButton.id = 'ytomo-main-fab';
@@ -119,6 +119,9 @@ function createEntranceReservationUI(config: ReservationConfig): void {
     `;
     fabIcon.innerText = '待機中';
     fabButton.appendChild(fabIcon);
+    
+    // FABボタンにrelative positionを設定（折りたたみボタン配置用）
+    fabButton.style.position = 'relative';
     
     // 初期状態は ytomo-fab-disabled クラスで制御
 
@@ -148,8 +151,8 @@ function createEntranceReservationUI(config: ReservationConfig): void {
         text-align: center !important;
         box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3) !important;
         border: 2px solid rgba(255, 255, 255, 0.3) !important;
-        min-width: 120px !important;
-        max-width: 200px !important;
+        min-width: 80px !important;
+        max-width: 120px !important;
         display: none !important;
         white-space: pre-line !important;
         overflow: visible !important;
@@ -173,8 +176,8 @@ function createEntranceReservationUI(config: ReservationConfig): void {
         text-align: center !important;
         box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3) !important;
         border: 2px solid rgba(255, 255, 255, 0.3) !important;
-        min-width: 120px !important;
-        max-width: 200px !important;
+        min-width: 80px !important;
+        max-width: 120px !important;
         display: none !important;
         white-space: pre-line !important;
         overflow: visible !important;
@@ -183,7 +186,7 @@ function createEntranceReservationUI(config: ReservationConfig): void {
         cursor: pointer !important;
         transition: all 0.3s ease !important;
     `;
-    monitoringTargetsDisplay.title = '監視対象一覧（クリックで詳細表示）';
+    monitoringTargetsDisplay.title = 'クリックで詳細表示';
     
     // ホバー効果
     monitoringTargetsDisplay.addEventListener('mouseenter', () => {
@@ -282,9 +285,10 @@ function createEntranceReservationUI(config: ReservationConfig): void {
                 return;
             }
         } else {
-            // フォールバック: 従来の判定
-            if (multiTargetManager.hasTargets() && timeSlotState.mode === 'selecting') {
-                console.log('📡 従来システムによる監視開始');
+            // フォールバック: 統一状態管理による判定
+            const unifiedStateManager = getExternalFunction('unifiedStateManager');
+            if (unifiedStateManager && unifiedStateManager.hasMonitoringTargets() && timeSlotState.mode === 'selecting') {
+                console.log('📡 統一状態管理による監視開始');
                 updateMainButtonDisplay();
                 await startSlotMonitoring();
                 return;
@@ -304,6 +308,17 @@ function createEntranceReservationUI(config: ReservationConfig): void {
             const result = await entranceReservationHelper(config);
             if (result.success) {
                 showStatus(`🎉 予約成功！(${result.attempts}回試行)`, 'green');
+                
+                // 統一状態管理に予約成功情報を設定
+                const unifiedStateManager = getExternalFunction('unifiedStateManager');
+                if (unifiedStateManager) {
+                    const reservationTarget = unifiedStateManager.getReservationTarget();
+                    if (reservationTarget) {
+                        unifiedStateManager.setReservationSuccess(reservationTarget.timeSlot, reservationTarget.locationIndex);
+                        updateMainButtonDisplay(); // FAB表示更新
+                    }
+                }
+                
                 if (cacheManager) {
                     cacheManager.clearTargetSlots(); // 成功時はキャッシュクリア
                     cacheManager.clearMonitoringFlag(); // 監視継続フラグもクリア
@@ -365,49 +380,11 @@ function createEntranceReservationUI(config: ReservationConfig): void {
     });
 }
 
-// 監視対象表示を更新
+// 監視対象表示を更新（統一状態管理システムに委譲）
 function updateMonitoringTargetsDisplay(): void {
-    const targetsDisplay = document.querySelector('#ytomo-monitoring-targets') as HTMLElement;
-    if (!targetsDisplay) return;
-
-    // 予約実行中の対象を取得
-    const reservationTarget = getCurrentReservationTarget();
-    const targets = multiTargetManager.getTargets();
-    
-    // 予約実行中の場合は予約対象を表示
-    if (entranceReservationState.isRunning && reservationTarget) {
-        targetsDisplay.innerText = `予約対象:\n${reservationTarget}`;
-        targetsDisplay.style.display = 'block';
-        targetsDisplay.style.background = 'linear-gradient(135deg, rgba(0, 104, 33, 0.9), rgba(0, 150, 50, 0.9))';
-        targetsDisplay.title = `現在予約実行中の対象: ${reservationTarget}`;
-        return;
-    }
-    
-    // 監視対象がない場合は非表示
-    if (targets.length === 0) {
-        targetsDisplay.style.display = 'none';
-        return;
-    }
-    
-    // 監視対象を東西+時間形式で表示
-    const targetTexts = targets.map((target, index) => {
-        const location = multiTargetManager.getLocationFromSelector(target.tdSelector);
-        const priority = index + 1;
-        return `${priority}.${location}${target.timeText}`;
-    });
-    
-    targetsDisplay.innerText = `監視対象:\n${targetTexts.join('\n')}`;
-    targetsDisplay.style.display = 'block';
-    targetsDisplay.style.background = 'linear-gradient(135deg, rgba(255, 140, 0, 0.9), rgba(255, 180, 0, 0.9))';
-    
-    // 詳細なツールチップ
-    const detailText = targets.map((target, index) => {
-        const location = multiTargetManager.getLocationFromSelector(target.tdSelector);
-        const priority = index + 1;
-        return `${priority}. ${location}${target.timeText}`;
-    }).join('\n');
-    
-    targetsDisplay.title = `監視対象 (${targets.length}個):\n${detailText}\n\nクリックで詳細表示`;
+    // 統一状態管理システムのupdateMainButtonDisplay()に委譲
+    // これにより重複表示を回避し、一貫した表示を実現
+    updateMainButtonDisplay();
 }
 
 // 現在の予約対象時間帯を取得
@@ -424,9 +401,11 @@ function getCurrentReservationTarget(): string | null {
     // 東西判定
     const tdElement = selectedSlot.closest('td[data-gray-out]') as HTMLTableCellElement;
     const tdSelector = generateUniqueTdSelector(tdElement);
-    const location = multiTargetManager.getLocationFromSelector(tdSelector);
+    const locationIndex = LocationHelper.getIndexFromSelector(tdSelector);
+    const location = LocationHelper.getLocationFromIndex(locationIndex);
+    const locationText = location === 'east' ? '東' : '西';
     
-    return `${location}${timeText}`;
+    return `${locationText}${timeText}`;
 }
 
 // 来場日時設定ボタンの状態をチェック
@@ -566,22 +545,15 @@ function startCalendarWatcher(): void {
                     const ariaPressed = element.getAttribute('aria-pressed');
                     console.log(`🔄 時間帯選択変更検出: ${ariaPressed}`);
                     
-                    // 統一状態管理システムの同期
+                    // 統一状態管理システムの同期（初期化中は除外）
                     const unifiedStateManager = getExternalFunction('unifiedStateManager');
-                    if (unifiedStateManager && ariaPressed === 'true') {
-                        // 新しい選択を検出した場合
-                        const tdElement = element.closest('td[data-gray-out]') as HTMLTableCellElement;
-                        if (tdElement) {
-                            const timeText = element.querySelector('dt span')?.textContent?.trim();
-                            const locationIndex = LocationHelper.getIndexFromElement(tdElement);
-                            
-                            if (timeText) {
-                                console.log(`🔄 統一状態管理に予約対象を同期: ${timeText}`);
-                                unifiedStateManager.setReservationTarget(timeText, locationIndex);
-                                // FABボタン表示を更新
-                                updateMainButtonDisplay();
-                            }
-                        }
+                    if (unifiedStateManager && ariaPressed === 'true' && !calendarWatchState.isInitializing) {
+                        // 選択状態変更を検出 - DOM状態から予約対象を同期
+                        console.log(`🔄 時間帯選択状態を検出`);
+                        setTimeout(() => {
+                            syncReservationTargetFromDOM();
+                            updateMainButtonDisplay();
+                        }, 50);
                     }
                     
                     shouldUpdate = true;
@@ -632,9 +604,14 @@ function handleCalendarChange(): void {
         
         calendarWatchState.currentSelectedDate = newSelectedDate;
         
+        // 統一状態管理にも日付を設定
+        const unifiedStateManager = getExternalFunction('unifiedStateManager');
+        if (unifiedStateManager && newSelectedDate) {
+            unifiedStateManager.setSelectedCalendarDate(newSelectedDate);
+        }
+        
         // 既存の監視状態をクリア（日付が変わったため）
         // 統一状態管理システムからもクリア
-        const unifiedStateManager = getExternalFunction('unifiedStateManager');
         if (unifiedStateManager) {
             const hasReservationTarget = unifiedStateManager.hasReservationTarget();
             const hasMonitoringTargets = unifiedStateManager.hasMonitoringTargets();
@@ -646,20 +623,21 @@ function handleCalendarChange(): void {
             }
         }
         
-        if (multiTargetManager.hasTargets() && !timeSlotState.isMonitoring) {
-            console.log('📅 日付変更により従来システムの監視対象をクリア');
-            multiTargetManager.clearAll();
-            timeSlotState.mode = 'idle';
-            if (cacheManager) {
-                cacheManager.clearTargetSlots();
-            }
-        }
+        // 従来システムはもう使用しないため、このブロックは削除
+        // if (multiTargetManager.hasTargets() && !timeSlotState.isMonitoring) {
+        //     console.log('📅 日付変更により従来システムの監視対象をクリア');
+        //     multiTargetManager.clearAll();
+        //     timeSlotState.mode = 'idle';
+        //     if (cacheManager) {
+        //         cacheManager.clearTargetSlots();
+        //     }
+        // }
         
         // 予約対象がクリアされたため、即座にFAB表示を更新
         updateMainButtonDisplay();
         
-        // 監視ボタンを再設置
-        setTimeout(() => {
+        // 監視ボタンを再設置（動的待機を使用）
+        waitForTimeSlotTable(() => {
             removeAllMonitorButtons();
             analyzeAndAddMonitorButtons();
             
@@ -667,7 +645,7 @@ function handleCalendarChange(): void {
             updateMainButtonDisplay();
             
             console.log('🔄 監視ボタンとFABを再設置しました');
-        }, 1000); // 時間帯テーブル更新を待つ
+        });
     } else {
         // 日付は変わっていない - FABボタンの状態のみ更新
         console.log('📅 日付変更なし - FABボタンの状態のみ更新');
@@ -698,8 +676,44 @@ function removeAllMonitorButtons(): void {
     console.log(`🗑️ 既存の監視ボタンを${existingButtons.length}個削除しました`);
 }
 
+// DOM上の選択状態から予約対象を同期
+function syncReservationTargetFromDOM(): void {
+    const unifiedStateManager = getExternalFunction('unifiedStateManager');
+    if (!unifiedStateManager) return;
+
+    // DOM上で選択状態の時間帯要素を取得
+    const selectedElement = document.querySelector('td[data-gray-out] div[role="button"][aria-pressed="true"]');
+    
+    if (selectedElement) {
+        const tdElement = selectedElement.closest('td[data-gray-out]') as HTMLTableCellElement;
+        const timeText = selectedElement.querySelector('dt span')?.textContent?.trim();
+        
+        if (tdElement && timeText) {
+            const locationIndex = LocationHelper.getIndexFromElement(tdElement);
+            const selector = generateUniqueTdSelector(tdElement);
+            
+            console.log(`🔄 DOM状態から予約対象を同期: ${timeText} (位置: ${locationIndex})`);
+            unifiedStateManager.setReservationTarget(timeText, locationIndex, selector);
+        }
+    } else {
+        // 選択状態の要素がない場合は予約対象をクリア
+        console.log(`🔄 選択状態なし - 予約対象をクリア`);
+        unifiedStateManager.clearReservationTarget();
+    }
+}
+
 // 時間帯テーブルの準備を待つ
 function waitForTimeSlotTable(callback: () => void): void {
+    // まず即座にチェック（最短の場合は遅延なし）
+    const timeSlotButtons = document.querySelectorAll('td[data-gray-out] div[role="button"]');
+    
+    if (timeSlotButtons.length > 0) {
+        console.log(`✅ 時間帯テーブル準備済み (${timeSlotButtons.length}個の時間帯を検出) - 即座に実行`);
+        callback();
+        return;
+    }
+    
+    // DOM要素が存在しない場合のみ動的待機を開始
     const checkInterval = 50; // 50ms間隔で高速チェック
     const maxAttempts = 100; // 最大5秒待機（50ms × 100 = 5000ms）
     let attempts = 0;
@@ -711,7 +725,7 @@ function waitForTimeSlotTable(callback: () => void): void {
         const timeSlotButtons = document.querySelectorAll('td[data-gray-out] div[role="button"]');
         
         if (timeSlotButtons.length > 0) {
-            console.log(`✅ 時間帯テーブル準備完了 (${timeSlotButtons.length}個の時間帯を検出)`);
+            console.log(`✅ 時間帯テーブル準備完了 (${timeSlotButtons.length}個の時間帯を検出) - ${attempts * checkInterval}ms後`);
             callback();
         } else if (attempts >= maxAttempts) {
             console.log('⚠️ 時間帯テーブルの準備がタイムアウト - 強制実行');
@@ -722,7 +736,8 @@ function waitForTimeSlotTable(callback: () => void): void {
         }
     };
     
-    checkTableReady();
+    console.log('🔍 時間帯テーブル待機開始...');
+    setTimeout(checkTableReady, checkInterval);
 }
 
 // 時間帯tdクリック処理を設定（公式サイト仕様を利用した選択解除機能付き）
@@ -737,15 +752,15 @@ function setupTimeSlotClickHandlers(): void {
     const timeSlotClickHandler = (event: Event) => {
         const target = event.target as HTMLElement;
         
-        console.log(`🖱️ クリックハンドラー呼び出し: ${target.tagName}.${target.className}, id="${target.id}"`);
-        
-        // 時間帯のdiv[role="button"]または子要素がクリックされた場合
+        // 時間帯のdiv[role="button"]または子要素がクリックされた場合のみ処理
         const actualTarget = target.closest('td[data-gray-out] div[role="button"]') as HTMLElement;
         
         if (!actualTarget) {
-            console.log(`🔍 時間帯要素なし、処理終了`);
+            // 時間帯要素でない場合は処理しない（ログも出力しない）
             return;
         }
+        
+        console.log(`🖱️ 時間帯クリック検出: ${actualTarget.tagName}.${actualTarget.className}`);
         
         console.log(`✅ 時間帯クリック判定成功: ${actualTarget.tagName}.${actualTarget.className}`);
         
@@ -807,24 +822,12 @@ function setupTimeSlotClickHandlers(): void {
                     // 新規選択または別の時間帯への変更
                     console.log(`✅ 新規選択: ${timeText}`);
                     
-                    // 統一状態管理に予約対象を設定（既存の予約対象は自動的に置き換え）
+                    // DOM上の選択状態から予約対象を同期
                     setTimeout(() => {
-                        unifiedStateManager.setReservationTarget(timeText, locationIndex);
+                        syncReservationTargetFromDOM();
                         updateMainButtonDisplay();
-                        console.log(`✅ 統一状態管理に予約対象設定: ${timeText} (位置: ${locationIndex})`);
                     }, 100);
                 }
-        } else {
-            // 統一状態管理が利用できない場合はDOMベースの判定
-            const isCurrentlySelected = actualTarget.getAttribute('aria-pressed') === 'true';
-            console.log(`⚠️ 統一状態管理なし、DOM判定: ${isCurrentlySelected}`);
-            
-            if (!isCurrentlySelected) {
-                // 通常の選択処理（何もしない、デフォルト動作に任せる）
-                setTimeout(() => {
-                    updateMainButtonDisplay();
-                }, 100);
-            }
         }
     };
     
@@ -939,6 +942,7 @@ export {
     startCalendarWatcher,
     handleCalendarChange,
     removeAllMonitorButtons,
+    waitForTimeSlotTable,
     entranceReservationHelper
 };
 

@@ -1,4 +1,47 @@
-## 現在の作業: 巨大ソースコード(3798行)の段階的分析・分割アプローチ
+## 現在の作業: 統一状態管理システムへの移行調査
+
+### 問題
+- timeSlotStateが残存し、統一状態管理との二重管理状態
+- 移行が不完全で新旧システムが混在
+- 監視継続処理でtimeSlotState.isMonitoringが原因でリロードがスキップされる
+
+### 調査対象
+1. timeSlotStateの全使用箇所の特定と移行状況確認
+2. 他の古いシステム（multiTargetManager以外）の残存確認
+3. 統一状態管理に移行されていない状態管理の洗い出し
+
+### 調査完了結果
+1. **timeSlotState**: 38箇所使用（最重要・最優先修正対象）
+2. **entranceReservationState**: 13箇所使用（予約処理）
+3. **reloadCountdownState**: 14箇所使用（UI表示）
+4. **calendarWatchState**: 6箇所使用（カレンダー監視）
+5. **pageLoadingState**: 3箇所使用（ページ状態）
+
+### 緊急修正計画（今すぐ実行）
+**最優先**: section5.ts:869の監視継続条件を修正
+```typescript
+// 修正前（問題のある条件）
+if (!timeSlotState.isMonitoring || !unifiedStateManager || !unifiedStateManager.hasMonitoringTargets()) {
+    return; // 監視継続を阻害
+}
+
+// 修正後
+if (!unifiedStateManager || unifiedStateManager.getExecutionState() !== ExecutionState.MONITORING_RUNNING) {
+    return;
+}
+```
+
+### 段階的移行計画
+1. **Phase 1**: 監視継続処理の緊急修正
+2. **Phase 2**: timeSlotStateの段階的統合（38箇所）
+3. **Phase 3**: 他の状態管理の統合検討
+
+### 作業開始
+監視継続問題を即座に修正する
+
+---
+
+## 過去の作業履歴
 
 ### Phase 1: 詳細構造調査と分析
 
@@ -207,7 +250,81 @@ fabContainer.style.cssText = `
 
 ---
 
-## 現在の作業: Phase 5 - TypeScript移行
+## 作業完了: multiTargetManager完全削除による統一状態管理移行 ✅
+
+### 背景と現状
+現在の安定状態：commit 56cddb0（複数監視対象の改行表示対応）
+- ✅ buildが成功する
+- ✅ 統一状態管理システム（UnifiedStateManager）は実装済み
+- ✅ multiTargetManagerと統一状態管理の二重管理状態
+- ❌ 監視処理開始時に「❌ 監視対象時間帯が設定されていません」エラー発生
+
+### 削除されたコミットで試みていた作業内容
+
+#### 1. commit 558198a: multiTargetManagerの完全削除とTypeScript構文エラー修正
+**対象ファイル**: 
+- src-modules/section5.ts (139行変更)
+- src/index.js (35行変更)  
+- .claude/settings.local.json
+
+**実施していた内容**:
+- section5.tsからmultiTargetManagerの完全削除
+- UnifiedStateManagerへの統一状態管理移行
+- startSlotMonitoring()でのmultiTargetManager依存を統一状態管理に変更
+- TypeScript構文エラー修正
+
+#### 2. commit 93090e1: 監視対象チェック処理のデバッグ情報を追加
+**対象ファイル**: src-modules/section5.ts (12行追加)
+
+**実施していた内容**:
+- startSlotMonitoring()関数にデバッグ情報追加
+- 統一状態管理からの監視対象取得状況をログ出力
+- hasTargets=false, targetsCount=0 の原因調査
+
+#### 3. commit d0401ae: section6.tsとsection7.tsからmultiTargetManagerを部分削除
+**対象ファイル**: 
+- src-modules/section6.ts
+- src-modules/section7.ts
+
+**実施していた内容**:
+- section6.tsとsection7.tsからのmultiTargetManager参照削除
+- 統一状態管理システムへの移行
+- importの削除とUnifiedStateManagerへの置き換え
+
+### 発生していた問題
+1. **buildエラー**: export構造の循環参照やTypeScript構文エラー
+2. **重複変数宣言**: targets変数の重複使用
+3. **存在しない関数参照**: 削除された関数への参照残存
+4. **型注釈不足**: parameterのany型エラー
+
+### 今後の作業計画
+
+#### Phase 1: section5.tsのmultiTargetManager削除
+1. startSlotMonitoring()関数の統一状態管理対応
+2. checkSlotAvailabilityAndReload()関数の統一状態管理対応  
+3. handleMonitorButtonClick()関数の統一状態管理対応
+4. 型注釈の追加とTypeScriptエラー修正
+5. **各修正後にnpm run buildでの成功確認を必須とする**
+
+#### Phase 2: section6.ts, section7.tsのmultiTargetManager削除
+1. import文からmultiTargetManagerを削除
+2. 使用箇所をUnifiedStateManagerに置き換え
+3. 型注釈の追加
+4. **各修正後にnpm run buildでの成功確認を必須とする**
+
+#### Phase 3: 他ファイルのmultiTargetManager削除
+1. section2.ts, section3.ts, test-export-helper.ts
+2. unified-state.tsの最終調整
+
+### 重要な方針
+- **build成功を最優先**: 各段階でnpm run buildが成功することを確認
+- **段階的な修正**: 一度に複数ファイルを変更せず、1ファイルずつ確実に
+- **型安全性**: TypeScript strict modeに対応した型注釈を追加
+- **機能保持**: multiTargetManagerの機能をUnifiedStateManagerで完全に代替
+
+---
+
+## Phase 5 - TypeScript移行（保留中）
 
 ### セクション分割の標準手順
 

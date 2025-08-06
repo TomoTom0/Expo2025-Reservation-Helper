@@ -6,14 +6,14 @@ import { setCacheManager, setExternalFunctions } from './section5';
 import { 
     getCurrentSelectedCalendarDate, getCurrentTableContent, shouldUpdateMonitorButtons,
     restoreSelectionAfterUpdate, enableAllMonitorButtons,
-    updateMainButtonDisplay, selectTimeSlotAndStartReservation, startReloadCountdown,
-    resetMonitoringUI, showErrorMessage, tryClickCalendarForTimeSlot, setPageLoadingState,
+    updateMainButtonDisplay, selectTimeSlotAndStartReservation, scheduleReload, startReloadCountdown,
+    stopReloadCountdown, resetMonitoringUI, showErrorMessage, tryClickCalendarForTimeSlot, setPageLoadingState,
     disableAllMonitorButtons, restoreFromCache, setCacheManagerForSection6, setEntranceReservationHelper,
     setUpdateMonitoringTargetsDisplay
 } from './section6';
 import { 
     updateMonitoringTargetsDisplay, createEntranceReservationUI, setCacheManagerForSection7,
-    entranceReservationHelper
+    entranceReservationHelper, waitForTimeSlotTable
 } from './section7';
 import { initTimeSlotMonitoring } from './section4';
 
@@ -23,8 +23,12 @@ import { UnifiedStateManager } from './unified-state';
 // 型定義のインポート
 import type { CacheManager } from '../types/index.js';
 
+// Window型の拡張（beforeunloadハンドラー削除により不要）
+
 // 【8. ページ判定・初期化】
 // ============================================================================
+
+// beforeunloadハンドラーは不要なので削除
 
 // cacheManagerの初期化
 const cacheManager: CacheManager = createCacheManager({
@@ -33,12 +37,19 @@ const cacheManager: CacheManager = createCacheManager({
 
 // 統一状態管理システムの初期化
 const unifiedStateManager = new UnifiedStateManager();
+let isUnifiedStateManagerInitialized = false; // 重複初期化防止フラグ
 
 // ページ初期化時に既存データを移行
 const initializeUnifiedStateManager = (): void => {
+    if (isUnifiedStateManagerInitialized) {
+        console.log('🔄 統一状態管理システムは既に初期化済みです');
+        return;
+    }
+    
     try {
         // 既存システムからの状態移行
         unifiedStateManager.migrateFromExisting();
+        isUnifiedStateManagerInitialized = true;
         console.log('✅ 統一状態管理システム初期化完了');
     } catch (error) {
         console.error('⚠️ 統一状態管理システム初期化エラー:', error);
@@ -65,7 +76,9 @@ setExternalFunctions({
     updateMonitoringTargetsDisplay,
     disableAllMonitorButtons,
     selectTimeSlotAndStartReservation,
+    scheduleReload,
     startReloadCountdown,
+    stopReloadCountdown,
     reloadCountdownState,
     resetMonitoringUI,
     showErrorMessage,
@@ -87,6 +100,13 @@ const identify_page_type = (url: string): string | null => {
 const trigger_init = (url_record: string): void => {
     const page_type = identify_page_type(url_record);
     
+    // ページ遷移時に既存のFABボタンをクリーンアップ
+    const existingFab = document.getElementById('ytomo-fab-container');
+    if (existingFab) {
+        existingFab.remove();
+        console.log('🗑️ ページ遷移により既存のFABボタンを削除しました');
+    }
+    
     if (page_type === "pavilion_reservation") {
         const interval_judge = setInterval(() => {
             if (judge_init()) {
@@ -106,23 +126,32 @@ const trigger_init = (url_record: string): void => {
                     restoreFromCacheFn: restoreFromCache
                 });
                 
-                // 入場予約ページ初期化後に統一状態管理システムを初期化
-                setTimeout(() => {
+                // 入場予約ページ初期化後に統一状態管理システムを初期化（動的待機）
+                waitForTimeSlotTable(() => {
                     initializeUnifiedStateManager();
-                }, 500);
+                });
                 
-                // 追加で定期的に状態同期を実行
+                // beforeunloadハンドラーは削除済み
+                
+                // 必要に応じて状態同期を実行（頻度を下げて負荷軽減）
                 setInterval(() => {
+                    // 初期化済みの場合はスキップ
+                    if (isUnifiedStateManagerInitialized) return;
+                    
                     const selectedSlot = document.querySelector('td[data-gray-out] div[role="button"][aria-pressed="true"]');
                     if (selectedSlot && unifiedStateManager && !unifiedStateManager.hasReservationTarget()) {
                         console.log('🔄 選択状態の後続同期を実行');
                         initializeUnifiedStateManager();
                     }
-                }, 2000);
+                }, 5000); // 頻度を2秒から5秒に下げる
                 
                 console.log("ytomo extension loaded (entrance reservation)");
             }
         }, 500);
+    } else {
+        // 対象外のページの場合はログ出力のみ
+        console.log(`🔍 対象外ページ: ${url_record}`);
+        console.log("ytomo extension: no action needed for this page");
     }
 }
 

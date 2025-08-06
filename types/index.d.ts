@@ -63,6 +63,7 @@ export interface CalendarWatchState {
   isWatching: boolean;
   observer: MutationObserver | null;
   currentSelectedDate: string | null;
+  isInitializing?: boolean;
 }
 
 // =========================================================================
