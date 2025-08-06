@@ -1,256 +1,130 @@
-## 現在の作業: 統一状態管理システムへの移行調査
+## 現在の作業: 同行者追加機能の設計・分析・実装
 
-### 問題
-- timeSlotStateが残存し、統一状態管理との二重管理状態
-- 移行が不完全で新旧システムが混在
-- 監視継続処理でtimeSlotState.isMonitoringが原因でリロードがスキップされる
+### 背景
+大阪万博のチケット選択画面で、同行者追加操作を自動化する機能を実装する。
+毎回手動でチケットIDを1枚ずつ入力する不便さを解決する。
 
-### 調査対象
-1. timeSlotStateの全使用箇所の特定と移行状況確認
-2. 他の古いシステム（multiTargetManager以外）の残存確認
-3. 統一状態管理に移行されていない状態管理の洗い出し
+### 要求仕様（doc/design/acompany_ticket.mdより）
+1. **チケット選択画面での操作**
+   - 右下FABから複数のチケットIDを入力・選択できるダイアログを開く
+   - 過去に入力したチケットIDも表示・管理可能  
+   - 選択したチケットIDを一括で同行者追加処理する
 
-### 調査完了結果
-1. **timeSlotState**: 38箇所使用（最重要・最優先修正対象）
-2. **entranceReservationState**: 13箇所使用（予約処理）
-3. **reloadCountdownState**: 14箇所使用（UI表示）
-4. **calendarWatchState**: 6箇所使用（カレンダー監視）
-5. **pageLoadingState**: 3箇所使用（ページ状態）
+2. **自動化処理**
+   - 同行者追加画面への遷移→入力→追加を自動化
+   - チケット選択画面に戻る一連のサイクルを繰り返し
+   - エラー処理と動的待機対応
 
-### 緊急修正計画（今すぐ実行）
-**最優先**: section5.ts:869の監視継続条件を修正
-```typescript
-// 修正前（問題のある条件）
-if (!timeSlotState.isMonitoring || !unifiedStateManager || !unifiedStateManager.hasMonitoringTargets()) {
-    return; // 監視継続を阻害
-}
+### 技術調査完了結果
 
-// 修正後
-if (!unifiedStateManager || unifiedStateManager.getExecutionState() !== ExecutionState.MONITORING_RUNNING) {
-    return;
-}
+#### 1. 新規モジュール実装方針
+- **独立性**: 既存の入場予約・パビリオン予約機能とは完全に独立
+- **対象画面**: 
+  - `ticket_selection/?lottery=4&screen_id=018` (チケット選択画面)
+  - `agent_ticket/?lottery=4&screen_id=018` (同行者追加画面)
+- **実装方式**: 新規モジュールとして独立実装
+
+#### 2. 参考にする既存システム
+- **FABスタイル**: 既存FABのCSSスタイルを参考にする
+- **URL検出**: identify_page_type()のパターンを参考
+- **キャッシュパターン**: cacheManagerの保存・復元パターンを参考
+- **ページ初期化**: 既存のページ判定・初期化フローを参考
+
+#### 3. 新規実装が必要な機能
+- **チケットID管理**: 独自のストレージシステム
+- **同行者追加自動化**: 画面遷移・自動入力・エラー処理
+- **FABダイアログ**: モーダルダイアログUI
+- **状態管理**: 独立した実行状態管理
+
+### 実装設計案
+
+#### Phase 1: URL検出拡張とページタイプ追加
+```javascript
+// identify_page_type()関数に追加
+if (url.includes('ticket_selection')) return "ticket_selection";
+if (url.includes('agent_ticket')) return "agent_ticket";
 ```
 
-### 段階的移行計画
-1. **Phase 1**: 監視継続処理の緊急修正
-2. **Phase 2**: timeSlotStateの段階的統合（38箇所）
-3. **Phase 3**: 他の状態管理の統合検討
+#### Phase 2: チケットID管理機能（キャッシュ活用）
+```javascript
+// cacheManagerパターンを活用
+saveTicketIds(ticketIds) // 配列形式で保存
+restoreTicketIds()       // 保存済みチケットID復元
+removeTicketId(id)       // 個別削除
+```
 
-### 作業開始
-監視継続問題を即座に修正する
+#### Phase 3: FABダイアログ拡張
+```javascript
+// チケット選択画面でのFAB拡張
+- ダイアログモーダル作成（既存FABシステムに統合）
+- チケットID入力フィールド（ラベル付き）
+- 保存済みチケットIDリスト表示
+- 選択・削除機能付きチェックボックス
+- 「同行者追加」実行ボタン
+```
+
+#### Phase 4: 自動化処理エンジン
+```javascript
+// 同行者追加画面での処理
+- チケットID自動入力 (agent_ticket_id_register)
+- 追加ボタン自動クリック
+- 結果判定（成功/エラー）
+- エラーメッセージ解析
+- 次のチケットまたは完了処理
+```
+
+#### Phase 5: 統一状態管理統合
+```javascript
+// 新しい状態追加
+- COMPANION_TICKET_ADDING: 同行者追加実行中
+- companionTicketQueue: 処理待ちチケットIDキュー
+- currentProcessingTicket: 現在処理中チケットID
+```
+
+### 技術的課題と解決策
+
+#### 1. 動的待機とエラー処理
+- **問題**: 各画面遷移で動的待機が必要
+- **解決**: 既存のgetRandomWaitTime()パターンを活用
+- **エラー対応**: エラーメッセージの文言パターンマッチング
+
+#### 2. ページ遷移の状態保持
+- **問題**: 画面遷移時の進行状況管理
+- **解決**: cacheManagerでの進行状況永続化
+- **復旧**: ページリロード後の処理再開機能
+
+#### 3. FABダイアログのUI設計
+- **問題**: 既存FABシステムにダイアログ機能なし
+- **解決**: 既存FABスタイルを継承したモーダル作成
+- **操作性**: タッチデバイス対応、アクセシビリティ考慮
+
+### 実装計画（段階的開発）
+
+#### Phase 1: 基盤機能実装（1-2日）
+1. URL検出拡張
+2. チケットID管理キャッシュ機能
+3. 基本的なFABダイアログUI
+
+#### Phase 2: 同行者追加自動化（2-3日） 
+1. 同行者追加画面での自動処理
+2. エラーハンドリング
+3. 処理進捗管理
+
+#### Phase 3: 統合テスト・改善（1日）
+1. 全体テスト
+2. UI/UX改善
+3. エラー処理強化
+
+### リスクと対策
+- **DOM構造変更**: セレクタの柔軟性確保
+- **レート制限**: 適切な待機時間設定
+- **エラー回復**: 処理中断からの復旧機能
 
 ---
 
 ## 過去の作業履歴
 
-### Phase 1: 詳細構造調査と分析
-
-#### 調査対象
-- **ファイル**: src/index.js (3,798行)
-- **形式**: Chrome拡張UserScript形式
-- **対象サイト**: 大阪万博予約システム (パビリオン予約・入場予約)
-
-#### 主要機能ブロック分析
-
-##### 1. 基本機能・ユーティリティ (12-427行)
-```
-- insert_style(): CSS挿入
-- prepare_filter(): 正規表現変換（パビリオン検索用）  
-- init_page(): パビリオンページ初期化
-- judge_init(), judge_entrance_init(): ページ判定
-- init_entrance_page(): 入場予約ページ初期化
-- getRandomWaitTime(): ランダム待機時間生成
-```
-
-##### 2. 状態管理オブジェクト (495-617行)
-```
-- entranceReservationState: 入場予約実行状態
-- timeSlotState: 時間帯監視状態 (idle/selecting/monitoring/trying)
-- multiTargetManager: 複数監視対象管理
-- pageLoadingState: ページ読み込み状態
-- reloadCountdownState: リロードカウントダウン
-- calendarWatchState: カレンダー変更監視
-```
-
-##### 3. キャッシュ・永続化システム (620-797行)
-```
-- cacheManager: localStorage基盤のキャッシュ管理
-  - saveTargetSlots(): 監視対象保存
-  - restoreTargetSlots(): 監視対象復元
-  - clear(): キャッシュクリア
-```
-
-##### 4. DOM要素セレクタ・検索 (799-898行)
-```
-- timeSlotSelectors: 時間帯要素セレクタ定義
-- generateUniqueTdSelector(): 一意td要素セレクタ生成
-- findSameTdElement(): 同一要素検索
-- extractTdStatus(): 要素状態抽出（満員/利用可能判定）
-```
-
-##### 5. 時間帯監視・分析システム (900-1870行)
-```
-- startTimeSlotTableObserver(): 動的テーブル監視
-- analyzeAndAddMonitorButtons(): 監視ボタン追加
-- analyzeTimeSlots(): 全時間帯状態分析
-- createMonitorButton(): 個別監視ボタン作成
-- handleMonitorButtonClick(): ボタンクリック処理
-- findTargetSlotInPage(): 監視対象検索
-- terminateMonitoring(): 異常終了処理
-```
-
-##### 6. カレンダー・UI状態管理 (1871-3111行)
-```
-- getCurrentSelectedCalendarDate(): 選択日付取得
-- resetMonitoringUI(): UI状態リセット
-- updateMainButtonDisplay(): FABボタン表示更新
-- startReloadCountdown(): リロードカウントダウン
-- getCurrentMode(): 現在モード取得
-```
-
-##### 7. FAB・メインUI (3112-3742行)
-```
-- createEntranceReservationUI(): FABボタン作成
-- updateMonitoringTargetsDisplay(): 監視対象表示更新
-- checkVisitTimeButtonState(): 来場日時ボタン状態確認
-- startCalendarWatcher(): カレンダー変更監視開始
-- handleCalendarChange(): カレンダー変更処理
-```
-
-##### 8. ページ判定・初期化 (3743-3798行)
-```
-- identify_page_type(): URL判定
-- trigger_init(): 初期化トリガー
-```
-
-#### 重要な技術的特徴
-
-##### DOM監視アーキテクチャ
-1. **MutationObserver**: カレンダー変更・時間帯選択変更を検出
-2. **動的要素対応**: ページリロード後の同一要素追跡
-3. **状態同期**: リロード間でのキャッシュ状態維持
-
-##### 複数監視対象システム
-```javascript
-// 時間帯 + 位置（東西）での一意性管理
-multiTargetManager.addTarget(slotInfo);
-multiTargetManager.isSelected(timeText, tdSelector);
-```
-
-##### FAB UI パターン
-```javascript
-// 右下固定FABボタン + 監視対象表示
-fabContainer.style.cssText = `
-    position: fixed !important;
-    bottom: 24px !important; 
-    right: 24px !important;
-`;
-```
-
-### 分析完了の結論
-
-#### 機能モジュール分割案
-1. **core/**: 基本ユーティリティ・状態管理
-2. **dom/**: DOM操作・セレクタ・要素検索
-3. **monitor/**: 時間帯監視・分析システム
-4. **ui/**: FAB・ボタン・表示系
-5. **cache/**: 永続化・キャッシュ管理
-6. **calendar/**: カレンダー監視・変更検出
-7. **pavilion/**: パビリオン検索機能
-8. **main/**: エントリーポイント・初期化
-
-#### 依存関係分析
-- **core** ← すべてのモジュールが依存
-- **dom** ← monitor, ui, calendar が依存
-- **cache** ← monitor, ui が依存
-- **ui** ← calendar が依存
-
-#### Phase 2進行中: テスト作成
-
-#### 問題認識
-- 前回作成したブラウザ手動実行テストは実用的でない
-- npm testで自動実行できるテスト環境が必要
-- 実際のindex.js関数を直接テストする必要
-- 分割作業中の品質保証には自動テストが必須
-
-#### 現在の課題
-- **テスト環境未構築**: Jest/Vitest等の自動テストフレームワーク未導入
-- **実行形式不適切**: ブラウザ手動実行では継続的テスト不可
-- **モック依存**: 実際の関数ではなく抽出したモック関数をテスト
-- **CI/CD非対応**: 自動化パイプラインに組み込めない
-
-#### 必要な作業
-1. **Jest環境構築**: package.json、jest.config.js設定
-2. **jsdom環境**: DOM操作テストのためのNode.js DOM環境
-3. **実関数テスト**: src/index.jsから直接関数をimportしてテスト
-4. **自動実行確認**: npm testでの動作確認
-
-### 事前品質保証フェーズ完了 ✅
-
-#### 完了した作業
-1. **Unit Test 3段階実装完了**
-   - Phase 1: 純粋関数Unit Test（5関数、26テスト）
-   - Phase 2: DOM検索系Unit Test（3関数、5テスト）
-   - Phase 3: 判定・検証系Unit Test（5関数、9テスト）
-
-2. **Integration Test基盤構築完了**
-   - ヘルパー関数・アサーション関数作成
-   - 基本結合テスト実装（9テスト）
-   - 状態管理統合テストの基盤整備
-
-3. **コード構造整理完了**
-   - 8セクションヘッダー追加完了
-   - 依存関係順序での関数配置完了
-   - 152テスト全通過確認
-
-#### 品質指標達成
-- **総テスト数**: 103 → 152テスト（+49テスト、47%増）
-- **Unit Test実装率**: 2.5% → 50%（20倍向上）
-- **テスト成功率**: 100%（152/152）
-- **分割準備**: 8セクション構造整理完了
-
-### Phase 4実行中: JavaScript分割とコンパイル環境構築
-
-#### 完了した分割作業
-1. **src-modules/ ディレクトリ構造作成完了**
-   - 9個のモジュールフォルダ作成
-   - 依存関係順序に基づく分割計画策定
-
-2. **基本モジュール作成完了** (5/9)
-   - ✅ core/utils.js: 基本機能・ユーティリティ (257行)
-   - ✅ state/manager.js: 状態管理オブジェクト (125行)  
-   - ✅ cache/manager.js: キャッシュ・永続化システム (150行)
-   - ✅ dom/selectors.js: DOM要素セレクタ・検索 (140行)
-   - ✅ pavilion/search.js: パビリオン検索機能 (180行)
-
-### Phase 4完了: JavaScript分割とコンパイル環境構築成功 ✅
-
-#### 完了した全作業
-✅ **8つのsectionモジュール分割完了** (100%)
-✅ **webpack + Babel環境構築完了**
-✅ **循環参照解決・依存注入パターン実装完了**
-✅ **TypeScript静的チェック: 未定義変数エラー0件達成**
-
-#### 最終成果
-- **分割モジュール数**: 8個（section1-8 + main.js）
-- **総行数**: 3,798行を8モジュールに分割
-- **webpack コンパイル**: 成功（241 KiB出力）
-- **技術スタック**: ES6 modules + webpack + Babel
-- **依存関係管理**: 依存注入による循環参照解決
-
-#### 各モジュール構成
-- **section1**: 基本機能・ユーティリティ (502行)
-- **section2**: 状態管理オブジェクト (137行)  
-- **section3**: キャッシュ管理 (194行)
-- **section4**: DOMセレクタ・検索機能 (177行)
-- **section5**: 時間帯監視システム (965行)
-- **section6**: カレンダー・UI状態管理 (1,275行)
-- **section7**: FAB・メインUI (651行)
-- **section8**: ページ初期化・セットアップ (137行)
-
----
-
-## 作業完了: multiTargetManager完全削除による統一状態管理移行 ✅
+### 作業完了: multiTargetManager完全削除による統一状態管理移行 ✅
 
 ### 背景と現状
 現在の安定状態：commit 56cddb0（複数監視対象の改行表示対応）
@@ -322,80 +196,21 @@ fabContainer.style.cssText = `
 - **型安全性**: TypeScript strict modeに対応した型注釈を追加
 - **機能保持**: multiTargetManagerの機能をUnifiedStateManagerで完全に代替
 
----
+### 緊急修正計画（今すぐ実行）
+**最優先**: section5.ts:869の監視継続条件を修正
+```typescript
+// 修正前（問題のある条件）
+if (!timeSlotState.isMonitoring || !unifiedStateManager || !unifiedStateManager.hasMonitoringTargets()) {
+    return; // 監視継続を阻害
+}
 
-## Phase 5 - TypeScript移行（保留中）
-
-### セクション分割の標準手順
-
-#### 1. 分割前の準備
-- 元ファイル: `src/index-original.js` を基準とする
-- 分割対象セクションの正確な行数範囲を確認する
-
-#### 2. 2つのファイル作成
-```bash
-# 元ファイルを複製して2つのファイルを作成
-cp src/index-original.js src-modules/sectionX.js  # セクションX用
-cp src/index-original.js src-modules/main.js      # それ以外用（既存の場合は更新）
+// 修正後
+if (!unifiedStateManager || unifiedStateManager.getExecutionState() !== ExecutionState.MONITORING_RUNNING) {
+    return;
+}
 ```
 
-#### 3. 範囲による正確な分割
-- **sectionX.js**: セクションXのみ残す（指定行数範囲のみ保持）
-- **main.js**: セクションXを削除（指定行数範囲を除去）
-- **重要**: 元のコード内容は一切変更しない
-
-#### 4. import/export関係の調整
-
-##### 4.1 sectionX.jsの調整
-- 必要な関数にexport文を追加
-- 他セクションの関数を使用している場合、適切なimport文を追加
-
-##### 4.2 main.jsの調整
-- sectionXから使用される関数をimportに追加
-- sectionXが他セクションの関数を使う場合、その関数にexport文を追加
-
-##### 4.3 既存分割ファイルの修正（重要）
-- **新しいセクション分割により、import元がmain.js以外になる場合の対応**
-- 例: section1.jsがsection2の関数を使用している場合
-  - 従来: `import { func } from './main.js'`
-  - 修正後: `import { func } from './section2.js'`
-- **すべての既存分割ファイルのimport文を確認・修正する**
-
-#### 5. webpack設定更新
-- エントリーポイントがmain.jsを指していることを確認
-- 必要に応じて設定を更新
-
-#### 6. コンパイル確認
-```bash
-mise run build
-```
-- コンパイルエラーがないことを確認
-- 生成されたindex.jsのサイズが適切であることを確認
-
-### 循環依存の回避
-- sectionX → main.js → sectionX の循環を避ける
-- 依存関係は一方向に保つ
-- 必要に応じて依存関係を整理する
-
-### 注意事項
-- **元のコード動作を完全に保持する**
-- **import/export以外の変更は絶対に行わない**
-- **正確な行数での分割を行う**
-- **すべての依存関係を正しく解決する**
-
-### 現在の進捗
-- [x] セクション1分割完了（基本機能・ユーティリティ：13-498行目）
-- [ ] セクション2分割
-- [ ] セクション3分割
-- [ ] セクション4分割
-- [ ] セクション5分割
-- [ ] セクション6分割
-- [ ] セクション7分割
-- [ ] セクション8分割
-
-### 分割済みファイル構造
-```
-src-modules/
-├── section1.js    # 基本機能・ユーティリティ（13-498行目）
-└── main.js        # UserScriptヘッダー + セクション2以降
-```
+### 段階的移行計画
+1. **Phase 1**: 監視継続処理の緊急修正
+2. **Phase 2**: timeSlotStateの段階的統合（38箇所）
+3. **Phase 3**: 他の状態管理の統合検討
