@@ -19,7 +19,7 @@ import './pavilion-search-page';
 import './entrance-page-init';
 import './entrance-page-state';
 import './cache-manager';
-import './entrance-page-selectors';
+import './entrance-page-dom-utils';
 import './entrance-page-monitor';
 import './entrance-page-ui';
 import './entrance-page-fab';

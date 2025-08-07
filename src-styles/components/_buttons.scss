@@ -79,7 +79,7 @@ button.ext-ytomo.pavilion-sub-btn {
   display: none;
 }
 
-// 時間帯監視ボタン（満員ボタン）
+// 時間帯監視ボタン
 button.ext-ytomo {
   &.monitor-btn {
     height: auto;
@@ -87,7 +87,6 @@ button.ext-ytomo {
     width: auto;
     min-width: 35px;
     padding: 1px 4px;
-    background: rgb(255, 140, 0) !important;
     color: white !important;
     margin-left: 8px;
     font-size: 10px;
@@ -102,18 +101,22 @@ button.ext-ytomo {
     opacity: 1 !important;
     visibility: visible !important;
 
-    // 監視中状態
-    &.monitoring {
-      background: rgb(255, 87, 51) !important;
+    // 満員状態（緑色）
+    &.full-status {
+      background: rgb(34, 139, 34) !important; // 緑色
       
       &:hover {
-        background: rgb(255, 69, 0) !important;
+        background: rgb(50, 205, 50) !important; // ホバー時明るい緑
       }
     }
 
-    // ホバー効果
-    &:hover:not(.monitoring) {
-      background: rgb(255, 165, 0) !important;
+    // 監視中状態（赤色）
+    &.monitoring-status {
+      background: rgb(220, 53, 69) !important; // 赤色
+      
+      &:hover {
+        background: rgb(255, 69, 84) !important; // ホバー時明るい赤
+      }
     }
 
     // 無効状態

@@ -16,7 +16,7 @@ import {
     updateMonitoringTargetsDisplay, createEntranceReservationUI, setCacheManagerForSection7,
     entranceReservationHelper, waitForTimeSlotTable
 } from './entrance-page-fab';
-import { initTimeSlotMonitoring } from './entrance-page-selectors';
+import { initTimeSlotMonitoring } from './entrance-page-dom-utils';
 import { initCompanionTicketFeature, initializeTicketSelectionPage, initializeAgentTicketPage } from './companion-ticket-page'; // 同行者追加機能
 
 // 統一状態管理システムのimport

@@ -6,13 +6,13 @@ import {
 // 統一状態管理システムからのimport
 import { LocationHelper, ExecutionState } from './unified-state';
 
-// entrance-page-selectorsからのimport
+// entrance-page-dom-utilsからのimport
 import {
     timeSlotSelectors,
     generateUniqueTdSelector,
     findSameTdElement,
     extractTdStatus
-} from './entrance-page-selectors';
+} from './entrance-page-dom-utils';
 
 // 型定義のインポート
 import type { 
@@ -235,7 +235,7 @@ function startTimeSlotTableObserver(): void {
     // 初回チェック
     setTimeout(() => {
         if (checkTimeSlotTableExistsSync()) {
-            console.log('既存の時間帯テーブルを検出');
+            // console.log('既存の時間帯テーブルを検出');
             isProcessing = true;
             analyzeAndAddMonitorButtons(); // 差分更新で処理
             lastTableContent = safeCall('getCurrentTableContent');
@@ -397,7 +397,7 @@ function analyzeTimeSlots(): AnalysisResult {
     // 全てのtd要素を取得（時間帯テーブル内）
     const allTdElements = document.querySelectorAll(timeSlotSelectors.timeSlotContainer + ' td[data-gray-out]');
     
-    console.log(`📊 時間帯分析開始: ${allTdElements.length}個のtd要素を確認`);
+    // console.log(`📊 時間帯分析開始: ${allTdElements.length}個のtd要素を確認`);
     
     allTdElements.forEach(tdElement => {
         const status = extractTdStatus(tdElement as HTMLTableCellElement);
@@ -415,7 +415,7 @@ function analyzeTimeSlots(): AnalysisResult {
                 statusType = 'available';
             }
             
-            console.log(`📊 ${status.timeText}: ${statusType} (満員:${isFull}, 利用可能:${isAvailable}, 選択:${isSelected})`);
+            // console.log(`📊 ${status.timeText}: ${statusType} (満員:${isFull}, 利用可能:${isAvailable}, 選択:${isSelected})`);
             
             const timeInfo: TimeSlotInfo = {
                 element: status.element,
@@ -436,7 +436,7 @@ function analyzeTimeSlots(): AnalysisResult {
         }
     });
     
-    console.log(`📊 分析結果: 利用可能=${available.length}, 満員=${full.length}, 選択=${selected.length}`);
+    // console.log(`📊 分析結果: 利用可能=${available.length}, 満員=${full.length}, 選択=${selected.length}`);
     
     return { available, full, selected };
 }
@@ -560,11 +560,13 @@ function updateAllMonitorButtonPriorities(): void {
                     // 監視対象として選択されている場合、優先順位を表示
                     const priority = targetIndex + 1;
                     span.innerText = `監視${priority}`;
-                    (button as HTMLElement).style.background = 'rgb(0, 104, 33)';
+                    (button as HTMLElement).classList.remove('full-status');
+                    (button as HTMLElement).classList.add('monitoring-status');
                 } else {
                     // 監視対象でない場合は「満員」
                     span.innerText = '満員';
-                    (button as HTMLElement).style.background = 'rgb(255, 140, 0)';
+                    (button as HTMLElement).classList.remove('monitoring-status');
+                    (button as HTMLElement).classList.add('full-status');
                 }
             }
         }
@@ -651,6 +653,14 @@ function createMonitorButton(slotInfo: TimeSlotInfo): void {
         event.stopImmediatePropagation();
     });
     
+    // 初期状態のクラス設定（満員状態）
+    const initialButtonText = getMonitorButtonText(slotInfo);
+    if (initialButtonText.startsWith('監視')) {
+        monitorButton.classList.add('monitoring-status');
+    } else {
+        monitorButton.classList.add('full-status');
+    }
+    
     // dt要素内に追加（spanの後）
     dtElement.appendChild(monitorButton);
     
@@ -697,7 +707,8 @@ function handleMonitorButtonClick(slotInfo: TimeSlotInfo, buttonElement: HTMLBut
         
         // ボタンの表示を元に戻す
         buttonSpan.innerText = '満員';
-        buttonElement.style.background = 'rgb(255, 140, 0)';
+        buttonElement.classList.remove('monitoring-status');
+        buttonElement.classList.add('full-status');
         buttonElement.style.opacity = '1';
         buttonElement.style.cursor = 'pointer';
         buttonElement.disabled = false;
@@ -780,7 +791,8 @@ function handleMonitorButtonClick(slotInfo: TimeSlotInfo, buttonElement: HTMLBut
         } else {
             buttonSpan.innerText = '監視1'; // フォールバック
         }
-        buttonElement.style.background = 'rgb(0, 104, 33)';
+        buttonElement.classList.remove('full-status');
+        buttonElement.classList.add('monitoring-status');
         buttonElement.style.opacity = '1';
         buttonElement.style.cursor = 'pointer';
         buttonElement.disabled = false; // クリックで解除できるように

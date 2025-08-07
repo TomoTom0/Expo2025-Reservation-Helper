@@ -4,7 +4,7 @@
  */
 
 // 必要なimport
-import { timeSlotSelectors, generateUniqueTdSelector, extractTdStatus } from './entrance-page-selectors';
+import { timeSlotSelectors, generateUniqueTdSelector, extractTdStatus } from './entrance-page-dom-utils';
 import { getCurrentSelectedCalendarDate } from './entrance-page-ui';
 
 // ============================================================================

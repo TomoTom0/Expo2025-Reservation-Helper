@@ -6,14 +6,14 @@ import {
     pageLoadingState
 } from './entrance-page-state';
 
-// entrance-page-selectorsからのimport
+// entrance-page-dom-utilsからのimport
 import {
     generateUniqueTdSelector,
     extractTdStatus,
     waitForCalendar,
     findSameTdElement,
     timeSlotSelectors
-} from './entrance-page-selectors';
+} from './entrance-page-dom-utils';
 
 // 統一状態管理システムからのimport
 import { LocationHelper } from './unified-state';
@@ -122,14 +122,27 @@ function getCurrentSelectedCalendarDate(): string | null {
     }
 }
 
-// 動的待機版のカレンダー日付取得
-async function waitForValidCalendarDate(maxRetries: number = 10, interval: number = 100): Promise<string | null> {
+// 動的待機版のカレンダー日付取得（強化版）
+async function waitForValidCalendarDate(maxRetries: number = 30, interval: number = 200): Promise<string | null> {
+    console.log('📅 カレンダー日付取得の動的待機を開始...');
+    
     for (let i = 0; i < maxRetries; i++) {
+        // まずtime要素の存在を確認
+        const timeElements = document.querySelectorAll('time[datetime]');
+        
+        if (timeElements.length === 0) {
+            console.log(`⏳ time要素がまだ存在しません (${i + 1}/${maxRetries}) - さらに待機`);
+            await new Promise(resolve => setTimeout(resolve, interval));
+            continue;
+        }
+        
         const date = getCurrentSelectedCalendarDate();
         if (date) {
             console.log(`📅 動的待機で日付取得成功: ${date} (${i + 1}回目)`);
             return date;
         }
+        
+        console.log(`⏳ 日付取得リトライ中 (${i + 1}/${maxRetries}) - time要素は${timeElements.length}個存在`);
         
         if (i < maxRetries - 1) {
             await new Promise(resolve => setTimeout(resolve, interval));
@@ -358,7 +371,8 @@ function resetMonitoringUI(): void {
         const span = button.querySelector('span') as HTMLSpanElement;
         if (span && span.innerText.startsWith('監視')) {
             span.innerText = '満員';
-            (button as HTMLElement).style.background = 'rgb(255, 140, 0)';
+            (button as HTMLElement).classList.remove('monitoring-status');
+            (button as HTMLElement).classList.add('full-status');
             (button as HTMLButtonElement).disabled = false;
         }
     });
@@ -589,9 +603,10 @@ function enableAllMonitorButtons(): void {
         (button as HTMLElement).style.cursor = 'pointer';
         (button as HTMLButtonElement).disabled = false;
         
-        // 監視対象のボタンは緑色を維持
+        // 監視対象のボタンは赤色を維持
         if (span && span.innerText.startsWith('監視')) {
-            (button as HTMLElement).style.background = 'rgb(0, 104, 33)';
+            (button as HTMLElement).classList.remove('full-status');
+            (button as HTMLElement).classList.add('monitoring-status');
         }
         
         // ツールチップをクリア
@@ -710,7 +725,8 @@ function restoreSelectionAfterUpdate(): void {
                     // 監視対象リストでの位置を取得（統一状態管理の優先度を使用）
                     const priority = target.priority;
                     span.innerText = `監視${priority}`;
-                    (button as HTMLElement).style.background = 'rgb(0, 104, 33)';
+                    (button as HTMLElement).classList.remove('full-status');
+                    (button as HTMLElement).classList.add('monitoring-status');
                     restoredCount++;
                     
                     console.log(`✅ 選択状態を復元しました: ${target.timeSlot}`);
@@ -1407,7 +1423,8 @@ async function restoreFromCache(): Promise<void> {
                             } else {
                                 span.innerText = '監視1'; // フォールバック
                             }
-                            (targetButton as HTMLElement).style.background = 'rgb(0, 104, 33)';
+                            (targetButton as HTMLElement).classList.remove('full-status');
+                            (targetButton as HTMLElement).classList.add('monitoring-status');
                             (targetButton as HTMLButtonElement).disabled = false; // クリックで解除可能
                         }
                         

@@ -5,7 +5,7 @@
 
 // 必要なモジュールをインポート
 import { timeSlotState } from './entrance-page-state';
-import { generateUniqueTdSelector, getTdPositionInfo, findSameTdElement, extractTdStatus, timeSlotSelectors } from './entrance-page-selectors';
+import { generateUniqueTdSelector, getTdPositionInfo, findSameTdElement, extractTdStatus, timeSlotSelectors } from './entrance-page-dom-utils';
 import { checkTimeSlotTableExistsSync, validatePageLoaded } from './entrance-page-monitor';
 import { isInterruptionAllowed } from './entrance-page-ui';
 import { checkVisitTimeButtonState, canStartReservation } from './entrance-page-fab';

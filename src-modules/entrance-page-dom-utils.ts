@@ -1,5 +1,8 @@
-// entrance-page-monitorからのimport
-import { startTimeSlotTableObserver } from './entrance-page-monitor';
+// ============================================================================
+// 【入場予約DOM操作ユーティリティ】 
+// ============================================================================
+// 循環参照解決のための基盤モジュール
+// DOM操作、セレクタ定義、基本的な待機関数を提供
 
 // 型定義のインポート
 import type { 
@@ -8,11 +11,8 @@ import type {
     TimeSlotTarget
 } from '../types/index.js';
 
-// 【4. DOM要素セレクタ・検索】
-// ============================================================================
-
 // 時間帯セレクタ定義（設計書の固定DOM構造に基づく）
-const timeSlotSelectors: TimeSlotSelectors = {
+export const timeSlotSelectors: TimeSlotSelectors = {
     // 時間帯選択エリア
     timeSlotContainer: "table",
     timeSlotCells: "td[data-gray-out] div[role='button']",
@@ -29,7 +29,7 @@ const timeSlotSelectors: TimeSlotSelectors = {
 };
 
 // td要素の一意特定機能
-function generateUniqueTdSelector(tdElement: HTMLTableCellElement): string {
+export function generateUniqueTdSelector(tdElement: HTMLTableCellElement): string {
     // td要素の親要素（tr）内での位置を取得
     const row = tdElement.parentElement as HTMLTableRowElement;
     const rowIndex = Array.from(row.parentElement!.children).indexOf(row);
@@ -39,7 +39,7 @@ function generateUniqueTdSelector(tdElement: HTMLTableCellElement): string {
     return `table tr:nth-child(${rowIndex + 1}) td:nth-child(${cellIndex + 1})[data-gray-out]`;
 }
 
-function getTdPositionInfo(tdElement: HTMLTableCellElement): { rowIndex: number; cellIndex: number } {
+export function getTdPositionInfo(tdElement: HTMLTableCellElement): { rowIndex: number; cellIndex: number } {
     const row = tdElement.parentElement as HTMLTableRowElement;
     const rowIndex = Array.from(row.parentElement!.children).indexOf(row);
     const cellIndex = Array.from(row.children).indexOf(tdElement);
@@ -47,7 +47,7 @@ function getTdPositionInfo(tdElement: HTMLTableCellElement): { rowIndex: number;
     return { rowIndex, cellIndex };
 }
 
-function findSameTdElement(targetInfo: TimeSlotTarget): HTMLTableCellElement | null {
+export function findSameTdElement(targetInfo: TimeSlotTarget): HTMLTableCellElement | null {
     // 1. セレクタベースでの検索を優先
     if (targetInfo.tdSelector) {
         const element = document.querySelector(targetInfo.tdSelector) as HTMLTableCellElement;
@@ -75,7 +75,7 @@ function findSameTdElement(targetInfo: TimeSlotTarget): HTMLTableCellElement | n
     return null;
 }
 
-function extractTdStatus(tdElement: HTMLTableCellElement): TdStatus | null {
+export function extractTdStatus(tdElement: HTMLTableCellElement): TdStatus | null {
     if (!tdElement) return null;
     
     const buttonDiv = tdElement.querySelector('div[role="button"]') as HTMLElement;
@@ -122,8 +122,49 @@ function extractTdStatus(tdElement: HTMLTableCellElement): TdStatus | null {
     };
 }
 
+// カレンダーの動的待機（time要素の存在も確認）
+export async function waitForCalendar(timeout: number = 10000): Promise<boolean> {
+    const startTime = Date.now();
+    const checkInterval = 100; // 待機間隔を長めに設定
+    
+    console.log('カレンダーとtime要素の出現を待機中...');
+    
+    while (Date.now() - startTime < timeout) {
+        // time[datetime]要素が実際に存在するかを確認
+        const timeElements = document.querySelectorAll('time[datetime]');
+        
+        if (timeElements.length > 0) {
+            console.log(`✅ カレンダーとtime要素が見つかりました (${timeElements.length}個のtime要素)`);
+            
+            // 追加待機: time要素が見つかってもすぐに使用せず、少し待つ
+            await new Promise(resolve => setTimeout(resolve, 200));
+            return true;
+        }
+        
+        // デバッグ: 現在の状況を確認
+        const tables = document.querySelectorAll('table');
+        const buttons = document.querySelectorAll('[role="button"]');
+        
+        if (tables.length > 0 || buttons.length > 10) {
+            console.log(`⏳ DOM要素は存在するがtime要素がまだ生成されていません (table: ${tables.length}, button: ${buttons.length})`);
+        }
+        
+        await new Promise(resolve => setTimeout(resolve, checkInterval));
+    }
+    
+    console.log('⏰ カレンダー待機がタイムアウトしました');
+    
+    // デバッグ情報
+    const allTables = document.querySelectorAll('table');
+    const allButtons = document.querySelectorAll('[role="button"]');
+    const allTimeElements = document.querySelectorAll('time');
+    console.log(`🔍 最終状態: table=${allTables.length}, button=${allButtons.length}, time=${allTimeElements.length}`);
+    
+    return false;
+}
+
 // 時間帯監視機能の初期化
-async function initTimeSlotMonitoring(): Promise<void> {
+export async function initTimeSlotMonitoring(): Promise<void> {
     console.log('時間帯監視機能を初期化中...');
     
     // カレンダーの存在確認
@@ -134,62 +175,9 @@ async function initTimeSlotMonitoring(): Promise<void> {
     }
     
     // DOM変化監視を開始（時間帯テーブルの動的生成を検出）
+    // startTimeSlotTableObserverを動的importで取得（循環参照回避）
+    const { startTimeSlotTableObserver } = await import('./entrance-page-monitor');
     startTimeSlotTableObserver();
     
     console.log('時間帯監視機能の初期化完了（カレンダー監視中）');
 }
-
-// カレンダーの動的待機
-async function waitForCalendar(timeout: number = 10000): Promise<boolean> {
-    const startTime = Date.now();
-    const checkInterval = 50; // 50msで高速チェック
-    
-    console.log('カレンダーの出現を待機中...');
-    
-    while (Date.now() - startTime < timeout) {
-        // :has()のフォールバック - カレンダーテーブルを検索
-        let calendar = document.querySelector('table:has(time[datetime])');
-        if (!calendar) {
-            // :has()がサポートされていない場合のフォールバック
-            calendar = document.querySelector('[class*="calendar_table"]');
-            if (!calendar) {
-                const tables = document.querySelectorAll('table');
-                for (const table of tables) {
-                    if (table.querySelectorAll('time[datetime]').length > 0) {
-                        calendar = table;
-                        break;
-                    }
-                }
-            }
-        }
-        
-        if (calendar) {
-            // カレンダー要素内の日付要素も確認
-            const dateElements = calendar.querySelectorAll('time[datetime]');
-            if (dateElements.length > 0) {
-                console.log(`カレンダーを検出しました（日付要素: ${dateElements.length}個）`);
-                return true;
-            } else {
-                console.log('カレンダー要素はあるが、日付要素がまだ読み込まれていません');
-            }
-        }
-        
-        await new Promise(resolve => setTimeout(resolve, checkInterval));
-    }
-    
-    console.log('カレンダーの待機がタイムアウトしました');
-    return false;
-}
-
-// エクスポート
-export {
-    timeSlotSelectors,
-    generateUniqueTdSelector,
-    getTdPositionInfo,
-    findSameTdElement,
-    extractTdStatus,
-    initTimeSlotMonitoring,
-    waitForCalendar
-};
-
-// ============================================================================

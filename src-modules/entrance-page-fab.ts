@@ -15,12 +15,12 @@ import {
     updateFABVisibility
 } from './entrance-page-state';
 
-// entrance-page-selectorsからのimport
+// entrance-page-dom-utilsからのimport
 import {
     timeSlotSelectors,
     generateUniqueTdSelector,
     extractTdStatus
-} from './entrance-page-selectors';
+} from './entrance-page-dom-utils';
 
 // entrance-page-monitorからのimport
 import {
