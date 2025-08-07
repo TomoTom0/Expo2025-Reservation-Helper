@@ -18,7 +18,9 @@
       "Bash(git restore:*)",
       "Bash(git merge:*)",
       "Bash(git push:*)",
-      "Bash(find:*)"
+      "Bash(find:*)",
+      "Bash(git rm:*)",
+      "Bash(cat:*)"
     ],
     "deny": []
   }

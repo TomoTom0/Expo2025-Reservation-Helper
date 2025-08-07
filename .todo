@@ -1,72 +1,7 @@
-## ToDo: 段階的JavaScript分割・TypeScript移行
+## 現在の作業
 
-### Phase 1: 詳細構造調査と分析 ✅
-- [x] 元の巨大なソースコード(3798行)の詳細構造調査
-- [x] 8つの主要機能ブロック特定
-- [x] 依存関係分析完了
-- [x] モジュール分割案策定
-
-### Phase 2: 機能に基づくテスト作成 ✅
-- [x] Jest環境構築（package.json、jest.config.js）
-- [x] jsdom環境設定（DOM操作テスト用）
-- [x] パビリオン検索機能のテスト作成（実関数）
-- [x] 時間帯監視システムのテスト作成（実関数）
-- [x] FAB UI機能のテスト作成（実関数）
-- [x] カレンダー変更監視のテスト作成（実関数）
-- [x] キャッシュ・永続化システムのテスト作成（実関数）
-- [x] npm test自動実行確認
-- [x] 分割作業中の品質保証体制確立
-
-### Phase 2.5: Unit Test・Integration Test強化 ✅
-- [x] Phase 1: 純粋関数Unit Test実装（5関数、26テスト）
-- [x] Phase 2: DOM検索系Unit Test実装（3関数、5テスト）
-- [x] Phase 3: 判定・検証系Unit Test実装（5関数、9テスト）
-- [x] Integration Test基盤準備（ヘルパー関数・アサーション関数作成）
-- [x] 基本結合テスト実装（9テスト）
-- [x] 総テスト数: 152テスト、Unit Test実装率50%達成
-
-### Phase 3: 元コードの順序整理（分割準備） ✅
-- [x] 元ファイルに戻す（index-backup.js → index.js）
-- [x] 純粋な順序整理のみ実行（記述内容は1文字も変更しない）
-- [x] セクション分けコメントヘッダーのみ追加（8セクション）
-- [x] 依存関係順序での関数配置（cut & paste のみ）
-- [x] 整理後テスト実行確認（152テスト全通過）
-
-### Phase 4: JavaScript分割とコンパイル環境構築 ✅
-- [x] 8つのsectionモジュールファイル作成完了
-  - [x] section1.js (基本機能・ユーティリティ: 502行)
-  - [x] section2.js (状態管理オブジェクト: 137行)
-  - [x] section3.js (キャッシュ管理: 194行)
-  - [x] section4.js (DOMセレクタ・検索機能: 177行)
-  - [x] section5.js (時間帯監視システム: 965行)
-  - [x] section6.js (カレンダー・UI状態管理: 1,275行)
-  - [x] section7.js (FAB・メインUI: 651行)
-  - [x] section8.js (ページ初期化・セットアップ: 137行)
-- [x] webpack + Babel環境構築完了
-- [x] 循環参照解決・依存注入パターン実装完了
-- [x] コンパイル・結合テスト成功（241 KiB出力）
-- [x] TypeScript静的チェック: 未定義変数エラー0件達成
-
-### Phase 5: TypeScript移行（実行中）
-- [ ] TypeScript環境セットアップ
-  - [ ] TypeScript + 関連パッケージインストール
-  - [ ] tsconfig.json設定作成
-  - [ ] webpack設定のTypeScript対応
-- [ ] 型定義ファイル作成
-  - [ ] Chrome拡張API型定義
-  - [ ] DOM関連型定義
-  - [ ] プロジェクト固有型定義
-- [ ] 段階的JavaScript → TypeScript変換
-  - [ ] section1.js → section1.ts
-  - [ ] section2.js → section2.ts
-  - [ ] section3.js → section3.ts
-  - [ ] section4.js → section4.ts
-  - [ ] section5.js → section5.ts
-  - [ ] section6.js → section6.ts
-  - [ ] section7.js → section7.ts
-  - [ ] section8.js → section8.ts
-- [ ] TypeScriptコンパイル確認
-- [ ] 最終テスト・デプロイ準備
+### 次の作業候補
+- [ ] バージョン番号の更新（version.dat）
 
 ## 将来のテスト拡張・改善項目
 
@@ -102,16 +37,9 @@
 - [ ] テスト実行時間最適化
 - [ ] テストデータ管理改善
 
-## 現在の状況
-**Phase 1-5完了済み**: TypeScript移行・SCSS導入完了
-- 総テスト数: 152テスト（47%増加）
-- Unit Test実装率: 50%達成
-- TypeScript完全移行: 全8セクション完了
-- SCSS導入完了: CSSをJavaScriptから分離
-- webpack統合: index.js一つにコンパイル
+## 今後の改善項目
 
-## 未解決の問題
-- [ ] 実行中の「すべて読み込み」ボタンが緑色（enabled状態）のまま
-  - 問題: SCSS導入後もCSS優先度の問題が残存
-  - 状況: disabled=true, btn-loading/btn-disabledクラス付与済みだが、緑色のまま表示
-  - 対応: CSS specificity をさらに強化する必要
+### CSS優先度問題の修正
+- [ ] 「すべて読み込み」ボタンのdisabled状態表示修正
+- [ ] CSS specificity強化
+
