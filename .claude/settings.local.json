@@ -15,7 +15,8 @@
       "Bash(done)",
       "Bash(mv:*)",
       "Bash(npm install:*)",
-      "Bash(git restore:*)"
+      "Bash(git restore:*)",
+      "Bash(git merge:*)"
     ],
     "deny": []
   }
