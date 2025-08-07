@@ -23,3 +23,4 @@ import './section5';
 import './section6';
 import './section7';
 import './section8';
+import './section9'; // 同行者追加機能

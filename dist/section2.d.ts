@@ -13,5 +13,5 @@ declare function loadFABVisibility(): void;
 declare function saveFABVisibility(isVisible: boolean): void;
 declare function toggleFABVisibility(): void;
 declare function updateFABVisibility(): void;
-declare function createFABToggleButton(): void;
-export { entranceReservationState, timeSlotState, pageLoadingState, reloadCountdownState, calendarWatchState, fabVisibilityState, loadFABVisibility, saveFABVisibility, toggleFABVisibility, updateFABVisibility, createFABToggleButton };
+export declare function createFABToggleButton(): void;
+export { entranceReservationState, timeSlotState, pageLoadingState, reloadCountdownState, calendarWatchState, fabVisibilityState, loadFABVisibility, saveFABVisibility, toggleFABVisibility, updateFABVisibility };

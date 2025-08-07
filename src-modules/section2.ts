@@ -106,10 +106,16 @@ function updateFABVisibility(): void {
     if (pavilionFabContainer) {
         pavilionFabContainer.style.display = fabVisibilityState.isVisible ? 'flex' : 'none';
     }
+    
+    // 同行者追加FAB
+    const companionFabContainer = document.getElementById('ytomo-companion-fab-container');
+    if (companionFabContainer) {
+        companionFabContainer.style.display = fabVisibilityState.isVisible ? 'flex' : 'none';
+    }
 }
 
 // ヘッダーにFAB表示切替ボタンを追加
-function createFABToggleButton(): void {
+export function createFABToggleButton(): void {
     // 既存のボタンがあるかチェック
     const existingButton = document.getElementById('ytomo-fab-toggle-btn');
     if (existingButton) {
@@ -273,6 +279,5 @@ export {
     loadFABVisibility,
     saveFABVisibility,
     toggleFABVisibility,
-    updateFABVisibility,
-    createFABToggleButton
+    updateFABVisibility
 };

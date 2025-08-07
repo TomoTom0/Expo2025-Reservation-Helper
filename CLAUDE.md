@@ -10,3 +10,7 @@
 第一段階として、既に開いたサイトでdeveloper consoleに貼り付けて実行する。
 
 詳細はdoc/design/visiting-reservation.mdに記載した
+
+## build
+
+- buildは`mise run build-rsync`で行う。これで拡張機能のwindowsへの同期も行われる

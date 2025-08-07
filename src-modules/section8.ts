@@ -1,6 +1,6 @@
 // 各sectionからのimport
 import { init_page, judge_init, judge_entrance_init, init_entrance_page } from './section1';
-import { reloadCountdownState } from './section2';
+import { reloadCountdownState, createFABToggleButton } from './section2';
 import { createCacheManager } from './section3';
 import { setCacheManager, setExternalFunctions } from './section5';
 import { 
@@ -16,6 +16,7 @@ import {
     entranceReservationHelper, waitForTimeSlotTable
 } from './section7';
 import { initTimeSlotMonitoring } from './section4';
+import { initCompanionTicketFeature, initializeTicketSelectionPage, initializeAgentTicketPage } from './section9'; // 同行者追加機能
 
 // 統一状態管理システムのimport
 import { UnifiedStateManager } from './unified-state';
@@ -92,18 +93,23 @@ setExternalFunctions({
 
 // URL判定とページタイプ識別
 const identify_page_type = (url: string): string | null => {
-    console.log(`🔍 ページタイプ識別中: ${url}`);
-    
-    // より厳密なURL判定
-    if (url.includes("ticket.expo2025.or.jp/ticket_visiting_reservation/")) {
-        console.log(`✅ 入場予約ページとして識別`);
-        return "entrance_reservation";
-    } else if (url.includes("ticket.expo2025.or.jp/event_search/")) {
-        console.log(`✅ パビリオン予約ページとして識別`);
-        return "pavilion_reservation";
+    try {
+        const urlObj = new URL(url);
+        const pathname = urlObj.pathname;
+        
+        if (pathname === '/ticket_visiting_reservation/') {
+            return "entrance_reservation";
+        } else if (pathname === '/event_search/') {
+            return "pavilion_reservation";
+        } else if (pathname === '/ticket_selection/') {
+            return "ticket_selection";
+        } else if (pathname === '/agent_ticket/') {
+            return "agent_ticket";
+        }
+    } catch (error) {
+        console.error(`URL解析エラー: ${error}`);
     }
     
-    console.log(`❌ 対象外ページ`);
     return null;
 }
 
@@ -113,13 +119,32 @@ const trigger_init = (url_record: string): void => {
     
     // 同じページタイプで初期化中の場合はスキップ
     if (currentPageType === page_type && isPageInitializing) {
-        console.log(`⏸️ 同じページタイプ (${page_type}) で初期化中のためスキップします`);
         return;
+    }
+    
+    // 同じページタイプでもFABが消えている場合は再作成
+    if (currentPageType === page_type && !isPageInitializing) {
+        if (page_type === 'ticket_selection') {
+            const companionFab = document.getElementById('ytomo-companion-main-fab');
+            if (!companionFab) {
+                console.log(`🔄 ${page_type}ページで同行者FABが消失しているため再作成します`);
+            } else {
+                console.log(`✅ ${page_type}ページで同行者FABが既に存在します、スキップ`);
+                return;
+            }
+        } else if (page_type === 'agent_ticket') {
+            const agentFab = document.getElementById('ytomo-agent-progress-fab');
+            if (!agentFab) {
+                console.log(`🔄 ${page_type}ページで進捗FABが消失しているため再作成します`);
+            } else {
+                console.log(`✅ ${page_type}ページで進捗FABが既に存在します、スキップ`);
+                return;
+            }
+        }
     }
     
     // 前回と異なるページタイプの場合は状態をリセット
     if (currentPageType !== page_type) {
-        console.log(`🔄 ページタイプ変更: ${currentPageType} -> ${page_type}`);
         currentPageType = page_type;
         isPageInitializing = false;
         
@@ -134,6 +159,26 @@ const trigger_init = (url_record: string): void => {
         if (existingPavilionFab) {
             existingPavilionFab.remove();
             console.log('🗑️ ページ遷移により既存のパビリオンFABボタンを削除しました');
+        }
+        
+        // 同行者チケット関連FABを削除
+        if (currentPageType === 'ticket_selection' || currentPageType === 'agent_ticket') {
+            const companionMainFab = document.getElementById('ytomo-companion-main-fab');
+            if (companionMainFab) {
+                companionMainFab.remove();
+                console.log('🗑️ ページ遷移により同行者メインFABを削除しました');
+            }
+            
+            const agentFab = document.getElementById('ytomo-agent-progress-fab');
+            if (agentFab) {
+                // タイムアウトをキャンセル
+                const timeoutId = (agentFab as any).__timeoutId;
+                if (timeoutId) {
+                    clearTimeout(timeoutId);
+                }
+                agentFab.remove();
+                console.log('🗑️ ページ遷移によりエージェント進捗FABを削除しました');
+            }
         }
     }
     
@@ -186,6 +231,31 @@ const trigger_init = (url_record: string): void => {
                 console.log("ytomo extension loaded (entrance reservation)");
             }
         }, 500);
+    } else if (page_type === "ticket_selection" || page_type === "agent_ticket") {
+        if (isPageInitializing) return;
+        isPageInitializing = true;
+        
+        // 同行者追加機能の初期化（DOM準備完了を待機）
+        const interval_companion = setInterval(() => {
+            if (document.body && (document.readyState === 'complete' || document.readyState === 'interactive')) {
+                clearInterval(interval_companion);
+                console.log(`🎫 ${page_type}ページを初期化します`);
+                // ヘッダートグルボタンを作成
+                createFABToggleButton();
+                
+                // ページタイプ別初期化
+                if (page_type === 'ticket_selection') {
+                    initializeTicketSelectionPage();
+                } else if (page_type === 'agent_ticket') {
+                    initializeAgentTicketPage();
+                } else {
+                    // フォールバック（旧方式）
+                    initCompanionTicketFeature();
+                }
+                isPageInitializing = false;
+                console.log(`ytomo extension loaded (${page_type})`);
+            }
+        }, 500);
     } else {
         // 対象外のページの場合はログ出力のみ
         console.log(`🔍 対象外ページ: ${url_record}`);
@@ -195,28 +265,124 @@ const trigger_init = (url_record: string): void => {
     }
 }
 
-try {
-    // urlの変更をMutationObserverで監視する
-    const url = window.location.href;
-    trigger_init(url);
+// DOM準備完了を待機してから初期化
+function initializeExtension() {
+    try {
+        // SPA対応: URL変更を複数の方法で監視する
+        console.log('🚀 ytomo extension 初期化開始');
+        console.log(`🔗 現在のURL: ${window.location.href}`);
+        console.log(`🔗 document.readyState: ${document.readyState}`);
+        
+        const url = window.location.href;
+        trigger_init(url);
 
     let url_record = url;
+    
+    // 方法1: popstateイベント（ブラウザの戻る/進む）
+    window.addEventListener('popstate', () => {
+        const new_url = window.location.href;
+        if (new_url !== url_record) {
+            console.log(`🔄 popstate URL変更検出: ${url_record} -> ${new_url}`);
+            url_record = new_url;
+            setTimeout(() => trigger_init(url_record), 500);
+        }
+    });
+    
+    // 方法2: History APIのpushState/replaceStateを監視
+    const originalPushState = history.pushState;
+    const originalReplaceState = history.replaceState;
+    
+    history.pushState = function(state, title, url) {
+        console.log(`📍 pushState called:`, arguments);
+        originalPushState.apply(history, [state, title, url] as [any, string, string | URL | null | undefined]);
+        setTimeout(() => {
+            const new_url = window.location.href;
+            if (new_url !== url_record) {
+                console.log(`🔄 pushState URL変更検出: ${url_record} -> ${new_url}`);
+                url_record = new_url;
+                setTimeout(() => trigger_init(url_record), 500);
+            }
+        }, 100);
+    };
+    
+    history.replaceState = function(state, title, url) {
+        console.log(`📍 replaceState called:`, arguments);
+        originalReplaceState.apply(history, [state, title, url] as [any, string, string | URL | null | undefined]);
+        setTimeout(() => {
+            const new_url = window.location.href;
+            if (new_url !== url_record) {
+                console.log(`🔄 replaceState URL変更検出: ${url_record} -> ${new_url}`);
+                url_record = new_url;
+                setTimeout(() => trigger_init(url_record), 500);
+            }
+        }, 100);
+    };
+    
+    // 方法3: MutationObserver（DOM変更による補完的な検出）
     const observer = new MutationObserver(() => {
         const new_url = window.location.href;
         if (new_url !== url_record) {
             url_record = new_url;
             trigger_init(url_record);
         }
+        
+        // ページタイプごとのFABが意図せず削除された場合の自動復旧（サイレント）
+        if (window.location.href.includes('ticket_selection')) {
+            const companionFab = document.getElementById('ytomo-companion-main-fab');
+            if (!companionFab) {
+                setTimeout(() => trigger_init(window.location.href), 100); // 即座復旧
+            }
+        } else if (window.location.href.includes('agent_ticket')) {
+            const agentFab = document.getElementById('ytomo-agent-progress-fab');
+            const processState = (window as any).companionProcessManager?.getState?.();
+            if (!agentFab && processState?.isRunning) {
+                setTimeout(() => trigger_init(window.location.href), 100); // 即座復旧
+            }
+        }
     });
-    observer.observe(document, {
+    observer.observe(document.documentElement, {
         childList: true,
         subtree: true
     });
+    
+    // 方法4: 定期的なURL監視（フォールバック）
+    setInterval(() => {
+        const new_url = window.location.href;
+        if (new_url !== url_record) {
+            url_record = new_url;
+            trigger_init(url_record);
+        }
+        
+        // ページタイプごとのFAB存在チェックと自動復旧（定期監視、サイレント）
+        if (window.location.href.includes('ticket_selection')) {
+            const companionFab = document.getElementById('ytomo-companion-main-fab');
+            if (!companionFab) {
+                trigger_init(window.location.href);
+            }
+        } else if (window.location.href.includes('agent_ticket')) {
+            const agentFab = document.getElementById('ytomo-agent-progress-fab');
+            const processState = (window as any).companionProcessManager?.getState?.();
+            if (!agentFab && processState?.isRunning) {
+                trigger_init(window.location.href);
+            }
+        }
+    }, 2000); // 2秒間隔でFABチェック
+    
+        console.log('👀 SPA対応URL監視設定完了');
+    }
+    catch (e) {
+        // エラー時の処理
+        console.error("ytomo extension error", e);
+        // alert(e);
+    }
 }
-catch (e) {
-    // エラー時の処理
-    console.error("ytomo extension error", e);
-    // alert(e);
+
+// DOM準備完了を待機して初期化実行
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initializeExtension);
+} else {
+    // 既に読み込み完了している場合は即座に実行
+    initializeExtension();
 }
 
 // TypeScript環境では module.exports は使用しない
