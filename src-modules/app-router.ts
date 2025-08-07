@@ -1,5 +1,6 @@
 // 各モジュールからのimport
-import { init_page, judge_init, judge_entrance_init, init_entrance_page } from './pavilion-search-page';
+import { init_page, judge_init } from './pavilion-search-page';
+import { judge_entrance_init, init_entrance_page } from './entrance-page-init';
 import { reloadCountdownState, createFABToggleButton } from './entrance-page-state';
 import { createCacheManager } from './cache-manager';
 import { setCacheManager, setExternalFunctions } from './entrance-page-monitor';

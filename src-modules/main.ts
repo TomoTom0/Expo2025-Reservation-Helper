@@ -16,6 +16,7 @@
 
 // すべてのモジュールをimport（副作用importも含む）
 import './pavilion-search-page';
+import './entrance-page-init';
 import './entrance-page-state';
 import './cache-manager';
 import './entrance-page-selectors';
