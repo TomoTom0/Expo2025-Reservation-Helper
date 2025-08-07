@@ -8,8 +8,7 @@
   "content_scripts": [
     {
       "matches": [
-        "https://ticket.expo2025.or.jp/event_search/*",
-        "https://ticket.expo2025.or.jp/ticket_visiting_reservation/*"
+        "https://ticket.expo2025.or.jp/*"
       ],
       "js": [
         "index.js"
@@ -19,9 +18,11 @@
     }
   ],
   "permissions": [
+    "storage",
+    "activeTab"
   ],
   "host_permissions": [
-        "https://www.db.yugioh-card.com/yugiohdb/*"
-    ],
+    "https://ticket.expo2025.or.jp/*"
+  ],
   "description": "大阪万博Expo2025の予約を補助します"
 }

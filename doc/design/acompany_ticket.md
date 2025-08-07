@@ -83,3 +83,11 @@ https://ticket.expo2025.or.jp/ticket_selection/?lottery=4&screen_id=018
 
 各画面や処理後は動的待機をする必要がある。
 基本的に処理結果の要素や次の処理に必要なボタンを条件とすればいい。
+
+## チケット選択画面のチケット
+
+以下を参考に日付情報の参照と選択状態の切り替えを行う
+
+```
+<ul class="tickets-type1 with-check no-arrow " data-list-type="myticket_send"><li class="item style_item___UCBs"><label class="check-type1"><input id="ticket_3bebi5uetti_0" type="checkbox" tabindex="0"><span class="check-text"></span></label><div class="col3"><div class="group1 style_content__JWbnm"><div class="fig-ticket style_image_area__rluEA" data-has-checkbox="true"><img src="https://ticket.expo2025.or.jp/tickethub_file/images/0433/00433/0010/0/item_large_image/d477b10309c43041f70a54c08d751e48516b.gif" alt="通期パス"></div><label for="ticket_3bebi5uetti_0" class="texts style_text_area__Msfzl" data-has-checkbox="true"><span class="type style_labeled_block__uTa7c">通期パス</span><span class="age style_labeled_block__uTa7c">大人（満18歳以上）</span></label></div><dl class="style_detail__Y9amN"><div><dt>チケットID</dt><dd>XXXXXZ9PC6</dd></div><div><dt class="style_visiting_date__Jih1c undefined">来場日時</dt><dd class="style_visiting_date__Jih1c"><span>2025年8月17日(日) 10:00-</span></dd></div></dl></div></li></ul>
+```
