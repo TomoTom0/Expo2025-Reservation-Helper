@@ -1,13 +1,26 @@
 ## 現在の作業: 完了
 
-### 完了した作業: モジュール責務分離
-- pavilion-search-page.ts から入場予約初期化関数を分離
-- entrance-page-init.ts を新規作成  
-- app-router.ts, main.ts のimport修正
-- ビルド確認済み
+### 完了した作業: アーキテクチャリファクタリング（2025-08-07）
+
+#### 1. 循環参照解決
+- entrance-page-dom-utils.ts を新規作成（共有DOM関数を集約）
+- entrance-page-selectors.ts を削除（依存注入構造の除去）
+- import文を直接参照に変更
+
+#### 2. 監視継続失敗の修正
+- カレンダー検出の動的待機処理強化
+- waitForCalendar: time要素の存在確認とより長い待機時間
+- waitForValidCalendarDate: 30回リトライ、200ms間隔
+
+#### 3. UI改善
+- 満員ボタン→緑色、監視ボタン→赤色に変更
+- JavaScript style.background → SCSSクラス（full-status/monitoring-status）に移行
+- 不要なデバッグログの削除
 
 ### 結果
-各モジュールの画面責務が明確化され、単一責任原則を遵守
+- 循環参照完全解決により保守性向上
+- 監視継続の安定性改善
+- より視認性の高いUI
 
 ---
 

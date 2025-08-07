@@ -373,3 +373,50 @@
 
 ### バージョン更新
 - v0.5.3: 同行者追加機能の日付選択改善完了
+
+## 2025-08-07 アーキテクチャリファクタリング完了 ✅
+
+### 実装内容
+1. **モジュール名リファクタリング** - 2025-08-07
+   - `section1-9.ts` → 画面機能対応の名前に変更
+   - `pavilion-search-page.ts`, `entrance-page-init.ts`, `companion-ticket-page.ts` など
+   - 各モジュールの責務を画面対応で明確化
+
+2. **循環参照解決** - 2025-08-07
+   - `entrance-page-dom-utils.ts` 新規作成（共有DOM関数を集約）
+   - `entrance-page-selectors.ts` 削除（依存注入構造の除去）
+   - `entrance-page-monitor.ts` と `entrance-page-selectors.ts` の循環参照完全解決
+   - import文を直接参照に変更、依存注入コード削除
+
+3. **監視継続失敗の修正** - 2025-08-07
+   - カレンダー検出の動的待機処理強化（10秒→リトライ30回・200ms間隔）
+   - `waitForCalendar`: time要素の存在確認とより長い待機時間
+   - `waitForValidCalendarDate`: time要素の存在を事前チェック
+   - DOM読み込みタイミング問題を根本解決
+
+4. **UI改善** - 2025-08-07
+   - 満員ボタン→緑色、監視中ボタン→赤色に変更
+   - JavaScript `style.background` → SCSSクラス（`full-status`/`monitoring-status`）に移行
+   - ホバー効果付きで視認性向上
+   - 不要なデバッグログ削除でコンソール整理
+
+### 技術的成果
+- **保守性向上**: 循環参照完全解決により依存関係が明確化
+- **安定性改善**: DOM要素検出の動的待機処理で監視継続が安定化
+- **コード品質**: 依存注入除去によりシンプルで理解しやすい構造
+- **UI/UX向上**: 色分けによる状態の視認性向上
+
+### 解決された問題
+- ❌ 「利用可能なカレンダー要素数: 0」→ ✅ 動的待機で解決
+- ❌ 「現在日付: null」→ ✅ time要素検出強化で解決
+- ❌ entrance-page-monitor ↔ entrance-page-selectors 循環参照 → ✅ DOM共通モジュールで解決
+- ❌ 複雑な依存注入構造 → ✅ 直接import・単純な構造
+
+### ファイル変更概要
+- **新規作成**: `entrance-page-dom-utils.ts`（共有DOM関数）
+- **削除**: `entrance-page-selectors.ts`（依存注入構造）
+- **改名**: `section1-9.ts` → 機能名対応モジュール
+- **修正**: 8ファイルのimport文変更、SCSS色定義追加
+
+### バージョン更新
+- v0.5.4: アーキテクチャリファクタリング・バグ修正・UI改善
