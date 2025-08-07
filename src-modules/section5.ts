@@ -601,27 +601,6 @@ function createMonitorButton(slotInfo: TimeSlotInfo): void {
     const monitorButton = document.createElement('button');
     monitorButton.classList.add('ext-ytomo', 'monitor-btn');
     monitorButton.setAttribute('data-target-time', timeText);
-    monitorButton.style.cssText = `
-        height: auto;
-        min-height: 20px;
-        width: auto;
-        min-width: 35px;
-        padding: 1px 4px;
-        background: rgb(255, 140, 0) !important;
-        color: white !important;
-        margin-left: 8px;
-        font-size: 10px;
-        border: none !important;
-        border-radius: 2px;
-        cursor: pointer !important;
-        display: inline-block;
-        vertical-align: middle;
-        position: relative;
-        z-index: 1000 !important;
-        pointer-events: auto !important;
-        opacity: 1 !important;
-        visibility: visible !important;
-    `;
     
     // ボタンテキストとイベントリスナー
     const buttonSpan = document.createElement('span');

@@ -20,7 +20,9 @@
       "Bash(git push:*)",
       "Bash(find:*)",
       "Bash(git rm:*)",
-      "Bash(cat:*)"
+      "Bash(cat:*)",
+      "Bash(npx tsc:*)",
+      "Bash(grep:*)"
     ],
     "deny": []
   }

@@ -125,19 +125,11 @@ const trigger_init = (url_record: string): void => {
     // 同じページタイプでもFABが消えている場合は再作成
     if (currentPageType === page_type && !isPageInitializing) {
         if (page_type === 'ticket_selection') {
-            const companionFab = document.getElementById('ytomo-companion-main-fab');
-            if (!companionFab) {
-                console.log(`🔄 ${page_type}ページで同行者FABが消失しているため再作成します`);
+            const ticketSelectionFab = document.getElementById('ytomo-ticket-selection-fab-container');
+            if (!ticketSelectionFab) {
+                console.log(`🔄 ${page_type}ページでチケット選択FABが消失しているため再作成します`);
             } else {
-                console.log(`✅ ${page_type}ページで同行者FABが既に存在します、スキップ`);
-                return;
-            }
-        } else if (page_type === 'agent_ticket') {
-            const agentFab = document.getElementById('ytomo-agent-progress-fab');
-            if (!agentFab) {
-                console.log(`🔄 ${page_type}ページで進捗FABが消失しているため再作成します`);
-            } else {
-                console.log(`✅ ${page_type}ページで進捗FABが既に存在します、スキップ`);
+                console.log(`✅ ${page_type}ページでチケット選択FABが既に存在します、スキップ`);
                 return;
             }
         }
@@ -162,22 +154,11 @@ const trigger_init = (url_record: string): void => {
         }
         
         // 同行者チケット関連FABを削除
-        if (currentPageType === 'ticket_selection' || currentPageType === 'agent_ticket') {
-            const companionMainFab = document.getElementById('ytomo-companion-main-fab');
-            if (companionMainFab) {
-                companionMainFab.remove();
-                console.log('🗑️ ページ遷移により同行者メインFABを削除しました');
-            }
-            
-            const agentFab = document.getElementById('ytomo-agent-progress-fab');
-            if (agentFab) {
-                // タイムアウトをキャンセル
-                const timeoutId = (agentFab as any).__timeoutId;
-                if (timeoutId) {
-                    clearTimeout(timeoutId);
-                }
-                agentFab.remove();
-                console.log('🗑️ ページ遷移によりエージェント進捗FABを削除しました');
+        if (currentPageType === 'ticket_selection') {
+            const ticketSelectionFab = document.getElementById('ytomo-ticket-selection-fab-container');
+            if (ticketSelectionFab) {
+                ticketSelectionFab.remove();
+                console.log('🗑️ ページ遷移によりチケット選択FABを削除しました');
             }
         }
     }
@@ -328,14 +309,8 @@ function initializeExtension() {
         
         // ページタイプごとのFABが意図せず削除された場合の自動復旧（サイレント）
         if (window.location.href.includes('ticket_selection')) {
-            const companionFab = document.getElementById('ytomo-companion-main-fab');
-            if (!companionFab) {
-                setTimeout(() => trigger_init(window.location.href), 100); // 即座復旧
-            }
-        } else if (window.location.href.includes('agent_ticket')) {
-            const agentFab = document.getElementById('ytomo-agent-progress-fab');
-            const processState = (window as any).companionProcessManager?.getState?.();
-            if (!agentFab && processState?.isRunning) {
+            const ticketSelectionFab = document.getElementById('ytomo-ticket-selection-fab-container');
+            if (!ticketSelectionFab) {
                 setTimeout(() => trigger_init(window.location.href), 100); // 即座復旧
             }
         }
@@ -355,14 +330,8 @@ function initializeExtension() {
         
         // ページタイプごとのFAB存在チェックと自動復旧（定期監視、サイレント）
         if (window.location.href.includes('ticket_selection')) {
-            const companionFab = document.getElementById('ytomo-companion-main-fab');
-            if (!companionFab) {
-                trigger_init(window.location.href);
-            }
-        } else if (window.location.href.includes('agent_ticket')) {
-            const agentFab = document.getElementById('ytomo-agent-progress-fab');
-            const processState = (window as any).companionProcessManager?.getState?.();
-            if (!agentFab && processState?.isRunning) {
+            const ticketSelectionFab = document.getElementById('ytomo-ticket-selection-fab-container');
+            if (!ticketSelectionFab) {
                 trigger_init(window.location.href);
             }
         }

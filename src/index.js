@@ -168,7 +168,7 @@ module.exports = styleTagTransform;
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1___default()((_node_modules_css_loader_dist_runtime_noSourceMaps_js__WEBPACK_IMPORTED_MODULE_0___default()));
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, `button.ext-ytomo{height:40px;width:auto;min-width:60px;padding:0px 8px;background:#006821 !important;color:#fff}button.ext-ytomo.no-after:after{background:rgba(0,0,0,0) none repeat 0 0/auto auto padding-box border-box scroll}button.ext-ytomo.btn-done{background:#4a4c4a !important}button.ext-ytomo:hover{background:#02862b}.pavilion-sub-btn.btn-enabled{background:#006821 !important;cursor:pointer !important;opacity:1 !important}.pavilion-sub-btn.btn-enabled:hover{background:#02862b !important;transform:scale(1.05) !important}.pavilion-sub-btn.btn-disabled,.pavilion-sub-btn.btn-loading{background:gray !important;cursor:not-allowed !important;opacity:.6 !important}.pavilion-sub-btn.btn-disabled:hover,.pavilion-sub-btn.btn-loading:hover{background:gray !important;transform:scale(1) !important}button.ext-ytomo.pavilion-sub-btn.btn-disabled,button.ext-ytomo.pavilion-sub-btn.btn-loading{background:gray !important;cursor:not-allowed !important;opacity:.6 !important}button.ext-ytomo.pavilion-sub-btn.btn-disabled:hover,button.ext-ytomo.pavilion-sub-btn.btn-loading:hover{background:gray !important;transform:scale(1) !important}.safe-none,.ytomo-none,.filter-none{display:none}div.div-flex{display:flex;justify-content:center;margin:5px}.ytomo-fab{width:56px !important;height:56px !important;border-radius:50% !important;color:#fff !important;border:none !important;box-shadow:0 6px 20px rgba(0,0,0,.4),0 2px 8px rgba(0,0,0,.2) !important;border:3px solid hsla(0,0%,100%,.2) !important;display:flex !important;align-items:center !important;justify-content:center !important;font-size:14px !important;font-weight:bold !important;transition:all .3s ease !important;position:relative !important;overflow:hidden !important;pointer-events:auto !important}.ytomo-fab-enabled{background:#006821 !important;opacity:.9 !important;cursor:pointer !important;pointer-events:auto !important}.ytomo-fab-disabled{background:gray !important;opacity:.6 !important;cursor:not-allowed !important;pointer-events:none !important}.ytomo-fab-monitoring{background:#ff8c00 !important;opacity:.9 !important;cursor:pointer !important;pointer-events:auto !important}.ytomo-fab-running{background:#dc3545 !important;opacity:.6 !important;cursor:not-allowed !important;pointer-events:none !important}input.ext-tomo.search{height:50px;min-width:200px;max-width:min(300px,100%);font-family:quicksand;font-size:16px;-webkit-appearance:textfield;-moz-appearance:textfield;appearance:textfield;border:1px solid #222426;border-radius:25px;box-shadow:0 1px 0 0 #ccc;padding:0 0 0 10px;flex:1 1}`, ""]);
+___CSS_LOADER_EXPORT___.push([module.id, `button.ext-ytomo{height:40px;width:auto;min-width:60px;padding:0px 8px;background:#006821 !important;color:#fff}button.ext-ytomo.no-after:after{background:rgba(0,0,0,0) none repeat 0 0/auto auto padding-box border-box scroll}button.ext-ytomo.btn-done{background:#4a4c4a !important}button.ext-ytomo:hover{background:#02862b}.pavilion-sub-btn{color:#fff;border:none;border-radius:20px;padding:8px 16px;font-size:12px;white-space:nowrap;transition:all .2s ease}.pavilion-sub-btn.btn-enabled{background:#006821 !important;cursor:pointer !important;opacity:1 !important}.pavilion-sub-btn.btn-enabled:hover{background:#02862b !important;transform:scale(1.05) !important}.pavilion-sub-btn.btn-disabled,.pavilion-sub-btn.btn-loading{background:gray !important;cursor:not-allowed !important;opacity:.6 !important}.pavilion-sub-btn.btn-disabled:hover,.pavilion-sub-btn.btn-loading:hover{background:gray !important;transform:scale(1) !important}button.ext-ytomo.pavilion-sub-btn.btn-disabled,button.ext-ytomo.pavilion-sub-btn.btn-loading{background:gray !important;cursor:not-allowed !important;opacity:.6 !important}button.ext-ytomo.pavilion-sub-btn.btn-disabled:hover,button.ext-ytomo.pavilion-sub-btn.btn-loading:hover{background:gray !important;transform:scale(1) !important}.safe-none,.ytomo-none,.filter-none{display:none}button.ext-ytomo.monitor-btn{height:auto;min-height:20px;width:auto;min-width:35px;padding:1px 4px;background:#ff8c00 !important;color:#fff !important;margin-left:8px;font-size:10px;border:none !important;border-radius:2px;cursor:pointer !important;display:inline-block;vertical-align:middle;position:relative;z-index:10 !important;pointer-events:auto !important;opacity:1 !important;visibility:visible !important}button.ext-ytomo.monitor-btn.monitoring{background:#ff5733 !important}button.ext-ytomo.monitor-btn.monitoring:hover{background:#ff4500 !important}button.ext-ytomo.monitor-btn:hover:not(.monitoring){background:orange !important}button.ext-ytomo.monitor-btn:disabled{background:gray !important;cursor:not-allowed !important;opacity:.6 !important}button.ext-ytomo.pavilion-sub-btn.ytomo-date-button.date-selected{border:2px solid #4caf50;box-shadow:0 0 8px rgba(76,175,80,.6)}div.div-flex{display:flex;justify-content:center;margin:5px}.ytomo-fab{width:56px !important;height:56px !important;border-radius:50% !important;color:#fff !important;border:none !important;box-shadow:0 6px 20px rgba(0,0,0,.4),0 2px 8px rgba(0,0,0,.2) !important;border:3px solid hsla(0,0%,100%,.2) !important;display:flex !important;align-items:center !important;justify-content:center !important;font-size:14px !important;font-weight:bold !important;transition:all .3s ease !important;position:relative !important;overflow:hidden !important;pointer-events:auto !important}.ytomo-fab-enabled{background:#006821 !important;opacity:.9 !important;cursor:pointer !important;pointer-events:auto !important}.ytomo-fab-disabled{background:gray !important;opacity:.6 !important;cursor:not-allowed !important;pointer-events:none !important}.ytomo-fab-monitoring{background:#ff8c00 !important;opacity:.9 !important;cursor:pointer !important;pointer-events:auto !important}.ytomo-fab-running{background:#dc3545 !important;opacity:.6 !important;cursor:not-allowed !important;pointer-events:none !important}.ytomo-fab-container{position:fixed !important;bottom:20px !important;right:20px !important;z-index:9999 !important;display:flex !important;flex-direction:column-reverse !important;align-items:center !important;gap:12px !important;pointer-events:none !important}.ytomo-fab-container.visible{display:flex !important}.ytomo-fab-container.hidden{display:none !important}.ytomo-fab-content{position:relative !important;display:flex !important;flex-direction:column-reverse !important;align-items:center !important;gap:8px !important;opacity:0 !important;transform:scale(0.8) translateY(10px) !important;transition:all .3s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;pointer-events:none !important}.ytomo-fab-content.expanded{opacity:1 !important;transform:scale(1) translateY(0) !important;pointer-events:auto !important}.ytomo-sub-fab{width:45px !important;height:32px !important;border-radius:16px !important;background:rgba(0,104,33,.9) !important;color:#fff !important;border:none !important;font-size:11px !important;font-weight:bold !important;cursor:pointer !important;transition:all .2s ease !important;box-shadow:0 2px 8px rgba(0,0,0,.3) !important;display:flex !important;align-items:center !important;justify-content:center !important;pointer-events:auto !important}.ytomo-sub-fab:hover{background:rgba(2,134,43,.9) !important;transform:scale(1.1) !important;box-shadow:0 4px 12px rgba(0,0,0,.4) !important}.ytomo-sub-fab:active{transform:scale(0.95) !important}.ytomo-pavilion-fab-container{position:fixed !important;bottom:24px !important;right:24px !important;z-index:10000 !important;display:flex !important;flex-direction:column !important;gap:12px !important;align-items:flex-end !important;pointer-events:auto !important}.ytomo-fab-inner-content{display:flex !important;flex-direction:column !important;align-items:center !important;justify-content:center !important;height:100% !important;pointer-events:none !important}input.ext-tomo.search{height:50px;min-width:200px;max-width:min(300px,100%);font-family:quicksand;font-size:16px;-webkit-appearance:textfield;-moz-appearance:textfield;appearance:textfield;border:1px solid #222426;border-radius:25px;box-shadow:0 1px 0 0 #ccc;padding:0 0 0 10px;flex:1 1}.ytomo-icon.expand-icon{font-size:8px !important;line-height:1 !important;color:#fff !important;font-weight:bold !important;text-align:center !important;pointer-events:none !important}.ytomo-icon.countdown-text{font-size:6px !important;line-height:1 !important;color:#fff !important;font-weight:bold !important;text-align:center !important;margin-top:1px !important;pointer-events:none !important}.ytomo-toggle.toggle-li{position:fixed !important;bottom:10px !important;left:10px !important;z-index:1000 !important;list-style:none !important;margin:0 !important;padding:0 !important}.ytomo-toggle.toggle-button{width:50px !important;height:30px !important;background:rgba(255,140,0,.8) !important;border:none !important;border-radius:15px !important;cursor:pointer !important;transition:all .3s ease !important;display:flex !important;align-items:center !important;justify-content:center !important;font-size:12px !important;font-weight:bold !important;position:relative !important;overflow:hidden !important}.ytomo-toggle.toggle-button.enabled{color:#fff}.ytomo-toggle.toggle-button.disabled{color:#ddd}.ytomo-toggle.toggle-figure{width:100% !important;height:100% !important;margin:0 !important;padding:0 !important;border:none !important;background:rgba(0,0,0,0) !important;pointer-events:none !important}.ytomo-dialog.overlay{position:fixed !important;top:0 !important;left:0 !important;width:100% !important;height:100% !important;background-color:rgba(0,0,0,.5) !important;z-index:10000 !important;display:flex !important;justify-content:center !important;align-items:center !important}.ytomo-dialog.container{background:#fff !important;border-radius:8px !important;padding:20px !important;max-width:400px !important;width:90% !important;max-height:70vh !important;overflow-y:auto !important;box-shadow:0 4px 12px rgba(0,0,0,.3) !important}.ytomo-dialog.title{margin:0 0 16px 0 !important;color:#333 !important;font-size:18px !important;font-weight:bold !important}.ytomo-dialog.button-group{display:flex !important;justify-content:flex-end !important;gap:10px !important;margin-top:20px !important}.ytomo-dialog.primary-button{background:#006821 !important;color:#fff !important;border:none !important;padding:10px 20px !important;border-radius:4px !important;cursor:pointer !important;font-size:14px !important}.ytomo-dialog.primary-button:hover{background:#02862b !important}.ytomo-dialog.primary-button:disabled{background:gray !important;cursor:not-allowed !important}.ytomo-dialog.secondary-button{background:rgba(0,0,0,0) !important;color:#666 !important;border:1px solid #ccc !important;padding:10px 20px !important;border-radius:4px !important;cursor:pointer !important;font-size:14px !important}.ytomo-dialog.secondary-button:hover{background:#f5f5f5 !important}.ytomo-progress.counter{display:inline-block !important;margin-left:8px !important;padding:2px 6px !important;background:rgba(0,0,0,.3) !important;border-radius:10px !important;font-size:10px !important;color:#fff !important;font-weight:bold !important}`, ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -501,10 +501,10 @@ function updateFABVisibility() {
     if (pavilionFabContainer) {
         pavilionFabContainer.style.display = fabVisibilityState.isVisible ? 'flex' : 'none';
     }
-    // 同行者追加FAB
-    const companionFabContainer = document.getElementById('ytomo-companion-fab-container');
-    if (companionFabContainer) {
-        companionFabContainer.style.display = fabVisibilityState.isVisible ? 'flex' : 'none';
+    // チケット選択画面FAB
+    const ticketSelectionFabContainer = document.getElementById('ytomo-ticket-selection-fab-container');
+    if (ticketSelectionFabContainer) {
+        ticketSelectionFabContainer.style.display = fabVisibilityState.isVisible ? 'flex' : 'none';
     }
 }
 // ヘッダーにFAB表示切替ボタンを追加
@@ -999,31 +999,14 @@ const init_page = () => {
         // FABコンテナを作成（右下固定、入場予約FABと同じスタイル）
         const fabContainer = document.createElement('div');
         fabContainer.id = 'ytomo-pavilion-fab-container';
-        fabContainer.style.cssText = `
-            position: fixed !important;
-            bottom: 24px !important;
-            right: 24px !important;
-            z-index: 10000 !important;
-            display: flex !important;
-            flex-direction: column !important;
-            gap: 12px !important;
-            align-items: flex-end !important;
-            pointer-events: auto !important;
-        `;
+        fabContainer.classList.add('ytomo-pavilion-fab-container');
         // メインFABボタンを作成（入場予約FABと同じスタイル）
         const fabButton = document.createElement('button');
         fabButton.id = 'ytomo-pavilion-fab-button';
         fabButton.classList.add('ext-ytomo', 'ytomo-fab', 'ytomo-fab-enabled');
         // FABボタンの内容構造（縦配置）
         const fabContent = document.createElement('div');
-        fabContent.style.cssText = `
-            display: flex !important;
-            flex-direction: column !important;
-            align-items: center !important;
-            justify-content: center !important;
-            height: 100% !important;
-            pointer-events: none !important;
-        `;
+        fabContent.classList.add('ytomo-fab-inner-content');
         // 展開/縮小アイコン（上部）
         const expandIcon = document.createElement('div');
         expandIcon.style.cssText = `
@@ -4119,27 +4102,6 @@ function createMonitorButton(slotInfo) {
     const monitorButton = document.createElement('button');
     monitorButton.classList.add('ext-ytomo', 'monitor-btn');
     monitorButton.setAttribute('data-target-time', timeText);
-    monitorButton.style.cssText = `
-        height: auto;
-        min-height: 20px;
-        width: auto;
-        min-width: 35px;
-        padding: 1px 4px;
-        background: rgb(255, 140, 0) !important;
-        color: white !important;
-        margin-left: 8px;
-        font-size: 10px;
-        border: none !important;
-        border-radius: 2px;
-        cursor: pointer !important;
-        display: inline-block;
-        vertical-align: middle;
-        position: relative;
-        z-index: 1000 !important;
-        pointer-events: auto !important;
-        opacity: 1 !important;
-        visibility: visible !important;
-    `;
     // ボタンテキストとイベントリスナー
     const buttonSpan = document.createElement('span');
     buttonSpan.classList.add('ext-ytomo');
@@ -5925,6 +5887,10 @@ function initializeTicketSelectionPage() {
         uncheckAllTickets();
     }, 800); // 少し遅らせてDOMが安定してから実行
     createTicketSelectionFAB();
+    // チケット選択変更の監視を開始（視覚フィードバック用）
+    setTimeout(() => {
+        startTicketSelectionMonitoring();
+    }, 1500); // FAB作成後に開始
 }
 function initializeAgentTicketPage() {
     console.log('👥 同行者追加画面を初期化中...');
@@ -5933,9 +5899,8 @@ function initializeAgentTicketPage() {
         console.log('🚫 agent_ticketページではないため初期化をスキップ');
         return;
     }
-    // 進行状況FAB作成
-    createAgentTicketProgressFAB();
-    console.log('✅ 同行者追加画面の初期化完了');
+    // 同行者追加画面ではFABは不要
+    console.log('✅ 同行者追加画面の初期化完了（FAB作成なし）');
 }
 // FABダイアログ作成（画面に応じて切り替え）
 function createCompanionTicketFAB() {
@@ -5950,18 +5915,67 @@ function createCompanionTicketFAB() {
         return;
     }
 }
+// 日付ボタンのみを更新（既存FAB再利用時）
+function updateDateButtonsOnly(subButtonsContainer) {
+    console.log('🗓️ 日付ボタンのみ更新します');
+    const tickets = getTicketElements();
+    const availableDates = getAvailableDates(tickets);
+    // 既存の日付ボタンをクリア
+    const existingDateButtons = subButtonsContainer.querySelectorAll('.ytomo-date-button');
+    existingDateButtons.forEach(btn => btn.remove());
+    console.log(`🗑️ 既存の日付ボタン${existingDateButtons.length}個を削除`);
+    if (availableDates.length === 0) {
+        console.log('📅 利用可能な日付がないため、日付ボタンは作成しません');
+        return;
+    }
+    // 同行者ボタンを保持（削除しない）
+    const companionButton = subButtonsContainer.querySelector('.ytomo-sub-fab:not(.ytomo-date-button)');
+    // 新しい日付ボタンを同行者ボタンの前に挿入
+    availableDates.slice(0, 3).forEach((date, index) => {
+        const formatted = formatDateForLabel(date);
+        const buttonLabel = '選択';
+        const button = createSubFABButton(buttonLabel, () => {
+            if (index === 2 && availableDates.length > 3) {
+                showDateSelectionDialog(availableDates);
+            }
+            else {
+                toggleNearestDateSelection(date);
+            }
+        });
+        button.classList.add('ytomo-date-button');
+        if (index === 0)
+            button.style.fontWeight = 'bold !important';
+        const displayText = (index === 2 && availableDates.length > 3) ? '他' : formatted;
+        button.innerHTML = `${buttonLabel} <span style="font-family: 'Courier New', 'Monaco', monospace; font-weight: bold; color: #ffeb3b; vertical-align: baseline;">${displayText}</span>`;
+        // 同行者ボタンの前に挿入
+        if (companionButton) {
+            subButtonsContainer.insertBefore(button, companionButton);
+        }
+        else {
+            subButtonsContainer.appendChild(button);
+        }
+    });
+    console.log(`✅ 日付ボタン更新完了: ${Math.min(availableDates.length, 3)}個のボタンを作成`);
+}
 // チケット選択画面用のFAB（展開可能）
 function createTicketSelectionFAB() {
-    // 既存FAB削除
-    const existingFab = document.getElementById('ytomo-companion-fab-container');
-    if (existingFab) {
-        existingFab.remove();
+    // 既存FABコンテナがある場合は子ボタンのみ更新
+    const existingFabContainer = document.getElementById('ytomo-ticket-selection-fab-container');
+    if (existingFabContainer) {
+        console.log('✅ 既存のチケット選択FABコンテナを再利用し、子ボタンを更新します');
+        // 既存の子ボタンコンテナを取得
+        const existingSubContainer = existingFabContainer.querySelector('#ytomo-companion-sub-buttons');
+        if (existingSubContainer) {
+            // 日付ボタンのみ更新（同行者ボタンは保持）
+            updateDateButtonsOnly(existingSubContainer);
+        }
+        return;
     }
     // FAB展開状態管理（初期状態を展開に）
     let isExpanded = true;
     // チケット選択画面用FABコンテナ作成（パビリオン検索画面と同様の構造）
     const fabContainer = document.createElement('div');
-    fabContainer.id = 'ytomo-ticket-selection-fab';
+    fabContainer.id = 'ytomo-ticket-selection-fab-container';
     fabContainer.classList.add('ytomo-companion-fab', 'ytomo-ticket-selection-page');
     // FAB作成ログ
     console.log('✨ チケット選択画面用同行者FABを作成しました:', fabContainer.id);
@@ -6021,31 +6035,30 @@ function createTicketSelectionFAB() {
             // 2種類の場合: 2個のボタン
             availableDates.forEach((date, index) => {
                 const formatted = formatDateForLabel(date);
-                const baseLabel = index === 0 ? '直近' : '選択';
-                const button = createSubFABButton(baseLabel, () => {
+                const button = createSubFABButton('選択', () => {
                     toggleNearestDateSelection(date);
                 });
                 button.classList.add('ytomo-date-button');
                 if (index === 0)
                     button.style.fontWeight = 'bold !important';
                 // 日付部分を強調表示で追加
-                button.innerHTML = `${baseLabel} <span style="font-family: 'Courier New', 'Monaco', monospace; font-weight: bold; color: #ffeb3b; vertical-align: baseline;">${formatted}</span>`;
+                button.innerHTML = `選択 <span style="font-family: 'Courier New', 'Monaco', monospace; font-weight: bold; color: #ffeb3b; vertical-align: baseline;">${formatted}</span>`;
                 subButtonsContainer.appendChild(button);
             });
         }
         else {
             // 3種類以上の場合: 3個のボタン
-            // ボタン1: 直近日付
-            const nearestDate = availableDates[0];
-            const nearestFormatted = formatDateForLabel(nearestDate);
-            const nearestButton = createSubFABButton('直近', () => {
-                toggleNearestDateSelection(nearestDate);
+            // ボタン1: 1番目の日付
+            const firstDate = availableDates[0];
+            const firstFormatted = formatDateForLabel(firstDate);
+            const firstButton = createSubFABButton('選択', () => {
+                toggleNearestDateSelection(firstDate);
             });
-            nearestButton.classList.add('ytomo-date-button');
-            nearestButton.style.fontWeight = 'bold !important';
+            firstButton.classList.add('ytomo-date-button');
+            firstButton.style.fontWeight = 'bold !important';
             // 日付部分を強調表示で追加
-            nearestButton.innerHTML = `直近 <span style="font-family: 'Courier New', 'Monaco', monospace; font-weight: bold; color: #ffeb3b; vertical-align: baseline;">${nearestFormatted}</span>`;
-            subButtonsContainer.appendChild(nearestButton);
+            firstButton.innerHTML = `選択 <span style="font-family: 'Courier New', 'Monaco', monospace; font-weight: bold; color: #ffeb3b; vertical-align: baseline;">${firstFormatted}</span>`;
+            subButtonsContainer.appendChild(firstButton);
             // ボタン2: 2番目の日付
             const secondDate = availableDates[1];
             const secondFormatted = formatDateForLabel(secondDate);
@@ -6077,7 +6090,7 @@ function createTicketSelectionFAB() {
                         cursor: pointer !important;
                         text-decoration: underline !important;
                     `;
-                    dateSpan.textContent = thirdFormatted;
+                    dateSpan.textContent = '他';
                     // 日付部分クリック時は日付選択ダイアログを開く
                     dateSpan.addEventListener('click', (e) => {
                         e.stopPropagation(); // 親ボタンのクリックを防ぐ
@@ -6108,11 +6121,16 @@ function createTicketSelectionFAB() {
     const waitForTicketsAndUpdate = () => {
         const tickets = getTicketElements();
         if (tickets.length > 0) {
+            console.log(`🎫 チケット${tickets.length}件を検出、日付ボタンを更新します`);
             createDynamicDateButtons();
         }
         else if (retryCount < maxRetries) {
             retryCount++;
+            console.log(`⏳ チケット検出待機中... (${retryCount}/${maxRetries})`);
             setTimeout(waitForTicketsAndUpdate, 500);
+        }
+        else {
+            console.warn('⚠️ チケット検出がタイムアウトしました');
         }
     };
     // 初期の同行者ボタン配置（日付ボタンが未生成の状態）
@@ -6121,7 +6139,7 @@ function createTicketSelectionFAB() {
     setTimeout(waitForTicketsAndUpdate, 1000);
     // メインFABボタン作成（パビリオン検索FABと統一デザイン）
     const mainFabButton = document.createElement('button');
-    mainFabButton.id = 'ytomo-companion-main-fab';
+    mainFabButton.id = 'ytomo-ticket-selection-main-fab';
     mainFabButton.classList.add('ext-ytomo', 'ytomo-fab', 'ytomo-fab-enabled');
     // FABボタンにrelative positionを設定
     mainFabButton.style.position = 'relative';
@@ -6199,16 +6217,7 @@ function createSubFABButton(label, onClick) {
     const button = document.createElement('button');
     button.classList.add('ext-ytomo', 'pavilion-sub-btn', 'btn-enabled');
     button.textContent = label;
-    button.style.cssText = `
-        color: white !important;
-        border: none !important;
-        border-radius: 20px !important;
-        padding: 8px 16px !important;
-        font-size: 12px !important;
-        white-space: nowrap !important;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3) !important;
-        transition: all 0.2s ease !important;
-    `;
+    // インラインスタイル完全削除 - 全てSCSSで管理
     // クリックイベント
     button.addEventListener('click', onClick);
     return button;
@@ -6300,6 +6309,59 @@ function uncheckAllTickets() {
         }
     };
     uncheckProcess();
+}
+// 指定日付のチケットがすべて選択されているかチェック
+function isDateFullySelected(targetDate, tickets) {
+    const targetDateTickets = getTicketsByDate(tickets, targetDate);
+    if (targetDateTickets.length === 0) {
+        return false;
+    }
+    // 対象日付の全チケットが選択されているかチェック
+    const allSelected = targetDateTickets.every(ticket => {
+        const parentLi = ticket.closest('li');
+        const checkbox = parentLi?.querySelector('input[type="checkbox"]');
+        return checkbox?.checked;
+    });
+    // 他の日付のチケットが選択されていないかチェック
+    const otherTicketsSelected = tickets.some(ticket => {
+        if (targetDateTickets.includes(ticket)) {
+            return false; // 対象日付のチケットは除外
+        }
+        const parentLi = ticket.closest('li');
+        const checkbox = parentLi?.querySelector('input[type="checkbox"]');
+        return checkbox?.checked;
+    });
+    return allSelected && !otherTicketsSelected;
+}
+// 日付ボタンの選択状態を更新
+function updateDateButtonStates() {
+    const tickets = getTicketElements();
+    const availableDates = getAvailableDates(tickets);
+    // 全ての日付ボタンの選択状態を更新
+    const dateButtons = document.querySelectorAll('.ytomo-date-button');
+    dateButtons.forEach((button, index) => {
+        const buttonElement = button;
+        // ボタンに対応する日付を取得
+        let targetDate = null;
+        if (index < availableDates.length) {
+            targetDate = availableDates[index];
+        }
+        else if (availableDates.length >= 4 && index === 2) {
+            // 4種類以上の場合の3番目のボタンは特殊（日付選択ダイアログ）
+            targetDate = availableDates[2];
+        }
+        if (!targetDate)
+            return;
+        // 選択状態をチェック
+        const isSelected = isDateFullySelected(targetDate, tickets);
+        // 選択状態に応じてCSSクラスを更新
+        if (isSelected) {
+            buttonElement.classList.add('date-selected');
+        }
+        else {
+            buttonElement.classList.remove('date-selected');
+        }
+    });
 }
 // 利用可能な全ての日付を取得（重複除去・ソート済み）
 function getAvailableDates(tickets) {
@@ -6507,17 +6569,10 @@ function toggleNearestDateSelection(targetDate) {
         showCustomAlert('対象日付のチケットが見つかりません');
         return;
     }
-    // 現在の選択状態をチェック
-    const currentNearestSelected = targetDateTickets.every(ticket => {
-        const checkbox = ticket.querySelector('input[type="checkbox"]');
-        return checkbox?.checked;
-    });
-    const otherSelected = checkboxes.some(cb => {
-        const ticket = cb.closest('.col3');
-        return cb.checked && !targetDateTickets.includes(ticket);
-    });
-    if (currentNearestSelected && !otherSelected) {
-        // 直近日付のみが選択済みの場合は全て解除
+    // 現在の選択状態をチェック（新しい関数を使用）
+    const isCurrentlyFullySelected = isDateFullySelected(targetDate, tickets);
+    if (isCurrentlyFullySelected) {
+        // 対象日付がすべて選択済みの場合は全て解除
         checkboxes.forEach((cb, index) => {
             if (cb.checked) {
                 try {
@@ -6570,253 +6625,73 @@ function toggleNearestDateSelection(targetDate) {
         const dateStr = formatDateForLabel(targetDate);
         console.log(`✅ 対象日付(${dateStr})のチケット${targetDateTickets.length}件を選択しました`);
     }
+    // 選択状態変更後、日付ボタンの視覚状態を更新
+    setTimeout(() => updateDateButtonStates(), 100);
 }
-// 同行者追加画面用の進行状況表示FAB
-function createAgentTicketProgressFAB() {
-    // agent_ticketページでない場合は何もしない
-    if (!window.location.href.includes('agent_ticket')) {
-        return;
-    }
-    // 既存の進捗FABを削除（同ページ内でのみ）
-    const existingProgressFab = document.getElementById('ytomo-agent-progress-fab');
-    if (existingProgressFab) {
-        existingProgressFab.remove();
-    }
-    // 処理中でない場合は何も表示しない
-    const processState = companionProcessManager.getState();
-    if (!processState.isRunning) {
-        return;
-    }
-    // 同行者追加画面用進捗FABコンテナ作成
-    const fabContainer = document.createElement('div');
-    fabContainer.id = 'ytomo-agent-progress-fab';
-    fabContainer.classList.add('ytomo-companion-fab', 'ytomo-agent-ticket-page');
-    fabContainer.style.cssText = `
-        position: fixed !important;
-        bottom: 100px !important;
-        right: 24px !important;
-        z-index: 10000 !important;
-        display: flex !important;
-        flex-direction: column !important;
-        gap: 12px !important;
-        align-items: flex-end !important;
-        pointer-events: auto !important;
-    `;
-    const remainingCount = processState.queuedTicketIds.length;
-    // メイン状況表示ボタン
-    const statusButton = document.createElement('button');
-    statusButton.id = 'ytomo-companion-status-button';
-    statusButton.style.cssText = `
-        width: 64px !important;
-        height: 64px !important;
-        border-radius: 50% !important;
-        background: linear-gradient(135deg, #FF9800 0%, #F57C00 100%) !important;
-        border: none !important;
-        box-shadow: 0 4px 20px rgba(0,0,0,0.3) !important;
-        cursor: pointer !important;
-        display: flex !important;
-        align-items: center !important;
-        justify-content: center !important;
-        font-size: 10px !important;
-        color: white !important;
-        transition: all 0.3s ease !important;
-        animation: pulse 2s infinite !important;
-        text-align: center !important;
-        line-height: 1.2 !important;
-    `;
-    statusButton.innerHTML = `
-        <div>
-            <div style="font-size: 16px; margin-bottom: 2px;">🎫</div>
-            <div>実行中</div>
-            <div style="font-size: 8px;">${processState.successCount}/${processState.successCount + processState.errorCount + remainingCount}</div>
-        </div>
-    `;
-    // CSS animationを追加
-    if (!document.getElementById('ytomo-pulse-animation')) {
-        const style = document.createElement('style');
-        style.id = 'ytomo-pulse-animation';
-        style.textContent = `
-            @keyframes pulse {
-                0% { transform: scale(1); }
-                50% { transform: scale(1.05); }
-                100% { transform: scale(1); }
+// チケット選択変更の監視を開始
+function startTicketSelectionMonitoring() {
+    console.log('👀 チケット選択監視を開始します');
+    // MutationObserverでチェックボックスの変更を監視
+    const observer = new MutationObserver((mutations) => {
+        let shouldUpdate = false;
+        mutations.forEach((mutation) => {
+            // チェックボックスの変更を検知
+            if (mutation.type === 'attributes' && mutation.attributeName === 'checked') {
+                const target = mutation.target;
+                if (target.type === 'checkbox') {
+                    shouldUpdate = true;
+                }
             }
-        `;
-        document.head.appendChild(style);
-    }
-    // ホバー効果
-    statusButton.addEventListener('mouseenter', () => {
-        statusButton.style.transform = 'scale(1.1)';
-        statusButton.style.boxShadow = '0 6px 25px rgba(0,0,0,0.4)';
-    });
-    statusButton.addEventListener('mouseleave', () => {
-        statusButton.style.transform = 'scale(1)';
-        statusButton.style.boxShadow = '0 4px 20px rgba(0,0,0,0.3)';
-    });
-    // クリックで詳細表示
-    statusButton.addEventListener('click', () => {
-        showCompanionProgressDetail();
-    });
-    // 停止ボタン（小さめのFAB）
-    const stopButton = document.createElement('button');
-    stopButton.id = 'ytomo-companion-stop-button';
-    stopButton.style.cssText = `
-        width: 48px !important;
-        height: 48px !important;
-        border-radius: 50% !important;
-        background: linear-gradient(135deg, #f44336 0%, #d32f2f 100%) !important;
-        border: none !important;
-        box-shadow: 0 3px 15px rgba(0,0,0,0.3) !important;
-        cursor: pointer !important;
-        display: flex !important;
-        align-items: center !important;
-        justify-content: center !important;
-        font-size: 18px !important;
-        color: white !important;
-        transition: all 0.3s ease !important;
-    `;
-    stopButton.innerHTML = '⏹️';
-    stopButton.title = '同行者追加処理を停止';
-    stopButton.addEventListener('mouseenter', () => {
-        stopButton.style.transform = 'scale(1.1)';
-        stopButton.style.boxShadow = '0 5px 20px rgba(0,0,0,0.4)';
-    });
-    stopButton.addEventListener('mouseleave', () => {
-        stopButton.style.transform = 'scale(1)';
-        stopButton.style.boxShadow = '0 3px 15px rgba(0,0,0,0.3)';
-    });
-    stopButton.addEventListener('click', () => {
-        showCustomConfirm('同行者追加処理を停止しますか？', () => {
-            companionProcessManager.stopProcess();
-            fabContainer.remove();
+            // DOM構造の変更（チケット追加・削除）を検知
+            if (mutation.type === 'childList') {
+                const hasCheckboxes = Array.from(mutation.addedNodes).some(node => {
+                    if (node.nodeType === Node.ELEMENT_NODE) {
+                        const element = node;
+                        return element.querySelector('input[type="checkbox"]') !== null;
+                    }
+                    return false;
+                });
+                if (hasCheckboxes) {
+                    shouldUpdate = true;
+                }
+            }
         });
-    });
-    // DOM追加
-    fabContainer.appendChild(statusButton);
-    fabContainer.appendChild(stopButton);
-    document.documentElement.appendChild(fabContainer);
-    // 5秒後に自動更新（agent_ticketページでのみ）
-    const timeoutId = setTimeout(() => {
-        // ページがagent_ticketであり、処理が継続中の場合のみ再実行
-        if (window.location.href.includes('agent_ticket') &&
-            companionProcessManager.getState().isRunning &&
-            document.getElementById('ytomo-companion-progress-fab')) {
-            createAgentTicketProgressFAB();
+        if (shouldUpdate) {
+            // 短いdebounceで更新頻度を制御
+            clearTimeout(updateTimeout);
+            updateTimeout = setTimeout(() => {
+                updateDateButtonStates();
+            }, 200);
         }
-        else {
-            console.log('🚫 進捗FAB自動更新をキャンセルしました（ページ遷移または処理終了）');
-        }
-    }, 5000);
-    // タイムアウトIDを保存して、必要時にキャンセルできるようにする
-    fabContainer.__timeoutId = timeoutId;
-}
-// 同行者追加進行状況詳細表示
-function showCompanionProgressDetail() {
-    const processState = companionProcessManager.getState();
-    // 既存ダイアログ削除
-    const existingDialog = document.getElementById('ytomo-companion-progress-dialog');
-    if (existingDialog) {
-        existingDialog.remove();
-    }
-    // モーダルオーバーレイ作成
-    const overlay = document.createElement('div');
-    overlay.id = 'ytomo-companion-progress-dialog';
-    overlay.style.cssText = `
-        position: fixed !important;
-        top: 0 !important;
-        left: 0 !important;
-        width: 100% !important;
-        height: 100% !important;
-        background: rgba(0,0,0,0.5) !important;
-        z-index: 10001 !important;
-        display: flex !important;
-        align-items: center !important;
-        justify-content: center !important;
-    `;
-    // ダイアログコンテンツ
-    const dialog = document.createElement('div');
-    dialog.style.cssText = `
-        background: white !important;
-        border-radius: 12px !important;
-        padding: 24px !important;
-        max-width: 500px !important;
-        width: 90% !important;
-        max-height: 80vh !important;
-        overflow-y: auto !important;
-        box-shadow: 0 10px 40px rgba(0,0,0,0.3) !important;
-    `;
-    const currentTicketText = processState.currentTicketId
-        ? `処理中: ${processState.currentTicketId}`
-        : '待機中...';
-    const remainingCount = processState.queuedTicketIds.length;
-    dialog.innerHTML = `
-        <div style="margin-bottom: 20px;">
-            <h2 style="margin: 0 0 12px 0; color: #333; font-size: 18px;">🎫 同行者追加処理状況</h2>
-        </div>
-        
-        <div style="margin-bottom: 16px; padding: 16px; background: #f5f5f5; border-radius: 8px;">
-            <div style="font-weight: bold; margin-bottom: 8px; color: #FF9800;">現在の状況</div>
-            <div style="margin-bottom: 4px;">${currentTicketText}</div>
-            <div style="margin-bottom: 4px;">待機中: ${remainingCount}件</div>
-            <div style="margin-bottom: 4px;">完了: ${processState.successCount}件</div>
-            <div>エラー: ${processState.errorCount}件</div>
-        </div>
-        
-        ${processState.queuedTicketIds.length > 0 ? `
-        <div style="margin-bottom: 16px;">
-            <div style="font-weight: bold; margin-bottom: 8px; color: #333;">待機中のチケットID</div>
-            <div style="max-height: 120px; overflow-y: auto; border: 1px solid #ddd; border-radius: 4px; padding: 8px; background: #fafafa;">
-                ${processState.queuedTicketIds.map(id => `<div style="padding: 2px 0; font-family: monospace;">${id}</div>`).join('')}
-            </div>
-        </div>
-        ` : ''}
-        
-        ${processState.errors.length > 0 ? `
-        <div style="margin-bottom: 16px;">
-            <div style="font-weight: bold; margin-bottom: 8px; color: #f44336;">エラー履歴</div>
-            <div style="max-height: 120px; overflow-y: auto; border: 1px solid #ffcdd2; border-radius: 4px; padding: 8px; background: #ffebee;">
-                ${processState.errors.map(error => `
-                    <div style="padding: 4px 0; border-bottom: 1px solid #ffcdd2; font-size: 12px;">
-                        <div style="font-weight: bold; color: #d32f2f;">${error.ticketId}</div>
-                        <div style="color: #666;">${error.message}</div>
-                        <div style="color: #999; font-size: 10px;">${new Date(error.timestamp).toLocaleString()}</div>
-                    </div>
-                `).join('')}
-            </div>
-        </div>
-        ` : ''}
-        
-        <div style="display: flex; gap: 12px; justify-content: flex-end;">
-            <button id="close-progress-btn" style="padding: 8px 16px; background: #666; color: white; border: none; border-radius: 4px; cursor: pointer;">
-                閉じる
-            </button>
-            <button id="stop-process-btn" style="padding: 8px 16px; background: #f44336; color: white; border: none; border-radius: 4px; cursor: pointer;">
-                処理停止
-            </button>
-        </div>
-    `;
-    // イベントリスナー設定
-    dialog.querySelector('#close-progress-btn')?.addEventListener('click', () => {
-        overlay.remove();
     });
-    dialog.querySelector('#stop-process-btn')?.addEventListener('click', () => {
-        showCustomConfirm('同行者追加処理を停止しますか？', () => {
-            companionProcessManager.stopProcess();
-            overlay.remove();
-            const fab = document.getElementById('ytomo-companion-fab-container');
-            if (fab)
-                fab.remove();
+    // チケットリスト全体を監視
+    const ticketContainer = document.querySelector('ul.product-list, .ticket-list, main, body');
+    if (ticketContainer) {
+        observer.observe(ticketContainer, {
+            childList: true,
+            subtree: true,
+            attributes: true,
+            attributeFilter: ['checked']
         });
-    });
-    overlay.appendChild(dialog);
-    document.body.appendChild(overlay);
-    // オーバーレイクリックで閉じる
-    overlay.addEventListener('click', (e) => {
-        if (e.target === overlay) {
-            overlay.remove();
+        console.log('✅ チケット選択監視設定完了');
+    }
+    else {
+        console.warn('⚠️ チケットコンテナが見つからないため監視を開始できませんでした');
+    }
+    // DOM変更イベントリスナーも追加（フォールバック）
+    document.addEventListener('change', (event) => {
+        const target = event.target;
+        if (target.tagName === 'INPUT' && target.type === 'checkbox') {
+            clearTimeout(updateTimeout);
+            updateTimeout = setTimeout(() => {
+                updateDateButtonStates();
+            }, 200);
         }
     });
 }
+// デバウンス用のタイムアウト
+let updateTimeout;
+// 同行者追加画面ではFABは不要なため削除済み
 // 同行者チケット管理ダイアログ表示
 function showCompanionTicketDialog() {
     // 既存ダイアログ削除
@@ -7233,22 +7108,12 @@ const trigger_init = (url_record) => {
     // 同じページタイプでもFABが消えている場合は再作成
     if (currentPageType === page_type && !isPageInitializing) {
         if (page_type === 'ticket_selection') {
-            const companionFab = document.getElementById('ytomo-companion-main-fab');
-            if (!companionFab) {
-                console.log(`🔄 ${page_type}ページで同行者FABが消失しているため再作成します`);
+            const ticketSelectionFab = document.getElementById('ytomo-ticket-selection-fab-container');
+            if (!ticketSelectionFab) {
+                console.log(`🔄 ${page_type}ページでチケット選択FABが消失しているため再作成します`);
             }
             else {
-                console.log(`✅ ${page_type}ページで同行者FABが既に存在します、スキップ`);
-                return;
-            }
-        }
-        else if (page_type === 'agent_ticket') {
-            const agentFab = document.getElementById('ytomo-agent-progress-fab');
-            if (!agentFab) {
-                console.log(`🔄 ${page_type}ページで進捗FABが消失しているため再作成します`);
-            }
-            else {
-                console.log(`✅ ${page_type}ページで進捗FABが既に存在します、スキップ`);
+                console.log(`✅ ${page_type}ページでチケット選択FABが既に存在します、スキップ`);
                 return;
             }
         }
@@ -7269,21 +7134,11 @@ const trigger_init = (url_record) => {
             console.log('🗑️ ページ遷移により既存のパビリオンFABボタンを削除しました');
         }
         // 同行者チケット関連FABを削除
-        if (currentPageType === 'ticket_selection' || currentPageType === 'agent_ticket') {
-            const companionMainFab = document.getElementById('ytomo-companion-main-fab');
-            if (companionMainFab) {
-                companionMainFab.remove();
-                console.log('🗑️ ページ遷移により同行者メインFABを削除しました');
-            }
-            const agentFab = document.getElementById('ytomo-agent-progress-fab');
-            if (agentFab) {
-                // タイムアウトをキャンセル
-                const timeoutId = agentFab.__timeoutId;
-                if (timeoutId) {
-                    clearTimeout(timeoutId);
-                }
-                agentFab.remove();
-                console.log('🗑️ ページ遷移によりエージェント進捗FABを削除しました');
+        if (currentPageType === 'ticket_selection') {
+            const ticketSelectionFab = document.getElementById('ytomo-ticket-selection-fab-container');
+            if (ticketSelectionFab) {
+                ticketSelectionFab.remove();
+                console.log('🗑️ ページ遷移によりチケット選択FABを削除しました');
             }
         }
     }
@@ -7424,15 +7279,8 @@ function initializeExtension() {
             }
             // ページタイプごとのFABが意図せず削除された場合の自動復旧（サイレント）
             if (window.location.href.includes('ticket_selection')) {
-                const companionFab = document.getElementById('ytomo-companion-main-fab');
-                if (!companionFab) {
-                    setTimeout(() => trigger_init(window.location.href), 100); // 即座復旧
-                }
-            }
-            else if (window.location.href.includes('agent_ticket')) {
-                const agentFab = document.getElementById('ytomo-agent-progress-fab');
-                const processState = window.companionProcessManager?.getState?.();
-                if (!agentFab && processState?.isRunning) {
+                const ticketSelectionFab = document.getElementById('ytomo-ticket-selection-fab-container');
+                if (!ticketSelectionFab) {
                     setTimeout(() => trigger_init(window.location.href), 100); // 即座復旧
                 }
             }
@@ -7450,15 +7298,8 @@ function initializeExtension() {
             }
             // ページタイプごとのFAB存在チェックと自動復旧（定期監視、サイレント）
             if (window.location.href.includes('ticket_selection')) {
-                const companionFab = document.getElementById('ytomo-companion-main-fab');
-                if (!companionFab) {
-                    trigger_init(window.location.href);
-                }
-            }
-            else if (window.location.href.includes('agent_ticket')) {
-                const agentFab = document.getElementById('ytomo-agent-progress-fab');
-                const processState = window.companionProcessManager?.getState?.();
-                if (!agentFab && processState?.isRunning) {
+                const ticketSelectionFab = document.getElementById('ytomo-ticket-selection-fab-container');
+                if (!ticketSelectionFab) {
                     trigger_init(window.location.href);
                 }
             }

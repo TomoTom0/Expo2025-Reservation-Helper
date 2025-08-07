@@ -46,3 +46,97 @@
     pointer-events: none !important;
   }
 }
+
+// FABコンテナ
+.ytomo-fab-container {
+  position: fixed !important;
+  bottom: 20px !important;
+  right: 20px !important;
+  z-index: 9999 !important;
+  display: flex !important;
+  flex-direction: column-reverse !important;
+  align-items: center !important;
+  gap: 12px !important;
+  pointer-events: none !important;
+
+  // 表示状態管理
+  &.visible {
+    display: flex !important;
+  }
+
+  &.hidden {
+    display: none !important;
+  }
+}
+
+// FABコンテンツ（子ボタン用コンテナ）
+.ytomo-fab-content {
+  position: relative !important;
+  display: flex !important;
+  flex-direction: column-reverse !important;
+  align-items: center !important;
+  gap: 8px !important;
+  opacity: 0 !important;
+  transform: scale(0.8) translateY(10px) !important;
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
+  pointer-events: none !important;
+
+  // 展開状態
+  &.expanded {
+    opacity: 1 !important;
+    transform: scale(1) translateY(0) !important;
+    pointer-events: auto !important;
+  }
+}
+
+// サブFABボタン
+.ytomo-sub-fab {
+  width: 45px !important;
+  height: 32px !important;
+  border-radius: 16px !important;
+  background: rgba(0, 104, 33, 0.9) !important;
+  color: white !important;
+  border: none !important;
+  font-size: 11px !important;
+  font-weight: bold !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  pointer-events: auto !important;
+
+  &:hover {
+    background: rgba(2, 134, 43, 0.9) !important;
+    transform: scale(1.1) !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4) !important;
+  }
+
+  &:active {
+    transform: scale(0.95) !important;
+  }
+}
+
+// パビリオンFABコンテナ（特別な配置）
+.ytomo-pavilion-fab-container {
+  position: fixed !important;
+  bottom: 24px !important;
+  right: 24px !important;
+  z-index: 10000 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 12px !important;
+  align-items: flex-end !important;
+  pointer-events: auto !important;
+}
+
+// FABボタン内のコンテンツ（縦配置）
+.ytomo-fab-inner-content {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  height: 100% !important;
+  pointer-events: none !important;
+}

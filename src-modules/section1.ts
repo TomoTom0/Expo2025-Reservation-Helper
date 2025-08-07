@@ -270,17 +270,7 @@ const init_page = (): void => {
         // FABコンテナを作成（右下固定、入場予約FABと同じスタイル）
         const fabContainer = document.createElement('div');
         fabContainer.id = 'ytomo-pavilion-fab-container';
-        fabContainer.style.cssText = `
-            position: fixed !important;
-            bottom: 24px !important;
-            right: 24px !important;
-            z-index: 10000 !important;
-            display: flex !important;
-            flex-direction: column !important;
-            gap: 12px !important;
-            align-items: flex-end !important;
-            pointer-events: auto !important;
-        `;
+        fabContainer.classList.add('ytomo-pavilion-fab-container');
 
         // メインFABボタンを作成（入場予約FABと同じスタイル）
         const fabButton = document.createElement('button');
@@ -289,14 +279,7 @@ const init_page = (): void => {
 
         // FABボタンの内容構造（縦配置）
         const fabContent = document.createElement('div');
-        fabContent.style.cssText = `
-            display: flex !important;
-            flex-direction: column !important;
-            align-items: center !important;
-            justify-content: center !important;
-            height: 100% !important;
-            pointer-events: none !important;
-        `;
+        fabContent.classList.add('ytomo-fab-inner-content');
 
         // 展開/縮小アイコン（上部）
         const expandIcon = document.createElement('div');

@@ -107,10 +107,10 @@ function updateFABVisibility(): void {
         pavilionFabContainer.style.display = fabVisibilityState.isVisible ? 'flex' : 'none';
     }
     
-    // 同行者追加FAB
-    const companionFabContainer = document.getElementById('ytomo-companion-fab-container');
-    if (companionFabContainer) {
-        companionFabContainer.style.display = fabVisibilityState.isVisible ? 'flex' : 'none';
+    // チケット選択画面FAB
+    const ticketSelectionFabContainer = document.getElementById('ytomo-ticket-selection-fab-container');
+    if (ticketSelectionFabContainer) {
+        ticketSelectionFabContainer.style.display = fabVisibilityState.isVisible ? 'flex' : 'none';
     }
 }
 

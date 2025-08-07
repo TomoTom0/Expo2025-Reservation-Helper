@@ -1,0 +1,160 @@
+// UI共通コンポーネント
+
+// アイコン系
+.ytomo-icon {
+  &.expand-icon {
+    font-size: 8px !important;
+    line-height: 1 !important;
+    color: white !important;
+    font-weight: bold !important;
+    text-align: center !important;
+    pointer-events: none !important;
+  }
+
+  &.countdown-text {
+    font-size: 6px !important;
+    line-height: 1 !important;
+    color: white !important;
+    font-weight: bold !important;
+    text-align: center !important;
+    margin-top: 1px !important;
+    pointer-events: none !important;
+  }
+}
+
+// トグル系
+.ytomo-toggle {
+  &.toggle-li {
+    position: fixed !important;
+    bottom: 10px !important;
+    left: 10px !important;
+    z-index: 1000 !important;
+    list-style: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  &.toggle-button {
+    width: 50px !important;
+    height: 30px !important;
+    background: rgba(255, 140, 0, 0.8) !important;
+    border: none !important;
+    border-radius: 15px !important;
+    cursor: pointer !important;
+    transition: all 0.3s ease !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    font-size: 12px !important;
+    font-weight: bold !important;
+    position: relative !important;
+    overflow: hidden !important;
+
+    // 状態による色分け
+    &.enabled {
+      color: white;
+    }
+
+    &.disabled {
+      color: #ddd;
+    }
+  }
+
+  &.toggle-figure {
+    width: 100% !important;
+    height: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: none !important;
+    background: transparent !important;
+    pointer-events: none !important;
+  }
+}
+
+// ダイアログ系
+.ytomo-dialog {
+  &.overlay {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    background-color: rgba(0, 0, 0, 0.5) !important;
+    z-index: 10000 !important;
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+  }
+
+  &.container {
+    background: white !important;
+    border-radius: 8px !important;
+    padding: 20px !important;
+    max-width: 400px !important;
+    width: 90% !important;
+    max-height: 70vh !important;
+    overflow-y: auto !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3) !important;
+  }
+
+  &.title {
+    margin: 0 0 16px 0 !important;
+    color: #333 !important;
+    font-size: 18px !important;
+    font-weight: bold !important;
+  }
+
+  &.button-group {
+    display: flex !important;
+    justify-content: flex-end !important;
+    gap: 10px !important;
+    margin-top: 20px !important;
+  }
+
+  &.primary-button {
+    background: rgb(0, 104, 33) !important;
+    color: white !important;
+    border: none !important;
+    padding: 10px 20px !important;
+    border-radius: 4px !important;
+    cursor: pointer !important;
+    font-size: 14px !important;
+
+    &:hover {
+      background: rgb(2, 134, 43) !important;
+    }
+
+    &:disabled {
+      background: rgb(128, 128, 128) !important;
+      cursor: not-allowed !important;
+    }
+  }
+
+  &.secondary-button {
+    background: transparent !important;
+    color: #666 !important;
+    border: 1px solid #ccc !important;
+    padding: 10px 20px !important;
+    border-radius: 4px !important;
+    cursor: pointer !important;
+    font-size: 14px !important;
+
+    &:hover {
+      background: #f5f5f5 !important;
+    }
+  }
+}
+
+// プログレス表示
+.ytomo-progress {
+  &.counter {
+    display: inline-block !important;
+    margin-left: 8px !important;
+    padding: 2px 6px !important;
+    background: rgba(0, 0, 0, 0.3) !important;
+    border-radius: 10px !important;
+    font-size: 10px !important;
+    color: white !important;
+    font-weight: bold !important;
+  }
+}

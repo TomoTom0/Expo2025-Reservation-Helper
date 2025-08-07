@@ -480,6 +480,11 @@ export function initializeTicketSelectionPage(): void {
     }, 800); // 少し遅らせてDOMが安定してから実行
     
     createTicketSelectionFAB();
+    
+    // チケット選択変更の監視を開始（視覚フィードバック用）
+    setTimeout(() => {
+        startTicketSelectionMonitoring();
+    }, 1500); // FAB作成後に開始
 }
 
 export function initializeAgentTicketPage(): void {
@@ -491,10 +496,8 @@ export function initializeAgentTicketPage(): void {
         return;
     }
     
-    // 進行状況FAB作成
-    createAgentTicketProgressFAB();
-    
-    console.log('✅ 同行者追加画面の初期化完了');
+    // 同行者追加画面ではFABは不要
+    console.log('✅ 同行者追加画面の初期化完了（FAB作成なし）');
 }
 
 // FABダイアログ作成（画面に応じて切り替え）
@@ -512,13 +515,71 @@ export function createCompanionTicketFAB(): void {
     }
 }
 
+// 日付ボタンのみを更新（既存FAB再利用時）
+function updateDateButtonsOnly(subButtonsContainer: HTMLElement): void {
+    console.log('🗓️ 日付ボタンのみ更新します');
+    
+    const tickets = getTicketElements();
+    const availableDates = getAvailableDates(tickets);
+    
+    // 既存の日付ボタンをクリア
+    const existingDateButtons = subButtonsContainer.querySelectorAll('.ytomo-date-button');
+    existingDateButtons.forEach(btn => btn.remove());
+    console.log(`🗑️ 既存の日付ボタン${existingDateButtons.length}個を削除`);
+    
+    if (availableDates.length === 0) {
+        console.log('📅 利用可能な日付がないため、日付ボタンは作成しません');
+        return;
+    }
+    
+    // 同行者ボタンを保持（削除しない）
+    const companionButton = subButtonsContainer.querySelector('.ytomo-sub-fab:not(.ytomo-date-button)') as HTMLElement;
+    
+    // 新しい日付ボタンを同行者ボタンの前に挿入
+    availableDates.slice(0, 3).forEach((date, index) => {
+        const formatted = formatDateForLabel(date);
+        const buttonLabel = '選択';
+        
+        const button = createSubFABButton(buttonLabel, () => {
+            if (index === 2 && availableDates.length > 3) {
+                showDateSelectionDialog(availableDates);
+            } else {
+                toggleNearestDateSelection(date);
+            }
+        });
+        
+        button.classList.add('ytomo-date-button');
+        if (index === 0) button.style.fontWeight = 'bold !important';
+        
+        const displayText = (index === 2 && availableDates.length > 3) ? '他' : formatted;
+        button.innerHTML = `${buttonLabel} <span style="font-family: 'Courier New', 'Monaco', monospace; font-weight: bold; color: #ffeb3b; vertical-align: baseline;">${displayText}</span>`;
+        
+        // 同行者ボタンの前に挿入
+        if (companionButton) {
+            subButtonsContainer.insertBefore(button, companionButton);
+        } else {
+            subButtonsContainer.appendChild(button);
+        }
+    });
+    
+    console.log(`✅ 日付ボタン更新完了: ${Math.min(availableDates.length, 3)}個のボタンを作成`);
+}
+
 // チケット選択画面用のFAB（展開可能）
 function createTicketSelectionFAB(): void {
 
-    // 既存FAB削除
-    const existingFab = document.getElementById('ytomo-companion-fab-container');
-    if (existingFab) {
-        existingFab.remove();
+    // 既存FABコンテナがある場合は子ボタンのみ更新
+    const existingFabContainer = document.getElementById('ytomo-ticket-selection-fab-container');
+    if (existingFabContainer) {
+        console.log('✅ 既存のチケット選択FABコンテナを再利用し、子ボタンを更新します');
+        
+        // 既存の子ボタンコンテナを取得
+        const existingSubContainer = existingFabContainer.querySelector('#ytomo-companion-sub-buttons');
+        if (existingSubContainer) {
+            // 日付ボタンのみ更新（同行者ボタンは保持）
+            updateDateButtonsOnly(existingSubContainer as HTMLElement);
+        }
+        return;
     }
 
     // FAB展開状態管理（初期状態を展開に）
@@ -526,7 +587,7 @@ function createTicketSelectionFAB(): void {
 
     // チケット選択画面用FABコンテナ作成（パビリオン検索画面と同様の構造）
     const fabContainer = document.createElement('div');
-    fabContainer.id = 'ytomo-ticket-selection-fab';
+    fabContainer.id = 'ytomo-ticket-selection-fab-container';
     fabContainer.classList.add('ytomo-companion-fab', 'ytomo-ticket-selection-page');
     
     // FAB作成ログ
@@ -594,29 +655,28 @@ function createTicketSelectionFAB(): void {
             // 2種類の場合: 2個のボタン
             availableDates.forEach((date, index) => {
                 const formatted = formatDateForLabel(date);
-                const baseLabel = index === 0 ? '直近' : '選択';
-                const button = createSubFABButton(baseLabel, () => {
+                const button = createSubFABButton('選択', () => {
                     toggleNearestDateSelection(date);
                 });
                 button.classList.add('ytomo-date-button');
                 if (index === 0) button.style.fontWeight = 'bold !important';
                 // 日付部分を強調表示で追加
-                button.innerHTML = `${baseLabel} <span style="font-family: 'Courier New', 'Monaco', monospace; font-weight: bold; color: #ffeb3b; vertical-align: baseline;">${formatted}</span>`;
+                button.innerHTML = `選択 <span style="font-family: 'Courier New', 'Monaco', monospace; font-weight: bold; color: #ffeb3b; vertical-align: baseline;">${formatted}</span>`;
                 subButtonsContainer.appendChild(button);
             });
         } else {
             // 3種類以上の場合: 3個のボタン
-            // ボタン1: 直近日付
-            const nearestDate = availableDates[0];
-            const nearestFormatted = formatDateForLabel(nearestDate);
-            const nearestButton = createSubFABButton('直近', () => {
-                toggleNearestDateSelection(nearestDate);
+            // ボタン1: 1番目の日付
+            const firstDate = availableDates[0];
+            const firstFormatted = formatDateForLabel(firstDate);
+            const firstButton = createSubFABButton('選択', () => {
+                toggleNearestDateSelection(firstDate);
             });
-            nearestButton.classList.add('ytomo-date-button');
-            nearestButton.style.fontWeight = 'bold !important';
+            firstButton.classList.add('ytomo-date-button');
+            firstButton.style.fontWeight = 'bold !important';
             // 日付部分を強調表示で追加
-            nearestButton.innerHTML = `直近 <span style="font-family: 'Courier New', 'Monaco', monospace; font-weight: bold; color: #ffeb3b; vertical-align: baseline;">${nearestFormatted}</span>`;
-            subButtonsContainer.appendChild(nearestButton);
+            firstButton.innerHTML = `選択 <span style="font-family: 'Courier New', 'Monaco', monospace; font-weight: bold; color: #ffeb3b; vertical-align: baseline;">${firstFormatted}</span>`;
+            subButtonsContainer.appendChild(firstButton);
 
             // ボタン2: 2番目の日付
             const secondDate = availableDates[1];
@@ -652,7 +712,7 @@ function createTicketSelectionFAB(): void {
                         cursor: pointer !important;
                         text-decoration: underline !important;
                     `;
-                    dateSpan.textContent = thirdFormatted;
+                    dateSpan.textContent = '他';
                     
                     // 日付部分クリック時は日付選択ダイアログを開く
                     dateSpan.addEventListener('click', (e) => {
@@ -688,10 +748,14 @@ function createTicketSelectionFAB(): void {
         const tickets = getTicketElements();
         
         if (tickets.length > 0) {
+            console.log(`🎫 チケット${tickets.length}件を検出、日付ボタンを更新します`);
             createDynamicDateButtons();
         } else if (retryCount < maxRetries) {
             retryCount++;
+            console.log(`⏳ チケット検出待機中... (${retryCount}/${maxRetries})`);
             setTimeout(waitForTicketsAndUpdate, 500);
+        } else {
+            console.warn('⚠️ チケット検出がタイムアウトしました');
         }
     };
     
@@ -703,7 +767,7 @@ function createTicketSelectionFAB(): void {
 
     // メインFABボタン作成（パビリオン検索FABと統一デザイン）
     const mainFabButton = document.createElement('button');
-    mainFabButton.id = 'ytomo-companion-main-fab';
+    mainFabButton.id = 'ytomo-ticket-selection-main-fab';
     mainFabButton.classList.add('ext-ytomo', 'ytomo-fab', 'ytomo-fab-enabled');
     
     // FABボタンにrelative positionを設定
@@ -796,16 +860,7 @@ function createSubFABButton(label: string, onClick: () => void): HTMLButtonEleme
     const button = document.createElement('button');
     button.classList.add('ext-ytomo', 'pavilion-sub-btn', 'btn-enabled');
     button.textContent = label;
-    button.style.cssText = `
-        color: white !important;
-        border: none !important;
-        border-radius: 20px !important;
-        padding: 8px 16px !important;
-        font-size: 12px !important;
-        white-space: nowrap !important;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3) !important;
-        transition: all 0.2s ease !important;
-    `;
+    // インラインスタイル完全削除 - 全てSCSSで管理
 
     // クリックイベント
     button.addEventListener('click', onClick);
@@ -918,6 +973,68 @@ function uncheckAllTickets(): void {
     };
     
     uncheckProcess();
+}
+
+// 指定日付のチケットがすべて選択されているかチェック
+function isDateFullySelected(targetDate: Date, tickets: Element[]): boolean {
+    const targetDateTickets = getTicketsByDate(tickets, targetDate);
+    
+    if (targetDateTickets.length === 0) {
+        return false;
+    }
+    
+    // 対象日付の全チケットが選択されているかチェック
+    const allSelected = targetDateTickets.every(ticket => {
+        const parentLi = ticket.closest('li');
+        const checkbox = parentLi?.querySelector('input[type="checkbox"]') as HTMLInputElement;
+        return checkbox?.checked;
+    });
+    
+    // 他の日付のチケットが選択されていないかチェック
+    const otherTicketsSelected = tickets.some(ticket => {
+        if (targetDateTickets.includes(ticket)) {
+            return false; // 対象日付のチケットは除外
+        }
+        const parentLi = ticket.closest('li');
+        const checkbox = parentLi?.querySelector('input[type="checkbox"]') as HTMLInputElement;
+        return checkbox?.checked;
+    });
+    
+    return allSelected && !otherTicketsSelected;
+}
+
+// 日付ボタンの選択状態を更新
+function updateDateButtonStates(): void {
+    const tickets = getTicketElements();
+    const availableDates = getAvailableDates(tickets);
+    
+    // 全ての日付ボタンの選択状態を更新
+    const dateButtons = document.querySelectorAll('.ytomo-date-button');
+    
+    dateButtons.forEach((button, index) => {
+        const buttonElement = button as HTMLButtonElement;
+        
+        // ボタンに対応する日付を取得
+        let targetDate: Date | null = null;
+        if (index < availableDates.length) {
+            targetDate = availableDates[index];
+        } else if (availableDates.length >= 4 && index === 2) {
+            // 4種類以上の場合の3番目のボタンは特殊（日付選択ダイアログ）
+            targetDate = availableDates[2];
+        }
+        
+        if (!targetDate) return;
+        
+        // 選択状態をチェック
+        const isSelected = isDateFullySelected(targetDate, tickets);
+        
+        // 選択状態に応じてCSSクラスを更新
+        if (isSelected) {
+            buttonElement.classList.add('date-selected');
+        } else {
+            buttonElement.classList.remove('date-selected');
+        }
+    });
 }
 
 // 利用可能な全ての日付を取得（重複除去・ソート済み）
@@ -1159,19 +1276,11 @@ function toggleNearestDateSelection(targetDate: Date): void {
         return;
     }
 
-    // 現在の選択状態をチェック
-    const currentNearestSelected = targetDateTickets.every(ticket => {
-        const checkbox = ticket.querySelector('input[type="checkbox"]') as HTMLInputElement;
-        return checkbox?.checked;
-    });
+    // 現在の選択状態をチェック（新しい関数を使用）
+    const isCurrentlyFullySelected = isDateFullySelected(targetDate, tickets);
 
-    const otherSelected = checkboxes.some(cb => {
-        const ticket = cb.closest('.col3');
-        return cb.checked && !targetDateTickets.includes(ticket as Element);
-    });
-
-    if (currentNearestSelected && !otherSelected) {
-        // 直近日付のみが選択済みの場合は全て解除
+    if (isCurrentlyFullySelected) {
+        // 対象日付がすべて選択済みの場合は全て解除
         checkboxes.forEach((cb, index) => {
             if (cb.checked) {
                 try {
@@ -1222,282 +1331,82 @@ function toggleNearestDateSelection(targetDate: Date): void {
         const dateStr = formatDateForLabel(targetDate);
         console.log(`✅ 対象日付(${dateStr})のチケット${targetDateTickets.length}件を選択しました`);
     }
+    
+    // 選択状態変更後、日付ボタンの視覚状態を更新
+    setTimeout(() => updateDateButtonStates(), 100);
 }
 
-// 同行者追加画面用の進行状況表示FAB
-function createAgentTicketProgressFAB(): void {
-    // agent_ticketページでない場合は何もしない
-    if (!window.location.href.includes('agent_ticket')) {
-        return;
-    }
-
-    // 既存の進捗FABを削除（同ページ内でのみ）
-    const existingProgressFab = document.getElementById('ytomo-agent-progress-fab');
-    if (existingProgressFab) {
-        existingProgressFab.remove();
-    }
-
-    // 処理中でない場合は何も表示しない
-    const processState = companionProcessManager.getState();
-    if (!processState.isRunning) {
-        return;
-    }
-
-    // 同行者追加画面用進捗FABコンテナ作成
-    const fabContainer = document.createElement('div');
-    fabContainer.id = 'ytomo-agent-progress-fab';
-    fabContainer.classList.add('ytomo-companion-fab', 'ytomo-agent-ticket-page');
-    fabContainer.style.cssText = `
-        position: fixed !important;
-        bottom: 100px !important;
-        right: 24px !important;
-        z-index: 10000 !important;
-        display: flex !important;
-        flex-direction: column !important;
-        gap: 12px !important;
-        align-items: flex-end !important;
-        pointer-events: auto !important;
-    `;
-
-    const remainingCount = processState.queuedTicketIds.length;
-
-    // メイン状況表示ボタン
-    const statusButton = document.createElement('button');
-    statusButton.id = 'ytomo-companion-status-button';
-    statusButton.style.cssText = `
-        width: 64px !important;
-        height: 64px !important;
-        border-radius: 50% !important;
-        background: linear-gradient(135deg, #FF9800 0%, #F57C00 100%) !important;
-        border: none !important;
-        box-shadow: 0 4px 20px rgba(0,0,0,0.3) !important;
-        cursor: pointer !important;
-        display: flex !important;
-        align-items: center !important;
-        justify-content: center !important;
-        font-size: 10px !important;
-        color: white !important;
-        transition: all 0.3s ease !important;
-        animation: pulse 2s infinite !important;
-        text-align: center !important;
-        line-height: 1.2 !important;
-    `;
-
-    statusButton.innerHTML = `
-        <div>
-            <div style="font-size: 16px; margin-bottom: 2px;">🎫</div>
-            <div>実行中</div>
-            <div style="font-size: 8px;">${processState.successCount}/${processState.successCount + processState.errorCount + remainingCount}</div>
-        </div>
-    `;
-
-    // CSS animationを追加
-    if (!document.getElementById('ytomo-pulse-animation')) {
-        const style = document.createElement('style');
-        style.id = 'ytomo-pulse-animation';
-        style.textContent = `
-            @keyframes pulse {
-                0% { transform: scale(1); }
-                50% { transform: scale(1.05); }
-                100% { transform: scale(1); }
+// チケット選択変更の監視を開始
+function startTicketSelectionMonitoring(): void {
+    console.log('👀 チケット選択監視を開始します');
+    
+    // MutationObserverでチェックボックスの変更を監視
+    const observer = new MutationObserver((mutations) => {
+        let shouldUpdate = false;
+        
+        mutations.forEach((mutation) => {
+            // チェックボックスの変更を検知
+            if (mutation.type === 'attributes' && mutation.attributeName === 'checked') {
+                const target = mutation.target as HTMLInputElement;
+                if (target.type === 'checkbox') {
+                    shouldUpdate = true;
+                }
             }
-        `;
-        document.head.appendChild(style);
-    }
-
-    // ホバー効果
-    statusButton.addEventListener('mouseenter', () => {
-        statusButton.style.transform = 'scale(1.1)';
-        statusButton.style.boxShadow = '0 6px 25px rgba(0,0,0,0.4)';
-    });
-
-    statusButton.addEventListener('mouseleave', () => {
-        statusButton.style.transform = 'scale(1)';
-        statusButton.style.boxShadow = '0 4px 20px rgba(0,0,0,0.3)';
-    });
-
-    // クリックで詳細表示
-    statusButton.addEventListener('click', () => {
-        showCompanionProgressDetail();
-    });
-
-    // 停止ボタン（小さめのFAB）
-    const stopButton = document.createElement('button');
-    stopButton.id = 'ytomo-companion-stop-button';
-    stopButton.style.cssText = `
-        width: 48px !important;
-        height: 48px !important;
-        border-radius: 50% !important;
-        background: linear-gradient(135deg, #f44336 0%, #d32f2f 100%) !important;
-        border: none !important;
-        box-shadow: 0 3px 15px rgba(0,0,0,0.3) !important;
-        cursor: pointer !important;
-        display: flex !important;
-        align-items: center !important;
-        justify-content: center !important;
-        font-size: 18px !important;
-        color: white !important;
-        transition: all 0.3s ease !important;
-    `;
-
-    stopButton.innerHTML = '⏹️';
-    stopButton.title = '同行者追加処理を停止';
-
-    stopButton.addEventListener('mouseenter', () => {
-        stopButton.style.transform = 'scale(1.1)';
-        stopButton.style.boxShadow = '0 5px 20px rgba(0,0,0,0.4)';
-    });
-
-    stopButton.addEventListener('mouseleave', () => {
-        stopButton.style.transform = 'scale(1)';
-        stopButton.style.boxShadow = '0 3px 15px rgba(0,0,0,0.3)';
-    });
-
-    stopButton.addEventListener('click', () => {
-        showCustomConfirm('同行者追加処理を停止しますか？', () => {
-            companionProcessManager.stopProcess();
-            fabContainer.remove();
+            
+            // DOM構造の変更（チケット追加・削除）を検知
+            if (mutation.type === 'childList') {
+                const hasCheckboxes = Array.from(mutation.addedNodes).some(node => {
+                    if (node.nodeType === Node.ELEMENT_NODE) {
+                        const element = node as Element;
+                        return element.querySelector('input[type="checkbox"]') !== null;
+                    }
+                    return false;
+                });
+                if (hasCheckboxes) {
+                    shouldUpdate = true;
+                }
+            }
         });
-    });
-
-    // DOM追加
-    fabContainer.appendChild(statusButton);
-    fabContainer.appendChild(stopButton);
-    document.documentElement.appendChild(fabContainer);
-
-
-    // 5秒後に自動更新（agent_ticketページでのみ）
-    const timeoutId = setTimeout(() => {
-        // ページがagent_ticketであり、処理が継続中の場合のみ再実行
-        if (window.location.href.includes('agent_ticket') && 
-            companionProcessManager.getState().isRunning &&
-            document.getElementById('ytomo-companion-progress-fab')) {
-            createAgentTicketProgressFAB();
-        } else {
-            console.log('🚫 進捗FAB自動更新をキャンセルしました（ページ遷移または処理終了）');
+        
+        if (shouldUpdate) {
+            // 短いdebounceで更新頻度を制御
+            clearTimeout(updateTimeout);
+            updateTimeout = setTimeout(() => {
+                updateDateButtonStates();
+            }, 200);
         }
-    }, 5000);
-    
-    // タイムアウトIDを保存して、必要時にキャンセルできるようにする
-    (fabContainer as any).__timeoutId = timeoutId;
-}
-
-// 同行者追加進行状況詳細表示
-function showCompanionProgressDetail(): void {
-    const processState = companionProcessManager.getState();
-    
-    // 既存ダイアログ削除
-    const existingDialog = document.getElementById('ytomo-companion-progress-dialog');
-    if (existingDialog) {
-        existingDialog.remove();
-    }
-
-    // モーダルオーバーレイ作成
-    const overlay = document.createElement('div');
-    overlay.id = 'ytomo-companion-progress-dialog';
-    overlay.style.cssText = `
-        position: fixed !important;
-        top: 0 !important;
-        left: 0 !important;
-        width: 100% !important;
-        height: 100% !important;
-        background: rgba(0,0,0,0.5) !important;
-        z-index: 10001 !important;
-        display: flex !important;
-        align-items: center !important;
-        justify-content: center !important;
-    `;
-
-    // ダイアログコンテンツ
-    const dialog = document.createElement('div');
-    dialog.style.cssText = `
-        background: white !important;
-        border-radius: 12px !important;
-        padding: 24px !important;
-        max-width: 500px !important;
-        width: 90% !important;
-        max-height: 80vh !important;
-        overflow-y: auto !important;
-        box-shadow: 0 10px 40px rgba(0,0,0,0.3) !important;
-    `;
-
-    const currentTicketText = processState.currentTicketId 
-        ? `処理中: ${processState.currentTicketId}`
-        : '待機中...';
-    
-    const remainingCount = processState.queuedTicketIds.length;
-
-    dialog.innerHTML = `
-        <div style="margin-bottom: 20px;">
-            <h2 style="margin: 0 0 12px 0; color: #333; font-size: 18px;">🎫 同行者追加処理状況</h2>
-        </div>
-        
-        <div style="margin-bottom: 16px; padding: 16px; background: #f5f5f5; border-radius: 8px;">
-            <div style="font-weight: bold; margin-bottom: 8px; color: #FF9800;">現在の状況</div>
-            <div style="margin-bottom: 4px;">${currentTicketText}</div>
-            <div style="margin-bottom: 4px;">待機中: ${remainingCount}件</div>
-            <div style="margin-bottom: 4px;">完了: ${processState.successCount}件</div>
-            <div>エラー: ${processState.errorCount}件</div>
-        </div>
-        
-        ${processState.queuedTicketIds.length > 0 ? `
-        <div style="margin-bottom: 16px;">
-            <div style="font-weight: bold; margin-bottom: 8px; color: #333;">待機中のチケットID</div>
-            <div style="max-height: 120px; overflow-y: auto; border: 1px solid #ddd; border-radius: 4px; padding: 8px; background: #fafafa;">
-                ${processState.queuedTicketIds.map(id => `<div style="padding: 2px 0; font-family: monospace;">${id}</div>`).join('')}
-            </div>
-        </div>
-        ` : ''}
-        
-        ${processState.errors.length > 0 ? `
-        <div style="margin-bottom: 16px;">
-            <div style="font-weight: bold; margin-bottom: 8px; color: #f44336;">エラー履歴</div>
-            <div style="max-height: 120px; overflow-y: auto; border: 1px solid #ffcdd2; border-radius: 4px; padding: 8px; background: #ffebee;">
-                ${processState.errors.map(error => `
-                    <div style="padding: 4px 0; border-bottom: 1px solid #ffcdd2; font-size: 12px;">
-                        <div style="font-weight: bold; color: #d32f2f;">${error.ticketId}</div>
-                        <div style="color: #666;">${error.message}</div>
-                        <div style="color: #999; font-size: 10px;">${new Date(error.timestamp).toLocaleString()}</div>
-                    </div>
-                `).join('')}
-            </div>
-        </div>
-        ` : ''}
-        
-        <div style="display: flex; gap: 12px; justify-content: flex-end;">
-            <button id="close-progress-btn" style="padding: 8px 16px; background: #666; color: white; border: none; border-radius: 4px; cursor: pointer;">
-                閉じる
-            </button>
-            <button id="stop-process-btn" style="padding: 8px 16px; background: #f44336; color: white; border: none; border-radius: 4px; cursor: pointer;">
-                処理停止
-            </button>
-        </div>
-    `;
-
-    // イベントリスナー設定
-    dialog.querySelector('#close-progress-btn')?.addEventListener('click', () => {
-        overlay.remove();
     });
-
-    dialog.querySelector('#stop-process-btn')?.addEventListener('click', () => {
-        showCustomConfirm('同行者追加処理を停止しますか？', () => {
-            companionProcessManager.stopProcess();
-            overlay.remove();
-            const fab = document.getElementById('ytomo-companion-fab-container');
-            if (fab) fab.remove();
+    
+    // チケットリスト全体を監視
+    const ticketContainer = document.querySelector('ul.product-list, .ticket-list, main, body');
+    if (ticketContainer) {
+        observer.observe(ticketContainer, {
+            childList: true,
+            subtree: true,
+            attributes: true,
+            attributeFilter: ['checked']
         });
-    });
-
-    overlay.appendChild(dialog);
-    document.body.appendChild(overlay);
-
-    // オーバーレイクリックで閉じる
-    overlay.addEventListener('click', (e) => {
-        if (e.target === overlay) {
-            overlay.remove();
+        console.log('✅ チケット選択監視設定完了');
+    } else {
+        console.warn('⚠️ チケットコンテナが見つからないため監視を開始できませんでした');
+    }
+    
+    // DOM変更イベントリスナーも追加（フォールバック）
+    document.addEventListener('change', (event) => {
+        const target = event.target as HTMLElement;
+        if (target.tagName === 'INPUT' && (target as HTMLInputElement).type === 'checkbox') {
+            clearTimeout(updateTimeout);
+            updateTimeout = setTimeout(() => {
+                updateDateButtonStates();
+            }, 200);
         }
     });
 }
+
+// デバウンス用のタイムアウト
+let updateTimeout: NodeJS.Timeout | undefined;
+
+// 同行者追加画面ではFABは不要なため削除済み
 
 // 同行者チケット管理ダイアログ表示
 function showCompanionTicketDialog(): void {
