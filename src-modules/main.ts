@@ -14,13 +14,13 @@
  * 各sectionモジュールをimportすることで、webpackで統合されたバンドルを作成
  */
 
-// すべてのsectionモジュールをimport（副作用importも含む）
-import './section1';
-import './section2';
-import './section3';
-import './section4';
-import './section5';
-import './section6';
-import './section7';
-import './section8';
-import './section9'; // 同行者追加機能
+// すべてのモジュールをimport（副作用importも含む）
+import './pavilion-search-page';
+import './entrance-page-state';
+import './cache-manager';
+import './entrance-page-selectors';
+import './entrance-page-monitor';
+import './entrance-page-ui';
+import './entrance-page-fab';
+import './app-router';
+import './companion-ticket-page'; // 同行者追加機能

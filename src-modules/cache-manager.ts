@@ -1,9 +1,9 @@
-// Section 2からのimport
-import { timeSlotState } from './section2';
+// entrance-page-stateからのimport
+import { timeSlotState } from './entrance-page-state';
 
 
-// getExternalFunctionのimport（section5から）
-import { getExternalFunction } from './section5';
+// getExternalFunctionのimport（entrance-page-monitorから）
+import { getExternalFunction } from './entrance-page-monitor';
 
 // 型定義のインポート
 import type { CacheManager, Dependencies } from '../types/index.js';

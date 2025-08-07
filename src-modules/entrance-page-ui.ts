@@ -1,19 +1,19 @@
-// Section 2からのimport
+// entrance-page-stateからのimport
 import { 
     entranceReservationState, 
     timeSlotState,
     reloadCountdownState,
     pageLoadingState
-} from './section2';
+} from './entrance-page-state';
 
-// Section 4からのimport
+// entrance-page-selectorsからのimport
 import {
     generateUniqueTdSelector,
     extractTdStatus,
     waitForCalendar,
     findSameTdElement,
     timeSlotSelectors
-} from './section4';
+} from './entrance-page-selectors';
 
 // 統一状態管理システムからのimport
 import { LocationHelper } from './unified-state';
@@ -26,7 +26,7 @@ import {
     waitForTimeSlotTable,
     startSlotMonitoring,
     getExternalFunction
-} from './section5';
+} from './entrance-page-monitor';
 
 // 型定義のインポート
 import type { 

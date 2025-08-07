@@ -1,34 +1,34 @@
-// Section 1からのimport
+// pavilion-search-pageからのimport
 import {
     getRandomWaitTime,
     waitForElement,
     waitForAnyElement,
     clickElement
-} from './section1';
+} from './pavilion-search-page';
 
-// Section 2からのimport
+// entrance-page-stateからのimport
 import { 
     entranceReservationState, 
     timeSlotState,
     calendarWatchState,
     loadFABVisibility,
     updateFABVisibility
-} from './section2';
+} from './entrance-page-state';
 
-// Section 4からのimport
+// entrance-page-selectorsからのimport
 import {
     timeSlotSelectors,
     generateUniqueTdSelector,
     extractTdStatus
-} from './section4';
+} from './entrance-page-selectors';
 
-// Section 5からのimport
+// entrance-page-monitorからのimport
 import {
     checkTimeSlotTableExistsSync,
     analyzeAndAddMonitorButtons,
     startSlotMonitoring,
     getExternalFunction
-} from './section5';
+} from './entrance-page-monitor';
 
 // unified-stateからのimport
 import { LocationHelper } from './unified-state';
@@ -40,7 +40,7 @@ import {
     updateStatusBadge,
     stopSlotMonitoring,
     isInterruptionAllowed
-} from './section6';
+} from './entrance-page-ui';
 
 // 型定義のインポート
 import type { 

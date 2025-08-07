@@ -127,8 +127,8 @@ const prepare_filter = (val_search: string): { include: RegExp, exclude: RegExp[
 const init_page = (): void => {
     // ヘッダーにFAB切替ボタンを追加（DOM構築完了を待つ）
     setTimeout(() => {
-        import('./section2').then((section2) => {
-            section2.createFABToggleButton();
+        import('./entrance-page-state').then((entrancePageState) => {
+            entrancePageState.createFABToggleButton();
         });
     }, 1000);
     
@@ -724,8 +724,8 @@ const init_entrance_page = (dependencies: Dependencies = {}): void => {
     
     // ヘッダーにFAB切替ボタンを追加（DOM構築完了を待つ）
     setTimeout(() => {
-        import('./section2').then((section2) => {
-            section2.createFABToggleButton();
+        import('./entrance-page-state').then((entrancePageState) => {
+            entrancePageState.createFABToggleButton();
         });
     }, 1000);
     

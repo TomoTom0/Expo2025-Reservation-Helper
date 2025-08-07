@@ -1,8 +1,8 @@
-// 各sectionからのimport
-import { init_page, judge_init, judge_entrance_init, init_entrance_page } from './section1';
-import { reloadCountdownState, createFABToggleButton } from './section2';
-import { createCacheManager } from './section3';
-import { setCacheManager, setExternalFunctions } from './section5';
+// 各モジュールからのimport
+import { init_page, judge_init, judge_entrance_init, init_entrance_page } from './pavilion-search-page';
+import { reloadCountdownState, createFABToggleButton } from './entrance-page-state';
+import { createCacheManager } from './cache-manager';
+import { setCacheManager, setExternalFunctions } from './entrance-page-monitor';
 import { 
     getCurrentSelectedCalendarDate, getCurrentTableContent, shouldUpdateMonitorButtons,
     restoreSelectionAfterUpdate, enableAllMonitorButtons,
@@ -10,13 +10,13 @@ import {
     stopReloadCountdown, resetMonitoringUI, showErrorMessage, tryClickCalendarForTimeSlot, setPageLoadingState,
     disableAllMonitorButtons, restoreFromCache, setCacheManagerForSection6, setEntranceReservationHelper,
     setUpdateMonitoringTargetsDisplay
-} from './section6';
+} from './entrance-page-ui';
 import { 
     updateMonitoringTargetsDisplay, createEntranceReservationUI, setCacheManagerForSection7,
     entranceReservationHelper, waitForTimeSlotTable
-} from './section7';
-import { initTimeSlotMonitoring } from './section4';
-import { initCompanionTicketFeature, initializeTicketSelectionPage, initializeAgentTicketPage } from './section9'; // 同行者追加機能
+} from './entrance-page-fab';
+import { initTimeSlotMonitoring } from './entrance-page-selectors';
+import { initCompanionTicketFeature, initializeTicketSelectionPage, initializeAgentTicketPage } from './companion-ticket-page'; // 同行者追加機能
 
 // 統一状態管理システムのimport
 import { UnifiedStateManager } from './unified-state';
@@ -61,16 +61,16 @@ const initializeUnifiedStateManager = (): void => {
     }
 };
 
-// section5、section6、section7にcacheManagerを設定
+// entrance-page-monitor、entrance-page-ui、entrance-page-fabにcacheManagerを設定
 setCacheManager(cacheManager);
 setCacheManagerForSection6(cacheManager);
 setCacheManagerForSection7(cacheManager);
 
-// section6に必要な関数を注入
+// entrance-page-uiに必要な関数を注入
 setEntranceReservationHelper(entranceReservationHelper);
 setUpdateMonitoringTargetsDisplay(updateMonitoringTargetsDisplay);
 
-// section5.jsに外部関数を注入（showStatusは一時的に除外）
+// entrance-page-monitorに外部関数を注入（showStatusは一時的に除外）
 setExternalFunctions({
     getCurrentTableContent,
     shouldUpdateMonitorButtons,

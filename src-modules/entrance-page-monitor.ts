@@ -1,18 +1,18 @@
-// Section 2からのimport
+// entrance-page-stateからのimport
 import {
     timeSlotState
-} from './section2';
+} from './entrance-page-state';
 
 // 統一状態管理システムからのimport
 import { LocationHelper, ExecutionState } from './unified-state';
 
-// Section 4からのimport
+// entrance-page-selectorsからのimport
 import {
     timeSlotSelectors,
     generateUniqueTdSelector,
     findSameTdElement,
     extractTdStatus
-} from './section4';
+} from './entrance-page-selectors';
 
 // 型定義のインポート
 import type { 

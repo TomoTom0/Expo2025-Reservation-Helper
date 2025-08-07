@@ -4,11 +4,11 @@
  */
 
 // 必要なモジュールをインポート
-import { timeSlotState } from './section2';
-import { generateUniqueTdSelector, getTdPositionInfo, findSameTdElement, extractTdStatus, timeSlotSelectors } from './section4';
-import { checkTimeSlotTableExistsSync, validatePageLoaded } from './section5';
-import { isInterruptionAllowed } from './section6';
-import { checkVisitTimeButtonState, canStartReservation } from './section7';
+import { timeSlotState } from './entrance-page-state';
+import { generateUniqueTdSelector, getTdPositionInfo, findSameTdElement, extractTdStatus, timeSlotSelectors } from './entrance-page-selectors';
+import { checkTimeSlotTableExistsSync, validatePageLoaded } from './entrance-page-monitor';
+import { isInterruptionAllowed } from './entrance-page-ui';
+import { checkVisitTimeButtonState, canStartReservation } from './entrance-page-fab';
 
 // CommonJS形式でエクスポート
 module.exports = {

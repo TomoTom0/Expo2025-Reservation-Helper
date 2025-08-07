@@ -1,5 +1,5 @@
-// Section 5からのimport
-import { startTimeSlotTableObserver } from './section5';
+// entrance-page-monitorからのimport
+import { startTimeSlotTableObserver } from './entrance-page-monitor';
 
 // 型定義のインポート
 import type { 

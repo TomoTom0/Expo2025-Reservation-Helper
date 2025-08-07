@@ -4,8 +4,8 @@
  */
 
 // 必要なimport
-import { timeSlotSelectors, generateUniqueTdSelector, extractTdStatus } from './section4';
-import { getCurrentSelectedCalendarDate } from './section6';
+import { timeSlotSelectors, generateUniqueTdSelector, extractTdStatus } from './entrance-page-selectors';
+import { getCurrentSelectedCalendarDate } from './entrance-page-ui';
 
 // ============================================================================
 // 型定義
