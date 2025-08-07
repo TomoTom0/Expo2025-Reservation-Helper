@@ -22,7 +22,8 @@
       "Bash(git rm:*)",
       "Bash(cat:*)",
       "Bash(npx tsc:*)",
-      "Bash(grep:*)"
+      "Bash(grep:*)",
+      "Bash(echo)"
     ],
     "deny": []
   }
