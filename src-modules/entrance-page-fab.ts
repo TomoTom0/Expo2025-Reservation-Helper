@@ -318,6 +318,13 @@ attempts: ${entranceReservationState.attempts}`;
         entranceReservationState.shouldStop = false;
         entranceReservationState.startTime = Date.now();
         entranceReservationState.attempts = 0;
+        
+        // 統一状態管理システムに予約実行状態を設定
+        const stateManager = getExternalFunction('unifiedStateManager');
+        if (stateManager) {
+            stateManager.setExecutionState('reservation_running');
+        }
+        
         showStatus('予約処理実行中...', 'blue');
         updateMainButtonDisplay();
         updateMonitoringTargetsDisplay(); // 予約対象を表示
@@ -352,6 +359,13 @@ attempts: ${entranceReservationState.attempts}`;
             entranceReservationState.isRunning = false;
             entranceReservationState.startTime = null;
             entranceReservationState.attempts = 0;
+            
+            // 統一状態管理システムをIDLEに戻す
+            const stateManager = getExternalFunction('unifiedStateManager');
+            if (stateManager) {
+                stateManager.setExecutionState('idle');
+            }
+            
             updateMainButtonDisplay();
             updateMonitoringTargetsDisplay(); // 予約終了時に表示更新
         }

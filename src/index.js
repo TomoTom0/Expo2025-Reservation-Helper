@@ -4964,6 +4964,11 @@ attempts: ${entrance_page_state.entranceReservationState.attempts}`;
         entrance_page_state.entranceReservationState.shouldStop = false;
         entrance_page_state.entranceReservationState.startTime = Date.now();
         entrance_page_state.entranceReservationState.attempts = 0;
+        // 統一状態管理システムに予約実行状態を設定
+        const stateManager = (0,entrance_page_monitor/* getExternalFunction */.ac)('unifiedStateManager');
+        if (stateManager) {
+            stateManager.setExecutionState('reservation_running');
+        }
         showStatus('予約処理実行中...', 'blue');
         (0,entrance_page_ui/* updateMainButtonDisplay */.vp)();
         updateMonitoringTargetsDisplay(); // 予約対象を表示
@@ -4998,6 +5003,11 @@ attempts: ${entrance_page_state.entranceReservationState.attempts}`;
             entrance_page_state.entranceReservationState.isRunning = false;
             entrance_page_state.entranceReservationState.startTime = null;
             entrance_page_state.entranceReservationState.attempts = 0;
+            // 統一状態管理システムをIDLEに戻す
+            const stateManager = (0,entrance_page_monitor/* getExternalFunction */.ac)('unifiedStateManager');
+            if (stateManager) {
+                stateManager.setExecutionState('idle');
+            }
             (0,entrance_page_ui/* updateMainButtonDisplay */.vp)();
             updateMonitoringTargetsDisplay(); // 予約終了時に表示更新
         }
