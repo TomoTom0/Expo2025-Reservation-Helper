@@ -352,14 +352,8 @@ export class EntranceReservationStateManager {
             if (this.reloadCountdown.secondsRemaining !== null) {
                 this.reloadCountdown.secondsRemaining--;
                 
-                // FAB表示更新（グローバル関数を呼び出し）
-                try {
-                    if (typeof window !== 'undefined' && (window as any).updateMainButtonDisplay) {
-                        (window as any).updateMainButtonDisplay(null, true);
-                    }
-                } catch (error) {
-                    console.warn('UI更新の呼び出しに失敗:', error);
-                }
+                // FAB表示更新（自己完結型）
+                this.updateCountdownDisplay();
                 
                 if (this.reloadCountdown.secondsRemaining <= 0) {
                     // カウントダウン完了
@@ -899,6 +893,132 @@ export class EntranceReservationStateManager {
         console.log('監視可能:', this.canStartMonitoring());
         console.log('推奨アクション:', this.getPreferredAction());
         console.groupEnd();
+    }
+    
+    // ============================================================================
+    // UI更新処理（自己完結型）
+    // ============================================================================
+    
+    // カウントダウン表示更新
+    private updateCountdownDisplay(): void {
+        const fabContainer = document.getElementById('ytomo-fab-container');
+        if (!fabContainer) return;
+        
+        const mainButton = fabContainer.querySelector('.ytomo-fab');
+        if (!mainButton) return;
+        
+        // カウントダウン表示の更新
+        const innerContent = mainButton.querySelector('.ytomo-fab-inner-content');
+        if (innerContent) {
+            const currentMode = this.getCurrentDisplayMode();
+            const statusText = this.getStatusText(currentMode);
+            const countdownText = this.getCountdownText();
+            
+            // ボタンの状態とスタイルを更新
+            this.updateButtonStatus(mainButton as HTMLElement, currentMode);
+            
+            // テキスト内容を更新
+            this.updateButtonText(innerContent, statusText, countdownText);
+        }
+    }
+    
+    // 現在の表示モードを取得
+    private getCurrentDisplayMode(): string {
+        if (this.isNearReload()) {
+            return 'near-reload';
+        } else if (this.isReloadCountdownActive()) {
+            return 'countdown';
+        } else if (this.executionState === ExecutionState.MONITORING_RUNNING) {
+            return 'monitoring';
+        } else if (this.executionState === ExecutionState.RESERVATION_RUNNING) {
+            return 'running';
+        } else if (this.canStartReservation()) {
+            return 'ready';
+        } else {
+            return 'idle';
+        }
+    }
+    
+    // 状態テキストを取得
+    private getStatusText(mode: string): string {
+        switch (mode) {
+            case 'near-reload':
+                return 'リロード直前';
+            case 'countdown':
+                return '監視実行中';
+            case 'monitoring':
+                return '監視中';
+            case 'running':
+                return '予約実行中';
+            case 'ready':
+                return '準備完了';
+            default:
+                return 'アイドル';
+        }
+    }
+    
+    // カウントダウンテキストを取得
+    private getCountdownText(): string {
+        if (this.reloadCountdown.secondsRemaining !== null) {
+            return `${this.reloadCountdown.secondsRemaining}s`;
+        }
+        return '';
+    }
+    
+    // ボタンの状態とスタイルを更新
+    private updateButtonStatus(button: HTMLElement, mode: string): void {
+        // 既存のクラスをクリア
+        button.classList.remove('ytomo-fab-enabled', 'ytomo-fab-disabled', 'ytomo-fab-monitoring', 'ytomo-fab-running');
+        
+        // モードに応じてクラスを追加
+        switch (mode) {
+            case 'near-reload':
+            case 'countdown':
+            case 'monitoring':
+                button.classList.add('ytomo-fab-monitoring');
+                break;
+            case 'running':
+                button.classList.add('ytomo-fab-running');
+                break;
+            case 'ready':
+                button.classList.add('ytomo-fab-enabled');
+                break;
+            default:
+                button.classList.add('ytomo-fab-disabled');
+                break;
+        }
+    }
+    
+    // ボタンテキスト内容を更新
+    private updateButtonText(innerContent: Element, statusText: string, countdownText: string): void {
+        // 既存の構造を保持しながらテキストを更新
+        let expandIcon = innerContent.querySelector('.pavilion-fab-expand-icon') as HTMLElement;
+        let brandText = innerContent.querySelector('.pavilion-fab-brand-text') as HTMLElement;
+        let countsText = innerContent.querySelector('.pavilion-fab-counts-text') as HTMLElement;
+        
+        // 要素が存在しない場合は作成
+        if (!expandIcon) {
+            expandIcon = document.createElement('div');
+            expandIcon.className = 'pavilion-fab-expand-icon ytomo-icon expand-icon';
+            innerContent.appendChild(expandIcon);
+        }
+        
+        if (!brandText) {
+            brandText = document.createElement('div');
+            brandText.className = 'pavilion-fab-brand-text';
+            innerContent.appendChild(brandText);
+        }
+        
+        if (!countsText) {
+            countsText = document.createElement('div');
+            countsText.className = 'pavilion-fab-counts-text';
+            innerContent.appendChild(countsText);
+        }
+        
+        // テキスト内容を設定
+        expandIcon.textContent = '▲';
+        brandText.textContent = statusText;
+        countsText.textContent = countdownText;
     }
 }
 

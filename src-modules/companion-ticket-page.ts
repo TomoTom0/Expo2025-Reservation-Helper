@@ -346,345 +346,194 @@ class CompanionProcessManager {
         return this.performInput(inputField, ticketId);
     }
     
-    // 実際の入力処理（スマホ特有問題対応版）
+    // 実際の入力処理（ReactのonChangeハンドラ直接呼び出し方式）
     private async performInput(inputField: HTMLInputElement, ticketId: string): Promise<boolean> {
         try {
             console.log(`🎯 チケットID入力開始: "${ticketId}"`);
-            console.log('📱 スマートフォン対応入力処理を実行中...');
+            console.log('⚛️ ReactのonChangeハンドラ直接呼び出し方式を実行中...');
             
-            // モバイル環境検知
-            const isMobile = /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || 
-                             'ontouchstart' in window || navigator.maxTouchPoints > 0;
-            console.log(`📱 モバイル環境: ${isMobile ? 'Yes' : 'No'}`);
-            
-            // Step 1: フィールドの完全初期化（モバイル強化版）
-            await this.completeFieldReset(inputField);
-            
-            // Step 2: フォーカス確立（モバイル対応）
-            await this.establishMobileFocus(inputField);
-            
-            // Step 3: React内部状態の強制変更（モバイル版）
-            await this.setReactStateMobile(inputField, ticketId);
-            
-            // Step 4: タッチイベントシミュレーション（モバイル専用）
-            if (isMobile) {
-                await this.simulateTouchInput(inputField, ticketId);
+            // Method 1: ReactのonChangeハンドラを直接呼び出す (推奨方式)
+            const reactSuccess = await this.setReactValueDirectly(inputField, ticketId);
+            if (reactSuccess) {
+                console.log('✅ React onChangeハンドラ直接呼び出しで成功');
+                return true;
             }
             
-            // Step 5: 従来の入力メソッド（デスクトップ互換）
-            await this.simulateTypingInput(inputField, ticketId);
-            
-            // Step 6: IME完了待機とvalidation（モバイル強化）
-            await this.waitForInputStabilization();
-            
-            // Step 7: 最終値検証と補正
-            const success = await this.validateAndCorrectFinalValue(inputField, ticketId);
-            
-            return success;
+            // Method 2: フォールバック - 従来の方法
+            console.log('⚠️ React直接呼び出しが失敗、フォールバック処理中...');
+            return await this.fallbackInputMethod(inputField, ticketId);
             
         } catch (error) {
-            console.error('❌ スマホ対応チケットID入力エラー:', error);
+            console.error('❌ チケットID入力エラー:', error);
             return false;
         }
     }
 
-    // Step 1: フィールドの完全初期化（モバイル強化版）
-    private async completeFieldReset(inputField: HTMLInputElement): Promise<void> {
-        console.log('🧹 フィールド完全初期化（モバイル対応）');
-        
-        // 全ての方法で値をクリア
-        inputField.value = '';
-        inputField.textContent = '';
-        inputField.innerHTML = '';
-        inputField.setAttribute('value', '');
-        inputField.removeAttribute('value');
-        
-        // React内部プロパティもクリア
-        const reactFiberKey = Object.keys(inputField).find(key => key.startsWith('__reactFiber'));
-        if (reactFiberKey) {
-            try {
-                const fiber = (inputField as any)[reactFiberKey];
-                if (fiber && fiber.memoizedProps) {
-                    fiber.memoizedProps.value = '';
-                }
-                if (fiber && fiber.pendingProps) {
-                    fiber.pendingProps.value = '';
-                }
-            } catch (e) {
-                console.warn('React fiber清除失敗:', e);
-            }
-        }
-        
-        // 各種イベントでクリア確定
-        inputField.dispatchEvent(new Event('input', { bubbles: true }));
-        inputField.dispatchEvent(new Event('change', { bubbles: true }));
-        
-        // モバイル用追加待機
-        await new Promise(resolve => setTimeout(resolve, 200));
-        console.log('✅ フィールド初期化完了');
-    }
-
-    // Step 2: フォーカス確立（モバイル対応）
-    private async establishMobileFocus(inputField: HTMLInputElement): Promise<void> {
-        console.log('🎯 フォーカス確立（モバイル対応）');
-        
-        // ブラウザの差異に対応するフォーカス処理
-        inputField.focus();
-        
-        // iOS Safari対応: touchstartでフォーカスを強化
-        if ('ontouchstart' in window) {
-            const touchEvent = new TouchEvent('touchstart', {
-                bubbles: true,
-                cancelable: true,
-                touches: [new Touch({
-                    identifier: 0,
-                    target: inputField,
-                    clientX: inputField.offsetLeft + 10,
-                    clientY: inputField.offsetTop + 10
-                })]
-            });
-            inputField.dispatchEvent(touchEvent);
-        }
-        
-        // フォーカス確定待機
-        await new Promise(resolve => setTimeout(resolve, 100));
-        
-        // フォーカス確認
-        if (document.activeElement !== inputField) {
-            console.warn('⚠️ フォーカス確立に失敗、再試行');
-            inputField.click(); // フォールバック
-            await new Promise(resolve => setTimeout(resolve, 100));
-        }
-        
-        console.log(`✅ フォーカス確立完了: ${document.activeElement === inputField}`);
-    }
-
-    // Step 3: React内部状態の強制変更（モバイル版）
-    private async setReactStateMobile(inputField: HTMLInputElement, ticketId: string): Promise<void> {
-        console.log('⚛️ React内部状態変更（モバイル強化版）');
+    // iPhone Safari IMEイベント完全シミュレーション（gemini -p最新推奨）
+    private async setReactValueDirectly(inputField: HTMLInputElement, value: string): Promise<boolean> {
+        console.log('🍎 iPhone Safari IMEイベントシーケンスシミュレーション開始');
         
         try {
-            // ネイティブセッターを使用（モバイルブラウザ対応）
-            const nativeInputValueSetter = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value')?.set;
+            // 1. ネイティブのvalueプロパティセッターを取得
+            const nativeInputValueSetter = Object.getOwnPropertyDescriptor(
+                HTMLInputElement.prototype,
+                'value'
+            )?.set;
             
-            if (nativeInputValueSetter) {
-                nativeInputValueSetter.call(inputField, ticketId);
-                console.log('📝 ネイティブ値セッター実行');
+            if (!nativeInputValueSetter) {
+                console.error('❌ ネイティブInputValueSetterが取得できません');
+                return false;
             }
             
-            // React fiberの強制更新（モバイル対応）
-            const reactKeys = Object.keys(inputField).filter(key => 
-                key.startsWith('__reactFiber') || key.startsWith('__reactInternalInstance') || key.startsWith('__reactEventHandlers')
-            );
+            console.log('🎯 ネイティブセッター取得成功');
             
-            for (const key of reactKeys) {
-                try {
-                    const reactInstance = (inputField as any)[key];
-                    if (reactInstance) {
-                        // フォース更新をスケジュール
-                        if (reactInstance.stateNode) {
-                            reactInstance.stateNode.value = ticketId;
-                        }
-                        if (reactInstance.memoizedState) {
-                            reactInstance.memoizedState.value = ticketId;
-                        }
-                    }
-                } catch (e) {
-                    const errorMessage = e instanceof Error ? e.message : String(e);
-                    console.log(`React ${key}更新スキップ:`, errorMessage);
-                }
-            }
+            // 2. フォーカス確立
+            inputField.focus();
+            console.log('🔍 フォーカス設定完了');
             
-            // React合成イベント発火（モバイル特化）
-            const syntheticEvent = new Event('input', { bubbles: true });
-            Object.defineProperty(syntheticEvent, 'target', { value: inputField, enumerable: true });
-            Object.defineProperty(syntheticEvent, 'currentTarget', { value: inputField, enumerable: true });
-            Object.defineProperty(syntheticEvent, 'nativeEvent', { value: syntheticEvent, enumerable: true });
-            inputField.dispatchEvent(syntheticEvent);
-            
-            console.log('✅ React状態更新完了');
-            
-        } catch (error) {
-            console.warn('⚠️ React状態更新失敗:', error);
-        }
-        
-        await new Promise(resolve => setTimeout(resolve, 100));
-    }
-
-    // Step 4: タッチイベントシミュレーション（モバイル専用）
-    private async simulateTouchInput(inputField: HTMLInputElement, ticketId: string): Promise<void> {
-        console.log('👆 タッチ入力シミュレーション（モバイル専用）');
-        
-        // タッチ開始
-        const touchStartEvent = new TouchEvent('touchstart', {
-            bubbles: true,
-            cancelable: true,
-            touches: [new Touch({
-                identifier: 0,
-                target: inputField,
-                clientX: inputField.offsetLeft + 10,
-                clientY: inputField.offsetTop + 10
-            })]
-        });
-        inputField.dispatchEvent(touchStartEvent);
-        
-        await new Promise(resolve => setTimeout(resolve, 50));
-        
-        // 一文字ずつタッチ入力
-        for (let i = 0; i < ticketId.length; i++) {
-            const char = ticketId[i];
-            const currentValue = ticketId.substring(0, i + 1);
-            
-            // タッチによるキー入力
-            const touchMoveEvent = new TouchEvent('touchmove', {
+            // 3. Composition Event開始（IME入力開始）
+            console.log('⌨️ CompositionStart発火中...');
+            inputField.dispatchEvent(new CompositionEvent('compositionstart', {
                 bubbles: true,
                 cancelable: true,
-                touches: [new Touch({
-                    identifier: 0,
-                    target: inputField,
-                    clientX: inputField.offsetLeft + 10 + i,
-                    clientY: inputField.offsetTop + 10
-                })]
-            });
-            inputField.dispatchEvent(touchMoveEvent);
+            }));
             
-            // 値を段階的に設定
-            inputField.value = currentValue;
-            inputField.setAttribute('value', currentValue);
+            // 4. ネイティブセッター経由で値を設定
+            console.log(`📝 ネイティブセッター経由で値設定中: "${value}"`);
+            nativeInputValueSetter.call(inputField, value);
             
-            // モバイル用inputイベント
-            const mobileInputEvent = new Event('input', { bubbles: true });
-            Object.defineProperty(mobileInputEvent, 'data', { value: char });
-            Object.defineProperty(mobileInputEvent, 'inputType', { value: 'insertText' });
-            inputField.dispatchEvent(mobileInputEvent);
+            // 5. inputイベント発火（Reactが変更を検知）
+            console.log('📡 inputイベント発火中...');
+            inputField.dispatchEvent(new Event('input', { bubbles: true }));
             
-            await new Promise(resolve => setTimeout(resolve, 30)); // モバイル用遅延
-        }
-        
-        // タッチ終了
-        const touchEndEvent = new TouchEvent('touchend', {
-            bubbles: true,
-            cancelable: true
-        });
-        inputField.dispatchEvent(touchEndEvent);
-        
-        console.log('✅ タッチ入力シミュレーション完了');
-        await new Promise(resolve => setTimeout(resolve, 100));
-    }
-
-    // Step 5: 従来の入力メソッド（デスクトップ互換）
-    private async simulateTypingInput(inputField: HTMLInputElement, ticketId: string): Promise<void> {
-        console.log('⌨️ タイピング入力シミュレーション');
-        
-        // 一文字ずつのキーボード入力シミュレーション
-        for (let i = 0; i < ticketId.length; i++) {
-            const char = ticketId[i];
-            const currentValue = ticketId.substring(0, i + 1);
-            
-            // keydown
-            const keydownEvent = new KeyboardEvent('keydown', {
-                key: char,
-                code: `Key${char.toUpperCase()}`,
+            // 6. Composition Event終了（IME入力確定）
+            console.log('✅ CompositionEnd発火中...');
+            inputField.dispatchEvent(new CompositionEvent('compositionend', {
                 bubbles: true,
-                cancelable: true
-            });
-            inputField.dispatchEvent(keydownEvent);
+                cancelable: true,
+                data: value, // ★ 確定した値をdataプロパティに設定
+            }));
             
-            // 値更新
-            inputField.value = currentValue;
+            // 7. changeイベント発火（念のため）
+            console.log('🔄 changeイベント発火中...');
+            inputField.dispatchEvent(new Event('change', { bubbles: true }));
             
-            // input（詳細プロパティ付き）
-            const inputEvent = new Event('input', { bubbles: true });
-            Object.defineProperty(inputEvent, 'target', { value: inputField, enumerable: true });
-            Object.defineProperty(inputEvent, 'data', { value: char, enumerable: true });
-            Object.defineProperty(inputEvent, 'inputType', { value: 'insertText', enumerable: true });
-            inputField.dispatchEvent(inputEvent);
+            // 8. フォーカスを外す
+            inputField.blur();
+            console.log('👁️ フォーカス解除完了');
             
-            // keyup
-            const keyupEvent = new KeyboardEvent('keyup', {
-                key: char,
-                code: `Key${char.toUpperCase()}`,
-                bubbles: true,
-                cancelable: true
-            });
-            inputField.dispatchEvent(keyupEvent);
+            // 9. 短い待機後に値を検証
+            await new Promise(resolve => setTimeout(resolve, 200));
             
-            await new Promise(resolve => setTimeout(resolve, 15));
+            const finalValue = inputField.value;
+            const success = finalValue === value;
+            
+            if (success) {
+                console.log('✅ iPhone Safari IMEシミュレーションで入力成功');
+            } else {
+                console.warn(`⚠️ 値の不一致: 期待="${value}", 実際="${finalValue}"`);
+            }
+            
+            return success;
+            
+        } catch (error) {
+            console.error('❌ iPhone Safari IMEシミュレーションエラー:', error);
+            return false;
         }
-        
-        // pasteイベントも実行（フォールバック）
-        const clipboardData = new DataTransfer();
-        clipboardData.setData('text/plain', ticketId);
-        const pasteEvent = new ClipboardEvent('paste', {
-            bubbles: true,
-            cancelable: true,
-            clipboardData: clipboardData
-        });
-        inputField.dispatchEvent(pasteEvent);
-        
-        console.log('✅ タイピング入力シミュレーション完了');
     }
-
-    // Step 6: IME完了待機とvalidation（モバイル強化）
-    private async waitForInputStabilization(): Promise<void> {
-        console.log('⏳ 入力安定化待機（IME対応）');
+    
+    // React onChange直接呼び出し方式（フォールバック用）
+    private async callReactOnChangeDirectly(inputField: HTMLInputElement, value: string): Promise<boolean> {
+        console.log('⚛️ React onChangeハンドラ直接呼び出し（フォールバック）');
         
-        // IME完了やフォーム更新の完了を待機
-        await new Promise(resolve => setTimeout(resolve, 800)); // モバイル環境での待機時間延長
-        
-        // 追加のUIスレッド安定化待機
-        await new Promise(resolve => requestAnimationFrame(() => {
-            requestAnimationFrame(resolve);
-        }));
-        
-        console.log('✅ 入力安定化完了');
-    }
-
-    // Step 7: 最終値検証と補正
-    private async validateAndCorrectFinalValue(inputField: HTMLInputElement, ticketId: string): Promise<boolean> {
-        console.log('🔍 最終値検証と補正');
-        
-        let finalValue = inputField.value;
-        console.log(`📊 最終値確認: "${finalValue}" (期待値: "${ticketId}")`);
-        
-        if (finalValue === ticketId) {
-            console.log('✅ 入力値検証成功');
+        try {
+            const fiberKey = Object.keys(inputField).find(key => key.startsWith('__reactFiber$'));
+            if (!fiberKey) {
+                console.warn('⚠️ React Fiberキーが見つかりません');
+                return false;
+            }
             
-            // 完了イベント発火
+            const fiberInstance = (inputField as any)[fiberKey];
+            const onChangeHandler = fiberInstance?.memoizedProps?.onChange;
+            if (!onChangeHandler || typeof onChangeHandler !== 'function') {
+                console.warn('⚠️ onChangeハンドラが見つかりません');
+                return false;
+            }
+            
+            const mockEvent = {
+                target: { value: value },
+                currentTarget: { value: value },
+                type: 'change',
+                bubbles: true
+            };
+            
+            onChangeHandler(mockEvent);
+            
+            const nativeInputValueSetter = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value')?.set;
+            if (nativeInputValueSetter) {
+                nativeInputValueSetter.call(inputField, value);
+            }
+            
+            await new Promise(resolve => setTimeout(resolve, 100));
+            const success = inputField.value === value;
+            
+            if (success) {
+                console.log('✅ React直接呼び出しで成功');
+            }
+            
+            return success;
+            
+        } catch (error) {
+            console.error('❌ React直接呼び出しエラー:', error);
+            return false;
+        }
+    }
+
+    // フォールバック処理（多段階方式）
+    private async fallbackInputMethod(inputField: HTMLInputElement, ticketId: string): Promise<boolean> {
+        console.log('🔄 フォールバック入力処理開始');
+        
+        try {
+            // Method 1: React onChange直接呼び出し方式
+            console.log('🔄 Method 1: React直接呼び出し試行中...');
+            const reactSuccess = await this.callReactOnChangeDirectly(inputField, ticketId);
+            if (reactSuccess) {
+                console.log('✅ React直接呼び出しで成功');
+                return true;
+            }
+            
+            // Method 2: 従来のpasteイベント方式
+            console.log('🔄 Method 2: pasteイベント方式試行中...');
+            inputField.focus();
+            inputField.value = '';
+            inputField.dispatchEvent(new Event('input', { bubbles: true }));
+            
+            const clipboardData = new DataTransfer();
+            clipboardData.setData('text/plain', ticketId);
+            const pasteEvent = new ClipboardEvent('paste', {
+                bubbles: true,
+                cancelable: true,
+                clipboardData: clipboardData
+            });
+            
+            inputField.dispatchEvent(pasteEvent);
+            inputField.value = ticketId;
+            
+            inputField.dispatchEvent(new Event('input', { bubbles: true }));
             inputField.dispatchEvent(new Event('change', { bubbles: true }));
             inputField.dispatchEvent(new Event('blur', { bubbles: true }));
-            inputField.dispatchEvent(new Event('focusout', { bubbles: true }));
             
-            return true;
+            const pasteSuccess = inputField.value === ticketId;
+            console.log(`🔄 pasteイベント方式結果: ${pasteSuccess ? '成功' : '失敗'}`);
+            
+            return pasteSuccess;
+            
+        } catch (error) {
+            console.error('❌ フォールバック入力エラー:', error);
+            return false;
         }
-        
-        // 不一致の場合、強制補正を試行
-        console.warn(`⚠️ 値の不一致検出、強制補正を実行: 実際="${finalValue}" 期待="${ticketId}"`);
-        
-        // 最後の手段: 全ての方法で強制的に値を設定
-        inputField.value = ticketId;
-        inputField.textContent = ticketId;
-        inputField.setAttribute('value', ticketId);
-        
-        // DOM更新強制
-        inputField.style.display = 'none';
-        inputField.offsetHeight; // reflow強制
-        inputField.style.display = '';
-        
-        // 全イベント再発火
-        ['input', 'change', 'keyup', 'blur'].forEach(eventType => {
-            inputField.dispatchEvent(new Event(eventType, { bubbles: true }));
-        });
-        
-        // 最終確認
-        await new Promise(resolve => setTimeout(resolve, 500));
-        finalValue = inputField.value;
-        
-        const success = finalValue === ticketId;
-        console.log(`🎯 強制補正結果: ${success ? '成功' : '失敗'} (最終値: "${finalValue}")`);
-        
-        return success;
     }
+
 
     // 追加ボタンをクリック（動的待機付き）
     private async clickAddButton(): Promise<boolean> {

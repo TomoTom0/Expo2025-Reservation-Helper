@@ -24,7 +24,8 @@
       "Bash(npx tsc:*)",
       "Bash(grep:*)",
       "Bash(echo)",
-      "Bash(rg:*)"
+      "Bash(rg:*)",
+      "Bash(gemini:*)"
     ],
     "deny": []
   }
