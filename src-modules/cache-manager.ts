@@ -1,9 +1,9 @@
 // entrance-page-stateからのimport
-import { timeSlotState } from './entrance-page-state';
+// import { timeSlotState } from './entrance-page-state'; // 統合により不要
 
 
-// getExternalFunctionのimport（entrance-page-monitorから）
-import { getExternalFunction } from './entrance-page-monitor';
+// unified-stateからの直接インポート
+import { entranceReservationStateManager } from './entrance-reservation-state-manager';
 
 // 型定義のインポート
 import type { CacheManager, Dependencies } from '../types/index.js';
@@ -24,10 +24,9 @@ return {
     // 複数監視対象を保存
     saveTargetSlots(): void {
         try {
-            const unifiedStateManager = getExternalFunction('unifiedStateManager');
-            if (!unifiedStateManager) return;
+            if (!entranceReservationStateManager) return;
             
-            const targets = unifiedStateManager.getMonitoringTargets();
+            const targets = entranceReservationStateManager.getMonitoringTargets();
             if (targets.length === 0) return;
             
             // 現在選択されているカレンダー日付を取得
@@ -44,7 +43,7 @@ return {
                 selectedDate: selectedCalendarDate,
                 timestamp: Date.now(),
                 url: window.location.href,
-                retryCount: timeSlotState.retryCount || 0
+                retryCount: entranceReservationStateManager.getRetryCount() || 0
             };
             
             localStorage.setItem(this.generateKey('target_slots'), JSON.stringify(data));

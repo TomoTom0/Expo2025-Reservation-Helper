@@ -1,6 +1,6 @@
 /**
- * 統一状態管理システム
- * 予約・監視の状態と対象を一元管理
+ * 入場予約状態管理システム
+ * 入場予約・監視の状態と対象を管理
  */
 
 // 必要なimport
@@ -108,10 +108,10 @@ export class LocationHelper {
 }
 
 // ============================================================================
-// 統一状態管理クラス
+// 入場予約状態管理クラス
 // ============================================================================
 
-export class UnifiedStateManager {
+export class EntranceReservationStateManager {
     // 実行状態
     private executionState: ExecutionState = ExecutionState.IDLE;
     
@@ -128,6 +128,21 @@ export class UnifiedStateManager {
     // 優先度設定
     private priorityMode: PriorityMode = PriorityMode.AUTO;
     
+    // 予約実行情報（旧entranceReservationStateから統合）
+    private reservationExecution = {
+        shouldStop: false,
+        startTime: null as number | null,
+        attempts: 0
+    };
+    
+    // 監視実行情報（旧timeSlotStateから統合）
+    private monitoringExecution = {
+        retryCount: 0,
+        maxRetries: 100,
+        reloadInterval: 30000,
+        monitoringInterval: null as number | null
+    };
+    
     // デバッグフラグ（本番環境では詳細ログを抑制）
     private debugMode: boolean = true;
     
@@ -137,6 +152,13 @@ export class UnifiedStateManager {
     
     getExecutionState(): ExecutionState {
         return this.executionState;
+    }
+    
+    setExecutionState(state: ExecutionState): void {
+        this.executionState = state;
+        if (this.debugMode) {
+            console.log(`[UnifiedState] 実行状態変更: ${state}`);
+        }
     }
     
     startReservation(): boolean {
@@ -178,11 +200,115 @@ export class UnifiedStateManager {
         switch (prevState) {
             case ExecutionState.RESERVATION_RUNNING:
                 this.log('⏹️ 予約処理を停止');
+                // 予約実行情報をリセット
+                this.reservationExecution.shouldStop = false;
+                this.reservationExecution.startTime = null;
+                this.reservationExecution.attempts = 0;
                 break;
             case ExecutionState.MONITORING_RUNNING:
                 this.log('⏹️ 監視処理を停止');
+                // 監視インターバルをクリア
+                if (this.monitoringExecution.monitoringInterval) {
+                    clearInterval(this.monitoringExecution.monitoringInterval);
+                    this.monitoringExecution.monitoringInterval = null;
+                }
                 break;
         }
+    }
+    
+    // ============================================================================
+    // 予約実行情報管理（旧entranceReservationStateから統合）
+    // ============================================================================
+    
+    // 予約実行開始
+    startReservationExecution(): void {
+        this.reservationExecution.shouldStop = false;
+        this.reservationExecution.startTime = Date.now();
+        this.reservationExecution.attempts = 0;
+        this.log('🚀 予約実行情報を初期化');
+    }
+    
+    // 予約中断フラグ設定
+    setShouldStop(shouldStop: boolean): void {
+        this.reservationExecution.shouldStop = shouldStop;
+        this.log(`🛑 予約中断フラグ: ${shouldStop}`);
+    }
+    
+    // 予約中断フラグ取得
+    getShouldStop(): boolean {
+        return this.reservationExecution.shouldStop;
+    }
+    
+    // 試行回数増加
+    incrementAttempts(): void {
+        this.reservationExecution.attempts++;
+        this.log(`🔄 予約試行回数: ${this.reservationExecution.attempts}`);
+    }
+    
+    // 試行回数取得
+    getAttempts(): number {
+        return this.reservationExecution.attempts;
+    }
+    
+    // 予約開始時刻取得
+    getReservationStartTime(): number | null {
+        return this.reservationExecution.startTime;
+    }
+    
+    // 予約実行中かどうか
+    isReservationRunning(): boolean {
+        return this.executionState === ExecutionState.RESERVATION_RUNNING;
+    }
+    
+    // ============================================================================
+    // 監視実行情報管理（旧timeSlotStateから統合）
+    // ============================================================================
+    
+    // 監視実行中かどうか
+    isMonitoringRunning(): boolean {
+        return this.executionState === ExecutionState.MONITORING_RUNNING;
+    }
+    
+    // リトライ回数増加
+    incrementRetryCount(): void {
+        this.monitoringExecution.retryCount++;
+        this.log(`🔄 監視リトライ回数: ${this.monitoringExecution.retryCount}`);
+    }
+    
+    // リトライ回数取得
+    getRetryCount(): number {
+        return this.monitoringExecution.retryCount;
+    }
+    
+    // リトライ回数リセット
+    resetRetryCount(): void {
+        this.monitoringExecution.retryCount = 0;
+        this.log('🔄 監視リトライ回数をリセット');
+    }
+    
+    // 最大リトライ回数取得
+    getMaxRetries(): number {
+        return this.monitoringExecution.maxRetries;
+    }
+    
+    // 監視インターバル設定
+    setMonitoringInterval(intervalId: number): void {
+        this.monitoringExecution.monitoringInterval = intervalId;
+        this.log(`⏰ 監視インターバル設定: ${intervalId}`);
+    }
+    
+    // 監視インターバルクリア
+    clearMonitoringInterval(): void {
+        if (this.monitoringExecution.monitoringInterval) {
+            clearInterval(this.monitoringExecution.monitoringInterval);
+            this.monitoringExecution.monitoringInterval = null;
+            this.log('⏰ 監視インターバルをクリア');
+        }
+    }
+    
+    // 監視インターバル取得
+    getMonitoringInterval(): number | null {
+        return this.monitoringExecution.monitoringInterval;
     }
     
     // ============================================================================
@@ -647,3 +773,6 @@ export class UnifiedStateManager {
         console.groupEnd();
     }
 }
+
+// 入場予約状態管理システムのシングルトンインスタンス
+export const entranceReservationStateManager = new EntranceReservationStateManager();

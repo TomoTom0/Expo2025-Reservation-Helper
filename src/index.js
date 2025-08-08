@@ -318,39 +318,27 @@ async function initTimeSlotMonitoring() {
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   Ak: () => (/* binding */ enableAllMonitorButtons),
-/* harmony export */   Il: () => (/* binding */ restoreSelectionAfterUpdate),
 /* harmony export */   Is: () => (/* binding */ isInterruptionAllowed),
-/* harmony export */   Lf: () => (/* binding */ scheduleReload),
-/* harmony export */   Lm: () => (/* binding */ stopReloadCountdown),
 /* harmony export */   MM: () => (/* binding */ setCacheManagerForSection6),
-/* harmony export */   PH: () => (/* binding */ startReloadCountdown),
-/* harmony export */   PT: () => (/* binding */ disableAllMonitorButtons),
 /* harmony export */   XG: () => (/* binding */ stopSlotMonitoring),
 /* harmony export */   XP: () => (/* binding */ setEntranceReservationHelper),
 /* harmony export */   ZK: () => (/* binding */ setPageLoadingState),
 /* harmony export */   Zu: () => (/* binding */ restoreFromCache),
-/* harmony export */   dm: () => (/* binding */ getCurrentTableContent),
-/* harmony export */   f1: () => (/* binding */ showErrorMessage),
-/* harmony export */   iG: () => (/* binding */ shouldUpdateMonitorButtons),
-/* harmony export */   oH: () => (/* binding */ resetMonitoringUI),
-/* harmony export */   oy: () => (/* binding */ tryClickCalendarForTimeSlot),
 /* harmony export */   pW: () => (/* binding */ updateStatusBadge),
 /* harmony export */   qy: () => (/* binding */ setUpdateMonitoringTargetsDisplay),
-/* harmony export */   rG: () => (/* binding */ selectTimeSlotAndStartReservation),
 /* harmony export */   rY: () => (/* binding */ getCurrentSelectedCalendarDate),
 /* harmony export */   vp: () => (/* binding */ updateMainButtonDisplay)
 /* harmony export */ });
-/* unused harmony exports clickCalendarDate, getCurrentEntranceConfig, resetPreviousSelection, disableOtherMonitorButtons, clearExistingMonitorButtons, getCurrentMode, getTargetDisplayInfo */
+/* unused harmony exports clickCalendarDate, tryClickCalendarForTimeSlot, showErrorMessage, resetMonitoringUI, selectTimeSlotAndStartReservation, getCurrentEntranceConfig, resetPreviousSelection, disableOtherMonitorButtons, enableAllMonitorButtons, disableAllMonitorButtons, clearExistingMonitorButtons, getCurrentTableContent, shouldUpdateMonitorButtons, restoreSelectionAfterUpdate, getCurrentMode, getTargetDisplayInfo, scheduleReload, startReloadCountdown, stopReloadCountdown */
 /* harmony import */ var _entrance_page_state__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(278);
 /* harmony import */ var _entrance_page_dom_utils__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(115);
-/* harmony import */ var _unified_state__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(742);
+/* harmony import */ var _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(461);
 /* harmony import */ var _entrance_page_monitor__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(429);
 // entrance-page-stateからのimport
 
 // entrance-page-dom-utilsからのimport
 
-// 統一状態管理システムからのimport
+// 入場予約状態管理システムからのimport
 
 // Section 5からのimport
 
@@ -519,9 +507,8 @@ async function clickCalendarDate(targetDate) {
 async function tryClickCalendarForTimeSlot() {
     console.log('📅 時間帯表示のためのカレンダークリックを試行中...');
     // 監視対象確認（情報表示のみ）
-    const unifiedStateManager = (0,_entrance_page_monitor__WEBPACK_IMPORTED_MODULE_3__/* .getExternalFunction */ .ac)('unifiedStateManager');
-    if (unifiedStateManager && unifiedStateManager.hasMonitoringTargets()) {
-        const targets = unifiedStateManager.getMonitoringTargets();
+    if (_entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_2__/* .entranceReservationStateManager */ .xx && _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_2__/* .entranceReservationStateManager */ .xx.hasMonitoringTargets()) {
+        const targets = _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_2__/* .entranceReservationStateManager */ .xx.getMonitoringTargets();
         const targetTexts = targets.map((t) => t.timeSlot).join(', ');
         console.log(`🎯 監視対象: ${targetTexts} (${targets.length}個)`);
     }
@@ -655,7 +642,7 @@ function resetMonitoringUI() {
 }
 // 時間帯を自動選択して予約開始
 async function selectTimeSlotAndStartReservation(slotInfo) {
-    const location = _unified_state__WEBPACK_IMPORTED_MODULE_2__/* .LocationHelper */ .Qs.getLocationFromIndex(_unified_state__WEBPACK_IMPORTED_MODULE_2__/* .LocationHelper */ .Qs.getIndexFromSelector(slotInfo.targetInfo.tdSelector));
+    const location = _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_2__/* .LocationHelper */ .Qs.getLocationFromIndex(_entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_2__/* .LocationHelper */ .Qs.getIndexFromSelector(slotInfo.targetInfo.tdSelector));
     console.log(`🎯 時間帯を自動選択します: ${location}${slotInfo.timeText}`);
     // クリック対象のdl要素を探す
     let clickTarget = null;
@@ -727,18 +714,18 @@ async function selectTimeSlotAndStartReservation(slotInfo) {
         }
         // 監視停止
         stopSlotMonitoring();
-        // 通常の予約処理を開始
+        // 通常の予約処理を開始（入場予約状態管理システム使用）
         const config = getCurrentEntranceConfig();
         if (config && entranceReservationHelper) {
-            _entrance_page_state__WEBPACK_IMPORTED_MODULE_0__.entranceReservationState.isRunning = true;
+            _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_2__/* .entranceReservationStateManager */ .xx.setExecutionState(_entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_2__/* .ExecutionState */ .si.RESERVATION_RUNNING);
+            _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_2__/* .entranceReservationStateManager */ .xx.startReservationExecution();
             const result = await entranceReservationHelper(config);
             if (result.success) {
-                // 統一状態管理に予約成功情報を設定
-                const unifiedStateManager = (0,_entrance_page_monitor__WEBPACK_IMPORTED_MODULE_3__/* .getExternalFunction */ .ac)('unifiedStateManager');
-                if (unifiedStateManager) {
-                    const reservationTarget = unifiedStateManager.getReservationTarget();
+                // 入場予約状態管理に予約成功情報を設定
+                if (_entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_2__/* .entranceReservationStateManager */ .xx) {
+                    const reservationTarget = _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_2__/* .entranceReservationStateManager */ .xx.getReservationTarget();
                     if (reservationTarget) {
-                        unifiedStateManager.setReservationSuccess(reservationTarget.timeSlot, reservationTarget.locationIndex);
+                        _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_2__/* .entranceReservationStateManager */ .xx.setReservationSuccess(reservationTarget.timeSlot, reservationTarget.locationIndex);
                         updateMainButtonDisplay(); // FAB表示更新
                     }
                 }
@@ -753,11 +740,9 @@ async function selectTimeSlotAndStartReservation(slotInfo) {
 }
 // 監視停止（監視対象選択は維持）
 function stopSlotMonitoring() {
-    _entrance_page_state__WEBPACK_IMPORTED_MODULE_0__.timeSlotState.isMonitoring = false;
-    // 統一状態管理システムの実行状態を停止
-    const unifiedStateManager = (0,_entrance_page_monitor__WEBPACK_IMPORTED_MODULE_3__/* .getExternalFunction */ .ac)('unifiedStateManager');
-    if (unifiedStateManager) {
-        unifiedStateManager.stop();
+    // 入場予約状態管理システムの実行状態を停止
+    if (_entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_2__/* .entranceReservationStateManager */ .xx) {
+        _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_2__/* .entranceReservationStateManager */ .xx.stop();
     }
     // 監視継続フラグをクリア（手動停止なので継続させない）
     if (cacheManager) {
@@ -765,17 +750,6 @@ function stopSlotMonitoring() {
     }
     // リロードカウントダウンも確実に停止
     stopReloadCountdown();
-    // 監視対象が設定されている場合は選択状態に戻す
-    if (unifiedStateManager && unifiedStateManager.hasMonitoringTargets()) {
-        _entrance_page_state__WEBPACK_IMPORTED_MODULE_0__.timeSlotState.mode = 'selecting';
-    }
-    else {
-        _entrance_page_state__WEBPACK_IMPORTED_MODULE_0__.timeSlotState.mode = 'idle';
-    }
-    if (_entrance_page_state__WEBPACK_IMPORTED_MODULE_0__.timeSlotState.monitoringInterval) {
-        clearInterval(_entrance_page_state__WEBPACK_IMPORTED_MODULE_0__.timeSlotState.monitoringInterval);
-        _entrance_page_state__WEBPACK_IMPORTED_MODULE_0__.timeSlotState.monitoringInterval = null;
-    }
     // 監視ボタンを有効化（操作可能に戻す）
     enableAllMonitorButtons();
     // メインボタンの表示を更新
@@ -815,9 +789,8 @@ function getCurrentEntranceConfig() {
 // 前の選択をリセット
 function resetPreviousSelection() {
     // すべての監視対象をクリア
-    const unifiedStateManager = getExternalFunction('unifiedStateManager');
-    if (unifiedStateManager) {
-        unifiedStateManager.clearAllTargets();
+    if (entranceReservationStateManager) {
+        entranceReservationStateManager.clearAllTargets();
     }
     // ボタンの表示を「満員」に戻す
     updateAllMonitorButtonPriorities();
@@ -895,7 +868,7 @@ function getCurrentTableContent() {
 }
 // 監視ボタンの更新が必要かチェック
 function shouldUpdateMonitorButtons() {
-    const analysis = (0,_entrance_page_monitor__WEBPACK_IMPORTED_MODULE_3__/* .analyzeTimeSlots */ .bU)();
+    const analysis = analyzeTimeSlots();
     const existingButtons = document.querySelectorAll('.monitor-btn');
     console.log(`満員時間帯数: ${analysis.full.length}, 既存ボタン数: ${existingButtons.length}`);
     // 満員時間帯の数と既存ボタン数が異なる場合は更新が必要
@@ -926,10 +899,9 @@ function shouldUpdateMonitorButtons() {
 }
 // 日付変更後の選択状態復元
 function restoreSelectionAfterUpdate() {
-    const unifiedStateManager = (0,_entrance_page_monitor__WEBPACK_IMPORTED_MODULE_3__/* .getExternalFunction */ .ac)('unifiedStateManager');
-    if (!unifiedStateManager || !unifiedStateManager.hasMonitoringTargets())
+    if (!entranceReservationStateManager || !entranceReservationStateManager.hasMonitoringTargets())
         return;
-    const targets = unifiedStateManager.getMonitoringTargets();
+    const targets = entranceReservationStateManager.getMonitoringTargets();
     const targetTexts = targets.map((t) => t.timeSlot).join(', ');
     console.log(`選択状態を復元中: ${targetTexts}`);
     // 該当する時間帯の監視ボタンを探して選択状態にする
@@ -939,12 +911,12 @@ function restoreSelectionAfterUpdate() {
         monitorButtons.forEach(button => {
             const buttonTargetTime = button.getAttribute('data-target-time') || '';
             const buttonTdElement = button.closest('td[data-gray-out]');
-            const buttonTdSelector = buttonTdElement ? (0,_entrance_page_dom_utils__WEBPACK_IMPORTED_MODULE_1__/* .generateUniqueTdSelector */ .sN)(buttonTdElement) : '';
+            const buttonTdSelector = buttonTdElement ? generateUniqueTdSelector(buttonTdElement) : '';
             // 時間+位置で一致するかチェック
             if (buttonTargetTime === target.timeSlot && buttonTdSelector === target.selector) {
                 const span = button.querySelector('span');
                 if (span) {
-                    // 監視対象リストでの位置を取得（統一状態管理の優先度を使用）
+                    // 監視対象リストでの位置を取得（入場予約状態管理の優先度を使用）
                     const priority = target.priority;
                     span.innerText = `監視${priority}`;
                     button.classList.remove('full-status');
@@ -958,10 +930,10 @@ function restoreSelectionAfterUpdate() {
     if (restoredCount === 0) {
         console.log(`⚠️ 対象時間帯が見つからないため選択状態をリセット: ${targetTexts}`);
         // 対象時間帯がない場合は状態をリセット
-        if (unifiedStateManager) {
-            unifiedStateManager.clearAllTargets();
+        if (entranceReservationStateManager) {
+            entranceReservationStateManager.clearAllTargets();
+            entranceReservationStateManager.stop(); // 実行状態もIDLEにリセット
         }
-        _entrance_page_state__WEBPACK_IMPORTED_MODULE_0__.timeSlotState.mode = 'idle';
         if (cacheManager) {
             cacheManager.clearTargetSlots();
         }
@@ -973,15 +945,14 @@ function restoreSelectionAfterUpdate() {
 let lastFabState = '';
 // 現在のFAB状態を文字列として取得
 function getCurrentFabState() {
-    const unifiedStateManager = (0,_entrance_page_monitor__WEBPACK_IMPORTED_MODULE_3__/* .getExternalFunction */ .ac)('unifiedStateManager');
-    if (!unifiedStateManager)
+    if (!_entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_2__/* .entranceReservationStateManager */ .xx)
         return 'no-manager';
     const mode = getCurrentMode();
-    const executionState = unifiedStateManager.getExecutionState();
-    const hasReservation = unifiedStateManager.hasReservationTarget();
-    const hasMonitoring = unifiedStateManager.hasMonitoringTargets();
+    const executionState = _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_2__/* .entranceReservationStateManager */ .xx.getExecutionState();
+    const hasReservation = _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_2__/* .entranceReservationStateManager */ .xx.hasReservationTarget();
+    const hasMonitoring = _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_2__/* .entranceReservationStateManager */ .xx.hasMonitoringTargets();
     // 監視対象の実際の内容を含める
-    const monitoringTargets = unifiedStateManager.getMonitoringTargets();
+    const monitoringTargets = _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_2__/* .entranceReservationStateManager */ .xx.getMonitoringTargets();
     const monitoringContent = monitoringTargets
         .map((target) => `${target.locationIndex}:${target.timeSlot}`)
         .sort()
@@ -1004,15 +975,14 @@ function updateMainButtonDisplay(forceMode = null, isCountdownUpdate = false) {
     if (fabButton && statusBadge) {
         const span = fabButton.querySelector('span');
         if (span) {
-            // 統一状態管理システムを取得
-            const unifiedStateManager = (0,_entrance_page_monitor__WEBPACK_IMPORTED_MODULE_3__/* .getExternalFunction */ .ac)('unifiedStateManager');
-            if (!unifiedStateManager) {
-                console.warn('⚠️ UnifiedStateManager が利用できないため、FAB更新を中止');
+            // 入場予約状態管理システムを取得
+            if (!_entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_2__/* .entranceReservationStateManager */ .xx) {
+                console.warn('⚠️ EntranceReservationStateManager が利用できないため、FAB更新を中止');
                 return;
             }
             // 対象情報の表示更新（カウントダウン中は既存の表示を維持）
             if (!isCountdownUpdate) {
-                const targetInfo = unifiedStateManager.getFabTargetDisplayInfo();
+                const targetInfo = _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_2__/* .entranceReservationStateManager */ .xx.getFabTargetDisplayInfo();
                 // 予約対象情報の表示更新（ログを簡素化）
                 if (reservationTargetDisplay) {
                     if (targetInfo.hasTarget && targetInfo.targetType === 'reservation') {
@@ -1038,20 +1008,20 @@ function updateMainButtonDisplay(forceMode = null, isCountdownUpdate = false) {
                 }
             }
             const currentMode = forceMode || getCurrentMode();
-            // 統一状態管理システムから状態を取得
-            const preferredAction = unifiedStateManager.getPreferredAction();
-            const hasReservationTarget = unifiedStateManager.hasReservationTarget();
-            const hasMonitoringTargets = unifiedStateManager.hasMonitoringTargets();
-            const executionState = unifiedStateManager.getExecutionState();
+            // 入場予約状態管理システムから状態を取得
+            const preferredAction = _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_2__/* .entranceReservationStateManager */ .xx.getPreferredAction();
+            const hasReservationTarget = _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_2__/* .entranceReservationStateManager */ .xx.hasReservationTarget();
+            const hasMonitoringTargets = _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_2__/* .entranceReservationStateManager */ .xx.hasMonitoringTargets();
+            const executionState = _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_2__/* .entranceReservationStateManager */ .xx.getExecutionState();
             // 詳細ログは重要な状態変更時のみ出力
             if (!isCountdownUpdate && (currentMode !== 'monitoring' || executionState !== 'monitoring_running')) {
                 console.log(`🔄 FAB更新: mode=${currentMode}, preferredAction=${preferredAction}, reservation=${hasReservationTarget}, monitoring=${hasMonitoringTargets}, execution=${executionState}`);
                 // デバッグ用: 予約対象設定の詳細情報
-                if (unifiedStateManager.hasReservationTarget()) {
-                    const target = unifiedStateManager.getReservationTarget();
+                if (_entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_2__/* .entranceReservationStateManager */ .xx.hasReservationTarget()) {
+                    const target = _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_2__/* .entranceReservationStateManager */ .xx.getReservationTarget();
                     console.log(`📍 予約対象詳細: ${target?.timeSlot} (位置: ${target?.locationIndex}, 有効: ${target?.isValid})`);
                     // canStartReservation()の各条件をチェック
-                    const canStart = unifiedStateManager.canStartReservation();
+                    const canStart = _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_2__/* .entranceReservationStateManager */ .xx.canStartReservation();
                     console.log(`🔍 予約開始可能性: ${canStart}`);
                     if (!canStart) {
                         // DOM状態を詳細確認
@@ -1135,8 +1105,8 @@ function updateMainButtonDisplay(forceMode = null, isCountdownUpdate = false) {
                 case 'idle':
                 default:
                     console.log(`🔄 idle ケース実行`);
-                    // 統一状態管理システム経由での処理（既にunifiedStateManagerは取得済み）
-                    console.log(`🔍 統一状態管理 優先アクション: ${preferredAction}`);
+                    // 入場予約状態管理システム経由での処理（既にentranceReservationStateManagerは取得済み）
+                    console.log(`🔍 入場予約状態管理 優先アクション: ${preferredAction}`);
                     if (preferredAction === 'reservation') {
                         span.innerText = '予約\n開始';
                         // CSSクラスによる状態管理
@@ -1159,7 +1129,7 @@ function updateMainButtonDisplay(forceMode = null, isCountdownUpdate = false) {
                         fabButton.title = '待機中（条件未満足）';
                         fabButton.disabled = true;
                     }
-                    // 統一状態管理システムでのステータスバッジ更新
+                    // 入場予約状態管理システムでのステータスバッジ更新
                     if (preferredAction === 'reservation' || preferredAction === 'monitoring') {
                         updateStatusBadge('idle');
                     }
@@ -1173,18 +1143,17 @@ function updateMainButtonDisplay(forceMode = null, isCountdownUpdate = false) {
 }
 // 現在のモードを取得するヘルパー関数（予約優先ロジック組み込み）
 function getCurrentMode() {
-    // 統一状態管理システムを取得（必須）
-    const unifiedStateManager = (0,_entrance_page_monitor__WEBPACK_IMPORTED_MODULE_3__/* .getExternalFunction */ .ac)('unifiedStateManager');
-    if (!unifiedStateManager) {
-        console.warn('⚠️ UnifiedStateManager が利用できません');
+    // 入場予約状態管理システムを取得（必須）
+    if (!_entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_2__/* .entranceReservationStateManager */ .xx) {
+        console.warn('⚠️ EntranceReservationStateManager が利用できません');
         return 'idle';
     }
     // ページローディング状態の確認
     if (_entrance_page_state__WEBPACK_IMPORTED_MODULE_0__.pageLoadingState?.isLoading) {
         return 'loading';
     }
-    // 統一状態管理システムの実行状態を確認
-    const executionState = unifiedStateManager.getExecutionState();
+    // 入場予約状態管理システムの実行状態を確認
+    const executionState = _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_2__/* .entranceReservationStateManager */ .xx.getExecutionState();
     switch (executionState) {
         case 'reservation_running':
             return 'reservation-running';
@@ -1192,7 +1161,7 @@ function getCurrentMode() {
             return 'monitoring';
         case 'idle':
             // 推奨アクションを確認
-            const preferredAction = unifiedStateManager.getPreferredAction();
+            const preferredAction = _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_2__/* .entranceReservationStateManager */ .xx.getPreferredAction();
             switch (preferredAction) {
                 case 'reservation':
                     return 'idle'; // 予約可能状態
@@ -1230,10 +1199,11 @@ function updateStatusBadge(mode) {
             }
             break;
         case 'reservation-running':
-            // 経過時間と回数を表示
-            const elapsedMinutes = _entrance_page_state__WEBPACK_IMPORTED_MODULE_0__.entranceReservationState.startTime ?
-                Math.floor((Date.now() - _entrance_page_state__WEBPACK_IMPORTED_MODULE_0__.entranceReservationState.startTime) / 60000) : 0;
-            const attempts = _entrance_page_state__WEBPACK_IMPORTED_MODULE_0__.entranceReservationState.attempts;
+            // 経過時間と回数を表示（入場予約状態管理システムから取得）
+            const startTime = _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_2__/* .entranceReservationStateManager */ .xx.getReservationStartTime();
+            const elapsedMinutes = startTime ?
+                Math.floor((Date.now() - startTime) / 60000) : 0;
+            const attempts = _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_2__/* .entranceReservationStateManager */ .xx.getAttempts();
             message = `予約実行中\n${elapsedMinutes}分 ${attempts}回`;
             bgColor = 'rgba(255, 140, 0, 0.9)'; // オレンジ色
             break;
@@ -1271,11 +1241,10 @@ function updateStatusBadge(mode) {
 }
 // 監視/予約対象の表示情報を取得（簡潔版）
 function getTargetDisplayInfo() {
-    const unifiedStateManager = getExternalFunction('unifiedStateManager');
-    if (!unifiedStateManager) {
+    if (!entranceReservationStateManager) {
         return '不明';
     }
-    const targets = unifiedStateManager.getMonitoringTargets();
+    const targets = entranceReservationStateManager.getMonitoringTargets();
     if (targets.length === 0) {
         return '不明';
     }
@@ -1315,23 +1284,22 @@ function getTargetDisplayInfo() {
 // 統一されたリロードスケジュール関数
 function scheduleReload(seconds = 30) {
     // 既存のタイマーを個別にクリア（stopReloadCountdown()は使わない）
-    if (_entrance_page_state__WEBPACK_IMPORTED_MODULE_0__.reloadCountdownState.countdownInterval) {
-        clearInterval(_entrance_page_state__WEBPACK_IMPORTED_MODULE_0__.reloadCountdownState.countdownInterval);
-        _entrance_page_state__WEBPACK_IMPORTED_MODULE_0__.reloadCountdownState.countdownInterval = null;
+    if (reloadCountdownState.countdownInterval) {
+        clearInterval(reloadCountdownState.countdownInterval);
+        reloadCountdownState.countdownInterval = null;
     }
-    if (_entrance_page_state__WEBPACK_IMPORTED_MODULE_0__.reloadCountdownState.reloadTimer) {
-        clearTimeout(_entrance_page_state__WEBPACK_IMPORTED_MODULE_0__.reloadCountdownState.reloadTimer);
-        _entrance_page_state__WEBPACK_IMPORTED_MODULE_0__.reloadCountdownState.reloadTimer = null;
+    if (reloadCountdownState.reloadTimer) {
+        clearTimeout(reloadCountdownState.reloadTimer);
+        reloadCountdownState.reloadTimer = null;
         console.log('🔄 既存のリロードタイマーをクリア（新規スケジュール開始）');
     }
-    _entrance_page_state__WEBPACK_IMPORTED_MODULE_0__.reloadCountdownState.totalSeconds = seconds;
-    _entrance_page_state__WEBPACK_IMPORTED_MODULE_0__.reloadCountdownState.secondsRemaining = seconds;
-    _entrance_page_state__WEBPACK_IMPORTED_MODULE_0__.reloadCountdownState.startTime = Date.now();
+    reloadCountdownState.totalSeconds = seconds;
+    reloadCountdownState.secondsRemaining = seconds;
+    reloadCountdownState.startTime = Date.now();
     console.log(`🔄 統一リロードスケジュール開始: ${seconds}秒`);
-    // 統一状態管理システムの状態をログ出力
-    const unifiedStateManager = (0,_entrance_page_monitor__WEBPACK_IMPORTED_MODULE_3__/* .getExternalFunction */ .ac)('unifiedStateManager');
-    if (unifiedStateManager) {
-        console.log(`📊 リロードスケジュール時の状態: ${unifiedStateManager.getExecutionState()}`);
+    // 入場予約状態管理システムの状態をログ出力
+    if (entranceReservationStateManager) {
+        console.log(`📊 リロードスケジュール時の状態: ${entranceReservationStateManager.getExecutionState()}`);
     }
     // 監視継続フラグを設定（リロード5秒前）
     const flagDelay = Math.max(0, (seconds - 5) * 1000);
@@ -1342,24 +1310,24 @@ function scheduleReload(seconds = 30) {
         }
     }, flagDelay);
     // 実際のリロード実行タイマー
-    _entrance_page_state__WEBPACK_IMPORTED_MODULE_0__.reloadCountdownState.reloadTimer = window.setTimeout(() => {
+    reloadCountdownState.reloadTimer = window.setTimeout(() => {
         console.log('🔄 統一リロード実行');
         window.location.reload();
     }, seconds * 1000);
     // 即座に一度UI更新
     updateMainButtonDisplay();
-    _entrance_page_state__WEBPACK_IMPORTED_MODULE_0__.reloadCountdownState.countdownInterval = window.setInterval(() => {
-        if (_entrance_page_state__WEBPACK_IMPORTED_MODULE_0__.reloadCountdownState.secondsRemaining !== null) {
-            _entrance_page_state__WEBPACK_IMPORTED_MODULE_0__.reloadCountdownState.secondsRemaining--;
+    reloadCountdownState.countdownInterval = window.setInterval(() => {
+        if (reloadCountdownState.secondsRemaining !== null) {
+            reloadCountdownState.secondsRemaining--;
             // UI更新（カウントダウン表示のみ）
             updateMainButtonDisplay(null, true);
-            if (_entrance_page_state__WEBPACK_IMPORTED_MODULE_0__.reloadCountdownState.secondsRemaining <= 0) {
+            if (reloadCountdownState.secondsRemaining <= 0) {
                 // カウントダウン表示のみ停止（リロードタイマーは停止しない）
-                if (_entrance_page_state__WEBPACK_IMPORTED_MODULE_0__.reloadCountdownState.countdownInterval) {
-                    clearInterval(_entrance_page_state__WEBPACK_IMPORTED_MODULE_0__.reloadCountdownState.countdownInterval);
-                    _entrance_page_state__WEBPACK_IMPORTED_MODULE_0__.reloadCountdownState.countdownInterval = null;
+                if (reloadCountdownState.countdownInterval) {
+                    clearInterval(reloadCountdownState.countdownInterval);
+                    reloadCountdownState.countdownInterval = null;
                 }
-                _entrance_page_state__WEBPACK_IMPORTED_MODULE_0__.reloadCountdownState.secondsRemaining = null;
+                reloadCountdownState.secondsRemaining = null;
                 console.log('🔄 カウントダウン完了（リロード実行待機中）');
             }
         }
@@ -1435,11 +1403,10 @@ async function restoreFromCache() {
         // 動的待機で正しい日付を取得
         const currentSelectedDate = await waitForValidCalendarDate();
         console.log(`📅 比較 - キャッシュ日付: ${cached.selectedDate}, 現在日付: ${currentSelectedDate}`);
-        // 統一状態管理システムにキャッシュされた日付を設定
-        const unifiedStateManager = (0,_entrance_page_monitor__WEBPACK_IMPORTED_MODULE_3__/* .getExternalFunction */ .ac)('unifiedStateManager');
-        if (unifiedStateManager) {
-            unifiedStateManager.setSelectedCalendarDate(cached.selectedDate);
-            console.log(`📅 統一状態管理にキャッシュ日付を設定: ${cached.selectedDate}`);
+        // 入場予約状態管理システムにキャッシュされた日付を設定
+        if (_entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_2__/* .entranceReservationStateManager */ .xx) {
+            _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_2__/* .entranceReservationStateManager */ .xx.setSelectedCalendarDate(cached.selectedDate);
+            console.log(`📅 入場予約状態管理にキャッシュ日付を設定: ${cached.selectedDate}`);
         }
         if (currentSelectedDate !== cached.selectedDate) {
             console.log('📅 日付が一致しません。キャッシュされた日付に移動します...');
@@ -1503,8 +1470,8 @@ async function restoreFromCache() {
         const availableTargets = [];
         // 各監視対象について状態をチェック
         cached.targets?.forEach((targetData, index) => {
-            const locationIndex = _unified_state__WEBPACK_IMPORTED_MODULE_2__/* .LocationHelper */ .Qs.getIndexFromSelector(targetData.tdSelector);
-            const location = _unified_state__WEBPACK_IMPORTED_MODULE_2__/* .LocationHelper */ .Qs.getLocationFromIndex(locationIndex);
+            const locationIndex = _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_2__/* .LocationHelper */ .Qs.getIndexFromSelector(targetData.tdSelector);
+            const location = _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_2__/* .LocationHelper */ .Qs.getLocationFromIndex(locationIndex);
             const locationText = location === 'east' ? '東' : '西';
             const priority = index + 1;
             console.log(`📍 復元対象を処理中: ${priority}.${locationText}${targetData.timeText}`);
@@ -1547,21 +1514,20 @@ async function restoreFromCache() {
                     //     positionInfo: targetData.positionInfo,
                     //     status: targetData.status
                     // };
-                    // 統一状態管理システムに追加（一元管理）
-                    const unifiedStateManager = (0,_entrance_page_monitor__WEBPACK_IMPORTED_MODULE_3__/* .getExternalFunction */ .ac)('unifiedStateManager');
+                    // 入場予約状態管理システムに追加（一元管理）
                     let added = false;
-                    if (unifiedStateManager) {
-                        const locationIndex = _unified_state__WEBPACK_IMPORTED_MODULE_2__/* .LocationHelper */ .Qs.getIndexFromSelector(targetData.tdSelector);
-                        added = unifiedStateManager.addMonitoringTarget(targetData.timeText, locationIndex, targetData.tdSelector);
-                        console.log(`📡 統一状態管理への復元: ${added ? '成功' : '失敗'} - ${location}${targetData.timeText}`);
+                    if (_entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_2__/* .entranceReservationStateManager */ .xx) {
+                        const locationIndex = _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_2__/* .LocationHelper */ .Qs.getIndexFromSelector(targetData.tdSelector);
+                        added = _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_2__/* .entranceReservationStateManager */ .xx.addMonitoringTarget(targetData.timeText, locationIndex, targetData.tdSelector);
+                        console.log(`📡 入場予約状態管理への復元: ${added ? '成功' : '失敗'} - ${location}${targetData.timeText}`);
                     }
                     if (added && targetButton) {
                         // ボタンの表示を更新
                         const span = targetButton.querySelector('span');
                         if (span) {
-                            // 監視対象での優先順位を取得（統一状態管理から）
-                            if (unifiedStateManager) {
-                                const targets = unifiedStateManager.getMonitoringTargets();
+                            // 監視対象での優先順位を取得（入場予約状態管理から）
+                            if (_entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_2__/* .entranceReservationStateManager */ .xx) {
+                                const targets = _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_2__/* .entranceReservationStateManager */ .xx.getMonitoringTargets();
                                 const target = targets.find((t) => t.timeSlot === targetData.timeText && t.selector === targetData.tdSelector);
                                 if (target) {
                                     span.innerText = `監視${target.priority}`;
@@ -1596,14 +1562,15 @@ async function restoreFromCache() {
             console.log(`🎉 最優先の空きあり監視対象を発見: ${topPriority.priority}.${topPriority.location}${topPriority.timeText}`);
             // 監視中に空きが見つかったら自動で予約処理に移行
             console.log(`🎉 空きが見つかりました！自動で予約処理を開始します: ${topPriority.location}${topPriority.timeText}`);
-            // 統一状態管理で予約対象に設定
-            const unifiedStateManager = (0,_entrance_page_monitor__WEBPACK_IMPORTED_MODULE_3__/* .getExternalFunction */ .ac)('unifiedStateManager');
-            if (unifiedStateManager) {
-                unifiedStateManager.setReservationTarget(topPriority.timeText, topPriority.locationIndex, topPriority.tdSelector);
+            // 入場予約状態管理で予約対象に設定
+            if (_entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_2__/* .entranceReservationStateManager */ .xx) {
+                _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_2__/* .entranceReservationStateManager */ .xx.setReservationTarget(topPriority.timeText, topPriority.locationIndex, topPriority.tdSelector);
                 console.log('✅ 予約対象に設定完了');
             }
             // 予約処理を自動開始
-            _entrance_page_state__WEBPACK_IMPORTED_MODULE_0__.timeSlotState.mode = 'trying';
+            if (_entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_2__/* .entranceReservationStateManager */ .xx) {
+                _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_2__/* .entranceReservationStateManager */ .xx.startReservation();
+            }
             updateMainButtonDisplay();
             // 時間帯を選択して予約開始（監視対象から予約対象に移行した正当な処理）
             if (selectTimeSlotAndStartReservation) {
@@ -1631,8 +1598,8 @@ async function restoreFromCache() {
         }
         // 復元結果の処理
         if (restoredCount > 0) {
-            _entrance_page_state__WEBPACK_IMPORTED_MODULE_0__.timeSlotState.retryCount = cached.retryCount || 0;
-            _entrance_page_state__WEBPACK_IMPORTED_MODULE_0__.timeSlotState.mode = 'selecting';
+            // EntranceReservationStateManagerに統合されているため、リトライ回数の設定は不要
+            // 実行状態は監視対象が存在する場合はIDLEのまま（監視開始可能状態）
             // メインボタンの表示更新
             updateMainButtonDisplay();
             // FAB監視対象表示の更新
@@ -1640,24 +1607,18 @@ async function restoreFromCache() {
                 updateMonitoringTargetsDisplayFn();
             }
             console.log(`✅ ${restoredCount}個の監視状態を復元完了 (試行回数: ${cached.retryCount})`);
-            // 統一状態管理の状態確認
-            const unifiedStateManager = (0,_entrance_page_monitor__WEBPACK_IMPORTED_MODULE_3__/* .getExternalFunction */ .ac)('unifiedStateManager');
-            if (unifiedStateManager) {
-                unifiedStateManager.debugInfo();
+            // 入場予約状態管理の状態確認
+            if (_entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_2__/* .entranceReservationStateManager */ .xx) {
+                _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_2__/* .entranceReservationStateManager */ .xx.debugInfo();
             }
             // 監視継続フラグをチェックして監視を再開（既に取得済みの値を使用）
             if (shouldContinueMonitoring) {
                 console.log('🔄 監視継続フラグが有効です。監視を自動再開します...');
-                // 統一状態管理システムの実行状態を監視中に設定
-                const unifiedStateManager = (0,_entrance_page_monitor__WEBPACK_IMPORTED_MODULE_3__/* .getExternalFunction */ .ac)('unifiedStateManager');
-                if (unifiedStateManager) {
-                    unifiedStateManager.startMonitoring();
-                    console.log('📡 統一状態管理システム: 監視実行状態に設定');
+                // 入場予約状態管理システムの実行状態を監視中に設定
+                if (_entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_2__/* .entranceReservationStateManager */ .xx) {
+                    _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_2__/* .entranceReservationStateManager */ .xx.startMonitoring();
+                    console.log('📡 入場予約状態管理システム: 監視実行状態に設定');
                 }
-                // timeSlotStateも監視中に設定
-                _entrance_page_state__WEBPACK_IMPORTED_MODULE_0__.timeSlotState.mode = 'monitoring';
-                _entrance_page_state__WEBPACK_IMPORTED_MODULE_0__.timeSlotState.isMonitoring = true;
-                console.log('🎯 timeSlotState: 監視モードに設定');
                 // FABボタン表示を即座に更新
                 updateMainButtonDisplay();
                 setTimeout(() => {
@@ -1666,18 +1627,14 @@ async function restoreFromCache() {
             }
             else {
                 console.log('🛑 監視継続フラグが無効または期限切れです。監視は再開されません');
-                // 手動リロード時: 監視対象が復元されている場合は selecting状態に設定
+                // 手動リロード時: 監視対象が復元されている場合の処理
                 if (restoredCount > 0) {
-                    console.log('🔄 手動リロード後: 監視対象が復元されているため selecting状態に設定');
-                    _entrance_page_state__WEBPACK_IMPORTED_MODULE_0__.timeSlotState.mode = 'selecting';
-                    _entrance_page_state__WEBPACK_IMPORTED_MODULE_0__.timeSlotState.isMonitoring = false;
+                    console.log('🔄 手動リロード後: 監視対象が復元されました');
                     // FABボタン表示を更新
                     updateMainButtonDisplay();
                 }
                 else {
-                    // 監視対象がない場合は idle状態
-                    _entrance_page_state__WEBPACK_IMPORTED_MODULE_0__.timeSlotState.mode = 'idle';
-                    _entrance_page_state__WEBPACK_IMPORTED_MODULE_0__.timeSlotState.isMonitoring = false;
+                    console.log('🔄 手動リロード後: 監視対象がありません（IDLE状態）');
                 }
             }
         }
@@ -1692,13 +1649,11 @@ async function restoreFromCache() {
                     if (cacheManager) {
                         cacheManager.clearTargetSlots();
                     }
-                    // 統一状態管理をクリア
-                    const unifiedStateManager = (0,_entrance_page_monitor__WEBPACK_IMPORTED_MODULE_3__/* .getExternalFunction */ .ac)('unifiedStateManager');
-                    if (unifiedStateManager) {
-                        unifiedStateManager.clearAllTargets();
+                    // 入場予約状態管理をクリア
+                    if (_entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_2__/* .entranceReservationStateManager */ .xx) {
+                        _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_2__/* .entranceReservationStateManager */ .xx.clearAllTargets();
+                        _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_2__/* .entranceReservationStateManager */ .xx.stop(); // IDLE状態に設定
                     }
-                    _entrance_page_state__WEBPACK_IMPORTED_MODULE_0__.timeSlotState.mode = 'idle';
-                    _entrance_page_state__WEBPACK_IMPORTED_MODULE_0__.timeSlotState.retryCount = 0;
                     updateMainButtonDisplay();
                     console.log('✅ キャッシュクリア完了');
                 };
@@ -1717,11 +1672,10 @@ async function restoreFromCache() {
                                         return;
                                     const retryStatus = (0,_entrance_page_dom_utils__WEBPACK_IMPORTED_MODULE_1__/* .extractTdStatus */ .SE)(retryTargetElement);
                                     if (retryStatus) {
-                                        // 統一状態管理に追加
-                                        const unifiedStateManager = (0,_entrance_page_monitor__WEBPACK_IMPORTED_MODULE_3__/* .getExternalFunction */ .ac)('unifiedStateManager');
-                                        if (unifiedStateManager) {
-                                            const locationIndex = _unified_state__WEBPACK_IMPORTED_MODULE_2__/* .LocationHelper */ .Qs.getIndexFromSelector(targetData.tdSelector);
-                                            const added = unifiedStateManager.addMonitoringTarget(targetData.timeText, locationIndex, targetData.tdSelector);
+                                        // 入場予約状態管理に追加
+                                        if (_entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_2__/* .entranceReservationStateManager */ .xx) {
+                                            const locationIndex = _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_2__/* .LocationHelper */ .Qs.getIndexFromSelector(targetData.tdSelector);
+                                            const added = _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_2__/* .entranceReservationStateManager */ .xx.addMonitoringTarget(targetData.timeText, locationIndex, targetData.tdSelector);
                                             if (added) {
                                                 retryRestoredCount++;
                                             }
@@ -1729,7 +1683,6 @@ async function restoreFromCache() {
                                     }
                                 });
                                 if (retryRestoredCount > 0) {
-                                    _entrance_page_state__WEBPACK_IMPORTED_MODULE_0__.timeSlotState.mode = 'selecting';
                                     console.log(`✅ ${retryRestoredCount}個の監視対象を再試行で復元成功`);
                                     updateMainButtonDisplay();
                                     (0,_entrance_page_monitor__WEBPACK_IMPORTED_MODULE_3__/* .startSlotMonitoring */ .fp)();
@@ -1756,25 +1709,22 @@ async function restoreFromCache() {
                 if (cacheManager) {
                     cacheManager.clearTargetSlots();
                 }
-                // 統一状態管理システムもクリア
-                const unifiedStateManager = (0,_entrance_page_monitor__WEBPACK_IMPORTED_MODULE_3__/* .getExternalFunction */ .ac)('unifiedStateManager');
-                if (unifiedStateManager) {
-                    unifiedStateManager.clearAllTargets();
-                    console.log('📡 統一状態管理システムもクリアしました');
+                // 入場予約状態管理システムもクリア
+                if (_entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_2__/* .entranceReservationStateManager */ .xx) {
+                    _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_2__/* .entranceReservationStateManager */ .xx.clearAllTargets();
+                    console.log('📡 入場予約状態管理システムもクリアしました');
                 }
-                _entrance_page_state__WEBPACK_IMPORTED_MODULE_0__.timeSlotState.mode = 'idle';
-                _entrance_page_state__WEBPACK_IMPORTED_MODULE_0__.timeSlotState.retryCount = 0;
+                // EntranceReservationStateManagerで統合管理されているため、個別設定は不要
                 updateMainButtonDisplay();
                 console.log('✅ キャッシュクリア完了');
             }
         }
-        // キャッシュ復元処理完了後、統一状態管理システムの状態を最終確認（1回のみ）
+        // キャッシュ復元処理完了後、入場予約状態管理システムの状態を最終確認（1回のみ）
         setTimeout(() => {
-            const unifiedStateManager = (0,_entrance_page_monitor__WEBPACK_IMPORTED_MODULE_3__/* .getExternalFunction */ .ac)('unifiedStateManager');
-            if (unifiedStateManager) {
-                console.log('🔄 キャッシュ復元後の統一状態管理状態確認');
-                const hasTargets = unifiedStateManager.hasMonitoringTargets();
-                const preferredAction = unifiedStateManager.getPreferredAction();
+            if (_entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_2__/* .entranceReservationStateManager */ .xx) {
+                console.log('🔄 キャッシュ復元後の入場予約状態管理状態確認');
+                const hasTargets = _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_2__/* .entranceReservationStateManager */ .xx.hasMonitoringTargets();
+                const preferredAction = _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_2__/* .entranceReservationStateManager */ .xx.getPreferredAction();
                 console.log(`📡 復元後状態: hasTargets=${hasTargets}, preferredAction=${preferredAction}`);
                 // FABボタン表示を最終更新（1回のみ）
                 if (hasTargets && preferredAction === 'none') {
@@ -1786,7 +1736,7 @@ async function restoreFromCache() {
     }, 500); // キャッシュ復元UI更新の高速化
 }
 // 注意: checkReservationConditions関数は削除されました
-// 予約開始条件は統一状態管理システム（UnifiedStateManager.canStartReservation）で判定されます
+// 予約開始条件は入場予約状態管理システム（EntranceReservationStateManager.canStartReservation）で判定されます
 // エクスポート
 
 // ============================================================================
@@ -1829,7 +1779,6 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   pageLoadingState: () => (/* binding */ pageLoadingState),
 /* harmony export */   reloadCountdownState: () => (/* binding */ reloadCountdownState),
 /* harmony export */   saveFABVisibility: () => (/* binding */ saveFABVisibility),
-/* harmony export */   timeSlotState: () => (/* binding */ timeSlotState),
 /* harmony export */   toggleFABVisibility: () => (/* binding */ toggleFABVisibility),
 /* harmony export */   updateFABVisibility: () => (/* binding */ updateFABVisibility)
 /* harmony export */ });
@@ -1843,15 +1792,16 @@ let entranceReservationState = {
     attempts: 0
 };
 // 時間帯監視機能の状態管理
-let timeSlotState = {
-    mode: 'idle', // idle, selecting, monitoring, trying
-    targetSlots: [], // 複数選択対象の時間帯情報配列
-    monitoringInterval: null, // 監視用インターバル
-    isMonitoring: false,
-    retryCount: 0,
-    maxRetries: 100,
-    reloadInterval: 30000 // 30秒間隔
-};
+// timeSlotStateはEntranceReservationStateManagerに統合済み
+// let timeSlotState: TimeSlotState = {
+//     mode: 'idle',  // idle, selecting, monitoring, trying
+//     targetSlots: [],   // 複数選択対象の時間帯情報配列
+//     monitoringInterval: null,  // 監視用インターバル
+//     isMonitoring: false,
+//     retryCount: 0,
+//     maxRetries: 100,
+//     reloadInterval: 30000  // 30秒間隔
+// };
 // ページ読み込み状態管理
 const pageLoadingState = {
     isLoading: false,
@@ -2135,22 +2085,18 @@ module.exports = function (cssWithMappingToString) {
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   H5: () => (/* binding */ checkTimeSlotTableExistsSync),
 /* harmony export */   S9: () => (/* binding */ setCacheManager),
-/* harmony export */   ac: () => (/* binding */ getExternalFunction),
-/* harmony export */   bU: () => (/* binding */ analyzeTimeSlots),
 /* harmony export */   fp: () => (/* binding */ startSlotMonitoring),
 /* harmony export */   gW: () => (/* binding */ checkTimeSlotTableExistsAsync),
 /* harmony export */   il: () => (/* binding */ waitForTimeSlotTable),
-/* harmony export */   po: () => (/* binding */ setExternalFunctions),
 /* harmony export */   startTimeSlotTableObserver: () => (/* binding */ startTimeSlotTableObserver),
 /* harmony export */   wj: () => (/* binding */ analyzeAndAddMonitorButtons)
 /* harmony export */ });
-/* unused harmony exports extractTimeSlotInfo, generateSelectorForElement, addMonitorButtonsToFullSlots, getMonitorButtonText, updateAllMonitorButtonPriorities, createMonitorButton, handleMonitorButtonClick, checkSlotAvailabilityAndReload, findTargetSlotInPageUnified, terminateMonitoring, checkTargetElementExists, checkMonitoringTargetExists, validatePageLoaded, checkMaxReloads */
-/* harmony import */ var _entrance_page_state__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(278);
-/* harmony import */ var _unified_state__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(742);
-/* harmony import */ var _entrance_page_dom_utils__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(115);
-// entrance-page-stateからのimport
-
-// 統一状態管理システムからのimport
+/* unused harmony exports analyzeTimeSlots, extractTimeSlotInfo, generateSelectorForElement, addMonitorButtonsToFullSlots, getMonitorButtonText, updateAllMonitorButtonPriorities, createMonitorButton, handleMonitorButtonClick, checkSlotAvailabilityAndReload, findTargetSlotInPageUnified, terminateMonitoring, checkTargetElementExists, checkMonitoringTargetExists, validatePageLoaded, checkMaxReloads */
+/* harmony import */ var _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(461);
+/* harmony import */ var _entrance_page_dom_utils__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(115);
+// entrance-page-stateからのimport（もう使用しません）
+// import { timeSlotState } from './entrance-page-state';
+// 入場予約状態管理システムからのimport
 
 // entrance-page-dom-utilsからのimport
 
@@ -2159,35 +2105,8 @@ module.exports = function (cssWithMappingToString) {
 // 依存注入用の外部関数参照
 let externalFunctions = {};
 let isInitialized = false;
-// 必要な外部関数のリスト
-const REQUIRED_FUNCTIONS = [
-    'getCurrentTableContent',
-    'shouldUpdateMonitorButtons',
-    'restoreSelectionAfterUpdate',
-    // 'showStatus', // 内部関数のため一時的に除外
-    'enableAllMonitorButtons',
-    'updateMainButtonDisplay',
-    'updateMonitoringTargetsDisplay',
-    'disableAllMonitorButtons',
-    'selectTimeSlotAndStartReservation',
-    'startReloadCountdown',
-    'resetMonitoringUI',
-    'showErrorMessage',
-    'tryClickCalendarForTimeSlot',
-    'unifiedStateManager' // 統一状態管理システムを追加
-];
-// 外部関数を設定するヘルパー関数
-const setExternalFunctions = (funcs) => {
-    // 必要な関数がすべて存在するかチェック
-    for (const funcName of REQUIRED_FUNCTIONS) {
-        if (typeof funcs[funcName] !== 'function' && typeof funcs[funcName] !== 'object') {
-            console.warn(`Warning: Required function/object ${funcName} not provided or not a function`);
-        }
-    }
-    externalFunctions = funcs;
-    isInitialized = true;
-    console.log('✅ Section 5: External functions initialized');
-};
+// REQUIRED_FUNCTIONS配列は削除済み - 直接インポートを使用
+// 依存注入は削除 - 直接インポートを使用
 // 安全な外部関数呼び出し
 const safeCall = (funcName, ...args) => {
     if (!isInitialized) {
@@ -2199,13 +2118,7 @@ const safeCall = (funcName, ...args) => {
     return externalFunctions[funcName](...args);
 };
 // 安全な外部オブジェクト参照
-const getExternalFunction = (name) => {
-    if (!isInitialized) {
-        console.warn('External functions not initialized in Section 5');
-        return null;
-    }
-    return externalFunctions[name] || null;
-};
+// getExternalFunction は削除 - 直接インポートを使用
 // 依存注入用のcacheManager参照
 let cacheManager = null;
 // cacheManagerを設定するヘルパー関数
@@ -2360,7 +2273,7 @@ async function waitForTimeSlotTable(timeout = 10000) {
 // 時間帯テーブルの存在確認（同期版）
 function checkTimeSlotTableExistsSync() {
     // 実際の時間帯要素をチェック（時間を含むもの）
-    const allElements = document.querySelectorAll(_entrance_page_dom_utils__WEBPACK_IMPORTED_MODULE_2__/* .timeSlotSelectors */ .eN.timeSlotCells);
+    const allElements = document.querySelectorAll(_entrance_page_dom_utils__WEBPACK_IMPORTED_MODULE_1__/* .timeSlotSelectors */ .eN.timeSlotCells);
     const actualTimeSlots = [];
     allElements.forEach(el => {
         const text = el.textContent?.trim();
@@ -2390,7 +2303,7 @@ function analyzeAndAddMonitorButtons() {
     const existingSlots = Array.from(existingButtons).map(btn => {
         const timeText = btn.getAttribute('data-target-time') || '';
         const tdElement = btn.closest('td[data-gray-out]');
-        const tdSelector = tdElement ? (0,_entrance_page_dom_utils__WEBPACK_IMPORTED_MODULE_2__/* .generateUniqueTdSelector */ .sN)(tdElement) : '';
+        const tdSelector = tdElement ? (0,_entrance_page_dom_utils__WEBPACK_IMPORTED_MODULE_1__/* .generateUniqueTdSelector */ .sN)(tdElement) : '';
         return { timeText, tdSelector };
     });
     console.log(`📋 差分計算: 既存ボタン数=${existingButtons.length}個 vs 満員時間帯数=${analysis.full.length}個`);
@@ -2399,16 +2312,15 @@ function analyzeAndAddMonitorButtons() {
     existingButtons.forEach(button => {
         const timeText = button.getAttribute('data-target-time') || '';
         const tdElement = button.closest('td[data-gray-out]');
-        const tdSelector = tdElement ? (0,_entrance_page_dom_utils__WEBPACK_IMPORTED_MODULE_2__/* .generateUniqueTdSelector */ .sN)(tdElement) : '';
+        const tdSelector = tdElement ? (0,_entrance_page_dom_utils__WEBPACK_IMPORTED_MODULE_1__/* .generateUniqueTdSelector */ .sN)(tdElement) : '';
         // 監視対象として設定済みの場合は削除しない（状態変化を追跡するため）
-        const unifiedStateManager = getExternalFunction('unifiedStateManager');
-        const locationIndex = _unified_state__WEBPACK_IMPORTED_MODULE_1__/* .LocationHelper */ .Qs.getIndexFromSelector(tdSelector);
-        const isMonitoringTarget = unifiedStateManager?.isMonitoringTarget(timeText, locationIndex) || false;
+        const locationIndex = _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_0__/* .LocationHelper */ .Qs.getIndexFromSelector(tdSelector);
+        const isMonitoringTarget = _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_0__/* .entranceReservationStateManager */ .xx?.isMonitoringTarget(timeText, locationIndex) || false;
         if (isMonitoringTarget) {
             console.log(`🎯 監視対象のため保持: ${timeText} (状態変化を追跡中)`);
             // 監視対象の状態が変わった場合はボタンテキストを更新
             const currentTd = button.closest('td[data-gray-out]');
-            const currentStatus = (0,_entrance_page_dom_utils__WEBPACK_IMPORTED_MODULE_2__/* .extractTdStatus */ .SE)(currentTd);
+            const currentStatus = (0,_entrance_page_dom_utils__WEBPACK_IMPORTED_MODULE_1__/* .extractTdStatus */ .SE)(currentTd);
             if (currentStatus && currentStatus.isAvailable) {
                 const span = button.querySelector('span');
                 if (span) {
@@ -2422,7 +2334,7 @@ function analyzeAndAddMonitorButtons() {
             // 現在の満員時間帯に対応するものがあるかチェック
             const stillExists = analysis.full.some(slot => {
                 const slotTdElement = slot.element.closest('td[data-gray-out]');
-                const slotTdSelector = (0,_entrance_page_dom_utils__WEBPACK_IMPORTED_MODULE_2__/* .generateUniqueTdSelector */ .sN)(slotTdElement);
+                const slotTdSelector = (0,_entrance_page_dom_utils__WEBPACK_IMPORTED_MODULE_1__/* .generateUniqueTdSelector */ .sN)(slotTdElement);
                 return slot.timeText === timeText && slotTdSelector === tdSelector;
             });
             if (!stillExists) {
@@ -2435,7 +2347,7 @@ function analyzeAndAddMonitorButtons() {
     // 新しい満員時間帯にボタンを追加（時間+位置で判定）
     const newFullSlots = analysis.full.filter(slot => {
         const slotTdElement = slot.element.closest('td[data-gray-out]');
-        const slotTdSelector = (0,_entrance_page_dom_utils__WEBPACK_IMPORTED_MODULE_2__/* .generateUniqueTdSelector */ .sN)(slotTdElement);
+        const slotTdSelector = (0,_entrance_page_dom_utils__WEBPACK_IMPORTED_MODULE_1__/* .generateUniqueTdSelector */ .sN)(slotTdElement);
         return !existingSlots.some(existing => existing.timeText === slot.timeText && existing.tdSelector === slotTdSelector);
     });
     if (newFullSlots.length > 0) {
@@ -2462,10 +2374,10 @@ function analyzeTimeSlots() {
     const full = [];
     const selected = [];
     // 全てのtd要素を取得（時間帯テーブル内）
-    const allTdElements = document.querySelectorAll(_entrance_page_dom_utils__WEBPACK_IMPORTED_MODULE_2__/* .timeSlotSelectors */ .eN.timeSlotContainer + ' td[data-gray-out]');
+    const allTdElements = document.querySelectorAll(_entrance_page_dom_utils__WEBPACK_IMPORTED_MODULE_1__/* .timeSlotSelectors */ .eN.timeSlotContainer + ' td[data-gray-out]');
     // console.log(`📊 時間帯分析開始: ${allTdElements.length}個のtd要素を確認`);
     allTdElements.forEach(tdElement => {
-        const status = (0,_entrance_page_dom_utils__WEBPACK_IMPORTED_MODULE_2__/* .extractTdStatus */ .SE)(tdElement);
+        const status = (0,_entrance_page_dom_utils__WEBPACK_IMPORTED_MODULE_1__/* .extractTdStatus */ .SE)(tdElement);
         if (status && status.timeText) {
             const isFull = status.isFull;
             const isAvailable = status.isAvailable;
@@ -2487,7 +2399,7 @@ function analyzeTimeSlots() {
                 timeText: status.timeText,
                 isAvailable: isAvailable,
                 isFull: isFull,
-                tdSelector: (0,_entrance_page_dom_utils__WEBPACK_IMPORTED_MODULE_2__/* .generateUniqueTdSelector */ .sN)(status.tdElement)
+                tdSelector: (0,_entrance_page_dom_utils__WEBPACK_IMPORTED_MODULE_1__/* .generateUniqueTdSelector */ .sN)(status.tdElement)
             };
             if (statusType === 'full') {
                 full.push(timeInfo);
@@ -2565,14 +2477,13 @@ function addMonitorButtonsToFullSlots(fullSlots) {
 // 監視ボタンのテキストを決定（優先順位表示）
 function getMonitorButtonText(slotInfo) {
     const tdElement = slotInfo.element.closest('td[data-gray-out]');
-    const tdSelector = (0,_entrance_page_dom_utils__WEBPACK_IMPORTED_MODULE_2__/* .generateUniqueTdSelector */ .sN)(tdElement);
+    const tdSelector = (0,_entrance_page_dom_utils__WEBPACK_IMPORTED_MODULE_1__/* .generateUniqueTdSelector */ .sN)(tdElement);
     // 既に監視対象として選択されているかチェック
-    const unifiedStateManager = getExternalFunction('unifiedStateManager');
-    const locationIndex = _unified_state__WEBPACK_IMPORTED_MODULE_1__/* .LocationHelper */ .Qs.getIndexFromSelector(tdSelector);
-    const isSelected = unifiedStateManager?.isMonitoringTarget(slotInfo.timeText, locationIndex) || false;
+    const locationIndex = _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_0__/* .LocationHelper */ .Qs.getIndexFromSelector(tdSelector);
+    const isSelected = _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_0__/* .entranceReservationStateManager */ .xx?.isMonitoringTarget(slotInfo.timeText, locationIndex) || false;
     if (isSelected) {
         // 監視対象リストでの位置を取得（1ベース）
-        const targets = unifiedStateManager?.getMonitoringTargets() || [];
+        const targets = _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_0__/* .entranceReservationStateManager */ .xx?.getMonitoringTargets() || [];
         const targetIndex = targets.findIndex((target) => target.timeSlot === slotInfo.timeText && target.locationIndex === locationIndex);
         if (targetIndex >= 0) {
             const priority = targetIndex + 1; // 1ベースの優先順位
@@ -2584,8 +2495,7 @@ function getMonitorButtonText(slotInfo) {
 // すべての監視ボタンの優先順位を更新
 function updateAllMonitorButtonPriorities() {
     const allMonitorButtons = document.querySelectorAll('.monitor-btn');
-    const unifiedStateManager = getExternalFunction('unifiedStateManager');
-    const targets = unifiedStateManager?.getMonitoringTargets() || [];
+    const targets = _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_0__/* .entranceReservationStateManager */ .xx?.getMonitoringTargets() || [];
     allMonitorButtons.forEach(button => {
         const span = button.querySelector('span');
         const timeText = button.getAttribute('data-target-time') || '';
@@ -2593,9 +2503,9 @@ function updateAllMonitorButtonPriorities() {
             // このボタンの時間帯と位置情報を特定
             const tdElement = button.closest('td[data-gray-out]');
             if (tdElement) {
-                const tdSelector = (0,_entrance_page_dom_utils__WEBPACK_IMPORTED_MODULE_2__/* .generateUniqueTdSelector */ .sN)(tdElement);
+                const tdSelector = (0,_entrance_page_dom_utils__WEBPACK_IMPORTED_MODULE_1__/* .generateUniqueTdSelector */ .sN)(tdElement);
                 // 監視対象リストでの位置を検索
-                const locationIndex = _unified_state__WEBPACK_IMPORTED_MODULE_1__/* .LocationHelper */ .Qs.getIndexFromSelector(tdSelector);
+                const locationIndex = _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_0__/* .LocationHelper */ .Qs.getIndexFromSelector(tdSelector);
                 const targetIndex = targets.findIndex((target) => target.timeSlot === timeText && target.locationIndex === locationIndex);
                 if (targetIndex >= 0) {
                     // 監視対象として選択されている場合、優先順位を表示
@@ -2652,9 +2562,9 @@ function createMonitorButton(slotInfo) {
         event.stopPropagation();
         event.stopImmediatePropagation();
         const tdElement = slotInfo.element.closest('td[data-gray-out]');
-        const tdSelector = (0,_entrance_page_dom_utils__WEBPACK_IMPORTED_MODULE_2__/* .generateUniqueTdSelector */ .sN)(tdElement);
-        const locationIndex = _unified_state__WEBPACK_IMPORTED_MODULE_1__/* .LocationHelper */ .Qs.getIndexFromSelector(tdSelector);
-        const location = _unified_state__WEBPACK_IMPORTED_MODULE_1__/* .LocationHelper */ .Qs.getLocationFromIndex(locationIndex);
+        const tdSelector = (0,_entrance_page_dom_utils__WEBPACK_IMPORTED_MODULE_1__/* .generateUniqueTdSelector */ .sN)(tdElement);
+        const locationIndex = _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_0__/* .LocationHelper */ .Qs.getIndexFromSelector(tdSelector);
+        const location = _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_0__/* .LocationHelper */ .Qs.getLocationFromIndex(locationIndex);
         const locationText = location === 'east' ? '東' : '西';
         console.log(`🖱️ 監視ボタンクリック検出: ${locationText}${slotInfo.timeText}`);
         // ボタン要素の確認
@@ -2694,13 +2604,13 @@ function createMonitorButton(slotInfo) {
 // 監視ボタンクリック処理（選択・解除切り替え）
 function handleMonitorButtonClick(slotInfo, buttonElement) {
     const tdElement = slotInfo.element.closest('td[data-gray-out]');
-    const tdSelector = (0,_entrance_page_dom_utils__WEBPACK_IMPORTED_MODULE_2__/* .generateUniqueTdSelector */ .sN)(tdElement);
-    const locationIndex = _unified_state__WEBPACK_IMPORTED_MODULE_1__/* .LocationHelper */ .Qs.getIndexFromSelector(tdSelector);
-    const location = _unified_state__WEBPACK_IMPORTED_MODULE_1__/* .LocationHelper */ .Qs.getLocationFromIndex(locationIndex);
+    const tdSelector = (0,_entrance_page_dom_utils__WEBPACK_IMPORTED_MODULE_1__/* .generateUniqueTdSelector */ .sN)(tdElement);
+    const locationIndex = _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_0__/* .LocationHelper */ .Qs.getIndexFromSelector(tdSelector);
+    const location = _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_0__/* .LocationHelper */ .Qs.getLocationFromIndex(locationIndex);
     const locationText = location === 'east' ? '東' : '西';
     // 監視ボタンがクリックされました
     // 監視実行中は操作不可
-    if (_entrance_page_state__WEBPACK_IMPORTED_MODULE_0__.timeSlotState.isMonitoring) {
+    if (_entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_0__/* .entranceReservationStateManager */ .xx.isMonitoringRunning()) {
         // 監視実行中のため操作不可
         return;
     }
@@ -2711,19 +2621,18 @@ function handleMonitorButtonClick(slotInfo, buttonElement) {
     if (isCurrentlySelected) {
         // 現在選択中の場合は解除
         // 監視対象を解除
-        // 統一状態管理システムから削除
-        const unifiedStateManager = getExternalFunction('unifiedStateManager');
-        if (unifiedStateManager) {
-            const unifiedRemoved = unifiedStateManager.removeMonitoringTarget(slotInfo.timeText, locationIndex);
+        // 入場予約状態管理システムから削除
+        if (_entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_0__/* .entranceReservationStateManager */ .xx) {
+            const unifiedRemoved = _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_0__/* .entranceReservationStateManager */ .xx.removeMonitoringTarget(slotInfo.timeText, locationIndex);
             if (unifiedRemoved) {
-                console.log(`✅ 統一状態管理から監視対象を削除: ${locationText}${slotInfo.timeText}`);
+                console.log(`✅ 入場予約状態管理から監視対象を削除: ${locationText}${slotInfo.timeText}`);
             }
             else {
-                console.log(`⚠️ 統一状態管理からの削除失敗: ${locationText}${slotInfo.timeText}`);
+                console.log(`⚠️ 入場予約状態管理からの削除失敗: ${locationText}${slotInfo.timeText}`);
             }
         }
         else {
-            // 統一状態管理システムが利用できません
+            // 入場予約状態管理システムが利用できません
         }
         // ボタンの表示を元に戻す
         buttonSpan.innerText = '満員';
@@ -2733,9 +2642,8 @@ function handleMonitorButtonClick(slotInfo, buttonElement) {
         buttonElement.style.cursor = 'pointer';
         buttonElement.disabled = false;
         // 監視対象がすべてなくなった場合の処理
-        if (!unifiedStateManager || !unifiedStateManager.hasMonitoringTargets()) {
-            _entrance_page_state__WEBPACK_IMPORTED_MODULE_0__.timeSlotState.mode = 'idle';
-            _entrance_page_state__WEBPACK_IMPORTED_MODULE_0__.timeSlotState.retryCount = 0;
+        if (!_entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_0__/* .entranceReservationStateManager */ .xx || !_entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_0__/* .entranceReservationStateManager */ .xx.hasMonitoringTargets()) {
+            // EntranceReservationStateManagerで統合管理されているため、個別設定不要
             // キャッシュをクリア
             if (cacheManager) {
                 cacheManager.clearTargetSlots();
@@ -2769,34 +2677,32 @@ function handleMonitorButtonClick(slotInfo, buttonElement) {
         //     tdSelector: generateUniqueTdSelector(tdElement),
         //     positionInfo: getTdPositionInfo(tdElement)
         // };
-        // 統一状態管理システムに追加（一元管理）
-        const unifiedStateManager = getExternalFunction('unifiedStateManager');
+        // 入場予約状態管理システムに追加（一元管理）
         let added = false;
-        if (unifiedStateManager) {
-            added = unifiedStateManager.addMonitoringTarget(slotInfo.timeText, locationIndex, tdSelector);
+        if (_entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_0__/* .entranceReservationStateManager */ .xx) {
+            added = _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_0__/* .entranceReservationStateManager */ .xx.addMonitoringTarget(slotInfo.timeText, locationIndex, tdSelector);
             if (added) {
-                console.log(`✅ 統一状態管理に監視対象を追加: ${locationText}${slotInfo.timeText}`);
+                console.log(`✅ 入場予約状態管理に監視対象を追加: ${locationText}${slotInfo.timeText}`);
             }
             else {
-                console.log(`⚠️ 統一状態管理への追加失敗（既に選択済み）: ${locationText}${slotInfo.timeText}`);
+                console.log(`⚠️ 入場予約状態管理への追加失敗（既に選択済み）: ${locationText}${slotInfo.timeText}`);
                 return;
             }
         }
         else {
-            // 統一状態管理システムが利用できません
+            // 入場予約状態管理システムが利用できません
             return;
         }
         if (!added)
             return; // 追加失敗時は処理を中止
-        _entrance_page_state__WEBPACK_IMPORTED_MODULE_0__.timeSlotState.mode = 'selecting';
-        _entrance_page_state__WEBPACK_IMPORTED_MODULE_0__.timeSlotState.retryCount = 0;
+        // EntranceReservationStateManagerで統合管理されているため、個別設定不要
         // キャッシュに保存（すべての監視対象を保存）
         if (cacheManager) {
             cacheManager.saveTargetSlots();
         }
         // ボタンの表示を変更（優先順位表示）
-        if (unifiedStateManager) {
-            const targets = unifiedStateManager.getMonitoringTargets();
+        if (_entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_0__/* .entranceReservationStateManager */ .xx) {
+            const targets = _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_0__/* .entranceReservationStateManager */ .xx.getMonitoringTargets();
             const target = targets.find((t) => t.timeSlot === slotInfo.timeText && t.selector === tdSelector);
             const priority = target ? target.priority : targets.length;
             buttonSpan.innerText = `監視${priority}`;
@@ -2810,11 +2716,11 @@ function handleMonitorButtonClick(slotInfo, buttonElement) {
         buttonElement.style.cursor = 'pointer';
         buttonElement.disabled = false; // クリックで解除できるように
         // メインボタンの表示を更新
-        if (unifiedStateManager) {
-            const targets = unifiedStateManager.getMonitoringTargets();
+        if (_entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_0__/* .entranceReservationStateManager */ .xx) {
+            const targets = _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_0__/* .entranceReservationStateManager */ .xx.getMonitoringTargets();
             const targetCount = targets.length;
-            console.log(`🔄 監視対象設定後のFAB更新を実行: targetSlots=${targetCount}個, mode=${_entrance_page_state__WEBPACK_IMPORTED_MODULE_0__.timeSlotState.mode}`);
-            console.log('📊 統一状態管理の監視対象一覧:', targets.map((t) => `${_unified_state__WEBPACK_IMPORTED_MODULE_1__/* .LocationHelper */ .Qs.getLocationFromIndex(t.locationIndex) === 'east' ? '東' : '西'}${t.timeSlot}`));
+            console.log(`🔄 監視対象設定後のFAB更新を実行: targetSlots=${targetCount}個`);
+            console.log('📊 入場予約状態管理の監視対象一覧:', targets.map((t) => `${_entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_0__/* .LocationHelper */ .Qs.getLocationFromIndex(t.locationIndex) === 'east' ? '東' : '西'}${t.timeSlot}`));
         }
         safeCall('updateMainButtonDisplay');
         // 監視対象表示も更新
@@ -2829,27 +2735,23 @@ function handleMonitorButtonClick(slotInfo, buttonElement) {
 }
 // 満員時間帯の可用性監視を開始
 async function startSlotMonitoring() {
-    const unifiedStateManager = getExternalFunction('unifiedStateManager');
-    if (!unifiedStateManager || !unifiedStateManager.hasMonitoringTargets()) {
+    if (!_entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_0__/* .entranceReservationStateManager */ .xx || !_entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_0__/* .entranceReservationStateManager */ .xx.hasMonitoringTargets()) {
         console.log('❌ 監視対象時間帯が設定されていません');
         return;
     }
-    // 即座に状態更新（UI応答性向上）
-    _entrance_page_state__WEBPACK_IMPORTED_MODULE_0__.timeSlotState.mode = 'monitoring';
-    _entrance_page_state__WEBPACK_IMPORTED_MODULE_0__.timeSlotState.isMonitoring = true;
-    // 統一状態管理で監視開始
-    if (unifiedStateManager.startMonitoring()) {
-        console.log('✅ 統一状態管理で監視を開始しました');
+    // 入場予約状態管理で監視開始
+    if (_entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_0__/* .entranceReservationStateManager */ .xx.startMonitoring()) {
+        console.log('✅ 入場予約状態管理で監視を開始しました');
     }
     else {
-        console.log('⚠️ 統一状態管理での監視開始に失敗しました (状態確認が必要)');
+        console.log('⚠️ 入場予約状態管理での監視開始に失敗しました (状態確認が必要)');
     }
     safeCall('updateMainButtonDisplay'); // 即座にボタン表示を更新
     // 監視実行中は全ての監視ボタンを無効化
     safeCall('disableAllMonitorButtons');
-    const targets = unifiedStateManager.getMonitoringTargets();
+    const targets = _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_0__/* .entranceReservationStateManager */ .xx.getMonitoringTargets();
     const targetTexts = targets.map((t) => {
-        const location = _unified_state__WEBPACK_IMPORTED_MODULE_1__/* .LocationHelper */ .Qs.getLocationFromIndex(t.locationIndex);
+        const location = _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_0__/* .LocationHelper */ .Qs.getLocationFromIndex(t.locationIndex);
         const locationText = location === 'east' ? '東' : '西';
         return `${locationText}${t.timeSlot}`;
     }).join(', ');
@@ -2862,8 +2764,7 @@ async function startSlotMonitoring() {
 }
 // 時間帯の可用性チェックとページ再読み込み
 async function checkSlotAvailabilityAndReload() {
-    const unifiedStateManager = getExternalFunction('unifiedStateManager');
-    if (!unifiedStateManager || unifiedStateManager.getExecutionState() !== _unified_state__WEBPACK_IMPORTED_MODULE_1__/* .ExecutionState */ .si.MONITORING_RUNNING) {
+    if (!_entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_0__/* .entranceReservationStateManager */ .xx || _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_0__/* .entranceReservationStateManager */ .xx.getExecutionState() !== _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_0__/* .ExecutionState */ .si.MONITORING_RUNNING) {
         return;
     }
     // バリデーションチェック
@@ -2872,24 +2773,24 @@ async function checkSlotAvailabilityAndReload() {
     if (!(await checkTimeSlotTableExistsAsync()))
         return;
     // 複数監視対象の存在チェック
-    const targets = unifiedStateManager.getMonitoringTargets();
+    const targets = _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_0__/* .entranceReservationStateManager */ .xx.getMonitoringTargets();
     for (const target of targets) {
         if (!checkMonitoringTargetExists(target))
             return;
     }
-    if (!checkMaxReloads(_entrance_page_state__WEBPACK_IMPORTED_MODULE_0__.timeSlotState.retryCount))
+    if (!checkMaxReloads(_entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_0__/* .entranceReservationStateManager */ .xx.getRetryCount()))
         return;
-    _entrance_page_state__WEBPACK_IMPORTED_MODULE_0__.timeSlotState.retryCount++;
+    _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_0__/* .entranceReservationStateManager */ .xx.incrementRetryCount();
     if (cacheManager) {
-        cacheManager.updateRetryCount(_entrance_page_state__WEBPACK_IMPORTED_MODULE_0__.timeSlotState.retryCount);
+        cacheManager.updateRetryCount(_entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_0__/* .entranceReservationStateManager */ .xx.getRetryCount());
     }
     const targetTexts = targets.map((t) => t.timeSlot).join(', ');
-    console.log(`🔍 可用性チェック (${_entrance_page_state__WEBPACK_IMPORTED_MODULE_0__.timeSlotState.retryCount}回目): ${targetTexts}`);
+    console.log(`🔍 可用性チェック (${_entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_0__/* .entranceReservationStateManager */ .xx.getRetryCount()}回目): ${targetTexts}`);
     // 現在の時間帯をチェック
     const currentSlot = findTargetSlotInPageUnified();
     console.log(`📊 監視チェック結果: currentSlot=${!!currentSlot}, status=${currentSlot?.status}`);
     if (currentSlot && currentSlot.status === 'available') {
-        const location = _unified_state__WEBPACK_IMPORTED_MODULE_1__/* .LocationHelper */ .Qs.getLocationFromIndex(currentSlot.targetInfo.locationIndex);
+        const location = _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_0__/* .LocationHelper */ .Qs.getLocationFromIndex(currentSlot.targetInfo.locationIndex);
         const locationText = location === 'east' ? '東' : '西';
         console.log(`🎉🎉 対象時間帯が利用可能になりました！: ${locationText}${currentSlot.targetInfo.timeSlot}`);
         console.log(`  → 監視を終了し、自動選択+予約を開始します`);
@@ -2902,20 +2803,19 @@ async function checkSlotAvailabilityAndReload() {
     // まだ満員の場合はページリロード
     console.log('⏳ すべての監視対象がまだ満員です。ページを再読み込みします...');
     // BAN対策：設定されたリロード間隔にランダム要素を追加
-    const baseInterval = _entrance_page_state__WEBPACK_IMPORTED_MODULE_0__.timeSlotState.reloadInterval; // 30000ms (30秒)
+    const baseInterval = 30000; // 30000ms (30秒) - EntranceReservationStateManagerで管理されている値
     const randomVariation = Math.random() * 5000; // 0-5秒のランダム要素
     const totalWaitTime = baseInterval + randomVariation;
     const displaySeconds = Math.ceil(totalWaitTime / 1000);
     // カウントダウンとリロードを統一実行
     safeCall('scheduleReload', displaySeconds);
 }
-// 統一状態管理対応版の監視対象検索関数
+// 入場予約状態管理対応版の監視対象検索関数
 function findTargetSlotInPageUnified() {
-    const unifiedStateManager = getExternalFunction('unifiedStateManager');
-    if (!unifiedStateManager || !unifiedStateManager.hasMonitoringTargets()) {
+    if (!_entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_0__/* .entranceReservationStateManager */ .xx || !_entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_0__/* .entranceReservationStateManager */ .xx.hasMonitoringTargets()) {
         return null;
     }
-    const targets = unifiedStateManager.getMonitoringTargets();
+    const targets = _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_0__/* .entranceReservationStateManager */ .xx.getMonitoringTargets();
     // 複数監視対象をチェック
     for (const target of targets) {
         // selectorが保存されている場合はそれを使用、ない場合は検索
@@ -2930,7 +2830,7 @@ function findTargetSlotInPageUnified() {
                 if (timeEl.textContent?.includes(target.timeSlot)) {
                     const tdElement = timeEl.closest('td[data-gray-out]');
                     if (tdElement) {
-                        const elementIndex = _unified_state__WEBPACK_IMPORTED_MODULE_1__/* .LocationHelper */ .Qs.getIndexFromElement(tdElement);
+                        const elementIndex = _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_0__/* .LocationHelper */ .Qs.getIndexFromElement(tdElement);
                         if (elementIndex === target.locationIndex) {
                             targetTd = tdElement;
                             break;
@@ -2941,8 +2841,8 @@ function findTargetSlotInPageUnified() {
         }
         if (targetTd) {
             // 同一td要素の現在の状態を取得
-            const currentStatus = (0,_entrance_page_dom_utils__WEBPACK_IMPORTED_MODULE_2__/* .extractTdStatus */ .SE)(targetTd);
-            const location = _unified_state__WEBPACK_IMPORTED_MODULE_1__/* .LocationHelper */ .Qs.getLocationFromIndex(target.locationIndex);
+            const currentStatus = (0,_entrance_page_dom_utils__WEBPACK_IMPORTED_MODULE_1__/* .extractTdStatus */ .SE)(targetTd);
+            const location = _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_0__/* .LocationHelper */ .Qs.getLocationFromIndex(target.locationIndex);
             const locationText = location === 'east' ? '東' : '西';
             // 詳細なデバッグ情報を出力
             const buttonElement = targetTd.querySelector('div[role="button"]');
@@ -2969,7 +2869,7 @@ function findTargetSlotInPageUnified() {
         }
         else {
             // 要素が見つからない場合
-            const location = _unified_state__WEBPACK_IMPORTED_MODULE_1__/* .LocationHelper */ .Qs.getLocationFromIndex(target.locationIndex);
+            const location = _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_0__/* .LocationHelper */ .Qs.getLocationFromIndex(target.locationIndex);
             const locationText = location === 'east' ? '東' : '西';
             console.log(`❌ 監視対象要素が見つかりません: ${locationText}${target.timeSlot}`);
         }
@@ -2986,30 +2886,29 @@ function terminateMonitoring(errorCode, errorMessage) {
         cacheManager.clearTargetSlots();
         cacheManager.clearMonitoringFlag(); // 監視継続フラグもクリア
     }
-    // インターバル停止
-    if (_entrance_page_state__WEBPACK_IMPORTED_MODULE_0__.timeSlotState.monitoringInterval) {
-        clearInterval(_entrance_page_state__WEBPACK_IMPORTED_MODULE_0__.timeSlotState.monitoringInterval);
-        _entrance_page_state__WEBPACK_IMPORTED_MODULE_0__.timeSlotState.monitoringInterval = null;
+    // 入場予約状態管理システムでインターバル停止と状態リセット
+    if (_entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_0__/* .entranceReservationStateManager */ .xx) {
+        _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_0__/* .entranceReservationStateManager */ .xx.clearMonitoringInterval();
+        _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_0__/* .entranceReservationStateManager */ .xx.stop();
     }
     // UI状態リセット
     safeCall('resetMonitoringUI');
     safeCall('updateMainButtonDisplay', 'idle');
     // エラー表示
     safeCall('showErrorMessage', errorMessage);
-    // 状態初期化
-    _entrance_page_state__WEBPACK_IMPORTED_MODULE_0__.timeSlotState.mode = 'idle';
-    _entrance_page_state__WEBPACK_IMPORTED_MODULE_0__.timeSlotState.isMonitoring = false;
-    // 統一状態管理で監視停止
-    const unifiedStateManager = getExternalFunction('unifiedStateManager');
-    if (unifiedStateManager) {
-        unifiedStateManager.stop();
-        console.log('🛑 統一状態管理で監視を停止しました');
+    // 入場予約状態管理で監視停止
+    if (_entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_0__/* .entranceReservationStateManager */ .xx) {
+        _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_0__/* .entranceReservationStateManager */ .xx.stop();
+        console.log('🛑 入場予約状態管理で監視を停止しました');
     }
-    // 統一状態管理をクリア
-    if (unifiedStateManager) {
-        unifiedStateManager.clearAllTargets();
+    // 入場予約状態管理をクリア
+    if (_entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_0__/* .entranceReservationStateManager */ .xx) {
+        _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_0__/* .entranceReservationStateManager */ .xx.clearAllTargets();
     }
-    _entrance_page_state__WEBPACK_IMPORTED_MODULE_0__.timeSlotState.retryCount = 0;
+    // リトライ回数もEntranceReservationStateManagerでリセット
+    if (_entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_0__/* .entranceReservationStateManager */ .xx) {
+        _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_0__/* .entranceReservationStateManager */ .xx.resetRetryCount();
+    }
 }
 // 監視バリデーション関数群
 function checkTargetElementExists(targetInfo) {
@@ -3020,14 +2919,14 @@ function checkTargetElementExists(targetInfo) {
     }
     return true;
 }
-// 統一状態管理用の監視対象存在チェック
+// 入場予約状態管理用の監視対象存在チェック
 function checkMonitoringTargetExists(target) {
     // MonitoringTargetをTimeSlotTarget形式に変換
     const targetInfo = {
         timeText: target.timeSlot,
         tdSelector: target.selector
     };
-    const element = (0,_entrance_page_dom_utils__WEBPACK_IMPORTED_MODULE_2__/* .findSameTdElement */ .e0)(targetInfo);
+    const element = (0,_entrance_page_dom_utils__WEBPACK_IMPORTED_MODULE_1__/* .findSameTdElement */ .e0)(targetInfo);
     if (!element) {
         terminateMonitoring('ERROR_TARGET_NOT_FOUND', `監視対象の時間帯 ${target.timeSlot} が見つかりません`);
         return false;
@@ -3035,7 +2934,7 @@ function checkMonitoringTargetExists(target) {
     return true;
 }
 async function checkTimeSlotTableExistsAsync() {
-    const table = document.querySelector(_entrance_page_dom_utils__WEBPACK_IMPORTED_MODULE_2__/* .timeSlotSelectors */ .eN.timeSlotContainer);
+    const table = document.querySelector(_entrance_page_dom_utils__WEBPACK_IMPORTED_MODULE_1__/* .timeSlotSelectors */ .eN.timeSlotContainer);
     if (!table) {
         // テーブルが見つからない場合、カレンダークリックを試行
         console.log('⚠️ 時間帯テーブルが見つからないため、カレンダークリックを試行します');
@@ -3082,87 +2981,20 @@ function checkMaxReloads(currentCount) {
 
 /***/ }),
 
-/***/ 540:
-/***/ ((module) => {
-
-
-
-/* istanbul ignore next  */
-function insertStyleElement(options) {
-  var element = document.createElement("style");
-  options.setAttributes(element, options.attributes);
-  options.insert(element, options.options);
-  return element;
-}
-module.exports = insertStyleElement;
-
-/***/ }),
-
-/***/ 601:
-/***/ ((module) => {
-
-
-
-module.exports = function (i) {
-  return i[1];
-};
-
-/***/ }),
-
-/***/ 659:
-/***/ ((module) => {
-
-
-
-var memo = {};
-
-/* istanbul ignore next  */
-function getTarget(target) {
-  if (typeof memo[target] === "undefined") {
-    var styleTarget = document.querySelector(target);
-
-    // Special case to return head of iframe instead of iframe itself
-    if (window.HTMLIFrameElement && styleTarget instanceof window.HTMLIFrameElement) {
-      try {
-        // This will throw an exception if access to iframe is blocked
-        // due to cross-origin restrictions
-        styleTarget = styleTarget.contentDocument.head;
-      } catch (e) {
-        // istanbul ignore next
-        styleTarget = null;
-      }
-    }
-    memo[target] = styleTarget;
-  }
-  return memo[target];
-}
-
-/* istanbul ignore next  */
-function insertBySelector(insert, style) {
-  var target = getTarget(insert);
-  if (!target) {
-    throw new Error("Couldn't find a style target. This probably means that the value for the 'insert' parameter is invalid.");
-  }
-  target.appendChild(style);
-}
-module.exports = insertBySelector;
-
-/***/ }),
-
-/***/ 742:
+/***/ 461:
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   Dx: () => (/* binding */ UnifiedStateManager),
 /* harmony export */   Qs: () => (/* binding */ LocationHelper),
-/* harmony export */   si: () => (/* binding */ ExecutionState)
+/* harmony export */   si: () => (/* binding */ ExecutionState),
+/* harmony export */   xx: () => (/* binding */ entranceReservationStateManager)
 /* harmony export */ });
-/* unused harmony export PriorityMode */
+/* unused harmony exports PriorityMode, EntranceReservationStateManager */
 /* harmony import */ var _entrance_page_dom_utils__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(115);
 /* harmony import */ var _entrance_page_ui__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(213);
 /**
- * 統一状態管理システム
- * 予約・監視の状態と対象を一元管理
+ * 入場予約状態管理システム
+ * 入場予約・監視の状態と対象を管理
  */
 // 必要なimport
 
@@ -3233,9 +3065,9 @@ class LocationHelper {
     }
 }
 // ============================================================================
-// 統一状態管理クラス
+// 入場予約状態管理クラス
 // ============================================================================
-class UnifiedStateManager {
+class EntranceReservationStateManager {
     constructor() {
         // 実行状態
         this.executionState = ExecutionState.IDLE;
@@ -3248,6 +3080,19 @@ class UnifiedStateManager {
         this.selectedCalendarDate = null;
         // 優先度設定
         this.priorityMode = PriorityMode.AUTO;
+        // 予約実行情報（旧entranceReservationStateから統合）
+        this.reservationExecution = {
+            shouldStop: false,
+            startTime: null,
+            attempts: 0
+        };
+        // 監視実行情報（旧timeSlotStateから統合）
+        this.monitoringExecution = {
+            retryCount: 0,
+            maxRetries: 100,
+            reloadInterval: 30000,
+            monitoringInterval: null
+        };
         // デバッグフラグ（本番環境では詳細ログを抑制）
         this.debugMode = true;
     }
@@ -3256,6 +3101,12 @@ class UnifiedStateManager {
     // ============================================================================
     getExecutionState() {
         return this.executionState;
+    }
+    setExecutionState(state) {
+        this.executionState = state;
+        if (this.debugMode) {
+            console.log(`[UnifiedState] 実行状態変更: ${state}`);
+        }
     }
     startReservation() {
         if (this.executionState !== ExecutionState.IDLE) {
@@ -3289,11 +3140,98 @@ class UnifiedStateManager {
         switch (prevState) {
             case ExecutionState.RESERVATION_RUNNING:
                 this.log('⏹️ 予約処理を停止');
+                // 予約実行情報をリセット
+                this.reservationExecution.shouldStop = false;
+                this.reservationExecution.startTime = null;
+                this.reservationExecution.attempts = 0;
                 break;
             case ExecutionState.MONITORING_RUNNING:
                 this.log('⏹️ 監視処理を停止');
+                // 監視インターバルをクリア
+                if (this.monitoringExecution.monitoringInterval) {
+                    clearInterval(this.monitoringExecution.monitoringInterval);
+                    this.monitoringExecution.monitoringInterval = null;
+                }
                 break;
         }
+    }
+    // ============================================================================
+    // 予約実行情報管理（旧entranceReservationStateから統合）
+    // ============================================================================
+    // 予約実行開始
+    startReservationExecution() {
+        this.reservationExecution.shouldStop = false;
+        this.reservationExecution.startTime = Date.now();
+        this.reservationExecution.attempts = 0;
+        this.log('🚀 予約実行情報を初期化');
+    }
+    // 予約中断フラグ設定
+    setShouldStop(shouldStop) {
+        this.reservationExecution.shouldStop = shouldStop;
+        this.log(`🛑 予約中断フラグ: ${shouldStop}`);
+    }
+    // 予約中断フラグ取得
+    getShouldStop() {
+        return this.reservationExecution.shouldStop;
+    }
+    // 試行回数増加
+    incrementAttempts() {
+        this.reservationExecution.attempts++;
+        this.log(`🔄 予約試行回数: ${this.reservationExecution.attempts}`);
+    }
+    // 試行回数取得
+    getAttempts() {
+        return this.reservationExecution.attempts;
+    }
+    // 予約開始時刻取得
+    getReservationStartTime() {
+        return this.reservationExecution.startTime;
+    }
+    // 予約実行中かどうか
+    isReservationRunning() {
+        return this.executionState === ExecutionState.RESERVATION_RUNNING;
+    }
+    // ============================================================================
+    // 監視実行情報管理（旧timeSlotStateから統合）
+    // ============================================================================
+    // 監視実行中かどうか
+    isMonitoringRunning() {
+        return this.executionState === ExecutionState.MONITORING_RUNNING;
+    }
+    // リトライ回数増加
+    incrementRetryCount() {
+        this.monitoringExecution.retryCount++;
+        this.log(`🔄 監視リトライ回数: ${this.monitoringExecution.retryCount}`);
+    }
+    // リトライ回数取得
+    getRetryCount() {
+        return this.monitoringExecution.retryCount;
+    }
+    // リトライ回数リセット
+    resetRetryCount() {
+        this.monitoringExecution.retryCount = 0;
+        this.log('🔄 監視リトライ回数をリセット');
+    }
+    // 最大リトライ回数取得
+    getMaxRetries() {
+        return this.monitoringExecution.maxRetries;
+    }
+    // 監視インターバル設定
+    setMonitoringInterval(intervalId) {
+        this.monitoringExecution.monitoringInterval = intervalId;
+        this.log(`⏰ 監視インターバル設定: ${intervalId}`);
+    }
+    // 監視インターバルクリア
+    clearMonitoringInterval() {
+        if (this.monitoringExecution.monitoringInterval) {
+            clearInterval(this.monitoringExecution.monitoringInterval);
+            this.monitoringExecution.monitoringInterval = null;
+            this.log('⏰ 監視インターバルをクリア');
+        }
+    }
+    // 監視インターバル取得
+    getMonitoringInterval() {
+        return this.monitoringExecution.monitoringInterval;
     }
     // ============================================================================
     // 対象管理
@@ -3677,7 +3615,76 @@ class UnifiedStateManager {
         console.groupEnd();
     }
 }
+// 入場予約状態管理システムのシングルトンインスタンス
+const entranceReservationStateManager = new EntranceReservationStateManager();
 
+
+/***/ }),
+
+/***/ 540:
+/***/ ((module) => {
+
+
+
+/* istanbul ignore next  */
+function insertStyleElement(options) {
+  var element = document.createElement("style");
+  options.setAttributes(element, options.attributes);
+  options.insert(element, options.options);
+  return element;
+}
+module.exports = insertStyleElement;
+
+/***/ }),
+
+/***/ 601:
+/***/ ((module) => {
+
+
+
+module.exports = function (i) {
+  return i[1];
+};
+
+/***/ }),
+
+/***/ 659:
+/***/ ((module) => {
+
+
+
+var memo = {};
+
+/* istanbul ignore next  */
+function getTarget(target) {
+  if (typeof memo[target] === "undefined") {
+    var styleTarget = document.querySelector(target);
+
+    // Special case to return head of iframe instead of iframe itself
+    if (window.HTMLIFrameElement && styleTarget instanceof window.HTMLIFrameElement) {
+      try {
+        // This will throw an exception if access to iframe is blocked
+        // due to cross-origin restrictions
+        styleTarget = styleTarget.contentDocument.head;
+      } catch (e) {
+        // istanbul ignore next
+        styleTarget = null;
+      }
+    }
+    memo[target] = styleTarget;
+  }
+  return memo[target];
+}
+
+/* istanbul ignore next  */
+function insertBySelector(insert, style) {
+  var target = getTarget(insert);
+  if (!target) {
+    throw new Error("Couldn't find a style target. This probably means that the value for the 'insert' parameter is invalid.");
+  }
+  target.appendChild(style);
+}
+module.exports = insertBySelector;
 
 /***/ }),
 
@@ -4502,12 +4509,12 @@ async function clickElement(element, config) {
 
 // EXTERNAL MODULE: ./src-modules/entrance-page-state.ts
 var entrance_page_state = __webpack_require__(278);
-// EXTERNAL MODULE: ./src-modules/entrance-page-monitor.ts
-var entrance_page_monitor = __webpack_require__(429);
+// EXTERNAL MODULE: ./src-modules/entrance-reservation-state-manager.ts
+var entrance_reservation_state_manager = __webpack_require__(461);
 ;// ./src-modules/cache-manager.ts
 // entrance-page-stateからのimport
-
-// getExternalFunctionのimport（entrance-page-monitorから）
+// import { timeSlotState } from './entrance-page-state'; // 統合により不要
+// unified-stateからの直接インポート
 
 // ============================================================================
 // キャッシュ管理機能
@@ -4523,10 +4530,9 @@ const createCacheManager = (dependencies = {}) => {
         // 複数監視対象を保存
         saveTargetSlots() {
             try {
-                const unifiedStateManager = (0,entrance_page_monitor/* getExternalFunction */.ac)('unifiedStateManager');
-                if (!unifiedStateManager)
+                if (!entrance_reservation_state_manager/* entranceReservationStateManager */.xx)
                     return;
-                const targets = unifiedStateManager.getMonitoringTargets();
+                const targets = entrance_reservation_state_manager/* entranceReservationStateManager */.xx.getMonitoringTargets();
                 if (targets.length === 0)
                     return;
                 // 現在選択されているカレンダー日付を取得
@@ -4542,7 +4548,7 @@ const createCacheManager = (dependencies = {}) => {
                     selectedDate: selectedCalendarDate,
                     timestamp: Date.now(),
                     url: window.location.href,
-                    retryCount: entrance_page_state.timeSlotState.retryCount || 0
+                    retryCount: entrance_reservation_state_manager/* entranceReservationStateManager */.xx.getRetryCount() || 0
                 };
                 localStorage.setItem(this.generateKey('target_slots'), JSON.stringify(data));
                 const targetTexts = targets.map((t) => t.timeSlot).join(', ');
@@ -4701,10 +4707,10 @@ const createCacheManager = (dependencies = {}) => {
 
 // EXTERNAL MODULE: ./src-modules/entrance-page-dom-utils.ts
 var entrance_page_dom_utils = __webpack_require__(115);
+// EXTERNAL MODULE: ./src-modules/entrance-page-monitor.ts
+var entrance_page_monitor = __webpack_require__(429);
 // EXTERNAL MODULE: ./src-modules/entrance-page-ui.ts
 var entrance_page_ui = __webpack_require__(213);
-// EXTERNAL MODULE: ./src-modules/unified-state.ts
-var unified_state = __webpack_require__(742);
 ;// ./src-modules/entrance-page-fab.ts
 // pavilion-search-pageからのimport
 
@@ -4895,8 +4901,8 @@ function createEntranceReservationUI(config) {
             showStatus('リロード直前のため中断できません', 'red');
             return;
         }
-        // 実行中の場合は中断処理
-        if (entrance_page_state.timeSlotState.isMonitoring) {
+        // 実行中の場合は中断処理（入場予約状態管理システム使用）
+        if (entrance_reservation_state_manager/* entranceReservationStateManager */.xx.isMonitoringRunning()) {
             // 監視を中断
             (0,entrance_page_ui/* stopSlotMonitoring */.XG)();
             // ステータスは中断を示すメッセージを表示（消さない）
@@ -4904,71 +4910,51 @@ function createEntranceReservationUI(config) {
             (0,entrance_page_ui/* updateMainButtonDisplay */.vp)();
             return;
         }
-        if (entrance_page_state.entranceReservationState.isRunning) {
+        if (entrance_reservation_state_manager/* entranceReservationStateManager */.xx.isReservationRunning()) {
             // スマホ用：現在の状態をアラート表示
+            const startTime = entrance_reservation_state_manager/* entranceReservationStateManager */.xx.getReservationStartTime();
+            const attempts = entrance_reservation_state_manager/* entranceReservationStateManager */.xx.getAttempts();
+            const shouldStop = entrance_reservation_state_manager/* entranceReservationStateManager */.xx.getShouldStop();
             const debugInfo = `予約状態確認:
-isRunning: ${entrance_page_state.entranceReservationState.isRunning}
-shouldStop: ${entrance_page_state.entranceReservationState.shouldStop}
-startTime: ${entrance_page_state.entranceReservationState.startTime}
-attempts: ${entrance_page_state.entranceReservationState.attempts}`;
+isRunning: ${entrance_reservation_state_manager/* entranceReservationStateManager */.xx.isReservationRunning()}
+shouldStop: ${shouldStop}
+startTime: ${startTime}
+attempts: ${attempts}`;
             if (confirm(`[DEBUG] 予約処理を中断しますか？\n\n${debugInfo}`)) {
                 // 予約処理を中断
-                entrance_page_state.entranceReservationState.shouldStop = true;
+                entrance_reservation_state_manager/* entranceReservationStateManager */.xx.setShouldStop(true);
                 showStatus('予約処理を中断中...', 'orange');
             }
             else {
-                // 強制リセット（デバッグ用）
-                entrance_page_state.entranceReservationState.isRunning = false;
-                entrance_page_state.entranceReservationState.shouldStop = false;
-                entrance_page_state.entranceReservationState.startTime = null;
-                entrance_page_state.entranceReservationState.attempts = 0;
+                // 強制リセット（デバッグ用） - 統一状態管理システム経由
+                entrance_reservation_state_manager/* entranceReservationStateManager */.xx.stop();
                 alert('状態をリセットしました。もう一度お試しください。');
             }
             return;
         }
-        // 統一状態管理システムを使用した監視開始判定
-        const unifiedStateManager = (0,entrance_page_monitor/* getExternalFunction */.ac)('unifiedStateManager');
-        if (unifiedStateManager) {
-            const preferredAction = unifiedStateManager.getPreferredAction();
-            // FABクリック処理開始
-            if (preferredAction === 'monitoring') {
-                console.log('📡 統一状態管理システムによる監視開始');
-                // 実行状態を監視中に変更
-                unifiedStateManager.startMonitoring();
-                // 即座にUI更新してから監視開始
-                (0,entrance_page_ui/* updateMainButtonDisplay */.vp)();
-                await (0,entrance_page_monitor/* startSlotMonitoring */.fp)();
-                return;
-            }
-            else if (preferredAction === 'reservation') {
-                console.log('🚀 統一状態管理システムによる予約開始');
-                // 予約処理は下の通常処理で実行
-            }
-            else {
-                console.log('⚠️ 統一状態管理システム: 実行可能なアクションなし');
-                return;
-            }
+        // 入場予約状態管理システムを使用した監視開始判定
+        const preferredAction = entrance_reservation_state_manager/* entranceReservationStateManager */.xx.getPreferredAction();
+        // FABクリック処理開始
+        if (preferredAction === 'monitoring') {
+            console.log('📡 入場予約状態管理システムによる監視開始');
+            // 実行状態を監視中に変更
+            entrance_reservation_state_manager/* entranceReservationStateManager */.xx.startMonitoring();
+            // 即座にUI更新してから監視開始
+            (0,entrance_page_ui/* updateMainButtonDisplay */.vp)();
+            await (0,entrance_page_monitor/* startSlotMonitoring */.fp)();
+            return;
+        }
+        else if (preferredAction === 'reservation') {
+            console.log('🚀 入場予約状態管理システムによる予約開始');
+            // 予約処理は下の通常処理で実行
         }
         else {
-            // フォールバック: 統一状態管理による判定
-            const unifiedStateManager = (0,entrance_page_monitor/* getExternalFunction */.ac)('unifiedStateManager');
-            if (unifiedStateManager && unifiedStateManager.hasMonitoringTargets() && entrance_page_state.timeSlotState.mode === 'selecting') {
-                console.log('📡 統一状態管理による監視開始');
-                (0,entrance_page_ui/* updateMainButtonDisplay */.vp)();
-                await (0,entrance_page_monitor/* startSlotMonitoring */.fp)();
-                return;
-            }
+            console.log('⚠️ 入場予約状態管理システム: 実行可能なアクションなし');
+            return;
         }
-        // 通常の予約処理
-        entrance_page_state.entranceReservationState.isRunning = true;
-        entrance_page_state.entranceReservationState.shouldStop = false;
-        entrance_page_state.entranceReservationState.startTime = Date.now();
-        entrance_page_state.entranceReservationState.attempts = 0;
-        // 統一状態管理システムに予約実行状態を設定
-        const stateManager = (0,entrance_page_monitor/* getExternalFunction */.ac)('unifiedStateManager');
-        if (stateManager) {
-            stateManager.setExecutionState('reservation_running');
-        }
+        // 入場予約状態管理システムで予約実行開始
+        entrance_reservation_state_manager/* entranceReservationStateManager */.xx.setExecutionState(entrance_reservation_state_manager/* ExecutionState */.si.RESERVATION_RUNNING);
+        entrance_reservation_state_manager/* entranceReservationStateManager */.xx.startReservationExecution();
         showStatus('予約処理実行中...', 'blue');
         (0,entrance_page_ui/* updateMainButtonDisplay */.vp)();
         updateMonitoringTargetsDisplay(); // 予約対象を表示
@@ -4976,14 +4962,11 @@ attempts: ${entrance_page_state.entranceReservationState.attempts}`;
             const result = await entranceReservationHelper(config);
             if (result.success) {
                 showStatus(`🎉 予約成功！(${result.attempts}回試行)`, 'green');
-                // 統一状態管理に予約成功情報を設定
-                const unifiedStateManager = (0,entrance_page_monitor/* getExternalFunction */.ac)('unifiedStateManager');
-                if (unifiedStateManager) {
-                    const reservationTarget = unifiedStateManager.getReservationTarget();
-                    if (reservationTarget) {
-                        unifiedStateManager.setReservationSuccess(reservationTarget.timeSlot, reservationTarget.locationIndex);
-                        (0,entrance_page_ui/* updateMainButtonDisplay */.vp)(); // FAB表示更新
-                    }
+                // 入場予約状態管理に予約成功情報を設定
+                const reservationTarget = entrance_reservation_state_manager/* entranceReservationStateManager */.xx.getReservationTarget();
+                if (reservationTarget) {
+                    entrance_reservation_state_manager/* entranceReservationStateManager */.xx.setReservationSuccess(reservationTarget.timeSlot, reservationTarget.locationIndex);
+                    (0,entrance_page_ui/* updateMainButtonDisplay */.vp)(); // FAB表示更新
                 }
                 if (cacheManager) {
                     cacheManager.clearTargetSlots(); // 成功時はキャッシュクリア
@@ -5000,14 +4983,8 @@ attempts: ${entrance_page_state.entranceReservationState.attempts}`;
             showStatus(`エラー: ${errorMessage}`, 'red');
         }
         finally {
-            entrance_page_state.entranceReservationState.isRunning = false;
-            entrance_page_state.entranceReservationState.startTime = null;
-            entrance_page_state.entranceReservationState.attempts = 0;
-            // 統一状態管理システムをIDLEに戻す
-            const stateManager = (0,entrance_page_monitor/* getExternalFunction */.ac)('unifiedStateManager');
-            if (stateManager) {
-                stateManager.setExecutionState('idle');
-            }
+            // 入場予約状態管理システムで予約実行終了
+            entrance_reservation_state_manager/* entranceReservationStateManager */.xx.stop();
             (0,entrance_page_ui/* updateMainButtonDisplay */.vp)();
             updateMonitoringTargetsDisplay(); // 予約終了時に表示更新
         }
@@ -5045,9 +5022,9 @@ attempts: ${entrance_page_state.entranceReservationState.attempts}`;
         setupTimeSlotClickHandlers();
     });
 }
-// 監視対象表示を更新（統一状態管理システムに委譲）
+// 監視対象表示を更新（入場予約状態管理システムに委譲）
 function updateMonitoringTargetsDisplay() {
-    // 統一状態管理システムのupdateMainButtonDisplay()に委譲
+    // 入場予約状態管理システムのupdateMainButtonDisplay()に委譲
     // これにより重複表示を回避し、一貫した表示を実現
     (0,entrance_page_ui/* updateMainButtonDisplay */.vp)();
 }
@@ -5183,9 +5160,8 @@ function startCalendarWatcher() {
                 if (element.matches && element.matches('td[data-gray-out] div[role="button"]')) {
                     const ariaPressed = element.getAttribute('aria-pressed');
                     console.log(`🔄 時間帯選択変更検出: ${ariaPressed}`);
-                    // 統一状態管理システムの同期（初期化中は除外）
-                    const unifiedStateManager = (0,entrance_page_monitor/* getExternalFunction */.ac)('unifiedStateManager');
-                    if (unifiedStateManager && ariaPressed === 'true' && !entrance_page_state.calendarWatchState.isInitializing) {
+                    // 入場予約状態管理システムの同期（初期化中は除外）
+                    if (ariaPressed === 'true' && !entrance_page_state.calendarWatchState.isInitializing) {
                         // 選択状態変更を検出 - DOM状態から予約対象を同期
                         console.log(`🔄 時間帯選択状態を検出`);
                         setTimeout(() => {
@@ -5228,26 +5204,23 @@ function handleCalendarChange() {
     if (calendarDateChanged) {
         console.log(`📅 カレンダー日付変更を検出: ${entrance_page_state.calendarWatchState.currentSelectedDate} → ${newSelectedDate}`);
         // 監視実行中は日付変更を無視
-        if (entrance_page_state.timeSlotState.isMonitoring) {
+        if (entrance_reservation_state_manager/* entranceReservationStateManager */.xx.isMonitoringRunning()) {
             console.log('⚠️ 監視実行中のため日付変更を無視します');
             return;
         }
         entrance_page_state.calendarWatchState.currentSelectedDate = newSelectedDate;
-        // 統一状態管理にも日付を設定
-        const unifiedStateManager = (0,entrance_page_monitor/* getExternalFunction */.ac)('unifiedStateManager');
-        if (unifiedStateManager && newSelectedDate) {
-            unifiedStateManager.setSelectedCalendarDate(newSelectedDate);
+        // 入場予約状態管理にも日付を設定
+        if (newSelectedDate) {
+            entrance_reservation_state_manager/* entranceReservationStateManager */.xx.setSelectedCalendarDate(newSelectedDate);
         }
         // 既存の監視状態をクリア（日付が変わったため）
-        // 統一状態管理システムからもクリア
-        if (unifiedStateManager) {
-            const hasReservationTarget = unifiedStateManager.hasReservationTarget();
-            const hasMonitoringTargets = unifiedStateManager.hasMonitoringTargets();
-            if (hasReservationTarget || hasMonitoringTargets) {
-                console.log('📅 日付変更により統一状態管理システムの対象をクリア');
-                unifiedStateManager.clearReservationTarget();
-                unifiedStateManager.clearMonitoringTargets();
-            }
+        // 入場予約状態管理システムからもクリア
+        const hasReservationTarget = entrance_reservation_state_manager/* entranceReservationStateManager */.xx.hasReservationTarget();
+        const hasMonitoringTargets = entrance_reservation_state_manager/* entranceReservationStateManager */.xx.hasMonitoringTargets();
+        if (hasReservationTarget || hasMonitoringTargets) {
+            console.log('📅 日付変更により入場予約状態管理システムの対象をクリア');
+            entrance_reservation_state_manager/* entranceReservationStateManager */.xx.clearReservationTarget();
+            entrance_reservation_state_manager/* entranceReservationStateManager */.xx.clearMonitoringTargets();
         }
         // 従来システムはもう使用しないため、このブロックは削除
         // if (multiTargetManager.hasTargets() && !timeSlotState.isMonitoring) {
@@ -5272,18 +5245,15 @@ function handleCalendarChange() {
     else {
         // 日付は変わっていない - FABボタンの状態のみ更新
         console.log('📅 日付変更なし - FABボタンの状態のみ更新');
-        // 統一状態管理システムを取得して状態同期
-        const unifiedStateManager = (0,entrance_page_monitor/* getExternalFunction */.ac)('unifiedStateManager');
-        if (unifiedStateManager) {
-            // 公式サイトによる選択解除があった場合の状態同期
-            const selectedSlot = document.querySelector(entrance_page_dom_utils/* timeSlotSelectors */.eN.selectedSlot);
-            if (!selectedSlot && unifiedStateManager.hasReservationTarget()) {
-                // DOM上に選択がないが統一状態管理に予約対象がある場合はクリア
-                console.log('🔄 公式サイトによる選択解除を検出 - 統一状態管理を同期');
-                unifiedStateManager.clearReservationTarget();
-                // UI更新を確実に実行
-                (0,entrance_page_ui/* updateMainButtonDisplay */.vp)();
-            }
+        // 入場予約状態管理システムを取得して状態同期
+        // 公式サイトによる選択解除があった場合の状態同期
+        const selectedSlot = document.querySelector(entrance_page_dom_utils/* timeSlotSelectors */.eN.selectedSlot);
+        if (!selectedSlot && entrance_reservation_state_manager/* entranceReservationStateManager */.xx.hasReservationTarget()) {
+            // DOM上に選択がないが入場予約状態管理に予約対象がある場合はクリア
+            console.log('🔄 公式サイトによる選択解除を検出 - 入場予約状態管理を同期');
+            entrance_reservation_state_manager/* entranceReservationStateManager */.xx.clearReservationTarget();
+            // UI更新を確実に実行
+            (0,entrance_page_ui/* updateMainButtonDisplay */.vp)();
         }
         // FABボタンの状態を更新（監視ボタンは再設置しない）
         (0,entrance_page_ui/* updateMainButtonDisplay */.vp)();
@@ -5297,25 +5267,22 @@ function removeAllMonitorButtons() {
 }
 // DOM上の選択状態から予約対象を同期
 function syncReservationTargetFromDOM() {
-    const unifiedStateManager = (0,entrance_page_monitor/* getExternalFunction */.ac)('unifiedStateManager');
-    if (!unifiedStateManager)
-        return;
     // DOM上で選択状態の時間帯要素を取得
     const selectedElement = document.querySelector('td[data-gray-out] div[role="button"][aria-pressed="true"]');
     if (selectedElement) {
         const tdElement = selectedElement.closest('td[data-gray-out]');
         const timeText = selectedElement.querySelector('dt span')?.textContent?.trim();
         if (tdElement && timeText) {
-            const locationIndex = unified_state/* LocationHelper */.Qs.getIndexFromElement(tdElement);
+            const locationIndex = entrance_reservation_state_manager/* LocationHelper */.Qs.getIndexFromElement(tdElement);
             const selector = (0,entrance_page_dom_utils/* generateUniqueTdSelector */.sN)(tdElement);
             console.log(`🔄 DOM状態から予約対象を同期: ${timeText} (位置: ${locationIndex})`);
-            unifiedStateManager.setReservationTarget(timeText, locationIndex, selector);
+            entrance_reservation_state_manager/* entranceReservationStateManager */.xx.setReservationTarget(timeText, locationIndex, selector);
         }
     }
     else {
         // 選択状態の要素がない場合は予約対象をクリア
         console.log(`🔄 選択状態なし - 予約対象をクリア`);
-        unifiedStateManager.clearReservationTarget();
+        entrance_reservation_state_manager/* entranceReservationStateManager */.xx.clearReservationTarget();
     }
 }
 // 時間帯テーブルの準備を待つ
@@ -5378,41 +5345,38 @@ function setupTimeSlotClickHandlers() {
         if (!timeText) {
             return;
         }
-        // 統一状態管理システムを取得
-        const unifiedStateManager = (0,entrance_page_monitor/* getExternalFunction */.ac)('unifiedStateManager');
-        const locationIndex = unified_state/* LocationHelper */.Qs.getIndexFromElement(tdElement);
-        if (unifiedStateManager) {
-            // 統一状態管理で現在の選択状態を確認
-            const isCurrentlyReservationTarget = unifiedStateManager.isReservationTarget(timeText, locationIndex);
-            if (isCurrentlyReservationTarget) {
-                // 既に予約対象として設定済みの場合は選択解除
-                // イベントを停止（デフォルト動作を防ぐ）
-                event.preventDefault();
-                event.stopPropagation();
-                // 公式サイトの仕様を利用：現在選択中のカレンダー日付ボタンをクリック
-                const currentSelectedCalendarButton = document.querySelector('[role="button"][aria-pressed="true"]');
-                if (currentSelectedCalendarButton && currentSelectedCalendarButton.querySelector('time[datetime]')) {
-                    currentSelectedCalendarButton.click();
-                    // 統一状態管理からも予約対象を削除
-                    setTimeout(() => {
-                        unifiedStateManager.clearReservationTarget();
-                        (0,entrance_page_ui/* updateMainButtonDisplay */.vp)();
-                    }, 100);
-                }
-                else {
-                    // フォールバック: 直接削除
-                    unifiedStateManager.clearReservationTarget();
-                    (0,entrance_page_ui/* updateMainButtonDisplay */.vp)();
-                }
-            }
-            else {
-                // 新規選択または別の時間帯への変更
-                // DOM上の選択状態から予約対象を同期
+        // 入場予約状態管理システムを取得
+        const locationIndex = entrance_reservation_state_manager/* LocationHelper */.Qs.getIndexFromElement(tdElement);
+        // 入場予約状態管理で現在の選択状態を確認
+        const isCurrentlyReservationTarget = entrance_reservation_state_manager/* entranceReservationStateManager */.xx.isReservationTarget(timeText, locationIndex);
+        if (isCurrentlyReservationTarget) {
+            // 既に予約対象として設定済みの場合は選択解除
+            // イベントを停止（デフォルト動作を防ぐ）
+            event.preventDefault();
+            event.stopPropagation();
+            // 公式サイトの仕様を利用：現在選択中のカレンダー日付ボタンをクリック
+            const currentSelectedCalendarButton = document.querySelector('[role="button"][aria-pressed="true"]');
+            if (currentSelectedCalendarButton && currentSelectedCalendarButton.querySelector('time[datetime]')) {
+                currentSelectedCalendarButton.click();
+                // 入場予約状態管理からも予約対象を削除
                 setTimeout(() => {
-                    syncReservationTargetFromDOM();
+                    entrance_reservation_state_manager/* entranceReservationStateManager */.xx.clearReservationTarget();
                     (0,entrance_page_ui/* updateMainButtonDisplay */.vp)();
                 }, 100);
             }
+            else {
+                // フォールバック: 直接削除
+                entrance_reservation_state_manager/* entranceReservationStateManager */.xx.clearReservationTarget();
+                (0,entrance_page_ui/* updateMainButtonDisplay */.vp)();
+            }
+        }
+        else {
+            // 新規選択または別の時間帯への変更
+            // DOM上の選択状態から予約対象を同期
+            setTimeout(() => {
+                syncReservationTargetFromDOM();
+                (0,entrance_page_ui/* updateMainButtonDisplay */.vp)();
+            }, 100);
         }
     };
     // グローバルに保存（後でremoveするため）
@@ -7243,7 +7207,7 @@ function initCompanionTicketFeature() {
 
 
  // 同行者追加機能
-// 統一状態管理システムのimport
+// 入場予約状態管理システムのimport
 
 // Window型の拡張（beforeunloadハンドラー削除により不要）
 // 【8. ページ判定・初期化】
@@ -7253,8 +7217,7 @@ function initCompanionTicketFeature() {
 const app_router_cacheManager = createCacheManager({
     getCurrentSelectedCalendarDateFn: entrance_page_ui/* getCurrentSelectedCalendarDate */.rY
 });
-// 統一状態管理システムの初期化
-const unifiedStateManager = new unified_state/* UnifiedStateManager */.Dx();
+// 入場予約状態管理システムの初期化フラグ
 let isUnifiedStateManagerInitialized = false; // 重複初期化防止フラグ
 // ページ初期化の重複実行防止
 let currentPageType = null;
@@ -7262,17 +7225,17 @@ let isPageInitializing = false;
 // ページ初期化時に既存データを移行
 const initializeUnifiedStateManager = () => {
     if (isUnifiedStateManagerInitialized) {
-        console.log('🔄 統一状態管理システムは既に初期化済みです');
+        console.log('🔄 入場予約状態管理システムは既に初期化済みです');
         return;
     }
     try {
         // 既存システムからの状態移行
-        unifiedStateManager.migrateFromExisting();
+        entrance_reservation_state_manager/* entranceReservationStateManager */.xx.migrateFromExisting();
         isUnifiedStateManagerInitialized = true;
-        console.log('✅ 統一状態管理システム初期化完了');
+        console.log('✅ 入場予約状態管理システム初期化完了');
     }
     catch (error) {
-        console.error('⚠️ 統一状態管理システム初期化エラー:', error);
+        console.error('⚠️ 入場予約状態管理システム初期化エラー:', error);
     }
 };
 // entrance-page-monitor、entrance-page-ui、entrance-page-fabにcacheManagerを設定
@@ -7282,26 +7245,7 @@ setCacheManagerForSection7(app_router_cacheManager);
 // entrance-page-uiに必要な関数を注入
 (0,entrance_page_ui/* setEntranceReservationHelper */.XP)(entranceReservationHelper);
 (0,entrance_page_ui/* setUpdateMonitoringTargetsDisplay */.qy)(updateMonitoringTargetsDisplay);
-// entrance-page-monitorに外部関数を注入（showStatusは一時的に除外）
-(0,entrance_page_monitor/* setExternalFunctions */.po)({
-    getCurrentTableContent: entrance_page_ui/* getCurrentTableContent */.dm,
-    shouldUpdateMonitorButtons: entrance_page_ui/* shouldUpdateMonitorButtons */.iG,
-    restoreSelectionAfterUpdate: entrance_page_ui/* restoreSelectionAfterUpdate */.Il,
-    // showStatus, // 内部関数のため一時的に除外
-    enableAllMonitorButtons: entrance_page_ui/* enableAllMonitorButtons */.Ak,
-    updateMainButtonDisplay: entrance_page_ui/* updateMainButtonDisplay */.vp,
-    updateMonitoringTargetsDisplay: updateMonitoringTargetsDisplay,
-    disableAllMonitorButtons: entrance_page_ui/* disableAllMonitorButtons */.PT,
-    selectTimeSlotAndStartReservation: entrance_page_ui/* selectTimeSlotAndStartReservation */.rG,
-    scheduleReload: entrance_page_ui/* scheduleReload */.Lf,
-    startReloadCountdown: entrance_page_ui/* startReloadCountdown */.PH,
-    stopReloadCountdown: entrance_page_ui/* stopReloadCountdown */.Lm,
-    reloadCountdownState: entrance_page_state.reloadCountdownState,
-    resetMonitoringUI: entrance_page_ui/* resetMonitoringUI */.oH,
-    showErrorMessage: entrance_page_ui/* showErrorMessage */.f1,
-    tryClickCalendarForTimeSlot: entrance_page_ui/* tryClickCalendarForTimeSlot */.oy,
-    unifiedStateManager // 統一状態管理システムを外部関数に注入
-});
+// 依存注入は削除済み - 各モジュールで直接インポートを使用
 // URL判定とページタイプ識別
 const identify_page_type = (url) => {
     try {
@@ -7395,7 +7339,7 @@ const trigger_init = (url_record) => {
                     initTimeSlotMonitoringFn: entrance_page_dom_utils/* initTimeSlotMonitoring */.Yz,
                     restoreFromCacheFn: entrance_page_ui/* restoreFromCache */.Zu
                 });
-                // 入場予約ページ初期化後に統一状態管理システムを初期化（動的待機）
+                // 入場予約ページ初期化後に入場予約状態管理システムを初期化（動的待機）
                 waitForTimeSlotTable(() => {
                     initializeUnifiedStateManager();
                 });
@@ -7406,7 +7350,7 @@ const trigger_init = (url_record) => {
                     if (isUnifiedStateManagerInitialized)
                         return;
                     const selectedSlot = document.querySelector('td[data-gray-out] div[role="button"][aria-pressed="true"]');
-                    if (selectedSlot && unifiedStateManager && !unifiedStateManager.hasReservationTarget()) {
+                    if (selectedSlot && entrance_reservation_state_manager/* entranceReservationStateManager */.xx && !entrance_reservation_state_manager/* entranceReservationStateManager */.xx.hasReservationTarget()) {
                         console.log('🔄 選択状態の後続同期を実行');
                         initializeUnifiedStateManager();
                     }

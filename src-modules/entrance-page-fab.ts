@@ -9,7 +9,6 @@ import {
 // entrance-page-stateからのimport
 import { 
     entranceReservationState, 
-    timeSlotState,
     calendarWatchState,
     loadFABVisibility,
     updateFABVisibility
@@ -26,12 +25,11 @@ import {
 import {
     checkTimeSlotTableExistsSync,
     analyzeAndAddMonitorButtons,
-    startSlotMonitoring,
-    getExternalFunction
+    startSlotMonitoring
 } from './entrance-page-monitor';
 
 // unified-stateからのimport
-import { LocationHelper } from './unified-state';
+import { LocationHelper, ExecutionState, entranceReservationStateManager } from './entrance-reservation-state-manager';
 
 // Section 6からのimport  
 import {
@@ -248,8 +246,8 @@ function createEntranceReservationUI(config: ReservationConfig): void {
             return;
         }
         
-        // 実行中の場合は中断処理
-        if (timeSlotState.isMonitoring) {
+        // 実行中の場合は中断処理（入場予約状態管理システム使用）
+        if (entranceReservationStateManager.isMonitoringRunning()) {
             // 監視を中断
             stopSlotMonitoring();
             // ステータスは中断を示すメッセージを表示（消さない）
@@ -258,72 +256,53 @@ function createEntranceReservationUI(config: ReservationConfig): void {
             return;
         }
         
-        if (entranceReservationState.isRunning) {
+        if (entranceReservationStateManager.isReservationRunning()) {
             // スマホ用：現在の状態をアラート表示
+            const startTime = entranceReservationStateManager.getReservationStartTime();
+            const attempts = entranceReservationStateManager.getAttempts();
+            const shouldStop = entranceReservationStateManager.getShouldStop();
+            
             const debugInfo = `予約状態確認:
-isRunning: ${entranceReservationState.isRunning}
-shouldStop: ${entranceReservationState.shouldStop}
-startTime: ${entranceReservationState.startTime}
-attempts: ${entranceReservationState.attempts}`;
+isRunning: ${entranceReservationStateManager.isReservationRunning()}
+shouldStop: ${shouldStop}
+startTime: ${startTime}
+attempts: ${attempts}`;
             
             if (confirm(`[DEBUG] 予約処理を中断しますか？\n\n${debugInfo}`)) {
                 // 予約処理を中断
-                entranceReservationState.shouldStop = true;
+                entranceReservationStateManager.setShouldStop(true);
                 showStatus('予約処理を中断中...', 'orange');
             } else {
-                // 強制リセット（デバッグ用）
-                entranceReservationState.isRunning = false;
-                entranceReservationState.shouldStop = false;
-                entranceReservationState.startTime = null;
-                entranceReservationState.attempts = 0;
+                // 強制リセット（デバッグ用） - 統一状態管理システム経由
+                entranceReservationStateManager.stop();
                 alert('状態をリセットしました。もう一度お試しください。');
             }
             return;
         }
         
-        // 統一状態管理システムを使用した監視開始判定
-        const unifiedStateManager = getExternalFunction('unifiedStateManager');
-        if (unifiedStateManager) {
-            const preferredAction = unifiedStateManager.getPreferredAction();
-            // FABクリック処理開始
-            
-            if (preferredAction === 'monitoring') {
-                console.log('📡 統一状態管理システムによる監視開始');
-                // 実行状態を監視中に変更
-                unifiedStateManager.startMonitoring();
-                // 即座にUI更新してから監視開始
-                updateMainButtonDisplay();
-                await startSlotMonitoring();
-                return;
-            } else if (preferredAction === 'reservation') {
-                console.log('🚀 統一状態管理システムによる予約開始');
-                // 予約処理は下の通常処理で実行
-            } else {
-                console.log('⚠️ 統一状態管理システム: 実行可能なアクションなし');
-                return;
-            }
+        // 入場予約状態管理システムを使用した監視開始判定
+        const preferredAction = entranceReservationStateManager.getPreferredAction();
+        // FABクリック処理開始
+        
+        if (preferredAction === 'monitoring') {
+            console.log('📡 入場予約状態管理システムによる監視開始');
+            // 実行状態を監視中に変更
+            entranceReservationStateManager.startMonitoring();
+            // 即座にUI更新してから監視開始
+            updateMainButtonDisplay();
+            await startSlotMonitoring();
+            return;
+        } else if (preferredAction === 'reservation') {
+            console.log('🚀 入場予約状態管理システムによる予約開始');
+            // 予約処理は下の通常処理で実行
         } else {
-            // フォールバック: 統一状態管理による判定
-            const unifiedStateManager = getExternalFunction('unifiedStateManager');
-            if (unifiedStateManager && unifiedStateManager.hasMonitoringTargets() && timeSlotState.mode === 'selecting') {
-                console.log('📡 統一状態管理による監視開始');
-                updateMainButtonDisplay();
-                await startSlotMonitoring();
-                return;
-            }
+            console.log('⚠️ 入場予約状態管理システム: 実行可能なアクションなし');
+            return;
         }
         
-        // 通常の予約処理
-        entranceReservationState.isRunning = true;
-        entranceReservationState.shouldStop = false;
-        entranceReservationState.startTime = Date.now();
-        entranceReservationState.attempts = 0;
-        
-        // 統一状態管理システムに予約実行状態を設定
-        const stateManager = getExternalFunction('unifiedStateManager');
-        if (stateManager) {
-            stateManager.setExecutionState('reservation_running');
-        }
+        // 入場予約状態管理システムで予約実行開始
+        entranceReservationStateManager.setExecutionState(ExecutionState.RESERVATION_RUNNING);
+        entranceReservationStateManager.startReservationExecution();
         
         showStatus('予約処理実行中...', 'blue');
         updateMainButtonDisplay();
@@ -334,14 +313,11 @@ attempts: ${entranceReservationState.attempts}`;
             if (result.success) {
                 showStatus(`🎉 予約成功！(${result.attempts}回試行)`, 'green');
                 
-                // 統一状態管理に予約成功情報を設定
-                const unifiedStateManager = getExternalFunction('unifiedStateManager');
-                if (unifiedStateManager) {
-                    const reservationTarget = unifiedStateManager.getReservationTarget();
-                    if (reservationTarget) {
-                        unifiedStateManager.setReservationSuccess(reservationTarget.timeSlot, reservationTarget.locationIndex);
-                        updateMainButtonDisplay(); // FAB表示更新
-                    }
+                // 入場予約状態管理に予約成功情報を設定
+                const reservationTarget = entranceReservationStateManager.getReservationTarget();
+                if (reservationTarget) {
+                    entranceReservationStateManager.setReservationSuccess(reservationTarget.timeSlot, reservationTarget.locationIndex);
+                    updateMainButtonDisplay(); // FAB表示更新
                 }
                 
                 if (cacheManager) {
@@ -356,15 +332,8 @@ attempts: ${entranceReservationState.attempts}`;
             const errorMessage = error instanceof Error ? error.message : String(error);
             showStatus(`エラー: ${errorMessage}`, 'red');
         } finally {
-            entranceReservationState.isRunning = false;
-            entranceReservationState.startTime = null;
-            entranceReservationState.attempts = 0;
-            
-            // 統一状態管理システムをIDLEに戻す
-            const stateManager = getExternalFunction('unifiedStateManager');
-            if (stateManager) {
-                stateManager.setExecutionState('idle');
-            }
+            // 入場予約状態管理システムで予約実行終了
+            entranceReservationStateManager.stop();
             
             updateMainButtonDisplay();
             updateMonitoringTargetsDisplay(); // 予約終了時に表示更新
@@ -415,9 +384,9 @@ attempts: ${entranceReservationState.attempts}`;
     });
 }
 
-// 監視対象表示を更新（統一状態管理システムに委譲）
+// 監視対象表示を更新（入場予約状態管理システムに委譲）
 function updateMonitoringTargetsDisplay(): void {
-    // 統一状態管理システムのupdateMainButtonDisplay()に委譲
+    // 入場予約状態管理システムのupdateMainButtonDisplay()に委譲
     // これにより重複表示を回避し、一貫した表示を実現
     updateMainButtonDisplay();
 }
@@ -580,9 +549,8 @@ function startCalendarWatcher(): void {
                     const ariaPressed = element.getAttribute('aria-pressed');
                     console.log(`🔄 時間帯選択変更検出: ${ariaPressed}`);
                     
-                    // 統一状態管理システムの同期（初期化中は除外）
-                    const unifiedStateManager = getExternalFunction('unifiedStateManager');
-                    if (unifiedStateManager && ariaPressed === 'true' && !calendarWatchState.isInitializing) {
+                    // 入場予約状態管理システムの同期（初期化中は除外）
+                    if (ariaPressed === 'true' && !calendarWatchState.isInitializing) {
                         // 選択状態変更を検出 - DOM状態から予約対象を同期
                         console.log(`🔄 時間帯選択状態を検出`);
                         setTimeout(() => {
@@ -632,30 +600,27 @@ function handleCalendarChange(): void {
         console.log(`📅 カレンダー日付変更を検出: ${calendarWatchState.currentSelectedDate} → ${newSelectedDate}`);
         
         // 監視実行中は日付変更を無視
-        if (timeSlotState.isMonitoring) {
+        if (entranceReservationStateManager.isMonitoringRunning()) {
             console.log('⚠️ 監視実行中のため日付変更を無視します');
             return;
         }
         
         calendarWatchState.currentSelectedDate = newSelectedDate;
         
-        // 統一状態管理にも日付を設定
-        const unifiedStateManager = getExternalFunction('unifiedStateManager');
-        if (unifiedStateManager && newSelectedDate) {
-            unifiedStateManager.setSelectedCalendarDate(newSelectedDate);
+        // 入場予約状態管理にも日付を設定
+        if (newSelectedDate) {
+            entranceReservationStateManager.setSelectedCalendarDate(newSelectedDate);
         }
         
         // 既存の監視状態をクリア（日付が変わったため）
-        // 統一状態管理システムからもクリア
-        if (unifiedStateManager) {
-            const hasReservationTarget = unifiedStateManager.hasReservationTarget();
-            const hasMonitoringTargets = unifiedStateManager.hasMonitoringTargets();
-            
-            if (hasReservationTarget || hasMonitoringTargets) {
-                console.log('📅 日付変更により統一状態管理システムの対象をクリア');
-                unifiedStateManager.clearReservationTarget();
-                unifiedStateManager.clearMonitoringTargets();
-            }
+        // 入場予約状態管理システムからもクリア
+        const hasReservationTarget = entranceReservationStateManager.hasReservationTarget();
+        const hasMonitoringTargets = entranceReservationStateManager.hasMonitoringTargets();
+        
+        if (hasReservationTarget || hasMonitoringTargets) {
+            console.log('📅 日付変更により入場予約状態管理システムの対象をクリア');
+            entranceReservationStateManager.clearReservationTarget();
+            entranceReservationStateManager.clearMonitoringTargets();
         }
         
         // 従来システムはもう使用しないため、このブロックは削除
@@ -685,18 +650,15 @@ function handleCalendarChange(): void {
         // 日付は変わっていない - FABボタンの状態のみ更新
         console.log('📅 日付変更なし - FABボタンの状態のみ更新');
         
-        // 統一状態管理システムを取得して状態同期
-        const unifiedStateManager = getExternalFunction('unifiedStateManager');
-        if (unifiedStateManager) {
-            // 公式サイトによる選択解除があった場合の状態同期
-            const selectedSlot = document.querySelector(timeSlotSelectors.selectedSlot);
-            if (!selectedSlot && unifiedStateManager.hasReservationTarget()) {
-                // DOM上に選択がないが統一状態管理に予約対象がある場合はクリア
-                console.log('🔄 公式サイトによる選択解除を検出 - 統一状態管理を同期');
-                unifiedStateManager.clearReservationTarget();
-                // UI更新を確実に実行
-                updateMainButtonDisplay();
-            }
+        // 入場予約状態管理システムを取得して状態同期
+        // 公式サイトによる選択解除があった場合の状態同期
+        const selectedSlot = document.querySelector(timeSlotSelectors.selectedSlot);
+        if (!selectedSlot && entranceReservationStateManager.hasReservationTarget()) {
+            // DOM上に選択がないが入場予約状態管理に予約対象がある場合はクリア
+            console.log('🔄 公式サイトによる選択解除を検出 - 入場予約状態管理を同期');
+            entranceReservationStateManager.clearReservationTarget();
+            // UI更新を確実に実行
+            updateMainButtonDisplay();
         }
         
         // FABボタンの状態を更新（監視ボタンは再設置しない）
@@ -713,8 +675,6 @@ function removeAllMonitorButtons(): void {
 
 // DOM上の選択状態から予約対象を同期
 function syncReservationTargetFromDOM(): void {
-    const unifiedStateManager = getExternalFunction('unifiedStateManager');
-    if (!unifiedStateManager) return;
 
     // DOM上で選択状態の時間帯要素を取得
     const selectedElement = document.querySelector('td[data-gray-out] div[role="button"][aria-pressed="true"]');
@@ -728,12 +688,12 @@ function syncReservationTargetFromDOM(): void {
             const selector = generateUniqueTdSelector(tdElement);
             
             console.log(`🔄 DOM状態から予約対象を同期: ${timeText} (位置: ${locationIndex})`);
-            unifiedStateManager.setReservationTarget(timeText, locationIndex, selector);
+            entranceReservationStateManager.setReservationTarget(timeText, locationIndex, selector);
         }
     } else {
         // 選択状態の要素がない場合は予約対象をクリア
         console.log(`🔄 選択状態なし - 予約対象をクリア`);
-        unifiedStateManager.clearReservationTarget();
+        entranceReservationStateManager.clearReservationTarget();
     }
 }
 
@@ -809,46 +769,43 @@ function setupTimeSlotClickHandlers(): void {
             return;
         }
             
-            // 統一状態管理システムを取得
-            const unifiedStateManager = getExternalFunction('unifiedStateManager');
-            const locationIndex = LocationHelper.getIndexFromElement(tdElement);
+        // 入場予約状態管理システムを取得
+        const locationIndex = LocationHelper.getIndexFromElement(tdElement);
+        
+        // 入場予約状態管理で現在の選択状態を確認
+        const isCurrentlyReservationTarget = entranceReservationStateManager.isReservationTarget(timeText, locationIndex);
+        
+        if (isCurrentlyReservationTarget) {
+            // 既に予約対象として設定済みの場合は選択解除
             
-            if (unifiedStateManager) {
-                // 統一状態管理で現在の選択状態を確認
-                const isCurrentlyReservationTarget = unifiedStateManager.isReservationTarget(timeText, locationIndex);
+            // イベントを停止（デフォルト動作を防ぐ）
+            event.preventDefault();
+            event.stopPropagation();
+            
+            // 公式サイトの仕様を利用：現在選択中のカレンダー日付ボタンをクリック
+            const currentSelectedCalendarButton = document.querySelector('[role="button"][aria-pressed="true"]') as HTMLElement;
+            if (currentSelectedCalendarButton && currentSelectedCalendarButton.querySelector('time[datetime]')) {
+                currentSelectedCalendarButton.click();
                 
-                if (isCurrentlyReservationTarget) {
-                    // 既に予約対象として設定済みの場合は選択解除
-                    
-                    // イベントを停止（デフォルト動作を防ぐ）
-                    event.preventDefault();
-                    event.stopPropagation();
-                    
-                    // 公式サイトの仕様を利用：現在選択中のカレンダー日付ボタンをクリック
-                    const currentSelectedCalendarButton = document.querySelector('[role="button"][aria-pressed="true"]') as HTMLElement;
-                    if (currentSelectedCalendarButton && currentSelectedCalendarButton.querySelector('time[datetime]')) {
-                        currentSelectedCalendarButton.click();
-                        
-                        // 統一状態管理からも予約対象を削除
-                        setTimeout(() => {
-                            unifiedStateManager.clearReservationTarget();
-                            updateMainButtonDisplay();
-                        }, 100);
-                    } else {
-                        // フォールバック: 直接削除
-                        unifiedStateManager.clearReservationTarget();
-                        updateMainButtonDisplay();
-                    }
-                    
-                } else {
-                    // 新規選択または別の時間帯への変更
-                    
-                    // DOM上の選択状態から予約対象を同期
-                    setTimeout(() => {
-                        syncReservationTargetFromDOM();
-                        updateMainButtonDisplay();
-                    }, 100);
-                }
+                // 入場予約状態管理からも予約対象を削除
+                setTimeout(() => {
+                    entranceReservationStateManager.clearReservationTarget();
+                    updateMainButtonDisplay();
+                }, 100);
+            } else {
+                // フォールバック: 直接削除
+                entranceReservationStateManager.clearReservationTarget();
+                updateMainButtonDisplay();
+            }
+            
+        } else {
+            // 新規選択または別の時間帯への変更
+            
+            // DOM上の選択状態から予約対象を同期
+            setTimeout(() => {
+                syncReservationTargetFromDOM();
+                updateMainButtonDisplay();
+            }, 100);
         }
     };
     

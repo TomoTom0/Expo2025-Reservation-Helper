@@ -1,15 +1,12 @@
 // 各モジュールからのimport
 import { init_page, judge_init } from './pavilion-search-page';
 import { judge_entrance_init, init_entrance_page } from './entrance-page-init';
-import { reloadCountdownState, createFABToggleButton } from './entrance-page-state';
+import { createFABToggleButton } from './entrance-page-state';
 import { createCacheManager } from './cache-manager';
-import { setCacheManager, setExternalFunctions } from './entrance-page-monitor';
+import { setCacheManager } from './entrance-page-monitor';
 import { 
-    getCurrentSelectedCalendarDate, getCurrentTableContent, shouldUpdateMonitorButtons,
-    restoreSelectionAfterUpdate, enableAllMonitorButtons,
-    updateMainButtonDisplay, selectTimeSlotAndStartReservation, scheduleReload, startReloadCountdown,
-    stopReloadCountdown, resetMonitoringUI, showErrorMessage, tryClickCalendarForTimeSlot, setPageLoadingState,
-    disableAllMonitorButtons, restoreFromCache, setCacheManagerForSection6, setEntranceReservationHelper,
+    getCurrentSelectedCalendarDate, setPageLoadingState,
+    restoreFromCache, setCacheManagerForSection6, setEntranceReservationHelper,
     setUpdateMonitoringTargetsDisplay
 } from './entrance-page-ui';
 import { 
@@ -19,8 +16,8 @@ import {
 import { initTimeSlotMonitoring } from './entrance-page-dom-utils';
 import { initCompanionTicketFeature, initializeTicketSelectionPage, initializeAgentTicketPage } from './companion-ticket-page'; // 同行者追加機能
 
-// 統一状態管理システムのimport
-import { UnifiedStateManager } from './unified-state';
+// 入場予約状態管理システムのimport
+import { entranceReservationStateManager } from './entrance-reservation-state-manager';
 
 // 型定義のインポート
 import type { CacheManager } from '../types/index.js';
@@ -37,8 +34,7 @@ const cacheManager: CacheManager = createCacheManager({
     getCurrentSelectedCalendarDateFn: getCurrentSelectedCalendarDate
 });
 
-// 統一状態管理システムの初期化
-const unifiedStateManager = new UnifiedStateManager();
+// 入場予約状態管理システムの初期化フラグ
 let isUnifiedStateManagerInitialized = false; // 重複初期化防止フラグ
 
 // ページ初期化の重複実行防止
@@ -48,17 +44,17 @@ let isPageInitializing = false;
 // ページ初期化時に既存データを移行
 const initializeUnifiedStateManager = (): void => {
     if (isUnifiedStateManagerInitialized) {
-        console.log('🔄 統一状態管理システムは既に初期化済みです');
+        console.log('🔄 入場予約状態管理システムは既に初期化済みです');
         return;
     }
     
     try {
         // 既存システムからの状態移行
-        unifiedStateManager.migrateFromExisting();
+        entranceReservationStateManager.migrateFromExisting();
         isUnifiedStateManagerInitialized = true;
-        console.log('✅ 統一状態管理システム初期化完了');
+        console.log('✅ 入場予約状態管理システム初期化完了');
     } catch (error) {
-        console.error('⚠️ 統一状態管理システム初期化エラー:', error);
+        console.error('⚠️ 入場予約状態管理システム初期化エラー:', error);
     }
 };
 
@@ -71,26 +67,7 @@ setCacheManagerForSection7(cacheManager);
 setEntranceReservationHelper(entranceReservationHelper);
 setUpdateMonitoringTargetsDisplay(updateMonitoringTargetsDisplay);
 
-// entrance-page-monitorに外部関数を注入（showStatusは一時的に除外）
-setExternalFunctions({
-    getCurrentTableContent,
-    shouldUpdateMonitorButtons,
-    restoreSelectionAfterUpdate,
-    // showStatus, // 内部関数のため一時的に除外
-    enableAllMonitorButtons,
-    updateMainButtonDisplay,
-    updateMonitoringTargetsDisplay,
-    disableAllMonitorButtons,
-    selectTimeSlotAndStartReservation,
-    scheduleReload,
-    startReloadCountdown,
-    stopReloadCountdown,
-    reloadCountdownState,
-    resetMonitoringUI,
-    showErrorMessage,
-    tryClickCalendarForTimeSlot,
-    unifiedStateManager // 統一状態管理システムを外部関数に注入
-});
+// 依存注入は削除済み - 各モジュールで直接インポートを使用
 
 // URL判定とページタイプ識別
 const identify_page_type = (url: string): string | null => {
@@ -190,7 +167,7 @@ const trigger_init = (url_record: string): void => {
                     restoreFromCacheFn: restoreFromCache
                 });
                 
-                // 入場予約ページ初期化後に統一状態管理システムを初期化（動的待機）
+                // 入場予約ページ初期化後に入場予約状態管理システムを初期化（動的待機）
                 waitForTimeSlotTable(() => {
                     initializeUnifiedStateManager();
                 });
@@ -203,7 +180,7 @@ const trigger_init = (url_record: string): void => {
                     if (isUnifiedStateManagerInitialized) return;
                     
                     const selectedSlot = document.querySelector('td[data-gray-out] div[role="button"][aria-pressed="true"]');
-                    if (selectedSlot && unifiedStateManager && !unifiedStateManager.hasReservationTarget()) {
+                    if (selectedSlot && entranceReservationStateManager && !entranceReservationStateManager.hasReservationTarget()) {
                         console.log('🔄 選択状態の後続同期を実行');
                         initializeUnifiedStateManager();
                     }

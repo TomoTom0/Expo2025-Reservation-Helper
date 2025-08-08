@@ -4,7 +4,7 @@
 
 import type { 
     EntranceReservationState, 
-    TimeSlotState, 
+    // TimeSlotState, // EntranceReservationStateManagerに統合済み
     PageLoadingState, 
     ReloadCountdownState, 
     CalendarWatchState 
@@ -18,15 +18,16 @@ let entranceReservationState: EntranceReservationState = {
 };
 
 // 時間帯監視機能の状態管理
-let timeSlotState: TimeSlotState = {
-    mode: 'idle',  // idle, selecting, monitoring, trying
-    targetSlots: [],   // 複数選択対象の時間帯情報配列
-    monitoringInterval: null,  // 監視用インターバル
-    isMonitoring: false,
-    retryCount: 0,
-    maxRetries: 100,
-    reloadInterval: 30000  // 30秒間隔
-};
+// timeSlotStateはEntranceReservationStateManagerに統合済み
+// let timeSlotState: TimeSlotState = {
+//     mode: 'idle',  // idle, selecting, monitoring, trying
+//     targetSlots: [],   // 複数選択対象の時間帯情報配列
+//     monitoringInterval: null,  // 監視用インターバル
+//     isMonitoring: false,
+//     retryCount: 0,
+//     maxRetries: 100,
+//     reloadInterval: 30000  // 30秒間隔
+// };
 
 
 // ページ読み込み状態管理
@@ -242,7 +243,7 @@ export function createFABToggleButton(): void {
 // エクスポート
 export {
     entranceReservationState,
-    timeSlotState,
+    // timeSlotState, // EntranceReservationStateManagerに統合済み
     pageLoadingState,
     reloadCountdownState,
     calendarWatchState,

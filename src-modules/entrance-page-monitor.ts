@@ -1,10 +1,8 @@
-// entrance-page-stateからのimport
-import {
-    timeSlotState
-} from './entrance-page-state';
+// entrance-page-stateからのimport（もう使用しません）
+// import { timeSlotState } from './entrance-page-state';
 
-// 統一状態管理システムからのimport
-import { LocationHelper, ExecutionState } from './unified-state';
+// 入場予約状態管理システムからのimport
+import { LocationHelper, ExecutionState, entranceReservationStateManager } from './entrance-reservation-state-manager';
 
 // entrance-page-dom-utilsからのimport
 import {
@@ -29,36 +27,9 @@ import type {
 let externalFunctions: Record<string, any> = {};
 let isInitialized: boolean = false;
 
-// 必要な外部関数のリスト
-const REQUIRED_FUNCTIONS: string[] = [
-    'getCurrentTableContent',
-    'shouldUpdateMonitorButtons', 
-    'restoreSelectionAfterUpdate',
-    // 'showStatus', // 内部関数のため一時的に除外
-    'enableAllMonitorButtons',
-    'updateMainButtonDisplay',
-    'updateMonitoringTargetsDisplay',
-    'disableAllMonitorButtons',
-    'selectTimeSlotAndStartReservation',
-    'startReloadCountdown',
-    'resetMonitoringUI',
-    'showErrorMessage',
-    'tryClickCalendarForTimeSlot',
-    'unifiedStateManager' // 統一状態管理システムを追加
-];
+// REQUIRED_FUNCTIONS配列は削除済み - 直接インポートを使用
 
-// 外部関数を設定するヘルパー関数
-export const setExternalFunctions = (funcs: Record<string, any>): void => {
-    // 必要な関数がすべて存在するかチェック
-    for (const funcName of REQUIRED_FUNCTIONS) {
-        if (typeof funcs[funcName] !== 'function' && typeof funcs[funcName] !== 'object') {
-            console.warn(`Warning: Required function/object ${funcName} not provided or not a function`);
-        }
-    }
-    externalFunctions = funcs;
-    isInitialized = true;
-    console.log('✅ Section 5: External functions initialized');
-};
+// 依存注入は削除 - 直接インポートを使用
 
 // 安全な外部関数呼び出し
 const safeCall: SafeCallFunction = (funcName: string, ...args: any[]): any => {
@@ -72,13 +43,7 @@ const safeCall: SafeCallFunction = (funcName: string, ...args: any[]): any => {
 };
 
 // 安全な外部オブジェクト参照
-export const getExternalFunction = (name: string): any => {
-    if (!isInitialized) {
-        console.warn('External functions not initialized in Section 5');
-        return null;
-    }
-    return externalFunctions[name] || null;
-};
+// getExternalFunction は削除 - 直接インポートを使用
 
 // 依存注入用のcacheManager参照
 let cacheManager: CacheManager | null = null;
@@ -320,9 +285,8 @@ function analyzeAndAddMonitorButtons(): void {
         const tdSelector = tdElement ? generateUniqueTdSelector(tdElement) : '';
         
         // 監視対象として設定済みの場合は削除しない（状態変化を追跡するため）
-        const unifiedStateManager = getExternalFunction('unifiedStateManager');
         const locationIndex = LocationHelper.getIndexFromSelector(tdSelector);
-        const isMonitoringTarget = unifiedStateManager?.isMonitoringTarget(timeText, locationIndex) || false;
+        const isMonitoringTarget = entranceReservationStateManager?.isMonitoringTarget(timeText, locationIndex) || false;
         
         if (isMonitoringTarget) {
             console.log(`🎯 監視対象のため保持: ${timeText} (状態変化を追跡中)`);
@@ -514,13 +478,12 @@ function getMonitorButtonText(slotInfo: TimeSlotInfo): string {
     const tdSelector = generateUniqueTdSelector(tdElement);
     
     // 既に監視対象として選択されているかチェック
-    const unifiedStateManager = getExternalFunction('unifiedStateManager');
     const locationIndex = LocationHelper.getIndexFromSelector(tdSelector);
-    const isSelected = unifiedStateManager?.isMonitoringTarget(slotInfo.timeText, locationIndex) || false;
+    const isSelected = entranceReservationStateManager?.isMonitoringTarget(slotInfo.timeText, locationIndex) || false;
     
     if (isSelected) {
         // 監視対象リストでの位置を取得（1ベース）
-        const targets = unifiedStateManager?.getMonitoringTargets() || [];
+        const targets = entranceReservationStateManager?.getMonitoringTargets() || [];
         const targetIndex = targets.findIndex(
             (target: any) => target.timeSlot === slotInfo.timeText && target.locationIndex === locationIndex
         );
@@ -537,8 +500,7 @@ function getMonitorButtonText(slotInfo: TimeSlotInfo): string {
 // すべての監視ボタンの優先順位を更新
 function updateAllMonitorButtonPriorities(): void {
     const allMonitorButtons = document.querySelectorAll('.monitor-btn');
-    const unifiedStateManager = getExternalFunction('unifiedStateManager');
-    const targets = unifiedStateManager?.getMonitoringTargets() || [];
+    const targets = entranceReservationStateManager?.getMonitoringTargets() || [];
     
     allMonitorButtons.forEach(button => {
         const span = button.querySelector('span') as HTMLSpanElement;
@@ -677,7 +639,7 @@ function handleMonitorButtonClick(slotInfo: TimeSlotInfo, buttonElement: HTMLBut
     // 監視ボタンがクリックされました
     
     // 監視実行中は操作不可
-    if (timeSlotState.isMonitoring) {
+    if (entranceReservationStateManager.isMonitoringRunning()) {
         // 監視実行中のため操作不可
         return;
     }
@@ -692,17 +654,16 @@ function handleMonitorButtonClick(slotInfo: TimeSlotInfo, buttonElement: HTMLBut
         // 現在選択中の場合は解除
         // 監視対象を解除
         
-        // 統一状態管理システムから削除
-        const unifiedStateManager = getExternalFunction('unifiedStateManager');
-        if (unifiedStateManager) {
-            const unifiedRemoved = unifiedStateManager.removeMonitoringTarget(slotInfo.timeText, locationIndex);
+        // 入場予約状態管理システムから削除
+        if (entranceReservationStateManager) {
+            const unifiedRemoved = entranceReservationStateManager.removeMonitoringTarget(slotInfo.timeText, locationIndex);
             if (unifiedRemoved) {
-                console.log(`✅ 統一状態管理から監視対象を削除: ${locationText}${slotInfo.timeText}`);
+                console.log(`✅ 入場予約状態管理から監視対象を削除: ${locationText}${slotInfo.timeText}`);
             } else {
-                console.log(`⚠️ 統一状態管理からの削除失敗: ${locationText}${slotInfo.timeText}`);
+                console.log(`⚠️ 入場予約状態管理からの削除失敗: ${locationText}${slotInfo.timeText}`);
             }
         } else {
-            // 統一状態管理システムが利用できません
+            // 入場予約状態管理システムが利用できません
         }
         
         // ボタンの表示を元に戻す
@@ -714,9 +675,8 @@ function handleMonitorButtonClick(slotInfo: TimeSlotInfo, buttonElement: HTMLBut
         buttonElement.disabled = false;
         
         // 監視対象がすべてなくなった場合の処理
-        if (!unifiedStateManager || !unifiedStateManager.hasMonitoringTargets()) {
-            timeSlotState.mode = 'idle';
-            timeSlotState.retryCount = 0;
+        if (!entranceReservationStateManager || !entranceReservationStateManager.hasMonitoringTargets()) {
+            // EntranceReservationStateManagerで統合管理されているため、個別設定不要
             
             // キャッシュをクリア
             if (cacheManager) {
@@ -756,26 +716,24 @@ function handleMonitorButtonClick(slotInfo: TimeSlotInfo, buttonElement: HTMLBut
         //     positionInfo: getTdPositionInfo(tdElement)
         // };
         
-        // 統一状態管理システムに追加（一元管理）
-        const unifiedStateManager = getExternalFunction('unifiedStateManager');
+        // 入場予約状態管理システムに追加（一元管理）
         let added = false;
-        if (unifiedStateManager) {
-            added = unifiedStateManager.addMonitoringTarget(slotInfo.timeText, locationIndex, tdSelector);
+        if (entranceReservationStateManager) {
+            added = entranceReservationStateManager.addMonitoringTarget(slotInfo.timeText, locationIndex, tdSelector);
             if (added) {
-                console.log(`✅ 統一状態管理に監視対象を追加: ${locationText}${slotInfo.timeText}`);
+                console.log(`✅ 入場予約状態管理に監視対象を追加: ${locationText}${slotInfo.timeText}`);
             } else {
-                console.log(`⚠️ 統一状態管理への追加失敗（既に選択済み）: ${locationText}${slotInfo.timeText}`);
+                console.log(`⚠️ 入場予約状態管理への追加失敗（既に選択済み）: ${locationText}${slotInfo.timeText}`);
                 return;
             }
         } else {
-            // 統一状態管理システムが利用できません
+            // 入場予約状態管理システムが利用できません
             return;
         }
         
         if (!added) return; // 追加失敗時は処理を中止
         
-        timeSlotState.mode = 'selecting';
-        timeSlotState.retryCount = 0;
+        // EntranceReservationStateManagerで統合管理されているため、個別設定不要
         
         // キャッシュに保存（すべての監視対象を保存）
         if (cacheManager) {
@@ -783,8 +741,8 @@ function handleMonitorButtonClick(slotInfo: TimeSlotInfo, buttonElement: HTMLBut
         }
         
         // ボタンの表示を変更（優先順位表示）
-        if (unifiedStateManager) {
-            const targets = unifiedStateManager.getMonitoringTargets();
+        if (entranceReservationStateManager) {
+            const targets = entranceReservationStateManager.getMonitoringTargets();
             const target = targets.find((t: any) => t.timeSlot === slotInfo.timeText && t.selector === tdSelector);
             const priority = target ? target.priority : targets.length;
             buttonSpan.innerText = `監視${priority}`;
@@ -798,11 +756,11 @@ function handleMonitorButtonClick(slotInfo: TimeSlotInfo, buttonElement: HTMLBut
         buttonElement.disabled = false; // クリックで解除できるように
         
         // メインボタンの表示を更新
-        if (unifiedStateManager) {
-            const targets = unifiedStateManager.getMonitoringTargets();
+        if (entranceReservationStateManager) {
+            const targets = entranceReservationStateManager.getMonitoringTargets();
             const targetCount = targets.length;
-            console.log(`🔄 監視対象設定後のFAB更新を実行: targetSlots=${targetCount}個, mode=${timeSlotState.mode}`);
-            console.log('📊 統一状態管理の監視対象一覧:', targets.map((t: any) => `${LocationHelper.getLocationFromIndex(t.locationIndex) === 'east' ? '東' : '西'}${t.timeSlot}`));
+            console.log(`🔄 監視対象設定後のFAB更新を実行: targetSlots=${targetCount}個`);
+            console.log('📊 入場予約状態管理の監視対象一覧:', targets.map((t: any) => `${LocationHelper.getLocationFromIndex(t.locationIndex) === 'east' ? '東' : '西'}${t.timeSlot}`));
         }
         safeCall('updateMainButtonDisplay');
         
@@ -821,21 +779,16 @@ function handleMonitorButtonClick(slotInfo: TimeSlotInfo, buttonElement: HTMLBut
 
 // 満員時間帯の可用性監視を開始
 async function startSlotMonitoring(): Promise<void> {
-    const unifiedStateManager = getExternalFunction('unifiedStateManager');
-    if (!unifiedStateManager || !unifiedStateManager.hasMonitoringTargets()) {
+    if (!entranceReservationStateManager || !entranceReservationStateManager.hasMonitoringTargets()) {
         console.log('❌ 監視対象時間帯が設定されていません');
         return;
     }
     
-    // 即座に状態更新（UI応答性向上）
-    timeSlotState.mode = 'monitoring';
-    timeSlotState.isMonitoring = true;
-    
-    // 統一状態管理で監視開始
-    if (unifiedStateManager.startMonitoring()) {
-        console.log('✅ 統一状態管理で監視を開始しました');
+    // 入場予約状態管理で監視開始
+    if (entranceReservationStateManager.startMonitoring()) {
+        console.log('✅ 入場予約状態管理で監視を開始しました');
     } else {
-        console.log('⚠️ 統一状態管理での監視開始に失敗しました (状態確認が必要)');
+        console.log('⚠️ 入場予約状態管理での監視開始に失敗しました (状態確認が必要)');
     }
     
     safeCall('updateMainButtonDisplay'); // 即座にボタン表示を更新
@@ -843,7 +796,7 @@ async function startSlotMonitoring(): Promise<void> {
     // 監視実行中は全ての監視ボタンを無効化
     safeCall('disableAllMonitorButtons');
     
-    const targets = unifiedStateManager.getMonitoringTargets();
+    const targets = entranceReservationStateManager.getMonitoringTargets();
     const targetTexts = targets.map((t: any) => {
         const location = LocationHelper.getLocationFromIndex(t.locationIndex);
         const locationText = location === 'east' ? '東' : '西';
@@ -860,8 +813,7 @@ async function startSlotMonitoring(): Promise<void> {
 
 // 時間帯の可用性チェックとページ再読み込み
 async function checkSlotAvailabilityAndReload(): Promise<void> {
-    const unifiedStateManager = getExternalFunction('unifiedStateManager');
-    if (!unifiedStateManager || unifiedStateManager.getExecutionState() !== ExecutionState.MONITORING_RUNNING) {
+    if (!entranceReservationStateManager || entranceReservationStateManager.getExecutionState() !== ExecutionState.MONITORING_RUNNING) {
         return;
     }
     
@@ -870,19 +822,19 @@ async function checkSlotAvailabilityAndReload(): Promise<void> {
     if (!(await checkTimeSlotTableExistsAsync())) return;
     
     // 複数監視対象の存在チェック
-    const targets = unifiedStateManager.getMonitoringTargets();
+    const targets = entranceReservationStateManager.getMonitoringTargets();
     for (const target of targets) {
         if (!checkMonitoringTargetExists(target)) return;
     }
-    if (!checkMaxReloads(timeSlotState.retryCount)) return;
+    if (!checkMaxReloads(entranceReservationStateManager.getRetryCount())) return;
     
-    timeSlotState.retryCount++;
+    entranceReservationStateManager.incrementRetryCount();
     if (cacheManager) {
-        cacheManager.updateRetryCount(timeSlotState.retryCount);
+        cacheManager.updateRetryCount(entranceReservationStateManager.getRetryCount());
     }
     
     const targetTexts = targets.map((t: any) => t.timeSlot).join(', ');
-    console.log(`🔍 可用性チェック (${timeSlotState.retryCount}回目): ${targetTexts}`);
+    console.log(`🔍 可用性チェック (${entranceReservationStateManager.getRetryCount()}回目): ${targetTexts}`);
     
     // 現在の時間帯をチェック
     const currentSlot = findTargetSlotInPageUnified();
@@ -907,7 +859,7 @@ async function checkSlotAvailabilityAndReload(): Promise<void> {
     console.log('⏳ すべての監視対象がまだ満員です。ページを再読み込みします...');
     
     // BAN対策：設定されたリロード間隔にランダム要素を追加
-    const baseInterval = timeSlotState.reloadInterval; // 30000ms (30秒)
+    const baseInterval = 30000; // 30000ms (30秒) - EntranceReservationStateManagerで管理されている値
     const randomVariation = Math.random() * 5000; // 0-5秒のランダム要素
     const totalWaitTime = baseInterval + randomVariation;
     const displaySeconds = Math.ceil(totalWaitTime / 1000);
@@ -917,14 +869,13 @@ async function checkSlotAvailabilityAndReload(): Promise<void> {
 }
 
 
-// 統一状態管理対応版の監視対象検索関数
+// 入場予約状態管理対応版の監視対象検索関数
 function findTargetSlotInPageUnified(): any {
-    const unifiedStateManager = getExternalFunction('unifiedStateManager');
-    if (!unifiedStateManager || !unifiedStateManager.hasMonitoringTargets()) {
+    if (!entranceReservationStateManager || !entranceReservationStateManager.hasMonitoringTargets()) {
         return null;
     }
     
-    const targets = unifiedStateManager.getMonitoringTargets();
+    const targets = entranceReservationStateManager.getMonitoringTargets();
     
     // 複数監視対象をチェック
     for (const target of targets) {
@@ -1000,10 +951,10 @@ function terminateMonitoring(errorCode: string, errorMessage: string): void {
         cacheManager.clearMonitoringFlag(); // 監視継続フラグもクリア
     }
     
-    // インターバル停止
-    if (timeSlotState.monitoringInterval) {
-        clearInterval(timeSlotState.monitoringInterval);
-        timeSlotState.monitoringInterval = null;
+    // 入場予約状態管理システムでインターバル停止と状態リセット
+    if (entranceReservationStateManager) {
+        entranceReservationStateManager.clearMonitoringInterval();
+        entranceReservationStateManager.stop();
     }
     
     // UI状態リセット
@@ -1013,23 +964,21 @@ function terminateMonitoring(errorCode: string, errorMessage: string): void {
     // エラー表示
     safeCall('showErrorMessage', errorMessage);
     
-    // 状態初期化
-    timeSlotState.mode = 'idle';
-    timeSlotState.isMonitoring = false;
-    
-    // 統一状態管理で監視停止
-    const unifiedStateManager = getExternalFunction('unifiedStateManager');
-    if (unifiedStateManager) {
-        unifiedStateManager.stop();
-        console.log('🛑 統一状態管理で監視を停止しました');
+    // 入場予約状態管理で監視停止
+    if (entranceReservationStateManager) {
+        entranceReservationStateManager.stop();
+        console.log('🛑 入場予約状態管理で監視を停止しました');
     }
     
-    // 統一状態管理をクリア
-    if (unifiedStateManager) {
-        unifiedStateManager.clearAllTargets();
+    // 入場予約状態管理をクリア
+    if (entranceReservationStateManager) {
+        entranceReservationStateManager.clearAllTargets();
     }
     
-    timeSlotState.retryCount = 0;
+    // リトライ回数もEntranceReservationStateManagerでリセット
+    if (entranceReservationStateManager) {
+        entranceReservationStateManager.resetRetryCount();
+    }
 }
 
 // 監視バリデーション関数群
@@ -1043,7 +992,7 @@ function checkTargetElementExists(targetInfo: TimeSlotTarget): boolean {
     return true;
 }
 
-// 統一状態管理用の監視対象存在チェック
+// 入場予約状態管理用の監視対象存在チェック
 function checkMonitoringTargetExists(target: any): boolean {
     // MonitoringTargetをTimeSlotTarget形式に変換
     const targetInfo = {

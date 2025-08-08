@@ -4,16 +4,19 @@
  */
 
 // 必要なモジュールをインポート
-import { timeSlotState } from './entrance-page-state';
+// import { timeSlotState } from './entrance-page-state'; // 統合により不要
 import { generateUniqueTdSelector, getTdPositionInfo, findSameTdElement, extractTdStatus, timeSlotSelectors } from './entrance-page-dom-utils';
 import { checkTimeSlotTableExistsSync, validatePageLoaded } from './entrance-page-monitor';
 import { isInterruptionAllowed } from './entrance-page-ui';
 import { checkVisitTimeButtonState, canStartReservation } from './entrance-page-fab';
 
+// 入場予約状態管理システムからのインポート
+import { entranceReservationStateManager } from './entrance-reservation-state-manager';
+
 // CommonJS形式でエクスポート
 module.exports = {
-    // Section 2からの状態オブジェクト
-    timeSlotState,
+    // 統合された状態管理システム
+    entranceReservationStateManager,
     
     // Section 4からの関数
     generateUniqueTdSelector,
