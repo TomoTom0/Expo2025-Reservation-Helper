@@ -5751,23 +5751,41 @@ class CompanionProcessManager {
     // 同行者追加ボタンをクリック（チケット選択画面、動的待機付き）
     async clickCompanionAddButton() {
         console.log('🔍 同行者追加ボタンを探しています...');
-        // 動的待機でボタンを取得
-        const span = await this.waitForElement('a.basic-btn.type1 span[data-message-code="SW_GP_DL_108_0042"]', 15000 // 15秒待機
-        );
-        if (!span || !span.parentElement) {
-            console.error('❌ 同行者追加ボタンが見つかりません（タイムアウト）');
-            return false;
+        // 複数のセレクタを試行
+        const selectors = [
+            'a.basic-btn.type1 span[data-message-code="SW_GP_DL_108_0042"]',
+            'span[data-message-code="SW_GP_DL_108_0042"]',
+            'a.basic-btn.type1',
+            'a[href*="companion"]',
+            'button:contains("同行者")',
+            '*[data-message-code="SW_GP_DL_108_0042"]'
+        ];
+        for (const selector of selectors) {
+            try {
+                const element = await this.waitForElement(selector, 5000);
+                if (element) {
+                    // spanの場合は親のaタグをクリック
+                    const clickTarget = element.tagName === 'SPAN' && element.parentElement
+                        ? element.parentElement
+                        : element;
+                    console.log(`✅ セレクタ "${selector}" でボタンを発見:`, clickTarget);
+                    // スマホ対応：タッチイベントも試行
+                    clickTarget.click();
+                    // タッチイベントも送信（スマホ用）
+                    if ('ontouchstart' in window) {
+                        clickTarget.dispatchEvent(new TouchEvent('touchstart', { bubbles: true }));
+                        clickTarget.dispatchEvent(new TouchEvent('touchend', { bubbles: true }));
+                    }
+                    console.log('✅ 同行者追加ボタンをクリックしました');
+                    return true;
+                }
+            }
+            catch (error) {
+                console.log(`⚠️ セレクタ "${selector}" では見つかりませんでした`);
+            }
         }
-        const button = span.parentElement;
-        try {
-            button.click();
-            console.log('✅ 同行者追加ボタンをクリックしました');
-            return true;
-        }
-        catch (error) {
-            console.error('❌ 同行者追加ボタンのクリックでエラー:', error);
-            return false;
-        }
+        console.error('❌ 全てのセレクタで同行者追加ボタンが見つかりませんでした');
+        return false;
     }
     // ページ遷移を待機
     async waitForPageTransition() {
@@ -5812,18 +5830,37 @@ class CompanionProcessManager {
         }
         return this.performInput(inputField, ticketId);
     }
-    // 実際の入力処理
+    // 実際の入力処理（pasteイベントでスマホ対応）
     async performInput(inputField, ticketId) {
-        // 入力欄をクリア
-        inputField.value = '';
-        inputField.focus();
-        // チケットIDを入力
-        inputField.value = ticketId;
-        // input/changeイベントを発火
-        inputField.dispatchEvent(new Event('input', { bubbles: true }));
-        inputField.dispatchEvent(new Event('change', { bubbles: true }));
-        console.log(`✅ チケットID "${ticketId}" を入力しました`);
-        return true;
+        try {
+            // フォーカスを設定
+            inputField.focus();
+            // 既存の値をクリア
+            inputField.value = '';
+            inputField.dispatchEvent(new Event('input', { bubbles: true }));
+            // pasteイベントでデータを設定（スマホで確実）
+            const clipboardData = new DataTransfer();
+            clipboardData.setData('text/plain', ticketId);
+            const pasteEvent = new ClipboardEvent('paste', {
+                bubbles: true,
+                cancelable: true,
+                clipboardData: clipboardData
+            });
+            // pasteイベントを発火
+            inputField.dispatchEvent(pasteEvent);
+            // 念のため直接値も設定
+            inputField.value = ticketId;
+            // 各種イベントを発火してフォームの状態更新を確実にする
+            inputField.dispatchEvent(new Event('input', { bubbles: true }));
+            inputField.dispatchEvent(new Event('change', { bubbles: true }));
+            inputField.dispatchEvent(new Event('blur', { bubbles: true }));
+            console.log(`✅ チケットID "${ticketId}" をpasteイベントで入力しました`);
+            return true;
+        }
+        catch (error) {
+            console.error('❌ paste入力エラー:', error);
+            return false;
+        }
     }
     // 追加ボタンをクリック（動的待機付き）
     async clickAddButton() {
@@ -6877,32 +6914,8 @@ function setupDialogEvents(dialog) {
     const newLabelInput = dialog.querySelector('#new-ticket-label');
     // スマホ対応：複数の方法で値を取得・検証する関数
     const getInputValue = (input) => {
-        // 複数方法で値を取得（スマホブラウザ対応）
-        const methods = [
-            () => input.value,
-            () => input.textContent,
-            () => input.innerText,
-            () => input.getAttribute('value'),
-            () => {
-                // 最後の手段：DOM直接検索
-                const computedValue = window.getComputedStyle(input).getPropertyValue('content');
-                // "none"や"normal"は無効な値として除外
-                return (computedValue !== 'none' && computedValue !== 'normal')
-                    ? computedValue.replace(/['"]/g, '') : '';
-            }
-        ];
-        for (const method of methods) {
-            try {
-                const value = method();
-                if (value && value.trim()) {
-                    return value.trim();
-                }
-            }
-            catch (error) {
-                console.warn('値取得エラー:', error);
-            }
-        }
-        return '';
+        // シンプルな値取得（スマホブラウザでも確実）
+        return (input.value || '').trim();
     };
     // スマホ対応：入力フィールドの強制リセット
     const forceResetInput = (input) => {
