@@ -6077,7 +6077,7 @@ function createTicketSelectionFAB() {
         position: fixed !important;
         bottom: 100px !important;
         right: 24px !important;
-        z-index: 10000 !important;
+        z-index: 9999 !important;
         display: flex !important;
         flex-direction: column !important;
         gap: 12px !important;
@@ -6859,34 +6859,96 @@ function setupDialogEvents(dialog) {
     const addBtn = dialog.querySelector('#add-ticket-btn');
     const newTicketInput = dialog.querySelector('#new-ticket-id');
     const newLabelInput = dialog.querySelector('#new-ticket-label');
-    // スマホ対応：複数の方法で値を取得する関数
+    // スマホ対応：複数の方法で値を取得・検証する関数
     const getInputValue = (input) => {
         // 複数方法で値を取得（スマホブラウザ対応）
-        return (input.value || input.textContent || input.innerText || '').trim();
+        const methods = [
+            () => input.value,
+            () => input.textContent,
+            () => input.innerText,
+            () => input.getAttribute('value'),
+            () => {
+                // 最後の手段：DOM直接検索
+                const computedValue = window.getComputedStyle(input).getPropertyValue('content');
+                return computedValue !== 'none' ? computedValue.replace(/['"]/g, '') : '';
+            }
+        ];
+        for (const method of methods) {
+            try {
+                const value = method();
+                if (value && value.trim()) {
+                    return value.trim();
+                }
+            }
+            catch (error) {
+                console.warn('値取得エラー:', error);
+            }
+        }
+        return '';
     };
-    // スマホ対応：入力完了待機のための追加処理
+    // スマホ対応：入力フィールドの強制リセット
+    const forceResetInput = (input) => {
+        // 全方法で値をクリア
+        input.value = '';
+        input.textContent = '';
+        input.innerHTML = '';
+        input.setAttribute('value', '');
+        input.removeAttribute('value');
+        // イベント発火で確実にクリア
+        input.dispatchEvent(new Event('input', { bubbles: true }));
+        input.dispatchEvent(new Event('change', { bubbles: true }));
+    };
+    // スマホ対応：入力完了待機のための強化処理
     const handleAddTicket = async () => {
-        // 固定待機でIME変換・フォーカス完了を待つ
-        await new Promise(resolve => setTimeout(resolve, 200));
-        const ticketId = getInputValue(newTicketInput);
-        const label = getInputValue(newLabelInput);
-        console.log('🎫 入力値取得:', { ticketId, label }); // デバッグログ
+        console.log('🔄 チケット追加処理開始...');
+        // 段階的待機：フォーカス→IME→入力完了
+        await new Promise(resolve => setTimeout(resolve, 500)); // 初回待機を延長
+        // リトライ機構で確実に値を取得
+        let ticketId = '';
+        let label = '';
+        let retryCount = 0;
+        const maxRetries = 5;
+        while (retryCount < maxRetries) {
+            ticketId = getInputValue(newTicketInput);
+            label = getInputValue(newLabelInput);
+            console.log(`🔍 入力値取得試行 ${retryCount + 1}:`, {
+                ticketId: ticketId || '(空)',
+                label: label || '(空)',
+                inputValue: newTicketInput.value || '(空)',
+                inputTextContent: newTicketInput.textContent || '(空)'
+            });
+            // チケットIDが取得できたら処理続行
+            if (ticketId) {
+                break;
+            }
+            // 取得できない場合は追加待機
+            retryCount++;
+            if (retryCount < maxRetries) {
+                console.log(`⏳ 入力値が空のため ${200}ms 待機後リトライ...`);
+                await new Promise(resolve => setTimeout(resolve, 200));
+            }
+        }
         if (ticketId) {
+            console.log('📝 有効な入力値を確認、追加処理実行');
             if (companionTicketManager.addTicketId(ticketId, label)) {
-                // 値クリア（複数方法で確実に）
-                newTicketInput.value = '';
-                newTicketInput.textContent = '';
-                newLabelInput.value = '';
-                newLabelInput.textContent = '';
+                // 強制リセット（確実なクリア）
+                forceResetInput(newTicketInput);
+                forceResetInput(newLabelInput);
+                // 再フォーカスでクリア確認
+                newTicketInput.blur();
+                newLabelInput.blur();
+                await new Promise(resolve => setTimeout(resolve, 100));
                 updateTicketList();
-                console.log('✅ チケットID追加成功');
+                console.log('✅ チケットID追加成功:', ticketId);
             }
             else {
+                console.error('❌ チケットID追加失敗（無効または重複）:', ticketId);
                 showCustomAlert('チケットIDが無効または既に登録済みです');
             }
         }
         else {
-            console.warn('⚠️ チケットIDが空です');
+            console.error('❌ 入力値の取得に失敗しました（全リトライ終了）');
+            showCustomAlert('チケットIDを入力してください');
         }
     };
     // 追加ボタンクリック（スマホ対応）
