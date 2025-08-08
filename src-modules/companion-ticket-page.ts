@@ -1152,7 +1152,7 @@ function showDateSelectionDialog(availableDates: Date[]): void {
         width: 100% !important;
         height: 100% !important;
         background-color: rgba(0, 0, 0, 0.5) !important;
-        z-index: 10000 !important;
+        z-index: 99999 !important;
         display: flex !important;
         justify-content: center !important;
         align-items: center !important;
@@ -1753,7 +1753,7 @@ function showCustomAlert(message: string): void {
         width: 100% !important;
         height: 100% !important;
         background: rgba(0,0,0,0.5) !important;
-        z-index: 10002 !important;
+        z-index: 100000 !important;
         display: flex !important;
         align-items: center !important;
         justify-content: center !important;
@@ -1794,7 +1794,7 @@ function showCustomConfirm(message: string, onConfirm: () => void): void {
         width: 100% !important;
         height: 100% !important;
         background: rgba(0,0,0,0.5) !important;
-        z-index: 10002 !important;
+        z-index: 100000 !important;
         display: flex !important;
         align-items: center !important;
         justify-content: center !important;

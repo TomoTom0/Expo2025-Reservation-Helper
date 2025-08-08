@@ -296,7 +296,7 @@ div.div-flex {
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 10000;
+  z-index: 99999; // FABより確実に前面に
   padding: 20px;
   box-sizing: border-box;
 
