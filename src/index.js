@@ -1,10 +1,13 @@
 // ==UserScript==
 // @name         yt-Expo2025-Reservation-Helper
 // @namespace    http://staybrowser.com/
-// @version      0.5.4
-// @description  大阪万博2025予約支援ツール: パビリオン検索補助, 入場予約監視自動化, 同行者追加自動化
+// @version      0.3
+// @description  help expo2025 ticket site
 // @author       TomoTom0 https://github.com/TomoTom0
-// @match        https://ticket.expo2025.or.jp/*
+// @match        https://ticket.expo2025.or.jp/event_search/*
+// @match        https://ticket.expo2025.or.jp/ticket_selection/*
+// @match        https://ticket.expo2025.or.jp/agent_ticket/*
+// @match        https://ticket.expo2025.or.jp/ticket_visiting_reservation/*
 // @grant       none
 // @run-at       document-end
 // ==/UserScript==
@@ -5732,16 +5735,26 @@ class CompanionProcessManager {
             return false;
         }
     }
-    // 同行者追加ボタンをクリック（チケット選択画面）
+    // 同行者追加ボタンをクリック（チケット選択画面、動的待機付き）
     async clickCompanionAddButton() {
-        const button = document.querySelector('a.basic-btn.type1 span[data-message-code="SW_GP_DL_108_0042"]')?.parentElement;
-        if (!button) {
-            console.warn('同行者追加ボタンが見つかりません');
+        console.log('🔍 同行者追加ボタンを探しています...');
+        // 動的待機でボタンを取得
+        const span = await this.waitForElement('a.basic-btn.type1 span[data-message-code="SW_GP_DL_108_0042"]', 15000 // 15秒待機
+        );
+        if (!span || !span.parentElement) {
+            console.error('❌ 同行者追加ボタンが見つかりません（タイムアウト）');
             return false;
         }
-        button.click();
-        console.log('✅ 同行者追加ボタンをクリックしました');
-        return true;
+        const button = span.parentElement;
+        try {
+            button.click();
+            console.log('✅ 同行者追加ボタンをクリックしました');
+            return true;
+        }
+        catch (error) {
+            console.error('❌ 同行者追加ボタンのクリックでエラー:', error);
+            return false;
+        }
     }
     // ページ遷移を待機
     async waitForPageTransition() {
@@ -5799,22 +5812,40 @@ class CompanionProcessManager {
         console.log(`✅ チケットID "${ticketId}" を入力しました`);
         return true;
     }
-    // 追加ボタンをクリック
+    // 追加ボタンをクリック（動的待機付き）
     async clickAddButton() {
-        const addButton = document.querySelector('button.basic-btn.type2.style_main__register_btn__FHBxM');
+        console.log('🔍 追加ボタンを探しています...');
+        // 動的待機でボタンを取得（iPhone Safariでも確実）
+        const addButton = await this.waitForElement('button.basic-btn.type2.style_main__register_btn__FHBxM', 15000 // 15秒待機（モバイル環境考慮）
+        );
         if (!addButton) {
-            console.warn('追加ボタンが見つかりません');
+            console.error('❌ 追加ボタンが見つかりません（タイムアウト）');
             return false;
+        }
+        // disabled状態もリトライで確認
+        let retryCount = 0;
+        const maxRetries = 10;
+        while (addButton.disabled && retryCount < maxRetries) {
+            console.log(`⏳ 追加ボタンが無効化中... (${retryCount + 1}/${maxRetries})`);
+            await new Promise(resolve => setTimeout(resolve, 500));
+            retryCount++;
         }
         if (addButton.disabled) {
-            console.warn('追加ボタンが無効化されています');
+            console.warn('⚠️ 追加ボタンが無効化されています');
             return false;
         }
-        addButton.click();
-        console.log('✅ 追加ボタンをクリックしました');
-        // 処理完了を待機
-        await this.waitForProcessingComplete();
-        return true;
+        // タッチイベント対応のクリック
+        try {
+            addButton.click();
+            console.log('✅ 追加ボタンをクリックしました');
+            // 処理完了を待機
+            await this.waitForProcessingComplete();
+            return true;
+        }
+        catch (error) {
+            console.error('❌ 追加ボタンのクリックでエラー:', error);
+            return false;
+        }
     }
     // 処理完了を待機
     async waitForProcessingComplete() {
@@ -5886,6 +5917,29 @@ class CompanionProcessManager {
                 setTimeout(checkReturn, checkInterval);
             };
             setTimeout(checkReturn, checkInterval);
+        });
+    }
+    // 要素の動的待機（汎用）
+    async waitForElement(selector, timeout = 10000) {
+        const checkInterval = 200; // 200ms間隔でチェック
+        let elapsed = 0;
+        return new Promise((resolve) => {
+            const checkElement = () => {
+                const element = document.querySelector(selector);
+                if (element) {
+                    console.log(`✅ 要素が見つかりました: ${selector}`);
+                    resolve(element);
+                    return;
+                }
+                elapsed += checkInterval;
+                if (elapsed >= timeout) {
+                    console.warn(`⚠️ 要素待機タイムアウト: ${selector} (${timeout}ms)`);
+                    resolve(null);
+                    return;
+                }
+                setTimeout(checkElement, checkInterval);
+            };
+            checkElement(); // 即座にチェック開始
         });
     }
     // エラーハンドリング

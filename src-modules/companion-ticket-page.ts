@@ -232,18 +232,31 @@ class CompanionProcessManager {
         }
     }
 
-    // 同行者追加ボタンをクリック（チケット選択画面）
+    // 同行者追加ボタンをクリック（チケット選択画面、動的待機付き）
     private async clickCompanionAddButton(): Promise<boolean> {
-        const button = document.querySelector('a.basic-btn.type1 span[data-message-code="SW_GP_DL_108_0042"]')?.parentElement as HTMLElement;
+        console.log('🔍 同行者追加ボタンを探しています...');
         
-        if (!button) {
-            console.warn('同行者追加ボタンが見つかりません');
+        // 動的待機でボタンを取得
+        const span = await this.waitForElement<HTMLSpanElement>(
+            'a.basic-btn.type1 span[data-message-code="SW_GP_DL_108_0042"]',
+            15000 // 15秒待機
+        );
+        
+        if (!span || !span.parentElement) {
+            console.error('❌ 同行者追加ボタンが見つかりません（タイムアウト）');
             return false;
         }
 
-        button.click();
-        console.log('✅ 同行者追加ボタンをクリックしました');
-        return true;
+        const button = span.parentElement as HTMLElement;
+        
+        try {
+            button.click();
+            console.log('✅ 同行者追加ボタンをクリックしました');
+            return true;
+        } catch (error) {
+            console.error('❌ 同行者追加ボタンのクリックでエラー:', error);
+            return false;
+        }
     }
 
     // ページ遷移を待機
@@ -317,26 +330,48 @@ class CompanionProcessManager {
         return true;
     }
 
-    // 追加ボタンをクリック
+    // 追加ボタンをクリック（動的待機付き）
     private async clickAddButton(): Promise<boolean> {
-        const addButton = document.querySelector('button.basic-btn.type2.style_main__register_btn__FHBxM') as HTMLButtonElement;
+        console.log('🔍 追加ボタンを探しています...');
+        
+        // 動的待機でボタンを取得（iPhone Safariでも確実）
+        const addButton = await this.waitForElement<HTMLButtonElement>(
+            'button.basic-btn.type2.style_main__register_btn__FHBxM', 
+            15000 // 15秒待機（モバイル環境考慮）
+        );
         
         if (!addButton) {
-            console.warn('追加ボタンが見つかりません');
+            console.error('❌ 追加ボタンが見つかりません（タイムアウト）');
             return false;
         }
 
+        // disabled状態もリトライで確認
+        let retryCount = 0;
+        const maxRetries = 10;
+        
+        while (addButton.disabled && retryCount < maxRetries) {
+            console.log(`⏳ 追加ボタンが無効化中... (${retryCount + 1}/${maxRetries})`);
+            await new Promise(resolve => setTimeout(resolve, 500));
+            retryCount++;
+        }
+        
         if (addButton.disabled) {
-            console.warn('追加ボタンが無効化されています');
+            console.warn('⚠️ 追加ボタンが無効化されています');
             return false;
         }
 
-        addButton.click();
-        console.log('✅ 追加ボタンをクリックしました');
-
-        // 処理完了を待機
-        await this.waitForProcessingComplete();
-        return true;
+        // タッチイベント対応のクリック
+        try {
+            addButton.click();
+            console.log('✅ 追加ボタンをクリックしました');
+            
+            // 処理完了を待機
+            await this.waitForProcessingComplete();
+            return true;
+        } catch (error) {
+            console.error('❌ 追加ボタンのクリックでエラー:', error);
+            return false;
+        }
     }
 
     // 処理完了を待機
@@ -427,6 +462,35 @@ class CompanionProcessManager {
             };
 
             setTimeout(checkReturn, checkInterval);
+        });
+    }
+
+    // 要素の動的待機（汎用）
+    private async waitForElement<T extends Element>(selector: string, timeout: number = 10000): Promise<T | null> {
+        const checkInterval = 200; // 200ms間隔でチェック
+        let elapsed = 0;
+
+        return new Promise((resolve) => {
+            const checkElement = () => {
+                const element = document.querySelector(selector) as T;
+                
+                if (element) {
+                    console.log(`✅ 要素が見つかりました: ${selector}`);
+                    resolve(element);
+                    return;
+                }
+
+                elapsed += checkInterval;
+                if (elapsed >= timeout) {
+                    console.warn(`⚠️ 要素待機タイムアウト: ${selector} (${timeout}ms)`);
+                    resolve(null);
+                    return;
+                }
+
+                setTimeout(checkElement, checkInterval);
+            };
+
+            checkElement(); // 即座にチェック開始
         });
     }
 
