@@ -1480,34 +1480,14 @@ function showCompanionTicketDialog(): void {
         existingDialog.remove();
     }
 
-    // モーダルオーバーレイ作成
+    // モーダルオーバーレイ作成（レスポンシブ対応）
     const overlay = document.createElement('div');
     overlay.id = 'ytomo-companion-dialog';
-    overlay.style.cssText = `
-        position: fixed !important;
-        top: 0 !important;
-        left: 0 !important;
-        width: 100% !important;
-        height: 100% !important;
-        background: rgba(0,0,0,0.5) !important;
-        z-index: 10001 !important;
-        display: flex !important;
-        align-items: center !important;
-        justify-content: center !important;
-    `;
+    overlay.className = 'ytomo-companion-dialog';
 
     // ダイアログコンテンツ
     const dialog = document.createElement('div');
-    dialog.style.cssText = `
-        background: white !important;
-        border-radius: 12px !important;
-        padding: 24px !important;
-        max-width: 500px !important;
-        width: 90% !important;
-        max-height: 80vh !important;
-        overflow-y: auto !important;
-        box-shadow: 0 10px 40px rgba(0,0,0,0.3) !important;
-    `;
+    dialog.className = 'dialog-content';
 
     // ダイアログ内容作成
     dialog.innerHTML = `
@@ -1518,15 +1498,12 @@ function showCompanionTicketDialog(): void {
         
         <div style="margin-bottom: 20px;">
             <label style="display: block; margin-bottom: 8px; color: #333; font-weight: bold;">新しいチケットID</label>
-            <div style="display: flex; gap: 8px;">
+            <div class="input-row">
                 <input type="text" id="new-ticket-id" placeholder="チケットIDを入力" 
-                    style="flex: 2; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+                    inputmode="text" autocomplete="off" style="flex: 2;">
                 <input type="text" id="new-ticket-label" placeholder="ラベル（任意）"
-                    style="flex: 1; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
-                <button id="add-ticket-btn"
-                    style="padding: 8px 16px; background: #4CAF50; color: white; border: none; border-radius: 4px; cursor: pointer;">
-                    追加
-                </button>
+                    inputmode="text" autocomplete="off" style="flex: 1;">
+                <button id="add-ticket-btn">追加</button>
             </div>
         </div>
 
@@ -1578,27 +1555,86 @@ function setupDialogEvents(dialog: HTMLElement): void {
     const newTicketInput = dialog.querySelector('#new-ticket-id') as HTMLInputElement;
     const newLabelInput = dialog.querySelector('#new-ticket-label') as HTMLInputElement;
 
-    addBtn?.addEventListener('click', () => {
-        const ticketId = newTicketInput.value.trim();
-        const label = newLabelInput.value.trim();
+    // スマホ対応：複数の方法で値を取得する関数
+    const getInputValue = (input: HTMLInputElement): string => {
+        // 複数方法で値を取得（スマホブラウザ対応）
+        return (input.value || input.textContent || input.innerText || '').trim();
+    };
+
+    // スマホ対応：入力完了待機のための追加処理
+    const handleAddTicket = async () => {
+        // 固定待機でIME変換・フォーカス完了を待つ
+        await new Promise(resolve => setTimeout(resolve, 200));
+        
+        const ticketId = getInputValue(newTicketInput);
+        const label = getInputValue(newLabelInput);
+        
+        console.log('🎫 入力値取得:', { ticketId, label }); // デバッグログ
         
         if (ticketId) {
             if (companionTicketManager.addTicketId(ticketId, label)) {
+                // 値クリア（複数方法で確実に）
                 newTicketInput.value = '';
+                newTicketInput.textContent = '';
                 newLabelInput.value = '';
+                newLabelInput.textContent = '';
                 updateTicketList();
+                console.log('✅ チケットID追加成功');
             } else {
                 showCustomAlert('チケットIDが無効または既に登録済みです');
             }
+        } else {
+            console.warn('⚠️ チケットIDが空です');
         }
+    };
+
+    // 追加ボタンクリック（スマホ対応）
+    addBtn?.addEventListener('click', (e) => {
+        e.preventDefault();
+        console.log('🖱️ 追加ボタンクリック');
+        handleAddTicket();
     });
 
-    // Enterキーで追加
-    newTicketInput?.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') {
-            addBtn?.click();
-        }
+    // タッチイベントも追加（スマホ対応）
+    addBtn?.addEventListener('touchend', (e) => {
+        e.preventDefault();
+        console.log('👆 追加ボタンタッチ');
+        handleAddTicket();
     });
+
+    // スマホ対応：入力完了イベント（IME対応）
+    const setupInputEvents = (input: HTMLInputElement) => {
+        let isComposing = false;
+        
+        // IME変換開始
+        input.addEventListener('compositionstart', () => {
+            isComposing = true;
+            console.log('🔤 IME変換開始');
+        });
+        
+        // IME変換完了
+        input.addEventListener('compositionend', () => {
+            isComposing = false;
+            console.log('✅ IME変換完了');
+        });
+        
+        // Enterキー（IME完了後のみ）
+        input.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter' && !isComposing) {
+                console.log('⌨️ Enter押下');
+                handleAddTicket();
+            }
+        });
+        
+        // フォーカス失失時の処理（スマホキーボード閉じる時）
+        input.addEventListener('blur', () => {
+            console.log('👁️ フォーカス離脱:', input.id, 'value:', input.value);
+        });
+    };
+
+    // 両方の入力フィールドにイベント設定
+    setupInputEvents(newTicketInput);
+    setupInputEvents(newLabelInput);
 
     // キャンセルボタン
     dialog.querySelector('#cancel-btn')?.addEventListener('click', () => {
