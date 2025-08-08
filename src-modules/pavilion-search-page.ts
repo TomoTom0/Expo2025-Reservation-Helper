@@ -269,7 +269,7 @@ const init_page = (): void => {
         // FABコンテナを作成（右下固定、入場予約FABと同じスタイル）
         const fabContainer = document.createElement('div');
         fabContainer.id = 'ytomo-pavilion-fab-container';
-        fabContainer.classList.add('ytomo-pavilion-fab-container');
+        fabContainer.classList.add('ytomo-pavilion-fab-container', 'ytomo-pavilion-fab');
 
         // メインFABボタンを作成（入場予約FABと同じスタイル）
         const fabButton = document.createElement('button');
@@ -282,32 +282,17 @@ const init_page = (): void => {
 
         // 展開/縮小アイコン（上部）
         const expandIcon = document.createElement('div');
-        expandIcon.style.cssText = `
-            font-size: 8px !important;
-            line-height: 1 !important;
-            margin-bottom: 1px !important;
-            opacity: 0.8 !important;
-        `;
+        expandIcon.className = 'pavilion-fab-expand-icon';
         expandIcon.innerHTML = '▲'; // 初期は縮小状態（展開可能）
 
         // YTomoテキスト（中央）- 小さく控えめに
         const brandText = document.createElement('div');
-        brandText.style.cssText = `
-            font-size: 7px !important;
-            font-weight: normal !important;
-            line-height: 1 !important;
-            margin-bottom: 2px !important;
-            opacity: 0.7 !important;
-        `;
+        brandText.className = 'pavilion-fab-brand-text';
         brandText.innerText = 'YTomo';
 
         // 件数表示（下部）- 大きく目立つように
         const countsText = document.createElement('div');
-        countsText.style.cssText = `
-            font-size: 12px !important;
-            font-weight: bold !important;
-            line-height: 1 !important;
-        `;
+        countsText.className = 'pavilion-fab-counts-text';
         countsText.innerText = '0/0'; // 初期値、後で更新
 
         // DOM構築
@@ -318,19 +303,6 @@ const init_page = (): void => {
         
         // FABボタンにrelative positionを設定
         fabButton.style.position = 'relative';
-
-        // ホバー効果（入場予約FABと同じ）
-        fabButton.addEventListener('mouseenter', () => {
-            fabButton.style.transform = 'scale(1.15)';
-            fabButton.style.boxShadow = '0 8px 25px rgba(0, 0, 0, 0.5), 0 4px 12px rgba(0, 0, 0, 0.3)';
-            fabButton.style.borderWidth = '4px';
-        });
-        
-        fabButton.addEventListener('mouseleave', () => {
-            fabButton.style.transform = 'scale(1.0)';
-            fabButton.style.boxShadow = '0 6px 20px rgba(0, 0, 0, 0.4), 0 2px 8px rgba(0, 0, 0, 0.2)';
-            fabButton.style.borderWidth = '3px';
-        });
 
         // 件数表示を更新する関数（FABボタン内に表示）
         const updateCountsDisplay = () => {
@@ -345,29 +317,13 @@ const init_page = (): void => {
         // サブアクションボタンコンテナ
         const subActionsContainer = document.createElement('div');
         subActionsContainer.id = 'pavilion-sub-actions';
-        subActionsContainer.style.cssText = `
-            display: none !important;
-            flex-direction: column !important;
-            gap: 8px !important;
-            align-items: flex-end !important;
-            margin-bottom: 8px !important;
-        `;
+        subActionsContainer.className = 'pavilion-sub-actions-container';
 
         // サブアクションボタンの作成
         const createSubButton = (text: string, className: string) => {
             const btn = document.createElement('button');
-            btn.classList.add('ext-ytomo', 'pavilion-sub-btn', className, 'btn-enabled');
+            btn.classList.add('ext-ytomo', 'pavilion-sub-btn', 'base-style', className, 'btn-enabled');
             btn.textContent = text;
-            btn.style.cssText = `
-                color: white !important;
-                border: none !important;
-                border-radius: 20px !important;
-                padding: 8px 16px !important;
-                font-size: 12px !important;
-                white-space: nowrap !important;
-                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3) !important;
-                transition: all 0.2s ease !important;
-            `;
             
             return btn;
         };
@@ -388,7 +344,7 @@ const init_page = (): void => {
         let isExpanded = true; // デフォルトで展開状態
         
         // 初期状態を展開に設定
-        subActionsContainer.style.display = 'flex';
+        subActionsContainer.classList.add('expanded');
         expandIcon.innerHTML = '▼'; // 展開状態（縮小可能）
         
         fabButton.addEventListener('click', (e) => {
@@ -397,10 +353,10 @@ const init_page = (): void => {
             isExpanded = !isExpanded;
             
             if (isExpanded) {
-                subActionsContainer.style.display = 'flex';
+                subActionsContainer.classList.add('expanded');
                 expandIcon.innerHTML = '▼'; // 展開状態（縮小可能）
             } else {
-                subActionsContainer.style.display = 'none';
+                subActionsContainer.classList.remove('expanded');
                 expandIcon.innerHTML = '▲'; // 縮小状態（展開可能）
                 updateCountsDisplay(); // 閉じる時に件数を更新して表示
             }

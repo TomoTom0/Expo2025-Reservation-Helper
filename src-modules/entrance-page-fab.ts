@@ -71,12 +71,12 @@ function showStatus(message: string, color: string = 'white'): void {
                                   color === 'orange' ? 'rgba(255, 140, 0, 0.9)' :
                                   color === 'blue' ? 'rgba(0, 104, 33, 0.9)' :
                                   'rgba(0, 0, 0, 0.8)';
-    statusBadge.style.display = 'block';
+    statusBadge.classList.remove('js-hide');
     
     // 一定時間後に自動で隠す（エラー、成功、中断メッセージ以外）
     if (color !== 'red' && color !== 'green' && color !== 'orange') {
         setTimeout(() => {
-            statusBadge.style.display = 'none';
+            statusBadge.classList.add('js-hide');
         }, 3000);
     }
 }

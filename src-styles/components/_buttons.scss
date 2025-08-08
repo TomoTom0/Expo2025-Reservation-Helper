@@ -145,3 +145,142 @@ div.div-flex {
   justify-content: center;
   margin: 5px;
 }
+
+// JavaScript制御用の表示・非表示クラス
+.js-show {
+  display: block;
+}
+
+.js-hide {
+  display: none;
+}
+
+.js-visible {
+  visibility: visible;
+}
+
+.js-invisible {
+  visibility: hidden;
+}
+
+// JavaScript制御用の状態クラス  
+.js-enabled {
+  pointer-events: auto;
+  opacity: 1;
+}
+
+.js-disabled {
+  pointer-events: none;
+  opacity: 0.6;
+}
+
+// JavaScript制御用の色・背景クラス
+.js-green {
+  background: rgb(34, 139, 34);
+  color: white;
+}
+
+.js-red {
+  background: rgb(220, 53, 69); 
+  color: white;
+}
+
+.js-gray {
+  background: rgb(128, 128, 128);
+  color: white;
+}
+
+// ヘッダートグル関連の階層構造
+.ytomo-header {
+  li.fab-toggle-li {
+    display: inline-block;
+    margin-right: 8px;
+    
+    button.fab-toggle-button {
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 0;
+      color: white;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      
+      &:hover {
+        color: #ddd;
+      }
+      
+      figure.fab-toggle-figure {
+        width: auto;
+        height: 24px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0 4px;
+      }
+    }
+  }
+}
+
+// パビリオンFAB関連の階層構造
+.ytomo-pavilion-fab {
+  // メインFABボタン
+  button.ytomo-fab {
+    position: relative;
+    
+    &:hover {
+      transform: scale(1.15);
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5), 0 4px 12px rgba(0, 0, 0, 0.3);
+      border-width: 4px;
+    }
+  }
+
+  .ytomo-fab-inner-content {
+    .pavilion-fab-expand-icon {
+      font-size: 8px;
+      line-height: 1;
+      margin-bottom: 1px;
+      opacity: 0.8;
+    }
+
+    .pavilion-fab-brand-text {
+      font-size: 7px;
+      font-weight: normal;
+      line-height: 1;
+      margin-bottom: 2px;
+      opacity: 0.7;
+    }
+
+    .pavilion-fab-counts-text {
+      font-size: 12px;
+      font-weight: bold;
+      line-height: 1;
+    }
+  }
+
+  // サブアクションコンテナ
+  .pavilion-sub-actions-container {
+    display: none;
+    flex-direction: column;
+    gap: 8px;
+    align-items: flex-end;
+    margin-bottom: 8px;
+    
+    &.expanded {
+      display: flex;
+    }
+
+    // サブボタンのベーススタイル
+    button.pavilion-sub-btn.base-style {
+      color: white;
+      border: none;
+      border-radius: 20px;
+      padding: 8px 16px;
+      font-size: 12px;
+      white-space: nowrap;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+      transition: all 0.2s ease;
+    }
+  }
+}

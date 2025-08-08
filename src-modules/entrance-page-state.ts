@@ -98,19 +98,19 @@ function updateFABVisibility(): void {
     // 入場予約FAB
     const fabContainer = document.getElementById('ytomo-fab-container');
     if (fabContainer) {
-        fabContainer.style.display = fabVisibilityState.isVisible ? 'flex' : 'none';
+        fabContainer.classList.toggle('js-hide', !fabVisibilityState.isVisible);
     }
     
     // パビリオン予約FAB
     const pavilionFabContainer = document.getElementById('ytomo-pavilion-fab-container');
     if (pavilionFabContainer) {
-        pavilionFabContainer.style.display = fabVisibilityState.isVisible ? 'flex' : 'none';
+        pavilionFabContainer.classList.toggle('js-hide', !fabVisibilityState.isVisible);
     }
     
     // チケット選択画面FAB
     const ticketSelectionFabContainer = document.getElementById('ytomo-ticket-selection-fab-container');
     if (ticketSelectionFabContainer) {
-        ticketSelectionFabContainer.style.display = fabVisibilityState.isVisible ? 'flex' : 'none';
+        ticketSelectionFabContainer.classList.toggle('js-hide', !fabVisibilityState.isVisible);
     }
 }
 
@@ -189,31 +189,9 @@ export function createFABToggleButton(): void {
     // 既存のヘッダーアイコン構造に合わせてDOM要素を作成
     
     // 既存のヘッダーアイコンのスタイルを継承
-    toggleLi.style.cssText = `
-        display: inline-block !important;
-        margin-right: 8px !important;
-    `;
-    
-    toggleButton.style.cssText = `
-        background: none !important;
-        border: none !important;
-        cursor: pointer !important;
-        padding: 0 !important;
-        color: white !important;
-        transition: all 0.2s ease !important;
-        display: flex !important;
-        align-items: center !important;
-        justify-content: center !important;
-    `;
-    
-    toggleFigure.style.cssText = `
-        width: auto !important;
-        height: 24px !important;
-        display: flex !important;
-        align-items: center !important;
-        justify-content: center !important;
-        padding: 0 4px !important;
-    `;
+    toggleLi.className = 'fab-toggle-li';
+    toggleButton.className = 'fab-toggle-button';
+    toggleFigure.className = 'fab-toggle-figure style_header_shortcut__figure__gNkUJ';
     
     // DOM構造を組み立て
     toggleFigure.appendChild(toggleButton);
@@ -240,15 +218,6 @@ export function createFABToggleButton(): void {
     
     updateButtonIcon();
     
-    // ホバー効果（既存のアイコンに合わせて控えめに）
-    toggleButton.addEventListener('mouseenter', () => {
-        toggleButton.style.color = '#ddd';
-    });
-    
-    toggleButton.addEventListener('mouseleave', () => {
-        toggleButton.style.color = 'white';
-    });
-    
     // クリックイベント
     toggleButton.addEventListener('click', (e: Event) => {
         e.preventDefault();
@@ -260,6 +229,8 @@ export function createFABToggleButton(): void {
     // 買い物アイコンの親ul要素を取得してその中に挿入
     const parentUl = targetElement.parentElement;
     if (parentUl && parentUl.tagName.toLowerCase() === 'ul') {
+        // YTomoヘッダークラスを追加
+        parentUl.classList.add('ytomo-header');
         // 買い物アイコンの直前に挿入
         parentUl.insertBefore(toggleLi, targetElement);
     } else {

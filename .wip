@@ -1,26 +1,32 @@
 ## 現在の作業: 完了
 
-### 完了した作業: アーキテクチャリファクタリング（2025-08-07）
+### 完了した作業: CSS管理システム改善（2025-08-07）
 
-#### 1. 循環参照解決
-- entrance-page-dom-utils.ts を新規作成（共有DOM関数を集約）
-- entrance-page-selectors.ts を削除（依存注入構造の除去）
-- import文を直接参照に変更
+#### Phase 1: 静的スタイルのSCSS移行（完了）
+- cssText（29箇所）→ SCSSクラス化完了
+- ヘッダートグル、パビリオンFAB、サブボタンのクラス化
+- 階層構造による適切な詳細度管理（.ytomo-header、.ytomo-pavilion-fab）
+- JavaScript display制御 → classList.toggle('js-hide')に変更
 
-#### 2. 監視継続失敗の修正
-- カレンダー検出の動的待機処理強化
-- waitForCalendar: time要素の存在確認とより長い待機時間
-- waitForValidCalendarDate: 30回リトライ、200ms間隔
+#### Phase 2: ホバーエフェクトのCSS移行（完了）
+- ヘッダートグルボタン: JavaScript → CSS :hover
+- パビリオンFABボタン: JavaScript → CSS :hover
+- マウスイベントリスナー削除によるパフォーマンス改善
 
-#### 3. UI改善
-- 満員ボタン→緑色、監視ボタン→赤色に変更
-- JavaScript style.background → SCSSクラス（full-status/monitoring-status）に移行
-- 不要なデバッグログの削除
+#### Phase 3: 動的制御部分のクラスベース管理（完了）
+- JavaScript制御用の基本クラスセット作成
+- .js-show/.js-hide、.js-enabled/.js-disabled
+- .js-green/.js-red/.js-gray 状態管理クラス
 
-### 結果
-- 循環参照完全解決により保守性向上
-- 監視継続の安定性改善
-- より視認性の高いUI
+### 技術的成果
+- CSS管理の完全刷新: 直接スタイル操作からクラスベース管理へ
+- 階層構造による詳細度管理: !important使用を最小化
+- パフォーマンス改善: イベントリスナー削減
+- 保守性向上: SCSS構造による統一的なスタイル管理
+
+### 完了した前回作業: アーキテクチャリファクタリング（2025-08-07）
+- 循環参照解決、監視継続失敗修正、UI改善完了
+- 詳細は.doneファイル参照
 
 ---
 
