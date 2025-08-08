@@ -1,5 +1,20 @@
 ## 現在の作業: 完了
 
+### 最新完了作業: 状態管理統合 & FABクリーンアップ改善（2025-08-08）
+
+#### 状態管理の完全統合
+- **entranceReservationState** → EntranceReservationStateManager統合
+- **timeSlotState** → EntranceReservationStateManager統合  
+- **reloadCountdownState** → EntranceReservationStateManager統合
+- **pageLoadingState** → EntranceReservationStateManager統合
+- 4つの分散した状態管理を1つのクラスに統合、二重管理を完全解消
+
+#### FABクリーンアップ機能改善
+- ページ遷移時のFAB残存問題（特にスマホ）を修正
+- `cleanupAllFABs()`統一関数実装
+- 全FAB（入場予約、パビリオン、チケット選択）の一括削除
+- モバイル向け遅延削除処理追加（100ms後の残存チェック）
+
 ### 完了した作業: CSS管理システム改善（2025-08-07）
 
 #### Phase 1: 静的スタイルのSCSS移行（完了）

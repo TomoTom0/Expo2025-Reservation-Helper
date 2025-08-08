@@ -5,8 +5,8 @@
 import type { 
     EntranceReservationState, 
     // TimeSlotState, // EntranceReservationStateManagerに統合済み
-    PageLoadingState, 
-    ReloadCountdownState, 
+    // PageLoadingState, // EntranceReservationStateManagerに統合済み
+    // ReloadCountdownState, // EntranceReservationStateManagerに統合済み
     CalendarWatchState 
 } from '../types/index.js';
 
@@ -30,25 +30,25 @@ let entranceReservationState: EntranceReservationState = {
 // };
 
 
-// ページ読み込み状態管理
-const pageLoadingState: PageLoadingState = {
-    isLoading: false,
-    startTime: null,
-    timeout: 10000
-};
+// ページ読み込み状態管理（EntranceReservationStateManagerに統合済み）
+// const pageLoadingState: PageLoadingState = {
+//     isLoading: false,
+//     startTime: null,
+//     timeout: 10000
+// };
 
-// リロードカウントダウン状態管理
-const reloadCountdownState: ReloadCountdownState = {
-    isActive: false,
-    timeLeft: 0,
-    intervalId: null,
-    onComplete: null,
-    totalSeconds: 30,
-    secondsRemaining: null,
-    startTime: null,
-    countdownInterval: null,
-    reloadTimer: null
-};
+// リロードカウントダウン状態管理（EntranceReservationStateManagerに統合済み）
+// const reloadCountdownState: ReloadCountdownState = {
+//     isActive: false,
+//     timeLeft: 0,
+//     intervalId: null,
+//     onComplete: null,
+//     totalSeconds: 30,
+//     secondsRemaining: null,
+//     startTime: null,
+//     countdownInterval: null,
+//     reloadTimer: null
+// };
 
 // カレンダー監視状態管理
 const calendarWatchState: CalendarWatchState = {
@@ -244,8 +244,8 @@ export function createFABToggleButton(): void {
 export {
     entranceReservationState,
     // timeSlotState, // EntranceReservationStateManagerに統合済み
-    pageLoadingState,
-    reloadCountdownState,
+    // pageLoadingState, // EntranceReservationStateManagerに統合済み
+    // reloadCountdownState, // EntranceReservationStateManagerに統合済み
     calendarWatchState,
     fabVisibilityState,
     loadFABVisibility,

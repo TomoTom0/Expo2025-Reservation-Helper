@@ -1,9 +1,9 @@
 // entrance-page-stateからのimport
-import { 
+// import { 
     // entranceReservationState, // 統合により不要
-    reloadCountdownState,
-    pageLoadingState
-} from './entrance-page-state';
+    // reloadCountdownState, // EntranceReservationStateManagerに統合済み
+    // pageLoadingState // EntranceReservationStateManagerに統合済み
+// } from './entrance-page-state';
 
 // entrance-page-dom-utilsからのimport
 import {
@@ -963,7 +963,7 @@ function getCurrentMode(): string {
     }
     
     // ページローディング状態の確認
-    if (pageLoadingState?.isLoading) {
+    if (entranceReservationStateManager.isPageLoading()) {
         return 'loading';
     }
     
@@ -1002,12 +1002,13 @@ function updateStatusBadge(mode: string): void {
     switch (mode) {
         case 'monitoring':
             message = '監視実行中';
-            if (reloadCountdownState.secondsRemaining !== null && reloadCountdownState.secondsRemaining !== undefined) {
-                if (reloadCountdownState.secondsRemaining <= 3) {
-                    message = `監視中\nリロード: ${reloadCountdownState.secondsRemaining}秒`;
+            const remainingSeconds = entranceReservationStateManager.getReloadSecondsRemaining();
+            if (remainingSeconds !== null && remainingSeconds !== undefined) {
+                if (remainingSeconds <= 3) {
+                    message = `監視中\nリロード: ${remainingSeconds}秒`;
                     bgColor = 'rgba(255, 0, 0, 0.9)'; // 赤色（中断不可）
                 } else {
-                    message = `監視中\nリロード: ${reloadCountdownState.secondsRemaining}秒`;
+                    message = `監視中\nリロード: ${remainingSeconds}秒`;
                     bgColor = 'rgba(255, 140, 0, 0.9)'; // オレンジ色
                 }
             } else {
@@ -1109,25 +1110,11 @@ function getTargetDisplayInfo(): string {
 
 // 統一されたリロードスケジュール関数
 function scheduleReload(seconds: number = 30): void {
-    // 既存のタイマーを個別にクリア（stopReloadCountdown()は使わない）
-    if (reloadCountdownState.countdownInterval) {
-        clearInterval(reloadCountdownState.countdownInterval);
-        reloadCountdownState.countdownInterval = null;
-    }
-    if (reloadCountdownState.reloadTimer) {
-        clearTimeout(reloadCountdownState.reloadTimer);
-        reloadCountdownState.reloadTimer = null;
-        console.log('🔄 既存のリロードタイマーをクリア（新規スケジュール開始）');
-    }
-    
-    reloadCountdownState.totalSeconds = seconds;
-    reloadCountdownState.secondsRemaining = seconds;
-    reloadCountdownState.startTime = Date.now();
-    
     console.log(`🔄 統一リロードスケジュール開始: ${seconds}秒`);
     
-    // 入場予約状態管理システムの状態をログ出力
+    // 入場予約状態管理システムでリロードカウントダウンを開始
     if (entranceReservationStateManager) {
+        entranceReservationStateManager.scheduleReload(seconds);
         console.log(`📊 リロードスケジュール時の状態: ${entranceReservationStateManager.getExecutionState()}`);
     }
     
@@ -1139,34 +1126,9 @@ function scheduleReload(seconds: number = 30): void {
             console.log(`🏃 監視継続フラグ設定（scheduleReload）`);
         }
     }, flagDelay);
-
-    // 実際のリロード実行タイマー
-    reloadCountdownState.reloadTimer = window.setTimeout(() => {
-        console.log('🔄 統一リロード実行');
-        window.location.reload();
-    }, seconds * 1000);
     
     // 即座に一度UI更新
     updateMainButtonDisplay();
-    
-    reloadCountdownState.countdownInterval = window.setInterval(() => {
-        if (reloadCountdownState.secondsRemaining !== null) {
-            reloadCountdownState.secondsRemaining--;
-            
-            // UI更新（カウントダウン表示のみ）
-            updateMainButtonDisplay(null, true);
-            
-            if (reloadCountdownState.secondsRemaining <= 0) {
-                // カウントダウン表示のみ停止（リロードタイマーは停止しない）
-                if (reloadCountdownState.countdownInterval) {
-                    clearInterval(reloadCountdownState.countdownInterval);
-                    reloadCountdownState.countdownInterval = null;
-                }
-                reloadCountdownState.secondsRemaining = null;
-                console.log('🔄 カウントダウン完了（リロード実行待機中）');
-            }
-        }
-    }, 1000);
 }
 
 // 下位互換のためのstartReloadCountdown関数（scheduleReloadのエイリアス）
@@ -1181,27 +1143,16 @@ function stopReloadCountdown(): void {
     const caller = stack?.split('\n')[2]?.trim() || 'unknown';
     console.log(`🛑 stopReloadCountdown() 呼び出し元: ${caller}`);
     
-    if (reloadCountdownState.countdownInterval) {
-        clearInterval(reloadCountdownState.countdownInterval);
-        reloadCountdownState.countdownInterval = null;
+    // 入場予約状態管理システムでリロードカウントダウンを停止
+    if (entranceReservationStateManager) {
+        entranceReservationStateManager.stopReloadCountdown();
     }
-    // リロードタイマーも停止
-    if (reloadCountdownState.reloadTimer) {
-        clearTimeout(reloadCountdownState.reloadTimer);
-        reloadCountdownState.reloadTimer = null;
-        console.log('🛑 リロードタイマーを停止しました（中断による停止）');
-    }
-    reloadCountdownState.secondsRemaining = null;
-    reloadCountdownState.startTime = null;
 }
 
 // ページ読み込み状態を設定
 function setPageLoadingState(isLoading: boolean): void {
-    pageLoadingState.isLoading = isLoading;
-    if (isLoading) {
-        pageLoadingState.startTime = Date.now();
-    } else {
-        pageLoadingState.startTime = null;
+    if (entranceReservationStateManager) {
+        entranceReservationStateManager.setPageLoadingState(isLoading);
     }
     updateMainButtonDisplay();
 }
@@ -1209,12 +1160,12 @@ function setPageLoadingState(isLoading: boolean): void {
 // 中断操作が許可されているかチェック
 function isInterruptionAllowed(): boolean {
     // リロード直前3秒間は中断不可（時間を短縮して中断可能期間を延長）
-    const isCountdownActive = reloadCountdownState.secondsRemaining !== null && reloadCountdownState.secondsRemaining !== undefined;
-    const isNearReload = isCountdownActive && reloadCountdownState.secondsRemaining !== null && reloadCountdownState.secondsRemaining <= 3;
-    
-    // console.log(`🔍 中断可否チェック: countdown=${reloadCountdownState.secondsRemaining}, active=${isCountdownActive}, nearReload=${isNearReload}`);
-    
-    return !isNearReload;
+    if (entranceReservationStateManager) {
+        const isNearReload = entranceReservationStateManager.isNearReload();
+        // console.log(`🔍 中断可否チェック: nearReload=${isNearReload}`);
+        return !isNearReload;
+    }
+    return true; // フォールバック：統合システムが利用できない場合は中断を許可
 }
 
 // ページ読み込み時のキャッシュ復元

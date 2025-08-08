@@ -143,6 +143,22 @@ export class EntranceReservationStateManager {
         monitoringInterval: null as number | null
     };
     
+    // リロードカウントダウン状態管理（旧reloadCountdownStateから統合）
+    private reloadCountdown = {
+        totalSeconds: 30,
+        secondsRemaining: null as number | null,
+        startTime: null as number | null,
+        countdownInterval: null as number | null,
+        reloadTimer: null as number | null
+    };
+    
+    // ページ読み込み状態管理（旧pageLoadingStateから統合）
+    private pageLoading = {
+        isLoading: false,
+        startTime: null as number | null,
+        timeout: 10000
+    };
+    
     // デバッグフラグ（本番環境では詳細ログを抑制）
     private debugMode: boolean = true;
     
@@ -309,6 +325,118 @@ export class EntranceReservationStateManager {
     // 監視インターバル取得
     getMonitoringInterval(): number | null {
         return this.monitoringExecution.monitoringInterval;
+    }
+    
+    // ============================================================================
+    // リロードカウントダウン管理（旧reloadCountdownStateから統合）
+    // ============================================================================
+    
+    // リロードカウントダウン開始
+    scheduleReload(seconds: number): void {
+        // 既存のカウントダウンをクリア
+        this.stopReloadCountdown();
+        
+        this.reloadCountdown.totalSeconds = seconds;
+        this.reloadCountdown.secondsRemaining = seconds;
+        this.reloadCountdown.startTime = Date.now();
+        
+        this.log(`⏰ リロードカウントダウン開始: ${seconds}秒`);
+        
+        // リロードタイマー設定
+        this.reloadCountdown.reloadTimer = window.setTimeout(() => {
+            window.location.reload();
+        }, seconds * 1000);
+        
+        // カウントダウンインターバル設定
+        this.reloadCountdown.countdownInterval = window.setInterval(() => {
+            if (this.reloadCountdown.secondsRemaining !== null) {
+                this.reloadCountdown.secondsRemaining--;
+                
+                // FAB表示更新（グローバル関数を呼び出し）
+                try {
+                    if (typeof window !== 'undefined' && (window as any).updateMainButtonDisplay) {
+                        (window as any).updateMainButtonDisplay(null, true);
+                    }
+                } catch (error) {
+                    console.warn('UI更新の呼び出しに失敗:', error);
+                }
+                
+                if (this.reloadCountdown.secondsRemaining <= 0) {
+                    // カウントダウン完了
+                    if (this.reloadCountdown.countdownInterval) {
+                        clearInterval(this.reloadCountdown.countdownInterval);
+                        this.reloadCountdown.countdownInterval = null;
+                    }
+                    this.reloadCountdown.secondsRemaining = null;
+                }
+            }
+        }, 1000);
+    }
+    
+    // リロードカウントダウン停止
+    stopReloadCountdown(): void {
+        if (this.reloadCountdown.countdownInterval) {
+            clearInterval(this.reloadCountdown.countdownInterval);
+            this.reloadCountdown.countdownInterval = null;
+        }
+        
+        if (this.reloadCountdown.reloadTimer) {
+            clearTimeout(this.reloadCountdown.reloadTimer);
+            this.reloadCountdown.reloadTimer = null;
+        }
+        
+        this.reloadCountdown.secondsRemaining = null;
+        this.reloadCountdown.startTime = null;
+        
+        this.log('⏰ リロードカウントダウン停止');
+    }
+    
+    // カウントダウン中かどうか
+    isReloadCountdownActive(): boolean {
+        return this.reloadCountdown.secondsRemaining !== null && this.reloadCountdown.secondsRemaining !== undefined;
+    }
+    
+    // 残り秒数取得
+    getReloadSecondsRemaining(): number | null {
+        return this.reloadCountdown.secondsRemaining;
+    }
+    
+    // リロード直前（3秒以内）かどうか
+    isNearReload(): boolean {
+        return this.isReloadCountdownActive() && 
+               this.reloadCountdown.secondsRemaining !== null && 
+               this.reloadCountdown.secondsRemaining <= 3;
+    }
+    
+    // ============================================================================
+    // ページ読み込み状態管理（旧pageLoadingStateから統合）
+    // ============================================================================
+    
+    // ページ読み込み状態を設定
+    setPageLoadingState(isLoading: boolean): void {
+        this.pageLoading.isLoading = isLoading;
+        if (isLoading) {
+            this.pageLoading.startTime = Date.now();
+            this.log('📄 ページ読み込み開始');
+        } else {
+            this.pageLoading.startTime = null;
+            this.log('📄 ページ読み込み完了');
+        }
+    }
+    
+    // ページ読み込み中かどうか
+    isPageLoading(): boolean {
+        return this.pageLoading.isLoading;
+    }
+    
+    // ページ読み込み開始時刻取得
+    getPageLoadingStartTime(): number | null {
+        return this.pageLoading.startTime;
+    }
+    
+    // ページ読み込みタイムアウト値取得
+    getPageLoadingTimeout(): number {
+        return this.pageLoading.timeout;
     }
     
     // ============================================================================

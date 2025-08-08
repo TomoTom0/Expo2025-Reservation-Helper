@@ -29,6 +29,55 @@ import type { CacheManager } from '../types/index.js';
 
 // beforeunloadハンドラーは不要なので削除
 
+// 全FABをクリーンアップする統一関数
+function cleanupAllFABs(): void {
+    console.log('🧹 全FABをクリーンアップ開始');
+    
+    const fabSelectors = [
+        'ytomo-fab-container',                    // 入場予約FAB
+        'ytomo-pavilion-fab-container',           // パビリオンFAB  
+        'ytomo-ticket-selection-fab-container'    // チケット選択FAB
+    ];
+    
+    let removedCount = 0;
+    
+    fabSelectors.forEach(id => {
+        const fab = document.getElementById(id);
+        if (fab) {
+            fab.remove();
+            removedCount++;
+            console.log(`🗑️ ${id} を削除しました`);
+        }
+    });
+    
+    if (removedCount === 0) {
+        console.log('🧹 クリーンアップ対象のFABは見つかりませんでした');
+    } else {
+        console.log(`🧹 FABクリーンアップ完了: ${removedCount}個削除`);
+        
+        // スマホ向けの追加処理: DOMの確実な更新を待つ
+        if (isMobileDevice()) {
+            setTimeout(() => {
+                // 残存FABの再チェックと強制削除
+                fabSelectors.forEach(id => {
+                    const remainingFab = document.getElementById(id);
+                    if (remainingFab) {
+                        remainingFab.style.display = 'none';
+                        remainingFab.remove();
+                        console.log(`📱 スマホ向け遅延削除: ${id}`);
+                    }
+                });
+            }, 100);
+        }
+    }
+}
+
+// モバイルデバイス判定（簡易版）
+function isMobileDevice(): boolean {
+    return /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
+           (window.innerWidth <= 768);
+}
+
 // cacheManagerの初期化
 const cacheManager: CacheManager = createCacheManager({
     getCurrentSelectedCalendarDateFn: getCurrentSelectedCalendarDate
@@ -119,26 +168,7 @@ const trigger_init = (url_record: string): void => {
         isPageInitializing = false;
         
         // ページ遷移時に既存のFABボタンをクリーンアップ
-        const existingFab = document.getElementById('ytomo-fab-container');
-        if (existingFab) {
-            existingFab.remove();
-            console.log('🗑️ ページ遷移により既存の入場予約FABボタンを削除しました');
-        }
-        
-        const existingPavilionFab = document.getElementById('ytomo-pavilion-fab-container');
-        if (existingPavilionFab) {
-            existingPavilionFab.remove();
-            console.log('🗑️ ページ遷移により既存のパビリオンFABボタンを削除しました');
-        }
-        
-        // 同行者チケット関連FABを削除
-        if (currentPageType === 'ticket_selection') {
-            const ticketSelectionFab = document.getElementById('ytomo-ticket-selection-fab-container');
-            if (ticketSelectionFab) {
-                ticketSelectionFab.remove();
-                console.log('🗑️ ページ遷移によりチケット選択FABを削除しました');
-            }
-        }
+        cleanupAllFABs();
     }
     
     if (page_type === "pavilion_reservation") {
