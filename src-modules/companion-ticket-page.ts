@@ -1566,7 +1566,9 @@ function setupDialogEvents(dialog: HTMLElement): void {
             () => {
                 // 最後の手段：DOM直接検索
                 const computedValue = window.getComputedStyle(input).getPropertyValue('content');
-                return computedValue !== 'none' ? computedValue.replace(/['"]/g, '') : '';
+                // "none"や"normal"は無効な値として除外
+                return (computedValue !== 'none' && computedValue !== 'normal') 
+                    ? computedValue.replace(/['"]/g, '') : '';
             }
         ];
         
@@ -1619,7 +1621,9 @@ function setupDialogEvents(dialog: HTMLElement): void {
                 ticketId: ticketId || '(空)', 
                 label: label || '(空)',
                 inputValue: newTicketInput.value || '(空)',
-                inputTextContent: newTicketInput.textContent || '(空)'
+                inputTextContent: newTicketInput.textContent || '(空)',
+                labelInputValue: newLabelInput.value || '(空)',
+                labelComputedContent: window.getComputedStyle(newLabelInput).getPropertyValue('content') || '(空)'
             });
             
             // チケットIDが取得できたら処理続行

@@ -4905,9 +4905,25 @@ function createEntranceReservationUI(config) {
             return;
         }
         if (entrance_page_state.entranceReservationState.isRunning) {
-            // 予約処理を中断
-            entrance_page_state.entranceReservationState.shouldStop = true;
-            showStatus('予約処理を中断中...', 'orange');
+            // スマホ用：現在の状態をアラート表示
+            const debugInfo = `予約状態確認:
+isRunning: ${entrance_page_state.entranceReservationState.isRunning}
+shouldStop: ${entrance_page_state.entranceReservationState.shouldStop}
+startTime: ${entrance_page_state.entranceReservationState.startTime}
+attempts: ${entrance_page_state.entranceReservationState.attempts}`;
+            if (confirm(`[DEBUG] 予約処理を中断しますか？\n\n${debugInfo}`)) {
+                // 予約処理を中断
+                entrance_page_state.entranceReservationState.shouldStop = true;
+                showStatus('予約処理を中断中...', 'orange');
+            }
+            else {
+                // 強制リセット（デバッグ用）
+                entrance_page_state.entranceReservationState.isRunning = false;
+                entrance_page_state.entranceReservationState.shouldStop = false;
+                entrance_page_state.entranceReservationState.startTime = null;
+                entrance_page_state.entranceReservationState.attempts = 0;
+                alert('状態をリセットしました。もう一度お試しください。');
+            }
             return;
         }
         // 統一状態管理システムを使用した監視開始判定
@@ -6870,7 +6886,9 @@ function setupDialogEvents(dialog) {
             () => {
                 // 最後の手段：DOM直接検索
                 const computedValue = window.getComputedStyle(input).getPropertyValue('content');
-                return computedValue !== 'none' ? computedValue.replace(/['"]/g, '') : '';
+                // "none"や"normal"は無効な値として除外
+                return (computedValue !== 'none' && computedValue !== 'normal')
+                    ? computedValue.replace(/['"]/g, '') : '';
             }
         ];
         for (const method of methods) {
@@ -6915,7 +6933,9 @@ function setupDialogEvents(dialog) {
                 ticketId: ticketId || '(空)',
                 label: label || '(空)',
                 inputValue: newTicketInput.value || '(空)',
-                inputTextContent: newTicketInput.textContent || '(空)'
+                inputTextContent: newTicketInput.textContent || '(空)',
+                labelInputValue: newLabelInput.value || '(空)',
+                labelComputedContent: window.getComputedStyle(newLabelInput).getPropertyValue('content') || '(空)'
             });
             // チケットIDが取得できたら処理続行
             if (ticketId) {

@@ -23,7 +23,8 @@
       "Bash(cat:*)",
       "Bash(npx tsc:*)",
       "Bash(grep:*)",
-      "Bash(echo)"
+      "Bash(echo)",
+      "Bash(rg:*)"
     ],
     "deny": []
   }

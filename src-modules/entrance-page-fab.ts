@@ -259,9 +259,25 @@ function createEntranceReservationUI(config: ReservationConfig): void {
         }
         
         if (entranceReservationState.isRunning) {
-            // 予約処理を中断
-            entranceReservationState.shouldStop = true;
-            showStatus('予約処理を中断中...', 'orange');
+            // スマホ用：現在の状態をアラート表示
+            const debugInfo = `予約状態確認:
+isRunning: ${entranceReservationState.isRunning}
+shouldStop: ${entranceReservationState.shouldStop}
+startTime: ${entranceReservationState.startTime}
+attempts: ${entranceReservationState.attempts}`;
+            
+            if (confirm(`[DEBUG] 予約処理を中断しますか？\n\n${debugInfo}`)) {
+                // 予約処理を中断
+                entranceReservationState.shouldStop = true;
+                showStatus('予約処理を中断中...', 'orange');
+            } else {
+                // 強制リセット（デバッグ用）
+                entranceReservationState.isRunning = false;
+                entranceReservationState.shouldStop = false;
+                entranceReservationState.startTime = null;
+                entranceReservationState.attempts = 0;
+                alert('状態をリセットしました。もう一度お試しください。');
+            }
             return;
         }
         
