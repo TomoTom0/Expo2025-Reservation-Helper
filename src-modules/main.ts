@@ -1,14 +1,3 @@
-// ==UserScript==
-// @name         yt-Expo2025-Reservation-Helper
-// @namespace    http://staybrowser.com/
-// @version      0.3
-// @description  help expo2025 ticket site
-// @author       TomoTom0 https://github.com/TomoTom0
-// @match        https://ticket.expo2025.or.jp/event_search/*
-// @grant       none
-// @run-at       document-end
-// ==/UserScript==
-
 /**
  * メインエントリーポイント
  * 各sectionモジュールをimportすることで、webpackで統合されたバンドルを作成

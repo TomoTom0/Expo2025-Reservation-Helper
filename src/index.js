@@ -1720,7 +1720,7 @@ async function restoreFromCache() {
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1___default()((_node_modules_css_loader_dist_runtime_noSourceMaps_js__WEBPACK_IMPORTED_MODULE_0___default()));
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, `button.ext-ytomo{height:40px;width:auto;min-width:60px;padding:0px 8px;background:#006821 !important;color:#fff}button.ext-ytomo.no-after:after{background:rgba(0,0,0,0) none repeat 0 0/auto auto padding-box border-box scroll}button.ext-ytomo.btn-done{background:#4a4c4a !important}button.ext-ytomo:hover{background:#02862b}.pavilion-sub-btn{color:#fff;border:none;border-radius:20px;padding:8px 16px;font-size:12px;white-space:nowrap;transition:all .2s ease}.pavilion-sub-btn.btn-enabled{background:#006821 !important;cursor:pointer !important;opacity:1 !important}.pavilion-sub-btn.btn-enabled:hover{background:#02862b !important;transform:scale(1.05) !important}.pavilion-sub-btn.btn-disabled,.pavilion-sub-btn.btn-loading{background:gray !important;cursor:not-allowed !important;opacity:.6 !important}.pavilion-sub-btn.btn-disabled:hover,.pavilion-sub-btn.btn-loading:hover{background:gray !important;transform:scale(1) !important}button.ext-ytomo.pavilion-sub-btn.btn-disabled,button.ext-ytomo.pavilion-sub-btn.btn-loading{background:gray !important;cursor:not-allowed !important;opacity:.6 !important}button.ext-ytomo.pavilion-sub-btn.btn-disabled:hover,button.ext-ytomo.pavilion-sub-btn.btn-loading:hover{background:gray !important;transform:scale(1) !important}.safe-none,.ytomo-none,.filter-none{display:none}button.ext-ytomo.monitor-btn{height:auto;min-height:20px;width:auto;min-width:35px;padding:1px 4px;color:#fff !important;margin-left:8px;font-size:10px;border:none !important;border-radius:2px;cursor:pointer !important;display:inline-block;vertical-align:middle;position:relative;z-index:10 !important;pointer-events:auto !important;opacity:1 !important;visibility:visible !important}button.ext-ytomo.monitor-btn.full-status{background:#228b22 !important}button.ext-ytomo.monitor-btn.full-status:hover{background:#32cd32 !important}button.ext-ytomo.monitor-btn.monitoring-status{background:#dc3545 !important}button.ext-ytomo.monitor-btn.monitoring-status:hover{background:#ff4554 !important}button.ext-ytomo.monitor-btn:disabled{background:gray !important;cursor:not-allowed !important;opacity:.6 !important}button.ext-ytomo.pavilion-sub-btn.ytomo-date-button.date-selected{border:2px solid #4caf50;box-shadow:0 0 8px rgba(76,175,80,.6)}div.div-flex{display:flex;justify-content:center;margin:5px}.js-show{display:block}.js-hide{display:none}.js-visible{visibility:visible}.js-invisible{visibility:hidden}.js-enabled{pointer-events:auto;opacity:1}.js-disabled{pointer-events:none;opacity:.6}.js-green{background:#228b22;color:#fff}.js-red{background:#dc3545;color:#fff}.js-gray{background:gray;color:#fff}.ytomo-header li.fab-toggle-li{display:inline-block;margin-right:8px}.ytomo-header li.fab-toggle-li button.fab-toggle-button{background:none;border:none;cursor:pointer;padding:0;color:#fff;transition:all .2s ease;display:flex;align-items:center;justify-content:center}.ytomo-header li.fab-toggle-li button.fab-toggle-button:hover{color:#ddd}.ytomo-header li.fab-toggle-li button.fab-toggle-button figure.fab-toggle-figure{width:auto;height:24px;display:flex;align-items:center;justify-content:center;padding:0 4px}.ytomo-pavilion-fab button.ytomo-fab{position:relative}.ytomo-pavilion-fab button.ytomo-fab:hover{transform:scale(1.15);box-shadow:0 8px 25px rgba(0,0,0,.5),0 4px 12px rgba(0,0,0,.3);border-width:4px}.ytomo-pavilion-fab .ytomo-fab-inner-content .pavilion-fab-expand-icon{font-size:8px;line-height:1;margin-bottom:1px;opacity:.8}.ytomo-pavilion-fab .ytomo-fab-inner-content .pavilion-fab-brand-text{font-size:7px;font-weight:normal;line-height:1;margin-bottom:2px;opacity:.7}.ytomo-pavilion-fab .ytomo-fab-inner-content .pavilion-fab-counts-text{font-size:12px;font-weight:bold;line-height:1}.ytomo-pavilion-fab .pavilion-sub-actions-container{display:none;flex-direction:column;gap:8px;align-items:flex-end;margin-bottom:8px}.ytomo-pavilion-fab .pavilion-sub-actions-container.expanded{display:flex}.ytomo-pavilion-fab .pavilion-sub-actions-container button.pavilion-sub-btn.base-style{color:#fff;border:none;border-radius:20px;padding:8px 16px;font-size:12px;white-space:nowrap;box-shadow:0 2px 8px rgba(0,0,0,.3);transition:all .2s ease}.ytomo-companion-dialog{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;z-index:99999;padding:20px;box-sizing:border-box}.ytomo-companion-dialog .dialog-content{background:#fff;border-radius:12px;padding:24px;width:100%;max-width:500px;max-height:90vh;overflow-y:auto;box-shadow:0 10px 40px rgba(0,0,0,.3)}@media(max-width: 768px){.ytomo-companion-dialog .dialog-content{max-width:95vw;max-height:85vh;padding:16px;border-radius:8px}}.ytomo-companion-dialog .dialog-content .input-row{display:flex;gap:8px;margin-bottom:12px}@media(max-width: 480px){.ytomo-companion-dialog .dialog-content .input-row{flex-direction:column;gap:12px}}.ytomo-companion-dialog .dialog-content .input-row input{padding:12px 8px;border:1px solid #ddd;border-radius:4px;font-size:16px}.ytomo-companion-dialog .dialog-content .input-row input:focus{outline:none;border-color:#4caf50;box-shadow:0 0 0 2px rgba(76,175,80,.2)}.ytomo-companion-dialog .dialog-content .input-row button{padding:12px 16px;background:#4caf50;color:#fff;border:none;border-radius:4px;cursor:pointer;font-size:14px;white-space:nowrap;min-width:60px}.ytomo-companion-dialog .dialog-content .input-row button:hover{background:#45a049}.ytomo-companion-dialog .dialog-content .input-row button:active{background:#3d8b40}.ytomo-fab{width:56px !important;height:56px !important;border-radius:50% !important;color:#fff !important;border:none !important;box-shadow:0 6px 20px rgba(0,0,0,.4),0 2px 8px rgba(0,0,0,.2) !important;border:3px solid hsla(0,0%,100%,.2) !important;display:flex !important;align-items:center !important;justify-content:center !important;font-size:14px !important;font-weight:bold !important;transition:all .3s ease !important;position:relative !important;overflow:hidden !important;pointer-events:auto !important}.ytomo-fab-enabled{background:#006821 !important;opacity:.9 !important;cursor:pointer !important;pointer-events:auto !important}.ytomo-fab-disabled{background:gray !important;opacity:.6 !important;cursor:not-allowed !important;pointer-events:none !important}.ytomo-fab-monitoring{background:#ff8c00 !important;opacity:.9 !important;cursor:pointer !important;pointer-events:auto !important}.ytomo-fab-running{background:#dc3545 !important;opacity:.6 !important;cursor:not-allowed !important;pointer-events:none !important}.ytomo-fab-container{position:fixed !important;bottom:20px !important;right:20px !important;z-index:9999 !important;display:flex !important;flex-direction:column-reverse !important;align-items:center !important;gap:12px !important;pointer-events:none !important}.ytomo-fab-container.visible{display:flex !important}.ytomo-fab-container.hidden{display:none !important}.ytomo-fab-content{position:relative !important;display:flex !important;flex-direction:column-reverse !important;align-items:center !important;gap:8px !important;opacity:0 !important;transform:scale(0.8) translateY(10px) !important;transition:all .3s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;pointer-events:none !important}.ytomo-fab-content.expanded{opacity:1 !important;transform:scale(1) translateY(0) !important;pointer-events:auto !important}.ytomo-sub-fab{width:45px !important;height:32px !important;border-radius:16px !important;background:rgba(0,104,33,.9) !important;color:#fff !important;border:none !important;font-size:11px !important;font-weight:bold !important;cursor:pointer !important;transition:all .2s ease !important;box-shadow:0 2px 8px rgba(0,0,0,.3) !important;display:flex !important;align-items:center !important;justify-content:center !important;pointer-events:auto !important}.ytomo-sub-fab:hover{background:rgba(2,134,43,.9) !important;transform:scale(1.1) !important;box-shadow:0 4px 12px rgba(0,0,0,.4) !important}.ytomo-sub-fab:active{transform:scale(0.95) !important}.ytomo-pavilion-fab-container{position:fixed !important;bottom:24px !important;right:24px !important;z-index:10000 !important;display:flex !important;flex-direction:column !important;gap:12px !important;align-items:flex-end !important;pointer-events:auto !important}.ytomo-fab-inner-content{display:flex !important;flex-direction:column !important;align-items:center !important;justify-content:center !important;height:100% !important;pointer-events:none !important}input.ext-tomo.search{height:50px;min-width:200px;max-width:min(300px,100%);font-family:quicksand;font-size:16px;-webkit-appearance:textfield;-moz-appearance:textfield;appearance:textfield;border:1px solid #222426;border-radius:25px;box-shadow:0 1px 0 0 #ccc;padding:0 0 0 10px;flex:1 1}.ytomo-icon.expand-icon{font-size:8px !important;line-height:1 !important;color:#fff !important;font-weight:bold !important;text-align:center !important;pointer-events:none !important}.ytomo-icon.countdown-text{font-size:6px !important;line-height:1 !important;color:#fff !important;font-weight:bold !important;text-align:center !important;margin-top:1px !important;pointer-events:none !important}.ytomo-toggle.toggle-li{position:fixed !important;bottom:10px !important;left:10px !important;z-index:1000 !important;list-style:none !important;margin:0 !important;padding:0 !important}.ytomo-toggle.toggle-button{width:50px !important;height:30px !important;background:rgba(255,140,0,.8) !important;border:none !important;border-radius:15px !important;cursor:pointer !important;transition:all .3s ease !important;display:flex !important;align-items:center !important;justify-content:center !important;font-size:12px !important;font-weight:bold !important;position:relative !important;overflow:hidden !important}.ytomo-toggle.toggle-button.enabled{color:#fff}.ytomo-toggle.toggle-button.disabled{color:#ddd}.ytomo-toggle.toggle-figure{width:100% !important;height:100% !important;margin:0 !important;padding:0 !important;border:none !important;background:rgba(0,0,0,0) !important;pointer-events:none !important}.ytomo-dialog.overlay{position:fixed !important;top:0 !important;left:0 !important;width:100% !important;height:100% !important;background-color:rgba(0,0,0,.5) !important;z-index:10000 !important;display:flex !important;justify-content:center !important;align-items:center !important}.ytomo-dialog.container{background:#fff !important;border-radius:8px !important;padding:20px !important;max-width:400px !important;width:90% !important;max-height:70vh !important;overflow-y:auto !important;box-shadow:0 4px 12px rgba(0,0,0,.3) !important}.ytomo-dialog.title{margin:0 0 16px 0 !important;color:#333 !important;font-size:18px !important;font-weight:bold !important}.ytomo-dialog.button-group{display:flex !important;justify-content:flex-end !important;gap:10px !important;margin-top:20px !important}.ytomo-dialog.primary-button{background:#006821 !important;color:#fff !important;border:none !important;padding:10px 20px !important;border-radius:4px !important;cursor:pointer !important;font-size:14px !important}.ytomo-dialog.primary-button:hover{background:#02862b !important}.ytomo-dialog.primary-button:disabled{background:gray !important;cursor:not-allowed !important}.ytomo-dialog.secondary-button{background:rgba(0,0,0,0) !important;color:#666 !important;border:1px solid #ccc !important;padding:10px 20px !important;border-radius:4px !important;cursor:pointer !important;font-size:14px !important}.ytomo-dialog.secondary-button:hover{background:#f5f5f5 !important}.ytomo-progress.counter{display:inline-block !important;margin-left:8px !important;padding:2px 6px !important;background:rgba(0,0,0,.3) !important;border-radius:10px !important;font-size:10px !important;color:#fff !important;font-weight:bold !important}`, ""]);
+___CSS_LOADER_EXPORT___.push([module.id, `button.ext-ytomo{height:40px;width:auto;min-width:60px;padding:0px 8px;background:#006821 !important;color:#fff}button.ext-ytomo.no-after:after{background:rgba(0,0,0,0) none repeat 0 0/auto auto padding-box border-box scroll}button.ext-ytomo.btn-done{background:#4a4c4a !important}button.ext-ytomo:hover{background:#02862b}.pavilion-sub-btn{color:#fff;border:none;border-radius:20px;padding:8px 16px;font-size:12px;white-space:nowrap;transition:all .2s ease}.pavilion-sub-btn.btn-enabled{background:#006821 !important;cursor:pointer !important;opacity:1 !important}.pavilion-sub-btn.btn-enabled:hover{background:#02862b !important;transform:scale(1.05) !important}.pavilion-sub-btn.btn-disabled,.pavilion-sub-btn.btn-loading{background:gray !important;cursor:not-allowed !important;opacity:.6 !important}.pavilion-sub-btn.btn-disabled:hover,.pavilion-sub-btn.btn-loading:hover{background:gray !important;transform:scale(1) !important}button.ext-ytomo.pavilion-sub-btn.btn-disabled,button.ext-ytomo.pavilion-sub-btn.btn-loading{background:gray !important;cursor:not-allowed !important;opacity:.6 !important}button.ext-ytomo.pavilion-sub-btn.btn-disabled:hover,button.ext-ytomo.pavilion-sub-btn.btn-loading:hover{background:gray !important;transform:scale(1) !important}.safe-none,.ytomo-none,.filter-none{display:none}button.ext-ytomo.monitor-btn{height:auto;min-height:20px;width:auto;min-width:35px;padding:1px 4px;color:#fff !important;margin-left:8px;font-size:10px;border:none !important;border-radius:2px;cursor:pointer !important;display:inline-block;vertical-align:middle;position:relative;z-index:10 !important;pointer-events:auto !important;opacity:1 !important;visibility:visible !important}button.ext-ytomo.monitor-btn.full-status{background:#228b22 !important}button.ext-ytomo.monitor-btn.full-status:hover{background:#32cd32 !important}button.ext-ytomo.monitor-btn.monitoring-status{background:#dc3545 !important}button.ext-ytomo.monitor-btn.monitoring-status:hover{background:#ff4554 !important}button.ext-ytomo.monitor-btn:disabled{cursor:not-allowed !important;opacity:.4 !important}button.ext-ytomo.monitor-btn:disabled.full-status{background:rgba(34,139,34,.3) !important;color:hsla(0,0%,100%,.7) !important}button.ext-ytomo.monitor-btn:disabled.monitoring-status{background:rgba(220,53,69,.3) !important;color:hsla(0,0%,100%,.7) !important}button.ext-ytomo.monitor-btn:disabled:not(.full-status):not(.monitoring-status){background:rgba(128,128,128,.5) !important;color:hsla(0,0%,100%,.7) !important}button.ext-ytomo.pavilion-sub-btn.ytomo-date-button.date-selected{border:2px solid #4caf50;box-shadow:0 0 8px rgba(76,175,80,.6)}div.div-flex{display:flex;justify-content:center;margin:5px}.js-show{display:block}.js-hide{display:none}.js-visible{visibility:visible}.js-invisible{visibility:hidden}.js-enabled{pointer-events:auto;opacity:1}.js-disabled{pointer-events:none;opacity:.6}.js-green{background:#228b22;color:#fff}.js-red{background:#dc3545;color:#fff}.js-gray{background:gray;color:#fff}.ytomo-header li.fab-toggle-li{display:inline-block;margin-right:8px}.ytomo-header li.fab-toggle-li button.fab-toggle-button{background:none;border:none;cursor:pointer;padding:0;color:#fff;transition:all .2s ease;display:flex;align-items:center;justify-content:center}.ytomo-header li.fab-toggle-li button.fab-toggle-button:hover{color:#ddd}.ytomo-header li.fab-toggle-li button.fab-toggle-button figure.fab-toggle-figure{width:auto;height:24px;display:flex;align-items:center;justify-content:center;padding:0 4px}.ytomo-pavilion-fab button.ytomo-fab{position:relative}.ytomo-pavilion-fab button.ytomo-fab:hover{transform:scale(1.15);box-shadow:0 8px 25px rgba(0,0,0,.5),0 4px 12px rgba(0,0,0,.3);border-width:4px}.ytomo-pavilion-fab .ytomo-fab-inner-content .pavilion-fab-expand-icon{font-size:8px;line-height:1;margin-bottom:1px;opacity:.8}.ytomo-pavilion-fab .ytomo-fab-inner-content .pavilion-fab-brand-text{font-size:7px;font-weight:normal;line-height:1;margin-bottom:2px;opacity:.7}.ytomo-pavilion-fab .ytomo-fab-inner-content .pavilion-fab-counts-text{font-size:12px;font-weight:bold;line-height:1}.ytomo-pavilion-fab .pavilion-sub-actions-container{display:none;flex-direction:column;gap:8px;align-items:flex-end;margin-bottom:8px}.ytomo-pavilion-fab .pavilion-sub-actions-container.expanded{display:flex}.ytomo-pavilion-fab .pavilion-sub-actions-container button.pavilion-sub-btn.base-style{color:#fff;border:none;border-radius:20px;padding:8px 16px;font-size:12px;white-space:nowrap;box-shadow:0 2px 8px rgba(0,0,0,.3);transition:all .2s ease}.ytomo-companion-dialog{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;z-index:99999;padding:20px;box-sizing:border-box}.ytomo-companion-dialog .dialog-content{background:#fff;border-radius:12px;padding:24px;width:100%;max-width:500px;max-height:90vh;overflow-y:auto;box-shadow:0 10px 40px rgba(0,0,0,.3)}@media(max-width: 768px){.ytomo-companion-dialog .dialog-content{max-width:95vw;max-height:85vh;padding:16px;border-radius:8px}}.ytomo-companion-dialog .dialog-content .input-row{display:flex;gap:8px;margin-bottom:12px}@media(max-width: 480px){.ytomo-companion-dialog .dialog-content .input-row{flex-direction:column;gap:12px}}.ytomo-companion-dialog .dialog-content .input-row input{padding:12px 8px;border:1px solid #ddd;border-radius:4px;font-size:16px}.ytomo-companion-dialog .dialog-content .input-row input:focus{outline:none;border-color:#4caf50;box-shadow:0 0 0 2px rgba(76,175,80,.2)}.ytomo-companion-dialog .dialog-content .input-row button{padding:12px 16px;background:#4caf50;color:#fff;border:none;border-radius:4px;cursor:pointer;font-size:14px;white-space:nowrap;min-width:60px}.ytomo-companion-dialog .dialog-content .input-row button:hover{background:#45a049}.ytomo-companion-dialog .dialog-content .input-row button:active{background:#3d8b40}.ytomo-fab{width:56px !important;height:56px !important;border-radius:50% !important;color:#fff !important;border:none !important;box-shadow:0 6px 20px rgba(0,0,0,.4),0 2px 8px rgba(0,0,0,.2) !important;border:3px solid hsla(0,0%,100%,.2) !important;display:flex !important;align-items:center !important;justify-content:center !important;font-size:14px !important;font-weight:bold !important;transition:all .3s ease !important;position:relative !important;overflow:hidden !important;pointer-events:auto !important}.ytomo-fab-enabled{background:#006821 !important;opacity:.9 !important;cursor:pointer !important;pointer-events:auto !important}.ytomo-fab-disabled{background:gray !important;opacity:.6 !important;cursor:not-allowed !important;pointer-events:none !important}.ytomo-fab-monitoring{background:#ff8c00 !important;opacity:.9 !important;cursor:pointer !important;pointer-events:auto !important}.ytomo-fab-running{background:#dc3545 !important;opacity:.6 !important;cursor:not-allowed !important;pointer-events:none !important}.ytomo-fab-container{position:fixed !important;bottom:20px !important;right:20px !important;z-index:9999 !important;display:flex !important;flex-direction:column-reverse !important;align-items:center !important;gap:12px !important;pointer-events:none !important}.ytomo-fab-container.visible{display:flex !important}.ytomo-fab-container.hidden{display:none !important}.ytomo-fab-content{position:relative !important;display:flex !important;flex-direction:column-reverse !important;align-items:center !important;gap:8px !important;opacity:0 !important;transform:scale(0.8) translateY(10px) !important;transition:all .3s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;pointer-events:none !important}.ytomo-fab-content.expanded{opacity:1 !important;transform:scale(1) translateY(0) !important;pointer-events:auto !important}.ytomo-sub-fab{width:45px !important;height:32px !important;border-radius:16px !important;background:rgba(0,104,33,.9) !important;color:#fff !important;border:none !important;font-size:11px !important;font-weight:bold !important;cursor:pointer !important;transition:all .2s ease !important;box-shadow:0 2px 8px rgba(0,0,0,.3) !important;display:flex !important;align-items:center !important;justify-content:center !important;pointer-events:auto !important}.ytomo-sub-fab:hover{background:rgba(2,134,43,.9) !important;transform:scale(1.1) !important;box-shadow:0 4px 12px rgba(0,0,0,.4) !important}.ytomo-sub-fab:active{transform:scale(0.95) !important}.ytomo-pavilion-fab-container{position:fixed !important;bottom:24px !important;right:24px !important;z-index:10000 !important;display:flex !important;flex-direction:column !important;gap:12px !important;align-items:flex-end !important;pointer-events:auto !important}.ytomo-fab-inner-content{display:flex !important;flex-direction:column !important;align-items:center !important;justify-content:center !important;height:100% !important;pointer-events:none !important}input.ext-tomo.search{height:50px;min-width:200px;max-width:min(300px,100%);font-family:quicksand;font-size:16px;-webkit-appearance:textfield;-moz-appearance:textfield;appearance:textfield;border:1px solid #222426;border-radius:25px;box-shadow:0 1px 0 0 #ccc;padding:0 0 0 10px;flex:1 1}.ytomo-icon.expand-icon{font-size:8px !important;line-height:1 !important;color:#fff !important;font-weight:bold !important;text-align:center !important;pointer-events:none !important}.ytomo-icon.countdown-text{font-size:6px !important;line-height:1 !important;color:#fff !important;font-weight:bold !important;text-align:center !important;margin-top:1px !important;pointer-events:none !important}.ytomo-toggle.toggle-li{position:fixed !important;bottom:10px !important;left:10px !important;z-index:1000 !important;list-style:none !important;margin:0 !important;padding:0 !important}.ytomo-toggle.toggle-button{width:50px !important;height:30px !important;background:rgba(255,140,0,.8) !important;border:none !important;border-radius:15px !important;cursor:pointer !important;transition:all .3s ease !important;display:flex !important;align-items:center !important;justify-content:center !important;font-size:12px !important;font-weight:bold !important;position:relative !important;overflow:hidden !important}.ytomo-toggle.toggle-button.enabled{color:#fff}.ytomo-toggle.toggle-button.disabled{color:#ddd}.ytomo-toggle.toggle-figure{width:100% !important;height:100% !important;margin:0 !important;padding:0 !important;border:none !important;background:rgba(0,0,0,0) !important;pointer-events:none !important}.ytomo-dialog.overlay{position:fixed !important;top:0 !important;left:0 !important;width:100% !important;height:100% !important;background-color:rgba(0,0,0,.5) !important;z-index:10000 !important;display:flex !important;justify-content:center !important;align-items:center !important}.ytomo-dialog.container{background:#fff !important;border-radius:8px !important;padding:20px !important;max-width:400px !important;width:90% !important;max-height:70vh !important;overflow-y:auto !important;box-shadow:0 4px 12px rgba(0,0,0,.3) !important}.ytomo-dialog.title{margin:0 0 16px 0 !important;color:#333 !important;font-size:18px !important;font-weight:bold !important}.ytomo-dialog.button-group{display:flex !important;justify-content:flex-end !important;gap:10px !important;margin-top:20px !important}.ytomo-dialog.primary-button{background:#006821 !important;color:#fff !important;border:none !important;padding:10px 20px !important;border-radius:4px !important;cursor:pointer !important;font-size:14px !important}.ytomo-dialog.primary-button:hover{background:#02862b !important}.ytomo-dialog.primary-button:disabled{background:gray !important;cursor:not-allowed !important}.ytomo-dialog.secondary-button{background:rgba(0,0,0,0) !important;color:#666 !important;border:1px solid #ccc !important;padding:10px 20px !important;border-radius:4px !important;cursor:pointer !important;font-size:14px !important}.ytomo-dialog.secondary-button:hover{background:#f5f5f5 !important}.ytomo-progress.counter{display:inline-block !important;margin-left:8px !important;padding:2px 6px !important;background:rgba(0,0,0,.3) !important;border-radius:10px !important;font-size:10px !important;color:#fff !important;font-weight:bold !important}`, ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -5775,6 +5775,19 @@ class CompanionProcessManager {
             if (!inputSuccess) {
                 throw new Error('チケットID入力に失敗');
             }
+            // 入力後の安定化待機（UI更新を確実に待つ）
+            console.log('⏳ 入力後の安定化待機中...');
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            // 再度値を確認（フォーム状態の最終検証）
+            const inputField = document.getElementById('agent_ticket_id_register');
+            if (inputField && inputField.value !== ticketId) {
+                console.warn(`⚠️ 最終検証で値の不一致を検出: "${inputField.value}" ≠ "${ticketId}"`);
+                // 再入力を試行
+                console.log('🔄 値の再設定を実行中...');
+                inputField.value = ticketId;
+                inputField.dispatchEvent(new Event('input', { bubbles: true }));
+                inputField.dispatchEvent(new Event('change', { bubbles: true }));
+            }
             // 追加ボタンクリック
             const addSuccess = await this.clickAddButton();
             if (!addSuccess) {
@@ -5871,37 +5884,281 @@ class CompanionProcessManager {
         }
         return this.performInput(inputField, ticketId);
     }
-    // 実際の入力処理（pasteイベントでスマホ対応）
+    // 実際の入力処理（スマホ特有問題対応版）
     async performInput(inputField, ticketId) {
         try {
-            // フォーカスを設定
-            inputField.focus();
-            // 既存の値をクリア
-            inputField.value = '';
-            inputField.dispatchEvent(new Event('input', { bubbles: true }));
-            // pasteイベントでデータを設定（スマホで確実）
-            const clipboardData = new DataTransfer();
-            clipboardData.setData('text/plain', ticketId);
-            const pasteEvent = new ClipboardEvent('paste', {
-                bubbles: true,
-                cancelable: true,
-                clipboardData: clipboardData
-            });
-            // pasteイベントを発火
-            inputField.dispatchEvent(pasteEvent);
-            // 念のため直接値も設定
-            inputField.value = ticketId;
-            // 各種イベントを発火してフォームの状態更新を確実にする
-            inputField.dispatchEvent(new Event('input', { bubbles: true }));
-            inputField.dispatchEvent(new Event('change', { bubbles: true }));
-            inputField.dispatchEvent(new Event('blur', { bubbles: true }));
-            console.log(`✅ チケットID "${ticketId}" をpasteイベントで入力しました`);
-            return true;
+            console.log(`🎯 チケットID入力開始: "${ticketId}"`);
+            console.log('📱 スマートフォン対応入力処理を実行中...');
+            // モバイル環境検知
+            const isMobile = /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
+                'ontouchstart' in window || navigator.maxTouchPoints > 0;
+            console.log(`📱 モバイル環境: ${isMobile ? 'Yes' : 'No'}`);
+            // Step 1: フィールドの完全初期化（モバイル強化版）
+            await this.completeFieldReset(inputField);
+            // Step 2: フォーカス確立（モバイル対応）
+            await this.establishMobileFocus(inputField);
+            // Step 3: React内部状態の強制変更（モバイル版）
+            await this.setReactStateMobile(inputField, ticketId);
+            // Step 4: タッチイベントシミュレーション（モバイル専用）
+            if (isMobile) {
+                await this.simulateTouchInput(inputField, ticketId);
+            }
+            // Step 5: 従来の入力メソッド（デスクトップ互換）
+            await this.simulateTypingInput(inputField, ticketId);
+            // Step 6: IME完了待機とvalidation（モバイル強化）
+            await this.waitForInputStabilization();
+            // Step 7: 最終値検証と補正
+            const success = await this.validateAndCorrectFinalValue(inputField, ticketId);
+            return success;
         }
         catch (error) {
-            console.error('❌ paste入力エラー:', error);
+            console.error('❌ スマホ対応チケットID入力エラー:', error);
             return false;
         }
+    }
+    // Step 1: フィールドの完全初期化（モバイル強化版）
+    async completeFieldReset(inputField) {
+        console.log('🧹 フィールド完全初期化（モバイル対応）');
+        // 全ての方法で値をクリア
+        inputField.value = '';
+        inputField.textContent = '';
+        inputField.innerHTML = '';
+        inputField.setAttribute('value', '');
+        inputField.removeAttribute('value');
+        // React内部プロパティもクリア
+        const reactFiberKey = Object.keys(inputField).find(key => key.startsWith('__reactFiber'));
+        if (reactFiberKey) {
+            try {
+                const fiber = inputField[reactFiberKey];
+                if (fiber && fiber.memoizedProps) {
+                    fiber.memoizedProps.value = '';
+                }
+                if (fiber && fiber.pendingProps) {
+                    fiber.pendingProps.value = '';
+                }
+            }
+            catch (e) {
+                console.warn('React fiber清除失敗:', e);
+            }
+        }
+        // 各種イベントでクリア確定
+        inputField.dispatchEvent(new Event('input', { bubbles: true }));
+        inputField.dispatchEvent(new Event('change', { bubbles: true }));
+        // モバイル用追加待機
+        await new Promise(resolve => setTimeout(resolve, 200));
+        console.log('✅ フィールド初期化完了');
+    }
+    // Step 2: フォーカス確立（モバイル対応）
+    async establishMobileFocus(inputField) {
+        console.log('🎯 フォーカス確立（モバイル対応）');
+        // ブラウザの差異に対応するフォーカス処理
+        inputField.focus();
+        // iOS Safari対応: touchstartでフォーカスを強化
+        if ('ontouchstart' in window) {
+            const touchEvent = new TouchEvent('touchstart', {
+                bubbles: true,
+                cancelable: true,
+                touches: [new Touch({
+                        identifier: 0,
+                        target: inputField,
+                        clientX: inputField.offsetLeft + 10,
+                        clientY: inputField.offsetTop + 10
+                    })]
+            });
+            inputField.dispatchEvent(touchEvent);
+        }
+        // フォーカス確定待機
+        await new Promise(resolve => setTimeout(resolve, 100));
+        // フォーカス確認
+        if (document.activeElement !== inputField) {
+            console.warn('⚠️ フォーカス確立に失敗、再試行');
+            inputField.click(); // フォールバック
+            await new Promise(resolve => setTimeout(resolve, 100));
+        }
+        console.log(`✅ フォーカス確立完了: ${document.activeElement === inputField}`);
+    }
+    // Step 3: React内部状態の強制変更（モバイル版）
+    async setReactStateMobile(inputField, ticketId) {
+        console.log('⚛️ React内部状態変更（モバイル強化版）');
+        try {
+            // ネイティブセッターを使用（モバイルブラウザ対応）
+            const nativeInputValueSetter = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value')?.set;
+            if (nativeInputValueSetter) {
+                nativeInputValueSetter.call(inputField, ticketId);
+                console.log('📝 ネイティブ値セッター実行');
+            }
+            // React fiberの強制更新（モバイル対応）
+            const reactKeys = Object.keys(inputField).filter(key => key.startsWith('__reactFiber') || key.startsWith('__reactInternalInstance') || key.startsWith('__reactEventHandlers'));
+            for (const key of reactKeys) {
+                try {
+                    const reactInstance = inputField[key];
+                    if (reactInstance) {
+                        // フォース更新をスケジュール
+                        if (reactInstance.stateNode) {
+                            reactInstance.stateNode.value = ticketId;
+                        }
+                        if (reactInstance.memoizedState) {
+                            reactInstance.memoizedState.value = ticketId;
+                        }
+                    }
+                }
+                catch (e) {
+                    const errorMessage = e instanceof Error ? e.message : String(e);
+                    console.log(`React ${key}更新スキップ:`, errorMessage);
+                }
+            }
+            // React合成イベント発火（モバイル特化）
+            const syntheticEvent = new Event('input', { bubbles: true });
+            Object.defineProperty(syntheticEvent, 'target', { value: inputField, enumerable: true });
+            Object.defineProperty(syntheticEvent, 'currentTarget', { value: inputField, enumerable: true });
+            Object.defineProperty(syntheticEvent, 'nativeEvent', { value: syntheticEvent, enumerable: true });
+            inputField.dispatchEvent(syntheticEvent);
+            console.log('✅ React状態更新完了');
+        }
+        catch (error) {
+            console.warn('⚠️ React状態更新失敗:', error);
+        }
+        await new Promise(resolve => setTimeout(resolve, 100));
+    }
+    // Step 4: タッチイベントシミュレーション（モバイル専用）
+    async simulateTouchInput(inputField, ticketId) {
+        console.log('👆 タッチ入力シミュレーション（モバイル専用）');
+        // タッチ開始
+        const touchStartEvent = new TouchEvent('touchstart', {
+            bubbles: true,
+            cancelable: true,
+            touches: [new Touch({
+                    identifier: 0,
+                    target: inputField,
+                    clientX: inputField.offsetLeft + 10,
+                    clientY: inputField.offsetTop + 10
+                })]
+        });
+        inputField.dispatchEvent(touchStartEvent);
+        await new Promise(resolve => setTimeout(resolve, 50));
+        // 一文字ずつタッチ入力
+        for (let i = 0; i < ticketId.length; i++) {
+            const char = ticketId[i];
+            const currentValue = ticketId.substring(0, i + 1);
+            // タッチによるキー入力
+            const touchMoveEvent = new TouchEvent('touchmove', {
+                bubbles: true,
+                cancelable: true,
+                touches: [new Touch({
+                        identifier: 0,
+                        target: inputField,
+                        clientX: inputField.offsetLeft + 10 + i,
+                        clientY: inputField.offsetTop + 10
+                    })]
+            });
+            inputField.dispatchEvent(touchMoveEvent);
+            // 値を段階的に設定
+            inputField.value = currentValue;
+            inputField.setAttribute('value', currentValue);
+            // モバイル用inputイベント
+            const mobileInputEvent = new Event('input', { bubbles: true });
+            Object.defineProperty(mobileInputEvent, 'data', { value: char });
+            Object.defineProperty(mobileInputEvent, 'inputType', { value: 'insertText' });
+            inputField.dispatchEvent(mobileInputEvent);
+            await new Promise(resolve => setTimeout(resolve, 30)); // モバイル用遅延
+        }
+        // タッチ終了
+        const touchEndEvent = new TouchEvent('touchend', {
+            bubbles: true,
+            cancelable: true
+        });
+        inputField.dispatchEvent(touchEndEvent);
+        console.log('✅ タッチ入力シミュレーション完了');
+        await new Promise(resolve => setTimeout(resolve, 100));
+    }
+    // Step 5: 従来の入力メソッド（デスクトップ互換）
+    async simulateTypingInput(inputField, ticketId) {
+        console.log('⌨️ タイピング入力シミュレーション');
+        // 一文字ずつのキーボード入力シミュレーション
+        for (let i = 0; i < ticketId.length; i++) {
+            const char = ticketId[i];
+            const currentValue = ticketId.substring(0, i + 1);
+            // keydown
+            const keydownEvent = new KeyboardEvent('keydown', {
+                key: char,
+                code: `Key${char.toUpperCase()}`,
+                bubbles: true,
+                cancelable: true
+            });
+            inputField.dispatchEvent(keydownEvent);
+            // 値更新
+            inputField.value = currentValue;
+            // input（詳細プロパティ付き）
+            const inputEvent = new Event('input', { bubbles: true });
+            Object.defineProperty(inputEvent, 'target', { value: inputField, enumerable: true });
+            Object.defineProperty(inputEvent, 'data', { value: char, enumerable: true });
+            Object.defineProperty(inputEvent, 'inputType', { value: 'insertText', enumerable: true });
+            inputField.dispatchEvent(inputEvent);
+            // keyup
+            const keyupEvent = new KeyboardEvent('keyup', {
+                key: char,
+                code: `Key${char.toUpperCase()}`,
+                bubbles: true,
+                cancelable: true
+            });
+            inputField.dispatchEvent(keyupEvent);
+            await new Promise(resolve => setTimeout(resolve, 15));
+        }
+        // pasteイベントも実行（フォールバック）
+        const clipboardData = new DataTransfer();
+        clipboardData.setData('text/plain', ticketId);
+        const pasteEvent = new ClipboardEvent('paste', {
+            bubbles: true,
+            cancelable: true,
+            clipboardData: clipboardData
+        });
+        inputField.dispatchEvent(pasteEvent);
+        console.log('✅ タイピング入力シミュレーション完了');
+    }
+    // Step 6: IME完了待機とvalidation（モバイル強化）
+    async waitForInputStabilization() {
+        console.log('⏳ 入力安定化待機（IME対応）');
+        // IME完了やフォーム更新の完了を待機
+        await new Promise(resolve => setTimeout(resolve, 800)); // モバイル環境での待機時間延長
+        // 追加のUIスレッド安定化待機
+        await new Promise(resolve => requestAnimationFrame(() => {
+            requestAnimationFrame(resolve);
+        }));
+        console.log('✅ 入力安定化完了');
+    }
+    // Step 7: 最終値検証と補正
+    async validateAndCorrectFinalValue(inputField, ticketId) {
+        console.log('🔍 最終値検証と補正');
+        let finalValue = inputField.value;
+        console.log(`📊 最終値確認: "${finalValue}" (期待値: "${ticketId}")`);
+        if (finalValue === ticketId) {
+            console.log('✅ 入力値検証成功');
+            // 完了イベント発火
+            inputField.dispatchEvent(new Event('change', { bubbles: true }));
+            inputField.dispatchEvent(new Event('blur', { bubbles: true }));
+            inputField.dispatchEvent(new Event('focusout', { bubbles: true }));
+            return true;
+        }
+        // 不一致の場合、強制補正を試行
+        console.warn(`⚠️ 値の不一致検出、強制補正を実行: 実際="${finalValue}" 期待="${ticketId}"`);
+        // 最後の手段: 全ての方法で強制的に値を設定
+        inputField.value = ticketId;
+        inputField.textContent = ticketId;
+        inputField.setAttribute('value', ticketId);
+        // DOM更新強制
+        inputField.style.display = 'none';
+        inputField.offsetHeight; // reflow強制
+        inputField.style.display = '';
+        // 全イベント再発火
+        ['input', 'change', 'keyup', 'blur'].forEach(eventType => {
+            inputField.dispatchEvent(new Event(eventType, { bubbles: true }));
+        });
+        // 最終確認
+        await new Promise(resolve => setTimeout(resolve, 500));
+        finalValue = inputField.value;
+        const success = finalValue === ticketId;
+        console.log(`🎯 強制補正結果: ${success ? '成功' : '失敗'} (最終値: "${finalValue}")`);
+        return success;
     }
     // 追加ボタンをクリック（動的待機付き）
     async clickAddButton() {
@@ -7588,16 +7845,6 @@ else {
 // 必要に応じてES6のexportを使用する
 
 ;// ./src-modules/main.ts
-// ==UserScript==
-// @name         yt-Expo2025-Reservation-Helper
-// @namespace    http://staybrowser.com/
-// @version      0.3
-// @description  help expo2025 ticket site
-// @author       TomoTom0 https://github.com/TomoTom0
-// @match        https://ticket.expo2025.or.jp/event_search/*
-// @grant       none
-// @run-at       document-end
-// ==/UserScript==
 /**
  * メインエントリーポイント
  * 各sectionモジュールをimportすることで、webpackで統合されたバンドルを作成
