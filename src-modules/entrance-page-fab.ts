@@ -596,6 +596,10 @@ function handleCalendarChange(): void {
     const newSelectedDate = getCurrentSelectedCalendarDate();
     const calendarDateChanged = newSelectedDate !== calendarWatchState.currentSelectedDate;
     
+    // 入場予約状態管理の管理している日付とも比較
+    const stateManagerSelectedDate = entranceReservationStateManager.getSelectedCalendarDate();
+    const actualDateChanged = newSelectedDate !== stateManagerSelectedDate;
+    
     if (calendarDateChanged) {
         console.log(`📅 カレンダー日付変更を検出: ${calendarWatchState.currentSelectedDate} → ${newSelectedDate}`);
         
@@ -612,15 +616,20 @@ function handleCalendarChange(): void {
             entranceReservationStateManager.setSelectedCalendarDate(newSelectedDate);
         }
         
-        // 既存の監視状態をクリア（日付が変わったため）
-        // 入場予約状態管理システムからもクリア
-        const hasReservationTarget = entranceReservationStateManager.hasReservationTarget();
-        const hasMonitoringTargets = entranceReservationStateManager.hasMonitoringTargets();
-        
-        if (hasReservationTarget || hasMonitoringTargets) {
-            console.log('📅 日付変更により入場予約状態管理システムの対象をクリア');
-            entranceReservationStateManager.clearReservationTarget();
-            entranceReservationStateManager.clearMonitoringTargets();
+        // 実際に日付が変更された場合のみ監視状態をクリア
+        if (actualDateChanged) {
+            console.log(`📅 実際の日付変更確認: ${stateManagerSelectedDate} → ${newSelectedDate}`);
+            
+            const hasReservationTarget = entranceReservationStateManager.hasReservationTarget();
+            const hasMonitoringTargets = entranceReservationStateManager.hasMonitoringTargets();
+            
+            if (hasReservationTarget || hasMonitoringTargets) {
+                console.log('📅 日付変更により入場予約状態管理システムの対象をクリア');
+                entranceReservationStateManager.clearReservationTarget();
+                entranceReservationStateManager.clearMonitoringTargets();
+            }
+        } else {
+            console.log('📅 同じ日付への再クリックのため監視対象は維持');
         }
         
         // 従来システムはもう使用しないため、このブロックは削除

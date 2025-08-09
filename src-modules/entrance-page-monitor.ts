@@ -12,6 +12,13 @@ import {
     extractTdStatus
 } from './entrance-page-dom-utils';
 
+// UI更新ヘルパー関数のimport（循環参照を避けるため独立モジュール）
+import {
+    updateMainButtonDisplay,
+    disableAllMonitorButtons,
+    updateMonitoringTargetsDisplay
+} from './entrance-page-ui-helpers';
+
 // 型定義のインポート
 import type { 
     TimeSlotInfo,
@@ -173,6 +180,7 @@ function startTimeSlotTableObserver(): void {
                                 safeCall('restoreSelectionAfterUpdate');
                                 
                                 // テーブル内容を記録
+                                safeCall('restoreSelectionAfterUpdate');
                                 lastTableContent = safeCall('getCurrentTableContent');
                                 isProcessing = false;
                             }, 200);
@@ -697,10 +705,10 @@ function handleMonitorButtonClick(slotInfo: TimeSlotInfo, buttonElement: HTMLBut
         }
         
         // メインボタンの表示を更新
-        safeCall('updateMainButtonDisplay');
+        updateMainButtonDisplay();
         
         // 監視対象表示も更新
-        safeCall('updateMonitoringTargetsDisplay');
+        updateMonitoringTargetsDisplay();
         
         // 監視対象を解除完了
     } else {
@@ -762,10 +770,10 @@ function handleMonitorButtonClick(slotInfo: TimeSlotInfo, buttonElement: HTMLBut
             console.log(`🔄 監視対象設定後のFAB更新を実行: targetSlots=${targetCount}個`);
             console.log('📊 入場予約状態管理の監視対象一覧:', targets.map((t: any) => `${LocationHelper.getLocationFromIndex(t.locationIndex) === 'east' ? '東' : '西'}${t.timeSlot}`));
         }
-        safeCall('updateMainButtonDisplay');
+        updateMainButtonDisplay();
         
         // 監視対象表示も更新
-        safeCall('updateMonitoringTargetsDisplay');
+        updateMonitoringTargetsDisplay();
         
         // 更新後の状態も確認
         setTimeout(() => {
@@ -791,10 +799,11 @@ async function startSlotMonitoring(): Promise<void> {
         console.log('⚠️ 入場予約状態管理での監視開始に失敗しました (状態確認が必要)');
     }
     
-    safeCall('updateMainButtonDisplay'); // 即座にボタン表示を更新
+    // UI更新はカウントダウン開始後に行う（上書き防止のため初期UI更新をスキップ）
+    // updateMainButtonDisplay();
     
     // 監視実行中は全ての監視ボタンを無効化
-    safeCall('disableAllMonitorButtons');
+    disableAllMonitorButtons();
     
     const targets = entranceReservationStateManager.getMonitoringTargets();
     const targetTexts = targets.map((t: any) => {
@@ -848,10 +857,14 @@ async function checkSlotAvailabilityAndReload(): Promise<void> {
         console.log(`  → 監視を終了し、自動選択+予約を開始します`);
         
         // ボタン表示を更新（見つかりましたモード）
-        safeCall('updateMainButtonDisplay', 'found-available');
+        window.dispatchEvent(new CustomEvent('entrance-ui-update', { 
+            detail: { type: 'main-button', mode: 'found-available' } 
+        }));
         
         // 自動選択
-        await safeCall('selectTimeSlotAndStartReservation', currentSlot);
+        window.dispatchEvent(new CustomEvent('entrance-auto-select', { 
+            detail: { slot: currentSlot } 
+        }));
         return;
     }
     
@@ -865,7 +878,7 @@ async function checkSlotAvailabilityAndReload(): Promise<void> {
     const displaySeconds = Math.ceil(totalWaitTime / 1000);
     
     // カウントダウンとリロードを統一実行
-    safeCall('scheduleReload', displaySeconds);
+    entranceReservationStateManager.scheduleReload(displaySeconds);
 }
 
 
