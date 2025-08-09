@@ -281,6 +281,7 @@ function createEntranceReservationUI(config: ReservationConfig): void {
                 return;
             } else if (preferredAction === 'reservation') {
                 console.log('🚀 統一状態管理システムによる予約開始');
+                unifiedStateManager.startReservation();
                 // 予約処理は下の通常処理で実行
             } else {
                 console.log('⚠️ 統一状態管理システム: 実行可能なアクションなし');
@@ -334,6 +335,7 @@ function createEntranceReservationUI(config: ReservationConfig): void {
             showStatus(`エラー: ${errorMessage}`, 'red');
         } finally {
             entranceReservationState.isRunning = false;
+            entranceReservationState.shouldStop = false;
             entranceReservationState.startTime = null;
             entranceReservationState.attempts = 0;
             updateMainButtonDisplay();
