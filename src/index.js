@@ -1,10 +1,13 @@
 // ==UserScript==
 // @name         yt-Expo2025-Reservation-Helper
 // @namespace    http://staybrowser.com/
-// @version      0.5.4
-// @description  大阪万博2025予約支援ツール: パビリオン検索補助, 入場予約監視自動化, 同行者追加自動化
+// @version      0.3
+// @description  help expo2025 ticket site
 // @author       TomoTom0 https://github.com/TomoTom0
-// @match        https://ticket.expo2025.or.jp/*
+// @match        https://ticket.expo2025.or.jp/event_search/*
+// @match        https://ticket.expo2025.or.jp/ticket_selection/*
+// @match        https://ticket.expo2025.or.jp/agent_ticket/*
+// @match        https://ticket.expo2025.or.jp/ticket_visiting_reservation/*
 // @grant       none
 // @run-at       document-end
 // ==/UserScript==
@@ -4745,6 +4748,37 @@ function showStatus(message, color = 'white') {
         }, 3000);
     }
 }
+// 待機時間のカウントダウン表示
+async function showCountdownWait(totalSeconds) {
+    return new Promise((resolve) => {
+        let remainingSeconds = totalSeconds;
+        const updateDisplay = () => {
+            if (entrance_page_state.entranceReservationState.shouldStop) {
+                resolve();
+                return;
+            }
+            let displayText = '';
+            if (remainingSeconds >= 60) {
+                const minutes = Math.floor(remainingSeconds / 60);
+                displayText = `予約待機(${minutes}分)`;
+            }
+            else if (remainingSeconds > 20) {
+                displayText = `予約待機(${remainingSeconds}秒)`;
+            }
+            else {
+                displayText = `予約待機(${remainingSeconds})`;
+            }
+            showStatus(displayText, 'orange');
+            if (remainingSeconds <= 0) {
+                resolve();
+                return;
+            }
+            remainingSeconds--;
+            setTimeout(updateDisplay, 1000);
+        };
+        updateDisplay();
+    });
+}
 function createEntranceReservationUI(config) {
     // 既存のFABがあれば削除
     const existingFab = document.getElementById('ytomo-fab-container');
@@ -4926,6 +4960,7 @@ function createEntranceReservationUI(config) {
             }
             else if (preferredAction === 'reservation') {
                 console.log('🚀 統一状態管理システムによる予約開始');
+                unifiedStateManager.startReservation();
                 // 予約処理は下の通常処理で実行
             }
             else {
@@ -4980,6 +5015,7 @@ function createEntranceReservationUI(config) {
         }
         finally {
             entrance_page_state.entranceReservationState.isRunning = false;
+            entrance_page_state.entranceReservationState.shouldStop = false;
             entrance_page_state.entranceReservationState.startTime = null;
             entrance_page_state.entranceReservationState.attempts = 0;
             (0,entrance_page_ui/* updateMainButtonDisplay */.vp)();
@@ -5398,14 +5434,16 @@ function setupTimeSlotClickHandlers() {
 async function entranceReservationHelper(config) {
     const { selectors, selectorTexts, timeouts } = config;
     let attempts = 0;
-    const maxAttempts = 100;
+    const batchSize = 100; // 100回ごとに待機
+    let totalAttempts = 0;
     console.log('入場予約補助機能を開始します...');
-    while (attempts < maxAttempts && !entrance_page_state.entranceReservationState.shouldStop) {
+    while (!entrance_page_state.entranceReservationState.shouldStop) {
         attempts++;
-        console.log(`試行回数: ${attempts}`);
+        totalAttempts++;
+        console.log(`試行回数: ${totalAttempts} (バッチ内: ${attempts})`);
         const statusDiv = document.getElementById('reservation-status');
         if (statusDiv) {
-            statusDiv.innerText = `試行中... (${attempts}回目)`;
+            statusDiv.innerText = `試行中... (${totalAttempts}回目)`;
         }
         try {
             console.log('1. submitボタンを待機中...');
@@ -5414,7 +5452,7 @@ async function entranceReservationHelper(config) {
                 break;
             console.log('submitボタンが見つかりました。クリックします。');
             // submit押下時に回数を更新
-            entrance_page_state.entranceReservationState.attempts = attempts;
+            entrance_page_state.entranceReservationState.attempts = totalAttempts;
             await clickElement(submitButton, config);
             console.log('2. レスポンスを待機中...');
             const responseSelectors = {
@@ -5438,7 +5476,7 @@ async function entranceReservationHelper(config) {
                 console.log(`最終レスポンス検出: ${finalResponse.key}`);
                 if (finalResponse.key === 'success') {
                     console.log('🎉 予約成功！処理を終了します。');
-                    return { success: true, attempts };
+                    return { success: true, attempts: totalAttempts };
                 }
                 else {
                     console.log('予約失敗。closeボタンをクリックして再試行します。');
@@ -5449,7 +5487,7 @@ async function entranceReservationHelper(config) {
             }
             else if (response.key === 'success') {
                 console.log('🎉 予約成功！処理を終了します。');
-                return { success: true, attempts };
+                return { success: true, attempts: totalAttempts };
             }
             else if (response.key === 'failure') {
                 console.log('予約失敗。closeボタンをクリックして再試行します。');
@@ -5460,18 +5498,29 @@ async function entranceReservationHelper(config) {
         }
         catch (error) {
             const errorMessage = error instanceof Error ? error.message : String(error);
-            console.error(`エラーが発生しました (試行 ${attempts}):`, errorMessage);
+            console.error(`エラーが発生しました (試行 ${totalAttempts}):`, errorMessage);
             if (entrance_page_state.entranceReservationState.shouldStop)
                 break;
             await new Promise(resolve => setTimeout(resolve, getRandomWaitTime(config.randomSettings.minRetryDelay, config.randomSettings.retryRandomRange, config)));
         }
+        // 100回ごとに待機時間を設ける
+        if (attempts >= batchSize && !entrance_page_state.entranceReservationState.shouldStop) {
+            console.log(`${batchSize}回試行完了。2-3分の待機を開始します...`);
+            // 2-3分のランダム待機（120-180秒）
+            const waitSeconds = Math.floor(Math.random() * 61) + 120; // 120-180秒
+            console.log(`待機時間: ${waitSeconds}秒`);
+            await showCountdownWait(waitSeconds);
+            // バッチカウンターをリセット
+            attempts = 0;
+            console.log('待機終了。予約試行を再開します...');
+        }
     }
     if (entrance_page_state.entranceReservationState.shouldStop) {
         console.log('ユーザーによってキャンセルされました。');
-        return { success: false, attempts, cancelled: true };
+        return { success: false, attempts: totalAttempts, cancelled: true };
     }
-    console.log(`最大試行回数 (${maxAttempts}) に達しました。処理を終了します。`);
-    return { success: false, attempts };
+    // 無限ループなので、ここには到達しない
+    return { success: false, attempts: totalAttempts };
 }
 // エクスポート
 
