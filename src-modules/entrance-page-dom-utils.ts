@@ -11,10 +11,19 @@ import type {
     TimeSlotTarget
 } from '../types/index.js';
 
+// 統一時間帯状態判定関数をimport
+import { detectTimeslotStatus } from './timeslot-status-detector';
+
+// テーブルセレクタ辞書
+export const tableSelectors = {
+    timeSlotTable: "table[class*='style_main__timetable__']",
+    calendarTable: "table[class*='style_main__calendar__']"
+};
+
 // 時間帯セレクタ定義（設計書の固定DOM構造に基づく）
 export const timeSlotSelectors: TimeSlotSelectors = {
     // 時間帯選択エリア
-    timeSlotContainer: "table",
+    timeSlotContainer: tableSelectors.timeSlotTable,
     timeSlotCells: "td[data-gray-out] div[role='button']",
     
     // 状態判定 - 設計書の構造に基づく正確な定義
@@ -35,8 +44,8 @@ export function generateUniqueTdSelector(tdElement: HTMLTableCellElement): strin
     const rowIndex = Array.from(row.parentElement!.children).indexOf(row);
     const cellIndex = Array.from(row.children).indexOf(tdElement);
     
-    // 設計書に基づく固定DOM構造での一意セレクタ
-    return `table tr:nth-child(${rowIndex + 1}) td:nth-child(${cellIndex + 1})[data-gray-out]`;
+    // 時間帯テーブル専用の固有セレクタ
+    return `${tableSelectors.timeSlotTable} tbody tr:nth-child(${rowIndex + 1}) td:nth-child(${cellIndex + 1})`;
 }
 
 export function getTdPositionInfo(tdElement: HTMLTableCellElement): { rowIndex: number; cellIndex: number } {
@@ -64,7 +73,11 @@ export function findSameTdElement(targetInfo: TimeSlotTarget): HTMLTableCellElem
         if (table) {
             const rows = table.querySelectorAll('tr');
             if (rows[targetInfo.positionInfo.rowIndex]) {
-                const cells = rows[targetInfo.positionInfo.rowIndex].querySelectorAll('td[data-gray-out]');
+                // 時間帯セルのみを対象（data-gray-out属性の有無に関係なく）
+                const allCells = rows[targetInfo.positionInfo.rowIndex].querySelectorAll('td');
+                const cells = Array.from(allCells).filter(cell => 
+                    cell.querySelector('div[role="button"]')
+                ) as HTMLTableCellElement[];
                 if (cells[targetInfo.positionInfo.cellIndex]) {
                     return cells[targetInfo.positionInfo.cellIndex] as HTMLTableCellElement;
                 }
@@ -76,47 +89,20 @@ export function findSameTdElement(targetInfo: TimeSlotTarget): HTMLTableCellElem
 }
 
 export function extractTdStatus(tdElement: HTMLTableCellElement): TdStatus | null {
-    if (!tdElement) return null;
+    // 統一状態判定関数を使用
+    const result = detectTimeslotStatus(tdElement);
+    if (!result) return null;
     
-    const buttonDiv = tdElement.querySelector('div[role="button"]') as HTMLElement;
+    // DOM構造: .btnDivまたはdiv[role="button"]のどちらでも対応
+    const buttonDiv = (tdElement.querySelector('.btnDiv') || tdElement.querySelector('div[role="button"]')) as HTMLElement;
     if (!buttonDiv) return null;
     
-    const timeSpan = buttonDiv.querySelector('dt span') as HTMLSpanElement;
-    const timeText = timeSpan ? timeSpan.textContent?.trim() || '' : '';
-    
-    // 満員判定
-    const isDisabled = buttonDiv.hasAttribute('data-disabled') && buttonDiv.getAttribute('data-disabled') === 'true';
-    const hasFullIcon = buttonDiv.querySelector('img[src*="calendar_ng.svg"]');
-    const isFull = isDisabled && !!hasFullIcon;
-    
-    // 利用可能判定
-    const hasLowIcon = buttonDiv.querySelector('img[src*="ico_scale_low.svg"]');
-    const hasHighIcon = buttonDiv.querySelector('img[src*="ico_scale_high.svg"]');
-    const isAvailable = !isDisabled && !!(hasLowIcon || hasHighIcon);
-    
-    // 選択状態判定
-    const isSelected = buttonDiv.classList.contains('selected') || 
-                      buttonDiv.hasAttribute('aria-selected') ||
-                      buttonDiv.getAttribute('aria-pressed') === 'true';
-    
-    // ステータス判定
-    let status: 'full' | 'available' | 'selected' | 'unknown';
-    if (isSelected) {
-        status = 'selected';
-    } else if (isFull) {
-        status = 'full';
-    } else if (isAvailable) {
-        status = 'available';
-    } else {
-        status = 'unknown';
-    }
-    
     return {
-        timeText,
-        isFull,
-        isAvailable,
-        isSelected,
-        status,
+        timeText: result.timeText,
+        isFull: result.isFull,
+        isAvailable: result.isAvailable,
+        isSelected: result.isSelected,
+        status: result.statusType,
         element: buttonDiv,
         tdElement
     };
@@ -146,7 +132,7 @@ export async function waitForCalendar(timeout: number = 10000): Promise<boolean>
         const buttons = document.querySelectorAll('[role="button"]');
         
         if (tables.length > 0 || buttons.length > 10) {
-            console.log(`⏳ DOM要素は存在するがtime要素がまだ生成されていません (table: ${tables.length}, button: ${buttons.length})`);
+            // DOM要素待機中（ログ削減）
         }
         
         await new Promise(resolve => setTimeout(resolve, checkInterval));

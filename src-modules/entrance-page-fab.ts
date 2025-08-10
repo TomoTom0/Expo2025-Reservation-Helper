@@ -335,16 +335,16 @@ function createEntranceReservationUI(): void {
         // 設定オブジェクトを作成
         const config: ReservationConfig = {
             selectors: {
-                submit: 'button[type="submit"]',
-                change: 'button:contains("変更")',
-                success: '.success, .completed, [class*="success"]',
-                failure: '.error, .failed, [class*="error"]',
-                close: 'button:contains("閉じる"), button:contains("OK"), .close-button'
+                submit: "#__next > div > div > main > div > div.style_main__add_cart_button__DCOw8 > button",
+                change: "body > div > div > div > div > div > div > button",
+                success: "#reservation_modal_title",
+                failure: "#reservation_fail_modal_title",
+                close: "body > div.style_buy-modal__1JZtS > div > div > div > div > ul > li > a"
             },
             selectorTexts: {
-                change: '変更',
-                success: '完了',
-                failure: 'エラー'
+                change: "来場日時を変更する",
+                success: "完了",
+                failure: "エラー"
             },
             timeouts: {
                 waitForSubmit: 3000,
@@ -446,8 +446,8 @@ function createEntranceReservationUI(): void {
             console.log(`🖱️ 自動選択: 時間帯をクリック ${timeSlot}`);
             const timeSlotElement = document.querySelector(slot.targetInfo.selector);
             if (timeSlotElement) {
-                const buttonElement = timeSlotElement.querySelector('button');
-                if (buttonElement && !buttonElement.disabled) {
+                const buttonElement = timeSlotElement.querySelector('div[role="button"]') as HTMLElement;
+                if (buttonElement && buttonElement.getAttribute('data-disabled') !== 'true') {
                     buttonElement.click();
                     console.log(`✅ 時間帯選択完了: ${timeSlot}`);
                     
@@ -840,7 +840,7 @@ function waitForTimeSlotTable(callback: () => void): void {
             console.log('⚠️ 時間帯テーブルの準備がタイムアウト - 強制実行');
             callback();
         } else {
-            console.log(`🔍 時間帯テーブル待機中... (${attempts}/${maxAttempts})`);
+            // 時間帯テーブル待機中（ログ削減）
             setTimeout(checkTableReady, checkInterval);
         }
     };

@@ -160,7 +160,6 @@ function startTimeSlotTableObserver(): void {
                                 restoreSelectionAfterUpdate();
                                 
                                 // テーブル内容を記録
-                                restoreSelectionAfterUpdate();
                                 lastTableContent = getCurrentTableContent();
                                 isProcessing = false;
                             }, 200);
@@ -972,18 +971,6 @@ function findTargetSlotInPageUnified(): any {
             const location = LocationHelper.getLocationFromIndex(target.locationIndex);
             const locationText = location === 'east' ? '東' : '西';
             
-            // 詳細なデバッグ情報を出力
-            const buttonElement = targetTd.querySelector('div[role="button"]');
-            const dataDisabled = buttonElement?.getAttribute('data-disabled');
-            const fullIcon = buttonElement?.querySelector('img[src*="calendar_ng.svg"]');
-            const lowIcon = buttonElement?.querySelector('img[src*="ico_scale_low.svg"]');
-            const highIcon = buttonElement?.querySelector('img[src*="ico_scale_high.svg"]');
-            
-            console.log(`🔍 監視対象要素を発見: ${locationText}${target.timeSlot}`);
-            console.log(`  - 現在状態: isAvailable=${currentStatus?.isAvailable}, isFull=${currentStatus?.isFull}`);
-            console.log(`  - data-disabled: ${dataDisabled}`);
-            console.log(`  - 満員アイコン: ${!!fullIcon}, 低混雑: ${!!lowIcon}, 高空き: ${!!highIcon}`);
-            
             // 利用可能になったかチェック
             if (currentStatus && currentStatus.isAvailable) {
                 console.log(`🎉 監視対象要素が利用可能になりました！: ${locationText}${target.timeSlot}`);
@@ -992,7 +979,12 @@ function findTargetSlotInPageUnified(): any {
             } else if (currentStatus && currentStatus.isFull) {
                 console.log(`⏳ 監視対象要素はまだ満員: ${locationText}${target.timeSlot}`);
             } else {
-                console.log(`❓ 監視対象要素の状態が不明: ${locationText}${target.timeSlot} (isAvailable: ${currentStatus?.isAvailable}, isFull: ${currentStatus?.isFull})`);
+                // 満員でも利用可能でもない場合（通常は満員状態での監視継続）
+                if (currentStatus) {
+                    console.log(`🔍 監視継続中: ${locationText}${target.timeSlot} (満員:${currentStatus.isFull}, 利用可能:${currentStatus.isAvailable}, 選択:${currentStatus.isSelected})`);
+                } else {
+                    console.log(`❓ 監視対象要素の状態が不明: ${locationText}${target.timeSlot} (status取得失敗)`);
+                }
             }
         } else {
             // 要素が見つからない場合
@@ -1632,8 +1624,11 @@ export async function restoreFromCache(): Promise<void> {
         // 各監視対象を統一状態管理システムに追加
         for (const target of cached.targets) {
             try {
-                const locationIndex = target.locationIndex || 0;
+                const locationIndex = typeof target.locationIndex === 'number' ? target.locationIndex : 0;
                 const timeSlot = target.timeSlot; // キャッシュ保存と復元でキー名統一済み
+                
+                console.log(`🔍 キャッシュデータ: timeSlot=${timeSlot}, locationIndex=${target.locationIndex} → 使用値=${locationIndex}`);
+                
                 entranceReservationStateManager.addMonitoringTarget(timeSlot, locationIndex, target.tdSelector || '');
                 console.log(`✅ 監視対象追加: ${timeSlot} (位置: ${locationIndex})`);
             } catch (error) {
@@ -2116,27 +2111,25 @@ function restoreSelectionAfterUpdate(): void {
         console.log(`🔍 復元対象: ${target.timeSlot} (selector: ${target.selector})`);
         let foundMatch = false;
         
-        monitorButtons.forEach(button => {
-            const buttonTargetTime = button.getAttribute('data-target-time') || '';
-            const buttonTdElement = button.closest('td[data-gray-out]') as HTMLTableCellElement;
-            const buttonTdSelector = buttonTdElement ? generateUniqueTdSelector(buttonTdElement) : '';
-            
-            // 時間+位置で一致するかチェック
-            if (buttonTargetTime === target.timeSlot && buttonTdSelector === target.selector) {
-                foundMatch = true;
-                const span = button.querySelector('span') as HTMLSpanElement;
-                if (span) {
-                    // 監視対象リストでの位置を取得（入場予約状態管理の優先度を使用）
-                    const priority = target.priority;
-                    span.innerText = `監視${priority}`;
-                    (button as HTMLElement).classList.remove('full-status');
-                    (button as HTMLElement).classList.add('monitoring-status');
-                    restoredCount++;
-                    
-                    console.log(`✅ 選択状態を復元しました: ${target.timeSlot}`);
+        // セレクタで直接検索
+        if (target.selector) {
+            const targetElement = document.querySelector(target.selector) as HTMLTableCellElement;
+            if (targetElement) {
+                const buttonInTargetTd = targetElement.querySelector('.monitor-btn') as HTMLElement;
+                if (buttonInTargetTd) {
+                    foundMatch = true;
+                    const span = buttonInTargetTd.querySelector('span') as HTMLSpanElement;
+                    if (span) {
+                        const priority = target.priority;
+                        span.innerText = `監視${priority}`;
+                        buttonInTargetTd.classList.remove('full-status');
+                        buttonInTargetTd.classList.add('monitoring-status');
+                        restoredCount++;
+                        console.log(`✅ セレクタで復元成功: ${target.timeSlot}`);
+                    }
                 }
             }
-        });
+        }
         
         if (!foundMatch) {
             console.log(`❌ 復元対象が見つかりません: ${target.timeSlot} (selector: ${target.selector})`);
@@ -2144,19 +2137,119 @@ function restoreSelectionAfterUpdate(): void {
     });
     
     if (restoredCount === 0) {
-        console.log(`⚠️ 対象時間帯が見つからないため選択状態をリセット: ${targetTexts}`);
-        // 対象時間帯がない場合は状態をリセット
-        if (entranceReservationStateManager) {
-            entranceReservationStateManager.clearAllTargets();
-            entranceReservationStateManager.stop();  // 実行状態もIDLEにリセット
-        }
-        if (cacheManager) {
-            cacheManager.clearTargetSlots();
-        }
+        console.log(`⚠️ 復元に失敗しましたが、監視対象はクリアしません: ${targetTexts}`);
+        console.log(`💡 DOM構造変化によるセレクタ無効化の可能性があります`);
+        console.log(`💡 次回の監視実行時に自動的にセレクタが更新されます`);
+        // 注意: 復元失敗でも監視対象をクリアしない（DOM構造変化の場合があるため）
+    } else {
+        console.log(`✅ 復元完了: ${restoredCount}/${targets.length}個の監視対象を復元しました`);
     }
+    
     
     updateMainButtonDisplayHelper();
 }
+
+/* 
+// キャッシュ復元後の可用性チェック（一時的に無効化）
+function checkAvailabilityAfterCacheRestore(): void {
+    if (!entranceReservationStateManager || !entranceReservationStateManager.hasMonitoringTargets()) {
+        return;
+    }
+    
+    console.log('🔍 キャッシュ復元後の監視対象可用性をチェック中...');
+    
+    const monitoringTargets = entranceReservationStateManager.getMonitoringTargets();
+    let availableCount = 0;
+    
+    for (const target of monitoringTargets) {
+        const tdElement = document.querySelector(target.selector) as HTMLTableCellElement;
+        if (!tdElement) continue;
+        
+        const buttonElement = tdElement.querySelector('div[role="button"]') as HTMLElement;
+        if (!buttonElement) continue;
+        
+        // 満員かどうか確認（data-disabled属性の有無で判定）
+        const isDisabled = buttonElement.getAttribute('data-disabled') === 'true';
+        const isAvailable = !isDisabled;
+        
+        if (isAvailable) {
+            availableCount++;
+            console.log(`✅ 空きあり検出: ${target.timeSlot} (位置: ${target.locationIndex})`);
+        }
+    }
+    
+    if (availableCount > 0) {
+        console.log(`🎉 ${availableCount}個の監視対象に空きが出ています - 既存処理に委ねます`);
+        
+        // 既存の自動/手動リロード時の空き検出処理を呼び出す
+        // これにより統一された空き検出・自動予約ロジックが動作する
+        handleAvailabilityDetected();
+    } else {
+        console.log('📋 すべての監視対象が満員状態です');
+    }
+}
+
+// 空き検出時の処理（既存の自動/手動リロード処理と統合）
+function handleAvailabilityDetected(): void {
+    console.log('🔄 キャッシュ復元後の空き検出 - 既存の自動予約処理を実行');
+    
+    if (!entranceReservationStateManager || !entranceReservationStateManager.hasMonitoringTargets()) {
+        return;
+    }
+    
+    // 優先度最高の空き監視対象を取得
+    const monitoringTargets = entranceReservationStateManager.getMonitoringTargets();
+    let highestPriorityAvailable: any = null;
+    
+    for (const target of monitoringTargets) {
+        const tdElement = document.querySelector(target.selector) as HTMLTableCellElement;
+        if (!tdElement) continue;
+        
+        const buttonElement = tdElement.querySelector('div[role="button"]') as HTMLElement;
+        if (!buttonElement) continue;
+        
+        const isAvailable = buttonElement.getAttribute('data-disabled') !== 'true';
+        if (isAvailable && (!highestPriorityAvailable || target.priority < highestPriorityAvailable.priority)) {
+            highestPriorityAvailable = target;
+        }
+    }
+    
+    if (highestPriorityAvailable) {
+        console.log(`🎯 優先度最高の空き時間帯を自動選択: ${highestPriorityAvailable.timeSlot}`);
+        
+        // 自動リロードかどうかを判定
+        const isAutoReload = entranceReservationStateManager.isMonitoringRunning() || false;
+        
+        if (isAutoReload) {
+            console.log(`  → 自動リロード相当: 監視を終了し、自動選択+予約を開始`);
+            
+            // ボタン表示を更新（見つかりましたモード）
+            window.dispatchEvent(new CustomEvent('entrance-ui-update', { 
+                detail: { type: 'main-button', mode: 'found-available' } 
+            }));
+            
+            // 自動選択イベントを発火
+            const slotInfo = {
+                targetInfo: {
+                    timeSlot: highestPriorityAvailable.timeSlot,
+                    tdSelector: highestPriorityAvailable.selector,
+                    locationIndex: highestPriorityAvailable.locationIndex
+                },
+                timeText: highestPriorityAvailable.timeSlot
+            };
+            
+            window.dispatchEvent(new CustomEvent('entrance-auto-select', { 
+                detail: { slot: slotInfo } 
+            }));
+        } else {
+            console.log(`  → 手動リロード相当: ステータス表示+監視対象削除+予約対象化`);
+            
+            // 手動リロード時の処理（監視対象から予約対象への移行）
+            updateMainButtonDisplayHelper();
+        }
+    }
+}
+*/
 
 // 時間帯を自動選択して予約開始
 async function selectTimeSlotAndStartReservation(slotInfo: any): Promise<void> {

@@ -119,27 +119,27 @@ button.ext-ytomo {
       }
     }
 
-    // 無効状態 - 元の色の痕跡を残す
+    // 無効状態 - 元の色の痕跡を残しつつ可読性を確保
     &:disabled {
       cursor: not-allowed !important;
-      opacity: 0.4 !important;
+      opacity: 0.7 !important;
       
       // 満員状態のdisabled
       &.full-status {
-        background: rgba(34, 139, 34, 0.3) !important; // 緑色の透明度を下げた状態
-        color: rgba(255, 255, 255, 0.7) !important;
+        background: rgba(34, 139, 34, 0.5) !important; // 緑色の透明度を下げた状態
+        color: rgba(255, 255, 255, 0.9) !important;
       }
       
       // 監視中状態のdisabled
       &.monitoring-status {
-        background: rgba(220, 53, 69, 0.3) !important; // 赤色の透明度を下げた状態
-        color: rgba(255, 255, 255, 0.7) !important;
+        background: rgba(220, 53, 69, 0.5) !important; // 赤色の透明度を下げた状態
+        color: rgba(255, 255, 255, 0.9) !important;
       }
       
       // 一般的なdisabled（色が指定されていない場合）
       &:not(.full-status):not(.monitoring-status) {
-        background: rgba(128, 128, 128, 0.5) !important;
-        color: rgba(255, 255, 255, 0.7) !important;
+        background: rgba(128, 128, 128, 0.7) !important;
+        color: rgba(255, 255, 255, 0.9) !important;
       }
     }
   }

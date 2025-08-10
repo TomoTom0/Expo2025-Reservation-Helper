@@ -708,7 +708,7 @@ export class EntranceReservationStateManager {
         // 1. 予約対象の存在確認
         if (!this.reservationTarget || !this.reservationTarget.isValid) {
             if (!this.isReloadCountdownActive()) {
-                console.log('🔍 [canStartReservation] 予約対象なし');
+                // 予約対象なし（ログ削減）
             }
             return false;
         }
@@ -716,11 +716,11 @@ export class EntranceReservationStateManager {
         // 2. 時間帯選択状態の確認
         const selectedSlot = document.querySelector(timeSlotSelectors.selectedSlot);
         if (!selectedSlot) {
-            console.log('🔍 [canStartReservation] 時間帯未選択');
+            // 時間帯未選択（ログ削減）
             return false;
         }
         
-        console.log('🔍 [canStartReservation] 予約対象あり、時間帯選択済み');
+        // 予約対象あり（ログ削減）
         
         // 3. 選択時間帯の満員状態確認
         const tdElement = selectedSlot.closest('td[data-gray-out]') as HTMLTableCellElement;
@@ -751,7 +751,7 @@ export class EntranceReservationStateManager {
     canStartMonitoring(): boolean {
         const result = this.monitoringTargets.length > 0;
         if (!this.isReloadCountdownActive()) {
-            console.log(`🔍 [canStartMonitoring] 監視対象数=${this.monitoringTargets.length}, result=${result}`);
+            // 監視開始可否チェック（ログ削減）
         }
         if (!result) {
             this.log(`❌ 監視開始不可: 監視対象数=${this.monitoringTargets.length}`);
@@ -773,7 +773,7 @@ export class EntranceReservationStateManager {
         
         // デバッグログ追加
         if (!this.isReloadCountdownActive()) {
-            console.log(`🔍 [getPreferredAction] canReserve=${canReserve}, canMonitor=${canMonitor}, priorityMode=${this.priorityMode}`);
+            // アクション判定（ログ削減）
             console.log(`🔍 [getPreferredAction] 予約対象=${!!this.reservationTarget}, 監視対象=${this.monitoringTargets.length}個`);
         }
         
@@ -788,20 +788,14 @@ export class EntranceReservationStateManager {
             default:
                 // 予約優先（両方可能な場合は予約を選択）
                 if (canReserve) {
-                    if (!this.isReloadCountdownActive()) {
-                        console.log('🔍 [getPreferredAction] 戻り値: reservation');
-                    }
+                    // 予約アクション選択（ログ削減）
                     return 'reservation';
                 }
                 if (canMonitor) {
-                    if (!this.isReloadCountdownActive()) {
-                        console.log('🔍 [getPreferredAction] 戻り値: monitoring');
-                    }
+                    // 監視アクション選択（ログ削減）
                     return 'monitoring';
                 }
-                if (!this.isReloadCountdownActive()) {
-                    console.log('🔍 [getPreferredAction] 戻り値: none');
-                }
+                // アクションなし（ログ削減）
                 return 'none';
         }
     }
@@ -1097,10 +1091,7 @@ export class EntranceReservationStateManager {
         const fabText = this.getFabButtonText();
         const preferredAction = this.getPreferredAction();
         
-        // カウントダウン中はログを削減（毎秒出力を避ける）
-        if (!this.isReloadCountdownActive()) {
-            console.log(`🔍 [統一FAB更新] state=${executionState}, text="${fabText}", action=${preferredAction}`);
-        }
+        // FAB更新ログを削減（問題時のみ出力）
         
         // 実行状態に応じてボタン表示を更新
         switch (executionState) {
@@ -1169,7 +1160,7 @@ export class EntranceReservationStateManager {
         
         // カウントダウン中は完了ログも削減
         if (!this.isReloadCountdownActive()) {
-            console.log(`✅ [統一FAB更新] 完了 - "${span.innerText}" (${mainButton.className})`);
+            // FAB更新完了ログを削減
         }
         
         // 監視対象リスト表示も更新
@@ -1202,7 +1193,7 @@ export class EntranceReservationStateManager {
             
             // カウントダウン中はログを削減
             if (!this.isReloadCountdownActive()) {
-                console.log(`✅ [監視対象更新] 表示更新完了: "${displayInfo.displayText}"`);
+                // 監視対象表示更新完了（ログ削減）
             }
         } else {
             monitoringTargetsElement.style.display = 'none';
