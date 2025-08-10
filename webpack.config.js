@@ -5,13 +5,10 @@ const webpack = require('webpack');
 const userScriptHeader = `// ==UserScript==
 // @name         yt-Expo2025-Reservation-Helper
 // @namespace    http://staybrowser.com/
-// @version      0.3
-// @description  help expo2025 ticket site
+// @version      0.5.4-fork.1
+// @description  大阪万博2025予約支援ツール: パビリオン検索補助, 入場予約監視自動化, 同行者追加自動化
 // @author       TomoTom0 https://github.com/TomoTom0
-// @match        https://ticket.expo2025.or.jp/event_search/*
-// @match        https://ticket.expo2025.or.jp/ticket_selection/*
-// @match        https://ticket.expo2025.or.jp/agent_ticket/*
-// @match        https://ticket.expo2025.or.jp/ticket_visiting_reservation/*
+// @match        https://ticket.expo2025.or.jp/*
 // @grant       none
 // @run-at       document-end
 // ==/UserScript==
