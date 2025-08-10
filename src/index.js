@@ -4961,7 +4961,61 @@ function createEntranceReservationUI(config) {
             else if (preferredAction === 'reservation') {
                 console.log('🚀 統一状態管理システムによる予約開始');
                 unifiedStateManager.startReservation();
-                // 予約処理は下の通常処理で実行
+                // 予約対象を統一状態管理システムに設定（DOM状態から同期）
+                const selectedSlot = document.querySelector(entrance_page_dom_utils/* timeSlotSelectors */.eN.selectedSlot);
+                if (selectedSlot) {
+                    const tdElement = selectedSlot.closest('td[data-gray-out]');
+                    const timeText = selectedSlot.querySelector('dt span')?.textContent?.trim();
+                    if (tdElement && timeText) {
+                        const locationIndex = unified_state/* LocationHelper */.Qs.getIndexFromElement(tdElement);
+                        const selector = (0,entrance_page_dom_utils/* generateUniqueTdSelector */.sN)(tdElement);
+                        console.log(`🎯 予約対象設定: ${timeText} (位置: ${locationIndex})`);
+                        unifiedStateManager.setReservationTarget(timeText, locationIndex, selector);
+                    }
+                }
+                // レガシー状態管理との同期
+                entrance_page_state.entranceReservationState.isRunning = true;
+                entrance_page_state.entranceReservationState.shouldStop = false;
+                entrance_page_state.entranceReservationState.startTime = Date.now();
+                entrance_page_state.entranceReservationState.attempts = 0;
+                // UI即座更新
+                showStatus('予約処理実行中...', 'blue');
+                (0,entrance_page_ui/* updateMainButtonDisplay */.vp)();
+                updateMonitoringTargetsDisplay(); // 予約対象を表示
+                // 予約処理を開始
+                try {
+                    const result = await entranceReservationHelper(config);
+                    if (result.success) {
+                        showStatus(`🎉 予約成功！(${result.attempts}回試行)`, 'green');
+                        // 統一状態管理に予約成功情報を設定
+                        const reservationTarget = unifiedStateManager.getReservationTarget();
+                        if (reservationTarget) {
+                            unifiedStateManager.setReservationSuccess(reservationTarget.timeSlot, reservationTarget.locationIndex);
+                            (0,entrance_page_ui/* updateMainButtonDisplay */.vp)(); // FAB表示更新
+                        }
+                        if (cacheManager) {
+                            cacheManager.clearTargetSlots(); // 成功時はキャッシュクリア
+                            cacheManager.clearMonitoringFlag(); // 監視継続フラグもクリア
+                        }
+                    }
+                    else {
+                        showStatus(`予約失敗 (${result.attempts}回試行)`, 'red');
+                    }
+                }
+                catch (error) {
+                    console.error('統一状態管理による予約処理エラー:', error);
+                    const errorMessage = error instanceof Error ? error.message : String(error);
+                    showStatus(`エラー: ${errorMessage}`, 'red');
+                }
+                finally {
+                    entrance_page_state.entranceReservationState.isRunning = false;
+                    entrance_page_state.entranceReservationState.shouldStop = false;
+                    entrance_page_state.entranceReservationState.startTime = null;
+                    entrance_page_state.entranceReservationState.attempts = 0;
+                    (0,entrance_page_ui/* updateMainButtonDisplay */.vp)();
+                    updateMonitoringTargetsDisplay(); // 予約終了時に表示更新
+                }
+                return; // 統一状態管理による処理完了、通常処理はスキップ
             }
             else {
                 console.log('⚠️ 統一状態管理システム: 実行可能なアクションなし');
