@@ -1,3 +1,10 @@
+// FABステータスバッジのカウントダウン警告スタイル
+#ytomo-status-badge {
+  &.countdown-warning {
+    background: rgba(255, 0, 0, 0.9) !important;
+  }
+}
+
 // ボタン共通スタイル
 button.ext-ytomo {
   height: 40px;

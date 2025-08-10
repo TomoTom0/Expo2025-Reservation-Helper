@@ -1226,31 +1226,43 @@ export class EntranceReservationStateManager {
                 const remainingSeconds = this.getReloadSecondsRemaining();
                 if (this.isReloadCountdownActive() && remainingSeconds !== null) {
                     statusBadge.innerText = `監視中\nリロード: ${remainingSeconds}秒`;
+                    // リロード5秒前から警告クラスを追加
+                    if (remainingSeconds <= 5) {
+                        statusBadge.classList.add('countdown-warning');
+                    } else {
+                        statusBadge.classList.remove('countdown-warning');
+                    }
                     statusBadge.classList.remove('js-hide');
                 } else {
                     statusBadge.innerText = '監視待機中';
+                    statusBadge.classList.remove('countdown-warning');
                     statusBadge.classList.remove('js-hide');
                 }
                 break;
             case 'reservation-running':
                 statusBadge.innerText = '予約実行中';
+                statusBadge.classList.remove('countdown-warning');
                 statusBadge.classList.remove('js-hide');
                 break;
             case 'cooldown':
                 statusBadge.innerText = customText || '予約待機中';
+                statusBadge.classList.remove('countdown-warning');
                 statusBadge.classList.remove('js-hide');
                 break;
             case 'idle-monitoring':
                 statusBadge.innerText = '監視可能';
+                statusBadge.classList.remove('countdown-warning');
                 statusBadge.classList.remove('js-hide');
                 break;
             case 'idle-reservation':
                 statusBadge.innerText = '予約可能';
+                statusBadge.classList.remove('countdown-warning');
                 statusBadge.classList.remove('js-hide');
                 break;
             case 'idle':
             default:
                 statusBadge.innerText = '対象選択待ち';
+                statusBadge.classList.remove('countdown-warning');
                 statusBadge.classList.remove('js-hide');
                 break;
         }
