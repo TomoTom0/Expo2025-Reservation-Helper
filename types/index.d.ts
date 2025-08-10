@@ -132,13 +132,12 @@ export interface ReservationConfig {
   };
   selectorTexts: {
     change: string;
-    success: string;
-    failure: string;
   };
   timeouts: {
     waitForSubmit: number;
     waitForResponse: number;
     waitForClose: number;
+    retryInterval?: number;
   };
   randomSettings: {
     minClickDelay: number;
@@ -169,6 +168,7 @@ export interface ReservationResult {
   attempts: number;
   cancelled?: boolean;
   cooldownStarted?: boolean;
+  abnormalTermination?: boolean;
 }
 
 export interface ElementSearchResult {
@@ -184,34 +184,6 @@ export interface ElementSearchResult {
 // UI・FAB関連の型定義
 // =========================================================================
 
-export interface ReservationUIConfig {
-  selectors: {
-    submit: string;
-    change: string;
-    success: string;
-    failure: string;
-    close: string;
-  };
-  selectorTexts: {
-    change: string;
-    success?: string;
-    failure?: string;
-  };
-  timeouts: {
-    waitForSubmit: number;
-    waitForResponse: number;
-    waitForClose: number;
-    retryInterval?: number;
-  };
-  randomSettings: {
-    minCheckInterval: number;
-    checkRandomRange: number;
-    minClickDelay: number;
-    clickRandomRange: number;
-    minRetryDelay: number;
-    retryRandomRange: number;
-  };
-}
 
 declare global {
   interface Window {

@@ -4993,33 +4993,39 @@ function createEntranceReservationUI() {
                 close: "body > div.style_buy-modal__1JZtS > div > div > div > div > ul > li > a"
             },
             selectorTexts: {
-                change: "来場日時を変更する",
-                success: "完了",
-                failure: "エラー"
+                change: "来場日時を変更する"
             },
             timeouts: {
-                waitForSubmit: 3000,
-                waitForResponse: 10000,
-                waitForClose: 2000
+                waitForSubmit: 5000,
+                waitForResponse: 60000,
+                waitForClose: 3000,
+                retryInterval: 1000
             },
             randomSettings: {
-                minClickDelay: 100,
+                minCheckInterval: 500,
+                checkRandomRange: 200,
+                minClickDelay: 500,
                 clickRandomRange: 200,
-                minRetryDelay: 500,
-                retryRandomRange: 1000,
-                minCheckInterval: 200,
-                checkRandomRange: 300
+                minRetryDelay: 1000,
+                retryRandomRange: 300
             }
         };
+        // 予約開始前に予約対象情報を保存（成功時のUI更新用）
+        const reservationTarget = _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_4__/* .entranceReservationStateManager */ .xx.getReservationTarget();
+        console.log('🔍 予約開始前の対象情報:', reservationTarget);
         try {
             const result = await entranceReservationHelper(config);
+            console.log('🔍 entranceReservationHelper戻り値:', result);
             if (result.success) {
                 showStatus(`🎉 予約成功！(${result.attempts}回試行)`, 'green');
-                // 入場予約状態管理に予約成功情報を設定
-                const reservationTarget = _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_4__/* .entranceReservationStateManager */ .xx.getReservationTarget();
+                // 予約開始前に保存した対象情報で成功情報を設定
                 if (reservationTarget) {
                     _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_4__/* .entranceReservationStateManager */ .xx.setReservationSuccess(reservationTarget.timeSlot, reservationTarget.locationIndex);
                     (0,_entrance_page_ui_helpers__WEBPACK_IMPORTED_MODULE_5__/* .updateMainButtonDisplay */ .vp)(); // FAB表示更新
+                    console.log('✅ 予約成功UI更新完了');
+                }
+                else {
+                    console.warn('⚠️ 予約開始前の対象情報がnullのためUI更新をスキップ');
                 }
                 if (cacheManager) {
                     cacheManager.clearTargetSlots(); // 成功時はキャッシュクリア
@@ -5027,7 +5033,11 @@ function createEntranceReservationUI() {
                 }
             }
             else {
-                if (result.cooldownStarted) {
+                if (result.abnormalTermination) {
+                    showStatus(`🚨 異常終了 (${result.attempts}回試行) - システム停止`, 'red');
+                    console.log('🚨 予約処理が異常終了しました。システムを停止します');
+                }
+                else if (result.cooldownStarted) {
                     showStatus(`予約失敗 (${result.attempts}回試行) - クールタイム開始`, 'orange');
                     console.log('🛑 100回試行後、クールタイムが開始されました');
                 }
@@ -5538,17 +5548,27 @@ async function entranceReservationHelper(config) {
                     success: selectors.success,
                     failure: selectors.failure
                 };
-                const finalResponse = await (0,_pavilion_search_page__WEBPACK_IMPORTED_MODULE_0__/* .waitForAnyElement */ .Dr)(finalSelectors, timeouts.waitForResponse, selectorTexts, config);
-                console.log(`最終レスポンス検出: ${finalResponse.key}`);
-                if (finalResponse.key === 'success') {
-                    console.log('🎉 予約成功！処理を終了します。');
-                    return { success: true, attempts };
+                console.log(`⏰ 最大${timeouts.waitForResponse / 1000}秒間待機開始...`);
+                const startTime = Date.now();
+                try {
+                    const finalResponse = await (0,_pavilion_search_page__WEBPACK_IMPORTED_MODULE_0__/* .waitForAnyElement */ .Dr)(finalSelectors, timeouts.waitForResponse, selectorTexts, config);
+                    const elapsedTime = Math.round((Date.now() - startTime) / 1000);
+                    console.log(`✅ 最終レスポンス検出: ${finalResponse.key} (${elapsedTime}秒後)`);
+                    if (finalResponse.key === 'success') {
+                        console.log('🎉 予約成功！処理を終了します。');
+                        return { success: true, attempts };
+                    }
+                    else {
+                        console.log('予約失敗。closeボタンをクリックして再試行します。');
+                        const closeButton = await (0,_pavilion_search_page__WEBPACK_IMPORTED_MODULE_0__/* .waitForElement */ .xk)(selectors.close, timeouts.waitForClose, config);
+                        await (0,_pavilion_search_page__WEBPACK_IMPORTED_MODULE_0__/* .clickElement */ .jp)(closeButton, config);
+                        await new Promise(resolve => setTimeout(resolve, (0,_pavilion_search_page__WEBPACK_IMPORTED_MODULE_0__/* .getRandomWaitTime */ .I1)(config.randomSettings.minRetryDelay, config.randomSettings.retryRandomRange, config)));
+                    }
                 }
-                else {
-                    console.log('予約失敗。closeボタンをクリックして再試行します。');
-                    const closeButton = await (0,_pavilion_search_page__WEBPACK_IMPORTED_MODULE_0__/* .waitForElement */ .xk)(selectors.close, timeouts.waitForClose, config);
-                    await (0,_pavilion_search_page__WEBPACK_IMPORTED_MODULE_0__/* .clickElement */ .jp)(closeButton, config);
-                    await new Promise(resolve => setTimeout(resolve, (0,_pavilion_search_page__WEBPACK_IMPORTED_MODULE_0__/* .getRandomWaitTime */ .I1)(config.randomSettings.minRetryDelay, config.randomSettings.retryRandomRange, config)));
+                catch (waitError) {
+                    const elapsedTime = Math.round((Date.now() - startTime) / 1000);
+                    console.error(`❌ ${elapsedTime}秒後にwaitForAnyElementでエラー:`, waitError);
+                    throw waitError; // エラーを再スロー
                 }
             }
             else if (response.key === 'success') {
@@ -5565,6 +5585,13 @@ async function entranceReservationHelper(config) {
         catch (error) {
             const errorMessage = error instanceof Error ? error.message : String(error);
             console.error(`エラーが発生しました (試行 ${attempts}):`, errorMessage);
+            // 3分待っても結果が返らない場合（タイムアウト）は異常終了
+            if (errorMessage.includes('いずれの要素も見つかりません') || errorMessage.includes('要素が見つかりませんでした')) {
+                console.error('🚨 予約処理異常終了: 3分待っても成功/失敗の結果が返りませんでした');
+                console.error('🛑 自動予約処理を完全停止します');
+                _entrance_page_state__WEBPACK_IMPORTED_MODULE_1__.entranceReservationState.shouldStop = true;
+                return { success: false, attempts, abnormalTermination: true };
+            }
             if (_entrance_page_state__WEBPACK_IMPORTED_MODULE_1__.entranceReservationState.shouldStop)
                 break;
             await new Promise(resolve => setTimeout(resolve, (0,_pavilion_search_page__WEBPACK_IMPORTED_MODULE_0__/* .getRandomWaitTime */ .I1)(config.randomSettings.minRetryDelay, config.randomSettings.retryRandomRange, config)));
