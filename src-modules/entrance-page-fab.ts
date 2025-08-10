@@ -26,19 +26,23 @@ import {
     checkTimeSlotTableExistsSync,
     analyzeAndAddMonitorButtons,
     startSlotMonitoring
-} from './entrance-page-monitor';
+} from './entrance-page-core';
 
 // unified-stateからのimport
 import { LocationHelper, ExecutionState, entranceReservationStateManager } from './entrance-reservation-state-manager';
 
 // Section 6からのimport  
 import {
-    getCurrentSelectedCalendarDate,
-    updateMainButtonDisplay,
     updateStatusBadge,
-    stopSlotMonitoring,
     isInterruptionAllowed
-} from './entrance-page-ui';
+} from './entrance-page-core';
+
+// UI更新ヘルパーからのimport
+import { updateMainButtonDisplay } from './entrance-page-ui-helpers';
+import {
+    getCurrentSelectedCalendarDate,
+    stopSlotMonitoring
+} from './entrance-page-core';
 
 // 型定義のインポート
 import type { 
@@ -79,7 +83,7 @@ function showStatus(message: string, color: string = 'white'): void {
     }
 }
 
-function createEntranceReservationUI(config: ReservationConfig): void {
+function createEntranceReservationUI(): void {
     // 既存のFABがあれば削除
     const existingFab = document.getElementById('ytomo-fab-container');
     if (existingFab) {
@@ -107,9 +111,9 @@ function createEntranceReservationUI(config: ReservationConfig): void {
     fabButton.id = 'ytomo-main-fab';
     fabButton.classList.add('ext-ytomo', 'ytomo-fab', 'ytomo-fab-disabled');
 
-    // FABボタンのテキスト/アイコン
+    // FABボタンのステータス表示
     const fabIcon = document.createElement('span');
-    fabIcon.classList.add('ext-ytomo');
+    fabIcon.classList.add('ext-ytomo', 'ytomo-fab-status');
     fabIcon.style.cssText = `
         font-size: 12px !important;
         text-align: center !important;
@@ -246,37 +250,24 @@ function createEntranceReservationUI(config: ReservationConfig): void {
             return;
         }
         
+        // クールタイム中の予約再開中止処理
+        if (fabButton.hasAttribute('data-cooldown-cancel')) {
+            if (confirm('予約の自動再開を中止しますか？\n\n手動での予約開始は引き続き可能です。')) {
+                entranceReservationStateManager.endReservationCooldown();
+                showStatus('予約再開を中止しました', 'orange');
+                updateMainButtonDisplay();
+            }
+            return;
+        }
+        
         // 実行中の場合は中断処理（入場予約状態管理システム使用）
         if (entranceReservationStateManager.isMonitoringRunning()) {
-            // 監視を中断
-            stopSlotMonitoring();
-            // ステータスは中断を示すメッセージを表示（消さない）
-            showStatus('監視中断', 'orange');
-            updateMainButtonDisplay();
+            stopMonitoringProcess();
             return;
         }
         
         if (entranceReservationStateManager.isReservationRunning()) {
-            // スマホ用：現在の状態をアラート表示
-            const startTime = entranceReservationStateManager.getReservationStartTime();
-            const attempts = entranceReservationStateManager.getAttempts();
-            const shouldStop = entranceReservationStateManager.getShouldStop();
-            
-            const debugInfo = `予約状態確認:
-isRunning: ${entranceReservationStateManager.isReservationRunning()}
-shouldStop: ${shouldStop}
-startTime: ${startTime}
-attempts: ${attempts}`;
-            
-            if (confirm(`[DEBUG] 予約処理を中断しますか？\n\n${debugInfo}`)) {
-                // 予約処理を中断
-                entranceReservationStateManager.setShouldStop(true);
-                showStatus('予約処理を中断中...', 'orange');
-            } else {
-                // 強制リセット（デバッグ用） - 統一状態管理システム経由
-                entranceReservationStateManager.stop();
-                alert('状態をリセットしました。もう一度お試しください。');
-            }
+            stopReservationProcess();
             return;
         }
         
@@ -285,20 +276,53 @@ attempts: ${attempts}`;
         // FABクリック処理開始
         
         if (preferredAction === 'monitoring') {
-            console.log('📡 入場予約状態管理システムによる監視開始');
-            // 実行状態を監視中に変更
-            entranceReservationStateManager.startMonitoring();
-            // 即座にUI更新してから監視開始
-            updateMainButtonDisplay();
-            await startSlotMonitoring();
-            return;
+            await startMonitoringProcess();
         } else if (preferredAction === 'reservation') {
-            console.log('🚀 入場予約状態管理システムによる予約開始');
-            // 予約処理は下の通常処理で実行
+            await startReservationProcess();
         } else {
             console.log('⚠️ 入場予約状態管理システム: 実行可能なアクションなし');
-            return;
         }
+        
+        return;
+    });
+
+    // 監視中断処理
+    function stopMonitoringProcess(): void {
+        console.log('⏹️ 監視を中断');
+        stopSlotMonitoring();
+        showStatus('監視中断', 'orange');
+        updateMainButtonDisplay();
+    }
+
+    // 予約中断処理
+    function stopReservationProcess(): void {
+        console.log('⏹️ 予約を中断');
+        entranceReservationStateManager.setShouldStop(true);
+        showStatus('予約処理を中断中...', 'orange');
+    }
+
+    // 監視開始処理
+    async function startMonitoringProcess(): Promise<void> {
+        console.log('📡 入場予約状態管理システムによる監視開始');
+        
+        // 状態変更前の確認
+        console.log(`🔍 [FAB] 監視開始前の状態: ${entranceReservationStateManager.getExecutionState()}`);
+        console.log(`🔍 [FAB] 監視対象数: ${entranceReservationStateManager.getMonitoringTargetCount()}`);
+        console.log(`🔍 [FAB] 監視開始可能: ${entranceReservationStateManager.canStartMonitoring()}`);
+        
+        // 実行状態を監視中に変更
+        const startSuccess = entranceReservationStateManager.startMonitoring();
+        console.log(`🔍 [FAB] startMonitoring結果: ${startSuccess}`);
+        console.log(`🔍 [FAB] 監視開始後の状態: ${entranceReservationStateManager.getExecutionState()}`);
+        
+        // 即座にUI更新してから監視開始
+        updateMainButtonDisplay();
+        await startSlotMonitoring();
+    }
+
+    // 予約開始処理
+    async function startReservationProcess(): Promise<void> {
+        console.log('🚀 入場予約状態管理システムによる予約開始');
         
         // 入場予約状態管理システムで予約実行開始
         entranceReservationStateManager.setExecutionState(ExecutionState.RESERVATION_RUNNING);
@@ -307,6 +331,35 @@ attempts: ${attempts}`;
         showStatus('予約処理実行中...', 'blue');
         updateMainButtonDisplay();
         updateMonitoringTargetsDisplay(); // 予約対象を表示
+        
+        // 設定オブジェクトを作成
+        const config: ReservationConfig = {
+            selectors: {
+                submit: 'button[type="submit"]',
+                change: 'button:contains("変更")',
+                success: '.success, .completed, [class*="success"]',
+                failure: '.error, .failed, [class*="error"]',
+                close: 'button:contains("閉じる"), button:contains("OK"), .close-button'
+            },
+            selectorTexts: {
+                change: '変更',
+                success: '完了',
+                failure: 'エラー'
+            },
+            timeouts: {
+                waitForSubmit: 3000,
+                waitForResponse: 10000,
+                waitForClose: 2000
+            },
+            randomSettings: {
+                minClickDelay: 100,
+                clickRandomRange: 200,
+                minRetryDelay: 500,
+                retryRandomRange: 1000,
+                minCheckInterval: 200,
+                checkRandomRange: 300
+            }
+        };
         
         try {
             const result = await entranceReservationHelper(config);
@@ -325,7 +378,12 @@ attempts: ${attempts}`;
                     cacheManager.clearMonitoringFlag(); // 監視継続フラグもクリア
                 }
             } else {
-                showStatus(`予約失敗 (${result.attempts}回試行)`, 'red');
+                if (result.cooldownStarted) {
+                    showStatus(`予約失敗 (${result.attempts}回試行) - クールタイム開始`, 'orange');
+                    console.log('🛑 100回試行後、クールタイムが開始されました');
+                } else {
+                    showStatus(`予約失敗 (${result.attempts}回試行)`, 'red');
+                }
             }
         } catch (error) {
             console.error('予約処理エラー:', error);
@@ -338,9 +396,7 @@ attempts: ${attempts}`;
             updateMainButtonDisplay();
             updateMonitoringTargetsDisplay(); // 予約終了時に表示更新
         }
-        
-        return; // 明示的なreturnを追加
-    });
+    }
     
     // disabled状態でのクリックを確実に防ぐため、キャプチャーフェーズでも処理
     fabButton.addEventListener('click', (event) => {
@@ -365,6 +421,56 @@ attempts: ${attempts}`;
     // DOMに追加（body直下）
     document.body.appendChild(fabContainer);
 
+    // 自動選択イベントリスナーを設定
+    window.addEventListener('entrance-auto-select', async (event: any) => {
+        console.log('🎯 自動選択イベントを受信:', event.detail);
+        const slot = event.detail?.slot;
+        if (!slot?.targetInfo) {
+            console.error('❌ 自動選択: スロット情報が無効');
+            return;
+        }
+        
+        try {
+            // 監視を停止
+            if (entranceReservationStateManager.isMonitoringRunning()) {
+                console.log('🛑 監視を停止');
+                stopSlotMonitoring();
+            }
+            
+            // 該当監視対象を削除
+            const timeSlot = slot.targetInfo.timeSlot;
+            const locationIndex = slot.targetInfo.locationIndex;
+            entranceReservationStateManager.removeMonitoringTarget(timeSlot, locationIndex);
+            
+            // 1. 時間帯要素をクリックして選択状態にする
+            console.log(`🖱️ 自動選択: 時間帯をクリック ${timeSlot}`);
+            const timeSlotElement = document.querySelector(slot.targetInfo.selector);
+            if (timeSlotElement) {
+                const buttonElement = timeSlotElement.querySelector('button');
+                if (buttonElement && !buttonElement.disabled) {
+                    buttonElement.click();
+                    console.log(`✅ 時間帯選択完了: ${timeSlot}`);
+                    
+                    // 2. 選択後、少し待ってから内部的に自動予約を開始
+                    setTimeout(async () => {
+                        console.log('🚀 内部的に自動予約を開始');
+                        if (entranceReservationStateManager.canStartReservation()) {
+                            await startReservationProcess();
+                        } else {
+                            console.error('❌ 予約開始条件が満たされていません');
+                        }
+                    }, 100);
+                } else {
+                    console.error(`❌ 時間帯ボタンが見つからないか無効: ${timeSlot}`);
+                }
+            } else {
+                console.error(`❌ 時間帯要素が見つからない: ${slot.targetInfo.selector}`);
+            }
+            
+        } catch (error) {
+            console.error('❌ 自動選択処理エラー:', error);
+        }
+    });
     
     // FAB表示状態を初期化・適用
     loadFABVisibility();
@@ -384,11 +490,10 @@ attempts: ${attempts}`;
     });
 }
 
-// 監視対象表示を更新（入場予約状態管理システムに委譲）
+// 監視対象表示を更新（統一システムに完全委譲）
 function updateMonitoringTargetsDisplay(): void {
-    // 入場予約状態管理システムのupdateMainButtonDisplay()に委譲
-    // これにより重複表示を回避し、一貫した表示を実現
-    updateMainButtonDisplay();
+    console.log('🔄 [updateMonitoringTargetsDisplay] 統一システムに委譲');
+    entranceReservationStateManager.updateFabDisplay();
 }
 
 // 現在の予約対象時間帯を取得
@@ -483,7 +588,7 @@ function checkInitialState(): void {
         
         // FABボタンの状態を設定
         const fabButton = document.querySelector('#ytomo-main-fab') as HTMLButtonElement;
-        const fabIcon = fabButton?.querySelector('span') as HTMLSpanElement;
+        const fabIcon = fabButton?.querySelector('.ytomo-fab-status') as HTMLSpanElement;
         
         if (fabButton && fabIcon) {
             // 常に「予約開始」と表示
@@ -913,8 +1018,12 @@ async function entranceReservationHelper(config: ReservationConfig): Promise<Res
         return { success: false, attempts, cancelled: true };
     }
     
-    console.log(`最大試行回数 (${maxAttempts}) に達しました。処理を終了します。`);
-    return { success: false, attempts };
+    console.log(`最大試行回数 (${maxAttempts}) に達しました。クールタイムを開始します。`);
+    
+    // クールタイム開始
+    entranceReservationStateManager.startReservationCooldown();
+    
+    return { success: false, attempts, cooldownStarted: true };
 }
 
 // エクスポート

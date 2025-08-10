@@ -3,12 +3,13 @@ import { init_page, judge_init } from './pavilion-search-page';
 import { judge_entrance_init, init_entrance_page } from './entrance-page-init';
 import { createFABToggleButton } from './entrance-page-state';
 import { createCacheManager } from './cache-manager';
-import { setCacheManager } from './entrance-page-monitor';
+import { setCacheManager } from './entrance-page-core';
 import { 
-    getCurrentSelectedCalendarDate, setPageLoadingState,
+    setPageLoadingState,
     restoreFromCache, setCacheManagerForSection6, setEntranceReservationHelper,
     setUpdateMonitoringTargetsDisplay
-} from './entrance-page-ui';
+} from './entrance-page-core';
+import { getCurrentSelectedCalendarDate } from './entrance-page-core';
 import { 
     updateMonitoringTargetsDisplay, createEntranceReservationUI, setCacheManagerForSection7,
     entranceReservationHelper, waitForTimeSlotTable

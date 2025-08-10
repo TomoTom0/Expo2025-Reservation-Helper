@@ -34,7 +34,7 @@ return {
             
             const data = {
                 targets: targets.map((target: any) => ({
-                    timeText: target.timeSlot,
+                    timeSlot: target.timeSlot,    // 復元時と統一（timeText→timeSlot）
                     tdSelector: target.selector,
                     positionInfo: target.positionInfo || {},
                     status: target.status || 'unknown',
@@ -72,7 +72,7 @@ return {
                 return null;
             }
             
-            console.log('📖 キャッシュから監視対象時間帯を読み込み:', parsed.timeText);
+            console.log('📖 キャッシュから監視対象時間帯を読み込み:', parsed.timeSlot);
             return parsed;
         } catch (error) {
             console.error('❌ キャッシュ読み込みエラー:', error);
@@ -93,7 +93,7 @@ return {
                     return null;
                 }
                 
-                const targetTexts = parsed.targets?.map((t: any) => t.timeText).join(', ') || '不明';
+                const targetTexts = parsed.targets?.map((t: any) => t.timeSlot).join(', ') || '不明';
                 console.log(`📖 複数監視対象キャッシュを読み込み: ${targetTexts} (${parsed.targets?.length || 0}個)`);
                 return parsed;
             }

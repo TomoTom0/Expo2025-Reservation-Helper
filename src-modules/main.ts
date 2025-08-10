@@ -9,8 +9,7 @@ import './entrance-page-init';
 import './entrance-page-state';
 import './cache-manager';
 import './entrance-page-dom-utils';
-import './entrance-page-monitor';
-import './entrance-page-ui';
+import './entrance-page-core';
 import './entrance-page-fab';
 import './app-router';
 import './companion-ticket-page'; // 同行者追加機能

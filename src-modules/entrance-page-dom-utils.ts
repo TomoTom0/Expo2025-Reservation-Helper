@@ -176,7 +176,7 @@ export async function initTimeSlotMonitoring(): Promise<void> {
     
     // DOM変化監視を開始（時間帯テーブルの動的生成を検出）
     // startTimeSlotTableObserverを動的importで取得（循環参照回避）
-    const { startTimeSlotTableObserver } = await import('./entrance-page-monitor');
+    const { startTimeSlotTableObserver } = await import('./entrance-page-core');
     startTimeSlotTableObserver();
     
     console.log('時間帯監視機能の初期化完了（カレンダー監視中）');
