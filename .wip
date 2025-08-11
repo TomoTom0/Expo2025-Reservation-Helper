@@ -30,6 +30,20 @@
 
 ### ✅ 最近完了した問題
 
+#### 予約中断ボタンdisabled問題（解決済み）
+**症状**:
+- 予約実行中にFAB中断ボタンがクリックできない状態になる
+- JavaScriptで`disabled = false`設定してもクリック不可
+
+**根本原因**:
+- CSS `.ytomo-fab-running` クラスに `pointer-events: none !important` が設定
+- CSSがJavaScriptのdisabled設定をオーバーライドしていた
+
+**修正内容**:
+- `.ytomo-fab-running`を `pointer-events: auto`, `cursor: pointer`, `opacity: 0.9` に変更
+- SCSSとビルド済みJS両方を修正
+- 過剰な`!important`使用について技術的負債として認識
+
 #### disabled監視ボタンの可読性問題（解決済み）
 **修正内容**:
 - 既にSCSSで適切な可読性確保済み（opacity: 0.7、背景色alpha: 0.5、テキスト色alpha: 0.9）

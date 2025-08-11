@@ -150,6 +150,12 @@ export class EntranceReservationStateManager {
         nextSubmitTarget: null as Date | null
     };
     
+    // changeダイアログ検出・調整管理
+    private changeDialogState = {
+        hasAppeared: false,  // 一度でもchangeダイアログが表示されたか
+        needsTimingAdjustment: false  // タイミング調整が必要か
+    };
+    
     // リロードカウントダウン状態管理（旧reloadCountdownStateから統合）
     private reloadCountdown = {
         totalSeconds: 30,
@@ -1117,6 +1123,11 @@ export class EntranceReservationStateManager {
         const fabText = this.getFabButtonText();
         const preferredAction = this.getPreferredAction();
         
+        // 予約実行中のdisabled問題デバッグ用
+        if (executionState === ExecutionState.RESERVATION_RUNNING) {
+            console.log(`🔍 [FAB更新] 予約実行中: state=${executionState}, disabled設定前=${mainButton.disabled}`);
+        }
+        
         // FAB更新ログを削減（問題時のみ出力）
         
         // 実行状態に応じてボタン表示を更新
@@ -1131,6 +1142,7 @@ export class EntranceReservationStateManager {
                 mainButton.classList.add('ytomo-fab-disabled');
                 mainButton.title = 'クールタイム中（中断不可）';
                 mainButton.disabled = true;
+                console.log(`🔍 [FAB更新] クールダウン状態でdisabled=true設定: state=${executionState}`);
                 break;
                 
             case ExecutionState.MONITORING_RUNNING:
@@ -1155,6 +1167,7 @@ export class EntranceReservationStateManager {
                 mainButton.classList.add('ytomo-fab-running');
                 mainButton.title = '予約中断';
                 mainButton.disabled = false; // 中断可能
+                console.log(`🔍 [FAB更新] 予約実行中のdisabled設定完了: disabled=${mainButton.disabled}`);
                 break;
                 
             case ExecutionState.IDLE:
@@ -1180,6 +1193,7 @@ export class EntranceReservationStateManager {
                     mainButton.classList.add('ytomo-fab-idle');
                     mainButton.title = '対象選択待ち';
                     mainButton.disabled = true;
+                    console.log(`🔍 [FAB更新] IDLE状態でdisabled=true設定: state=${executionState}`);
                 }
                 break;
         }
@@ -1443,6 +1457,62 @@ export class EntranceReservationStateManager {
         } catch (error) {
             console.error('効率モード設定読み込みエラー:', error);
         }
+    }
+    
+    // ============================================================================
+    // changeダイアログ管理
+    // ============================================================================
+    
+    // changeダイアログが表示されたことを記録
+    markChangeDialogAppeared(): void {
+        if (!this.changeDialogState.hasAppeared) {
+            this.changeDialogState.hasAppeared = true;
+            this.changeDialogState.needsTimingAdjustment = true;
+            console.log('🔄 changeダイアログ出現を検出 - タイミング調整が必要');
+        }
+    }
+    
+    // changeダイアログのタイミング調整が必要か
+    needsChangeDialogTimingAdjustment(): boolean {
+        return this.changeDialogState.hasAppeared && this.changeDialogState.needsTimingAdjustment;
+    }
+    
+    // changeダイアログのタイミング調整用待機時間を計算
+    calculateChangeDialogWaitTime(): number {
+        if (!this.needsChangeDialogTimingAdjustment()) {
+            return 0;
+        }
+        
+        const now = new Date();
+        const seconds = now.getSeconds();
+        const milliseconds = now.getMilliseconds();
+        
+        // 現在時刻から次の00秒または30秒までの時間を計算
+        let targetSeconds: number;
+        if (seconds < 30) {
+            targetSeconds = 30;
+        } else {
+            targetSeconds = 60; // 次の分の00秒
+        }
+        
+        const waitMs = ((targetSeconds - seconds) * 1000) - milliseconds;
+        const waitSeconds = Math.max(0, Math.ceil(waitMs / 1000));
+        
+        console.log(`🔄 changeダイアログ待機時間計算: ${waitSeconds}秒 (現在: ${seconds}.${String(milliseconds).padStart(3, '0')}秒 → 目標: ${targetSeconds % 60}秒)`);
+        return waitMs;
+    }
+    
+    // changeダイアログのタイミング調整完了を記録
+    markChangeDialogTimingAdjusted(): void {
+        this.changeDialogState.needsTimingAdjustment = false;
+        console.log('🔄 changeダイアログのタイミング調整完了');
+    }
+    
+    // リロード時にchangeダイアログ状態をリセット（リロードするまで必ずchangeは出るため）
+    resetChangeDialogState(): void {
+        this.changeDialogState.hasAppeared = false;
+        this.changeDialogState.needsTimingAdjustment = false;
+        console.log('🔄 changeダイアログ状態をリセット');
     }
     
 }

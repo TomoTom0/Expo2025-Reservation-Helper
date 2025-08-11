@@ -27,7 +27,10 @@
       "Bash(rg:*)",
       "Bash(gemini:*)",
       "Bash(git add:*)",
-      "Bash(mise run build-rsync:*)"
+      "Bash(mise run build-rsync:*)",
+      "Bash(git push:*)",
+      "Bash(npm run build:*)",
+      "Bash(npm install)"
     ],
     "deny": []
   }
