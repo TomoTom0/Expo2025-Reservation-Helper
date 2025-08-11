@@ -971,15 +971,6 @@ export class EntranceReservationStateManager {
     getFabButtonText(): string {
         switch (this.executionState) {
             case ExecutionState.RESERVATION_RUNNING:
-                // 効率モード実行中はカウントダウン表示
-                if (this.efficiencyMode.enabled && this.efficiencyMode.nextSubmitTarget) {
-                    const now = new Date();
-                    const remainingMs = this.efficiencyMode.nextSubmitTarget.getTime() - now.getTime();
-                    if (remainingMs > 0) {
-                        const remainingSec = Math.ceil(remainingMs / 1000);
-                        return `効率予約\n${remainingSec}秒`;
-                    }
-                }
                 return '予約\n中断';
             case ExecutionState.MONITORING_RUNNING:
                 return '監視\n中断';
@@ -1181,8 +1172,19 @@ export class EntranceReservationStateManager {
             case ExecutionState.RESERVATION_RUNNING:
                 span.innerText = fabText;
                 
-                // 既存のupdateStatusBadge関数を使用
-                this.updateStatusBadgeFromUnified('reservation-running');
+                // 効率モード実行中はステータスバッジでカウントダウン表示
+                if (this.efficiencyMode.enabled && this.efficiencyMode.nextSubmitTarget) {
+                    const now = new Date();
+                    const remainingMs = this.efficiencyMode.nextSubmitTarget.getTime() - now.getTime();
+                    if (remainingMs > 0) {
+                        const remainingSec = Math.ceil(remainingMs / 1000);
+                        this.updateStatusBadgeFromUnified('reservation-running', `効率予約実行中 ${remainingSec}秒後`);
+                    } else {
+                        this.updateStatusBadgeFromUnified('reservation-running', '効率予約実行中');
+                    }
+                } else {
+                    this.updateStatusBadgeFromUnified('reservation-running');
+                }
                 
                 mainButton.className = mainButton.className.replace(/ytomo-fab-\w+/g, '');
                 mainButton.classList.add('ytomo-fab-running');
