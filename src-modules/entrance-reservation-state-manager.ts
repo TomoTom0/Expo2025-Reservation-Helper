@@ -1211,20 +1211,20 @@ export class EntranceReservationStateManager {
         
         // 監視対象表示エリアは監視対象のみを表示（カウントダウンはFABボタンに表示）
         
-        // 通常の監視対象表示
+        // 予約対象または監視対象を表示
         const displayInfo = this.getFabTargetDisplayInfo();
-        if (displayInfo.hasTarget && displayInfo.targetType === 'monitoring') {
+        if (displayInfo.hasTarget) {
             monitoringTargetsElement.innerHTML = displayInfo.displayText.replace(/\n/g, '<br>');
             monitoringTargetsElement.style.display = 'block';
             
             // カウントダウン中はログを削減
             if (!this.isReloadCountdownActive()) {
-                // 監視対象表示更新完了（ログ削減）
+                console.log(`🔍 [対象表示更新] 表示タイプ: ${displayInfo.targetType}`);
             }
         } else {
             monitoringTargetsElement.style.display = 'none';
             monitoringTargetsElement.innerHTML = '';
-            console.log('🔍 [監視対象更新] displayInfo判定で非表示');
+            console.log('🔍 [対象表示更新] 対象なしで非表示');
         }
     }
     

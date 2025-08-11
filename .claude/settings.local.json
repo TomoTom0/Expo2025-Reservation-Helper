@@ -26,7 +26,8 @@
       "Bash(echo)",
       "Bash(rg:*)",
       "Bash(gemini:*)",
-      "Bash(git add:*)"
+      "Bash(git add:*)",
+      "Bash(mise run build-rsync:*)"
     ],
     "deny": []
   }
