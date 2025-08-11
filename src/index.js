@@ -157,7 +157,7 @@ module.exports = styleTagTransform;
 /* harmony export */   vp: () => (/* binding */ updateMainButtonDisplay)
 /* harmony export */ });
 /* unused harmony exports disableAllMonitorButtons, enableAllMonitorButtons, updateMonitoringTargetsDisplay */
-/* harmony import */ var _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(461);
+/* harmony import */ var _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(374);
 /**
  * 入場予約UI更新ヘルパー関数
  * 循環参照を避けるために独立したモジュールとして分離
@@ -558,7 +558,7 @@ module.exports = function (cssWithMappingToString) {
 /* harmony export */   wj: () => (/* binding */ analyzeAndAddMonitorButtons)
 /* harmony export */ });
 /* unused harmony exports waitForTimeSlotTable, analyzeTimeSlots, extractTimeSlotInfo, generateSelectorForElement, addMonitorButtonsToFullSlots, getMonitorButtonText, updateAllMonitorButtonPriorities, createMonitorButton, handleMonitorButtonClick, checkSlotAvailabilityAndReload, findTargetSlotInPageUnified, terminateMonitoring, checkTargetElementExists, checkMonitoringTargetExists, checkTimeSlotTableExistsAsync, validatePageLoaded, checkMaxReloads, waitForValidCalendarDate, clickCalendarDate, tryClickCalendarForTimeSlot, showErrorMessage, resetMonitoringUI, enableAllMonitorButtons, getCurrentTableContent, shouldUpdateMonitorButtons, restoreSelectionAfterUpdate, selectTimeSlotAndStartReservation, getCurrentEntranceConfig, getCurrentFabState, getCurrentMode, resetPreviousSelection, disableOtherMonitorButtons, disableAllMonitorButtons, clearExistingMonitorButtons, getTargetDisplayInfo, scheduleReload, clearMonitoringFlagTimer, startReloadCountdown, stopReloadCountdown */
-/* harmony import */ var _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(461);
+/* harmony import */ var _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(374);
 /* harmony import */ var _entrance_page_dom_utils__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(638);
 /* harmony import */ var _entrance_page_fab__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(982);
 /* harmony import */ var _entrance_page_ui_helpers__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(269);
@@ -2684,22 +2684,231 @@ function getCurrentEntranceConfig() {
 
 /***/ }),
 
-/***/ 461:
+/***/ 374:
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   Qs: () => (/* binding */ LocationHelper),
-/* harmony export */   si: () => (/* binding */ ExecutionState),
-/* harmony export */   xx: () => (/* binding */ entranceReservationStateManager)
-/* harmony export */ });
-/* unused harmony exports PriorityMode, EntranceReservationStateManager */
-/* harmony import */ var _entrance_page_dom_utils__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(638);
-/* harmony import */ var _entrance_page_core__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(364);
+
+// EXPORTS
+__webpack_require__.d(__webpack_exports__, {
+  si: () => (/* binding */ ExecutionState),
+  Qs: () => (/* binding */ LocationHelper),
+  xx: () => (/* binding */ entranceReservationStateManager)
+});
+
+// UNUSED EXPORTS: EntranceReservationStateManager, PriorityMode
+
+// EXTERNAL MODULE: ./src-modules/entrance-page-dom-utils.ts + 1 modules
+var entrance_page_dom_utils = __webpack_require__(638);
+// EXTERNAL MODULE: ./src-modules/entrance-page-core.ts
+var entrance_page_core = __webpack_require__(364);
+;// ./src-modules/unified-automation-manager.ts
+/**
+ * 統一自動処理管理システム
+ *
+ * 全ての自動処理（予約、監視、効率モード待機）を統一管理し、
+ * AbortController による即座中断を実現
+ */
+// カスタム例外クラス
+class CancellationError extends Error {
+    constructor(message) {
+        super(message);
+        this.name = 'CancellationError';
+    }
+}
+// 統一自動処理管理クラス
+class UnifiedAutomationManager {
+    constructor(stateManager) {
+        this.controller = null;
+        this.currentProcess = 'idle';
+        this.stateManager = stateManager;
+        console.log('🔧 統一自動処理管理システム初期化', this.stateManager ? '完了' : '失敗');
+    }
+    // ============================================================================
+    // 統一処理実行フレームワーク
+    // ============================================================================
+    /**
+     * 中断可能な処理実行フレームワーク
+     * @param processType 処理タイプ
+     * @param executor 実行する処理関数
+     * @returns 処理結果
+     */
+    async runWithCancellation(processType, executor) {
+        this.currentProcess = processType;
+        this.controller = new AbortController();
+        try {
+            console.log(`🚀 統一自動処理開始: ${processType}`);
+            return await executor(this.controller.signal);
+        }
+        catch (error) {
+            if (error instanceof Error && error.name === 'AbortError') {
+                const cancellationError = new CancellationError(`${processType} was cancelled`);
+                console.log(`⏹️ 統一自動処理中断: ${processType}`);
+                throw cancellationError;
+            }
+            console.error(`❌ 統一自動処理エラー: ${processType}`, error);
+            throw error;
+        }
+        finally {
+            this.cleanup();
+        }
+    }
+    /**
+     * 統一予約処理実行
+     * @param config 予約設定
+     * @returns 予約結果
+     */
+    async executeReservationProcess(config) {
+        return await this.runWithCancellation('reservation', async (signal) => {
+            return await this.reservationLoop(config, signal);
+        });
+    }
+    /**
+     * 統一監視処理実行（将来実装）
+     */
+    async executeMonitoringProcess() {
+        return await this.runWithCancellation('monitoring', async (signal) => {
+            return await this.monitoringLoop(signal);
+        });
+    }
+    // ============================================================================
+    // 中断可能待機システム
+    // ============================================================================
+    /**
+     * 中断可能待機（100ms間隔で中断チェック）
+     * @param ms 待機時間（ミリ秒）
+     * @param signal 中断シグナル
+     */
+    async waitWithCancellation(ms, signal) {
+        const checkInterval = 100; // 100ms間隔でチェック
+        const endTime = Date.now() + ms;
+        while (Date.now() < endTime) {
+            this.throwIfAborted(signal);
+            const remainingMs = endTime - Date.now();
+            const waitMs = Math.min(checkInterval, remainingMs);
+            if (waitMs <= 0)
+                break;
+            await new Promise(resolve => setTimeout(resolve, waitMs));
+        }
+    }
+    /**
+     * 効率モード用精密待機（タイミング精度維持）
+     * @param targetTime 目標時刻
+     * @param signal 中断シグナル
+     */
+    async waitForTargetTime(targetTime, signal) {
+        const totalWaitMs = targetTime.getTime() - Date.now();
+        if (totalWaitMs <= 0) {
+            return; // 既に目標時刻を過ぎている
+        }
+        if (totalWaitMs > 1000) {
+            // 長時間待機は100ms間隔で分割
+            const longWaitMs = totalWaitMs - 100; // 最後100msは精密待機
+            console.log(`🎯 統一効率モード待機: ${Math.floor(longWaitMs / 1000)}秒`);
+            await this.waitWithCancellation(longWaitMs, signal);
+        }
+        // 最終精密調整（100ms以下）
+        const finalWaitMs = targetTime.getTime() - Date.now();
+        if (finalWaitMs > 0) {
+            // 短時間は通常のsetTimeoutで精度を保つ
+            await new Promise(resolve => setTimeout(resolve, finalWaitMs));
+        }
+    }
+    // ============================================================================
+    // DOM操作の中断対応（Phase 3で実装予定）
+    // ============================================================================
+    /*
+    // Phase 3で実装予定: 中断可能なDOM要素待機
+    private async waitForElementWithCancellation(
+        selector: string,
+        timeout: number,
+        signal: AbortSignal
+    ): Promise<HTMLElement> {
+        const checkInterval = 100;
+        const endTime = Date.now() + timeout;
+
+        while (Date.now() < endTime) {
+            this.throwIfAborted(signal);
+
+            const element = document.querySelector(selector) as HTMLElement;
+            if (element) {
+                return element;
+            }
+
+            await this.waitWithCancellation(checkInterval, signal);
+        }
+
+        throw new Error(`要素が見つかりません: ${selector}`);
+    }
+    */
+    // ============================================================================
+    // 処理実装（将来のPhase 3で実装予定）
+    // ============================================================================
+    /**
+     * 予約処理ループ（Phase 3で実装予定）
+     */
+    async reservationLoop(_config, _signal) {
+        // Phase 3で entranceReservationHelper() から移植予定
+        console.log('🚧 予約処理ループ - Phase 3で実装予定');
+        // 暫定実装: 既存処理に委譲
+        throw new Error('予約処理ループは Phase 3 で実装予定です');
+    }
+    /**
+     * 監視処理ループ（将来実装予定）
+     */
+    async monitoringLoop(_signal) {
+        // 将来の監視処理統一時に実装
+        console.log('🚧 監視処理ループ - 将来実装予定');
+    }
+    // ============================================================================
+    // ユーティリティメソッド
+    // ============================================================================
+    /**
+     * 即座中断
+     */
+    abort() {
+        if (this.controller) {
+            console.log('🛑 統一自動処理を即座中断');
+            this.controller.abort();
+        }
+    }
+    /**
+     * 現在の処理状態取得
+     */
+    getCurrentProcess() {
+        return this.currentProcess;
+    }
+    /**
+     * 処理実行中かどうか
+     */
+    isRunning() {
+        return this.currentProcess !== 'idle' && this.controller !== null;
+    }
+    /**
+     * 中断チェック（AbortSignal使用）
+     * @param signal 中断シグナル
+     */
+    throwIfAborted(signal) {
+        if (signal.aborted) {
+            throw new Error('AbortError');
+        }
+    }
+    /**
+     * 処理終了時のクリーンアップ
+     */
+    cleanup() {
+        this.currentProcess = 'idle';
+        this.controller = null;
+        console.log('🧹 統一自動処理クリーンアップ完了');
+    }
+}
+
+;// ./src-modules/entrance-reservation-state-manager.ts
 /**
  * 入場予約状態管理システム
  * 入場予約・監視の状態と対象を管理
  */
 // 必要なimport
+
 
 
 // ============================================================================
@@ -2832,6 +3041,9 @@ class EntranceReservationStateManager {
             countdownInterval: null,
             remainingSeconds: null
         };
+        // 統一自動処理管理を初期化
+        this.automationManager = new UnifiedAutomationManager(this);
+        console.log('📋 統一状態管理システム初期化完了');
     }
     // ============================================================================
     // 実行状態管理
@@ -2919,6 +3131,11 @@ class EntranceReservationStateManager {
     setShouldStop(shouldStop) {
         this.reservationExecution.shouldStop = shouldStop;
         this.log(`🛑 予約中断フラグ: ${shouldStop}`);
+        // Phase 1: 統一自動処理管理での中断処理を追加
+        if (shouldStop && this.automationManager.isRunning()) {
+            this.log('🛑 統一自動処理管理での即座中断を実行');
+            this.automationManager.abort();
+        }
         // 中断フラグのみ設定、状態変更は予約処理完了後に行う
         // （予約処理ループが完了するまで RESERVATION_RUNNING 状態を維持）
     }
@@ -3191,10 +3408,10 @@ class EntranceReservationStateManager {
     setReservationTarget(timeSlot, locationIndex, selector) {
         // selectorが未指定の場合は生成
         if (!selector) {
-            const selectedSlot = document.querySelector(_entrance_page_dom_utils__WEBPACK_IMPORTED_MODULE_0__/* .timeSlotSelectors */ .eN.selectedSlot);
+            const selectedSlot = document.querySelector(entrance_page_dom_utils/* timeSlotSelectors */.eN.selectedSlot);
             if (selectedSlot) {
                 const tdElement = selectedSlot.closest('td[data-gray-out]');
-                selector = (0,_entrance_page_dom_utils__WEBPACK_IMPORTED_MODULE_0__/* .generateUniqueTdSelector */ .sN)(tdElement);
+                selector = (0,entrance_page_dom_utils/* generateUniqueTdSelector */.sN)(tdElement);
             }
             else {
                 this.log('⚠️ 予約対象設定失敗: DOM要素が見つからない');
@@ -3301,7 +3518,7 @@ class EntranceReservationStateManager {
             return false;
         }
         // 2. 時間帯選択状態の確認
-        const selectedSlot = document.querySelector(_entrance_page_dom_utils__WEBPACK_IMPORTED_MODULE_0__/* .timeSlotSelectors */ .eN.selectedSlot);
+        const selectedSlot = document.querySelector(entrance_page_dom_utils/* timeSlotSelectors */.eN.selectedSlot);
         if (!selectedSlot) {
             // 時間帯未選択（ログ削減）
             return false;
@@ -3310,7 +3527,7 @@ class EntranceReservationStateManager {
         // 3. 選択時間帯の満員状態確認
         const tdElement = selectedSlot.closest('td[data-gray-out]');
         if (tdElement) {
-            const status = (0,_entrance_page_dom_utils__WEBPACK_IMPORTED_MODULE_0__/* .extractTdStatus */ .SE)(tdElement);
+            const status = (0,entrance_page_dom_utils/* extractTdStatus */.SE)(tdElement);
             if (status?.isFull) {
                 return false;
             }
@@ -3323,7 +3540,7 @@ class EntranceReservationStateManager {
             // return false;
         }
         // 5. カレンダー選択確認
-        const selectedDate = (0,_entrance_page_core__WEBPACK_IMPORTED_MODULE_1__/* .getCurrentSelectedCalendarDate */ .rY)();
+        const selectedDate = (0,entrance_page_core/* getCurrentSelectedCalendarDate */.rY)();
         if (!selectedDate) {
             return false;
         }
@@ -3904,6 +4121,30 @@ class EntranceReservationStateManager {
     updateNextSubmitTarget() {
         if (this.efficiencyMode.enabled) {
             this.efficiencyMode.nextSubmitTarget = this.calculateNext00or30Seconds();
+        }
+    }
+    // Phase 1: 統一自動処理管理での効率モード待機（中断可能）
+    async waitForEfficiencyTarget(targetTime) {
+        if (!this.automationManager.isRunning()) {
+            console.log('⚠️ 統一自動処理が実行中でないため待機をスキップ');
+            return false;
+        }
+        try {
+            // UnifiedAutomationManagerの中断可能待機を使用
+            // Phase 2で実装予定: 現在は基本的な待機のみ
+            const waitMs = targetTime.getTime() - Date.now();
+            if (waitMs > 0) {
+                console.log(`🎯 統一効率モード待機: ${Math.floor(waitMs / 1000)}秒 (統一管理)`);
+                await new Promise(resolve => setTimeout(resolve, waitMs));
+            }
+            return true;
+        }
+        catch (error) {
+            if (error instanceof CancellationError) {
+                console.log('⏹️ 効率モード待機が中断されました');
+                return false;
+            }
+            throw error;
         }
     }
     // 効率モードFAB更新タイマー開始
@@ -5072,7 +5313,7 @@ module.exports = domAPI;
 /* harmony import */ var _entrance_page_state__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(278);
 /* harmony import */ var _entrance_page_dom_utils__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(638);
 /* harmony import */ var _entrance_page_core__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(364);
-/* harmony import */ var _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(461);
+/* harmony import */ var _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(374);
 /* harmony import */ var _entrance_page_ui_helpers__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(269);
 // pavilion-search-pageからのimport
 
@@ -6118,8 +6359,8 @@ var __webpack_exports__ = {};
 var pavilion_search_page = __webpack_require__(521);
 // EXTERNAL MODULE: ./src-modules/entrance-page-state.ts
 var entrance_page_state = __webpack_require__(278);
-// EXTERNAL MODULE: ./src-modules/entrance-reservation-state-manager.ts
-var entrance_reservation_state_manager = __webpack_require__(461);
+// EXTERNAL MODULE: ./src-modules/entrance-reservation-state-manager.ts + 1 modules
+var entrance_reservation_state_manager = __webpack_require__(374);
 ;// ./src-modules/cache-manager.ts
 // entrance-page-stateからのimport
 // import { timeSlotState } from './entrance-page-state'; // 統合により不要

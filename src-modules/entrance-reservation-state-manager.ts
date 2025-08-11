@@ -6,6 +6,7 @@
 // 必要なimport
 import { timeSlotSelectors, generateUniqueTdSelector, extractTdStatus } from './entrance-page-dom-utils';
 import { getCurrentSelectedCalendarDate } from './entrance-page-core';
+import { UnifiedAutomationManager, CancellationError } from './unified-automation-manager';
 
 // ============================================================================
 // 型定義
@@ -115,6 +116,15 @@ export class LocationHelper {
 export class EntranceReservationStateManager {
     // 実行状態
     private executionState: ExecutionState = ExecutionState.IDLE;
+    
+    // 統一自動処理管理（Phase 1で追加）
+    private automationManager: UnifiedAutomationManager;
+    
+    constructor() {
+        // 統一自動処理管理を初期化
+        this.automationManager = new UnifiedAutomationManager(this);
+        console.log('📋 統一状態管理システム初期化完了');
+    }
     
     // 対象管理
     private reservationTarget: ReservationTarget | null = null;
@@ -289,6 +299,12 @@ export class EntranceReservationStateManager {
     setShouldStop(shouldStop: boolean): void {
         this.reservationExecution.shouldStop = shouldStop;
         this.log(`🛑 予約中断フラグ: ${shouldStop}`);
+        
+        // Phase 1: 統一自動処理管理での中断処理を追加
+        if (shouldStop && this.automationManager.isRunning()) {
+            this.log('🛑 統一自動処理管理での即座中断を実行');
+            this.automationManager.abort();
+        }
         
         // 中断フラグのみ設定、状態変更は予約処理完了後に行う
         // （予約処理ループが完了するまで RESERVATION_RUNNING 状態を維持）
@@ -1443,6 +1459,31 @@ export class EntranceReservationStateManager {
     updateNextSubmitTarget(): void {
         if (this.efficiencyMode.enabled) {
             this.efficiencyMode.nextSubmitTarget = this.calculateNext00or30Seconds();
+        }
+    }
+    
+    // Phase 1: 統一自動処理管理での効率モード待機（中断可能）
+    async waitForEfficiencyTarget(targetTime: Date): Promise<boolean> {
+        if (!this.automationManager.isRunning()) {
+            console.log('⚠️ 統一自動処理が実行中でないため待機をスキップ');
+            return false;
+        }
+        
+        try {
+            // UnifiedAutomationManagerの中断可能待機を使用
+            // Phase 2で実装予定: 現在は基本的な待機のみ
+            const waitMs = targetTime.getTime() - Date.now();
+            if (waitMs > 0) {
+                console.log(`🎯 統一効率モード待機: ${Math.floor(waitMs/1000)}秒 (統一管理)`);
+                await new Promise(resolve => setTimeout(resolve, waitMs));
+            }
+            return true;
+        } catch (error) {
+            if (error instanceof CancellationError) {
+                console.log('⏹️ 効率モード待機が中断されました');
+                return false;
+            }
+            throw error;
         }
     }
     
