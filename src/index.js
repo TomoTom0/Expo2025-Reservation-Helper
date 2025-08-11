@@ -2770,6 +2770,16 @@ class UnifiedAutomationManager {
             return await this.monitoringLoop(signal);
         });
     }
+    /**
+     * 統一効率モード待機処理実行
+     * @param targetTime 目標時刻
+     * @returns Promise<void>
+     */
+    async executeEfficiencyWait(targetTime) {
+        return await this.runWithCancellation('efficiency-wait', async (signal) => {
+            await this.waitForTargetTime(targetTime, signal);
+        });
+    }
     // ============================================================================
     // 中断可能待機システム
     // ============================================================================
@@ -3138,6 +3148,26 @@ class EntranceReservationStateManager {
         }
         // 中断フラグのみ設定、状態変更は予約処理完了後に行う
         // （予約処理ループが完了するまで RESERVATION_RUNNING 状態を維持）
+    }
+    // ============================================================================
+    // 統一自動処理管理へのアクセスメソッド（Phase 2で追加）
+    // ============================================================================
+    /**
+     * 統一効率モード待機処理実行
+     * @param targetTime 目標時刻
+     * @returns Promise<void>
+     */
+    async executeUnifiedEfficiencyWait(targetTime) {
+        return await this.automationManager.executeEfficiencyWait(targetTime);
+    }
+    /**
+     * 統一中断可能待機
+     * @param ms 待機時間（ミリ秒）
+     * @param signal 中断シグナル
+     * @returns Promise<void>
+     */
+    async executeUnifiedWaitWithCancellation(ms, signal) {
+        return await this.automationManager.waitWithCancellation(ms, signal);
     }
     // 予約中断フラグ取得
     getShouldStop() {
@@ -6238,7 +6268,7 @@ async function entranceReservationHelper(config) {
 // ============================================================================
 // 効率モード対応関数
 // ============================================================================
-// 効率モード対応のsubmit実行
+// 効率モード対応のsubmit実行（統一自動処理管理対応）
 async function executeSubmitWithEfficiencyTiming(submitButton, config) {
     const isEfficiencyMode = _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_4__/* .entranceReservationStateManager */ .xx.isEfficiencyModeEnabled();
     if (!isEfficiencyMode) {
@@ -6250,25 +6280,49 @@ async function executeSubmitWithEfficiencyTiming(submitButton, config) {
     console.log('🚀 効率モード: submit標的時刻調整開始');
     // 次の00秒/30秒標的時刻を計算
     const nextTarget = _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_4__/* .entranceReservationStateManager */ .xx.calculateNext00or30Seconds();
-    const adjustmentWaitMs = nextTarget.getTime() - Date.now();
-    if (adjustmentWaitMs > 1000) {
-        console.log(`🎯 標的時刻調整待機: ${Math.floor(adjustmentWaitMs / 1000)}秒 (目標: ${nextTarget.toLocaleTimeString()})`);
-        await new Promise(resolve => setTimeout(resolve, adjustmentWaitMs));
+    try {
+        // 統一自動処理管理による中断可能な効率モード待機
+        console.log(`🎯 統一効率モード待機: 目標時刻 ${nextTarget.toLocaleTimeString()}`);
+        await _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_4__/* .entranceReservationStateManager */ .xx.executeUnifiedEfficiencyWait(nextTarget);
+        // 標的時刻でsubmitクリック実行
+        console.log(`🚀 submitクリック実行 (${new Date().toLocaleTimeString()})`);
+        await (0,_pavilion_search_page__WEBPACK_IMPORTED_MODULE_0__/* .clickElement */ .jp)(submitButton, config);
+        // 次回標的時刻を更新
+        _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_4__/* .entranceReservationStateManager */ .xx.updateNextSubmitTarget();
     }
-    // 標的時刻でsubmitクリック実行
-    console.log(`🚀 submitクリック実行 (${new Date().toLocaleTimeString()})`);
-    await (0,_pavilion_search_page__WEBPACK_IMPORTED_MODULE_0__/* .clickElement */ .jp)(submitButton, config);
-    // 4. 次回標的時刻を更新
-    _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_4__/* .entranceReservationStateManager */ .xx.updateNextSubmitTarget();
+    catch (error) {
+        if (error.name === 'CancellationError') {
+            console.log('⏹️ 効率モード待機が中断されました');
+            throw error; // 中断を上位に伝播
+        }
+        else {
+            console.error('❌ 効率モード待機エラー:', error);
+            throw error;
+        }
+    }
 }
-// 効率モード対応の固定待機付きクリック（change、closeボタン用）
+// 効率モード対応の固定待機付きクリック（change、closeボタン用、統一自動処理管理対応）
 async function clickElementWithFixedDelay(element, config) {
     const isEfficiencyMode = _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_4__/* .entranceReservationStateManager */ .xx.isEfficiencyModeEnabled();
     if (isEfficiencyMode) {
-        // 効率モード: 1.5-3秒の固定待機
-        const randomDelay = 1500 + Math.random() * 1500; // 1500~3000ms
-        console.log(`⏳ 効率モード固定待機: ${Math.round(randomDelay)}ms`);
-        await new Promise(resolve => setTimeout(resolve, randomDelay));
+        try {
+            // 効率モード: 1.5-3秒の固定待機（中断可能）
+            const randomDelay = 1500 + Math.random() * 1500; // 1500~3000ms
+            console.log(`⏳ 効率モード固定待機: ${Math.round(randomDelay)}ms`);
+            // 統一自動処理管理による中断可能な待機
+            const controller = new AbortController();
+            await _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_4__/* .entranceReservationStateManager */ .xx.executeUnifiedWaitWithCancellation(randomDelay, controller.signal);
+        }
+        catch (error) {
+            if (error.name === 'CancellationError' || error.message === 'AbortError') {
+                console.log('⏹️ 効率モード固定待機が中断されました');
+                throw error; // 中断を上位に伝播
+            }
+            else {
+                console.error('❌ 効率モード固定待機エラー:', error);
+                throw error;
+            }
+        }
     }
     // 通常のクリック処理
     await (0,_pavilion_search_page__WEBPACK_IMPORTED_MODULE_0__/* .clickElement */ .jp)(element, config);

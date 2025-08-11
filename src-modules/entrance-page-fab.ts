@@ -1102,7 +1102,7 @@ async function entranceReservationHelper(config: ReservationConfig): Promise<Res
 // 効率モード対応関数
 // ============================================================================
 
-// 効率モード対応のsubmit実行
+// 効率モード対応のsubmit実行（統一自動処理管理対応）
 async function executeSubmitWithEfficiencyTiming(submitButton: HTMLElement, config: ReservationConfig): Promise<void> {
     const isEfficiencyMode = entranceReservationStateManager.isEfficiencyModeEnabled();
     
@@ -1117,30 +1117,53 @@ async function executeSubmitWithEfficiencyTiming(submitButton: HTMLElement, conf
     
     // 次の00秒/30秒標的時刻を計算
     const nextTarget = entranceReservationStateManager.calculateNext00or30Seconds();
-    const adjustmentWaitMs = nextTarget.getTime() - Date.now();
     
-    if (adjustmentWaitMs > 1000) {
-        console.log(`🎯 標的時刻調整待機: ${Math.floor(adjustmentWaitMs/1000)}秒 (目標: ${nextTarget.toLocaleTimeString()})`);
-        await new Promise(resolve => setTimeout(resolve, adjustmentWaitMs));
+    try {
+        // 統一自動処理管理による中断可能な効率モード待機
+        console.log(`🎯 統一効率モード待機: 目標時刻 ${nextTarget.toLocaleTimeString()}`);
+        await entranceReservationStateManager.executeUnifiedEfficiencyWait(nextTarget);
+        
+        // 標的時刻でsubmitクリック実行
+        console.log(`🚀 submitクリック実行 (${new Date().toLocaleTimeString()})`);
+        await clickElement(submitButton, config);
+        
+        // 次回標的時刻を更新
+        entranceReservationStateManager.updateNextSubmitTarget();
+        
+    } catch (error: any) {
+        if (error.name === 'CancellationError') {
+            console.log('⏹️ 効率モード待機が中断されました');
+            throw error; // 中断を上位に伝播
+        } else {
+            console.error('❌ 効率モード待機エラー:', error);
+            throw error;
+        }
     }
-    
-    // 標的時刻でsubmitクリック実行
-    console.log(`🚀 submitクリック実行 (${new Date().toLocaleTimeString()})`);
-    await clickElement(submitButton, config);
-    
-    // 4. 次回標的時刻を更新
-    entranceReservationStateManager.updateNextSubmitTarget();
 }
 
-// 効率モード対応の固定待機付きクリック（change、closeボタン用）
+// 効率モード対応の固定待機付きクリック（change、closeボタン用、統一自動処理管理対応）
 async function clickElementWithFixedDelay(element: HTMLElement, config: ReservationConfig): Promise<void> {
     const isEfficiencyMode = entranceReservationStateManager.isEfficiencyModeEnabled();
     
     if (isEfficiencyMode) {
-        // 効率モード: 1.5-3秒の固定待機
-        const randomDelay = 1500 + Math.random() * 1500; // 1500~3000ms
-        console.log(`⏳ 効率モード固定待機: ${Math.round(randomDelay)}ms`);
-        await new Promise(resolve => setTimeout(resolve, randomDelay));
+        try {
+            // 効率モード: 1.5-3秒の固定待機（中断可能）
+            const randomDelay = 1500 + Math.random() * 1500; // 1500~3000ms
+            console.log(`⏳ 効率モード固定待機: ${Math.round(randomDelay)}ms`);
+            
+            // 統一自動処理管理による中断可能な待機
+            const controller = new AbortController();
+            await entranceReservationStateManager.executeUnifiedWaitWithCancellation(randomDelay, controller.signal);
+            
+        } catch (error: any) {
+            if (error.name === 'CancellationError' || error.message === 'AbortError') {
+                console.log('⏹️ 効率モード固定待機が中断されました');
+                throw error; // 中断を上位に伝播
+            } else {
+                console.error('❌ 効率モード固定待機エラー:', error);
+                throw error;
+            }
+        }
     }
     
     // 通常のクリック処理

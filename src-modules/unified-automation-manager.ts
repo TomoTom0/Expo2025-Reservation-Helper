@@ -80,6 +80,17 @@ export class UnifiedAutomationManager {
         });
     }
 
+    /**
+     * 統一効率モード待機処理実行
+     * @param targetTime 目標時刻
+     * @returns Promise<void>
+     */
+    async executeEfficiencyWait(targetTime: Date): Promise<void> {
+        return await this.runWithCancellation('efficiency-wait', async (signal) => {
+            await this.waitForTargetTime(targetTime, signal);
+        });
+    }
+
     // ============================================================================
     // 中断可能待機システム
     // ============================================================================

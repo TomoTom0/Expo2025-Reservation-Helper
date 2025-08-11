@@ -309,6 +309,29 @@ export class EntranceReservationStateManager {
         // 中断フラグのみ設定、状態変更は予約処理完了後に行う
         // （予約処理ループが完了するまで RESERVATION_RUNNING 状態を維持）
     }
+
+    // ============================================================================
+    // 統一自動処理管理へのアクセスメソッド（Phase 2で追加）
+    // ============================================================================
+
+    /**
+     * 統一効率モード待機処理実行
+     * @param targetTime 目標時刻
+     * @returns Promise<void>
+     */
+    async executeUnifiedEfficiencyWait(targetTime: Date): Promise<void> {
+        return await this.automationManager.executeEfficiencyWait(targetTime);
+    }
+
+    /**
+     * 統一中断可能待機
+     * @param ms 待機時間（ミリ秒）
+     * @param signal 中断シグナル
+     * @returns Promise<void>
+     */
+    async executeUnifiedWaitWithCancellation(ms: number, signal: AbortSignal): Promise<void> {
+        return await this.automationManager.waitWithCancellation(ms, signal);
+    }
     
     // 予約中断フラグ取得
     getShouldStop(): boolean {
