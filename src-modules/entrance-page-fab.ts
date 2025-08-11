@@ -519,13 +519,12 @@ function createEntranceReservationUI(): void {
         checkInitialState();
     });
     
-    // カレンダー変更監視を開始
-    startCalendarWatcher();
-    
     // 時間帯クリックハンドラーを設定（選択解除機能付き）
     waitForTimeSlotTable(() => {
         setupTimeSlotClickHandlers();
     });
+    
+    // カレンダー変更監視は別途初期化処理で開始（キャッシュ復元後）
 }
 
 // 監視対象表示を更新（統一システムに完全委譲）

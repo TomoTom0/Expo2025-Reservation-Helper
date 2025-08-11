@@ -68,6 +68,10 @@ export const init_entrance_page = (dependencies: Dependencies = {}): void => {
         // キャッシュからの状態復元（カレンダー読み込み完了後に実行）
         if (restoreFromCacheFn) await restoreFromCacheFn();
         
+        // キャッシュ復元後にカレンダー変更監視を開始
+        const { startCalendarWatcher } = await import('./entrance-page-fab');
+        startCalendarWatcher();
+        
         // 初期化完了時に読み込み状態を解除
         if (setPageLoadingStateFn) setPageLoadingStateFn(false);
     })();
