@@ -290,9 +290,10 @@ export class EntranceReservationStateManager {
         this.reservationExecution.shouldStop = shouldStop;
         this.log(`🛑 予約中断フラグ: ${shouldStop}`);
         
-        // 中断時は実行状態をIDLEに戻す
+        // 中断時は実行状態をIDLEに戻し、効率モードタイマーも停止
         if (shouldStop && this.executionState === ExecutionState.RESERVATION_RUNNING) {
             this.executionState = ExecutionState.IDLE;
+            this.stopEfficiencyModeUpdateTimer();
             this.log('🔄 予約中断により状態をIDLEに変更');
         }
     }
@@ -1464,8 +1465,14 @@ export class EntranceReservationStateManager {
         // 既存タイマーがあれば停止
         this.stopEfficiencyModeUpdateTimer();
         
-        // 1秒間隔でFABボタン更新
+        // 1秒間隔でFABボタン更新と目標時刻チェック
         this.efficiencyMode.updateTimer = window.setInterval(() => {
+            // 目標時刻が過去になっていたら次の目標時刻に更新
+            if (this.efficiencyMode.nextSubmitTarget && 
+                this.efficiencyMode.nextSubmitTarget.getTime() <= Date.now()) {
+                this.efficiencyMode.nextSubmitTarget = this.calculateNext00or30Seconds();
+                console.log('⚡ 効率モード: 目標時刻自動更新');
+            }
             this.updateFabDisplay();
         }, 1000);
         
