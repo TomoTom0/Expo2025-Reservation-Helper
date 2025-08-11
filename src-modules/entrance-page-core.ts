@@ -2169,31 +2169,55 @@ function restoreSelectionAfterUpdate(): void {
     let restoredCount = 0;
     
     targets.forEach((target: any) => {
-        console.log(`🔍 復元対象: ${target.timeSlot} (selector: ${target.selector})`);
+        console.log(`🔍 復元対象: ${target.timeSlot} (index: ${target.locationIndex}, selector: ${target.selector})`);
         let foundMatch = false;
         
-        // セレクタで直接検索
+        // 1. セレクタで直接検索（必須）
         if (target.selector) {
             const targetElement = document.querySelector(target.selector) as HTMLTableCellElement;
             if (targetElement) {
+                // 2. 時間テキストの確認（追加検証）
+                const timeTextInCell = targetElement.textContent?.trim() || '';
+                const expectedTime = target.timeSlot;
+                
+                // 3. locationIndexの確認（追加検証）
                 const buttonInTargetTd = targetElement.querySelector('.monitor-btn') as HTMLElement;
                 if (buttonInTargetTd) {
-                    foundMatch = true;
-                    const span = buttonInTargetTd.querySelector('span') as HTMLSpanElement;
-                    if (span) {
-                        const priority = target.priority;
-                        span.innerText = `監視${priority}`;
-                        buttonInTargetTd.classList.remove('full-status');
-                        buttonInTargetTd.classList.add('monitoring-status');
-                        restoredCount++;
-                        console.log(`✅ セレクタで復元成功: ${target.timeSlot}`);
+                    const actualLocationIndex = parseInt(buttonInTargetTd.getAttribute('data-location-index') || '0');
+                    
+                    // セレクタ、時間、locationIndexの三重チェック
+                    const selectorMatch = true; // セレクタで見つかっている
+                    const timeMatch = timeTextInCell.includes(expectedTime);
+                    const indexMatch = actualLocationIndex === target.locationIndex;
+                    
+                    console.log(`🔍 検証結果: セレクタ=✅, 時間=${timeMatch ? '✅' : '❌'}(${timeTextInCell}), index=${indexMatch ? '✅' : '❌'}(${actualLocationIndex}/${target.locationIndex})`);
+                    
+                    if (selectorMatch && timeMatch && indexMatch) {
+                        foundMatch = true;
+                        const span = buttonInTargetTd.querySelector('span') as HTMLSpanElement;
+                        if (span) {
+                            const priority = target.priority;
+                            span.innerText = `監視${priority}`;
+                            buttonInTargetTd.classList.remove('full-status');
+                            buttonInTargetTd.classList.add('monitoring-status');
+                            restoredCount++;
+                            console.log(`✅ 完全一致で復元成功: ${target.timeSlot} (index: ${target.locationIndex})`);
+                        }
+                    } else {
+                        console.log(`⚠️ 部分的不一致: セレクタは見つかったが時間またはindexが一致しません`);
                     }
+                } else {
+                    console.log(`⚠️ セレクタは見つかったが監視ボタンが存在しません`);
                 }
+            } else {
+                console.log(`❌ セレクタで要素が見つかりません: ${target.selector}`);
             }
+        } else {
+            console.log(`❌ セレクタが保存されていません`);
         }
         
         if (!foundMatch) {
-            console.log(`❌ 復元対象が見つかりません: ${target.timeSlot} (selector: ${target.selector})`);
+            console.log(`❌ 復元対象が見つかりません: ${target.timeSlot} (index: ${target.locationIndex}, selector: ${target.selector})`);
         }
     });
     
