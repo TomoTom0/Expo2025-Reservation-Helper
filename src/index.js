@@ -2375,8 +2375,9 @@ function restoreSelectionAfterUpdate() {
         if (target.selector) {
             const targetElement = document.querySelector(target.selector);
             if (targetElement) {
-                // 2. 時間テキストの確認（追加検証）
-                const timeTextInCell = targetElement.textContent?.trim() || '';
+                // 2. 時間帯セレクタでの厳密な時間確認（追加検証）
+                const timeSlotButton = targetElement.querySelector('div[role="button"] dt span');
+                const actualTimeSlot = timeSlotButton ? timeSlotButton.textContent?.trim() || '' : '';
                 const expectedTime = target.timeSlot;
                 // 3. locationIndexの確認（追加検証）
                 const buttonInTargetTd = targetElement.querySelector('.monitor-btn');
@@ -2384,9 +2385,9 @@ function restoreSelectionAfterUpdate() {
                     const actualLocationIndex = parseInt(buttonInTargetTd.getAttribute('data-location-index') || '0');
                     // セレクタ、時間、locationIndexの三重チェック
                     const selectorMatch = true; // セレクタで見つかっている
-                    const timeMatch = timeTextInCell.includes(expectedTime);
+                    const timeMatch = actualTimeSlot === expectedTime; // 厳密一致
                     const indexMatch = actualLocationIndex === target.locationIndex;
-                    console.log(`🔍 検証結果: セレクタ=✅, 時間=${timeMatch ? '✅' : '❌'}(${timeTextInCell}), index=${indexMatch ? '✅' : '❌'}(${actualLocationIndex}/${target.locationIndex})`);
+                    console.log(`🔍 検証結果: セレクタ=✅, 時間=${timeMatch ? '✅' : '❌'}(${actualTimeSlot}===${expectedTime}), index=${indexMatch ? '✅' : '❌'}(${actualLocationIndex}/${target.locationIndex})`);
                     if (selectorMatch && timeMatch && indexMatch) {
                         foundMatch = true;
                         const span = buttonInTargetTd.querySelector('span');
