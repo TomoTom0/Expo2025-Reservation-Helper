@@ -438,6 +438,12 @@ export class EntranceReservationStateManager {
     
     // クールタイム開始（100回試行後に呼び出される）
     startReservationCooldown(): void {
+        // 効率モード中はクールタイム不要
+        if (this.efficiencyMode.enabled) {
+            console.log('⚡ 効率モード中のためクールタイムをスキップ');
+            return;
+        }
+        
         this.reservationCooldown.isActive = true;
         this.reservationCooldown.startTime = Date.now();
         this.reservationCooldown.remainingSeconds = Math.ceil(this.reservationCooldown.duration / 1000);
