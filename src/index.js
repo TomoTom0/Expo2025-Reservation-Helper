@@ -220,7 +220,7 @@ function updateMonitoringTargetsDisplay() {
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1___default()((_node_modules_css_loader_dist_runtime_noSourceMaps_js__WEBPACK_IMPORTED_MODULE_0___default()));
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, `#ytomo-status-badge.countdown-warning{background:rgba(255,0,0,.9) !important}.ytomo-efficiency-toggle{width:45px;height:32px;border-radius:16px;color:#fff;border:none;font-size:10px;font-weight:bold;cursor:pointer;transition:all .2s ease;box-shadow:0 2px 8px rgba(0,0,0,.3);display:flex;align-items:center;justify-content:center;pointer-events:auto;margin-bottom:8px}.ytomo-efficiency-toggle.efficiency-enabled{background:rgba(255,140,0,.9)}.ytomo-efficiency-toggle.efficiency-disabled{background:rgba(128,128,128,.9)}.ytomo-efficiency-toggle:hover{transform:scale(1.1);box-shadow:0 4px 12px rgba(0,0,0,.4)}.ytomo-efficiency-toggle:active{transform:scale(0.95)}button.ext-ytomo{height:40px;width:auto;min-width:60px;padding:0px 8px;background:#006821;color:#fff}button.ext-ytomo.no-after:after{background:rgba(0,0,0,0) none repeat 0 0/auto auto padding-box border-box scroll}button.ext-ytomo.btn-done{background:#4a4c4a}button.ext-ytomo:hover{background:#02862b}.pavilion-sub-btn{color:#fff;border:none;border-radius:20px;padding:8px 16px;font-size:12px;white-space:nowrap;transition:all .2s ease}.pavilion-sub-btn.btn-enabled{background:#006821;cursor:pointer;opacity:1}.pavilion-sub-btn.btn-enabled:hover{background:#02862b;transform:scale(1.05)}.pavilion-sub-btn.btn-disabled,.pavilion-sub-btn.btn-loading{background:gray;cursor:not-allowed;opacity:.6}.pavilion-sub-btn.btn-disabled:hover,.pavilion-sub-btn.btn-loading:hover{background:gray;transform:scale(1)}button.ext-ytomo.pavilion-sub-btn.btn-disabled,button.ext-ytomo.pavilion-sub-btn.btn-loading{background:gray;cursor:not-allowed;opacity:.6}button.ext-ytomo.pavilion-sub-btn.btn-disabled:hover,button.ext-ytomo.pavilion-sub-btn.btn-loading:hover{background:gray;transform:scale(1)}.safe-none,.ytomo-none,.filter-none{display:none}button.ext-ytomo.monitor-btn{height:auto;min-height:20px;width:auto;min-width:35px;padding:1px 4px;color:#fff;margin-left:8px;font-size:10px;border:none;border-radius:2px;cursor:pointer;display:inline-block;vertical-align:middle;position:relative;z-index:10 !important;pointer-events:auto;opacity:1;visibility:visible}button.ext-ytomo.monitor-btn.full-status{background:#228b22}button.ext-ytomo.monitor-btn.full-status:hover{background:#32cd32}button.ext-ytomo.monitor-btn.monitoring-status{background:#dc3545}button.ext-ytomo.monitor-btn.monitoring-status:hover{background:#ff4554}button.ext-ytomo.monitor-btn:disabled{cursor:not-allowed;opacity:.7}button.ext-ytomo.monitor-btn:disabled.full-status{background:rgba(34,139,34,.5);color:hsla(0,0%,100%,.9)}button.ext-ytomo.monitor-btn:disabled.monitoring-status{background:rgba(220,53,69,.5);color:hsla(0,0%,100%,.9)}button.ext-ytomo.monitor-btn:disabled:not(.full-status):not(.monitoring-status){background:rgba(128,128,128,.7);color:hsla(0,0%,100%,.9)}button.ext-ytomo.pavilion-sub-btn.ytomo-date-button.date-selected{border:2px solid #4caf50;box-shadow:0 0 8px rgba(76,175,80,.6)}div.div-flex{display:flex;justify-content:center;margin:5px}.js-show{display:block}.js-hide{display:none}.js-visible{visibility:visible}.js-invisible{visibility:hidden}.js-enabled{pointer-events:auto;opacity:1}.js-disabled{pointer-events:none;opacity:.6}.js-green{background:#228b22;color:#fff}.js-red{background:#dc3545;color:#fff}.js-gray{background:gray;color:#fff}.ytomo-header li.fab-toggle-li{display:inline-block;margin-right:8px}.ytomo-header li.fab-toggle-li button.fab-toggle-button{background:none;border:none;cursor:pointer;padding:0;color:#fff;transition:all .2s ease;display:flex;align-items:center;justify-content:center}.ytomo-header li.fab-toggle-li button.fab-toggle-button:hover{color:#ddd}.ytomo-header li.fab-toggle-li button.fab-toggle-button figure.fab-toggle-figure{width:auto;height:24px;display:flex;align-items:center;justify-content:center;padding:0 4px}.ytomo-pavilion-fab button.ytomo-fab{position:relative}.ytomo-pavilion-fab button.ytomo-fab:hover{transform:scale(1.15);box-shadow:0 8px 25px rgba(0,0,0,.5),0 4px 12px rgba(0,0,0,.3);border-width:4px}.ytomo-pavilion-fab .ytomo-fab-inner-content .pavilion-fab-expand-icon{font-size:8px;line-height:1;margin-bottom:1px;opacity:.8}.ytomo-pavilion-fab .ytomo-fab-inner-content .pavilion-fab-brand-text{font-size:7px;font-weight:normal;line-height:1;margin-bottom:2px;opacity:.7}.ytomo-pavilion-fab .ytomo-fab-inner-content .pavilion-fab-counts-text{font-size:12px;font-weight:bold;line-height:1}.ytomo-pavilion-fab .pavilion-sub-actions-container{display:none;flex-direction:column;gap:8px;align-items:flex-end;margin-bottom:8px}.ytomo-pavilion-fab .pavilion-sub-actions-container.expanded{display:flex}.ytomo-pavilion-fab .pavilion-sub-actions-container button.pavilion-sub-btn.base-style{color:#fff;border:none;border-radius:20px;padding:8px 16px;font-size:12px;white-space:nowrap;box-shadow:0 2px 8px rgba(0,0,0,.3);transition:all .2s ease}.ytomo-companion-dialog{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;z-index:99999 !important;padding:20px;box-sizing:border-box}.ytomo-companion-dialog .dialog-content{background:#fff;border-radius:12px;padding:24px;width:100%;max-width:500px;max-height:90vh;overflow-y:auto;box-shadow:0 10px 40px rgba(0,0,0,.3)}@media(max-width: 768px){.ytomo-companion-dialog .dialog-content{max-width:95vw;max-height:85vh;padding:16px;border-radius:8px}}.ytomo-companion-dialog .dialog-content .input-row{display:flex;gap:8px;margin-bottom:12px}@media(max-width: 480px){.ytomo-companion-dialog .dialog-content .input-row{flex-direction:column;gap:12px}}.ytomo-companion-dialog .dialog-content .input-row input{padding:12px 8px;border:1px solid #ddd;border-radius:4px;font-size:16px}.ytomo-companion-dialog .dialog-content .input-row input:focus{outline:none;border-color:#4caf50;box-shadow:0 0 0 2px rgba(76,175,80,.2)}.ytomo-companion-dialog .dialog-content .input-row button{padding:12px 16px;background:#4caf50;color:#fff;border:none;border-radius:4px;cursor:pointer;font-size:14px;white-space:nowrap;min-width:60px}.ytomo-companion-dialog .dialog-content .input-row button:hover{background:#45a049}.ytomo-companion-dialog .dialog-content .input-row button:active{background:#3d8b40}.ytomo-fab{width:56px;height:56px;border-radius:50%;color:#fff;border:none;box-shadow:0 6px 20px rgba(0,0,0,.4),0 2px 8px rgba(0,0,0,.2);border:3px solid hsla(0,0%,100%,.2);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:bold;transition:all .3s ease;position:relative;overflow:hidden;pointer-events:auto}.ytomo-fab-enabled{background:#ff8c00;opacity:.9;cursor:pointer;pointer-events:auto}.ytomo-fab-disabled{background:gray;opacity:.6;cursor:not-allowed;pointer-events:none}.ytomo-fab-monitoring{background:#ff8c00;opacity:.9;cursor:pointer;pointer-events:auto}.ytomo-fab-running{background:#dc3545;opacity:.9;cursor:pointer;pointer-events:auto}.ytomo-fab-container{position:fixed !important;bottom:20px !important;right:20px !important;z-index:9999 !important;display:flex;flex-direction:column-reverse;align-items:center;gap:12px;pointer-events:none}.ytomo-fab-container.visible{display:flex}.ytomo-fab-container.hidden{display:none}.ytomo-fab-content{position:relative;display:flex;flex-direction:column-reverse;align-items:center;gap:8px;opacity:0;transform:scale(0.8) translateY(10px);transition:all .3s cubic-bezier(0.175, 0.885, 0.32, 1.275);pointer-events:none}.ytomo-fab-content.expanded{opacity:1;transform:scale(1) translateY(0);pointer-events:auto}.ytomo-sub-fab{width:45px;height:32px;border-radius:16px;background:rgba(0,104,33,.9);color:#fff;border:none;font-size:11px;font-weight:bold;cursor:pointer;transition:all .2s ease;box-shadow:0 2px 8px rgba(0,0,0,.3);display:flex;align-items:center;justify-content:center;pointer-events:auto}.ytomo-sub-fab:hover{background:rgba(2,134,43,.9);transform:scale(1.1);box-shadow:0 4px 12px rgba(0,0,0,.4)}.ytomo-sub-fab:active{transform:scale(0.95)}.ytomo-pavilion-fab-container{position:fixed !important;bottom:24px !important;right:24px !important;z-index:10000 !important;display:flex;flex-direction:column;gap:12px;align-items:flex-end;pointer-events:auto}.ytomo-fab-inner-content{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;pointer-events:none}input.ext-tomo.search{height:50px;min-width:200px;max-width:min(300px,100%);font-family:quicksand;font-size:16px;-webkit-appearance:textfield;-moz-appearance:textfield;appearance:textfield;border:1px solid #222426;border-radius:25px;box-shadow:0 1px 0 0 #ccc;padding:0 0 0 10px;flex:1 1}.ytomo-icon.expand-icon{font-size:8px;line-height:1;color:#fff;font-weight:bold;text-align:center;pointer-events:none}.ytomo-icon.countdown-text{font-size:6px;line-height:1;color:#fff;font-weight:bold;text-align:center;margin-top:1px;pointer-events:none}.ytomo-toggle.toggle-li{position:fixed !important;bottom:10px !important;left:10px !important;z-index:1000 !important;list-style:none;margin:0;padding:0}.ytomo-toggle.toggle-button{width:50px;height:30px;background:rgba(255,140,0,.8);border:none;border-radius:15px;cursor:pointer;transition:all .3s ease;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:bold;position:relative;overflow:hidden}.ytomo-toggle.toggle-button.enabled{color:#fff}.ytomo-toggle.toggle-button.disabled{color:#ddd}.ytomo-toggle.toggle-figure{width:100%;height:100%;margin:0;padding:0;border:none;background:rgba(0,0,0,0);pointer-events:none}.ytomo-dialog.overlay{position:fixed !important;top:0 !important;left:0 !important;width:100% !important;height:100% !important;background-color:rgba(0,0,0,.5);z-index:10000 !important;display:flex;justify-content:center;align-items:center}.ytomo-dialog.container{background:#fff;border-radius:8px;padding:20px;max-width:400px;width:90%;max-height:70vh;overflow-y:auto;box-shadow:0 4px 12px rgba(0,0,0,.3)}.ytomo-dialog.title{margin:0 0 16px 0;color:#333;font-size:18px;font-weight:bold}.ytomo-dialog.button-group{display:flex;justify-content:flex-end;gap:10px;margin-top:20px}.ytomo-dialog.primary-button{background:#006821;color:#fff;border:none;padding:10px 20px;border-radius:4px;cursor:pointer;font-size:14px}.ytomo-dialog.primary-button:hover{background:#02862b}.ytomo-dialog.primary-button:disabled{background:gray;cursor:not-allowed}.ytomo-dialog.secondary-button{background:rgba(0,0,0,0);color:#666;border:1px solid #ccc;padding:10px 20px;border-radius:4px;cursor:pointer;font-size:14px}.ytomo-dialog.secondary-button:hover{background:#f5f5f5}.ytomo-progress.counter{display:inline-block;margin-left:8px;padding:2px 6px;background:rgba(0,0,0,.3);border-radius:10px;font-size:10px;color:#fff;font-weight:bold}#ytomo-monitoring-targets.monitoring-targets{background:rgba(255,140,0,.15);border:1px solid rgba(255,140,0,.3);border-radius:8px;padding:8px;margin:4px 0}#ytomo-monitoring-targets.reservation-target{background:rgba(0,104,33,.15);border:1px solid rgba(0,104,33,.3);border-radius:8px;padding:8px;margin:4px 0}`, ""]);
+___CSS_LOADER_EXPORT___.push([module.id, `#ytomo-status-badge.countdown-warning{background:rgba(255,0,0,.9) !important}.ytomo-efficiency-toggle{width:45px;height:32px;border-radius:16px;color:#fff;border:none;font-size:10px;font-weight:bold;cursor:pointer;transition:all .2s ease;box-shadow:0 2px 8px rgba(0,0,0,.3);display:flex;align-items:center;justify-content:center;pointer-events:auto;margin-bottom:8px}.ytomo-efficiency-toggle.efficiency-enabled{background:rgba(255,140,0,.9)}.ytomo-efficiency-toggle.efficiency-disabled{background:rgba(128,128,128,.9)}.ytomo-efficiency-toggle:hover{transform:scale(1.1);box-shadow:0 4px 12px rgba(0,0,0,.4)}.ytomo-efficiency-toggle:active{transform:scale(0.95)}button.ext-ytomo{height:40px;width:auto;min-width:60px;padding:0px 8px;background:#006821;color:#fff}button.ext-ytomo.no-after:after{background:rgba(0,0,0,0) none repeat 0 0/auto auto padding-box border-box scroll}button.ext-ytomo.btn-done{background:#4a4c4a}button.ext-ytomo:hover{background:#02862b}.pavilion-sub-btn{color:#fff;border:none;border-radius:20px;padding:8px 16px;font-size:12px;white-space:nowrap;transition:all .2s ease}.pavilion-sub-btn.btn-enabled{background:#006821;cursor:pointer;opacity:1}.pavilion-sub-btn.btn-enabled:hover{background:#02862b;transform:scale(1.05)}.pavilion-sub-btn.btn-disabled,.pavilion-sub-btn.btn-loading{background:gray;cursor:not-allowed;opacity:.6}.pavilion-sub-btn.btn-disabled:hover,.pavilion-sub-btn.btn-loading:hover{background:gray;transform:scale(1)}button.ext-ytomo.pavilion-sub-btn.btn-disabled,button.ext-ytomo.pavilion-sub-btn.btn-loading{background:gray;cursor:not-allowed;opacity:.6}button.ext-ytomo.pavilion-sub-btn.btn-disabled:hover,button.ext-ytomo.pavilion-sub-btn.btn-loading:hover{background:gray;transform:scale(1)}.safe-none,.ytomo-none,.filter-none{display:none}button.ext-ytomo.monitor-btn{height:auto;min-height:20px;width:auto;min-width:35px;padding:1px 4px;color:#fff;margin-left:8px;font-size:10px;border:none;border-radius:2px;cursor:pointer;display:inline-block;vertical-align:middle;position:relative;z-index:10 !important;pointer-events:auto;opacity:1;visibility:visible}button.ext-ytomo.monitor-btn.full-status{background:#228b22}button.ext-ytomo.monitor-btn.full-status:hover{background:#32cd32}button.ext-ytomo.monitor-btn.monitoring-status{background:#dc3545}button.ext-ytomo.monitor-btn.monitoring-status:hover{background:#ff4554}button.ext-ytomo.monitor-btn:disabled{cursor:not-allowed;opacity:.7}button.ext-ytomo.monitor-btn:disabled.full-status{background:rgba(34,139,34,.5);color:hsla(0,0%,100%,.9)}button.ext-ytomo.monitor-btn:disabled.monitoring-status{background:rgba(220,53,69,.5);color:hsla(0,0%,100%,.9)}button.ext-ytomo.monitor-btn:disabled:not(.full-status):not(.monitoring-status){background:rgba(128,128,128,.7);color:hsla(0,0%,100%,.9)}button.ext-ytomo.pavilion-sub-btn.ytomo-date-button.date-selected{border:2px solid #4caf50;box-shadow:0 0 8px rgba(76,175,80,.6)}div.div-flex{display:flex;justify-content:center;margin:5px}.js-show{display:block}.js-hide{display:none}.js-visible{visibility:visible}.js-invisible{visibility:hidden}.js-enabled{pointer-events:auto;opacity:1}.js-disabled{pointer-events:none;opacity:.6}.js-green{background:#228b22;color:#fff}.js-red{background:#dc3545;color:#fff}.js-gray{background:gray;color:#fff}.ytomo-header li.fab-toggle-li{display:inline-block;margin-right:8px}.ytomo-header li.fab-toggle-li button.fab-toggle-button{background:none;border:none;cursor:pointer;padding:0;color:#fff;transition:all .2s ease;display:flex;align-items:center;justify-content:center}.ytomo-header li.fab-toggle-li button.fab-toggle-button:hover{color:#ddd}.ytomo-header li.fab-toggle-li button.fab-toggle-button figure.fab-toggle-figure{width:auto;height:24px;display:flex;align-items:center;justify-content:center;padding:0 4px}.ytomo-pavilion-fab button.ytomo-fab{position:relative}.ytomo-pavilion-fab button.ytomo-fab:hover{transform:scale(1.15);box-shadow:0 8px 25px rgba(0,0,0,.5),0 4px 12px rgba(0,0,0,.3);border-width:4px}.ytomo-pavilion-fab .ytomo-fab-inner-content .pavilion-fab-expand-icon{font-size:8px;line-height:1;margin-bottom:1px;opacity:.8}.ytomo-pavilion-fab .ytomo-fab-inner-content .pavilion-fab-brand-text{font-size:7px;font-weight:normal;line-height:1;margin-bottom:2px;opacity:.7}.ytomo-pavilion-fab .ytomo-fab-inner-content .pavilion-fab-counts-text{font-size:12px;font-weight:bold;line-height:1}.ytomo-pavilion-fab .pavilion-sub-actions-container{display:none;flex-direction:column;gap:8px;align-items:flex-end;margin-bottom:8px}.ytomo-pavilion-fab .pavilion-sub-actions-container.expanded{display:flex}.ytomo-pavilion-fab .pavilion-sub-actions-container button.pavilion-sub-btn.base-style{color:#fff;border:none;border-radius:20px;padding:8px 16px;font-size:12px;white-space:nowrap;box-shadow:0 2px 8px rgba(0,0,0,.3);transition:all .2s ease}.ytomo-companion-dialog{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;z-index:99999 !important;padding:20px;box-sizing:border-box}.ytomo-companion-dialog .dialog-content{background:#fff;border-radius:12px;padding:24px;width:100%;max-width:500px;max-height:90vh;overflow-y:auto;box-shadow:0 10px 40px rgba(0,0,0,.3)}@media(max-width: 768px){.ytomo-companion-dialog .dialog-content{max-width:95vw;max-height:85vh;padding:16px;border-radius:8px}}.ytomo-companion-dialog .dialog-content .input-row{display:flex;gap:8px;margin-bottom:12px}@media(max-width: 480px){.ytomo-companion-dialog .dialog-content .input-row{flex-direction:column;gap:12px}}.ytomo-companion-dialog .dialog-content .input-row input{padding:12px 8px;border:1px solid #ddd;border-radius:4px;font-size:16px}.ytomo-companion-dialog .dialog-content .input-row input:focus{outline:none;border-color:#4caf50;box-shadow:0 0 0 2px rgba(76,175,80,.2)}.ytomo-companion-dialog .dialog-content .input-row button{padding:12px 16px;background:#4caf50;color:#fff;border:none;border-radius:4px;cursor:pointer;font-size:14px;white-space:nowrap;min-width:60px}.ytomo-companion-dialog .dialog-content .input-row button:hover{background:#45a049}.ytomo-companion-dialog .dialog-content .input-row button:active{background:#3d8b40}.ytomo-fab{width:56px;height:56px;border-radius:50%;color:#fff;border:none;box-shadow:0 6px 20px rgba(0,0,0,.4),0 2px 8px rgba(0,0,0,.2);border:3px solid hsla(0,0%,100%,.2);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:bold;transition:all .3s ease;position:relative;overflow:hidden;pointer-events:auto}.ytomo-fab-enabled{background:#ff8c00;opacity:.9;cursor:pointer;pointer-events:auto}.ytomo-fab-disabled{background:gray;opacity:.6;cursor:not-allowed;pointer-events:none}.ytomo-fab-monitoring{background:#ff8c00;opacity:.9;cursor:pointer;pointer-events:auto}.ytomo-fab-running{background:#dc3545;opacity:.9;cursor:pointer;pointer-events:auto}.ytomo-fab-container{position:fixed !important;bottom:20px !important;right:20px !important;z-index:9999 !important;display:flex;flex-direction:column-reverse;align-items:center;gap:12px;pointer-events:none}.ytomo-fab-container.visible{display:flex}.ytomo-fab-container.hidden{display:none}.ytomo-fab-content{position:relative;display:flex;flex-direction:column-reverse;align-items:center;gap:8px;opacity:0;transform:scale(0.8) translateY(10px);transition:all .3s cubic-bezier(0.175, 0.885, 0.32, 1.275);pointer-events:none}.ytomo-fab-content.expanded{opacity:1;transform:scale(1) translateY(0);pointer-events:auto}.ytomo-sub-fab{width:45px;height:32px;border-radius:16px;background:rgba(0,104,33,.9);color:#fff;border:none;font-size:11px;font-weight:bold;cursor:pointer;transition:all .2s ease;box-shadow:0 2px 8px rgba(0,0,0,.3);display:flex;align-items:center;justify-content:center;pointer-events:auto}.ytomo-sub-fab:hover{background:rgba(2,134,43,.9);transform:scale(1.1);box-shadow:0 4px 12px rgba(0,0,0,.4)}.ytomo-sub-fab:active{transform:scale(0.95)}.ytomo-pavilion-fab-container{position:fixed !important;bottom:24px !important;right:24px !important;z-index:10000 !important;display:flex;flex-direction:column;gap:12px;align-items:flex-end;pointer-events:auto}.ytomo-fab-inner-content{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;pointer-events:none}input.ext-tomo.search{height:50px;min-width:200px;max-width:min(300px,100%);font-family:quicksand;font-size:16px;-webkit-appearance:textfield;-moz-appearance:textfield;appearance:textfield;border:1px solid #222426;border-radius:25px;box-shadow:0 1px 0 0 #ccc;padding:0 0 0 10px;flex:1 1}.ytomo-icon.expand-icon{font-size:8px;line-height:1;color:#fff;font-weight:bold;text-align:center;pointer-events:none}.ytomo-icon.countdown-text{font-size:6px;line-height:1;color:#fff;font-weight:bold;text-align:center;margin-top:1px;pointer-events:none}.ytomo-toggle.toggle-li{position:fixed !important;bottom:10px !important;left:10px !important;z-index:1000 !important;list-style:none;margin:0;padding:0}.ytomo-toggle.toggle-button{width:50px;height:30px;background:rgba(255,140,0,.8);border:none;border-radius:15px;cursor:pointer;transition:all .3s ease;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:bold;position:relative;overflow:hidden}.ytomo-toggle.toggle-button.enabled{color:#fff}.ytomo-toggle.toggle-button.disabled{color:#ddd}.ytomo-toggle.toggle-figure{width:100%;height:100%;margin:0;padding:0;border:none;background:rgba(0,0,0,0);pointer-events:none}.ytomo-dialog.overlay{position:fixed !important;top:0 !important;left:0 !important;width:100% !important;height:100% !important;background-color:rgba(0,0,0,.5);z-index:10000 !important;display:flex;justify-content:center;align-items:center}.ytomo-dialog.container{background:#fff;border-radius:8px;padding:20px;max-width:400px;width:90%;max-height:70vh;overflow-y:auto;box-shadow:0 4px 12px rgba(0,0,0,.3)}.ytomo-dialog.title{margin:0 0 16px 0;color:#333;font-size:18px;font-weight:bold}.ytomo-dialog.button-group{display:flex;justify-content:flex-end;gap:10px;margin-top:20px}.ytomo-dialog.primary-button{background:#006821;color:#fff;border:none;padding:10px 20px;border-radius:4px;cursor:pointer;font-size:14px}.ytomo-dialog.primary-button:hover{background:#02862b}.ytomo-dialog.primary-button:disabled{background:gray;cursor:not-allowed}.ytomo-dialog.secondary-button{background:rgba(0,0,0,0);color:#666;border:1px solid #ccc;padding:10px 20px;border-radius:4px;cursor:pointer;font-size:14px}.ytomo-dialog.secondary-button:hover{background:#f5f5f5}.ytomo-progress.counter{display:inline-block;margin-left:8px;padding:2px 6px;background:rgba(0,0,0,.3);border-radius:10px;font-size:10px;color:#fff;font-weight:bold}#ytomo-monitoring-targets.monitoring-targets{background:rgba(255,140,0,.15);border:1px solid rgba(255,140,0,.3);border-radius:8px;padding:8px;margin:4px 0}#ytomo-monitoring-targets.reservation-target{background:rgba(0,104,33,.15);border:1px solid rgba(0,104,33,.3);border-radius:8px;padding:8px;margin:4px 0}.ytomo-processing-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.3);z-index:100000 !important;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(1px);transition:all .3s ease;pointer-events:auto}.ytomo-processing-overlay.hidden{opacity:0;visibility:hidden;pointer-events:none}.ytomo-processing-overlay.visible{opacity:1;visibility:visible;pointer-events:auto}.ytomo-processing-overlay .processing-message-area{background:hsla(0,0%,100%,.95);border-radius:12px;padding:24px 32px;text-align:center;box-shadow:0 8px 32px rgba(0,0,0,.3);border:2px solid rgba(255,140,0,.3);max-width:400px;margin:20px}@media(max-width: 768px){.ytomo-processing-overlay .processing-message-area{padding:20px 24px;margin:16px;max-width:90vw}}.ytomo-processing-overlay .processing-status-icon{font-size:48px;margin-bottom:16px;animation:rotate 2s linear infinite}@media(max-width: 768px){.ytomo-processing-overlay .processing-status-icon{font-size:36px;margin-bottom:12px}}.ytomo-processing-overlay .processing-message-text{font-size:20px;font-weight:bold;color:#333;margin-bottom:12px}@media(max-width: 768px){.ytomo-processing-overlay .processing-message-text{font-size:18px;margin-bottom:10px}}.ytomo-processing-overlay .processing-warning-text{font-size:14px;color:#666;margin-bottom:16px;line-height:1.4;transition:all .3s ease}@media(max-width: 768px){.ytomo-processing-overlay .processing-warning-text{font-size:13px;margin-bottom:14px}}.ytomo-processing-overlay .processing-warning-text.warning-flash{color:#dc3545;font-weight:bold;transform:scale(1.05);animation:flash .5s ease-in-out 2}.ytomo-processing-overlay .processing-cancel-area{font-size:12px;color:#888;font-style:italic}@media(max-width: 768px){.ytomo-processing-overlay .processing-cancel-area{font-size:11px}}@keyframes rotate{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}@keyframes flash{0%,100%{opacity:1}50%{opacity:.7}}.ytomo-processing-overlay.efficiency-mode .processing-message-area{border-color:rgba(255,140,0,.5);background:linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(255, 248, 220, 0.95))}.ytomo-processing-overlay.efficiency-mode .processing-status-icon{color:#ff8c00}.ytomo-processing-overlay.efficiency-mode .processing-message-text{color:#e67e00}.ytomo-processing-overlay.monitoring-mode .processing-message-area{border-color:rgba(0,104,33,.5);background:linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(240, 255, 240, 0.95))}.ytomo-processing-overlay.monitoring-mode .processing-status-icon{color:#006821}.ytomo-processing-overlay.monitoring-mode .processing-message-text{color:#004d1a}@media(prefers-reduced-motion: reduce){.ytomo-processing-overlay{transition:none}.ytomo-processing-overlay .processing-status-icon{animation:none}.ytomo-processing-overlay .processing-warning-text.warning-flash{animation:none;transform:none}}`, ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -560,8 +560,9 @@ module.exports = function (cssWithMappingToString) {
 /* unused harmony exports waitForTimeSlotTable, analyzeTimeSlots, extractTimeSlotInfo, generateSelectorForElement, addMonitorButtonsToFullSlots, getMonitorButtonText, updateAllMonitorButtonPriorities, createMonitorButton, handleMonitorButtonClick, checkSlotAvailabilityAndReload, findTargetSlotInPageUnified, terminateMonitoring, checkTargetElementExists, checkMonitoringTargetExists, checkTimeSlotTableExistsAsync, validatePageLoaded, checkMaxReloads, waitForValidCalendarDate, clickCalendarDate, tryClickCalendarForTimeSlot, showErrorMessage, resetMonitoringUI, enableAllMonitorButtons, getCurrentTableContent, shouldUpdateMonitorButtons, restoreSelectionAfterUpdate, selectTimeSlotAndStartReservation, getCurrentEntranceConfig, getCurrentFabState, getCurrentMode, resetPreviousSelection, disableOtherMonitorButtons, disableAllMonitorButtons, clearExistingMonitorButtons, getTargetDisplayInfo, scheduleReload, clearMonitoringFlagTimer, startReloadCountdown, stopReloadCountdown */
 /* harmony import */ var _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(374);
 /* harmony import */ var _entrance_page_dom_utils__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(638);
-/* harmony import */ var _entrance_page_fab__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(982);
-/* harmony import */ var _entrance_page_ui_helpers__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(269);
+/* harmony import */ var _processing_overlay__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(624);
+/* harmony import */ var _entrance_page_fab__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(982);
+/* harmony import */ var _entrance_page_ui_helpers__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(269);
 // entrance-page-stateからのimport（もう使用しません）
 // import { timeSlotState } from './entrance-page-state';
 // 入場予約状態管理システムからのimport
@@ -569,6 +570,7 @@ module.exports = function (cssWithMappingToString) {
 // entrance-page-dom-utilsからのimport
 
 // entrance-page-fabからのimport
+
 
 // entrance-page-ui-helpersからのimport
 
@@ -1116,9 +1118,9 @@ function handleMonitorButtonClick(slotInfo, buttonElement) {
             updateAllMonitorButtonPriorities();
         }
         // メインボタンの表示を更新
-        (0,_entrance_page_ui_helpers__WEBPACK_IMPORTED_MODULE_3__/* .updateMainButtonDisplay */ .vp)();
+        (0,_entrance_page_ui_helpers__WEBPACK_IMPORTED_MODULE_4__/* .updateMainButtonDisplay */ .vp)();
         // 監視対象表示も更新
-        (0,_entrance_page_fab__WEBPACK_IMPORTED_MODULE_2__/* .updateMonitoringTargetsDisplay */ .yT)();
+        (0,_entrance_page_fab__WEBPACK_IMPORTED_MODULE_3__/* .updateMonitoringTargetsDisplay */ .yT)();
         // 監視対象を解除完了
     }
     else {
@@ -1150,7 +1152,7 @@ function handleMonitorButtonClick(slotInfo, buttonElement) {
                         cacheManager.saveTargetSlots();
                     }
                     // メインボタン更新
-                    (0,_entrance_page_ui_helpers__WEBPACK_IMPORTED_MODULE_3__/* .updateMainButtonDisplay */ .vp)();
+                    (0,_entrance_page_ui_helpers__WEBPACK_IMPORTED_MODULE_4__/* .updateMainButtonDisplay */ .vp)();
                     console.log(`✅ 監視対象解除完了: ${locationText}${slotInfo.timeText}`);
                 }
                 return; // 解除処理完了
@@ -1198,9 +1200,9 @@ function handleMonitorButtonClick(slotInfo, buttonElement) {
             console.log(`🔄 監視対象設定後のFAB更新を実行: targetSlots=${targetCount}個`);
             console.log('📊 入場予約状態管理の監視対象一覧:', targets.map((t) => `${_entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_0__/* .LocationHelper */ .Qs.getLocationFromIndex(t.locationIndex) === 'east' ? '東' : '西'}${t.timeSlot}`));
         }
-        (0,_entrance_page_ui_helpers__WEBPACK_IMPORTED_MODULE_3__/* .updateMainButtonDisplay */ .vp)();
+        (0,_entrance_page_ui_helpers__WEBPACK_IMPORTED_MODULE_4__/* .updateMainButtonDisplay */ .vp)();
         // 監視対象表示も更新
-        (0,_entrance_page_fab__WEBPACK_IMPORTED_MODULE_2__/* .updateMonitoringTargetsDisplay */ .yT)();
+        (0,_entrance_page_fab__WEBPACK_IMPORTED_MODULE_3__/* .updateMonitoringTargetsDisplay */ .yT)();
         // 更新後の状態も確認
         setTimeout(() => {
             const fabButton = document.querySelector('#ytomo-main-fab');
@@ -1223,9 +1225,11 @@ async function startSlotMonitoring() {
         return;
     }
     // UI更新（監視開始状態を反映）- カウントダウン保護機能付き
-    (0,_entrance_page_ui_helpers__WEBPACK_IMPORTED_MODULE_3__/* .updateMainButtonDisplay */ .vp)();
+    (0,_entrance_page_ui_helpers__WEBPACK_IMPORTED_MODULE_4__/* .updateMainButtonDisplay */ .vp)();
     // 監視対象表示も更新
-    (0,_entrance_page_fab__WEBPACK_IMPORTED_MODULE_2__/* .updateMonitoringTargetsDisplay */ .yT)();
+    (0,_entrance_page_fab__WEBPACK_IMPORTED_MODULE_3__/* .updateMonitoringTargetsDisplay */ .yT)();
+    // 誤動作防止オーバーレイを表示
+    _processing_overlay__WEBPACK_IMPORTED_MODULE_2__/* .processingOverlay */ .O.show('monitoring');
     // 監視実行中は全ての監視ボタンを無効化
     disableAllMonitorButtons();
     const targets = _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_0__/* .entranceReservationStateManager */ .xx.getMonitoringTargets();
@@ -1433,7 +1437,7 @@ function terminateMonitoring(errorCode, errorMessage) {
     }
     // UI状態リセット
     resetMonitoringUI();
-    (0,_entrance_page_ui_helpers__WEBPACK_IMPORTED_MODULE_3__/* .updateMainButtonDisplay */ .vp)();
+    (0,_entrance_page_ui_helpers__WEBPACK_IMPORTED_MODULE_4__/* .updateMainButtonDisplay */ .vp)();
     // エラー表示
     showErrorMessage(errorMessage);
     // 入場予約状態管理で監視停止
@@ -1862,7 +1866,7 @@ function scheduleReload(seconds = 30) {
         monitoringFlagTimerId = null;
     }, flagDelay);
     // 即座に一度UI更新
-    (0,_entrance_page_ui_helpers__WEBPACK_IMPORTED_MODULE_3__/* .updateMainButtonDisplay */ .vp)();
+    (0,_entrance_page_ui_helpers__WEBPACK_IMPORTED_MODULE_4__/* .updateMainButtonDisplay */ .vp)();
 }
 // 監視継続フラグタイマーをクリア
 function clearMonitoringFlagTimer() {
@@ -1892,7 +1896,7 @@ function setPageLoadingState(isLoading) {
     if (_entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_0__/* .entranceReservationStateManager */ .xx) {
         _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_0__/* .entranceReservationStateManager */ .xx.setPageLoadingState(isLoading);
     }
-    (0,_entrance_page_ui_helpers__WEBPACK_IMPORTED_MODULE_3__/* .updateMainButtonDisplay */ .vp)();
+    (0,_entrance_page_ui_helpers__WEBPACK_IMPORTED_MODULE_4__/* .updateMainButtonDisplay */ .vp)();
 }
 // 中断操作が許可されているかチェック
 function isInterruptionAllowed() {
@@ -1990,13 +1994,13 @@ async function restoreFromCache() {
             }
         }
         // メインボタンの表示更新
-        (0,_entrance_page_ui_helpers__WEBPACK_IMPORTED_MODULE_3__/* .updateMainButtonDisplay */ .vp)();
+        (0,_entrance_page_ui_helpers__WEBPACK_IMPORTED_MODULE_4__/* .updateMainButtonDisplay */ .vp)();
         // 監視継続フラグが有効な場合は自動監視再開
         if (shouldContinueMonitoring && _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_0__/* .entranceReservationStateManager */ .xx.hasMonitoringTargets()) {
             console.log('🚀 監視継続フラグが有効 - 監視を自動再開します');
             try {
                 _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_0__/* .entranceReservationStateManager */ .xx.startMonitoring();
-                (0,_entrance_page_ui_helpers__WEBPACK_IMPORTED_MODULE_3__/* .updateMainButtonDisplay */ .vp)();
+                (0,_entrance_page_ui_helpers__WEBPACK_IMPORTED_MODULE_4__/* .updateMainButtonDisplay */ .vp)();
                 await startSlotMonitoring();
             }
             catch (error) {
@@ -2428,7 +2432,7 @@ function restoreSelectionAfterUpdate() {
     else {
         console.log(`✅ 復元完了: ${restoredCount}/${targets.length}個の監視対象を復元しました`);
     }
-    (0,_entrance_page_ui_helpers__WEBPACK_IMPORTED_MODULE_3__/* .updateMainButtonDisplay */ .vp)();
+    (0,_entrance_page_ui_helpers__WEBPACK_IMPORTED_MODULE_4__/* .updateMainButtonDisplay */ .vp)();
 }
 /*
 // キャッシュ復元後の可用性チェック（一時的に無効化）
@@ -2643,10 +2647,12 @@ function stopSlotMonitoring() {
     clearMonitoringFlagTimer();
     // リロードカウントダウンの停止（入場予約状態管理システムで管理）
     _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_0__/* .entranceReservationStateManager */ .xx.stopReloadCountdown();
+    // 誤動作防止オーバーレイを非表示
+    _processing_overlay__WEBPACK_IMPORTED_MODULE_2__/* .processingOverlay */ .O.hide();
     // 監視ボタンを有効化（操作可能に戻す）
     enableAllMonitorButtons();
     // メインボタンの表示を更新
-    (0,_entrance_page_ui_helpers__WEBPACK_IMPORTED_MODULE_3__/* .updateMainButtonDisplay */ .vp)();
+    (0,_entrance_page_ui_helpers__WEBPACK_IMPORTED_MODULE_4__/* .updateMainButtonDisplay */ .vp)();
     console.log('⏹️ 時間帯監視を停止しました（監視対象選択は維持）');
 }
 // 現在の設定を取得（ヘルパー関数）
@@ -2701,6 +2707,8 @@ __webpack_require__.d(__webpack_exports__, {
 var entrance_page_dom_utils = __webpack_require__(638);
 // EXTERNAL MODULE: ./src-modules/entrance-page-core.ts
 var entrance_page_core = __webpack_require__(364);
+// EXTERNAL MODULE: ./src-modules/processing-overlay.ts
+var processing_overlay = __webpack_require__(624);
 ;// ./src-modules/unified-automation-manager.ts
 /**
  * 統一自動処理管理システム
@@ -2708,6 +2716,7 @@ var entrance_page_core = __webpack_require__(364);
  * 全ての自動処理（予約、監視、効率モード待機）を統一管理し、
  * AbortController による即座中断を実現
  */
+
 // カスタム例外クラス
 class CancellationError extends Error {
     constructor(message) {
@@ -2737,6 +2746,10 @@ class UnifiedAutomationManager {
         this.controller = new AbortController();
         try {
             console.log(`🚀 統一自動処理開始: ${processType}`);
+            // 誤動作防止オーバーレイを表示（efficiency-waitは除外）
+            if (processType !== 'efficiency-wait') {
+                processing_overlay/* processingOverlay */.O.show(processType);
+            }
             return await executor(this.controller.signal);
         }
         catch (error) {
@@ -2749,6 +2762,10 @@ class UnifiedAutomationManager {
             throw error;
         }
         finally {
+            // 誤動作防止オーバーレイを非表示
+            if (processType !== 'efficiency-wait') {
+                processing_overlay/* processingOverlay */.O.hide();
+            }
             this.cleanup();
         }
     }
@@ -2966,7 +2983,7 @@ class UnifiedAutomationManager {
             }
             catch (error) {
                 // 中断エラーは上位に伝播
-                if (error.message === 'AbortError') {
+                if (error instanceof Error && error.name === 'AbortError') {
                     throw new CancellationError('予約処理が中断されました');
                 }
                 const errorMessage = error instanceof Error ? error.message : String(error);
@@ -3000,26 +3017,42 @@ class UnifiedAutomationManager {
     async executeEfficiencyTimingSubmit(submitButton, config, signal) {
         const isEfficiencyMode = this.stateManager && this.stateManager.isEfficiencyModeEnabled ?
             this.stateManager.isEfficiencyModeEnabled() : false;
+        console.log(`🔍 効率モード状態確認: ${isEfficiencyMode}`);
+        console.log(`🔍 stateManager存在: ${!!this.stateManager}`);
+        console.log(`🔍 isEfficiencyModeEnabledメソッド存在: ${!!(this.stateManager && this.stateManager.isEfficiencyModeEnabled)}`);
         if (!isEfficiencyMode) {
             // 通常モード: そのままクリック
+            console.log('⚡ 通常モード: 効率待機なしでクリック実行');
             await this.executeStandardClick(submitButton, config, signal);
             return;
         }
         // 効率モード: 目標時間（00秒/30秒）への調整待機
         console.log('🚀 統一効率モード: submit標的時刻調整開始');
-        // 次の00秒/30秒標的時刻を計算
-        const nextTarget = this.stateManager && this.stateManager.calculateNext00or30Seconds ?
-            this.stateManager.calculateNext00or30Seconds() : new Date(Date.now() + 5000);
-        // 統一自動処理管理による中断可能な効率モード待機
+        // 効率モードで現在時刻から新しく目標時刻を計算
+        if (!this.stateManager || !this.stateManager.calculateNext00or30Seconds) {
+            console.error('⚠️ calculateNext00or30Secondsメソッドが利用できません');
+            await this.executeStandardClick(submitButton, config, signal);
+            return;
+        }
+        // 毎回新しく計算して最新の目標時刻を取得
+        const nextTarget = this.stateManager.calculateNext00or30Seconds();
+        console.log('🔄 効率モード: 最新の目標時刻を計算');
+        // 計算した目標時刻を保存
+        this.stateManager.setNextSubmitTarget(nextTarget);
+        const waitMs = nextTarget.getTime() - Date.now();
         console.log(`🎯 統一効率モード待機: 目標時刻 ${nextTarget.toLocaleTimeString()}`);
+        console.log(`🎯 待機時間: ${Math.floor(waitMs / 1000)}秒`);
+        if (waitMs < 0) {
+            console.warn('⚠️ 目標時刻が過去になっています - 即座実行');
+        }
+        else if (waitMs < 15000) {
+            console.warn(`⚠️ 待機時間が15秒未満: ${Math.floor(waitMs / 1000)}秒`);
+        }
         await this.waitForTargetTime(nextTarget, signal);
         // 標的時刻でsubmitクリック実行
         console.log(`🚀 submitクリック実行 (${new Date().toLocaleTimeString()})`);
         await this.executeStandardClick(submitButton, config, signal);
-        // 次回標的時刻を更新
-        if (this.stateManager && this.stateManager.updateNextSubmitTarget) {
-            this.stateManager.updateNextSubmitTarget();
-        }
+        // 注記: 次回標的時刻は毎回新規計算するため、更新処理は不要
     }
     /**
      * 効率モード対応固定待機クリック実行（統一処理内部用）
@@ -4502,6 +4535,206 @@ module.exports = function (i) {
 
 /***/ }),
 
+/***/ 624:
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   O: () => (/* binding */ processingOverlay)
+/* harmony export */ });
+/* unused harmony export ProcessingOverlay */
+/**
+ * 自動処理中の誤動作防止オーバーレイシステム
+ *
+ * 予約実行中・監視中に画面全体を薄いオーバーレイで覆い、
+ * 中断ボタン以外の操作を防ぐことで誤動作を防止
+ */
+class ProcessingOverlay {
+    constructor() {
+        this.overlayElement = null;
+        this.isActive = false;
+        this.initializeOverlay();
+    }
+    /**
+     * オーバーレイ要素を初期化
+     */
+    initializeOverlay() {
+        // 既存のオーバーレイがある場合は削除
+        const existingOverlay = document.getElementById('ytomo-processing-overlay');
+        if (existingOverlay) {
+            existingOverlay.remove();
+        }
+        // オーバーレイ要素を作成
+        this.overlayElement = document.createElement('div');
+        this.overlayElement.id = 'ytomo-processing-overlay';
+        this.overlayElement.className = 'ytomo-processing-overlay hidden';
+        // メッセージエリア
+        const messageArea = document.createElement('div');
+        messageArea.className = 'processing-message-area';
+        const statusIcon = document.createElement('div');
+        statusIcon.className = 'processing-status-icon';
+        statusIcon.innerHTML = '⚙️';
+        const messageText = document.createElement('div');
+        messageText.className = 'processing-message-text';
+        messageText.textContent = '自動処理実行中...';
+        const warningText = document.createElement('div');
+        warningText.className = 'processing-warning-text';
+        warningText.textContent = '誤動作防止のため他の操作を制限しています';
+        const cancelArea = document.createElement('div');
+        cancelArea.className = 'processing-cancel-area';
+        cancelArea.innerHTML = '中断は右下のFABボタンから可能です';
+        messageArea.appendChild(statusIcon);
+        messageArea.appendChild(messageText);
+        messageArea.appendChild(warningText);
+        messageArea.appendChild(cancelArea);
+        this.overlayElement.appendChild(messageArea);
+        // クリックイベントを処理（オーバーレイクリックをブロック）
+        this.overlayElement.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            // クリック音的フィードバック
+            this.showClickWarning();
+        });
+        // 右クリック、中クリックもブロック
+        this.overlayElement.addEventListener('contextmenu', (e) => {
+            e.preventDefault();
+        });
+        this.overlayElement.addEventListener('auxclick', (e) => {
+            e.preventDefault();
+        });
+        // キーボードイベントもブロック（ESCキー以外）
+        document.addEventListener('keydown', this.handleKeyDown.bind(this));
+        // bodyに追加
+        document.body.appendChild(this.overlayElement);
+        console.log('🛡️ 自動処理誤動作防止オーバーレイを初期化');
+    }
+    /**
+     * キーボードイベントハンドラー
+     */
+    handleKeyDown(e) {
+        if (!this.isActive)
+            return;
+        // ESCキーは許可（中断操作として機能させる）
+        if (e.key === 'Escape') {
+            // FABボタンのクリックをシミュレート
+            const fabButton = document.getElementById('ytomo-main-fab');
+            if (fabButton) {
+                fabButton.click();
+                e.preventDefault();
+            }
+            return;
+        }
+        // 他のキー操作をブロック（F5更新なども含む）
+        if (e.key === 'F5' || (e.ctrlKey && (e.key === 'r' || e.key === 'R'))) {
+            e.preventDefault();
+            this.showRefreshWarning();
+            return;
+        }
+        // その他のキー操作もブロック
+        e.preventDefault();
+        this.showClickWarning();
+    }
+    /**
+     * オーバーレイを表示（自動処理開始時）
+     */
+    show(processType = 'reservation') {
+        if (!this.overlayElement || this.isActive)
+            return;
+        console.log(`🛡️ 誤動作防止オーバーレイ表示: ${processType}`);
+        // メッセージをプロセスタイプに応じて更新
+        const messageText = this.overlayElement.querySelector('.processing-message-text');
+        const statusIcon = this.overlayElement.querySelector('.processing-status-icon');
+        if (processType === 'monitoring') {
+            if (messageText)
+                messageText.textContent = '監視実行中...';
+            if (statusIcon)
+                statusIcon.innerHTML = '👁️';
+        }
+        else {
+            if (messageText)
+                messageText.textContent = '予約実行中...';
+            if (statusIcon)
+                statusIcon.innerHTML = '🚀';
+        }
+        // 表示アニメーション
+        this.overlayElement.classList.remove('hidden');
+        this.overlayElement.classList.add('visible');
+        // FABボタンのz-indexを調整（オーバーレイより前面に）
+        const fabContainer = document.getElementById('ytomo-fab-container');
+        if (fabContainer) {
+            fabContainer.style.zIndex = '100001';
+        }
+        this.isActive = true;
+    }
+    /**
+     * オーバーレイを非表示（自動処理終了時）
+     */
+    hide() {
+        if (!this.overlayElement || !this.isActive)
+            return;
+        console.log('🛡️ 誤動作防止オーバーレイ非表示');
+        // 非表示アニメーション
+        this.overlayElement.classList.remove('visible');
+        this.overlayElement.classList.add('hidden');
+        // FABボタンのz-indexを元に戻す
+        const fabContainer = document.getElementById('ytomo-fab-container');
+        if (fabContainer) {
+            fabContainer.style.zIndex = '9999';
+        }
+        this.isActive = false;
+    }
+    /**
+     * オーバーレイクリック時の警告表示
+     */
+    showClickWarning() {
+        const warningText = this.overlayElement?.querySelector('.processing-warning-text');
+        if (!warningText)
+            return;
+        // 一時的に警告を強調
+        warningText.classList.add('warning-flash');
+        setTimeout(() => {
+            warningText.classList.remove('warning-flash');
+        }, 1000);
+    }
+    /**
+     * ページ更新試行時の警告表示
+     */
+    showRefreshWarning() {
+        const warningText = this.overlayElement?.querySelector('.processing-warning-text');
+        if (!warningText)
+            return;
+        const originalText = warningText.textContent;
+        warningText.textContent = '⚠️ 処理中のページ更新は危険です！中断してから更新してください';
+        warningText.classList.add('warning-flash');
+        setTimeout(() => {
+            warningText.textContent = originalText;
+            warningText.classList.remove('warning-flash');
+        }, 3000);
+    }
+    /**
+     * オーバーレイが表示中かどうか
+     */
+    isVisible() {
+        return this.isActive;
+    }
+    /**
+     * オーバーレイを破棄
+     */
+    destroy() {
+        if (this.overlayElement) {
+            this.overlayElement.remove();
+            this.overlayElement = null;
+        }
+        document.removeEventListener('keydown', this.handleKeyDown.bind(this));
+        this.isActive = false;
+        console.log('🛡️ 誤動作防止オーバーレイを破棄');
+    }
+}
+// グローバルインスタンス
+const processingOverlay = new ProcessingOverlay();
+
+
+/***/ }),
+
 /***/ 638:
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
@@ -4836,13 +5069,15 @@ module.exports = domAPI;
 /* harmony export */   yT: () => (/* binding */ updateMonitoringTargetsDisplay)
 /* harmony export */ });
 /* unused harmony exports getCurrentReservationTarget, checkVisitTimeButtonState, checkTimeSlotSelected, canStartReservation, checkInitialState, handleCalendarChange, removeAllMonitorButtons */
-/* harmony import */ var _entrance_page_state__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(278);
-/* harmony import */ var _entrance_page_dom_utils__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(638);
-/* harmony import */ var _entrance_page_core__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(364);
-/* harmony import */ var _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(374);
-/* harmony import */ var _entrance_page_ui_helpers__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(269);
+/* harmony import */ var _processing_overlay__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(624);
+/* harmony import */ var _entrance_page_state__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(278);
+/* harmony import */ var _entrance_page_dom_utils__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(638);
+/* harmony import */ var _entrance_page_core__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(364);
+/* harmony import */ var _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(374);
+/* harmony import */ var _entrance_page_ui_helpers__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(269);
 // Phase 3: 統一処理移行により個別importは不要
 // entrance-page-stateからのimport
+
 
 // entrance-page-dom-utilsからのimport
 
@@ -5027,7 +5262,7 @@ function createEntranceReservationUI() {
             return false;
         }
         // 中断不可期間のチェック
-        if (!(0,_entrance_page_core__WEBPACK_IMPORTED_MODULE_2__/* .isInterruptionAllowed */ .Is)()) {
+        if (!(0,_entrance_page_core__WEBPACK_IMPORTED_MODULE_3__/* .isInterruptionAllowed */ .Is)()) {
             // リロード直前のため中断不可
             showStatus('リロード直前のため中断できません', 'red');
             return;
@@ -5035,23 +5270,23 @@ function createEntranceReservationUI() {
         // クールタイム中の予約再開中止処理
         if (fabButton.hasAttribute('data-cooldown-cancel')) {
             if (confirm('予約の自動再開を中止しますか？\n\n手動での予約開始は引き続き可能です。')) {
-                _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_3__/* .entranceReservationStateManager */ .xx.endReservationCooldown();
+                _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_4__/* .entranceReservationStateManager */ .xx.endReservationCooldown();
                 showStatus('予約再開を中止しました', 'orange');
-                (0,_entrance_page_ui_helpers__WEBPACK_IMPORTED_MODULE_4__/* .updateMainButtonDisplay */ .vp)();
+                (0,_entrance_page_ui_helpers__WEBPACK_IMPORTED_MODULE_5__/* .updateMainButtonDisplay */ .vp)();
             }
             return;
         }
         // 実行中の場合は中断処理（入場予約状態管理システム使用）
-        if (_entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_3__/* .entranceReservationStateManager */ .xx.isMonitoringRunning()) {
+        if (_entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_4__/* .entranceReservationStateManager */ .xx.isMonitoringRunning()) {
             stopMonitoringProcess();
             return;
         }
-        if (_entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_3__/* .entranceReservationStateManager */ .xx.isReservationRunning()) {
+        if (_entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_4__/* .entranceReservationStateManager */ .xx.isReservationRunning()) {
             stopReservationProcess();
             return;
         }
         // 入場予約状態管理システムを使用した監視開始判定
-        const preferredAction = _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_3__/* .entranceReservationStateManager */ .xx.getPreferredAction();
+        const preferredAction = _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_4__/* .entranceReservationStateManager */ .xx.getPreferredAction();
         // FABクリック処理開始
         if (preferredAction === 'monitoring') {
             await startMonitoringProcess();
@@ -5067,41 +5302,43 @@ function createEntranceReservationUI() {
     // 監視中断処理
     function stopMonitoringProcess() {
         console.log('⏹️ 監視を中断');
-        (0,_entrance_page_core__WEBPACK_IMPORTED_MODULE_2__/* .stopSlotMonitoring */ .XG)();
+        (0,_entrance_page_core__WEBPACK_IMPORTED_MODULE_3__/* .stopSlotMonitoring */ .XG)();
+        // 誤動作防止オーバーレイを非表示
+        _processing_overlay__WEBPACK_IMPORTED_MODULE_0__/* .processingOverlay */ .O.hide();
         showStatus('監視中断', 'orange');
-        (0,_entrance_page_ui_helpers__WEBPACK_IMPORTED_MODULE_4__/* .updateMainButtonDisplay */ .vp)();
+        (0,_entrance_page_ui_helpers__WEBPACK_IMPORTED_MODULE_5__/* .updateMainButtonDisplay */ .vp)();
     }
     // 予約中断処理
     function stopReservationProcess() {
         console.log('⏹️ 予約を中断');
-        _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_3__/* .entranceReservationStateManager */ .xx.setShouldStop(true);
+        _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_4__/* .entranceReservationStateManager */ .xx.setShouldStop(true);
         showStatus('予約処理を中断中...', 'orange');
         // 中断フラグ設定後、UIを即座に更新
-        (0,_entrance_page_ui_helpers__WEBPACK_IMPORTED_MODULE_4__/* .updateMainButtonDisplay */ .vp)();
+        (0,_entrance_page_ui_helpers__WEBPACK_IMPORTED_MODULE_5__/* .updateMainButtonDisplay */ .vp)();
     }
     // 監視開始処理
     async function startMonitoringProcess() {
         console.log('📡 入場予約状態管理システムによる監視開始');
         // 状態変更前の確認
-        console.log(`🔍 [FAB] 監視開始前の状態: ${_entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_3__/* .entranceReservationStateManager */ .xx.getExecutionState()}`);
-        console.log(`🔍 [FAB] 監視対象数: ${_entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_3__/* .entranceReservationStateManager */ .xx.getMonitoringTargetCount()}`);
-        console.log(`🔍 [FAB] 監視開始可能: ${_entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_3__/* .entranceReservationStateManager */ .xx.canStartMonitoring()}`);
+        console.log(`🔍 [FAB] 監視開始前の状態: ${_entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_4__/* .entranceReservationStateManager */ .xx.getExecutionState()}`);
+        console.log(`🔍 [FAB] 監視対象数: ${_entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_4__/* .entranceReservationStateManager */ .xx.getMonitoringTargetCount()}`);
+        console.log(`🔍 [FAB] 監視開始可能: ${_entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_4__/* .entranceReservationStateManager */ .xx.canStartMonitoring()}`);
         // 実行状態を監視中に変更
-        const startSuccess = _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_3__/* .entranceReservationStateManager */ .xx.startMonitoring();
+        const startSuccess = _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_4__/* .entranceReservationStateManager */ .xx.startMonitoring();
         console.log(`🔍 [FAB] startMonitoring結果: ${startSuccess}`);
-        console.log(`🔍 [FAB] 監視開始後の状態: ${_entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_3__/* .entranceReservationStateManager */ .xx.getExecutionState()}`);
+        console.log(`🔍 [FAB] 監視開始後の状態: ${_entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_4__/* .entranceReservationStateManager */ .xx.getExecutionState()}`);
         // 即座にUI更新してから監視開始
-        (0,_entrance_page_ui_helpers__WEBPACK_IMPORTED_MODULE_4__/* .updateMainButtonDisplay */ .vp)();
-        await (0,_entrance_page_core__WEBPACK_IMPORTED_MODULE_2__/* .startSlotMonitoring */ .fp)();
+        (0,_entrance_page_ui_helpers__WEBPACK_IMPORTED_MODULE_5__/* .updateMainButtonDisplay */ .vp)();
+        await (0,_entrance_page_core__WEBPACK_IMPORTED_MODULE_3__/* .startSlotMonitoring */ .fp)();
     }
     // 予約開始処理
     async function startReservationProcess() {
         console.log('🚀 入場予約状態管理システムによる予約開始');
         // 入場予約状態管理システムで予約実行開始
-        _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_3__/* .entranceReservationStateManager */ .xx.setExecutionState(_entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_3__/* .ExecutionState */ .si.RESERVATION_RUNNING);
-        _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_3__/* .entranceReservationStateManager */ .xx.startReservationExecution();
+        _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_4__/* .entranceReservationStateManager */ .xx.setExecutionState(_entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_4__/* .ExecutionState */ .si.RESERVATION_RUNNING);
+        _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_4__/* .entranceReservationStateManager */ .xx.startReservationExecution();
         showStatus('予約処理実行中...', 'blue');
-        (0,_entrance_page_ui_helpers__WEBPACK_IMPORTED_MODULE_4__/* .updateMainButtonDisplay */ .vp)();
+        (0,_entrance_page_ui_helpers__WEBPACK_IMPORTED_MODULE_5__/* .updateMainButtonDisplay */ .vp)();
         updateMonitoringTargetsDisplay(); // 予約対象を表示
         // 設定オブジェクトを作成
         const config = {
@@ -5131,7 +5368,7 @@ function createEntranceReservationUI() {
             }
         };
         // 予約開始前に予約対象情報を保存（成功時のUI更新用）
-        const reservationTarget = _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_3__/* .entranceReservationStateManager */ .xx.getReservationTarget();
+        const reservationTarget = _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_4__/* .entranceReservationStateManager */ .xx.getReservationTarget();
         console.log('🔍 予約開始前の対象情報:', reservationTarget);
         try {
             const result = await entranceReservationHelper(config);
@@ -5140,8 +5377,8 @@ function createEntranceReservationUI() {
                 showStatus(`🎉 予約成功！(${result.attempts}回試行)`, 'green');
                 // 予約開始前に保存した対象情報で成功情報を設定
                 if (reservationTarget) {
-                    _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_3__/* .entranceReservationStateManager */ .xx.setReservationSuccess(reservationTarget.timeSlot, reservationTarget.locationIndex);
-                    (0,_entrance_page_ui_helpers__WEBPACK_IMPORTED_MODULE_4__/* .updateMainButtonDisplay */ .vp)(); // FAB表示更新
+                    _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_4__/* .entranceReservationStateManager */ .xx.setReservationSuccess(reservationTarget.timeSlot, reservationTarget.locationIndex);
+                    (0,_entrance_page_ui_helpers__WEBPACK_IMPORTED_MODULE_5__/* .updateMainButtonDisplay */ .vp)(); // FAB表示更新
                     console.log('✅ 予約成功UI更新完了');
                 }
                 else {
@@ -5177,8 +5414,8 @@ function createEntranceReservationUI() {
         }
         finally {
             // 入場予約状態管理システムで予約実行終了
-            _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_3__/* .entranceReservationStateManager */ .xx.stop();
-            (0,_entrance_page_ui_helpers__WEBPACK_IMPORTED_MODULE_4__/* .updateMainButtonDisplay */ .vp)();
+            _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_4__/* .entranceReservationStateManager */ .xx.stop();
+            (0,_entrance_page_ui_helpers__WEBPACK_IMPORTED_MODULE_5__/* .updateMainButtonDisplay */ .vp)();
             updateMonitoringTargetsDisplay(); // 予約終了時に表示更新
         }
     }
@@ -5199,7 +5436,7 @@ function createEntranceReservationUI() {
     efficiencyToggleButton.className = 'ytomo-efficiency-toggle';
     // 効率モード状態に応じた初期表示
     function updateEfficiencyToggleButton() {
-        const isEnabled = _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_3__/* .entranceReservationStateManager */ .xx.isEfficiencyModeEnabled();
+        const isEnabled = _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_4__/* .entranceReservationStateManager */ .xx.isEfficiencyModeEnabled();
         efficiencyToggleButton.innerText = isEnabled ? '効率ON' : '効率OFF';
         efficiencyToggleButton.classList.toggle('efficiency-enabled', isEnabled);
         efficiencyToggleButton.classList.toggle('efficiency-disabled', !isEnabled);
@@ -5209,7 +5446,7 @@ function createEntranceReservationUI() {
     efficiencyToggleButton.addEventListener('click', (e) => {
         e.preventDefault();
         e.stopPropagation();
-        _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_3__/* .entranceReservationStateManager */ .xx.toggleEfficiencyMode();
+        _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_4__/* .entranceReservationStateManager */ .xx.toggleEfficiencyMode();
         updateEfficiencyToggleButton();
     });
     // ホバー効果はCSSで制御
@@ -5221,7 +5458,7 @@ function createEntranceReservationUI() {
     // DOMに追加（body直下）
     document.body.appendChild(fabContainer);
     // 効率モード設定を読み込み
-    _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_3__/* .entranceReservationStateManager */ .xx.loadEfficiencyModeSettings();
+    _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_4__/* .entranceReservationStateManager */ .xx.loadEfficiencyModeSettings();
     updateEfficiencyToggleButton(); // ボタン表示を更新
     // 自動選択イベントリスナーを設定
     window.addEventListener('entrance-auto-select', async (event) => {
@@ -5233,14 +5470,14 @@ function createEntranceReservationUI() {
         }
         try {
             // 監視を停止
-            if (_entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_3__/* .entranceReservationStateManager */ .xx.isMonitoringRunning()) {
+            if (_entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_4__/* .entranceReservationStateManager */ .xx.isMonitoringRunning()) {
                 console.log('🛑 監視を停止');
-                (0,_entrance_page_core__WEBPACK_IMPORTED_MODULE_2__/* .stopSlotMonitoring */ .XG)();
+                (0,_entrance_page_core__WEBPACK_IMPORTED_MODULE_3__/* .stopSlotMonitoring */ .XG)();
             }
             // 該当監視対象を削除
             const timeSlot = slot.targetInfo.timeSlot;
             const locationIndex = slot.targetInfo.locationIndex;
-            _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_3__/* .entranceReservationStateManager */ .xx.removeMonitoringTarget(timeSlot, locationIndex);
+            _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_4__/* .entranceReservationStateManager */ .xx.removeMonitoringTarget(timeSlot, locationIndex);
             // 1. 時間帯要素をクリックして選択状態にする
             console.log(`🖱️ 自動選択: 時間帯をクリック ${timeSlot}`);
             const timeSlotElement = document.querySelector(slot.targetInfo.selector);
@@ -5252,7 +5489,7 @@ function createEntranceReservationUI() {
                     // 2. 選択後、少し待ってから内部的に自動予約を開始
                     setTimeout(async () => {
                         console.log('🚀 内部的に自動予約を開始');
-                        if (_entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_3__/* .entranceReservationStateManager */ .xx.canStartReservation()) {
+                        if (_entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_4__/* .entranceReservationStateManager */ .xx.canStartReservation()) {
                             await startReservationProcess();
                         }
                         else {
@@ -5273,8 +5510,8 @@ function createEntranceReservationUI() {
         }
     });
     // FAB表示状態を初期化・適用
-    (0,_entrance_page_state__WEBPACK_IMPORTED_MODULE_0__.loadFABVisibility)();
-    (0,_entrance_page_state__WEBPACK_IMPORTED_MODULE_0__.updateFABVisibility)();
+    (0,_entrance_page_state__WEBPACK_IMPORTED_MODULE_1__.loadFABVisibility)();
+    (0,_entrance_page_state__WEBPACK_IMPORTED_MODULE_1__.updateFABVisibility)();
     // 初期状態を判定してFABを更新
     waitForTimeSlotTable(() => {
         checkInitialState();
@@ -5288,7 +5525,7 @@ function createEntranceReservationUI() {
 // 監視対象表示を更新（統一システムに完全委譲）
 function updateMonitoringTargetsDisplay() {
     console.log('🔄 [updateMonitoringTargetsDisplay] 統一システムに委譲');
-    _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_3__/* .entranceReservationStateManager */ .xx.updateFabDisplay();
+    _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_4__/* .entranceReservationStateManager */ .xx.updateFabDisplay();
 }
 // 現在の予約対象時間帯を取得
 function getCurrentReservationTarget() {
@@ -5322,7 +5559,7 @@ function checkVisitTimeButtonState() {
 // 時間帯が選択されているかチェック
 function checkTimeSlotSelected() {
     // 選択された時間帯（aria-pressed="true"）をチェック
-    const selectedTimeSlot = document.querySelector(_entrance_page_dom_utils__WEBPACK_IMPORTED_MODULE_1__/* .timeSlotSelectors */ .eN.selectedSlot);
+    const selectedTimeSlot = document.querySelector(_entrance_page_dom_utils__WEBPACK_IMPORTED_MODULE_2__/* .timeSlotSelectors */ .eN.selectedSlot);
     if (!selectedTimeSlot) {
         console.log('⚠️ 時間帯が選択されていません');
         return false;
@@ -5331,7 +5568,7 @@ function checkTimeSlotSelected() {
     const tdElement = selectedTimeSlot.closest('td');
     if (!tdElement)
         return false;
-    const status = (0,_entrance_page_dom_utils__WEBPACK_IMPORTED_MODULE_1__/* .extractTdStatus */ .SE)(tdElement);
+    const status = (0,_entrance_page_dom_utils__WEBPACK_IMPORTED_MODULE_2__/* .extractTdStatus */ .SE)(tdElement);
     if (status && status.isFull) {
         console.log('⚠️ 選択された時間帯は満員です');
         return false;
@@ -5341,7 +5578,7 @@ function checkTimeSlotSelected() {
 }
 // 予約開始可能かどうかの総合判定
 function canStartReservation() {
-    const hasTimeSlotTable = (0,_entrance_page_core__WEBPACK_IMPORTED_MODULE_2__/* .checkTimeSlotTableExistsSync */ .H5)();
+    const hasTimeSlotTable = (0,_entrance_page_core__WEBPACK_IMPORTED_MODULE_3__/* .checkTimeSlotTableExistsSync */ .H5)();
     const isTimeSlotSelected = checkTimeSlotSelected();
     const isVisitTimeButtonEnabled = checkVisitTimeButtonState();
     console.log(`📊 予約開始条件チェック:`);
@@ -5354,8 +5591,8 @@ function canStartReservation() {
 function checkInitialState() {
     console.log('🔍 初期状態をチェック中...');
     // カレンダーで日付が選択されているかチェック
-    const selectedDate = (0,_entrance_page_core__WEBPACK_IMPORTED_MODULE_2__/* .getCurrentSelectedCalendarDate */ .rY)();
-    const hasTimeSlotTable = (0,_entrance_page_core__WEBPACK_IMPORTED_MODULE_2__/* .checkTimeSlotTableExistsSync */ .H5)();
+    const selectedDate = (0,_entrance_page_core__WEBPACK_IMPORTED_MODULE_3__/* .getCurrentSelectedCalendarDate */ .rY)();
+    const hasTimeSlotTable = (0,_entrance_page_core__WEBPACK_IMPORTED_MODULE_3__/* .checkTimeSlotTableExistsSync */ .H5)();
     console.log(`📅 選択日付: ${selectedDate || 'なし'}`);
     console.log(`🗓️ 時間帯テーブル: ${hasTimeSlotTable ? 'あり' : 'なし'}`);
     if (selectedDate && hasTimeSlotTable) {
@@ -5386,28 +5623,28 @@ function checkInitialState() {
             }
         }
         // ステータスも更新
-        (0,_entrance_page_core__WEBPACK_IMPORTED_MODULE_2__/* .updateStatusBadge */ .pW)(canStart ? 'idle' : 'waiting');
+        (0,_entrance_page_core__WEBPACK_IMPORTED_MODULE_3__/* .updateStatusBadge */ .pW)(canStart ? 'idle' : 'waiting');
     }
     else {
         // カレンダー未選択または時間帯テーブル未表示の場合は待機中のまま
         console.log('⏳ カレンダー未選択または時間帯テーブル未表示 - 待機中を維持');
-        (0,_entrance_page_core__WEBPACK_IMPORTED_MODULE_2__/* .updateStatusBadge */ .pW)('idle');
+        (0,_entrance_page_core__WEBPACK_IMPORTED_MODULE_3__/* .updateStatusBadge */ .pW)('idle');
     }
 }
 // カレンダー変更を監視して監視ボタンを再設置
 function startCalendarWatcher() {
-    if (_entrance_page_state__WEBPACK_IMPORTED_MODULE_0__.calendarWatchState.isWatching)
+    if (_entrance_page_state__WEBPACK_IMPORTED_MODULE_1__.calendarWatchState.isWatching)
         return;
-    _entrance_page_state__WEBPACK_IMPORTED_MODULE_0__.calendarWatchState.isWatching = true;
-    _entrance_page_state__WEBPACK_IMPORTED_MODULE_0__.calendarWatchState.currentSelectedDate = (0,_entrance_page_core__WEBPACK_IMPORTED_MODULE_2__/* .getCurrentSelectedCalendarDate */ .rY)();
+    _entrance_page_state__WEBPACK_IMPORTED_MODULE_1__.calendarWatchState.isWatching = true;
+    _entrance_page_state__WEBPACK_IMPORTED_MODULE_1__.calendarWatchState.currentSelectedDate = (0,_entrance_page_core__WEBPACK_IMPORTED_MODULE_3__/* .getCurrentSelectedCalendarDate */ .rY)();
     // 初期化時に入場予約状態管理にも現在の選択日付を設定
-    if (_entrance_page_state__WEBPACK_IMPORTED_MODULE_0__.calendarWatchState.currentSelectedDate) {
-        _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_3__/* .entranceReservationStateManager */ .xx.setSelectedCalendarDate(_entrance_page_state__WEBPACK_IMPORTED_MODULE_0__.calendarWatchState.currentSelectedDate);
-        console.log(`📅 初期化時の選択日付を設定: ${_entrance_page_state__WEBPACK_IMPORTED_MODULE_0__.calendarWatchState.currentSelectedDate}`);
+    if (_entrance_page_state__WEBPACK_IMPORTED_MODULE_1__.calendarWatchState.currentSelectedDate) {
+        _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_4__/* .entranceReservationStateManager */ .xx.setSelectedCalendarDate(_entrance_page_state__WEBPACK_IMPORTED_MODULE_1__.calendarWatchState.currentSelectedDate);
+        console.log(`📅 初期化時の選択日付を設定: ${_entrance_page_state__WEBPACK_IMPORTED_MODULE_1__.calendarWatchState.currentSelectedDate}`);
     }
     console.log('📅 カレンダー変更監視を開始');
     // MutationObserverでカレンダー変更・時間帯選択・ボタン状態変更を検出
-    _entrance_page_state__WEBPACK_IMPORTED_MODULE_0__.calendarWatchState.observer = new MutationObserver((mutations) => {
+    _entrance_page_state__WEBPACK_IMPORTED_MODULE_1__.calendarWatchState.observer = new MutationObserver((mutations) => {
         let shouldUpdate = false;
         mutations.forEach((mutation) => {
             // 1. カレンダーのaria-pressed属性の変更を検出
@@ -5428,12 +5665,12 @@ function startCalendarWatcher() {
                     const ariaPressed = element.getAttribute('aria-pressed');
                     console.log(`🔄 時間帯選択変更検出: ${ariaPressed}`);
                     // 入場予約状態管理システムの同期（初期化中は除外）
-                    if (ariaPressed === 'true' && !_entrance_page_state__WEBPACK_IMPORTED_MODULE_0__.calendarWatchState.isInitializing) {
+                    if (ariaPressed === 'true' && !_entrance_page_state__WEBPACK_IMPORTED_MODULE_1__.calendarWatchState.isInitializing) {
                         // 選択状態変更を検出 - DOM状態から予約対象を同期
                         console.log(`🔄 時間帯選択状態を検出`);
                         setTimeout(() => {
                             syncReservationTargetFromDOM();
-                            (0,_entrance_page_ui_helpers__WEBPACK_IMPORTED_MODULE_4__/* .updateMainButtonDisplay */ .vp)();
+                            (0,_entrance_page_ui_helpers__WEBPACK_IMPORTED_MODULE_5__/* .updateMainButtonDisplay */ .vp)();
                         }, 50);
                     }
                     shouldUpdate = true;
@@ -5458,7 +5695,7 @@ function startCalendarWatcher() {
     });
     // カレンダー要素全体を監視
     const observeTarget = document.body;
-    _entrance_page_state__WEBPACK_IMPORTED_MODULE_0__.calendarWatchState.observer.observe(observeTarget, {
+    _entrance_page_state__WEBPACK_IMPORTED_MODULE_1__.calendarWatchState.observer.observe(observeTarget, {
         attributes: true,
         subtree: true,
         attributeFilter: ['aria-pressed', 'class', 'disabled']
@@ -5466,32 +5703,32 @@ function startCalendarWatcher() {
 }
 // カレンダー変更・状態変更時の処理
 function handleCalendarChange() {
-    const newSelectedDate = (0,_entrance_page_core__WEBPACK_IMPORTED_MODULE_2__/* .getCurrentSelectedCalendarDate */ .rY)();
-    const calendarDateChanged = newSelectedDate !== _entrance_page_state__WEBPACK_IMPORTED_MODULE_0__.calendarWatchState.currentSelectedDate;
+    const newSelectedDate = (0,_entrance_page_core__WEBPACK_IMPORTED_MODULE_3__/* .getCurrentSelectedCalendarDate */ .rY)();
+    const calendarDateChanged = newSelectedDate !== _entrance_page_state__WEBPACK_IMPORTED_MODULE_1__.calendarWatchState.currentSelectedDate;
     // 入場予約状態管理の管理している日付とも比較
-    const stateManagerSelectedDate = _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_3__/* .entranceReservationStateManager */ .xx.getSelectedCalendarDate();
+    const stateManagerSelectedDate = _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_4__/* .entranceReservationStateManager */ .xx.getSelectedCalendarDate();
     const actualDateChanged = newSelectedDate !== stateManagerSelectedDate;
     if (calendarDateChanged) {
-        console.log(`📅 カレンダー日付変更を検出: ${_entrance_page_state__WEBPACK_IMPORTED_MODULE_0__.calendarWatchState.currentSelectedDate} → ${newSelectedDate}`);
+        console.log(`📅 カレンダー日付変更を検出: ${_entrance_page_state__WEBPACK_IMPORTED_MODULE_1__.calendarWatchState.currentSelectedDate} → ${newSelectedDate}`);
         // 監視実行中は日付変更を無視
-        if (_entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_3__/* .entranceReservationStateManager */ .xx.isMonitoringRunning()) {
+        if (_entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_4__/* .entranceReservationStateManager */ .xx.isMonitoringRunning()) {
             console.log('⚠️ 監視実行中のため日付変更を無視します');
             return;
         }
-        _entrance_page_state__WEBPACK_IMPORTED_MODULE_0__.calendarWatchState.currentSelectedDate = newSelectedDate;
+        _entrance_page_state__WEBPACK_IMPORTED_MODULE_1__.calendarWatchState.currentSelectedDate = newSelectedDate;
         // 入場予約状態管理にも日付を設定
         if (newSelectedDate) {
-            _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_3__/* .entranceReservationStateManager */ .xx.setSelectedCalendarDate(newSelectedDate);
+            _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_4__/* .entranceReservationStateManager */ .xx.setSelectedCalendarDate(newSelectedDate);
         }
         // 実際に日付が変更された場合のみ監視状態をクリア
         if (actualDateChanged) {
             console.log(`📅 実際の日付変更確認: ${stateManagerSelectedDate} → ${newSelectedDate}`);
-            const hasReservationTarget = _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_3__/* .entranceReservationStateManager */ .xx.hasReservationTarget();
-            const hasMonitoringTargets = _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_3__/* .entranceReservationStateManager */ .xx.hasMonitoringTargets();
+            const hasReservationTarget = _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_4__/* .entranceReservationStateManager */ .xx.hasReservationTarget();
+            const hasMonitoringTargets = _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_4__/* .entranceReservationStateManager */ .xx.hasMonitoringTargets();
             if (hasReservationTarget || hasMonitoringTargets) {
                 console.log('📅 日付変更により入場予約状態管理システムの対象をクリア');
-                _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_3__/* .entranceReservationStateManager */ .xx.clearReservationTarget();
-                _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_3__/* .entranceReservationStateManager */ .xx.clearMonitoringTargets();
+                _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_4__/* .entranceReservationStateManager */ .xx.clearReservationTarget();
+                _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_4__/* .entranceReservationStateManager */ .xx.clearMonitoringTargets();
             }
         }
         else {
@@ -5507,13 +5744,13 @@ function handleCalendarChange() {
         //     }
         // }
         // 予約対象がクリアされたため、即座にFAB表示を更新
-        (0,_entrance_page_ui_helpers__WEBPACK_IMPORTED_MODULE_4__/* .updateMainButtonDisplay */ .vp)();
+        (0,_entrance_page_ui_helpers__WEBPACK_IMPORTED_MODULE_5__/* .updateMainButtonDisplay */ .vp)();
         // 監視ボタンを再設置（動的待機を使用）
         waitForTimeSlotTable(() => {
             removeAllMonitorButtons();
-            (0,_entrance_page_core__WEBPACK_IMPORTED_MODULE_2__/* .analyzeAndAddMonitorButtons */ .wj)();
+            (0,_entrance_page_core__WEBPACK_IMPORTED_MODULE_3__/* .analyzeAndAddMonitorButtons */ .wj)();
             // 監視ボタン設置後も再度FABボタンの状態を更新
-            (0,_entrance_page_ui_helpers__WEBPACK_IMPORTED_MODULE_4__/* .updateMainButtonDisplay */ .vp)();
+            (0,_entrance_page_ui_helpers__WEBPACK_IMPORTED_MODULE_5__/* .updateMainButtonDisplay */ .vp)();
             console.log('🔄 監視ボタンとFABを再設置しました');
         });
     }
@@ -5522,16 +5759,16 @@ function handleCalendarChange() {
         console.log('📅 日付変更なし - FABボタンの状態のみ更新');
         // 入場予約状態管理システムを取得して状態同期
         // 公式サイトによる選択解除があった場合の状態同期
-        const selectedSlot = document.querySelector(_entrance_page_dom_utils__WEBPACK_IMPORTED_MODULE_1__/* .timeSlotSelectors */ .eN.selectedSlot);
-        if (!selectedSlot && _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_3__/* .entranceReservationStateManager */ .xx.hasReservationTarget()) {
+        const selectedSlot = document.querySelector(_entrance_page_dom_utils__WEBPACK_IMPORTED_MODULE_2__/* .timeSlotSelectors */ .eN.selectedSlot);
+        if (!selectedSlot && _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_4__/* .entranceReservationStateManager */ .xx.hasReservationTarget()) {
             // DOM上に選択がないが入場予約状態管理に予約対象がある場合はクリア
             console.log('🔄 公式サイトによる選択解除を検出 - 入場予約状態管理を同期');
-            _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_3__/* .entranceReservationStateManager */ .xx.clearReservationTarget();
+            _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_4__/* .entranceReservationStateManager */ .xx.clearReservationTarget();
             // UI更新を確実に実行
-            (0,_entrance_page_ui_helpers__WEBPACK_IMPORTED_MODULE_4__/* .updateMainButtonDisplay */ .vp)();
+            (0,_entrance_page_ui_helpers__WEBPACK_IMPORTED_MODULE_5__/* .updateMainButtonDisplay */ .vp)();
         }
         // FABボタンの状態を更新（監視ボタンは再設置しない）
-        (0,_entrance_page_ui_helpers__WEBPACK_IMPORTED_MODULE_4__/* .updateMainButtonDisplay */ .vp)();
+        (0,_entrance_page_ui_helpers__WEBPACK_IMPORTED_MODULE_5__/* .updateMainButtonDisplay */ .vp)();
     }
 }
 // 既存の監視ボタンをすべて削除
@@ -5548,16 +5785,16 @@ function syncReservationTargetFromDOM() {
         const tdElement = selectedElement.closest('td[data-gray-out]');
         const timeText = selectedElement.querySelector('dt span')?.textContent?.trim();
         if (tdElement && timeText) {
-            const locationIndex = _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_3__/* .LocationHelper */ .Qs.getIndexFromElement(tdElement);
-            const selector = (0,_entrance_page_dom_utils__WEBPACK_IMPORTED_MODULE_1__/* .generateUniqueTdSelector */ .sN)(tdElement);
+            const locationIndex = _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_4__/* .LocationHelper */ .Qs.getIndexFromElement(tdElement);
+            const selector = (0,_entrance_page_dom_utils__WEBPACK_IMPORTED_MODULE_2__/* .generateUniqueTdSelector */ .sN)(tdElement);
             console.log(`🔄 DOM状態から予約対象を同期: ${timeText} (位置: ${locationIndex})`);
-            _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_3__/* .entranceReservationStateManager */ .xx.setReservationTarget(timeText, locationIndex, selector);
+            _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_4__/* .entranceReservationStateManager */ .xx.setReservationTarget(timeText, locationIndex, selector);
         }
     }
     else {
         // 選択状態の要素がない場合は予約対象をクリア
         console.log(`🔄 選択状態なし - 予約対象をクリア`);
-        _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_3__/* .entranceReservationStateManager */ .xx.clearReservationTarget();
+        _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_4__/* .entranceReservationStateManager */ .xx.clearReservationTarget();
     }
 }
 // 時間帯テーブルの準備を待つ
@@ -5621,9 +5858,9 @@ function setupTimeSlotClickHandlers() {
             return;
         }
         // 入場予約状態管理システムを取得
-        const locationIndex = _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_3__/* .LocationHelper */ .Qs.getIndexFromElement(tdElement);
+        const locationIndex = _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_4__/* .LocationHelper */ .Qs.getIndexFromElement(tdElement);
         // 入場予約状態管理で現在の選択状態を確認
-        const isCurrentlyReservationTarget = _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_3__/* .entranceReservationStateManager */ .xx.isReservationTarget(timeText, locationIndex);
+        const isCurrentlyReservationTarget = _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_4__/* .entranceReservationStateManager */ .xx.isReservationTarget(timeText, locationIndex);
         if (isCurrentlyReservationTarget) {
             // 既に予約対象として設定済みの場合は選択解除
             // イベントを停止（デフォルト動作を防ぐ）
@@ -5635,14 +5872,14 @@ function setupTimeSlotClickHandlers() {
                 currentSelectedCalendarButton.click();
                 // 入場予約状態管理からも予約対象を削除
                 setTimeout(() => {
-                    _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_3__/* .entranceReservationStateManager */ .xx.clearReservationTarget();
-                    (0,_entrance_page_ui_helpers__WEBPACK_IMPORTED_MODULE_4__/* .updateMainButtonDisplay */ .vp)();
+                    _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_4__/* .entranceReservationStateManager */ .xx.clearReservationTarget();
+                    (0,_entrance_page_ui_helpers__WEBPACK_IMPORTED_MODULE_5__/* .updateMainButtonDisplay */ .vp)();
                 }, 100);
             }
             else {
                 // フォールバック: 直接削除
-                _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_3__/* .entranceReservationStateManager */ .xx.clearReservationTarget();
-                (0,_entrance_page_ui_helpers__WEBPACK_IMPORTED_MODULE_4__/* .updateMainButtonDisplay */ .vp)();
+                _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_4__/* .entranceReservationStateManager */ .xx.clearReservationTarget();
+                (0,_entrance_page_ui_helpers__WEBPACK_IMPORTED_MODULE_5__/* .updateMainButtonDisplay */ .vp)();
             }
         }
         else {
@@ -5650,7 +5887,7 @@ function setupTimeSlotClickHandlers() {
             // DOM上の選択状態から予約対象を同期
             setTimeout(() => {
                 syncReservationTargetFromDOM();
-                (0,_entrance_page_ui_helpers__WEBPACK_IMPORTED_MODULE_4__/* .updateMainButtonDisplay */ .vp)();
+                (0,_entrance_page_ui_helpers__WEBPACK_IMPORTED_MODULE_5__/* .updateMainButtonDisplay */ .vp)();
             }, 100);
         }
     };
@@ -5665,17 +5902,17 @@ async function entranceReservationHelper(config) {
     console.log('🚀 統一自動処理管理による入場予約補助機能を開始します...');
     try {
         // 統一自動処理管理による予約処理実行
-        const result = await _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_3__/* .entranceReservationStateManager */ .xx.executeUnifiedReservationProcess(config);
+        const result = await _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_4__/* .entranceReservationStateManager */ .xx.executeUnifiedReservationProcess(config);
         if (result.success) {
             console.log('🎉 統一予約処理成功！');
         }
         else if (result.cancelled) {
             console.log('⏹️ 統一予約処理がキャンセルされました');
-            _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_3__/* .entranceReservationStateManager */ .xx.stop();
+            _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_4__/* .entranceReservationStateManager */ .xx.stop();
         }
         else if (result.abnormalTermination) {
             console.error('🚨 統一予約処理異常終了');
-            _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_3__/* .entranceReservationStateManager */ .xx.setShouldStop(true);
+            _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_4__/* .entranceReservationStateManager */ .xx.setShouldStop(true);
         }
         else if (result.cooldownStarted) {
             console.log('⏰ 統一予約処理クールタイム開始');
@@ -5685,7 +5922,7 @@ async function entranceReservationHelper(config) {
     catch (error) {
         if (error.name === 'CancellationError') {
             console.log('⏹️ 統一予約処理が中断されました');
-            _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_3__/* .entranceReservationStateManager */ .xx.stop();
+            _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_4__/* .entranceReservationStateManager */ .xx.stop();
             return { success: false, attempts: 0, cancelled: true };
         }
         else {

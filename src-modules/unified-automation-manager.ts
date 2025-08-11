@@ -7,6 +7,7 @@
 
 // 型定義のインポート
 import type { ReservationConfig, ReservationResult } from '../types/index.js';
+import { processingOverlay } from './processing-overlay';
 
 // カスタム例外クラス
 export class CancellationError extends Error {
@@ -46,6 +47,12 @@ export class UnifiedAutomationManager {
 
         try {
             console.log(`🚀 統一自動処理開始: ${processType}`);
+            
+            // 誤動作防止オーバーレイを表示（efficiency-waitは除外）
+            if (processType !== 'efficiency-wait') {
+                processingOverlay.show(processType);
+            }
+            
             return await executor(this.controller.signal);
         } catch (error) {
             if (error instanceof Error && error.name === 'AbortError') {
@@ -56,6 +63,10 @@ export class UnifiedAutomationManager {
             console.error(`❌ 統一自動処理エラー: ${processType}`, error);
             throw error;
         } finally {
+            // 誤動作防止オーバーレイを非表示
+            if (processType !== 'efficiency-wait') {
+                processingOverlay.hide();
+            }
             this.cleanup();
         }
     }
@@ -349,7 +360,7 @@ export class UnifiedAutomationManager {
                 
             } catch (error: any) {
                 // 中断エラーは上位に伝播
-                if (error.message === 'AbortError') {
+                if (error instanceof Error && error.name === 'AbortError') {
                     throw new CancellationError('予約処理が中断されました');
                 }
                 
@@ -395,8 +406,13 @@ export class UnifiedAutomationManager {
         const isEfficiencyMode = this.stateManager && this.stateManager.isEfficiencyModeEnabled ? 
             this.stateManager.isEfficiencyModeEnabled() : false;
         
+        console.log(`🔍 効率モード状態確認: ${isEfficiencyMode}`);
+        console.log(`🔍 stateManager存在: ${!!this.stateManager}`);
+        console.log(`🔍 isEfficiencyModeEnabledメソッド存在: ${!!(this.stateManager && this.stateManager.isEfficiencyModeEnabled)}`);
+        
         if (!isEfficiencyMode) {
             // 通常モード: そのままクリック
+            console.log('⚡ 通常モード: 効率待機なしでクリック実行');
             await this.executeStandardClick(submitButton, config, signal);
             return;
         }
@@ -404,22 +420,37 @@ export class UnifiedAutomationManager {
         // 効率モード: 目標時間（00秒/30秒）への調整待機
         console.log('🚀 統一効率モード: submit標的時刻調整開始');
         
-        // 次の00秒/30秒標的時刻を計算
-        const nextTarget = this.stateManager && this.stateManager.calculateNext00or30Seconds ? 
-            this.stateManager.calculateNext00or30Seconds() : new Date(Date.now() + 5000);
+        // 効率モードで現在時刻から新しく目標時刻を計算
+        if (!this.stateManager || !this.stateManager.calculateNext00or30Seconds) {
+            console.error('⚠️ calculateNext00or30Secondsメソッドが利用できません');
+            await this.executeStandardClick(submitButton, config, signal);
+            return;
+        }
         
-        // 統一自動処理管理による中断可能な効率モード待機
+        // 毎回新しく計算して最新の目標時刻を取得
+        const nextTarget = this.stateManager.calculateNext00or30Seconds();
+        console.log('🔄 効率モード: 最新の目標時刻を計算');
+        
+        // 計算した目標時刻を保存
+        this.stateManager.setNextSubmitTarget(nextTarget);
+        const waitMs = nextTarget.getTime() - Date.now();
+        
         console.log(`🎯 統一効率モード待機: 目標時刻 ${nextTarget.toLocaleTimeString()}`);
+        console.log(`🎯 待機時間: ${Math.floor(waitMs/1000)}秒`);
+        
+        if (waitMs < 0) {
+            console.warn('⚠️ 目標時刻が過去になっています - 即座実行');
+        } else if (waitMs < 15000) {
+            console.warn(`⚠️ 待機時間が15秒未満: ${Math.floor(waitMs/1000)}秒`);
+        }
+        
         await this.waitForTargetTime(nextTarget, signal);
         
         // 標的時刻でsubmitクリック実行
         console.log(`🚀 submitクリック実行 (${new Date().toLocaleTimeString()})`);
         await this.executeStandardClick(submitButton, config, signal);
         
-        // 次回標的時刻を更新
-        if (this.stateManager && this.stateManager.updateNextSubmitTarget) {
-            this.stateManager.updateNextSubmitTarget();
-        }
+        // 注記: 次回標的時刻は毎回新規計算するため、更新処理は不要
     }
 
     /**

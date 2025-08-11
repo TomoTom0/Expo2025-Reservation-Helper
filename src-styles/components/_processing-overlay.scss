@@ -1,0 +1,174 @@
+// 自動処理中誤動作防止オーバーレイのスタイル
+.ytomo-processing-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.3); // 薄い黒のオーバーレイ
+  z-index: 100000 !important; // FABより少し低く設定（FABは100001に調整される）
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(1px); // わずかなブラー効果
+  transition: all 0.3s ease;
+  pointer-events: auto; // クリックをキャッチする
+  
+  // 初期状態（非表示）
+  &.hidden {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+  }
+  
+  // 表示状態
+  &.visible {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+  }
+  
+  // メッセージエリア
+  .processing-message-area {
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 12px;
+    padding: 24px 32px;
+    text-align: center;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    border: 2px solid rgba(255, 140, 0, 0.3);
+    max-width: 400px;
+    margin: 20px;
+    
+    // スマホ対応
+    @media (max-width: 768px) {
+      padding: 20px 24px;
+      margin: 16px;
+      max-width: 90vw;
+    }
+  }
+  
+  // ステータスアイコン
+  .processing-status-icon {
+    font-size: 48px;
+    margin-bottom: 16px;
+    animation: rotate 2s linear infinite;
+    
+    @media (max-width: 768px) {
+      font-size: 36px;
+      margin-bottom: 12px;
+    }
+  }
+  
+  // メインメッセージテキスト
+  .processing-message-text {
+    font-size: 20px;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 12px;
+    
+    @media (max-width: 768px) {
+      font-size: 18px;
+      margin-bottom: 10px;
+    }
+  }
+  
+  // 警告テキスト
+  .processing-warning-text {
+    font-size: 14px;
+    color: #666;
+    margin-bottom: 16px;
+    line-height: 1.4;
+    transition: all 0.3s ease;
+    
+    @media (max-width: 768px) {
+      font-size: 13px;
+      margin-bottom: 14px;
+    }
+    
+    &.warning-flash {
+      color: #dc3545;
+      font-weight: bold;
+      transform: scale(1.05);
+      animation: flash 0.5s ease-in-out 2;
+    }
+  }
+  
+  // 中断案内エリア
+  .processing-cancel-area {
+    font-size: 12px;
+    color: #888;
+    font-style: italic;
+    
+    @media (max-width: 768px) {
+      font-size: 11px;
+    }
+  }
+  
+  // ローテーションアニメーション
+  @keyframes rotate {
+    0% {
+      transform: rotate(0deg);
+    }
+    100% {
+      transform: rotate(360deg);
+    }
+  }
+  
+  // フラッシュアニメーション
+  @keyframes flash {
+    0%, 100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.7;
+    }
+  }
+}
+
+// 効率モード時の特別なスタイリング
+.ytomo-processing-overlay.efficiency-mode {
+  .processing-message-area {
+    border-color: rgba(255, 140, 0, 0.5);
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(255, 248, 220, 0.95));
+  }
+  
+  .processing-status-icon {
+    color: #ff8c00;
+  }
+  
+  .processing-message-text {
+    color: #e67e00;
+  }
+}
+
+// 監視モード時の特別なスタイリング
+.ytomo-processing-overlay.monitoring-mode {
+  .processing-message-area {
+    border-color: rgba(0, 104, 33, 0.5);
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(240, 255, 240, 0.95));
+  }
+  
+  .processing-status-icon {
+    color: #006821;
+  }
+  
+  .processing-message-text {
+    color: #004d1a;
+  }
+}
+
+// アクセシビリティ: 動きを抑制する設定
+@media (prefers-reduced-motion: reduce) {
+  .ytomo-processing-overlay {
+    .processing-status-icon {
+      animation: none;
+    }
+    
+    .processing-warning-text.warning-flash {
+      animation: none;
+      transform: none;
+    }
+    
+    transition: none;
+  }
+}

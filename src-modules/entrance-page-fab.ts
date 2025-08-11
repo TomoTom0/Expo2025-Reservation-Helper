@@ -1,6 +1,7 @@
 // Phase 3: 統一処理移行により個別importは不要
 
 // entrance-page-stateからのimport
+import { processingOverlay } from './processing-overlay';
 import { 
     calendarWatchState,
     loadFABVisibility,
@@ -283,6 +284,10 @@ function createEntranceReservationUI(): void {
     function stopMonitoringProcess(): void {
         console.log('⏹️ 監視を中断');
         stopSlotMonitoring();
+        
+        // 誤動作防止オーバーレイを非表示
+        processingOverlay.hide();
+        
         showStatus('監視中断', 'orange');
         updateMainButtonDisplay();
     }

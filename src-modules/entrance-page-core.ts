@@ -13,6 +13,7 @@ import {
 } from './entrance-page-dom-utils';
 
 // entrance-page-fabからのimport
+import { processingOverlay } from './processing-overlay';
 import { updateMonitoringTargetsDisplay, entranceReservationHelper } from './entrance-page-fab';
 
 // entrance-page-ui-helpersからのimport
@@ -812,6 +813,9 @@ async function startSlotMonitoring(): Promise<void> {
     
     // 監視対象表示も更新
     updateMonitoringTargetsDisplay();
+    
+    // 誤動作防止オーバーレイを表示
+    processingOverlay.show('monitoring');
     
     // 監視実行中は全ての監視ボタンを無効化
     disableAllMonitorButtons();
@@ -2469,6 +2473,9 @@ function stopSlotMonitoring(): void {
     
     // リロードカウントダウンの停止（入場予約状態管理システムで管理）
     entranceReservationStateManager.stopReloadCountdown();
+    
+    // 誤動作防止オーバーレイを非表示
+    processingOverlay.hide();
     
     // 監視ボタンを有効化（操作可能に戻す）
     enableAllMonitorButtons();
