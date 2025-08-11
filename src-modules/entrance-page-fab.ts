@@ -1082,6 +1082,8 @@ async function entranceReservationHelper(config: ReservationConfig): Promise<Res
     
     if (entranceReservationStateManager.getShouldStop()) {
         console.log('ユーザーによってキャンセルされました。');
+        // 中断時は状態をリセット
+        entranceReservationStateManager.stop();
         return { success: false, attempts, cancelled: true };
     }
     

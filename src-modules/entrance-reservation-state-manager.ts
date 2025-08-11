@@ -290,12 +290,8 @@ export class EntranceReservationStateManager {
         this.reservationExecution.shouldStop = shouldStop;
         this.log(`🛑 予約中断フラグ: ${shouldStop}`);
         
-        // 中断時は実行状態をIDLEに戻し、効率モードタイマーも停止
-        if (shouldStop && this.executionState === ExecutionState.RESERVATION_RUNNING) {
-            this.executionState = ExecutionState.IDLE;
-            this.stopEfficiencyModeUpdateTimer();
-            this.log('🔄 予約中断により状態をIDLEに変更');
-        }
+        // 中断フラグのみ設定、状態変更は予約処理完了後に行う
+        // （予約処理ループが完了するまで RESERVATION_RUNNING 状態を維持）
     }
     
     // 予約中断フラグ取得
@@ -1434,22 +1430,10 @@ export class EntranceReservationStateManager {
         
         const remainingMs = candidateTarget.getTime() - now.getTime();
         
-        // 15秒未満の場合は次の目標時刻に変更
+        // 15秒未満の場合は30秒後に変更
         if (remainingMs < 15000) { // 15秒 = 15000ms
-            // 新しいランダムバッファを生成
-            const newRandomBuffer = Math.pow(Math.random(), 2) * 2;
-            
-            if (currentSeconds < 30) {
-                // 元々00秒候補（現在時刻が30秒未満）だった場合、30秒 + ランダムバッファに変更
-                candidateTarget.setSeconds(Math.floor(30 + newRandomBuffer));
-                candidateTarget.setMilliseconds(((30 + newRandomBuffer) % 1) * 1000);
-            } else {
-                // 元々30秒候補（現在時刻が30秒以上）だった場合、次の分の00秒 + ランダムバッファに変更
-                candidateTarget.setMinutes(candidateTarget.getMinutes() + 1);
-                candidateTarget.setSeconds(Math.floor(newRandomBuffer));
-                candidateTarget.setMilliseconds((newRandomBuffer % 1) * 1000);
-            }
-            this.log(`⚡ 効率モード: 猶予${Math.floor(remainingMs/1000)}秒は短いため次の目標時刻に変更`);
+            candidateTarget.setSeconds(candidateTarget.getSeconds() + 30);
+            this.log(`⚡ 効率モード: 猶予${Math.floor(remainingMs/1000)}秒は短いため30秒後に変更`);
         }
         
         return candidateTarget;
