@@ -2824,43 +2824,168 @@ class UnifiedAutomationManager {
         }
     }
     // ============================================================================
-    // DOM操作の中断対応（Phase 3で実装予定）
+    // DOM操作の中断対応（Phase 3で実装）
     // ============================================================================
-    /*
-    // Phase 3で実装予定: 中断可能なDOM要素待機
-    private async waitForElementWithCancellation(
-        selector: string,
-        timeout: number,
-        signal: AbortSignal
-    ): Promise<HTMLElement> {
+    /**
+     * 中断可能なDOM要素待機
+     * @param selector セレクター
+     * @param timeout タイムアウト時間
+     * @param signal 中断シグナル
+     * @returns 見つかったHTMLElement
+     */
+    async waitForElementWithCancellation(selector, timeout, signal) {
         const checkInterval = 100;
         const endTime = Date.now() + timeout;
-
         while (Date.now() < endTime) {
             this.throwIfAborted(signal);
-
-            const element = document.querySelector(selector) as HTMLElement;
+            const element = document.querySelector(selector);
             if (element) {
                 return element;
             }
-
-            await this.waitWithCancellation(checkInterval, signal);
+            const remainingTime = endTime - Date.now();
+            const waitTime = Math.min(checkInterval, remainingTime);
+            if (waitTime > 0) {
+                await this.waitWithCancellation(waitTime, signal);
+            }
         }
-
         throw new Error(`要素が見つかりません: ${selector}`);
     }
-    */
+    /**
+     * 中断可能な複数要素待機
+     * @param selectors セレクター辞書
+     * @param timeout タイムアウト時間
+     * @param signal 中断シグナル
+     * @param selectorTexts テキスト条件辞書
+     * @returns 見つかった要素情報
+     */
+    async waitForAnyElementWithCancellation(selectors, timeout, signal, selectorTexts = {}) {
+        const checkInterval = 100;
+        const endTime = Date.now() + timeout;
+        while (Date.now() < endTime) {
+            this.throwIfAborted(signal);
+            // 全てのセレクターをチェック
+            for (const [key, selector] of Object.entries(selectors)) {
+                const elements = document.querySelectorAll(selector);
+                for (let i = 0; i < elements.length; i++) {
+                    const element = elements[i];
+                    if (selectorTexts[key]) {
+                        if (element.textContent && element.textContent.includes(selectorTexts[key])) {
+                            return { key, element };
+                        }
+                    }
+                    else {
+                        if (element) {
+                            return { key, element };
+                        }
+                    }
+                }
+            }
+            const remainingTime = endTime - Date.now();
+            const waitTime = Math.min(checkInterval, remainingTime);
+            if (waitTime > 0) {
+                await this.waitWithCancellation(waitTime, signal);
+            }
+        }
+        throw new Error(`いずれの要素も見つかりません: ${Object.keys(selectors).join(', ')}`);
+    }
     // ============================================================================
     // 処理実装（将来のPhase 3で実装予定）
     // ============================================================================
     /**
-     * 予約処理ループ（Phase 3で実装予定）
+     * 統一予約処理ループ（Phase 3で実装）
      */
-    async reservationLoop(_config, _signal) {
-        // Phase 3で entranceReservationHelper() から移植予定
-        console.log('🚧 予約処理ループ - Phase 3で実装予定');
-        // 暫定実装: 既存処理に委譲
-        throw new Error('予約処理ループは Phase 3 で実装予定です');
+    async reservationLoop(config, signal) {
+        const { selectors, selectorTexts, timeouts } = config;
+        let attempts = 0;
+        const maxAttempts = 100;
+        console.log('🚀 統一予約処理ループを開始します...');
+        while (attempts < maxAttempts) {
+            attempts++;
+            console.log(`試行回数: ${attempts}`);
+            // 中断チェック
+            this.throwIfAborted(signal);
+            // 状態表示更新
+            const statusDiv = document.getElementById('reservation-status');
+            if (statusDiv) {
+                statusDiv.innerText = `試行中... (${attempts}回目)`;
+            }
+            try {
+                console.log('1. submitボタンを待機中...');
+                const submitButton = await this.waitForElementWithCancellation(selectors.submit, timeouts.waitForSubmit, signal);
+                // 中断チェック
+                this.throwIfAborted(signal);
+                // 試行回数を状態管理に記録
+                if (this.stateManager && this.stateManager.setAttempts) {
+                    this.stateManager.setAttempts(attempts);
+                }
+                // 効率モード対応のsubmitクリック実行
+                console.log('2. submitボタンをクリック...');
+                await this.executeEfficiencyTimingSubmit(submitButton, config, signal);
+                console.log('3. レスポンスを待機中...');
+                const responseSelectors = {
+                    change: selectors.change,
+                    success: selectors.success,
+                    failure: selectors.failure
+                };
+                const response = await this.waitForAnyElementWithCancellation(responseSelectors, timeouts.waitForResponse, signal, selectorTexts);
+                console.log(`レスポンス検出: ${response.key}`);
+                if (response.key === 'change') {
+                    console.log('変更ボタンをクリックして最終結果を待機...');
+                    await this.executeFixedDelayClick(response.element, config, signal);
+                    console.log('success/failureを待機中...');
+                    const finalSelectors = {
+                        success: selectors.success,
+                        failure: selectors.failure
+                    };
+                    console.log(`⏰ 最大${timeouts.waitForResponse / 1000}秒間待機開始...`);
+                    const startTime = Date.now();
+                    const finalResponse = await this.waitForAnyElementWithCancellation(finalSelectors, timeouts.waitForResponse, signal, selectorTexts);
+                    const elapsedTime = Math.round((Date.now() - startTime) / 1000);
+                    console.log(`✅ 最終レスポンス検出: ${finalResponse.key} (${elapsedTime}秒後)`);
+                    if (finalResponse.key === 'success') {
+                        console.log('🎉 予約成功！処理を終了します。');
+                        return { success: true, attempts };
+                    }
+                    else {
+                        console.log('予約失敗。closeボタンをクリックして再試行します。');
+                        const closeButton = await this.waitForElementWithCancellation(selectors.close, timeouts.waitForClose, signal);
+                        await this.executeFixedDelayClick(closeButton, config, signal);
+                        await this.waitWithCancellation(this.getRandomWaitTime(config.randomSettings.minRetryDelay, config.randomSettings.retryRandomRange), signal);
+                    }
+                }
+                else if (response.key === 'success') {
+                    console.log('🎉 予約成功！処理を終了します。');
+                    return { success: true, attempts };
+                }
+                else if (response.key === 'failure') {
+                    console.log('予約失敗。closeボタンをクリックして再試行します。');
+                    const closeButton = await this.waitForElementWithCancellation(selectors.close, timeouts.waitForClose, signal);
+                    await this.executeFixedDelayClick(closeButton, config, signal);
+                    await this.waitWithCancellation(this.getRandomWaitTime(config.randomSettings.minRetryDelay, config.randomSettings.retryRandomRange), signal);
+                }
+            }
+            catch (error) {
+                // 中断エラーは上位に伝播
+                if (error.message === 'AbortError') {
+                    throw new CancellationError('予約処理が中断されました');
+                }
+                const errorMessage = error instanceof Error ? error.message : String(error);
+                console.error(`エラーが発生しました (試行 ${attempts}):`, errorMessage);
+                // タイムアウトエラーは異常終了
+                if (errorMessage.includes('いずれの要素も見つかりません') || errorMessage.includes('要素が見つかりませんでした')) {
+                    console.error('🚨 予約処理異常終了: 3分待っても成功/失敗の結果が返りませんでした');
+                    return { success: false, attempts, abnormalTermination: true };
+                }
+                // リトライ待機
+                await this.waitWithCancellation(this.getRandomWaitTime(config.randomSettings.minRetryDelay, config.randomSettings.retryRandomRange), signal);
+            }
+        }
+        console.log(`最大試行回数 (${maxAttempts}) に達しました。クールタイムを開始します。`);
+        // クールタイム開始（状態管理経由）
+        if (this.stateManager && this.stateManager.startReservationCooldown) {
+            this.stateManager.startReservationCooldown();
+        }
+        return { success: false, attempts, cooldownStarted: true };
     }
     /**
      * 監視処理ループ（将来実装予定）
@@ -2868,6 +2993,66 @@ class UnifiedAutomationManager {
     async monitoringLoop(_signal) {
         // 将来の監視処理統一時に実装
         console.log('🚧 監視処理ループ - 将来実装予定');
+    }
+    /**
+     * 効率モード対応submitクリック実行（統一処理内部用）
+     */
+    async executeEfficiencyTimingSubmit(submitButton, config, signal) {
+        const isEfficiencyMode = this.stateManager && this.stateManager.isEfficiencyModeEnabled ?
+            this.stateManager.isEfficiencyModeEnabled() : false;
+        if (!isEfficiencyMode) {
+            // 通常モード: そのままクリック
+            await this.executeStandardClick(submitButton, config, signal);
+            return;
+        }
+        // 効率モード: 目標時間（00秒/30秒）への調整待機
+        console.log('🚀 統一効率モード: submit標的時刻調整開始');
+        // 次の00秒/30秒標的時刻を計算
+        const nextTarget = this.stateManager && this.stateManager.calculateNext00or30Seconds ?
+            this.stateManager.calculateNext00or30Seconds() : new Date(Date.now() + 5000);
+        // 統一自動処理管理による中断可能な効率モード待機
+        console.log(`🎯 統一効率モード待機: 目標時刻 ${nextTarget.toLocaleTimeString()}`);
+        await this.waitForTargetTime(nextTarget, signal);
+        // 標的時刻でsubmitクリック実行
+        console.log(`🚀 submitクリック実行 (${new Date().toLocaleTimeString()})`);
+        await this.executeStandardClick(submitButton, config, signal);
+        // 次回標的時刻を更新
+        if (this.stateManager && this.stateManager.updateNextSubmitTarget) {
+            this.stateManager.updateNextSubmitTarget();
+        }
+    }
+    /**
+     * 効率モード対応固定待機クリック実行（統一処理内部用）
+     */
+    async executeFixedDelayClick(element, config, signal) {
+        const isEfficiencyMode = this.stateManager && this.stateManager.isEfficiencyModeEnabled ?
+            this.stateManager.isEfficiencyModeEnabled() : false;
+        if (isEfficiencyMode) {
+            // 効率モード: 1.5-3秒の固定待機（中断可能）
+            const randomDelay = 1500 + Math.random() * 1500; // 1500~3000ms
+            console.log(`⏳ 効率モード固定待機: ${Math.round(randomDelay)}ms`);
+            await this.waitWithCancellation(randomDelay, signal);
+        }
+        // 通常のクリック処理
+        await this.executeStandardClick(element, config, signal);
+    }
+    /**
+     * 標準クリック実行（統一処理内部用）
+     */
+    async executeStandardClick(element, config, signal) {
+        // 中断チェック
+        this.throwIfAborted(signal);
+        // クリック実行
+        element.click();
+        // クリック後の待機
+        const delay = this.getRandomWaitTime(config.randomSettings.minClickDelay, config.randomSettings.clickRandomRange);
+        await this.waitWithCancellation(delay, signal);
+    }
+    /**
+     * ランダム待機時間計算（統一処理内部用）
+     */
+    getRandomWaitTime(minTime, randomRange) {
+        return minTime + Math.floor(Math.random() * randomRange);
     }
     // ============================================================================
     // ユーティリティメソッド
@@ -3168,6 +3353,14 @@ class EntranceReservationStateManager {
      */
     async executeUnifiedWaitWithCancellation(ms, signal) {
         return await this.automationManager.waitWithCancellation(ms, signal);
+    }
+    /**
+     * 統一予約処理実行
+     * @param config 予約設定
+     * @returns Promise<ReservationResult>
+     */
+    async executeUnifiedReservationProcess(config) {
+        return await this.automationManager.executeReservationProcess(config);
     }
     // 予約中断フラグ取得
     getShouldStop() {
@@ -4282,21 +4475,1312 @@ const entranceReservationStateManager = new EntranceReservationStateManager();
 
 /***/ }),
 
-/***/ 521:
+/***/ 540:
+/***/ ((module) => {
+
+
+
+/* istanbul ignore next  */
+function insertStyleElement(options) {
+  var element = document.createElement("style");
+  options.setAttributes(element, options.attributes);
+  options.insert(element, options.options);
+  return element;
+}
+module.exports = insertStyleElement;
+
+/***/ }),
+
+/***/ 601:
+/***/ ((module) => {
+
+
+
+module.exports = function (i) {
+  return i[1];
+};
+
+/***/ }),
+
+/***/ 638:
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 
 // EXPORTS
 __webpack_require__.d(__webpack_exports__, {
-  jp: () => (/* binding */ clickElement),
-  I1: () => (/* binding */ getRandomWaitTime),
-  Xs: () => (/* binding */ init_page),
-  v8: () => (/* binding */ judge_init),
-  Dr: () => (/* binding */ waitForAnyElement),
-  xk: () => (/* binding */ waitForElement)
+  SE: () => (/* binding */ extractTdStatus),
+  e0: () => (/* binding */ findSameTdElement),
+  sN: () => (/* binding */ generateUniqueTdSelector),
+  Yz: () => (/* binding */ initTimeSlotMonitoring),
+  eN: () => (/* binding */ timeSlotSelectors)
 });
 
-// UNUSED EXPORTS: prepare_filter
+// UNUSED EXPORTS: getTdPositionInfo, tableSelectors, waitForCalendar
+
+;// ./src-modules/timeslot-status-detector.ts
+/**
+ * 時間帯状態判定の統一関数
+ * DOM要素を与えて状態を返すシンプルな共通関数
+ */
+/**
+ * 時間帯セル（td要素）の状態を判定する統一関数
+ * @param tdElement 時間帯のtd要素
+ * @returns 状態情報またはnull
+ */
+function detectTimeslotStatus(tdElement) {
+    if (!tdElement)
+        return null;
+    // DOM構造: .btnDivまたはdiv[role="button"]
+    const buttonDiv = (tdElement.querySelector('.btnDiv') || tdElement.querySelector('div[role="button"]'));
+    if (!buttonDiv) {
+        console.log(`🔍 [統一関数] buttonDiv not found in td:`, tdElement.innerHTML.substring(0, 200));
+        return null;
+    }
+    // 時間帯テキストを取得
+    const timeSpan = buttonDiv.querySelector('dt span');
+    const timeText = timeSpan ? timeSpan.textContent?.trim() || '' : '';
+    // 詳細な判定: 属性とアイコンの両方を確認
+    const isDisabledByAttr = buttonDiv.getAttribute('data-disabled') === 'true';
+    const hasFullIcon = !!buttonDiv.querySelector('img[src*="/asset/img/calendar_ng.svg"], img[alt*="満員"], img[alt*="予約不可"]');
+    const hasAvailableIcon = !!buttonDiv.querySelector('img[src*="/asset/img/ico_scale_low.svg"], img[src*="/asset/img/ico_scale_high.svg"], img[alt*="空いて"], img[alt*="混雑"]');
+    const isSelected = buttonDiv.getAttribute('aria-pressed') === 'true';
+    // 状態判定のロジック（analyzeTimeSlotsと同じ）
+    const isFull = hasFullIcon || isDisabledByAttr;
+    const isAvailable = !isDisabledByAttr && hasAvailableIcon;
+    let statusType;
+    if (isFull) {
+        statusType = 'full';
+    }
+    else if (isSelected) {
+        statusType = 'selected';
+    }
+    else if (isAvailable) {
+        statusType = 'available';
+    }
+    else {
+        statusType = 'unknown';
+    }
+    return {
+        isAvailable,
+        isFull,
+        isSelected,
+        statusType,
+        timeText
+    };
+}
+/**
+ * 時間帯ボタン要素の状態を判定する関数
+ * @param buttonElement 時間帯のbutton要素 (div[role="button"])
+ * @returns 状態情報またはnull
+ */
+function detectTimeslotStatusFromButton(buttonElement) {
+    if (!buttonElement)
+        return null;
+    const tdElement = buttonElement.closest('td');
+    return detectTimeslotStatus(tdElement);
+}
+
+;// ./src-modules/entrance-page-dom-utils.ts
+// ============================================================================
+// 【入場予約DOM操作ユーティリティ】 
+// ============================================================================
+// 循環参照解決のための基盤モジュール
+// DOM操作、セレクタ定義、基本的な待機関数を提供
+// 統一時間帯状態判定関数をimport
+
+// テーブルセレクタ辞書
+const tableSelectors = {
+    timeSlotTable: "table[class*='style_main__timetable__']",
+    calendarTable: "table[class*='style_main__calendar__']"
+};
+// 時間帯セレクタ定義（設計書の固定DOM構造に基づく）
+const timeSlotSelectors = {
+    // 時間帯選択エリア
+    timeSlotContainer: tableSelectors.timeSlotTable,
+    timeSlotCells: "td[data-gray-out] div[role='button']",
+    // 状態判定 - 設計書の構造に基づく正確な定義
+    availableSlots: "td[data-gray-out] div[role='button']:not([data-disabled='true'])",
+    fullSlots: "td[data-gray-out] div[role='button'][data-disabled='true']",
+    selectedSlot: "td[data-gray-out] div[role='button'][aria-pressed='true']",
+    // アイコン判定 - img要素は div[role='button'] 内の dd 要素内に存在
+    lowIcon: "img[src*='ico_scale_low.svg']",
+    highIcon: "img[src*='ico_scale_high.svg']",
+    fullIcon: "img[src*='calendar_ng.svg']"
+};
+// td要素の一意特定機能
+function generateUniqueTdSelector(tdElement) {
+    // td要素の親要素（tr）内での位置を取得
+    const row = tdElement.parentElement;
+    const rowIndex = Array.from(row.parentElement.children).indexOf(row);
+    const cellIndex = Array.from(row.children).indexOf(tdElement);
+    // 時間帯テーブル専用の固有セレクタ
+    return `${tableSelectors.timeSlotTable} tbody tr:nth-child(${rowIndex + 1}) td:nth-child(${cellIndex + 1})`;
+}
+function getTdPositionInfo(tdElement) {
+    const row = tdElement.parentElement;
+    const rowIndex = Array.from(row.parentElement.children).indexOf(row);
+    const cellIndex = Array.from(row.children).indexOf(tdElement);
+    return { rowIndex, cellIndex };
+}
+function findSameTdElement(targetInfo) {
+    // 1. セレクタベースでの検索を優先
+    if (targetInfo.tdSelector) {
+        const element = document.querySelector(targetInfo.tdSelector);
+        if (element) {
+            return element;
+        }
+    }
+    // 2. フォールバック: 位置情報による検索
+    if (targetInfo.positionInfo &&
+        targetInfo.positionInfo.rowIndex !== undefined &&
+        targetInfo.positionInfo.cellIndex !== undefined) {
+        const table = document.querySelector(timeSlotSelectors.timeSlotContainer);
+        if (table) {
+            const rows = table.querySelectorAll('tr');
+            if (rows[targetInfo.positionInfo.rowIndex]) {
+                // 時間帯セルのみを対象（data-gray-out属性の有無に関係なく）
+                const allCells = rows[targetInfo.positionInfo.rowIndex].querySelectorAll('td');
+                const cells = Array.from(allCells).filter(cell => cell.querySelector('div[role="button"]'));
+                if (cells[targetInfo.positionInfo.cellIndex]) {
+                    return cells[targetInfo.positionInfo.cellIndex];
+                }
+            }
+        }
+    }
+    return null;
+}
+function extractTdStatus(tdElement) {
+    // 統一状態判定関数を使用
+    const result = detectTimeslotStatus(tdElement);
+    if (!result)
+        return null;
+    // DOM構造: .btnDivまたはdiv[role="button"]のどちらでも対応
+    const buttonDiv = (tdElement.querySelector('.btnDiv') || tdElement.querySelector('div[role="button"]'));
+    if (!buttonDiv)
+        return null;
+    return {
+        timeText: result.timeText,
+        isFull: result.isFull,
+        isAvailable: result.isAvailable,
+        isSelected: result.isSelected,
+        status: result.statusType,
+        element: buttonDiv,
+        tdElement
+    };
+}
+// カレンダーの動的待機（time要素の存在も確認）
+async function waitForCalendar(timeout = 10000) {
+    const startTime = Date.now();
+    const checkInterval = 100; // 待機間隔を長めに設定
+    console.log('カレンダーとtime要素の出現を待機中...');
+    while (Date.now() - startTime < timeout) {
+        // time[datetime]要素が実際に存在するかを確認
+        const timeElements = document.querySelectorAll('time[datetime]');
+        if (timeElements.length > 0) {
+            console.log(`✅ カレンダーとtime要素が見つかりました (${timeElements.length}個のtime要素)`);
+            // 追加待機: time要素が見つかってもすぐに使用せず、少し待つ
+            await new Promise(resolve => setTimeout(resolve, 200));
+            return true;
+        }
+        // デバッグ: 現在の状況を確認
+        const tables = document.querySelectorAll('table');
+        const buttons = document.querySelectorAll('[role="button"]');
+        if (tables.length > 0 || buttons.length > 10) {
+            // DOM要素待機中（ログ削減）
+        }
+        await new Promise(resolve => setTimeout(resolve, checkInterval));
+    }
+    console.log('⏰ カレンダー待機がタイムアウトしました');
+    // デバッグ情報
+    const allTables = document.querySelectorAll('table');
+    const allButtons = document.querySelectorAll('[role="button"]');
+    const allTimeElements = document.querySelectorAll('time');
+    console.log(`🔍 最終状態: table=${allTables.length}, button=${allButtons.length}, time=${allTimeElements.length}`);
+    return false;
+}
+// 時間帯監視機能の初期化
+async function initTimeSlotMonitoring() {
+    console.log('時間帯監視機能を初期化中...');
+    // カレンダーの存在確認
+    const hasCalendar = await waitForCalendar();
+    if (!hasCalendar) {
+        console.log('カレンダーが見つかりません');
+        return;
+    }
+    // DOM変化監視を開始（時間帯テーブルの動的生成を検出）
+    // startTimeSlotTableObserverを動的importで取得（循環参照回避）
+    const { startTimeSlotTableObserver } = await Promise.resolve(/* import() */).then(__webpack_require__.bind(__webpack_require__, 364));
+    startTimeSlotTableObserver();
+    console.log('時間帯監視機能の初期化完了（カレンダー監視中）');
+}
+
+
+/***/ }),
+
+/***/ 659:
+/***/ ((module) => {
+
+
+
+var memo = {};
+
+/* istanbul ignore next  */
+function getTarget(target) {
+  if (typeof memo[target] === "undefined") {
+    var styleTarget = document.querySelector(target);
+
+    // Special case to return head of iframe instead of iframe itself
+    if (window.HTMLIFrameElement && styleTarget instanceof window.HTMLIFrameElement) {
+      try {
+        // This will throw an exception if access to iframe is blocked
+        // due to cross-origin restrictions
+        styleTarget = styleTarget.contentDocument.head;
+      } catch (e) {
+        // istanbul ignore next
+        styleTarget = null;
+      }
+    }
+    memo[target] = styleTarget;
+  }
+  return memo[target];
+}
+
+/* istanbul ignore next  */
+function insertBySelector(insert, style) {
+  var target = getTarget(insert);
+  if (!target) {
+    throw new Error("Couldn't find a style target. This probably means that the value for the 'insert' parameter is invalid.");
+  }
+  target.appendChild(style);
+}
+module.exports = insertBySelector;
+
+/***/ }),
+
+/***/ 825:
+/***/ ((module) => {
+
+
+
+/* istanbul ignore next  */
+function apply(styleElement, options, obj) {
+  var css = "";
+  if (obj.supports) {
+    css += "@supports (".concat(obj.supports, ") {");
+  }
+  if (obj.media) {
+    css += "@media ".concat(obj.media, " {");
+  }
+  var needLayer = typeof obj.layer !== "undefined";
+  if (needLayer) {
+    css += "@layer".concat(obj.layer.length > 0 ? " ".concat(obj.layer) : "", " {");
+  }
+  css += obj.css;
+  if (needLayer) {
+    css += "}";
+  }
+  if (obj.media) {
+    css += "}";
+  }
+  if (obj.supports) {
+    css += "}";
+  }
+  var sourceMap = obj.sourceMap;
+  if (sourceMap && typeof btoa !== "undefined") {
+    css += "\n/*# sourceMappingURL=data:application/json;base64,".concat(btoa(unescape(encodeURIComponent(JSON.stringify(sourceMap)))), " */");
+  }
+
+  // For old IE
+  /* istanbul ignore if  */
+  options.styleTagTransform(css, styleElement, options.options);
+}
+function removeStyleElement(styleElement) {
+  // istanbul ignore if
+  if (styleElement.parentNode === null) {
+    return false;
+  }
+  styleElement.parentNode.removeChild(styleElement);
+}
+
+/* istanbul ignore next  */
+function domAPI(options) {
+  if (typeof document === "undefined") {
+    return {
+      update: function update() {},
+      remove: function remove() {}
+    };
+  }
+  var styleElement = options.insertStyleElement(options);
+  return {
+    update: function update(obj) {
+      apply(styleElement, options, obj);
+    },
+    remove: function remove() {
+      removeStyleElement(styleElement);
+    }
+  };
+}
+module.exports = domAPI;
+
+/***/ }),
+
+/***/ 982:
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   DT: () => (/* binding */ createEntranceReservationUI),
+/* harmony export */   FX: () => (/* binding */ entranceReservationHelper),
+/* harmony export */   TP: () => (/* binding */ setCacheManagerForSection7),
+/* harmony export */   il: () => (/* binding */ waitForTimeSlotTable),
+/* harmony export */   startCalendarWatcher: () => (/* binding */ startCalendarWatcher),
+/* harmony export */   yT: () => (/* binding */ updateMonitoringTargetsDisplay)
+/* harmony export */ });
+/* unused harmony exports getCurrentReservationTarget, checkVisitTimeButtonState, checkTimeSlotSelected, canStartReservation, checkInitialState, handleCalendarChange, removeAllMonitorButtons */
+/* harmony import */ var _entrance_page_state__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(278);
+/* harmony import */ var _entrance_page_dom_utils__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(638);
+/* harmony import */ var _entrance_page_core__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(364);
+/* harmony import */ var _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(374);
+/* harmony import */ var _entrance_page_ui_helpers__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(269);
+// Phase 3: 統一処理移行により個別importは不要
+// entrance-page-stateからのimport
+
+// entrance-page-dom-utilsからのimport
+
+// entrance-page-monitorからのimport
+
+// unified-stateからのimport
+
+// Section 6からのimport  
+
+// UI更新ヘルパーからのimport
+
+
+// 【7. FAB・メインUI】
+// ============================================================================
+// 依存注入用のcacheManager参照
+let cacheManager = null;
+// cacheManagerを設定するヘルパー関数
+const setCacheManagerForSection7 = (cm) => {
+    cacheManager = cm;
+};
+// ステータス表示用のヘルパー関数
+function showStatus(message, color = 'white') {
+    const statusBadge = document.querySelector('#ytomo-status-badge');
+    if (!statusBadge)
+        return;
+    statusBadge.innerText = message;
+    statusBadge.style.background = color === 'green' ? 'rgba(0, 128, 0, 0.9)' :
+        color === 'red' ? 'rgba(255, 0, 0, 0.9)' :
+            color === 'orange' ? 'rgba(255, 140, 0, 0.9)' :
+                color === 'blue' ? 'rgba(0, 104, 33, 0.9)' :
+                    'rgba(0, 0, 0, 0.8)';
+    statusBadge.classList.remove('js-hide');
+    // 一定時間後に自動で隠す（エラー、成功、中断メッセージ以外）
+    if (color !== 'red' && color !== 'green' && color !== 'orange') {
+        setTimeout(() => {
+            statusBadge.classList.add('js-hide');
+        }, 3000);
+    }
+}
+function createEntranceReservationUI() {
+    // 既存のFABがあれば削除
+    const existingFab = document.getElementById('ytomo-fab-container');
+    if (existingFab) {
+        existingFab.remove();
+    }
+    // FABコンテナを作成（右下固定）
+    const fabContainer = document.createElement('div');
+    fabContainer.id = 'ytomo-fab-container';
+    fabContainer.style.cssText = `
+        position: fixed !important;
+        bottom: 24px !important;
+        right: 24px !important;
+        z-index: 10000 !important;
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 12px !important;
+        align-items: flex-end !important;
+        pointer-events: auto !important;
+    `;
+    // メインFABボタンを作成
+    const fabButton = document.createElement('button');
+    fabButton.id = 'ytomo-main-fab';
+    fabButton.classList.add('ext-ytomo', 'ytomo-fab', 'ytomo-fab-disabled');
+    // FABボタンのステータス表示
+    const fabIcon = document.createElement('span');
+    fabIcon.classList.add('ext-ytomo', 'ytomo-fab-status');
+    fabIcon.style.cssText = `
+        font-size: 12px !important;
+        text-align: center !important;
+        line-height: 1.2 !important;
+        white-space: nowrap !important;
+        pointer-events: none !important;
+    `;
+    fabIcon.innerText = '待機中';
+    fabButton.appendChild(fabIcon);
+    // FABボタンにrelative positionを設定（折りたたみボタン配置用）
+    fabButton.style.position = 'relative';
+    // 初期状態は ytomo-fab-disabled クラスで制御
+    // ホバー効果（強化版）
+    fabButton.addEventListener('mouseenter', () => {
+        fabButton.style.transform = 'scale(1.15)';
+        fabButton.style.boxShadow = '0 8px 25px rgba(0, 0, 0, 0.5), 0 4px 12px rgba(0, 0, 0, 0.3)';
+        fabButton.style.borderWidth = '4px';
+    });
+    fabButton.addEventListener('mouseleave', () => {
+        fabButton.style.transform = 'scale(1)';
+        fabButton.style.boxShadow = '0 6px 20px rgba(0, 0, 0, 0.4), 0 2px 8px rgba(0, 0, 0, 0.2)';
+        fabButton.style.borderWidth = '3px';
+    });
+    // 予約対象情報表示エリア（新規追加）
+    const reservationTargetDisplay = document.createElement('div');
+    reservationTargetDisplay.id = 'ytomo-reservation-target';
+    reservationTargetDisplay.style.cssText = `
+        background: linear-gradient(135deg, rgba(0, 123, 255, 0.95), rgba(0, 86, 179, 0.95)) !important;
+        color: white !important;
+        padding: 8px 12px !important;
+        border-radius: 12px !important;
+        font-size: 12px !important;
+        font-weight: bold !important;
+        text-align: center !important;
+        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3) !important;
+        border: 2px solid rgba(255, 255, 255, 0.3) !important;
+        min-width: 80px !important;
+        max-width: 120px !important;
+        display: none !important;
+        white-space: pre-line !important;
+        overflow: visible !important;
+        text-overflow: clip !important;
+        pointer-events: auto !important;
+        cursor: pointer !important;
+        transition: all 0.3s ease !important;
+    `;
+    reservationTargetDisplay.title = '予約対象（クリックで詳細表示）';
+    // 監視対象表示エリア（目立つ表示）
+    const monitoringTargetsDisplay = document.createElement('div');
+    monitoringTargetsDisplay.id = 'ytomo-monitoring-targets';
+    monitoringTargetsDisplay.style.cssText = `
+        background: linear-gradient(135deg, rgba(0, 104, 33, 0.95), rgba(0, 150, 50, 0.95)) !important;
+        color: white !important;
+        padding: 8px 12px !important;
+        border-radius: 12px !important;
+        font-size: 12px !important;
+        font-weight: bold !important;
+        text-align: center !important;
+        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3) !important;
+        border: 2px solid rgba(255, 255, 255, 0.3) !important;
+        min-width: 80px !important;
+        max-width: 120px !important;
+        display: none !important;
+        white-space: pre-line !important;
+        overflow: visible !important;
+        text-overflow: clip !important;
+        pointer-events: auto !important;
+        cursor: pointer !important;
+        transition: all 0.3s ease !important;
+    `;
+    monitoringTargetsDisplay.title = 'クリックで詳細表示';
+    // ホバー効果
+    monitoringTargetsDisplay.addEventListener('mouseenter', () => {
+        monitoringTargetsDisplay.style.transform = 'scale(1.05)';
+        monitoringTargetsDisplay.style.boxShadow = '0 4px 14px rgba(0, 0, 0, 0.4)';
+    });
+    monitoringTargetsDisplay.addEventListener('mouseleave', () => {
+        monitoringTargetsDisplay.style.transform = 'scale(1)';
+        monitoringTargetsDisplay.style.boxShadow = '0 3px 10px rgba(0, 0, 0, 0.3)';
+    });
+    // ステータス表示（コンパクト）
+    const statusBadge = document.createElement('div');
+    statusBadge.id = 'ytomo-status-badge';
+    statusBadge.style.cssText = `
+        background: linear-gradient(135deg, rgba(0, 0, 0, 0.9), rgba(40, 40, 40, 0.9)) !important;
+        color: white !important;
+        padding: 8px 16px !important;
+        border-radius: 20px !important;
+        font-size: 12px !important;
+        font-weight: bold !important;
+        white-space: pre-line !important;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3), 0 2px 6px rgba(0, 0, 0, 0.2) !important;
+        border: 2px solid rgba(255, 255, 255, 0.15) !important;
+        display: none !important;
+        pointer-events: none !important;
+        text-align: center !important;
+        line-height: 1.3 !important;
+    `;
+    statusBadge.innerText = '待機中';
+    // メインFABボタンにイベントリスナーを設定
+    fabButton.addEventListener('click', async (event) => {
+        // disabled状態の場合はクリックを完全に無視
+        if (fabButton.disabled || fabButton.hasAttribute('disabled')) {
+            // ボタンdisabledのためクリック無視
+            event.preventDefault();
+            event.stopPropagation();
+            event.stopImmediatePropagation();
+            return false;
+        }
+        // 追加のstyle確認（CSS disabled状態もチェック）
+        if (fabButton.style.pointerEvents === 'none') {
+            // pointer-events:noneのためクリック無視
+            event.preventDefault();
+            event.stopPropagation();
+            event.stopImmediatePropagation();
+            return false;
+        }
+        // 中断不可期間のチェック
+        if (!(0,_entrance_page_core__WEBPACK_IMPORTED_MODULE_2__/* .isInterruptionAllowed */ .Is)()) {
+            // リロード直前のため中断不可
+            showStatus('リロード直前のため中断できません', 'red');
+            return;
+        }
+        // クールタイム中の予約再開中止処理
+        if (fabButton.hasAttribute('data-cooldown-cancel')) {
+            if (confirm('予約の自動再開を中止しますか？\n\n手動での予約開始は引き続き可能です。')) {
+                _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_3__/* .entranceReservationStateManager */ .xx.endReservationCooldown();
+                showStatus('予約再開を中止しました', 'orange');
+                (0,_entrance_page_ui_helpers__WEBPACK_IMPORTED_MODULE_4__/* .updateMainButtonDisplay */ .vp)();
+            }
+            return;
+        }
+        // 実行中の場合は中断処理（入場予約状態管理システム使用）
+        if (_entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_3__/* .entranceReservationStateManager */ .xx.isMonitoringRunning()) {
+            stopMonitoringProcess();
+            return;
+        }
+        if (_entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_3__/* .entranceReservationStateManager */ .xx.isReservationRunning()) {
+            stopReservationProcess();
+            return;
+        }
+        // 入場予約状態管理システムを使用した監視開始判定
+        const preferredAction = _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_3__/* .entranceReservationStateManager */ .xx.getPreferredAction();
+        // FABクリック処理開始
+        if (preferredAction === 'monitoring') {
+            await startMonitoringProcess();
+        }
+        else if (preferredAction === 'reservation') {
+            await startReservationProcess();
+        }
+        else {
+            console.log('⚠️ 入場予約状態管理システム: 実行可能なアクションなし');
+        }
+        return;
+    });
+    // 監視中断処理
+    function stopMonitoringProcess() {
+        console.log('⏹️ 監視を中断');
+        (0,_entrance_page_core__WEBPACK_IMPORTED_MODULE_2__/* .stopSlotMonitoring */ .XG)();
+        showStatus('監視中断', 'orange');
+        (0,_entrance_page_ui_helpers__WEBPACK_IMPORTED_MODULE_4__/* .updateMainButtonDisplay */ .vp)();
+    }
+    // 予約中断処理
+    function stopReservationProcess() {
+        console.log('⏹️ 予約を中断');
+        _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_3__/* .entranceReservationStateManager */ .xx.setShouldStop(true);
+        showStatus('予約処理を中断中...', 'orange');
+        // 中断フラグ設定後、UIを即座に更新
+        (0,_entrance_page_ui_helpers__WEBPACK_IMPORTED_MODULE_4__/* .updateMainButtonDisplay */ .vp)();
+    }
+    // 監視開始処理
+    async function startMonitoringProcess() {
+        console.log('📡 入場予約状態管理システムによる監視開始');
+        // 状態変更前の確認
+        console.log(`🔍 [FAB] 監視開始前の状態: ${_entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_3__/* .entranceReservationStateManager */ .xx.getExecutionState()}`);
+        console.log(`🔍 [FAB] 監視対象数: ${_entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_3__/* .entranceReservationStateManager */ .xx.getMonitoringTargetCount()}`);
+        console.log(`🔍 [FAB] 監視開始可能: ${_entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_3__/* .entranceReservationStateManager */ .xx.canStartMonitoring()}`);
+        // 実行状態を監視中に変更
+        const startSuccess = _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_3__/* .entranceReservationStateManager */ .xx.startMonitoring();
+        console.log(`🔍 [FAB] startMonitoring結果: ${startSuccess}`);
+        console.log(`🔍 [FAB] 監視開始後の状態: ${_entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_3__/* .entranceReservationStateManager */ .xx.getExecutionState()}`);
+        // 即座にUI更新してから監視開始
+        (0,_entrance_page_ui_helpers__WEBPACK_IMPORTED_MODULE_4__/* .updateMainButtonDisplay */ .vp)();
+        await (0,_entrance_page_core__WEBPACK_IMPORTED_MODULE_2__/* .startSlotMonitoring */ .fp)();
+    }
+    // 予約開始処理
+    async function startReservationProcess() {
+        console.log('🚀 入場予約状態管理システムによる予約開始');
+        // 入場予約状態管理システムで予約実行開始
+        _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_3__/* .entranceReservationStateManager */ .xx.setExecutionState(_entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_3__/* .ExecutionState */ .si.RESERVATION_RUNNING);
+        _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_3__/* .entranceReservationStateManager */ .xx.startReservationExecution();
+        showStatus('予約処理実行中...', 'blue');
+        (0,_entrance_page_ui_helpers__WEBPACK_IMPORTED_MODULE_4__/* .updateMainButtonDisplay */ .vp)();
+        updateMonitoringTargetsDisplay(); // 予約対象を表示
+        // 設定オブジェクトを作成
+        const config = {
+            selectors: {
+                submit: "#__next > div > div > main > div > div.style_main__add_cart_button__DCOw8 > button",
+                change: "body > div > div > div > div > div > div > button",
+                success: "#reservation_modal_title",
+                failure: "#reservation_fail_modal_title",
+                close: "body > div.style_buy-modal__1JZtS > div > div > div > div > ul > li > a"
+            },
+            selectorTexts: {
+                change: "来場日時を変更する"
+            },
+            timeouts: {
+                waitForSubmit: 5000,
+                waitForResponse: 60000,
+                waitForClose: 3000,
+                retryInterval: 1000
+            },
+            randomSettings: {
+                minCheckInterval: 500,
+                checkRandomRange: 200,
+                minClickDelay: 500,
+                clickRandomRange: 200,
+                minRetryDelay: 1000,
+                retryRandomRange: 300
+            }
+        };
+        // 予約開始前に予約対象情報を保存（成功時のUI更新用）
+        const reservationTarget = _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_3__/* .entranceReservationStateManager */ .xx.getReservationTarget();
+        console.log('🔍 予約開始前の対象情報:', reservationTarget);
+        try {
+            const result = await entranceReservationHelper(config);
+            console.log('🔍 entranceReservationHelper戻り値:', result);
+            if (result.success) {
+                showStatus(`🎉 予約成功！(${result.attempts}回試行)`, 'green');
+                // 予約開始前に保存した対象情報で成功情報を設定
+                if (reservationTarget) {
+                    _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_3__/* .entranceReservationStateManager */ .xx.setReservationSuccess(reservationTarget.timeSlot, reservationTarget.locationIndex);
+                    (0,_entrance_page_ui_helpers__WEBPACK_IMPORTED_MODULE_4__/* .updateMainButtonDisplay */ .vp)(); // FAB表示更新
+                    console.log('✅ 予約成功UI更新完了');
+                }
+                else {
+                    console.warn('⚠️ 予約開始前の対象情報がnullのためUI更新をスキップ');
+                }
+                if (cacheManager) {
+                    cacheManager.clearTargetSlots(); // 成功時はキャッシュクリア
+                    cacheManager.clearMonitoringFlag(); // 監視継続フラグもクリア
+                }
+            }
+            else {
+                if (result.cancelled) {
+                    showStatus(`⏹️ 予約中断 (${result.attempts}回試行)`, 'orange');
+                    console.log('⏹️ ユーザーにより予約が中断されました');
+                }
+                else if (result.abnormalTermination) {
+                    showStatus(`🚨 異常終了 (${result.attempts}回試行) - システム停止`, 'red');
+                    console.log('🚨 予約処理が異常終了しました。システムを停止します');
+                }
+                else if (result.cooldownStarted) {
+                    showStatus(`予約失敗 (${result.attempts}回試行) - クールタイム開始`, 'orange');
+                    console.log('🛑 100回試行後、クールタイムが開始されました');
+                }
+                else {
+                    showStatus(`予約失敗 (${result.attempts}回試行)`, 'red');
+                }
+            }
+        }
+        catch (error) {
+            console.error('予約処理エラー:', error);
+            const errorMessage = error instanceof Error ? error.message : String(error);
+            showStatus(`エラー: ${errorMessage}`, 'red');
+        }
+        finally {
+            // 入場予約状態管理システムで予約実行終了
+            _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_3__/* .entranceReservationStateManager */ .xx.stop();
+            (0,_entrance_page_ui_helpers__WEBPACK_IMPORTED_MODULE_4__/* .updateMainButtonDisplay */ .vp)();
+            updateMonitoringTargetsDisplay(); // 予約終了時に表示更新
+        }
+    }
+    // disabled状態でのクリックを確実に防ぐため、キャプチャーフェーズでも処理
+    fabButton.addEventListener('click', (event) => {
+        if (fabButton.disabled || fabButton.hasAttribute('disabled') || fabButton.style.pointerEvents === 'none') {
+            console.log('🚫 キャプチャーフェーズでdisabledクリックを阻止');
+            event.preventDefault();
+            event.stopPropagation();
+            event.stopImmediatePropagation();
+            return false;
+        }
+        return; // 明示的なreturnを追加
+    }, true); // useCapture = true
+    // FABコンテナに要素を追加（上から順：予約対象→監視対象→ステータス→ボタン）
+    // 効率モードトグルボタン
+    const efficiencyToggleButton = document.createElement('button');
+    efficiencyToggleButton.className = 'ytomo-efficiency-toggle';
+    // 効率モード状態に応じた初期表示
+    function updateEfficiencyToggleButton() {
+        const isEnabled = _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_3__/* .entranceReservationStateManager */ .xx.isEfficiencyModeEnabled();
+        efficiencyToggleButton.innerText = isEnabled ? '効率ON' : '効率OFF';
+        efficiencyToggleButton.classList.toggle('efficiency-enabled', isEnabled);
+        efficiencyToggleButton.classList.toggle('efficiency-disabled', !isEnabled);
+    }
+    updateEfficiencyToggleButton();
+    // 効率モードトグル処理
+    efficiencyToggleButton.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_3__/* .entranceReservationStateManager */ .xx.toggleEfficiencyMode();
+        updateEfficiencyToggleButton();
+    });
+    // ホバー効果はCSSで制御
+    fabContainer.appendChild(reservationTargetDisplay);
+    fabContainer.appendChild(monitoringTargetsDisplay);
+    fabContainer.appendChild(statusBadge);
+    fabContainer.appendChild(efficiencyToggleButton);
+    fabContainer.appendChild(fabButton);
+    // DOMに追加（body直下）
+    document.body.appendChild(fabContainer);
+    // 効率モード設定を読み込み
+    _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_3__/* .entranceReservationStateManager */ .xx.loadEfficiencyModeSettings();
+    updateEfficiencyToggleButton(); // ボタン表示を更新
+    // 自動選択イベントリスナーを設定
+    window.addEventListener('entrance-auto-select', async (event) => {
+        console.log('🎯 自動選択イベントを受信:', event.detail);
+        const slot = event.detail?.slot;
+        if (!slot?.targetInfo) {
+            console.error('❌ 自動選択: スロット情報が無効');
+            return;
+        }
+        try {
+            // 監視を停止
+            if (_entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_3__/* .entranceReservationStateManager */ .xx.isMonitoringRunning()) {
+                console.log('🛑 監視を停止');
+                (0,_entrance_page_core__WEBPACK_IMPORTED_MODULE_2__/* .stopSlotMonitoring */ .XG)();
+            }
+            // 該当監視対象を削除
+            const timeSlot = slot.targetInfo.timeSlot;
+            const locationIndex = slot.targetInfo.locationIndex;
+            _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_3__/* .entranceReservationStateManager */ .xx.removeMonitoringTarget(timeSlot, locationIndex);
+            // 1. 時間帯要素をクリックして選択状態にする
+            console.log(`🖱️ 自動選択: 時間帯をクリック ${timeSlot}`);
+            const timeSlotElement = document.querySelector(slot.targetInfo.selector);
+            if (timeSlotElement) {
+                const buttonElement = timeSlotElement.querySelector('div[role="button"]');
+                if (buttonElement && buttonElement.getAttribute('data-disabled') !== 'true') {
+                    buttonElement.click();
+                    console.log(`✅ 時間帯選択完了: ${timeSlot}`);
+                    // 2. 選択後、少し待ってから内部的に自動予約を開始
+                    setTimeout(async () => {
+                        console.log('🚀 内部的に自動予約を開始');
+                        if (_entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_3__/* .entranceReservationStateManager */ .xx.canStartReservation()) {
+                            await startReservationProcess();
+                        }
+                        else {
+                            console.error('❌ 予約開始条件が満たされていません');
+                        }
+                    }, 100);
+                }
+                else {
+                    console.error(`❌ 時間帯ボタンが見つからないか無効: ${timeSlot}`);
+                }
+            }
+            else {
+                console.error(`❌ 時間帯要素が見つからない: ${slot.targetInfo.selector}`);
+            }
+        }
+        catch (error) {
+            console.error('❌ 自動選択処理エラー:', error);
+        }
+    });
+    // FAB表示状態を初期化・適用
+    (0,_entrance_page_state__WEBPACK_IMPORTED_MODULE_0__.loadFABVisibility)();
+    (0,_entrance_page_state__WEBPACK_IMPORTED_MODULE_0__.updateFABVisibility)();
+    // 初期状態を判定してFABを更新
+    waitForTimeSlotTable(() => {
+        checkInitialState();
+    });
+    // 時間帯クリックハンドラーを設定（選択解除機能付き）
+    waitForTimeSlotTable(() => {
+        setupTimeSlotClickHandlers();
+    });
+    // カレンダー変更監視は別途初期化処理で開始（キャッシュ復元後）
+}
+// 監視対象表示を更新（統一システムに完全委譲）
+function updateMonitoringTargetsDisplay() {
+    console.log('🔄 [updateMonitoringTargetsDisplay] 統一システムに委譲');
+    _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_3__/* .entranceReservationStateManager */ .xx.updateFabDisplay();
+}
+// 現在の予約対象時間帯を取得
+function getCurrentReservationTarget() {
+    // 選択された時間帯を探す
+    const selectedSlot = document.querySelector('td[data-gray-out] div[role="button"][aria-pressed="true"]');
+    if (!selectedSlot)
+        return null;
+    const timeSpan = selectedSlot.querySelector('dt span');
+    if (!timeSpan)
+        return null;
+    const timeText = timeSpan.textContent.trim();
+    // 東西判定
+    const tdElement = selectedSlot.closest('td[data-gray-out]');
+    const tdSelector = generateUniqueTdSelector(tdElement);
+    const locationIndex = LocationHelper.getIndexFromSelector(tdSelector);
+    const location = LocationHelper.getLocationFromIndex(locationIndex);
+    const locationText = location === 'east' ? '東' : '西';
+    return `${locationText}${timeText}`;
+}
+// 来場日時設定ボタンの状態をチェック
+function checkVisitTimeButtonState() {
+    const visitTimeButton = document.querySelector('button.basic-btn.type2.style_full__ptzZq');
+    if (!visitTimeButton) {
+        console.log('⚠️ 来場日時設定ボタンが見つかりません');
+        return false;
+    }
+    const isDisabled = visitTimeButton.hasAttribute('disabled') || visitTimeButton.disabled;
+    console.log(`🔘 来場日時設定ボタン: ${isDisabled ? '無効' : '有効'}`);
+    return !isDisabled;
+}
+// 時間帯が選択されているかチェック
+function checkTimeSlotSelected() {
+    // 選択された時間帯（aria-pressed="true"）をチェック
+    const selectedTimeSlot = document.querySelector(_entrance_page_dom_utils__WEBPACK_IMPORTED_MODULE_1__/* .timeSlotSelectors */ .eN.selectedSlot);
+    if (!selectedTimeSlot) {
+        console.log('⚠️ 時間帯が選択されていません');
+        return false;
+    }
+    // 選択された時間帯が満員でないかチェック
+    const tdElement = selectedTimeSlot.closest('td');
+    if (!tdElement)
+        return false;
+    const status = (0,_entrance_page_dom_utils__WEBPACK_IMPORTED_MODULE_1__/* .extractTdStatus */ .SE)(tdElement);
+    if (status && status.isFull) {
+        console.log('⚠️ 選択された時間帯は満員です');
+        return false;
+    }
+    console.log(`✅ 時間帯選択済み: ${status?.timeText || 'unknown'}`);
+    return true;
+}
+// 予約開始可能かどうかの総合判定
+function canStartReservation() {
+    const hasTimeSlotTable = (0,_entrance_page_core__WEBPACK_IMPORTED_MODULE_2__/* .checkTimeSlotTableExistsSync */ .H5)();
+    const isTimeSlotSelected = checkTimeSlotSelected();
+    const isVisitTimeButtonEnabled = checkVisitTimeButtonState();
+    console.log(`📊 予約開始条件チェック:`);
+    console.log(`  - 時間帯テーブル: ${hasTimeSlotTable ? '✅' : '❌'}`);
+    console.log(`  - 時間帯選択: ${isTimeSlotSelected ? '✅' : '❌'}`);
+    console.log(`  - 来場日時ボタン有効: ${isVisitTimeButtonEnabled ? '✅' : '❌'}`);
+    return hasTimeSlotTable && isTimeSlotSelected && isVisitTimeButtonEnabled;
+}
+// 初期状態をチェックしてFABを適切に設定
+function checkInitialState() {
+    console.log('🔍 初期状態をチェック中...');
+    // カレンダーで日付が選択されているかチェック
+    const selectedDate = (0,_entrance_page_core__WEBPACK_IMPORTED_MODULE_2__/* .getCurrentSelectedCalendarDate */ .rY)();
+    const hasTimeSlotTable = (0,_entrance_page_core__WEBPACK_IMPORTED_MODULE_2__/* .checkTimeSlotTableExistsSync */ .H5)();
+    console.log(`📅 選択日付: ${selectedDate || 'なし'}`);
+    console.log(`🗓️ 時間帯テーブル: ${hasTimeSlotTable ? 'あり' : 'なし'}`);
+    if (selectedDate && hasTimeSlotTable) {
+        // 時間帯テーブルがある場合、予約開始可能かチェック
+        const canStart = canStartReservation();
+        console.log(`✅ 日付選択済み、時間帯テーブル表示中 - ${canStart ? '予約開始可能' : '条件未満'}`);
+        // FABボタンの状態を設定
+        const fabButton = document.querySelector('#ytomo-main-fab');
+        const fabIcon = fabButton?.querySelector('.ytomo-fab-status');
+        if (fabButton && fabIcon) {
+            // 常に「予約開始」と表示
+            fabIcon.innerText = '予約\n開始';
+            if (canStart) {
+                // 予約開始可能
+                fabButton.style.background = 'rgb(0, 104, 33) !important';
+                fabButton.style.opacity = '0.9 !important';
+                fabButton.style.cursor = 'pointer !important';
+                fabButton.disabled = false;
+                fabButton.title = '予約開始';
+            }
+            else {
+                // 条件未満足 - disabled状態（グレー色）
+                fabButton.style.background = 'rgb(128, 128, 128) !important';
+                fabButton.style.opacity = '0.9 !important';
+                fabButton.style.cursor = 'not-allowed !important';
+                fabButton.disabled = true;
+                fabButton.title = '時間帯を選択し、来場日時設定ボタンが有効になるまでお待ちください';
+            }
+        }
+        // ステータスも更新
+        (0,_entrance_page_core__WEBPACK_IMPORTED_MODULE_2__/* .updateStatusBadge */ .pW)(canStart ? 'idle' : 'waiting');
+    }
+    else {
+        // カレンダー未選択または時間帯テーブル未表示の場合は待機中のまま
+        console.log('⏳ カレンダー未選択または時間帯テーブル未表示 - 待機中を維持');
+        (0,_entrance_page_core__WEBPACK_IMPORTED_MODULE_2__/* .updateStatusBadge */ .pW)('idle');
+    }
+}
+// カレンダー変更を監視して監視ボタンを再設置
+function startCalendarWatcher() {
+    if (_entrance_page_state__WEBPACK_IMPORTED_MODULE_0__.calendarWatchState.isWatching)
+        return;
+    _entrance_page_state__WEBPACK_IMPORTED_MODULE_0__.calendarWatchState.isWatching = true;
+    _entrance_page_state__WEBPACK_IMPORTED_MODULE_0__.calendarWatchState.currentSelectedDate = (0,_entrance_page_core__WEBPACK_IMPORTED_MODULE_2__/* .getCurrentSelectedCalendarDate */ .rY)();
+    // 初期化時に入場予約状態管理にも現在の選択日付を設定
+    if (_entrance_page_state__WEBPACK_IMPORTED_MODULE_0__.calendarWatchState.currentSelectedDate) {
+        _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_3__/* .entranceReservationStateManager */ .xx.setSelectedCalendarDate(_entrance_page_state__WEBPACK_IMPORTED_MODULE_0__.calendarWatchState.currentSelectedDate);
+        console.log(`📅 初期化時の選択日付を設定: ${_entrance_page_state__WEBPACK_IMPORTED_MODULE_0__.calendarWatchState.currentSelectedDate}`);
+    }
+    console.log('📅 カレンダー変更監視を開始');
+    // MutationObserverでカレンダー変更・時間帯選択・ボタン状態変更を検出
+    _entrance_page_state__WEBPACK_IMPORTED_MODULE_0__.calendarWatchState.observer = new MutationObserver((mutations) => {
+        let shouldUpdate = false;
+        mutations.forEach((mutation) => {
+            // 1. カレンダーのaria-pressed属性の変更を検出
+            if (mutation.type === 'attributes' &&
+                (mutation.attributeName === 'aria-pressed' ||
+                    mutation.attributeName === 'class')) {
+                const element = mutation.target;
+                if (element.matches && element.matches('[role="button"][aria-pressed]') &&
+                    element.querySelector('time[datetime]')) {
+                    shouldUpdate = true;
+                }
+            }
+            // 2. 時間帯選択の変更を検出
+            if (mutation.type === 'attributes' &&
+                mutation.attributeName === 'aria-pressed') {
+                const element = mutation.target;
+                if (element.matches && element.matches('td[data-gray-out] div[role="button"]')) {
+                    const ariaPressed = element.getAttribute('aria-pressed');
+                    console.log(`🔄 時間帯選択変更検出: ${ariaPressed}`);
+                    // 入場予約状態管理システムの同期（初期化中は除外）
+                    if (ariaPressed === 'true' && !_entrance_page_state__WEBPACK_IMPORTED_MODULE_0__.calendarWatchState.isInitializing) {
+                        // 選択状態変更を検出 - DOM状態から予約対象を同期
+                        console.log(`🔄 時間帯選択状態を検出`);
+                        setTimeout(() => {
+                            syncReservationTargetFromDOM();
+                            (0,_entrance_page_ui_helpers__WEBPACK_IMPORTED_MODULE_4__/* .updateMainButtonDisplay */ .vp)();
+                        }, 50);
+                    }
+                    shouldUpdate = true;
+                }
+            }
+            // 3. 来場日時設定ボタンのdisabled属性変更を検出
+            if (mutation.type === 'attributes' &&
+                mutation.attributeName === 'disabled') {
+                const element = mutation.target;
+                if (element.matches && element.matches('button.basic-btn.type2.style_full__ptzZq')) {
+                    console.log(`🔄 来場日時ボタン状態変更検出: disabled=${element.hasAttribute('disabled')}`);
+                    shouldUpdate = true;
+                }
+            }
+        });
+        if (shouldUpdate) {
+            // DOM更新完了を待ってから処理
+            waitForTimeSlotTable(() => {
+                handleCalendarChange();
+            });
+        }
+    });
+    // カレンダー要素全体を監視
+    const observeTarget = document.body;
+    _entrance_page_state__WEBPACK_IMPORTED_MODULE_0__.calendarWatchState.observer.observe(observeTarget, {
+        attributes: true,
+        subtree: true,
+        attributeFilter: ['aria-pressed', 'class', 'disabled']
+    });
+}
+// カレンダー変更・状態変更時の処理
+function handleCalendarChange() {
+    const newSelectedDate = (0,_entrance_page_core__WEBPACK_IMPORTED_MODULE_2__/* .getCurrentSelectedCalendarDate */ .rY)();
+    const calendarDateChanged = newSelectedDate !== _entrance_page_state__WEBPACK_IMPORTED_MODULE_0__.calendarWatchState.currentSelectedDate;
+    // 入場予約状態管理の管理している日付とも比較
+    const stateManagerSelectedDate = _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_3__/* .entranceReservationStateManager */ .xx.getSelectedCalendarDate();
+    const actualDateChanged = newSelectedDate !== stateManagerSelectedDate;
+    if (calendarDateChanged) {
+        console.log(`📅 カレンダー日付変更を検出: ${_entrance_page_state__WEBPACK_IMPORTED_MODULE_0__.calendarWatchState.currentSelectedDate} → ${newSelectedDate}`);
+        // 監視実行中は日付変更を無視
+        if (_entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_3__/* .entranceReservationStateManager */ .xx.isMonitoringRunning()) {
+            console.log('⚠️ 監視実行中のため日付変更を無視します');
+            return;
+        }
+        _entrance_page_state__WEBPACK_IMPORTED_MODULE_0__.calendarWatchState.currentSelectedDate = newSelectedDate;
+        // 入場予約状態管理にも日付を設定
+        if (newSelectedDate) {
+            _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_3__/* .entranceReservationStateManager */ .xx.setSelectedCalendarDate(newSelectedDate);
+        }
+        // 実際に日付が変更された場合のみ監視状態をクリア
+        if (actualDateChanged) {
+            console.log(`📅 実際の日付変更確認: ${stateManagerSelectedDate} → ${newSelectedDate}`);
+            const hasReservationTarget = _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_3__/* .entranceReservationStateManager */ .xx.hasReservationTarget();
+            const hasMonitoringTargets = _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_3__/* .entranceReservationStateManager */ .xx.hasMonitoringTargets();
+            if (hasReservationTarget || hasMonitoringTargets) {
+                console.log('📅 日付変更により入場予約状態管理システムの対象をクリア');
+                _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_3__/* .entranceReservationStateManager */ .xx.clearReservationTarget();
+                _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_3__/* .entranceReservationStateManager */ .xx.clearMonitoringTargets();
+            }
+        }
+        else {
+            console.log('📅 同じ日付への再クリックのため監視対象は維持');
+        }
+        // 従来システムはもう使用しないため、このブロックは削除
+        // if (multiTargetManager.hasTargets() && !timeSlotState.isMonitoring) {
+        //     console.log('📅 日付変更により従来システムの監視対象をクリア');
+        //     multiTargetManager.clearAll();
+        //     timeSlotState.mode = 'idle';
+        //     if (cacheManager) {
+        //         cacheManager.clearTargetSlots();
+        //     }
+        // }
+        // 予約対象がクリアされたため、即座にFAB表示を更新
+        (0,_entrance_page_ui_helpers__WEBPACK_IMPORTED_MODULE_4__/* .updateMainButtonDisplay */ .vp)();
+        // 監視ボタンを再設置（動的待機を使用）
+        waitForTimeSlotTable(() => {
+            removeAllMonitorButtons();
+            (0,_entrance_page_core__WEBPACK_IMPORTED_MODULE_2__/* .analyzeAndAddMonitorButtons */ .wj)();
+            // 監視ボタン設置後も再度FABボタンの状態を更新
+            (0,_entrance_page_ui_helpers__WEBPACK_IMPORTED_MODULE_4__/* .updateMainButtonDisplay */ .vp)();
+            console.log('🔄 監視ボタンとFABを再設置しました');
+        });
+    }
+    else {
+        // 日付は変わっていない - FABボタンの状態のみ更新
+        console.log('📅 日付変更なし - FABボタンの状態のみ更新');
+        // 入場予約状態管理システムを取得して状態同期
+        // 公式サイトによる選択解除があった場合の状態同期
+        const selectedSlot = document.querySelector(_entrance_page_dom_utils__WEBPACK_IMPORTED_MODULE_1__/* .timeSlotSelectors */ .eN.selectedSlot);
+        if (!selectedSlot && _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_3__/* .entranceReservationStateManager */ .xx.hasReservationTarget()) {
+            // DOM上に選択がないが入場予約状態管理に予約対象がある場合はクリア
+            console.log('🔄 公式サイトによる選択解除を検出 - 入場予約状態管理を同期');
+            _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_3__/* .entranceReservationStateManager */ .xx.clearReservationTarget();
+            // UI更新を確実に実行
+            (0,_entrance_page_ui_helpers__WEBPACK_IMPORTED_MODULE_4__/* .updateMainButtonDisplay */ .vp)();
+        }
+        // FABボタンの状態を更新（監視ボタンは再設置しない）
+        (0,_entrance_page_ui_helpers__WEBPACK_IMPORTED_MODULE_4__/* .updateMainButtonDisplay */ .vp)();
+    }
+}
+// 既存の監視ボタンをすべて削除
+function removeAllMonitorButtons() {
+    const existingButtons = document.querySelectorAll('.monitor-btn.ext-ytomo');
+    existingButtons.forEach(button => button.remove());
+    console.log(`🗑️ 既存の監視ボタンを${existingButtons.length}個削除しました`);
+}
+// DOM上の選択状態から予約対象を同期
+function syncReservationTargetFromDOM() {
+    // DOM上で選択状態の時間帯要素を取得
+    const selectedElement = document.querySelector('td[data-gray-out] div[role="button"][aria-pressed="true"]');
+    if (selectedElement) {
+        const tdElement = selectedElement.closest('td[data-gray-out]');
+        const timeText = selectedElement.querySelector('dt span')?.textContent?.trim();
+        if (tdElement && timeText) {
+            const locationIndex = _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_3__/* .LocationHelper */ .Qs.getIndexFromElement(tdElement);
+            const selector = (0,_entrance_page_dom_utils__WEBPACK_IMPORTED_MODULE_1__/* .generateUniqueTdSelector */ .sN)(tdElement);
+            console.log(`🔄 DOM状態から予約対象を同期: ${timeText} (位置: ${locationIndex})`);
+            _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_3__/* .entranceReservationStateManager */ .xx.setReservationTarget(timeText, locationIndex, selector);
+        }
+    }
+    else {
+        // 選択状態の要素がない場合は予約対象をクリア
+        console.log(`🔄 選択状態なし - 予約対象をクリア`);
+        _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_3__/* .entranceReservationStateManager */ .xx.clearReservationTarget();
+    }
+}
+// 時間帯テーブルの準備を待つ
+function waitForTimeSlotTable(callback) {
+    // まず即座にチェック（最短の場合は遅延なし）
+    const timeSlotButtons = document.querySelectorAll('td[data-gray-out] div[role="button"]');
+    if (timeSlotButtons.length > 0) {
+        console.log(`✅ 時間帯テーブル準備済み (${timeSlotButtons.length}個の時間帯を検出) - 即座に実行`);
+        callback();
+        return;
+    }
+    // DOM要素が存在しない場合のみ動的待機を開始
+    const checkInterval = 50; // 50ms間隔で高速チェック
+    const maxAttempts = 100; // 最大5秒待機（50ms × 100 = 5000ms）
+    let attempts = 0;
+    const checkTableReady = () => {
+        attempts++;
+        // 時間帯テーブルの存在確認
+        const timeSlotButtons = document.querySelectorAll('td[data-gray-out] div[role="button"]');
+        if (timeSlotButtons.length > 0) {
+            console.log(`✅ 時間帯テーブル準備完了 (${timeSlotButtons.length}個の時間帯を検出) - ${attempts * checkInterval}ms後`);
+            callback();
+        }
+        else if (attempts >= maxAttempts) {
+            console.log('⚠️ 時間帯テーブルの準備がタイムアウト - 強制実行');
+            callback();
+        }
+        else {
+            // 時間帯テーブル待機中（ログ削減）
+            setTimeout(checkTableReady, checkInterval);
+        }
+    };
+    console.log('🔍 時間帯テーブル待機開始...');
+    setTimeout(checkTableReady, checkInterval);
+}
+// 時間帯tdクリック処理を設定（公式サイト仕様を利用した選択解除機能付き）
+function setupTimeSlotClickHandlers() {
+    // 既存のハンドラーをクリア
+    const existingHandler = window.timeSlotClickHandler;
+    if (existingHandler) {
+        document.removeEventListener('click', existingHandler, true);
+    }
+    // 時間帯クリックハンドラーを設定
+    const timeSlotClickHandler = (event) => {
+        const target = event.target;
+        // 時間帯のdiv[role="button"]または子要素がクリックされた場合のみ処理
+        const actualTarget = target.closest('td[data-gray-out] div[role="button"]');
+        if (!actualTarget) {
+            // 時間帯要素でない場合は処理しない（ログも出力しない）
+            return;
+        }
+        // 時間帯クリック判定成功
+        // 時間帯のdiv[role="button"]がクリックされた場合
+        const tdElement = actualTarget.closest('td[data-gray-out]');
+        if (!tdElement) {
+            return;
+        }
+        // actualTargetから時間テキストを取得
+        const timeText = actualTarget.querySelector('dt span')?.textContent?.trim();
+        if (!timeText) {
+            return;
+        }
+        // 入場予約状態管理システムを取得
+        const locationIndex = _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_3__/* .LocationHelper */ .Qs.getIndexFromElement(tdElement);
+        // 入場予約状態管理で現在の選択状態を確認
+        const isCurrentlyReservationTarget = _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_3__/* .entranceReservationStateManager */ .xx.isReservationTarget(timeText, locationIndex);
+        if (isCurrentlyReservationTarget) {
+            // 既に予約対象として設定済みの場合は選択解除
+            // イベントを停止（デフォルト動作を防ぐ）
+            event.preventDefault();
+            event.stopPropagation();
+            // 公式サイトの仕様を利用：現在選択中のカレンダー日付ボタンをクリック
+            const currentSelectedCalendarButton = document.querySelector('[role="button"][aria-pressed="true"]');
+            if (currentSelectedCalendarButton && currentSelectedCalendarButton.querySelector('time[datetime]')) {
+                currentSelectedCalendarButton.click();
+                // 入場予約状態管理からも予約対象を削除
+                setTimeout(() => {
+                    _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_3__/* .entranceReservationStateManager */ .xx.clearReservationTarget();
+                    (0,_entrance_page_ui_helpers__WEBPACK_IMPORTED_MODULE_4__/* .updateMainButtonDisplay */ .vp)();
+                }, 100);
+            }
+            else {
+                // フォールバック: 直接削除
+                _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_3__/* .entranceReservationStateManager */ .xx.clearReservationTarget();
+                (0,_entrance_page_ui_helpers__WEBPACK_IMPORTED_MODULE_4__/* .updateMainButtonDisplay */ .vp)();
+            }
+        }
+        else {
+            // 新規選択または別の時間帯への変更
+            // DOM上の選択状態から予約対象を同期
+            setTimeout(() => {
+                syncReservationTargetFromDOM();
+                (0,_entrance_page_ui_helpers__WEBPACK_IMPORTED_MODULE_4__/* .updateMainButtonDisplay */ .vp)();
+            }, 100);
+        }
+    };
+    // グローバルに保存（後でremoveするため）
+    window.timeSlotClickHandler = timeSlotClickHandler;
+    // 捕獲フェーズでイベントをキャッチ
+    document.addEventListener('click', timeSlotClickHandler, true);
+    console.log('✅ 公式サイト仕様を利用した時間帯選択解除ハンドラーを設定しました');
+}
+// 統一自動処理管理に対応した予約処理（Phase 3で実装）
+async function entranceReservationHelper(config) {
+    console.log('🚀 統一自動処理管理による入場予約補助機能を開始します...');
+    try {
+        // 統一自動処理管理による予約処理実行
+        const result = await _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_3__/* .entranceReservationStateManager */ .xx.executeUnifiedReservationProcess(config);
+        if (result.success) {
+            console.log('🎉 統一予約処理成功！');
+        }
+        else if (result.cancelled) {
+            console.log('⏹️ 統一予約処理がキャンセルされました');
+            _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_3__/* .entranceReservationStateManager */ .xx.stop();
+        }
+        else if (result.abnormalTermination) {
+            console.error('🚨 統一予約処理異常終了');
+            _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_3__/* .entranceReservationStateManager */ .xx.setShouldStop(true);
+        }
+        else if (result.cooldownStarted) {
+            console.log('⏰ 統一予約処理クールタイム開始');
+        }
+        return result;
+    }
+    catch (error) {
+        if (error.name === 'CancellationError') {
+            console.log('⏹️ 統一予約処理が中断されました');
+            _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_3__/* .entranceReservationStateManager */ .xx.stop();
+            return { success: false, attempts: 0, cancelled: true };
+        }
+        else {
+            console.error('❌ 統一予約処理でエラー:', error);
+            throw error;
+        }
+    }
+}
+// Phase 3: 統一自動処理管理により予約処理ループを完全に置換完了
+// ============================================================================
+// ============================================================================
+// エクスポート（Phase 3で統一処理移行により最小限に）
+// ============================================================================
+// Phase 3完了: 統一自動処理管理により個別関数は不要
+// エクスポート
+
+// ============================================================================
+
+
+/***/ })
+
+/******/ 	});
+/************************************************************************/
+/******/ 	// The module cache
+/******/ 	var __webpack_module_cache__ = {};
+/******/ 	
+/******/ 	// The require function
+/******/ 	function __webpack_require__(moduleId) {
+/******/ 		// Check if module is in cache
+/******/ 		var cachedModule = __webpack_module_cache__[moduleId];
+/******/ 		if (cachedModule !== undefined) {
+/******/ 			return cachedModule.exports;
+/******/ 		}
+/******/ 		// Create a new module (and put it into the cache)
+/******/ 		var module = __webpack_module_cache__[moduleId] = {
+/******/ 			id: moduleId,
+/******/ 			// no module.loaded needed
+/******/ 			exports: {}
+/******/ 		};
+/******/ 	
+/******/ 		// Execute the module function
+/******/ 		__webpack_modules__[moduleId](module, module.exports, __webpack_require__);
+/******/ 	
+/******/ 		// Return the exports of the module
+/******/ 		return module.exports;
+/******/ 	}
+/******/ 	
+/************************************************************************/
+/******/ 	/* webpack/runtime/compat get default export */
+/******/ 	(() => {
+/******/ 		// getDefaultExport function for compatibility with non-harmony modules
+/******/ 		__webpack_require__.n = (module) => {
+/******/ 			var getter = module && module.__esModule ?
+/******/ 				() => (module['default']) :
+/******/ 				() => (module);
+/******/ 			__webpack_require__.d(getter, { a: getter });
+/******/ 			return getter;
+/******/ 		};
+/******/ 	})();
+/******/ 	
+/******/ 	/* webpack/runtime/define property getters */
+/******/ 	(() => {
+/******/ 		// define getter functions for harmony exports
+/******/ 		__webpack_require__.d = (exports, definition) => {
+/******/ 			for(var key in definition) {
+/******/ 				if(__webpack_require__.o(definition, key) && !__webpack_require__.o(exports, key)) {
+/******/ 					Object.defineProperty(exports, key, { enumerable: true, get: definition[key] });
+/******/ 				}
+/******/ 			}
+/******/ 		};
+/******/ 	})();
+/******/ 	
+/******/ 	/* webpack/runtime/hasOwnProperty shorthand */
+/******/ 	(() => {
+/******/ 		__webpack_require__.o = (obj, prop) => (Object.prototype.hasOwnProperty.call(obj, prop))
+/******/ 	})();
+/******/ 	
+/******/ 	/* webpack/runtime/make namespace object */
+/******/ 	(() => {
+/******/ 		// define __esModule on exports
+/******/ 		__webpack_require__.r = (exports) => {
+/******/ 			if(typeof Symbol !== 'undefined' && Symbol.toStringTag) {
+/******/ 				Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
+/******/ 			}
+/******/ 			Object.defineProperty(exports, '__esModule', { value: true });
+/******/ 		};
+/******/ 	})();
+/******/ 	
+/******/ 	/* webpack/runtime/nonce */
+/******/ 	(() => {
+/******/ 		__webpack_require__.nc = undefined;
+/******/ 	})();
+/******/ 	
+/************************************************************************/
+var __webpack_exports__ = {};
 
 // EXTERNAL MODULE: ./node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js
 var injectStylesIntoStyleTag = __webpack_require__(72);
@@ -4975,1442 +6459,6 @@ async function clickElement(element, config) {
 // エクスポート
 
 
-
-/***/ }),
-
-/***/ 540:
-/***/ ((module) => {
-
-
-
-/* istanbul ignore next  */
-function insertStyleElement(options) {
-  var element = document.createElement("style");
-  options.setAttributes(element, options.attributes);
-  options.insert(element, options.options);
-  return element;
-}
-module.exports = insertStyleElement;
-
-/***/ }),
-
-/***/ 601:
-/***/ ((module) => {
-
-
-
-module.exports = function (i) {
-  return i[1];
-};
-
-/***/ }),
-
-/***/ 638:
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-
-// EXPORTS
-__webpack_require__.d(__webpack_exports__, {
-  SE: () => (/* binding */ extractTdStatus),
-  e0: () => (/* binding */ findSameTdElement),
-  sN: () => (/* binding */ generateUniqueTdSelector),
-  Yz: () => (/* binding */ initTimeSlotMonitoring),
-  eN: () => (/* binding */ timeSlotSelectors)
-});
-
-// UNUSED EXPORTS: getTdPositionInfo, tableSelectors, waitForCalendar
-
-;// ./src-modules/timeslot-status-detector.ts
-/**
- * 時間帯状態判定の統一関数
- * DOM要素を与えて状態を返すシンプルな共通関数
- */
-/**
- * 時間帯セル（td要素）の状態を判定する統一関数
- * @param tdElement 時間帯のtd要素
- * @returns 状態情報またはnull
- */
-function detectTimeslotStatus(tdElement) {
-    if (!tdElement)
-        return null;
-    // DOM構造: .btnDivまたはdiv[role="button"]
-    const buttonDiv = (tdElement.querySelector('.btnDiv') || tdElement.querySelector('div[role="button"]'));
-    if (!buttonDiv) {
-        console.log(`🔍 [統一関数] buttonDiv not found in td:`, tdElement.innerHTML.substring(0, 200));
-        return null;
-    }
-    // 時間帯テキストを取得
-    const timeSpan = buttonDiv.querySelector('dt span');
-    const timeText = timeSpan ? timeSpan.textContent?.trim() || '' : '';
-    // 詳細な判定: 属性とアイコンの両方を確認
-    const isDisabledByAttr = buttonDiv.getAttribute('data-disabled') === 'true';
-    const hasFullIcon = !!buttonDiv.querySelector('img[src*="/asset/img/calendar_ng.svg"], img[alt*="満員"], img[alt*="予約不可"]');
-    const hasAvailableIcon = !!buttonDiv.querySelector('img[src*="/asset/img/ico_scale_low.svg"], img[src*="/asset/img/ico_scale_high.svg"], img[alt*="空いて"], img[alt*="混雑"]');
-    const isSelected = buttonDiv.getAttribute('aria-pressed') === 'true';
-    // 状態判定のロジック（analyzeTimeSlotsと同じ）
-    const isFull = hasFullIcon || isDisabledByAttr;
-    const isAvailable = !isDisabledByAttr && hasAvailableIcon;
-    let statusType;
-    if (isFull) {
-        statusType = 'full';
-    }
-    else if (isSelected) {
-        statusType = 'selected';
-    }
-    else if (isAvailable) {
-        statusType = 'available';
-    }
-    else {
-        statusType = 'unknown';
-    }
-    return {
-        isAvailable,
-        isFull,
-        isSelected,
-        statusType,
-        timeText
-    };
-}
-/**
- * 時間帯ボタン要素の状態を判定する関数
- * @param buttonElement 時間帯のbutton要素 (div[role="button"])
- * @returns 状態情報またはnull
- */
-function detectTimeslotStatusFromButton(buttonElement) {
-    if (!buttonElement)
-        return null;
-    const tdElement = buttonElement.closest('td');
-    return detectTimeslotStatus(tdElement);
-}
-
-;// ./src-modules/entrance-page-dom-utils.ts
-// ============================================================================
-// 【入場予約DOM操作ユーティリティ】 
-// ============================================================================
-// 循環参照解決のための基盤モジュール
-// DOM操作、セレクタ定義、基本的な待機関数を提供
-// 統一時間帯状態判定関数をimport
-
-// テーブルセレクタ辞書
-const tableSelectors = {
-    timeSlotTable: "table[class*='style_main__timetable__']",
-    calendarTable: "table[class*='style_main__calendar__']"
-};
-// 時間帯セレクタ定義（設計書の固定DOM構造に基づく）
-const timeSlotSelectors = {
-    // 時間帯選択エリア
-    timeSlotContainer: tableSelectors.timeSlotTable,
-    timeSlotCells: "td[data-gray-out] div[role='button']",
-    // 状態判定 - 設計書の構造に基づく正確な定義
-    availableSlots: "td[data-gray-out] div[role='button']:not([data-disabled='true'])",
-    fullSlots: "td[data-gray-out] div[role='button'][data-disabled='true']",
-    selectedSlot: "td[data-gray-out] div[role='button'][aria-pressed='true']",
-    // アイコン判定 - img要素は div[role='button'] 内の dd 要素内に存在
-    lowIcon: "img[src*='ico_scale_low.svg']",
-    highIcon: "img[src*='ico_scale_high.svg']",
-    fullIcon: "img[src*='calendar_ng.svg']"
-};
-// td要素の一意特定機能
-function generateUniqueTdSelector(tdElement) {
-    // td要素の親要素（tr）内での位置を取得
-    const row = tdElement.parentElement;
-    const rowIndex = Array.from(row.parentElement.children).indexOf(row);
-    const cellIndex = Array.from(row.children).indexOf(tdElement);
-    // 時間帯テーブル専用の固有セレクタ
-    return `${tableSelectors.timeSlotTable} tbody tr:nth-child(${rowIndex + 1}) td:nth-child(${cellIndex + 1})`;
-}
-function getTdPositionInfo(tdElement) {
-    const row = tdElement.parentElement;
-    const rowIndex = Array.from(row.parentElement.children).indexOf(row);
-    const cellIndex = Array.from(row.children).indexOf(tdElement);
-    return { rowIndex, cellIndex };
-}
-function findSameTdElement(targetInfo) {
-    // 1. セレクタベースでの検索を優先
-    if (targetInfo.tdSelector) {
-        const element = document.querySelector(targetInfo.tdSelector);
-        if (element) {
-            return element;
-        }
-    }
-    // 2. フォールバック: 位置情報による検索
-    if (targetInfo.positionInfo &&
-        targetInfo.positionInfo.rowIndex !== undefined &&
-        targetInfo.positionInfo.cellIndex !== undefined) {
-        const table = document.querySelector(timeSlotSelectors.timeSlotContainer);
-        if (table) {
-            const rows = table.querySelectorAll('tr');
-            if (rows[targetInfo.positionInfo.rowIndex]) {
-                // 時間帯セルのみを対象（data-gray-out属性の有無に関係なく）
-                const allCells = rows[targetInfo.positionInfo.rowIndex].querySelectorAll('td');
-                const cells = Array.from(allCells).filter(cell => cell.querySelector('div[role="button"]'));
-                if (cells[targetInfo.positionInfo.cellIndex]) {
-                    return cells[targetInfo.positionInfo.cellIndex];
-                }
-            }
-        }
-    }
-    return null;
-}
-function extractTdStatus(tdElement) {
-    // 統一状態判定関数を使用
-    const result = detectTimeslotStatus(tdElement);
-    if (!result)
-        return null;
-    // DOM構造: .btnDivまたはdiv[role="button"]のどちらでも対応
-    const buttonDiv = (tdElement.querySelector('.btnDiv') || tdElement.querySelector('div[role="button"]'));
-    if (!buttonDiv)
-        return null;
-    return {
-        timeText: result.timeText,
-        isFull: result.isFull,
-        isAvailable: result.isAvailable,
-        isSelected: result.isSelected,
-        status: result.statusType,
-        element: buttonDiv,
-        tdElement
-    };
-}
-// カレンダーの動的待機（time要素の存在も確認）
-async function waitForCalendar(timeout = 10000) {
-    const startTime = Date.now();
-    const checkInterval = 100; // 待機間隔を長めに設定
-    console.log('カレンダーとtime要素の出現を待機中...');
-    while (Date.now() - startTime < timeout) {
-        // time[datetime]要素が実際に存在するかを確認
-        const timeElements = document.querySelectorAll('time[datetime]');
-        if (timeElements.length > 0) {
-            console.log(`✅ カレンダーとtime要素が見つかりました (${timeElements.length}個のtime要素)`);
-            // 追加待機: time要素が見つかってもすぐに使用せず、少し待つ
-            await new Promise(resolve => setTimeout(resolve, 200));
-            return true;
-        }
-        // デバッグ: 現在の状況を確認
-        const tables = document.querySelectorAll('table');
-        const buttons = document.querySelectorAll('[role="button"]');
-        if (tables.length > 0 || buttons.length > 10) {
-            // DOM要素待機中（ログ削減）
-        }
-        await new Promise(resolve => setTimeout(resolve, checkInterval));
-    }
-    console.log('⏰ カレンダー待機がタイムアウトしました');
-    // デバッグ情報
-    const allTables = document.querySelectorAll('table');
-    const allButtons = document.querySelectorAll('[role="button"]');
-    const allTimeElements = document.querySelectorAll('time');
-    console.log(`🔍 最終状態: table=${allTables.length}, button=${allButtons.length}, time=${allTimeElements.length}`);
-    return false;
-}
-// 時間帯監視機能の初期化
-async function initTimeSlotMonitoring() {
-    console.log('時間帯監視機能を初期化中...');
-    // カレンダーの存在確認
-    const hasCalendar = await waitForCalendar();
-    if (!hasCalendar) {
-        console.log('カレンダーが見つかりません');
-        return;
-    }
-    // DOM変化監視を開始（時間帯テーブルの動的生成を検出）
-    // startTimeSlotTableObserverを動的importで取得（循環参照回避）
-    const { startTimeSlotTableObserver } = await Promise.resolve(/* import() */).then(__webpack_require__.bind(__webpack_require__, 364));
-    startTimeSlotTableObserver();
-    console.log('時間帯監視機能の初期化完了（カレンダー監視中）');
-}
-
-
-/***/ }),
-
-/***/ 659:
-/***/ ((module) => {
-
-
-
-var memo = {};
-
-/* istanbul ignore next  */
-function getTarget(target) {
-  if (typeof memo[target] === "undefined") {
-    var styleTarget = document.querySelector(target);
-
-    // Special case to return head of iframe instead of iframe itself
-    if (window.HTMLIFrameElement && styleTarget instanceof window.HTMLIFrameElement) {
-      try {
-        // This will throw an exception if access to iframe is blocked
-        // due to cross-origin restrictions
-        styleTarget = styleTarget.contentDocument.head;
-      } catch (e) {
-        // istanbul ignore next
-        styleTarget = null;
-      }
-    }
-    memo[target] = styleTarget;
-  }
-  return memo[target];
-}
-
-/* istanbul ignore next  */
-function insertBySelector(insert, style) {
-  var target = getTarget(insert);
-  if (!target) {
-    throw new Error("Couldn't find a style target. This probably means that the value for the 'insert' parameter is invalid.");
-  }
-  target.appendChild(style);
-}
-module.exports = insertBySelector;
-
-/***/ }),
-
-/***/ 825:
-/***/ ((module) => {
-
-
-
-/* istanbul ignore next  */
-function apply(styleElement, options, obj) {
-  var css = "";
-  if (obj.supports) {
-    css += "@supports (".concat(obj.supports, ") {");
-  }
-  if (obj.media) {
-    css += "@media ".concat(obj.media, " {");
-  }
-  var needLayer = typeof obj.layer !== "undefined";
-  if (needLayer) {
-    css += "@layer".concat(obj.layer.length > 0 ? " ".concat(obj.layer) : "", " {");
-  }
-  css += obj.css;
-  if (needLayer) {
-    css += "}";
-  }
-  if (obj.media) {
-    css += "}";
-  }
-  if (obj.supports) {
-    css += "}";
-  }
-  var sourceMap = obj.sourceMap;
-  if (sourceMap && typeof btoa !== "undefined") {
-    css += "\n/*# sourceMappingURL=data:application/json;base64,".concat(btoa(unescape(encodeURIComponent(JSON.stringify(sourceMap)))), " */");
-  }
-
-  // For old IE
-  /* istanbul ignore if  */
-  options.styleTagTransform(css, styleElement, options.options);
-}
-function removeStyleElement(styleElement) {
-  // istanbul ignore if
-  if (styleElement.parentNode === null) {
-    return false;
-  }
-  styleElement.parentNode.removeChild(styleElement);
-}
-
-/* istanbul ignore next  */
-function domAPI(options) {
-  if (typeof document === "undefined") {
-    return {
-      update: function update() {},
-      remove: function remove() {}
-    };
-  }
-  var styleElement = options.insertStyleElement(options);
-  return {
-    update: function update(obj) {
-      apply(styleElement, options, obj);
-    },
-    remove: function remove() {
-      removeStyleElement(styleElement);
-    }
-  };
-}
-module.exports = domAPI;
-
-/***/ }),
-
-/***/ 982:
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   DT: () => (/* binding */ createEntranceReservationUI),
-/* harmony export */   FX: () => (/* binding */ entranceReservationHelper),
-/* harmony export */   TP: () => (/* binding */ setCacheManagerForSection7),
-/* harmony export */   il: () => (/* binding */ waitForTimeSlotTable),
-/* harmony export */   startCalendarWatcher: () => (/* binding */ startCalendarWatcher),
-/* harmony export */   yT: () => (/* binding */ updateMonitoringTargetsDisplay)
-/* harmony export */ });
-/* unused harmony exports getCurrentReservationTarget, checkVisitTimeButtonState, checkTimeSlotSelected, canStartReservation, checkInitialState, handleCalendarChange, removeAllMonitorButtons */
-/* harmony import */ var _pavilion_search_page__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(521);
-/* harmony import */ var _entrance_page_state__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(278);
-/* harmony import */ var _entrance_page_dom_utils__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(638);
-/* harmony import */ var _entrance_page_core__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(364);
-/* harmony import */ var _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(374);
-/* harmony import */ var _entrance_page_ui_helpers__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(269);
-// pavilion-search-pageからのimport
-
-// entrance-page-stateからのimport
-
-// entrance-page-dom-utilsからのimport
-
-// entrance-page-monitorからのimport
-
-// unified-stateからのimport
-
-// Section 6からのimport  
-
-// UI更新ヘルパーからのimport
-
-
-// 【7. FAB・メインUI】
-// ============================================================================
-// 依存注入用のcacheManager参照
-let cacheManager = null;
-// cacheManagerを設定するヘルパー関数
-const setCacheManagerForSection7 = (cm) => {
-    cacheManager = cm;
-};
-// ステータス表示用のヘルパー関数
-function showStatus(message, color = 'white') {
-    const statusBadge = document.querySelector('#ytomo-status-badge');
-    if (!statusBadge)
-        return;
-    statusBadge.innerText = message;
-    statusBadge.style.background = color === 'green' ? 'rgba(0, 128, 0, 0.9)' :
-        color === 'red' ? 'rgba(255, 0, 0, 0.9)' :
-            color === 'orange' ? 'rgba(255, 140, 0, 0.9)' :
-                color === 'blue' ? 'rgba(0, 104, 33, 0.9)' :
-                    'rgba(0, 0, 0, 0.8)';
-    statusBadge.classList.remove('js-hide');
-    // 一定時間後に自動で隠す（エラー、成功、中断メッセージ以外）
-    if (color !== 'red' && color !== 'green' && color !== 'orange') {
-        setTimeout(() => {
-            statusBadge.classList.add('js-hide');
-        }, 3000);
-    }
-}
-function createEntranceReservationUI() {
-    // 既存のFABがあれば削除
-    const existingFab = document.getElementById('ytomo-fab-container');
-    if (existingFab) {
-        existingFab.remove();
-    }
-    // FABコンテナを作成（右下固定）
-    const fabContainer = document.createElement('div');
-    fabContainer.id = 'ytomo-fab-container';
-    fabContainer.style.cssText = `
-        position: fixed !important;
-        bottom: 24px !important;
-        right: 24px !important;
-        z-index: 10000 !important;
-        display: flex !important;
-        flex-direction: column !important;
-        gap: 12px !important;
-        align-items: flex-end !important;
-        pointer-events: auto !important;
-    `;
-    // メインFABボタンを作成
-    const fabButton = document.createElement('button');
-    fabButton.id = 'ytomo-main-fab';
-    fabButton.classList.add('ext-ytomo', 'ytomo-fab', 'ytomo-fab-disabled');
-    // FABボタンのステータス表示
-    const fabIcon = document.createElement('span');
-    fabIcon.classList.add('ext-ytomo', 'ytomo-fab-status');
-    fabIcon.style.cssText = `
-        font-size: 12px !important;
-        text-align: center !important;
-        line-height: 1.2 !important;
-        white-space: nowrap !important;
-        pointer-events: none !important;
-    `;
-    fabIcon.innerText = '待機中';
-    fabButton.appendChild(fabIcon);
-    // FABボタンにrelative positionを設定（折りたたみボタン配置用）
-    fabButton.style.position = 'relative';
-    // 初期状態は ytomo-fab-disabled クラスで制御
-    // ホバー効果（強化版）
-    fabButton.addEventListener('mouseenter', () => {
-        fabButton.style.transform = 'scale(1.15)';
-        fabButton.style.boxShadow = '0 8px 25px rgba(0, 0, 0, 0.5), 0 4px 12px rgba(0, 0, 0, 0.3)';
-        fabButton.style.borderWidth = '4px';
-    });
-    fabButton.addEventListener('mouseleave', () => {
-        fabButton.style.transform = 'scale(1)';
-        fabButton.style.boxShadow = '0 6px 20px rgba(0, 0, 0, 0.4), 0 2px 8px rgba(0, 0, 0, 0.2)';
-        fabButton.style.borderWidth = '3px';
-    });
-    // 予約対象情報表示エリア（新規追加）
-    const reservationTargetDisplay = document.createElement('div');
-    reservationTargetDisplay.id = 'ytomo-reservation-target';
-    reservationTargetDisplay.style.cssText = `
-        background: linear-gradient(135deg, rgba(0, 123, 255, 0.95), rgba(0, 86, 179, 0.95)) !important;
-        color: white !important;
-        padding: 8px 12px !important;
-        border-radius: 12px !important;
-        font-size: 12px !important;
-        font-weight: bold !important;
-        text-align: center !important;
-        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3) !important;
-        border: 2px solid rgba(255, 255, 255, 0.3) !important;
-        min-width: 80px !important;
-        max-width: 120px !important;
-        display: none !important;
-        white-space: pre-line !important;
-        overflow: visible !important;
-        text-overflow: clip !important;
-        pointer-events: auto !important;
-        cursor: pointer !important;
-        transition: all 0.3s ease !important;
-    `;
-    reservationTargetDisplay.title = '予約対象（クリックで詳細表示）';
-    // 監視対象表示エリア（目立つ表示）
-    const monitoringTargetsDisplay = document.createElement('div');
-    monitoringTargetsDisplay.id = 'ytomo-monitoring-targets';
-    monitoringTargetsDisplay.style.cssText = `
-        background: linear-gradient(135deg, rgba(0, 104, 33, 0.95), rgba(0, 150, 50, 0.95)) !important;
-        color: white !important;
-        padding: 8px 12px !important;
-        border-radius: 12px !important;
-        font-size: 12px !important;
-        font-weight: bold !important;
-        text-align: center !important;
-        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3) !important;
-        border: 2px solid rgba(255, 255, 255, 0.3) !important;
-        min-width: 80px !important;
-        max-width: 120px !important;
-        display: none !important;
-        white-space: pre-line !important;
-        overflow: visible !important;
-        text-overflow: clip !important;
-        pointer-events: auto !important;
-        cursor: pointer !important;
-        transition: all 0.3s ease !important;
-    `;
-    monitoringTargetsDisplay.title = 'クリックで詳細表示';
-    // ホバー効果
-    monitoringTargetsDisplay.addEventListener('mouseenter', () => {
-        monitoringTargetsDisplay.style.transform = 'scale(1.05)';
-        monitoringTargetsDisplay.style.boxShadow = '0 4px 14px rgba(0, 0, 0, 0.4)';
-    });
-    monitoringTargetsDisplay.addEventListener('mouseleave', () => {
-        monitoringTargetsDisplay.style.transform = 'scale(1)';
-        monitoringTargetsDisplay.style.boxShadow = '0 3px 10px rgba(0, 0, 0, 0.3)';
-    });
-    // ステータス表示（コンパクト）
-    const statusBadge = document.createElement('div');
-    statusBadge.id = 'ytomo-status-badge';
-    statusBadge.style.cssText = `
-        background: linear-gradient(135deg, rgba(0, 0, 0, 0.9), rgba(40, 40, 40, 0.9)) !important;
-        color: white !important;
-        padding: 8px 16px !important;
-        border-radius: 20px !important;
-        font-size: 12px !important;
-        font-weight: bold !important;
-        white-space: pre-line !important;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3), 0 2px 6px rgba(0, 0, 0, 0.2) !important;
-        border: 2px solid rgba(255, 255, 255, 0.15) !important;
-        display: none !important;
-        pointer-events: none !important;
-        text-align: center !important;
-        line-height: 1.3 !important;
-    `;
-    statusBadge.innerText = '待機中';
-    // メインFABボタンにイベントリスナーを設定
-    fabButton.addEventListener('click', async (event) => {
-        // disabled状態の場合はクリックを完全に無視
-        if (fabButton.disabled || fabButton.hasAttribute('disabled')) {
-            // ボタンdisabledのためクリック無視
-            event.preventDefault();
-            event.stopPropagation();
-            event.stopImmediatePropagation();
-            return false;
-        }
-        // 追加のstyle確認（CSS disabled状態もチェック）
-        if (fabButton.style.pointerEvents === 'none') {
-            // pointer-events:noneのためクリック無視
-            event.preventDefault();
-            event.stopPropagation();
-            event.stopImmediatePropagation();
-            return false;
-        }
-        // 中断不可期間のチェック
-        if (!(0,_entrance_page_core__WEBPACK_IMPORTED_MODULE_3__/* .isInterruptionAllowed */ .Is)()) {
-            // リロード直前のため中断不可
-            showStatus('リロード直前のため中断できません', 'red');
-            return;
-        }
-        // クールタイム中の予約再開中止処理
-        if (fabButton.hasAttribute('data-cooldown-cancel')) {
-            if (confirm('予約の自動再開を中止しますか？\n\n手動での予約開始は引き続き可能です。')) {
-                _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_4__/* .entranceReservationStateManager */ .xx.endReservationCooldown();
-                showStatus('予約再開を中止しました', 'orange');
-                (0,_entrance_page_ui_helpers__WEBPACK_IMPORTED_MODULE_5__/* .updateMainButtonDisplay */ .vp)();
-            }
-            return;
-        }
-        // 実行中の場合は中断処理（入場予約状態管理システム使用）
-        if (_entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_4__/* .entranceReservationStateManager */ .xx.isMonitoringRunning()) {
-            stopMonitoringProcess();
-            return;
-        }
-        if (_entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_4__/* .entranceReservationStateManager */ .xx.isReservationRunning()) {
-            stopReservationProcess();
-            return;
-        }
-        // 入場予約状態管理システムを使用した監視開始判定
-        const preferredAction = _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_4__/* .entranceReservationStateManager */ .xx.getPreferredAction();
-        // FABクリック処理開始
-        if (preferredAction === 'monitoring') {
-            await startMonitoringProcess();
-        }
-        else if (preferredAction === 'reservation') {
-            await startReservationProcess();
-        }
-        else {
-            console.log('⚠️ 入場予約状態管理システム: 実行可能なアクションなし');
-        }
-        return;
-    });
-    // 監視中断処理
-    function stopMonitoringProcess() {
-        console.log('⏹️ 監視を中断');
-        (0,_entrance_page_core__WEBPACK_IMPORTED_MODULE_3__/* .stopSlotMonitoring */ .XG)();
-        showStatus('監視中断', 'orange');
-        (0,_entrance_page_ui_helpers__WEBPACK_IMPORTED_MODULE_5__/* .updateMainButtonDisplay */ .vp)();
-    }
-    // 予約中断処理
-    function stopReservationProcess() {
-        console.log('⏹️ 予約を中断');
-        _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_4__/* .entranceReservationStateManager */ .xx.setShouldStop(true);
-        showStatus('予約処理を中断中...', 'orange');
-        // 中断フラグ設定後、UIを即座に更新
-        (0,_entrance_page_ui_helpers__WEBPACK_IMPORTED_MODULE_5__/* .updateMainButtonDisplay */ .vp)();
-    }
-    // 監視開始処理
-    async function startMonitoringProcess() {
-        console.log('📡 入場予約状態管理システムによる監視開始');
-        // 状態変更前の確認
-        console.log(`🔍 [FAB] 監視開始前の状態: ${_entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_4__/* .entranceReservationStateManager */ .xx.getExecutionState()}`);
-        console.log(`🔍 [FAB] 監視対象数: ${_entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_4__/* .entranceReservationStateManager */ .xx.getMonitoringTargetCount()}`);
-        console.log(`🔍 [FAB] 監視開始可能: ${_entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_4__/* .entranceReservationStateManager */ .xx.canStartMonitoring()}`);
-        // 実行状態を監視中に変更
-        const startSuccess = _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_4__/* .entranceReservationStateManager */ .xx.startMonitoring();
-        console.log(`🔍 [FAB] startMonitoring結果: ${startSuccess}`);
-        console.log(`🔍 [FAB] 監視開始後の状態: ${_entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_4__/* .entranceReservationStateManager */ .xx.getExecutionState()}`);
-        // 即座にUI更新してから監視開始
-        (0,_entrance_page_ui_helpers__WEBPACK_IMPORTED_MODULE_5__/* .updateMainButtonDisplay */ .vp)();
-        await (0,_entrance_page_core__WEBPACK_IMPORTED_MODULE_3__/* .startSlotMonitoring */ .fp)();
-    }
-    // 予約開始処理
-    async function startReservationProcess() {
-        console.log('🚀 入場予約状態管理システムによる予約開始');
-        // 入場予約状態管理システムで予約実行開始
-        _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_4__/* .entranceReservationStateManager */ .xx.setExecutionState(_entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_4__/* .ExecutionState */ .si.RESERVATION_RUNNING);
-        _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_4__/* .entranceReservationStateManager */ .xx.startReservationExecution();
-        showStatus('予約処理実行中...', 'blue');
-        (0,_entrance_page_ui_helpers__WEBPACK_IMPORTED_MODULE_5__/* .updateMainButtonDisplay */ .vp)();
-        updateMonitoringTargetsDisplay(); // 予約対象を表示
-        // 設定オブジェクトを作成
-        const config = {
-            selectors: {
-                submit: "#__next > div > div > main > div > div.style_main__add_cart_button__DCOw8 > button",
-                change: "body > div > div > div > div > div > div > button",
-                success: "#reservation_modal_title",
-                failure: "#reservation_fail_modal_title",
-                close: "body > div.style_buy-modal__1JZtS > div > div > div > div > ul > li > a"
-            },
-            selectorTexts: {
-                change: "来場日時を変更する"
-            },
-            timeouts: {
-                waitForSubmit: 5000,
-                waitForResponse: 60000,
-                waitForClose: 3000,
-                retryInterval: 1000
-            },
-            randomSettings: {
-                minCheckInterval: 500,
-                checkRandomRange: 200,
-                minClickDelay: 500,
-                clickRandomRange: 200,
-                minRetryDelay: 1000,
-                retryRandomRange: 300
-            }
-        };
-        // 予約開始前に予約対象情報を保存（成功時のUI更新用）
-        const reservationTarget = _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_4__/* .entranceReservationStateManager */ .xx.getReservationTarget();
-        console.log('🔍 予約開始前の対象情報:', reservationTarget);
-        try {
-            const result = await entranceReservationHelper(config);
-            console.log('🔍 entranceReservationHelper戻り値:', result);
-            if (result.success) {
-                showStatus(`🎉 予約成功！(${result.attempts}回試行)`, 'green');
-                // 予約開始前に保存した対象情報で成功情報を設定
-                if (reservationTarget) {
-                    _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_4__/* .entranceReservationStateManager */ .xx.setReservationSuccess(reservationTarget.timeSlot, reservationTarget.locationIndex);
-                    (0,_entrance_page_ui_helpers__WEBPACK_IMPORTED_MODULE_5__/* .updateMainButtonDisplay */ .vp)(); // FAB表示更新
-                    console.log('✅ 予約成功UI更新完了');
-                }
-                else {
-                    console.warn('⚠️ 予約開始前の対象情報がnullのためUI更新をスキップ');
-                }
-                if (cacheManager) {
-                    cacheManager.clearTargetSlots(); // 成功時はキャッシュクリア
-                    cacheManager.clearMonitoringFlag(); // 監視継続フラグもクリア
-                }
-            }
-            else {
-                if (result.cancelled) {
-                    showStatus(`⏹️ 予約中断 (${result.attempts}回試行)`, 'orange');
-                    console.log('⏹️ ユーザーにより予約が中断されました');
-                }
-                else if (result.abnormalTermination) {
-                    showStatus(`🚨 異常終了 (${result.attempts}回試行) - システム停止`, 'red');
-                    console.log('🚨 予約処理が異常終了しました。システムを停止します');
-                }
-                else if (result.cooldownStarted) {
-                    showStatus(`予約失敗 (${result.attempts}回試行) - クールタイム開始`, 'orange');
-                    console.log('🛑 100回試行後、クールタイムが開始されました');
-                }
-                else {
-                    showStatus(`予約失敗 (${result.attempts}回試行)`, 'red');
-                }
-            }
-        }
-        catch (error) {
-            console.error('予約処理エラー:', error);
-            const errorMessage = error instanceof Error ? error.message : String(error);
-            showStatus(`エラー: ${errorMessage}`, 'red');
-        }
-        finally {
-            // 入場予約状態管理システムで予約実行終了
-            _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_4__/* .entranceReservationStateManager */ .xx.stop();
-            (0,_entrance_page_ui_helpers__WEBPACK_IMPORTED_MODULE_5__/* .updateMainButtonDisplay */ .vp)();
-            updateMonitoringTargetsDisplay(); // 予約終了時に表示更新
-        }
-    }
-    // disabled状態でのクリックを確実に防ぐため、キャプチャーフェーズでも処理
-    fabButton.addEventListener('click', (event) => {
-        if (fabButton.disabled || fabButton.hasAttribute('disabled') || fabButton.style.pointerEvents === 'none') {
-            console.log('🚫 キャプチャーフェーズでdisabledクリックを阻止');
-            event.preventDefault();
-            event.stopPropagation();
-            event.stopImmediatePropagation();
-            return false;
-        }
-        return; // 明示的なreturnを追加
-    }, true); // useCapture = true
-    // FABコンテナに要素を追加（上から順：予約対象→監視対象→ステータス→ボタン）
-    // 効率モードトグルボタン
-    const efficiencyToggleButton = document.createElement('button');
-    efficiencyToggleButton.className = 'ytomo-efficiency-toggle';
-    // 効率モード状態に応じた初期表示
-    function updateEfficiencyToggleButton() {
-        const isEnabled = _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_4__/* .entranceReservationStateManager */ .xx.isEfficiencyModeEnabled();
-        efficiencyToggleButton.innerText = isEnabled ? '効率ON' : '効率OFF';
-        efficiencyToggleButton.classList.toggle('efficiency-enabled', isEnabled);
-        efficiencyToggleButton.classList.toggle('efficiency-disabled', !isEnabled);
-    }
-    updateEfficiencyToggleButton();
-    // 効率モードトグル処理
-    efficiencyToggleButton.addEventListener('click', (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_4__/* .entranceReservationStateManager */ .xx.toggleEfficiencyMode();
-        updateEfficiencyToggleButton();
-    });
-    // ホバー効果はCSSで制御
-    fabContainer.appendChild(reservationTargetDisplay);
-    fabContainer.appendChild(monitoringTargetsDisplay);
-    fabContainer.appendChild(statusBadge);
-    fabContainer.appendChild(efficiencyToggleButton);
-    fabContainer.appendChild(fabButton);
-    // DOMに追加（body直下）
-    document.body.appendChild(fabContainer);
-    // 効率モード設定を読み込み
-    _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_4__/* .entranceReservationStateManager */ .xx.loadEfficiencyModeSettings();
-    updateEfficiencyToggleButton(); // ボタン表示を更新
-    // 自動選択イベントリスナーを設定
-    window.addEventListener('entrance-auto-select', async (event) => {
-        console.log('🎯 自動選択イベントを受信:', event.detail);
-        const slot = event.detail?.slot;
-        if (!slot?.targetInfo) {
-            console.error('❌ 自動選択: スロット情報が無効');
-            return;
-        }
-        try {
-            // 監視を停止
-            if (_entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_4__/* .entranceReservationStateManager */ .xx.isMonitoringRunning()) {
-                console.log('🛑 監視を停止');
-                (0,_entrance_page_core__WEBPACK_IMPORTED_MODULE_3__/* .stopSlotMonitoring */ .XG)();
-            }
-            // 該当監視対象を削除
-            const timeSlot = slot.targetInfo.timeSlot;
-            const locationIndex = slot.targetInfo.locationIndex;
-            _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_4__/* .entranceReservationStateManager */ .xx.removeMonitoringTarget(timeSlot, locationIndex);
-            // 1. 時間帯要素をクリックして選択状態にする
-            console.log(`🖱️ 自動選択: 時間帯をクリック ${timeSlot}`);
-            const timeSlotElement = document.querySelector(slot.targetInfo.selector);
-            if (timeSlotElement) {
-                const buttonElement = timeSlotElement.querySelector('div[role="button"]');
-                if (buttonElement && buttonElement.getAttribute('data-disabled') !== 'true') {
-                    buttonElement.click();
-                    console.log(`✅ 時間帯選択完了: ${timeSlot}`);
-                    // 2. 選択後、少し待ってから内部的に自動予約を開始
-                    setTimeout(async () => {
-                        console.log('🚀 内部的に自動予約を開始');
-                        if (_entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_4__/* .entranceReservationStateManager */ .xx.canStartReservation()) {
-                            await startReservationProcess();
-                        }
-                        else {
-                            console.error('❌ 予約開始条件が満たされていません');
-                        }
-                    }, 100);
-                }
-                else {
-                    console.error(`❌ 時間帯ボタンが見つからないか無効: ${timeSlot}`);
-                }
-            }
-            else {
-                console.error(`❌ 時間帯要素が見つからない: ${slot.targetInfo.selector}`);
-            }
-        }
-        catch (error) {
-            console.error('❌ 自動選択処理エラー:', error);
-        }
-    });
-    // FAB表示状態を初期化・適用
-    (0,_entrance_page_state__WEBPACK_IMPORTED_MODULE_1__.loadFABVisibility)();
-    (0,_entrance_page_state__WEBPACK_IMPORTED_MODULE_1__.updateFABVisibility)();
-    // 初期状態を判定してFABを更新
-    waitForTimeSlotTable(() => {
-        checkInitialState();
-    });
-    // 時間帯クリックハンドラーを設定（選択解除機能付き）
-    waitForTimeSlotTable(() => {
-        setupTimeSlotClickHandlers();
-    });
-    // カレンダー変更監視は別途初期化処理で開始（キャッシュ復元後）
-}
-// 監視対象表示を更新（統一システムに完全委譲）
-function updateMonitoringTargetsDisplay() {
-    console.log('🔄 [updateMonitoringTargetsDisplay] 統一システムに委譲');
-    _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_4__/* .entranceReservationStateManager */ .xx.updateFabDisplay();
-}
-// 現在の予約対象時間帯を取得
-function getCurrentReservationTarget() {
-    // 選択された時間帯を探す
-    const selectedSlot = document.querySelector('td[data-gray-out] div[role="button"][aria-pressed="true"]');
-    if (!selectedSlot)
-        return null;
-    const timeSpan = selectedSlot.querySelector('dt span');
-    if (!timeSpan)
-        return null;
-    const timeText = timeSpan.textContent.trim();
-    // 東西判定
-    const tdElement = selectedSlot.closest('td[data-gray-out]');
-    const tdSelector = generateUniqueTdSelector(tdElement);
-    const locationIndex = LocationHelper.getIndexFromSelector(tdSelector);
-    const location = LocationHelper.getLocationFromIndex(locationIndex);
-    const locationText = location === 'east' ? '東' : '西';
-    return `${locationText}${timeText}`;
-}
-// 来場日時設定ボタンの状態をチェック
-function checkVisitTimeButtonState() {
-    const visitTimeButton = document.querySelector('button.basic-btn.type2.style_full__ptzZq');
-    if (!visitTimeButton) {
-        console.log('⚠️ 来場日時設定ボタンが見つかりません');
-        return false;
-    }
-    const isDisabled = visitTimeButton.hasAttribute('disabled') || visitTimeButton.disabled;
-    console.log(`🔘 来場日時設定ボタン: ${isDisabled ? '無効' : '有効'}`);
-    return !isDisabled;
-}
-// 時間帯が選択されているかチェック
-function checkTimeSlotSelected() {
-    // 選択された時間帯（aria-pressed="true"）をチェック
-    const selectedTimeSlot = document.querySelector(_entrance_page_dom_utils__WEBPACK_IMPORTED_MODULE_2__/* .timeSlotSelectors */ .eN.selectedSlot);
-    if (!selectedTimeSlot) {
-        console.log('⚠️ 時間帯が選択されていません');
-        return false;
-    }
-    // 選択された時間帯が満員でないかチェック
-    const tdElement = selectedTimeSlot.closest('td');
-    if (!tdElement)
-        return false;
-    const status = (0,_entrance_page_dom_utils__WEBPACK_IMPORTED_MODULE_2__/* .extractTdStatus */ .SE)(tdElement);
-    if (status && status.isFull) {
-        console.log('⚠️ 選択された時間帯は満員です');
-        return false;
-    }
-    console.log(`✅ 時間帯選択済み: ${status?.timeText || 'unknown'}`);
-    return true;
-}
-// 予約開始可能かどうかの総合判定
-function canStartReservation() {
-    const hasTimeSlotTable = (0,_entrance_page_core__WEBPACK_IMPORTED_MODULE_3__/* .checkTimeSlotTableExistsSync */ .H5)();
-    const isTimeSlotSelected = checkTimeSlotSelected();
-    const isVisitTimeButtonEnabled = checkVisitTimeButtonState();
-    console.log(`📊 予約開始条件チェック:`);
-    console.log(`  - 時間帯テーブル: ${hasTimeSlotTable ? '✅' : '❌'}`);
-    console.log(`  - 時間帯選択: ${isTimeSlotSelected ? '✅' : '❌'}`);
-    console.log(`  - 来場日時ボタン有効: ${isVisitTimeButtonEnabled ? '✅' : '❌'}`);
-    return hasTimeSlotTable && isTimeSlotSelected && isVisitTimeButtonEnabled;
-}
-// 初期状態をチェックしてFABを適切に設定
-function checkInitialState() {
-    console.log('🔍 初期状態をチェック中...');
-    // カレンダーで日付が選択されているかチェック
-    const selectedDate = (0,_entrance_page_core__WEBPACK_IMPORTED_MODULE_3__/* .getCurrentSelectedCalendarDate */ .rY)();
-    const hasTimeSlotTable = (0,_entrance_page_core__WEBPACK_IMPORTED_MODULE_3__/* .checkTimeSlotTableExistsSync */ .H5)();
-    console.log(`📅 選択日付: ${selectedDate || 'なし'}`);
-    console.log(`🗓️ 時間帯テーブル: ${hasTimeSlotTable ? 'あり' : 'なし'}`);
-    if (selectedDate && hasTimeSlotTable) {
-        // 時間帯テーブルがある場合、予約開始可能かチェック
-        const canStart = canStartReservation();
-        console.log(`✅ 日付選択済み、時間帯テーブル表示中 - ${canStart ? '予約開始可能' : '条件未満'}`);
-        // FABボタンの状態を設定
-        const fabButton = document.querySelector('#ytomo-main-fab');
-        const fabIcon = fabButton?.querySelector('.ytomo-fab-status');
-        if (fabButton && fabIcon) {
-            // 常に「予約開始」と表示
-            fabIcon.innerText = '予約\n開始';
-            if (canStart) {
-                // 予約開始可能
-                fabButton.style.background = 'rgb(0, 104, 33) !important';
-                fabButton.style.opacity = '0.9 !important';
-                fabButton.style.cursor = 'pointer !important';
-                fabButton.disabled = false;
-                fabButton.title = '予約開始';
-            }
-            else {
-                // 条件未満足 - disabled状態（グレー色）
-                fabButton.style.background = 'rgb(128, 128, 128) !important';
-                fabButton.style.opacity = '0.9 !important';
-                fabButton.style.cursor = 'not-allowed !important';
-                fabButton.disabled = true;
-                fabButton.title = '時間帯を選択し、来場日時設定ボタンが有効になるまでお待ちください';
-            }
-        }
-        // ステータスも更新
-        (0,_entrance_page_core__WEBPACK_IMPORTED_MODULE_3__/* .updateStatusBadge */ .pW)(canStart ? 'idle' : 'waiting');
-    }
-    else {
-        // カレンダー未選択または時間帯テーブル未表示の場合は待機中のまま
-        console.log('⏳ カレンダー未選択または時間帯テーブル未表示 - 待機中を維持');
-        (0,_entrance_page_core__WEBPACK_IMPORTED_MODULE_3__/* .updateStatusBadge */ .pW)('idle');
-    }
-}
-// カレンダー変更を監視して監視ボタンを再設置
-function startCalendarWatcher() {
-    if (_entrance_page_state__WEBPACK_IMPORTED_MODULE_1__.calendarWatchState.isWatching)
-        return;
-    _entrance_page_state__WEBPACK_IMPORTED_MODULE_1__.calendarWatchState.isWatching = true;
-    _entrance_page_state__WEBPACK_IMPORTED_MODULE_1__.calendarWatchState.currentSelectedDate = (0,_entrance_page_core__WEBPACK_IMPORTED_MODULE_3__/* .getCurrentSelectedCalendarDate */ .rY)();
-    // 初期化時に入場予約状態管理にも現在の選択日付を設定
-    if (_entrance_page_state__WEBPACK_IMPORTED_MODULE_1__.calendarWatchState.currentSelectedDate) {
-        _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_4__/* .entranceReservationStateManager */ .xx.setSelectedCalendarDate(_entrance_page_state__WEBPACK_IMPORTED_MODULE_1__.calendarWatchState.currentSelectedDate);
-        console.log(`📅 初期化時の選択日付を設定: ${_entrance_page_state__WEBPACK_IMPORTED_MODULE_1__.calendarWatchState.currentSelectedDate}`);
-    }
-    console.log('📅 カレンダー変更監視を開始');
-    // MutationObserverでカレンダー変更・時間帯選択・ボタン状態変更を検出
-    _entrance_page_state__WEBPACK_IMPORTED_MODULE_1__.calendarWatchState.observer = new MutationObserver((mutations) => {
-        let shouldUpdate = false;
-        mutations.forEach((mutation) => {
-            // 1. カレンダーのaria-pressed属性の変更を検出
-            if (mutation.type === 'attributes' &&
-                (mutation.attributeName === 'aria-pressed' ||
-                    mutation.attributeName === 'class')) {
-                const element = mutation.target;
-                if (element.matches && element.matches('[role="button"][aria-pressed]') &&
-                    element.querySelector('time[datetime]')) {
-                    shouldUpdate = true;
-                }
-            }
-            // 2. 時間帯選択の変更を検出
-            if (mutation.type === 'attributes' &&
-                mutation.attributeName === 'aria-pressed') {
-                const element = mutation.target;
-                if (element.matches && element.matches('td[data-gray-out] div[role="button"]')) {
-                    const ariaPressed = element.getAttribute('aria-pressed');
-                    console.log(`🔄 時間帯選択変更検出: ${ariaPressed}`);
-                    // 入場予約状態管理システムの同期（初期化中は除外）
-                    if (ariaPressed === 'true' && !_entrance_page_state__WEBPACK_IMPORTED_MODULE_1__.calendarWatchState.isInitializing) {
-                        // 選択状態変更を検出 - DOM状態から予約対象を同期
-                        console.log(`🔄 時間帯選択状態を検出`);
-                        setTimeout(() => {
-                            syncReservationTargetFromDOM();
-                            (0,_entrance_page_ui_helpers__WEBPACK_IMPORTED_MODULE_5__/* .updateMainButtonDisplay */ .vp)();
-                        }, 50);
-                    }
-                    shouldUpdate = true;
-                }
-            }
-            // 3. 来場日時設定ボタンのdisabled属性変更を検出
-            if (mutation.type === 'attributes' &&
-                mutation.attributeName === 'disabled') {
-                const element = mutation.target;
-                if (element.matches && element.matches('button.basic-btn.type2.style_full__ptzZq')) {
-                    console.log(`🔄 来場日時ボタン状態変更検出: disabled=${element.hasAttribute('disabled')}`);
-                    shouldUpdate = true;
-                }
-            }
-        });
-        if (shouldUpdate) {
-            // DOM更新完了を待ってから処理
-            waitForTimeSlotTable(() => {
-                handleCalendarChange();
-            });
-        }
-    });
-    // カレンダー要素全体を監視
-    const observeTarget = document.body;
-    _entrance_page_state__WEBPACK_IMPORTED_MODULE_1__.calendarWatchState.observer.observe(observeTarget, {
-        attributes: true,
-        subtree: true,
-        attributeFilter: ['aria-pressed', 'class', 'disabled']
-    });
-}
-// カレンダー変更・状態変更時の処理
-function handleCalendarChange() {
-    const newSelectedDate = (0,_entrance_page_core__WEBPACK_IMPORTED_MODULE_3__/* .getCurrentSelectedCalendarDate */ .rY)();
-    const calendarDateChanged = newSelectedDate !== _entrance_page_state__WEBPACK_IMPORTED_MODULE_1__.calendarWatchState.currentSelectedDate;
-    // 入場予約状態管理の管理している日付とも比較
-    const stateManagerSelectedDate = _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_4__/* .entranceReservationStateManager */ .xx.getSelectedCalendarDate();
-    const actualDateChanged = newSelectedDate !== stateManagerSelectedDate;
-    if (calendarDateChanged) {
-        console.log(`📅 カレンダー日付変更を検出: ${_entrance_page_state__WEBPACK_IMPORTED_MODULE_1__.calendarWatchState.currentSelectedDate} → ${newSelectedDate}`);
-        // 監視実行中は日付変更を無視
-        if (_entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_4__/* .entranceReservationStateManager */ .xx.isMonitoringRunning()) {
-            console.log('⚠️ 監視実行中のため日付変更を無視します');
-            return;
-        }
-        _entrance_page_state__WEBPACK_IMPORTED_MODULE_1__.calendarWatchState.currentSelectedDate = newSelectedDate;
-        // 入場予約状態管理にも日付を設定
-        if (newSelectedDate) {
-            _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_4__/* .entranceReservationStateManager */ .xx.setSelectedCalendarDate(newSelectedDate);
-        }
-        // 実際に日付が変更された場合のみ監視状態をクリア
-        if (actualDateChanged) {
-            console.log(`📅 実際の日付変更確認: ${stateManagerSelectedDate} → ${newSelectedDate}`);
-            const hasReservationTarget = _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_4__/* .entranceReservationStateManager */ .xx.hasReservationTarget();
-            const hasMonitoringTargets = _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_4__/* .entranceReservationStateManager */ .xx.hasMonitoringTargets();
-            if (hasReservationTarget || hasMonitoringTargets) {
-                console.log('📅 日付変更により入場予約状態管理システムの対象をクリア');
-                _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_4__/* .entranceReservationStateManager */ .xx.clearReservationTarget();
-                _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_4__/* .entranceReservationStateManager */ .xx.clearMonitoringTargets();
-            }
-        }
-        else {
-            console.log('📅 同じ日付への再クリックのため監視対象は維持');
-        }
-        // 従来システムはもう使用しないため、このブロックは削除
-        // if (multiTargetManager.hasTargets() && !timeSlotState.isMonitoring) {
-        //     console.log('📅 日付変更により従来システムの監視対象をクリア');
-        //     multiTargetManager.clearAll();
-        //     timeSlotState.mode = 'idle';
-        //     if (cacheManager) {
-        //         cacheManager.clearTargetSlots();
-        //     }
-        // }
-        // 予約対象がクリアされたため、即座にFAB表示を更新
-        (0,_entrance_page_ui_helpers__WEBPACK_IMPORTED_MODULE_5__/* .updateMainButtonDisplay */ .vp)();
-        // 監視ボタンを再設置（動的待機を使用）
-        waitForTimeSlotTable(() => {
-            removeAllMonitorButtons();
-            (0,_entrance_page_core__WEBPACK_IMPORTED_MODULE_3__/* .analyzeAndAddMonitorButtons */ .wj)();
-            // 監視ボタン設置後も再度FABボタンの状態を更新
-            (0,_entrance_page_ui_helpers__WEBPACK_IMPORTED_MODULE_5__/* .updateMainButtonDisplay */ .vp)();
-            console.log('🔄 監視ボタンとFABを再設置しました');
-        });
-    }
-    else {
-        // 日付は変わっていない - FABボタンの状態のみ更新
-        console.log('📅 日付変更なし - FABボタンの状態のみ更新');
-        // 入場予約状態管理システムを取得して状態同期
-        // 公式サイトによる選択解除があった場合の状態同期
-        const selectedSlot = document.querySelector(_entrance_page_dom_utils__WEBPACK_IMPORTED_MODULE_2__/* .timeSlotSelectors */ .eN.selectedSlot);
-        if (!selectedSlot && _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_4__/* .entranceReservationStateManager */ .xx.hasReservationTarget()) {
-            // DOM上に選択がないが入場予約状態管理に予約対象がある場合はクリア
-            console.log('🔄 公式サイトによる選択解除を検出 - 入場予約状態管理を同期');
-            _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_4__/* .entranceReservationStateManager */ .xx.clearReservationTarget();
-            // UI更新を確実に実行
-            (0,_entrance_page_ui_helpers__WEBPACK_IMPORTED_MODULE_5__/* .updateMainButtonDisplay */ .vp)();
-        }
-        // FABボタンの状態を更新（監視ボタンは再設置しない）
-        (0,_entrance_page_ui_helpers__WEBPACK_IMPORTED_MODULE_5__/* .updateMainButtonDisplay */ .vp)();
-    }
-}
-// 既存の監視ボタンをすべて削除
-function removeAllMonitorButtons() {
-    const existingButtons = document.querySelectorAll('.monitor-btn.ext-ytomo');
-    existingButtons.forEach(button => button.remove());
-    console.log(`🗑️ 既存の監視ボタンを${existingButtons.length}個削除しました`);
-}
-// DOM上の選択状態から予約対象を同期
-function syncReservationTargetFromDOM() {
-    // DOM上で選択状態の時間帯要素を取得
-    const selectedElement = document.querySelector('td[data-gray-out] div[role="button"][aria-pressed="true"]');
-    if (selectedElement) {
-        const tdElement = selectedElement.closest('td[data-gray-out]');
-        const timeText = selectedElement.querySelector('dt span')?.textContent?.trim();
-        if (tdElement && timeText) {
-            const locationIndex = _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_4__/* .LocationHelper */ .Qs.getIndexFromElement(tdElement);
-            const selector = (0,_entrance_page_dom_utils__WEBPACK_IMPORTED_MODULE_2__/* .generateUniqueTdSelector */ .sN)(tdElement);
-            console.log(`🔄 DOM状態から予約対象を同期: ${timeText} (位置: ${locationIndex})`);
-            _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_4__/* .entranceReservationStateManager */ .xx.setReservationTarget(timeText, locationIndex, selector);
-        }
-    }
-    else {
-        // 選択状態の要素がない場合は予約対象をクリア
-        console.log(`🔄 選択状態なし - 予約対象をクリア`);
-        _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_4__/* .entranceReservationStateManager */ .xx.clearReservationTarget();
-    }
-}
-// 時間帯テーブルの準備を待つ
-function waitForTimeSlotTable(callback) {
-    // まず即座にチェック（最短の場合は遅延なし）
-    const timeSlotButtons = document.querySelectorAll('td[data-gray-out] div[role="button"]');
-    if (timeSlotButtons.length > 0) {
-        console.log(`✅ 時間帯テーブル準備済み (${timeSlotButtons.length}個の時間帯を検出) - 即座に実行`);
-        callback();
-        return;
-    }
-    // DOM要素が存在しない場合のみ動的待機を開始
-    const checkInterval = 50; // 50ms間隔で高速チェック
-    const maxAttempts = 100; // 最大5秒待機（50ms × 100 = 5000ms）
-    let attempts = 0;
-    const checkTableReady = () => {
-        attempts++;
-        // 時間帯テーブルの存在確認
-        const timeSlotButtons = document.querySelectorAll('td[data-gray-out] div[role="button"]');
-        if (timeSlotButtons.length > 0) {
-            console.log(`✅ 時間帯テーブル準備完了 (${timeSlotButtons.length}個の時間帯を検出) - ${attempts * checkInterval}ms後`);
-            callback();
-        }
-        else if (attempts >= maxAttempts) {
-            console.log('⚠️ 時間帯テーブルの準備がタイムアウト - 強制実行');
-            callback();
-        }
-        else {
-            // 時間帯テーブル待機中（ログ削減）
-            setTimeout(checkTableReady, checkInterval);
-        }
-    };
-    console.log('🔍 時間帯テーブル待機開始...');
-    setTimeout(checkTableReady, checkInterval);
-}
-// 時間帯tdクリック処理を設定（公式サイト仕様を利用した選択解除機能付き）
-function setupTimeSlotClickHandlers() {
-    // 既存のハンドラーをクリア
-    const existingHandler = window.timeSlotClickHandler;
-    if (existingHandler) {
-        document.removeEventListener('click', existingHandler, true);
-    }
-    // 時間帯クリックハンドラーを設定
-    const timeSlotClickHandler = (event) => {
-        const target = event.target;
-        // 時間帯のdiv[role="button"]または子要素がクリックされた場合のみ処理
-        const actualTarget = target.closest('td[data-gray-out] div[role="button"]');
-        if (!actualTarget) {
-            // 時間帯要素でない場合は処理しない（ログも出力しない）
-            return;
-        }
-        // 時間帯クリック判定成功
-        // 時間帯のdiv[role="button"]がクリックされた場合
-        const tdElement = actualTarget.closest('td[data-gray-out]');
-        if (!tdElement) {
-            return;
-        }
-        // actualTargetから時間テキストを取得
-        const timeText = actualTarget.querySelector('dt span')?.textContent?.trim();
-        if (!timeText) {
-            return;
-        }
-        // 入場予約状態管理システムを取得
-        const locationIndex = _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_4__/* .LocationHelper */ .Qs.getIndexFromElement(tdElement);
-        // 入場予約状態管理で現在の選択状態を確認
-        const isCurrentlyReservationTarget = _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_4__/* .entranceReservationStateManager */ .xx.isReservationTarget(timeText, locationIndex);
-        if (isCurrentlyReservationTarget) {
-            // 既に予約対象として設定済みの場合は選択解除
-            // イベントを停止（デフォルト動作を防ぐ）
-            event.preventDefault();
-            event.stopPropagation();
-            // 公式サイトの仕様を利用：現在選択中のカレンダー日付ボタンをクリック
-            const currentSelectedCalendarButton = document.querySelector('[role="button"][aria-pressed="true"]');
-            if (currentSelectedCalendarButton && currentSelectedCalendarButton.querySelector('time[datetime]')) {
-                currentSelectedCalendarButton.click();
-                // 入場予約状態管理からも予約対象を削除
-                setTimeout(() => {
-                    _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_4__/* .entranceReservationStateManager */ .xx.clearReservationTarget();
-                    (0,_entrance_page_ui_helpers__WEBPACK_IMPORTED_MODULE_5__/* .updateMainButtonDisplay */ .vp)();
-                }, 100);
-            }
-            else {
-                // フォールバック: 直接削除
-                _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_4__/* .entranceReservationStateManager */ .xx.clearReservationTarget();
-                (0,_entrance_page_ui_helpers__WEBPACK_IMPORTED_MODULE_5__/* .updateMainButtonDisplay */ .vp)();
-            }
-        }
-        else {
-            // 新規選択または別の時間帯への変更
-            // DOM上の選択状態から予約対象を同期
-            setTimeout(() => {
-                syncReservationTargetFromDOM();
-                (0,_entrance_page_ui_helpers__WEBPACK_IMPORTED_MODULE_5__/* .updateMainButtonDisplay */ .vp)();
-            }, 100);
-        }
-    };
-    // グローバルに保存（後でremoveするため）
-    window.timeSlotClickHandler = timeSlotClickHandler;
-    // 捕獲フェーズでイベントをキャッチ
-    document.addEventListener('click', timeSlotClickHandler, true);
-    console.log('✅ 公式サイト仕様を利用した時間帯選択解除ハンドラーを設定しました');
-}
-async function entranceReservationHelper(config) {
-    const { selectors, selectorTexts, timeouts } = config;
-    let attempts = 0;
-    const maxAttempts = 100;
-    console.log('入場予約補助機能を開始します...');
-    while (attempts < maxAttempts && !_entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_4__/* .entranceReservationStateManager */ .xx.getShouldStop()) {
-        attempts++;
-        console.log(`試行回数: ${attempts}`);
-        const statusDiv = document.getElementById('reservation-status');
-        if (statusDiv) {
-            statusDiv.innerText = `試行中... (${attempts}回目)`;
-        }
-        try {
-            console.log('1. submitボタンを待機中...');
-            const submitButton = await (0,_pavilion_search_page__WEBPACK_IMPORTED_MODULE_0__/* .waitForElement */ .xk)(selectors.submit, timeouts.waitForSubmit, config);
-            if (_entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_4__/* .entranceReservationStateManager */ .xx.getShouldStop())
-                break;
-            console.log('submitボタンが見つかりました。効率モードチェック中...');
-            // submit押下時に回数を更新
-            _entrance_page_state__WEBPACK_IMPORTED_MODULE_1__.entranceReservationState.attempts = attempts;
-            // 効率モード対応のsubmitクリック実行
-            await executeSubmitWithEfficiencyTiming(submitButton, config);
-            console.log('2. レスポンスを待機中...');
-            const responseSelectors = {
-                change: selectors.change,
-                success: selectors.success,
-                failure: selectors.failure
-            };
-            const response = await (0,_pavilion_search_page__WEBPACK_IMPORTED_MODULE_0__/* .waitForAnyElement */ .Dr)(responseSelectors, timeouts.waitForResponse, selectorTexts, config);
-            console.log(`レスポンス検出: ${response.key}`);
-            if (_entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_4__/* .entranceReservationStateManager */ .xx.getShouldStop())
-                break;
-            if (response.key === 'change') {
-                console.log('changeボタンをクリックします。');
-                await clickElementWithFixedDelay(response.element, config);
-                console.log('success/failureを待機中...');
-                const finalSelectors = {
-                    success: selectors.success,
-                    failure: selectors.failure
-                };
-                console.log(`⏰ 最大${timeouts.waitForResponse / 1000}秒間待機開始...`);
-                const startTime = Date.now();
-                try {
-                    const finalResponse = await (0,_pavilion_search_page__WEBPACK_IMPORTED_MODULE_0__/* .waitForAnyElement */ .Dr)(finalSelectors, timeouts.waitForResponse, selectorTexts, config);
-                    const elapsedTime = Math.round((Date.now() - startTime) / 1000);
-                    console.log(`✅ 最終レスポンス検出: ${finalResponse.key} (${elapsedTime}秒後)`);
-                    if (finalResponse.key === 'success') {
-                        console.log('🎉 予約成功！処理を終了します。');
-                        return { success: true, attempts };
-                    }
-                    else {
-                        console.log('予約失敗。closeボタンをクリックして再試行します。');
-                        const closeButton = await (0,_pavilion_search_page__WEBPACK_IMPORTED_MODULE_0__/* .waitForElement */ .xk)(selectors.close, timeouts.waitForClose, config);
-                        await clickElementWithFixedDelay(closeButton, config);
-                        await new Promise(resolve => setTimeout(resolve, (0,_pavilion_search_page__WEBPACK_IMPORTED_MODULE_0__/* .getRandomWaitTime */ .I1)(config.randomSettings.minRetryDelay, config.randomSettings.retryRandomRange, config)));
-                    }
-                }
-                catch (waitError) {
-                    const elapsedTime = Math.round((Date.now() - startTime) / 1000);
-                    console.error(`❌ ${elapsedTime}秒後にwaitForAnyElementでエラー:`, waitError);
-                    throw waitError; // エラーを再スロー
-                }
-            }
-            else if (response.key === 'success') {
-                console.log('🎉 予約成功！処理を終了します。');
-                return { success: true, attempts };
-            }
-            else if (response.key === 'failure') {
-                console.log('予約失敗。closeボタンをクリックして再試行します。');
-                const closeButton = await (0,_pavilion_search_page__WEBPACK_IMPORTED_MODULE_0__/* .waitForElement */ .xk)(selectors.close, timeouts.waitForClose, config);
-                await clickElementWithFixedDelay(closeButton, config);
-                await new Promise(resolve => setTimeout(resolve, (0,_pavilion_search_page__WEBPACK_IMPORTED_MODULE_0__/* .getRandomWaitTime */ .I1)(config.randomSettings.minRetryDelay, config.randomSettings.retryRandomRange, config)));
-            }
-        }
-        catch (error) {
-            const errorMessage = error instanceof Error ? error.message : String(error);
-            console.error(`エラーが発生しました (試行 ${attempts}):`, errorMessage);
-            // 3分待っても結果が返らない場合（タイムアウト）は異常終了
-            if (errorMessage.includes('いずれの要素も見つかりません') || errorMessage.includes('要素が見つかりませんでした')) {
-                console.error('🚨 予約処理異常終了: 3分待っても成功/失敗の結果が返りませんでした');
-                console.error('🛑 自動予約処理を完全停止します');
-                _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_4__/* .entranceReservationStateManager */ .xx.setShouldStop(true);
-                return { success: false, attempts, abnormalTermination: true };
-            }
-            if (_entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_4__/* .entranceReservationStateManager */ .xx.getShouldStop())
-                break;
-            await new Promise(resolve => setTimeout(resolve, (0,_pavilion_search_page__WEBPACK_IMPORTED_MODULE_0__/* .getRandomWaitTime */ .I1)(config.randomSettings.minRetryDelay, config.randomSettings.retryRandomRange, config)));
-        }
-    }
-    if (_entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_4__/* .entranceReservationStateManager */ .xx.getShouldStop()) {
-        console.log('ユーザーによってキャンセルされました。');
-        // 中断時は状態をリセット
-        _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_4__/* .entranceReservationStateManager */ .xx.stop();
-        return { success: false, attempts, cancelled: true };
-    }
-    console.log(`最大試行回数 (${maxAttempts}) に達しました。クールタイムを開始します。`);
-    // クールタイム開始
-    _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_4__/* .entranceReservationStateManager */ .xx.startReservationCooldown();
-    return { success: false, attempts, cooldownStarted: true };
-}
-// ============================================================================
-// 効率モード対応関数
-// ============================================================================
-// 効率モード対応のsubmit実行（統一自動処理管理対応）
-async function executeSubmitWithEfficiencyTiming(submitButton, config) {
-    const isEfficiencyMode = _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_4__/* .entranceReservationStateManager */ .xx.isEfficiencyModeEnabled();
-    if (!isEfficiencyMode) {
-        // 通常モード: そのままクリック
-        await (0,_pavilion_search_page__WEBPACK_IMPORTED_MODULE_0__/* .clickElement */ .jp)(submitButton, config);
-        return;
-    }
-    // 効率モード: 目標時間（00秒/30秒）への調整待機
-    console.log('🚀 効率モード: submit標的時刻調整開始');
-    // 次の00秒/30秒標的時刻を計算
-    const nextTarget = _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_4__/* .entranceReservationStateManager */ .xx.calculateNext00or30Seconds();
-    try {
-        // 統一自動処理管理による中断可能な効率モード待機
-        console.log(`🎯 統一効率モード待機: 目標時刻 ${nextTarget.toLocaleTimeString()}`);
-        await _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_4__/* .entranceReservationStateManager */ .xx.executeUnifiedEfficiencyWait(nextTarget);
-        // 標的時刻でsubmitクリック実行
-        console.log(`🚀 submitクリック実行 (${new Date().toLocaleTimeString()})`);
-        await (0,_pavilion_search_page__WEBPACK_IMPORTED_MODULE_0__/* .clickElement */ .jp)(submitButton, config);
-        // 次回標的時刻を更新
-        _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_4__/* .entranceReservationStateManager */ .xx.updateNextSubmitTarget();
-    }
-    catch (error) {
-        if (error.name === 'CancellationError') {
-            console.log('⏹️ 効率モード待機が中断されました');
-            throw error; // 中断を上位に伝播
-        }
-        else {
-            console.error('❌ 効率モード待機エラー:', error);
-            throw error;
-        }
-    }
-}
-// 効率モード対応の固定待機付きクリック（change、closeボタン用、統一自動処理管理対応）
-async function clickElementWithFixedDelay(element, config) {
-    const isEfficiencyMode = _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_4__/* .entranceReservationStateManager */ .xx.isEfficiencyModeEnabled();
-    if (isEfficiencyMode) {
-        try {
-            // 効率モード: 1.5-3秒の固定待機（中断可能）
-            const randomDelay = 1500 + Math.random() * 1500; // 1500~3000ms
-            console.log(`⏳ 効率モード固定待機: ${Math.round(randomDelay)}ms`);
-            // 統一自動処理管理による中断可能な待機
-            const controller = new AbortController();
-            await _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_4__/* .entranceReservationStateManager */ .xx.executeUnifiedWaitWithCancellation(randomDelay, controller.signal);
-        }
-        catch (error) {
-            if (error.name === 'CancellationError' || error.message === 'AbortError') {
-                console.log('⏹️ 効率モード固定待機が中断されました');
-                throw error; // 中断を上位に伝播
-            }
-            else {
-                console.error('❌ 効率モード固定待機エラー:', error);
-                throw error;
-            }
-        }
-    }
-    // 通常のクリック処理
-    await (0,_pavilion_search_page__WEBPACK_IMPORTED_MODULE_0__/* .clickElement */ .jp)(element, config);
-}
-// エクスポート
-
-// ============================================================================
-
-
-/***/ })
-
-/******/ 	});
-/************************************************************************/
-/******/ 	// The module cache
-/******/ 	var __webpack_module_cache__ = {};
-/******/ 	
-/******/ 	// The require function
-/******/ 	function __webpack_require__(moduleId) {
-/******/ 		// Check if module is in cache
-/******/ 		var cachedModule = __webpack_module_cache__[moduleId];
-/******/ 		if (cachedModule !== undefined) {
-/******/ 			return cachedModule.exports;
-/******/ 		}
-/******/ 		// Create a new module (and put it into the cache)
-/******/ 		var module = __webpack_module_cache__[moduleId] = {
-/******/ 			id: moduleId,
-/******/ 			// no module.loaded needed
-/******/ 			exports: {}
-/******/ 		};
-/******/ 	
-/******/ 		// Execute the module function
-/******/ 		__webpack_modules__[moduleId](module, module.exports, __webpack_require__);
-/******/ 	
-/******/ 		// Return the exports of the module
-/******/ 		return module.exports;
-/******/ 	}
-/******/ 	
-/************************************************************************/
-/******/ 	/* webpack/runtime/compat get default export */
-/******/ 	(() => {
-/******/ 		// getDefaultExport function for compatibility with non-harmony modules
-/******/ 		__webpack_require__.n = (module) => {
-/******/ 			var getter = module && module.__esModule ?
-/******/ 				() => (module['default']) :
-/******/ 				() => (module);
-/******/ 			__webpack_require__.d(getter, { a: getter });
-/******/ 			return getter;
-/******/ 		};
-/******/ 	})();
-/******/ 	
-/******/ 	/* webpack/runtime/define property getters */
-/******/ 	(() => {
-/******/ 		// define getter functions for harmony exports
-/******/ 		__webpack_require__.d = (exports, definition) => {
-/******/ 			for(var key in definition) {
-/******/ 				if(__webpack_require__.o(definition, key) && !__webpack_require__.o(exports, key)) {
-/******/ 					Object.defineProperty(exports, key, { enumerable: true, get: definition[key] });
-/******/ 				}
-/******/ 			}
-/******/ 		};
-/******/ 	})();
-/******/ 	
-/******/ 	/* webpack/runtime/hasOwnProperty shorthand */
-/******/ 	(() => {
-/******/ 		__webpack_require__.o = (obj, prop) => (Object.prototype.hasOwnProperty.call(obj, prop))
-/******/ 	})();
-/******/ 	
-/******/ 	/* webpack/runtime/make namespace object */
-/******/ 	(() => {
-/******/ 		// define __esModule on exports
-/******/ 		__webpack_require__.r = (exports) => {
-/******/ 			if(typeof Symbol !== 'undefined' && Symbol.toStringTag) {
-/******/ 				Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
-/******/ 			}
-/******/ 			Object.defineProperty(exports, '__esModule', { value: true });
-/******/ 		};
-/******/ 	})();
-/******/ 	
-/******/ 	/* webpack/runtime/nonce */
-/******/ 	(() => {
-/******/ 		__webpack_require__.nc = undefined;
-/******/ 	})();
-/******/ 	
-/************************************************************************/
-var __webpack_exports__ = {};
-
-// EXTERNAL MODULE: ./src-modules/pavilion-search-page.ts + 1 modules
-var pavilion_search_page = __webpack_require__(521);
 // EXTERNAL MODULE: ./src-modules/entrance-page-state.ts
 var entrance_page_state = __webpack_require__(278);
 // EXTERNAL MODULE: ./src-modules/entrance-reservation-state-manager.ts + 1 modules
@@ -8628,9 +8676,9 @@ const trigger_init = (url_record) => {
             return;
         isPageInitializing = true;
         const interval_judge = setInterval(() => {
-            if ((0,pavilion_search_page/* judge_init */.v8)()) {
+            if (judge_init()) {
                 clearInterval(interval_judge);
-                (0,pavilion_search_page/* init_page */.Xs)();
+                init_page();
                 isPageInitializing = false;
                 console.log("ytomo extension loaded (pavilion reservation)");
             }

@@ -144,12 +144,17 @@ export class UnifiedAutomationManager {
     }
 
     // ============================================================================
-    // DOM操作の中断対応（Phase 3で実装予定）
+    // DOM操作の中断対応（Phase 3で実装）
     // ============================================================================
 
-    /*
-    // Phase 3で実装予定: 中断可能なDOM要素待機
-    private async waitForElementWithCancellation(
+    /**
+     * 中断可能なDOM要素待機
+     * @param selector セレクター
+     * @param timeout タイムアウト時間
+     * @param signal 中断シグナル
+     * @returns 見つかったHTMLElement
+     */
+    async waitForElementWithCancellation(
         selector: string,
         timeout: number,
         signal: AbortSignal
@@ -165,26 +170,214 @@ export class UnifiedAutomationManager {
                 return element;
             }
 
-            await this.waitWithCancellation(checkInterval, signal);
+            const remainingTime = endTime - Date.now();
+            const waitTime = Math.min(checkInterval, remainingTime);
+            if (waitTime > 0) {
+                await this.waitWithCancellation(waitTime, signal);
+            }
         }
 
         throw new Error(`要素が見つかりません: ${selector}`);
     }
-    */
+
+    /**
+     * 中断可能な複数要素待機
+     * @param selectors セレクター辞書
+     * @param timeout タイムアウト時間
+     * @param signal 中断シグナル
+     * @param selectorTexts テキスト条件辞書
+     * @returns 見つかった要素情報
+     */
+    async waitForAnyElementWithCancellation(
+        selectors: Record<string, string>,
+        timeout: number,
+        signal: AbortSignal,
+        selectorTexts: Record<string, string> = {}
+    ): Promise<{ key: string, element: HTMLElement }> {
+        const checkInterval = 100;
+        const endTime = Date.now() + timeout;
+
+        while (Date.now() < endTime) {
+            this.throwIfAborted(signal);
+
+            // 全てのセレクターをチェック
+            for (const [key, selector] of Object.entries(selectors)) {
+                const elements = document.querySelectorAll(selector);
+                
+                for (let i = 0; i < elements.length; i++) {
+                    const element = elements[i] as HTMLElement;
+                    if (selectorTexts[key]) {
+                        if (element.textContent && element.textContent.includes(selectorTexts[key])) {
+                            return { key, element };
+                        }
+                    } else {
+                        if (element) {
+                            return { key, element };
+                        }
+                    }
+                }
+            }
+
+            const remainingTime = endTime - Date.now();
+            const waitTime = Math.min(checkInterval, remainingTime);
+            if (waitTime > 0) {
+                await this.waitWithCancellation(waitTime, signal);
+            }
+        }
+
+        throw new Error(`いずれの要素も見つかりません: ${Object.keys(selectors).join(', ')}`);
+    }
 
     // ============================================================================
     // 処理実装（将来のPhase 3で実装予定）
     // ============================================================================
 
     /**
-     * 予約処理ループ（Phase 3で実装予定）
+     * 統一予約処理ループ（Phase 3で実装）
      */
-    private async reservationLoop(_config: ReservationConfig, _signal: AbortSignal): Promise<ReservationResult> {
-        // Phase 3で entranceReservationHelper() から移植予定
-        console.log('🚧 予約処理ループ - Phase 3で実装予定');
+    private async reservationLoop(config: ReservationConfig, signal: AbortSignal): Promise<ReservationResult> {
+        const { selectors, selectorTexts, timeouts } = config;
+        let attempts = 0;
+        const maxAttempts = 100;
         
-        // 暫定実装: 既存処理に委譲
-        throw new Error('予約処理ループは Phase 3 で実装予定です');
+        console.log('🚀 統一予約処理ループを開始します...');
+        
+        while (attempts < maxAttempts) {
+            attempts++;
+            console.log(`試行回数: ${attempts}`);
+            
+            // 中断チェック
+            this.throwIfAborted(signal);
+            
+            // 状態表示更新
+            const statusDiv = document.getElementById('reservation-status');
+            if (statusDiv) {
+                statusDiv.innerText = `試行中... (${attempts}回目)`;
+            }
+            
+            try {
+                console.log('1. submitボタンを待機中...');
+                const submitButton = await this.waitForElementWithCancellation(
+                    selectors.submit, 
+                    timeouts.waitForSubmit, 
+                    signal
+                );
+                
+                // 中断チェック
+                this.throwIfAborted(signal);
+                
+                // 試行回数を状態管理に記録
+                if (this.stateManager && this.stateManager.setAttempts) {
+                    this.stateManager.setAttempts(attempts);
+                }
+                
+                // 効率モード対応のsubmitクリック実行
+                console.log('2. submitボタンをクリック...');
+                await this.executeEfficiencyTimingSubmit(submitButton, config, signal);
+                
+                console.log('3. レスポンスを待機中...');
+                const responseSelectors = {
+                    change: selectors.change,
+                    success: selectors.success,
+                    failure: selectors.failure
+                };
+                
+                const response = await this.waitForAnyElementWithCancellation(
+                    responseSelectors, 
+                    timeouts.waitForResponse, 
+                    signal,
+                    selectorTexts
+                );
+                
+                console.log(`レスポンス検出: ${response.key}`);
+                
+                if (response.key === 'change') {
+                    console.log('変更ボタンをクリックして最終結果を待機...');
+                    await this.executeFixedDelayClick(response.element, config, signal);
+                    
+                    console.log('success/failureを待機中...');
+                    const finalSelectors = {
+                        success: selectors.success,
+                        failure: selectors.failure
+                    };
+                    
+                    console.log(`⏰ 最大${timeouts.waitForResponse / 1000}秒間待機開始...`);
+                    const startTime = Date.now();
+                    
+                    const finalResponse = await this.waitForAnyElementWithCancellation(
+                        finalSelectors, 
+                        timeouts.waitForResponse, 
+                        signal,
+                        selectorTexts
+                    );
+                    
+                    const elapsedTime = Math.round((Date.now() - startTime) / 1000);
+                    console.log(`✅ 最終レスポンス検出: ${finalResponse.key} (${elapsedTime}秒後)`);
+                    
+                    if (finalResponse.key === 'success') {
+                        console.log('🎉 予約成功！処理を終了します。');
+                        return { success: true, attempts };
+                    } else {
+                        console.log('予約失敗。closeボタンをクリックして再試行します。');
+                        const closeButton = await this.waitForElementWithCancellation(
+                            selectors.close, 
+                            timeouts.waitForClose, 
+                            signal
+                        );
+                        await this.executeFixedDelayClick(closeButton, config, signal);
+                        await this.waitWithCancellation(
+                            this.getRandomWaitTime(config.randomSettings.minRetryDelay, config.randomSettings.retryRandomRange), 
+                            signal
+                        );
+                    }
+                } else if (response.key === 'success') {
+                    console.log('🎉 予約成功！処理を終了します。');
+                    return { success: true, attempts };
+                } else if (response.key === 'failure') {
+                    console.log('予約失敗。closeボタンをクリックして再試行します。');
+                    const closeButton = await this.waitForElementWithCancellation(
+                        selectors.close, 
+                        timeouts.waitForClose, 
+                        signal
+                    );
+                    await this.executeFixedDelayClick(closeButton, config, signal);
+                    await this.waitWithCancellation(
+                        this.getRandomWaitTime(config.randomSettings.minRetryDelay, config.randomSettings.retryRandomRange), 
+                        signal
+                    );
+                }
+                
+            } catch (error: any) {
+                // 中断エラーは上位に伝播
+                if (error.message === 'AbortError') {
+                    throw new CancellationError('予約処理が中断されました');
+                }
+                
+                const errorMessage = error instanceof Error ? error.message : String(error);
+                console.error(`エラーが発生しました (試行 ${attempts}):`, errorMessage);
+                
+                // タイムアウトエラーは異常終了
+                if (errorMessage.includes('いずれの要素も見つかりません') || errorMessage.includes('要素が見つかりませんでした')) {
+                    console.error('🚨 予約処理異常終了: 3分待っても成功/失敗の結果が返りませんでした');
+                    return { success: false, attempts, abnormalTermination: true };
+                }
+                
+                // リトライ待機
+                await this.waitWithCancellation(
+                    this.getRandomWaitTime(config.randomSettings.minRetryDelay, config.randomSettings.retryRandomRange), 
+                    signal
+                );
+            }
+        }
+        
+        console.log(`最大試行回数 (${maxAttempts}) に達しました。クールタイムを開始します。`);
+        
+        // クールタイム開始（状態管理経由）
+        if (this.stateManager && this.stateManager.startReservationCooldown) {
+            this.stateManager.startReservationCooldown();
+        }
+        
+        return { success: false, attempts, cooldownStarted: true };
     }
 
     /**
@@ -193,6 +386,81 @@ export class UnifiedAutomationManager {
     private async monitoringLoop(_signal: AbortSignal): Promise<void> {
         // 将来の監視処理統一時に実装
         console.log('🚧 監視処理ループ - 将来実装予定');
+    }
+
+    /**
+     * 効率モード対応submitクリック実行（統一処理内部用）
+     */
+    private async executeEfficiencyTimingSubmit(submitButton: HTMLElement, config: ReservationConfig, signal: AbortSignal): Promise<void> {
+        const isEfficiencyMode = this.stateManager && this.stateManager.isEfficiencyModeEnabled ? 
+            this.stateManager.isEfficiencyModeEnabled() : false;
+        
+        if (!isEfficiencyMode) {
+            // 通常モード: そのままクリック
+            await this.executeStandardClick(submitButton, config, signal);
+            return;
+        }
+        
+        // 効率モード: 目標時間（00秒/30秒）への調整待機
+        console.log('🚀 統一効率モード: submit標的時刻調整開始');
+        
+        // 次の00秒/30秒標的時刻を計算
+        const nextTarget = this.stateManager && this.stateManager.calculateNext00or30Seconds ? 
+            this.stateManager.calculateNext00or30Seconds() : new Date(Date.now() + 5000);
+        
+        // 統一自動処理管理による中断可能な効率モード待機
+        console.log(`🎯 統一効率モード待機: 目標時刻 ${nextTarget.toLocaleTimeString()}`);
+        await this.waitForTargetTime(nextTarget, signal);
+        
+        // 標的時刻でsubmitクリック実行
+        console.log(`🚀 submitクリック実行 (${new Date().toLocaleTimeString()})`);
+        await this.executeStandardClick(submitButton, config, signal);
+        
+        // 次回標的時刻を更新
+        if (this.stateManager && this.stateManager.updateNextSubmitTarget) {
+            this.stateManager.updateNextSubmitTarget();
+        }
+    }
+
+    /**
+     * 効率モード対応固定待機クリック実行（統一処理内部用）
+     */
+    private async executeFixedDelayClick(element: HTMLElement, config: ReservationConfig, signal: AbortSignal): Promise<void> {
+        const isEfficiencyMode = this.stateManager && this.stateManager.isEfficiencyModeEnabled ? 
+            this.stateManager.isEfficiencyModeEnabled() : false;
+        
+        if (isEfficiencyMode) {
+            // 効率モード: 1.5-3秒の固定待機（中断可能）
+            const randomDelay = 1500 + Math.random() * 1500; // 1500~3000ms
+            console.log(`⏳ 効率モード固定待機: ${Math.round(randomDelay)}ms`);
+            
+            await this.waitWithCancellation(randomDelay, signal);
+        }
+        
+        // 通常のクリック処理
+        await this.executeStandardClick(element, config, signal);
+    }
+
+    /**
+     * 標準クリック実行（統一処理内部用）
+     */
+    private async executeStandardClick(element: HTMLElement, config: ReservationConfig, signal: AbortSignal): Promise<void> {
+        // 中断チェック
+        this.throwIfAborted(signal);
+        
+        // クリック実行
+        element.click();
+        
+        // クリック後の待機
+        const delay = this.getRandomWaitTime(config.randomSettings.minClickDelay, config.randomSettings.clickRandomRange);
+        await this.waitWithCancellation(delay, signal);
+    }
+
+    /**
+     * ランダム待機時間計算（統一処理内部用）
+     */
+    private getRandomWaitTime(minTime: number, randomRange: number): number {
+        return minTime + Math.floor(Math.random() * randomRange);
     }
 
     // ============================================================================

@@ -1,14 +1,7 @@
-// pavilion-search-pageからのimport
-import {
-    getRandomWaitTime,
-    waitForElement,
-    waitForAnyElement,
-    clickElement
-} from './pavilion-search-page';
+// Phase 3: 統一処理移行により個別importは不要
 
 // entrance-page-stateからのimport
 import { 
-    entranceReservationState, 
     calendarWatchState,
     loadFABVisibility,
     updateFABVisibility
@@ -981,194 +974,48 @@ function setupTimeSlotClickHandlers(): void {
     console.log('✅ 公式サイト仕様を利用した時間帯選択解除ハンドラーを設定しました');
 }
 
+// 統一自動処理管理に対応した予約処理（Phase 3で実装）
 async function entranceReservationHelper(config: ReservationConfig): Promise<ReservationResult> {
-    const { selectors, selectorTexts, timeouts } = config;
-    let attempts = 0;
-    const maxAttempts = 100;
-    
-    console.log('入場予約補助機能を開始します...');
-    
-    while (attempts < maxAttempts && !entranceReservationStateManager.getShouldStop()) {
-        attempts++;
-        console.log(`試行回数: ${attempts}`);
-        
-        const statusDiv = document.getElementById('reservation-status');
-        if (statusDiv) {
-            statusDiv.innerText = `試行中... (${attempts}回目)`;
-        }
-        
-        try {
-            console.log('1. submitボタンを待機中...');
-            const submitButton = await waitForElement(selectors.submit, timeouts.waitForSubmit, config);
-            
-            if (entranceReservationStateManager.getShouldStop()) break;
-            
-            console.log('submitボタンが見つかりました。効率モードチェック中...');
-            
-            // submit押下時に回数を更新
-            entranceReservationState.attempts = attempts;
-            
-            // 効率モード対応のsubmitクリック実行
-            await executeSubmitWithEfficiencyTiming(submitButton as HTMLElement, config);
-            
-            console.log('2. レスポンスを待機中...');
-            const responseSelectors = {
-                change: selectors.change,
-                success: selectors.success,
-                failure: selectors.failure
-            };
-            
-            const response = await waitForAnyElement(responseSelectors, timeouts.waitForResponse, selectorTexts, config);
-            console.log(`レスポンス検出: ${response.key}`);
-            
-            if (entranceReservationStateManager.getShouldStop()) break;
-            
-            if (response.key === 'change') {
-                console.log('changeボタンをクリックします。');
-                await clickElementWithFixedDelay(response.element, config);
-                
-                console.log('success/failureを待機中...');
-                
-                const finalSelectors = {
-                    success: selectors.success,
-                    failure: selectors.failure
-                };
-                
-                console.log(`⏰ 最大${timeouts.waitForResponse / 1000}秒間待機開始...`);
-                const startTime = Date.now();
-                
-                try {
-                    const finalResponse = await waitForAnyElement(finalSelectors, timeouts.waitForResponse, selectorTexts, config);
-                    const elapsedTime = Math.round((Date.now() - startTime) / 1000);
-                    console.log(`✅ 最終レスポンス検出: ${finalResponse.key} (${elapsedTime}秒後)`);
-                    
-                    if (finalResponse.key === 'success') {
-                        console.log('🎉 予約成功！処理を終了します。');
-                        return { success: true, attempts };
-                    } else {
-                        console.log('予約失敗。closeボタンをクリックして再試行します。');
-                        const closeButton = await waitForElement(selectors.close, timeouts.waitForClose, config);
-                        await clickElementWithFixedDelay(closeButton as HTMLElement, config);
-                        await new Promise(resolve => setTimeout(resolve, getRandomWaitTime(config.randomSettings.minRetryDelay, config.randomSettings.retryRandomRange, config)));
-                    }
-                } catch (waitError) {
-                    const elapsedTime = Math.round((Date.now() - startTime) / 1000);
-                    console.error(`❌ ${elapsedTime}秒後にwaitForAnyElementでエラー:`, waitError);
-                    throw waitError; // エラーを再スロー
-                }
-            } else if (response.key === 'success') {
-                console.log('🎉 予約成功！処理を終了します。');
-                return { success: true, attempts };
-            } else if (response.key === 'failure') {
-                console.log('予約失敗。closeボタンをクリックして再試行します。');
-                const closeButton = await waitForElement(selectors.close, timeouts.waitForClose, config);
-                await clickElementWithFixedDelay(closeButton as HTMLElement, config);
-                await new Promise(resolve => setTimeout(resolve, getRandomWaitTime(config.randomSettings.minRetryDelay, config.randomSettings.retryRandomRange, config)));
-            }
-            
-        } catch (error) {
-            const errorMessage = error instanceof Error ? error.message : String(error);
-            console.error(`エラーが発生しました (試行 ${attempts}):`, errorMessage);
-            
-            // 3分待っても結果が返らない場合（タイムアウト）は異常終了
-            if (errorMessage.includes('いずれの要素も見つかりません') || errorMessage.includes('要素が見つかりませんでした')) {
-                console.error('🚨 予約処理異常終了: 3分待っても成功/失敗の結果が返りませんでした');
-                console.error('🛑 自動予約処理を完全停止します');
-                entranceReservationStateManager.setShouldStop(true);
-                return { success: false, attempts, abnormalTermination: true };
-            }
-            
-            if (entranceReservationStateManager.getShouldStop()) break;
-            await new Promise(resolve => setTimeout(resolve, getRandomWaitTime(config.randomSettings.minRetryDelay, config.randomSettings.retryRandomRange, config)));
-        }
-    }
-    
-    if (entranceReservationStateManager.getShouldStop()) {
-        console.log('ユーザーによってキャンセルされました。');
-        // 中断時は状態をリセット
-        entranceReservationStateManager.stop();
-        return { success: false, attempts, cancelled: true };
-    }
-    
-    console.log(`最大試行回数 (${maxAttempts}) に達しました。クールタイムを開始します。`);
-    
-    // クールタイム開始
-    entranceReservationStateManager.startReservationCooldown();
-    
-    return { success: false, attempts, cooldownStarted: true };
-}
-
-// ============================================================================
-// 効率モード対応関数
-// ============================================================================
-
-// 効率モード対応のsubmit実行（統一自動処理管理対応）
-async function executeSubmitWithEfficiencyTiming(submitButton: HTMLElement, config: ReservationConfig): Promise<void> {
-    const isEfficiencyMode = entranceReservationStateManager.isEfficiencyModeEnabled();
-    
-    if (!isEfficiencyMode) {
-        // 通常モード: そのままクリック
-        await clickElement(submitButton, config);
-        return;
-    }
-    
-    // 効率モード: 目標時間（00秒/30秒）への調整待機
-    console.log('🚀 効率モード: submit標的時刻調整開始');
-    
-    // 次の00秒/30秒標的時刻を計算
-    const nextTarget = entranceReservationStateManager.calculateNext00or30Seconds();
+    console.log('🚀 統一自動処理管理による入場予約補助機能を開始します...');
     
     try {
-        // 統一自動処理管理による中断可能な効率モード待機
-        console.log(`🎯 統一効率モード待機: 目標時刻 ${nextTarget.toLocaleTimeString()}`);
-        await entranceReservationStateManager.executeUnifiedEfficiencyWait(nextTarget);
+        // 統一自動処理管理による予約処理実行
+        const result = await entranceReservationStateManager.executeUnifiedReservationProcess(config);
         
-        // 標的時刻でsubmitクリック実行
-        console.log(`🚀 submitクリック実行 (${new Date().toLocaleTimeString()})`);
-        await clickElement(submitButton, config);
+        if (result.success) {
+            console.log('🎉 統一予約処理成功！');
+        } else if (result.cancelled) {
+            console.log('⏹️ 統一予約処理がキャンセルされました');
+            entranceReservationStateManager.stop();
+        } else if (result.abnormalTermination) {
+            console.error('🚨 統一予約処理異常終了');
+            entranceReservationStateManager.setShouldStop(true);
+        } else if (result.cooldownStarted) {
+            console.log('⏰ 統一予約処理クールタイム開始');
+        }
         
-        // 次回標的時刻を更新
-        entranceReservationStateManager.updateNextSubmitTarget();
+        return result;
         
     } catch (error: any) {
         if (error.name === 'CancellationError') {
-            console.log('⏹️ 効率モード待機が中断されました');
-            throw error; // 中断を上位に伝播
+            console.log('⏹️ 統一予約処理が中断されました');
+            entranceReservationStateManager.stop();
+            return { success: false, attempts: 0, cancelled: true };
         } else {
-            console.error('❌ 効率モード待機エラー:', error);
+            console.error('❌ 統一予約処理でエラー:', error);
             throw error;
         }
     }
 }
 
-// 効率モード対応の固定待機付きクリック（change、closeボタン用、統一自動処理管理対応）
-async function clickElementWithFixedDelay(element: HTMLElement, config: ReservationConfig): Promise<void> {
-    const isEfficiencyMode = entranceReservationStateManager.isEfficiencyModeEnabled();
-    
-    if (isEfficiencyMode) {
-        try {
-            // 効率モード: 1.5-3秒の固定待機（中断可能）
-            const randomDelay = 1500 + Math.random() * 1500; // 1500~3000ms
-            console.log(`⏳ 効率モード固定待機: ${Math.round(randomDelay)}ms`);
-            
-            // 統一自動処理管理による中断可能な待機
-            const controller = new AbortController();
-            await entranceReservationStateManager.executeUnifiedWaitWithCancellation(randomDelay, controller.signal);
-            
-        } catch (error: any) {
-            if (error.name === 'CancellationError' || error.message === 'AbortError') {
-                console.log('⏹️ 効率モード固定待機が中断されました');
-                throw error; // 中断を上位に伝播
-            } else {
-                console.error('❌ 効率モード固定待機エラー:', error);
-                throw error;
-            }
-        }
-    }
-    
-    // 通常のクリック処理
-    await clickElement(element, config);
-}
+// Phase 3: 統一自動処理管理により予約処理ループを完全に置換完了
+
+// ============================================================================
+
+// ============================================================================
+// エクスポート（Phase 3で統一処理移行により最小限に）
+// ============================================================================
+// Phase 3完了: 統一自動処理管理により個別関数は不要
 
 // エクスポート
 export {

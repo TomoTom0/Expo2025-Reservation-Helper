@@ -7,6 +7,7 @@
 import { timeSlotSelectors, generateUniqueTdSelector, extractTdStatus } from './entrance-page-dom-utils';
 import { getCurrentSelectedCalendarDate } from './entrance-page-core';
 import { UnifiedAutomationManager, CancellationError } from './unified-automation-manager';
+import type { ReservationConfig, ReservationResult } from '../types/index.js';
 
 // ============================================================================
 // 型定義
@@ -331,6 +332,15 @@ export class EntranceReservationStateManager {
      */
     async executeUnifiedWaitWithCancellation(ms: number, signal: AbortSignal): Promise<void> {
         return await this.automationManager.waitWithCancellation(ms, signal);
+    }
+
+    /**
+     * 統一予約処理実行
+     * @param config 予約設定
+     * @returns Promise<ReservationResult>
+     */
+    async executeUnifiedReservationProcess(config: ReservationConfig): Promise<ReservationResult> {
+        return await this.automationManager.executeReservationProcess(config);
     }
     
     // 予約中断フラグ取得
