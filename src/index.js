@@ -5310,6 +5310,8 @@ function createEntranceReservationUI() {
         console.log('⏹️ 予約を中断');
         _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_4__/* .entranceReservationStateManager */ .xx.setShouldStop(true);
         showStatus('予約処理を中断中...', 'orange');
+        // 中断フラグ設定後、UIを即座に更新
+        (0,_entrance_page_ui_helpers__WEBPACK_IMPORTED_MODULE_5__/* .updateMainButtonDisplay */ .vp)();
     }
     // 監視開始処理
     async function startMonitoringProcess() {

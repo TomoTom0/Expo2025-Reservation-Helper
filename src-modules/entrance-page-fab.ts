@@ -299,6 +299,9 @@ function createEntranceReservationUI(): void {
         console.log('⏹️ 予約を中断');
         entranceReservationStateManager.setShouldStop(true);
         showStatus('予約処理を中断中...', 'orange');
+        
+        // 中断フラグ設定後、UIを即座に更新
+        updateMainButtonDisplay();
     }
 
     // 監視開始処理
