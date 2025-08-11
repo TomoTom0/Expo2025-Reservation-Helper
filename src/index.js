@@ -2890,6 +2890,11 @@ class EntranceReservationStateManager {
     setShouldStop(shouldStop) {
         this.reservationExecution.shouldStop = shouldStop;
         this.log(`🛑 予約中断フラグ: ${shouldStop}`);
+        // 中断時は実行状態をIDLEに戻す
+        if (shouldStop && this.executionState === ExecutionState.RESERVATION_RUNNING) {
+            this.executionState = ExecutionState.IDLE;
+            this.log('🔄 予約中断により状態をIDLEに変更');
+        }
     }
     // 予約中断フラグ取得
     getShouldStop() {
@@ -5329,7 +5334,11 @@ function createEntranceReservationUI() {
                 }
             }
             else {
-                if (result.abnormalTermination) {
+                if (result.cancelled) {
+                    showStatus(`⏹️ 予約中断 (${result.attempts}回試行)`, 'orange');
+                    console.log('⏹️ ユーザーにより予約が中断されました');
+                }
+                else if (result.abnormalTermination) {
                     showStatus(`🚨 異常終了 (${result.attempts}回試行) - システム停止`, 'red');
                     console.log('🚨 予約処理が異常終了しました。システムを停止します');
                 }

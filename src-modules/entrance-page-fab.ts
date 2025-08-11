@@ -384,7 +384,10 @@ function createEntranceReservationUI(): void {
                     cacheManager.clearMonitoringFlag(); // 監視継続フラグもクリア
                 }
             } else {
-                if (result.abnormalTermination) {
+                if (result.cancelled) {
+                    showStatus(`⏹️ 予約中断 (${result.attempts}回試行)`, 'orange');
+                    console.log('⏹️ ユーザーにより予約が中断されました');
+                } else if (result.abnormalTermination) {
                     showStatus(`🚨 異常終了 (${result.attempts}回試行) - システム停止`, 'red');
                     console.log('🚨 予約処理が異常終了しました。システムを停止します');
                 } else if (result.cooldownStarted) {

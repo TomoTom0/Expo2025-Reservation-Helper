@@ -284,6 +284,12 @@ export class EntranceReservationStateManager {
     setShouldStop(shouldStop: boolean): void {
         this.reservationExecution.shouldStop = shouldStop;
         this.log(`🛑 予約中断フラグ: ${shouldStop}`);
+        
+        // 中断時は実行状態をIDLEに戻す
+        if (shouldStop && this.executionState === ExecutionState.RESERVATION_RUNNING) {
+            this.executionState = ExecutionState.IDLE;
+            this.log('🔄 予約中断により状態をIDLEに変更');
+        }
     }
     
     // 予約中断フラグ取得
