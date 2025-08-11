@@ -665,6 +665,12 @@ function startCalendarWatcher(): void {
     calendarWatchState.isWatching = true;
     calendarWatchState.currentSelectedDate = getCurrentSelectedCalendarDate();
     
+    // 初期化時に入場予約状態管理にも現在の選択日付を設定
+    if (calendarWatchState.currentSelectedDate) {
+        entranceReservationStateManager.setSelectedCalendarDate(calendarWatchState.currentSelectedDate);
+        console.log(`📅 初期化時の選択日付を設定: ${calendarWatchState.currentSelectedDate}`);
+    }
+    
     console.log('📅 カレンダー変更監視を開始');
     
     // MutationObserverでカレンダー変更・時間帯選択・ボタン状態変更を検出
@@ -976,7 +982,7 @@ async function entranceReservationHelper(config: ReservationConfig): Promise<Res
     
     console.log('入場予約補助機能を開始します...');
     
-    while (attempts < maxAttempts && !entranceReservationState.shouldStop) {
+    while (attempts < maxAttempts && !entranceReservationStateManager.getShouldStop()) {
         attempts++;
         console.log(`試行回数: ${attempts}`);
         
@@ -989,7 +995,7 @@ async function entranceReservationHelper(config: ReservationConfig): Promise<Res
             console.log('1. submitボタンを待機中...');
             const submitButton = await waitForElement(selectors.submit, timeouts.waitForSubmit, config);
             
-            if (entranceReservationState.shouldStop) break;
+            if (entranceReservationStateManager.getShouldStop()) break;
             
             console.log('submitボタンが見つかりました。効率モードチェック中...');
             
@@ -1009,7 +1015,7 @@ async function entranceReservationHelper(config: ReservationConfig): Promise<Res
             const response = await waitForAnyElement(responseSelectors, timeouts.waitForResponse, selectorTexts, config);
             console.log(`レスポンス検出: ${response.key}`);
             
-            if (entranceReservationState.shouldStop) break;
+            if (entranceReservationStateManager.getShouldStop()) break;
             
             if (response.key === 'change') {
                 console.log('changeボタンをクリックします。');
@@ -1062,16 +1068,16 @@ async function entranceReservationHelper(config: ReservationConfig): Promise<Res
             if (errorMessage.includes('いずれの要素も見つかりません') || errorMessage.includes('要素が見つかりませんでした')) {
                 console.error('🚨 予約処理異常終了: 3分待っても成功/失敗の結果が返りませんでした');
                 console.error('🛑 自動予約処理を完全停止します');
-                entranceReservationState.shouldStop = true;
+                entranceReservationStateManager.setShouldStop(true);
                 return { success: false, attempts, abnormalTermination: true };
             }
             
-            if (entranceReservationState.shouldStop) break;
+            if (entranceReservationStateManager.getShouldStop()) break;
             await new Promise(resolve => setTimeout(resolve, getRandomWaitTime(config.randomSettings.minRetryDelay, config.randomSettings.retryRandomRange, config)));
         }
     }
     
-    if (entranceReservationState.shouldStop) {
+    if (entranceReservationStateManager.getShouldStop()) {
         console.log('ユーザーによってキャンセルされました。');
         return { success: false, attempts, cancelled: true };
     }

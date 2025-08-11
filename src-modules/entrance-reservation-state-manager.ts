@@ -1231,6 +1231,14 @@ export class EntranceReservationStateManager {
             monitoringTargetsElement.innerHTML = displayInfo.displayText.replace(/\n/g, '<br>');
             monitoringTargetsElement.style.display = 'block';
             
+            // 背景色の設定
+            monitoringTargetsElement.className = ''; // 既存のクラスをクリア
+            if (displayInfo.targetType === 'reservation') {
+                monitoringTargetsElement.classList.add('reservation-target');
+            } else if (displayInfo.targetType === 'monitoring') {
+                monitoringTargetsElement.classList.add('monitoring-targets');
+            }
+            
             // カウントダウン中はログを削減
             if (!this.isReloadCountdownActive()) {
                 console.log(`🔍 [対象表示更新] 表示タイプ: ${displayInfo.targetType}`);

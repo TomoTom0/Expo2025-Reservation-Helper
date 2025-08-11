@@ -19,7 +19,7 @@
 
   // FAB状態スタイル
   &-enabled {
-    background: rgb(0, 104, 33);
+    background: rgb(255, 140, 0);  // 監視開始と同じオレンジ色に変更
     opacity: 0.9;
     cursor: pointer;
     pointer-events: auto;
