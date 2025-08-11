@@ -25,7 +25,8 @@
       "Bash(grep:*)",
       "Bash(echo)",
       "Bash(rg:*)",
-      "Bash(gemini:*)"
+      "Bash(gemini:*)",
+      "Bash(git add:*)"
     ],
     "deny": []
   }
