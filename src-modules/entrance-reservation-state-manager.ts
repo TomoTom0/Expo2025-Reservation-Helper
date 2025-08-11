@@ -144,6 +144,12 @@ export class EntranceReservationStateManager {
         monitoringInterval: null as number | null
     };
     
+    // 効率モード設定管理
+    private efficiencyMode = {
+        enabled: false,
+        nextSubmitTarget: null as Date | null
+    };
+    
     // リロードカウントダウン状態管理（旧reloadCountdownStateから統合）
     private reloadCountdown = {
         totalSeconds: 30,
@@ -199,6 +205,13 @@ export class EntranceReservationStateManager {
         }
         
         this.executionState = ExecutionState.RESERVATION_RUNNING;
+        
+        // 効率モード有効時は目標時刻を再計算
+        if (this.efficiencyMode.enabled) {
+            this.efficiencyMode.nextSubmitTarget = this.calculateNext00or30Seconds();
+            this.log('⚡ 効率モード: 予約開始時に目標時刻を再計算');
+        }
+        
         this.log('🚀 予約処理を開始');
         return true;
     }
@@ -215,6 +228,13 @@ export class EntranceReservationStateManager {
         }
         
         this.executionState = ExecutionState.MONITORING_RUNNING;
+        
+        // 効率モード有効時は目標時刻を再計算
+        if (this.efficiencyMode.enabled) {
+            this.efficiencyMode.nextSubmitTarget = this.calculateNext00or30Seconds();
+            this.log('⚡ 効率モード: 監視開始時に目標時刻を再計算');
+        }
+        
         this.log('👁️ 監視処理を開始');
         return true;
     }
@@ -1225,7 +1245,8 @@ export class EntranceReservationStateManager {
             case 'monitoring':
                 const remainingSeconds = this.getReloadSecondsRemaining();
                 if (this.isReloadCountdownActive() && remainingSeconds !== null) {
-                    statusBadge.innerText = `監視中\nリロード: ${remainingSeconds}秒`;
+                    const prefix = this.isEfficiencyModeEnabled() ? '効率' : '';
+                    statusBadge.innerText = `${prefix}監視中\nリロード: ${remainingSeconds}秒`;
                     // リロード5秒前から警告クラスを追加
                     if (remainingSeconds <= 5) {
                         statusBadge.classList.add('countdown-warning');
@@ -1234,14 +1255,37 @@ export class EntranceReservationStateManager {
                     }
                     statusBadge.classList.remove('js-hide');
                 } else {
-                    statusBadge.innerText = '監視待機中';
+                    const prefix = this.isEfficiencyModeEnabled() ? '効率' : '';
+                    statusBadge.innerText = `${prefix}監視待機中`;
                     statusBadge.classList.remove('countdown-warning');
                     statusBadge.classList.remove('js-hide');
                 }
                 break;
             case 'reservation-running':
-                statusBadge.innerText = '予約実行中';
-                statusBadge.classList.remove('countdown-warning');
+                if (this.isEfficiencyModeEnabled()) {
+                    const nextTarget = this.getNextSubmitTarget();
+                    if (nextTarget) {
+                        const remainingMs = nextTarget.getTime() - Date.now();
+                        const remainingSeconds = Math.max(0, Math.floor(remainingMs / 1000));
+                        statusBadge.innerText = `効率予約実行中\n${remainingSeconds}秒後`;
+                        // 5秒前から警告色
+                        if (remainingSeconds <= 5) {
+                            statusBadge.classList.add('countdown-warning');
+                        } else {
+                            statusBadge.classList.remove('countdown-warning');
+                        }
+                    } else {
+                        statusBadge.innerText = '効率予約実行中';
+                        statusBadge.classList.remove('countdown-warning');
+                    }
+                } else {
+                    const startTime = this.getReservationStartTime();
+                    const elapsedMinutes = startTime ? 
+                        Math.floor((Date.now() - startTime) / 60000) : 0;
+                    const attempts = this.getAttempts();
+                    statusBadge.innerText = `予約実行中\n${elapsedMinutes}分 ${attempts}回`;
+                    statusBadge.classList.remove('countdown-warning');
+                }
                 statusBadge.classList.remove('js-hide');
                 break;
             case 'cooldown':
@@ -1274,9 +1318,126 @@ export class EntranceReservationStateManager {
     
     // 削除: updateCountdownDisplay()は統一FAB更新システム(updateFabDisplay)に統合済み
     
+    // ============================================================================
+    // 効率モード管理
+    // ============================================================================
+    
+    // 効率モードの有効/無効を切り替え
+    toggleEfficiencyMode(): boolean {
+        this.efficiencyMode.enabled = !this.efficiencyMode.enabled;
+        
+        if (this.efficiencyMode.enabled) {
+            this.efficiencyMode.nextSubmitTarget = this.calculateNext00or30Seconds();
+            this.saveEfficiencyModeSettings();
+            this.log('🚀 効率モード有効化');
+        } else {
+            this.efficiencyMode.nextSubmitTarget = null;
+            this.saveEfficiencyModeSettings();
+            this.log('⏸️ 効率モード無効化');
+        }
+        
+        return this.efficiencyMode.enabled;
+    }
+    
+    // 効率モードの状態を取得
+    isEfficiencyModeEnabled(): boolean {
+        return this.efficiencyMode.enabled;
+    }
+    
+    // 次のsubmit標的時刻を取得
+    getNextSubmitTarget(): Date | null {
+        return this.efficiencyMode.nextSubmitTarget;
+    }
+    
+    // 次のsubmit標的時刻を設定
+    setNextSubmitTarget(target: Date): void {
+        this.efficiencyMode.nextSubmitTarget = target;
+    }
+    
+    // 次の00秒/30秒を計算（15秒未満の場合は次の目標時刻を選択）
+    calculateNext00or30Seconds(): Date {
+        const now = new Date();
+        const currentSeconds = now.getSeconds();
+        const nextTarget = new Date(now);
+        
+        let targetSeconds: number;
+        let targetMinutes = nextTarget.getMinutes();
+        
+        // 0-2秒で0秒側に比重のあるランダム時間を生成（二次分布）
+        const randomBuffer = Math.pow(Math.random(), 2) * 2; // 0～2秒、0側に比重
+        
+        if (currentSeconds < 30) {
+            // 今の分の30秒 + ランダムバッファを候補とする
+            targetSeconds = 30 + randomBuffer;
+        } else {
+            // 次の分の00秒 + ランダムバッファを候補とする
+            targetMinutes += 1;
+            targetSeconds = randomBuffer;
+        }
+        
+        // 候補時刻までの猶予を計算
+        const candidateTarget = new Date(now);
+        candidateTarget.setMinutes(targetMinutes);
+        candidateTarget.setSeconds(Math.floor(targetSeconds));
+        candidateTarget.setMilliseconds((targetSeconds % 1) * 1000); // 小数部をミリ秒に
+        
+        const remainingMs = candidateTarget.getTime() - now.getTime();
+        
+        // 15秒未満の場合は次の目標時刻に変更
+        if (remainingMs < 15000) { // 15秒 = 15000ms
+            // 新しいランダムバッファを生成
+            const newRandomBuffer = Math.pow(Math.random(), 2) * 2;
+            
+            if (currentSeconds < 30) {
+                // 元々00秒候補（現在時刻が30秒未満）だった場合、30秒 + ランダムバッファに変更
+                candidateTarget.setSeconds(Math.floor(30 + newRandomBuffer));
+                candidateTarget.setMilliseconds(((30 + newRandomBuffer) % 1) * 1000);
+            } else {
+                // 元々30秒候補（現在時刻が30秒以上）だった場合、次の分の00秒 + ランダムバッファに変更
+                candidateTarget.setMinutes(candidateTarget.getMinutes() + 1);
+                candidateTarget.setSeconds(Math.floor(newRandomBuffer));
+                candidateTarget.setMilliseconds((newRandomBuffer % 1) * 1000);
+            }
+            this.log(`⚡ 効率モード: 猶予${Math.floor(remainingMs/1000)}秒は短いため次の目標時刻に変更`);
+        }
+        
+        return candidateTarget;
+    }
+    
+    // 次の標的時刻を更新（submit後に呼び出し）
+    updateNextSubmitTarget(): void {
+        if (this.efficiencyMode.enabled) {
+            this.efficiencyMode.nextSubmitTarget = this.calculateNext00or30Seconds();
+        }
+    }
     
     
+    // 効率モード設定保存
+    private saveEfficiencyModeSettings(): void {
+        try {
+            localStorage.setItem('ytomo-efficiency-mode', JSON.stringify({
+                enabled: this.efficiencyMode.enabled
+            }));
+        } catch (error) {
+            console.error('効率モード設定保存エラー:', error);
+        }
+    }
     
+    // 効率モード設定読み込み
+    loadEfficiencyModeSettings(): void {
+        try {
+            const saved = localStorage.getItem('ytomo-efficiency-mode');
+            if (saved) {
+                const settings = JSON.parse(saved);
+                if (settings.enabled) {
+                    this.efficiencyMode.enabled = true;
+                    this.efficiencyMode.nextSubmitTarget = this.calculateNext00or30Seconds();
+                }
+            }
+        } catch (error) {
+            console.error('効率モード設定読み込みエラー:', error);
+        }
+    }
     
 }
 

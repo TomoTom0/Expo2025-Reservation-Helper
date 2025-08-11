@@ -923,11 +923,39 @@ async function checkSlotAvailabilityAndReload(): Promise<void> {
     // まだ満員の場合はページリロード
     console.log('⏳ すべての監視対象がまだ満員です。ページを再読み込みします...');
     
-    // BAN対策：設定されたリロード間隔にランダム要素を追加
-    const baseInterval = 30000; // 30000ms (30秒) - EntranceReservationStateManagerで管理されている値
-    const randomVariation = Math.random() * 5000; // 0-5秒のランダム要素
-    const totalWaitTime = baseInterval + randomVariation;
-    const displaySeconds = Math.ceil(totalWaitTime / 1000);
+    let totalWaitTime: number;
+    let displaySeconds: number;
+    
+    // 効率モード時は00秒/30秒に同期、通常時は従来のランダム要素付き
+    if (entranceReservationStateManager.isEfficiencyModeEnabled()) {
+        // 次の00秒または30秒までの時間を計算
+        let nextTarget = entranceReservationStateManager.getNextSubmitTarget();
+        if (nextTarget) {
+            let remainingMs = nextTarget.getTime() - Date.now();
+            
+            // 15秒未満の場合は30秒加算
+            if (remainingMs < 15000) {
+                console.log(`⚡ 効率監視: 猶予${Math.floor(remainingMs/1000)}秒は短いため30秒加算`);
+                remainingMs += 30000; // 単純に30秒(30000ms)加算
+                console.log(`🕒 加算後猶予: ${Math.floor(remainingMs/1000)}秒`);
+            }
+            
+            totalWaitTime = Math.max(1000, remainingMs); // 最低1秒
+            displaySeconds = Math.ceil(totalWaitTime / 1000);
+        } else {
+            // 標的時刻が設定されていない場合は通常処理
+            const baseInterval = 30000;
+            const randomVariation = Math.random() * 5000;
+            totalWaitTime = baseInterval + randomVariation;
+            displaySeconds = Math.ceil(totalWaitTime / 1000);
+        }
+    } else {
+        // 通常モード: BAN対策のランダム要素付き
+        const baseInterval = 30000; // 30000ms (30秒)
+        const randomVariation = Math.random() * 5000; // 0-5秒のランダム要素
+        totalWaitTime = baseInterval + randomVariation;
+        displaySeconds = Math.ceil(totalWaitTime / 1000);
+    }
     
     // カウントダウンとリロードを統一実行（フラグ保存処理付き）
     scheduleReload(displaySeconds);
@@ -1319,29 +1347,46 @@ export function updateStatusBadge(mode: string): void {
     
     switch (mode) {
         case 'monitoring':
+            const isEfficiencyEnabled = entranceReservationStateManager?.isEfficiencyModeEnabled();
+            
             message = '監視実行中';
             const remainingSeconds = entranceReservationStateManager.getReloadSecondsRemaining();
             if (remainingSeconds !== null && remainingSeconds !== undefined) {
                 if (remainingSeconds <= 3) {
-                    message = `監視中\nリロード: ${remainingSeconds}秒`;
+                    message = `${isEfficiencyEnabled ? '効率' : ''}監視中\nリロード: ${remainingSeconds}秒`;
                     bgColor = 'rgba(255, 0, 0, 0.9)'; // 赤色（中断不可）
                 } else {
-                    message = `監視中\nリロード: ${remainingSeconds}秒`;
+                    message = `${isEfficiencyEnabled ? '効率' : ''}監視中\nリロード: ${remainingSeconds}秒`;
                     bgColor = 'rgba(255, 140, 0, 0.9)'; // オレンジ色
                 }
             } else {
+                message = `${isEfficiencyEnabled ? '効率' : ''}監視実行中`;
                 bgColor = 'rgba(255, 140, 0, 0.9)'; // オレンジ色
             }
             break;
             
         case 'reservation-running':
-            // 経過時間と回数を表示（入場予約状態管理システムから取得）
-            const startTime = entranceReservationStateManager.getReservationStartTime();
-            const elapsedMinutes = startTime ? 
-                Math.floor((Date.now() - startTime) / 60000) : 0;
-            const attempts = entranceReservationStateManager.getAttempts();
-            message = `予約実行中\n${elapsedMinutes}分 ${attempts}回`;
-            bgColor = 'rgba(255, 140, 0, 0.9)'; // オレンジ色
+            // 効率モードON時は標的時刻カウントダウン、通常時は経過時間と回数
+            if (entranceReservationStateManager.isEfficiencyModeEnabled()) {
+                const nextTarget = entranceReservationStateManager.getNextSubmitTarget();
+                if (nextTarget) {
+                    const remainingMs = nextTarget.getTime() - Date.now();
+                    const remainingSeconds = Math.max(0, Math.floor(remainingMs / 1000));
+                    message = `効率予約実行中\n${remainingSeconds}秒後`;
+                    bgColor = 'rgba(255, 140, 0, 0.9)'; // オレンジ色
+                } else {
+                    message = '効率予約実行中';
+                    bgColor = 'rgba(255, 140, 0, 0.9)';
+                }
+            } else {
+                // 通常モード: 経過時間と回数を表示
+                const startTime = entranceReservationStateManager.getReservationStartTime();
+                const elapsedMinutes = startTime ? 
+                    Math.floor((Date.now() - startTime) / 60000) : 0;
+                const attempts = entranceReservationStateManager.getAttempts();
+                message = `予約実行中\n${elapsedMinutes}分 ${attempts}回`;
+                bgColor = 'rgba(255, 140, 0, 0.9)'; // オレンジ色
+            }
             break;
             
         case 'selecting':
@@ -1376,6 +1421,22 @@ export function updateStatusBadge(mode: string): void {
         statusBadge.style.background = bgColor;
         statusBadge.style.display = 'block';
         statusBadge.style.whiteSpace = 'pre-line'; // 改行を有効にする
+        
+        // 効率モードの5秒前警告（予約実行中・監視中両方）
+        if ((mode === 'reservation-running' || mode === 'monitoring') && entranceReservationStateManager.isEfficiencyModeEnabled()) {
+            const nextTarget = entranceReservationStateManager.getNextSubmitTarget();
+            if (nextTarget) {
+                const remainingMs = nextTarget.getTime() - Date.now();
+                const remainingSeconds = Math.max(0, Math.floor(remainingMs / 1000));
+                if (remainingSeconds <= 5) {
+                    statusBadge.classList.add('countdown-warning');
+                } else {
+                    statusBadge.classList.remove('countdown-warning');
+                }
+            }
+        } else {
+            statusBadge.classList.remove('countdown-warning');
+        }
     } else {
         statusBadge.style.display = 'none';
     }

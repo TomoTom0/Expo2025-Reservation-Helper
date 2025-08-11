@@ -220,7 +220,7 @@ function updateMonitoringTargetsDisplay() {
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1___default()((_node_modules_css_loader_dist_runtime_noSourceMaps_js__WEBPACK_IMPORTED_MODULE_0___default()));
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, `button.ext-ytomo{height:40px;width:auto;min-width:60px;padding:0px 8px;background:#006821 !important;color:#fff}button.ext-ytomo.no-after:after{background:rgba(0,0,0,0) none repeat 0 0/auto auto padding-box border-box scroll}button.ext-ytomo.btn-done{background:#4a4c4a !important}button.ext-ytomo:hover{background:#02862b}.pavilion-sub-btn{color:#fff;border:none;border-radius:20px;padding:8px 16px;font-size:12px;white-space:nowrap;transition:all .2s ease}.pavilion-sub-btn.btn-enabled{background:#006821 !important;cursor:pointer !important;opacity:1 !important}.pavilion-sub-btn.btn-enabled:hover{background:#02862b !important;transform:scale(1.05) !important}.pavilion-sub-btn.btn-disabled,.pavilion-sub-btn.btn-loading{background:gray !important;cursor:not-allowed !important;opacity:.6 !important}.pavilion-sub-btn.btn-disabled:hover,.pavilion-sub-btn.btn-loading:hover{background:gray !important;transform:scale(1) !important}button.ext-ytomo.pavilion-sub-btn.btn-disabled,button.ext-ytomo.pavilion-sub-btn.btn-loading{background:gray !important;cursor:not-allowed !important;opacity:.6 !important}button.ext-ytomo.pavilion-sub-btn.btn-disabled:hover,button.ext-ytomo.pavilion-sub-btn.btn-loading:hover{background:gray !important;transform:scale(1) !important}.safe-none,.ytomo-none,.filter-none{display:none}button.ext-ytomo.monitor-btn{height:auto;min-height:20px;width:auto;min-width:35px;padding:1px 4px;color:#fff !important;margin-left:8px;font-size:10px;border:none !important;border-radius:2px;cursor:pointer !important;display:inline-block;vertical-align:middle;position:relative;z-index:10 !important;pointer-events:auto !important;opacity:1 !important;visibility:visible !important}button.ext-ytomo.monitor-btn.full-status{background:#228b22 !important}button.ext-ytomo.monitor-btn.full-status:hover{background:#32cd32 !important}button.ext-ytomo.monitor-btn.monitoring-status{background:#dc3545 !important}button.ext-ytomo.monitor-btn.monitoring-status:hover{background:#ff4554 !important}button.ext-ytomo.monitor-btn:disabled{cursor:not-allowed !important;opacity:.7 !important}button.ext-ytomo.monitor-btn:disabled.full-status{background:rgba(34,139,34,.5) !important;color:hsla(0,0%,100%,.9) !important}button.ext-ytomo.monitor-btn:disabled.monitoring-status{background:rgba(220,53,69,.5) !important;color:hsla(0,0%,100%,.9) !important}button.ext-ytomo.monitor-btn:disabled:not(.full-status):not(.monitoring-status){background:rgba(128,128,128,.7) !important;color:hsla(0,0%,100%,.9) !important}button.ext-ytomo.pavilion-sub-btn.ytomo-date-button.date-selected{border:2px solid #4caf50;box-shadow:0 0 8px rgba(76,175,80,.6)}div.div-flex{display:flex;justify-content:center;margin:5px}.js-show{display:block}.js-hide{display:none}.js-visible{visibility:visible}.js-invisible{visibility:hidden}.js-enabled{pointer-events:auto;opacity:1}.js-disabled{pointer-events:none;opacity:.6}.js-green{background:#228b22;color:#fff}.js-red{background:#dc3545;color:#fff}.js-gray{background:gray;color:#fff}.ytomo-header li.fab-toggle-li{display:inline-block;margin-right:8px}.ytomo-header li.fab-toggle-li button.fab-toggle-button{background:none;border:none;cursor:pointer;padding:0;color:#fff;transition:all .2s ease;display:flex;align-items:center;justify-content:center}.ytomo-header li.fab-toggle-li button.fab-toggle-button:hover{color:#ddd}.ytomo-header li.fab-toggle-li button.fab-toggle-button figure.fab-toggle-figure{width:auto;height:24px;display:flex;align-items:center;justify-content:center;padding:0 4px}.ytomo-pavilion-fab button.ytomo-fab{position:relative}.ytomo-pavilion-fab button.ytomo-fab:hover{transform:scale(1.15);box-shadow:0 8px 25px rgba(0,0,0,.5),0 4px 12px rgba(0,0,0,.3);border-width:4px}.ytomo-pavilion-fab .ytomo-fab-inner-content .pavilion-fab-expand-icon{font-size:8px;line-height:1;margin-bottom:1px;opacity:.8}.ytomo-pavilion-fab .ytomo-fab-inner-content .pavilion-fab-brand-text{font-size:7px;font-weight:normal;line-height:1;margin-bottom:2px;opacity:.7}.ytomo-pavilion-fab .ytomo-fab-inner-content .pavilion-fab-counts-text{font-size:12px;font-weight:bold;line-height:1}.ytomo-pavilion-fab .pavilion-sub-actions-container{display:none;flex-direction:column;gap:8px;align-items:flex-end;margin-bottom:8px}.ytomo-pavilion-fab .pavilion-sub-actions-container.expanded{display:flex}.ytomo-pavilion-fab .pavilion-sub-actions-container button.pavilion-sub-btn.base-style{color:#fff;border:none;border-radius:20px;padding:8px 16px;font-size:12px;white-space:nowrap;box-shadow:0 2px 8px rgba(0,0,0,.3);transition:all .2s ease}.ytomo-companion-dialog{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;z-index:99999;padding:20px;box-sizing:border-box}.ytomo-companion-dialog .dialog-content{background:#fff;border-radius:12px;padding:24px;width:100%;max-width:500px;max-height:90vh;overflow-y:auto;box-shadow:0 10px 40px rgba(0,0,0,.3)}@media(max-width: 768px){.ytomo-companion-dialog .dialog-content{max-width:95vw;max-height:85vh;padding:16px;border-radius:8px}}.ytomo-companion-dialog .dialog-content .input-row{display:flex;gap:8px;margin-bottom:12px}@media(max-width: 480px){.ytomo-companion-dialog .dialog-content .input-row{flex-direction:column;gap:12px}}.ytomo-companion-dialog .dialog-content .input-row input{padding:12px 8px;border:1px solid #ddd;border-radius:4px;font-size:16px}.ytomo-companion-dialog .dialog-content .input-row input:focus{outline:none;border-color:#4caf50;box-shadow:0 0 0 2px rgba(76,175,80,.2)}.ytomo-companion-dialog .dialog-content .input-row button{padding:12px 16px;background:#4caf50;color:#fff;border:none;border-radius:4px;cursor:pointer;font-size:14px;white-space:nowrap;min-width:60px}.ytomo-companion-dialog .dialog-content .input-row button:hover{background:#45a049}.ytomo-companion-dialog .dialog-content .input-row button:active{background:#3d8b40}.ytomo-fab{width:56px !important;height:56px !important;border-radius:50% !important;color:#fff !important;border:none !important;box-shadow:0 6px 20px rgba(0,0,0,.4),0 2px 8px rgba(0,0,0,.2) !important;border:3px solid hsla(0,0%,100%,.2) !important;display:flex !important;align-items:center !important;justify-content:center !important;font-size:14px !important;font-weight:bold !important;transition:all .3s ease !important;position:relative !important;overflow:hidden !important;pointer-events:auto !important}.ytomo-fab-enabled{background:#006821 !important;opacity:.9 !important;cursor:pointer !important;pointer-events:auto !important}.ytomo-fab-disabled{background:gray !important;opacity:.6 !important;cursor:not-allowed !important;pointer-events:none !important}.ytomo-fab-monitoring{background:#ff8c00 !important;opacity:.9 !important;cursor:pointer !important;pointer-events:auto !important}.ytomo-fab-running{background:#dc3545 !important;opacity:.6 !important;cursor:not-allowed !important;pointer-events:none !important}.ytomo-fab-container{position:fixed !important;bottom:20px !important;right:20px !important;z-index:9999 !important;display:flex !important;flex-direction:column-reverse !important;align-items:center !important;gap:12px !important;pointer-events:none !important}.ytomo-fab-container.visible{display:flex !important}.ytomo-fab-container.hidden{display:none !important}.ytomo-fab-content{position:relative !important;display:flex !important;flex-direction:column-reverse !important;align-items:center !important;gap:8px !important;opacity:0 !important;transform:scale(0.8) translateY(10px) !important;transition:all .3s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;pointer-events:none !important}.ytomo-fab-content.expanded{opacity:1 !important;transform:scale(1) translateY(0) !important;pointer-events:auto !important}.ytomo-sub-fab{width:45px !important;height:32px !important;border-radius:16px !important;background:rgba(0,104,33,.9) !important;color:#fff !important;border:none !important;font-size:11px !important;font-weight:bold !important;cursor:pointer !important;transition:all .2s ease !important;box-shadow:0 2px 8px rgba(0,0,0,.3) !important;display:flex !important;align-items:center !important;justify-content:center !important;pointer-events:auto !important}.ytomo-sub-fab:hover{background:rgba(2,134,43,.9) !important;transform:scale(1.1) !important;box-shadow:0 4px 12px rgba(0,0,0,.4) !important}.ytomo-sub-fab:active{transform:scale(0.95) !important}.ytomo-pavilion-fab-container{position:fixed !important;bottom:24px !important;right:24px !important;z-index:10000 !important;display:flex !important;flex-direction:column !important;gap:12px !important;align-items:flex-end !important;pointer-events:auto !important}.ytomo-fab-inner-content{display:flex !important;flex-direction:column !important;align-items:center !important;justify-content:center !important;height:100% !important;pointer-events:none !important}input.ext-tomo.search{height:50px;min-width:200px;max-width:min(300px,100%);font-family:quicksand;font-size:16px;-webkit-appearance:textfield;-moz-appearance:textfield;appearance:textfield;border:1px solid #222426;border-radius:25px;box-shadow:0 1px 0 0 #ccc;padding:0 0 0 10px;flex:1 1}.ytomo-icon.expand-icon{font-size:8px !important;line-height:1 !important;color:#fff !important;font-weight:bold !important;text-align:center !important;pointer-events:none !important}.ytomo-icon.countdown-text{font-size:6px !important;line-height:1 !important;color:#fff !important;font-weight:bold !important;text-align:center !important;margin-top:1px !important;pointer-events:none !important}.ytomo-toggle.toggle-li{position:fixed !important;bottom:10px !important;left:10px !important;z-index:1000 !important;list-style:none !important;margin:0 !important;padding:0 !important}.ytomo-toggle.toggle-button{width:50px !important;height:30px !important;background:rgba(255,140,0,.8) !important;border:none !important;border-radius:15px !important;cursor:pointer !important;transition:all .3s ease !important;display:flex !important;align-items:center !important;justify-content:center !important;font-size:12px !important;font-weight:bold !important;position:relative !important;overflow:hidden !important}.ytomo-toggle.toggle-button.enabled{color:#fff}.ytomo-toggle.toggle-button.disabled{color:#ddd}.ytomo-toggle.toggle-figure{width:100% !important;height:100% !important;margin:0 !important;padding:0 !important;border:none !important;background:rgba(0,0,0,0) !important;pointer-events:none !important}.ytomo-dialog.overlay{position:fixed !important;top:0 !important;left:0 !important;width:100% !important;height:100% !important;background-color:rgba(0,0,0,.5) !important;z-index:10000 !important;display:flex !important;justify-content:center !important;align-items:center !important}.ytomo-dialog.container{background:#fff !important;border-radius:8px !important;padding:20px !important;max-width:400px !important;width:90% !important;max-height:70vh !important;overflow-y:auto !important;box-shadow:0 4px 12px rgba(0,0,0,.3) !important}.ytomo-dialog.title{margin:0 0 16px 0 !important;color:#333 !important;font-size:18px !important;font-weight:bold !important}.ytomo-dialog.button-group{display:flex !important;justify-content:flex-end !important;gap:10px !important;margin-top:20px !important}.ytomo-dialog.primary-button{background:#006821 !important;color:#fff !important;border:none !important;padding:10px 20px !important;border-radius:4px !important;cursor:pointer !important;font-size:14px !important}.ytomo-dialog.primary-button:hover{background:#02862b !important}.ytomo-dialog.primary-button:disabled{background:gray !important;cursor:not-allowed !important}.ytomo-dialog.secondary-button{background:rgba(0,0,0,0) !important;color:#666 !important;border:1px solid #ccc !important;padding:10px 20px !important;border-radius:4px !important;cursor:pointer !important;font-size:14px !important}.ytomo-dialog.secondary-button:hover{background:#f5f5f5 !important}.ytomo-progress.counter{display:inline-block !important;margin-left:8px !important;padding:2px 6px !important;background:rgba(0,0,0,.3) !important;border-radius:10px !important;font-size:10px !important;color:#fff !important;font-weight:bold !important}`, ""]);
+___CSS_LOADER_EXPORT___.push([module.id, `#ytomo-status-badge.countdown-warning{background:rgba(255,0,0,.9) !important}.ytomo-efficiency-toggle{width:45px !important;height:32px !important;border-radius:16px !important;color:#fff !important;border:none !important;font-size:10px !important;font-weight:bold !important;cursor:pointer !important;transition:all .2s ease !important;box-shadow:0 2px 8px rgba(0,0,0,.3) !important;display:flex !important;align-items:center !important;justify-content:center !important;pointer-events:auto !important;margin-bottom:8px !important}.ytomo-efficiency-toggle.efficiency-enabled{background:rgba(255,140,0,.9) !important}.ytomo-efficiency-toggle.efficiency-disabled{background:rgba(128,128,128,.9) !important}.ytomo-efficiency-toggle:hover{transform:scale(1.1) !important;box-shadow:0 4px 12px rgba(0,0,0,.4) !important}.ytomo-efficiency-toggle:active{transform:scale(0.95) !important}button.ext-ytomo{height:40px;width:auto;min-width:60px;padding:0px 8px;background:#006821 !important;color:#fff}button.ext-ytomo.no-after:after{background:rgba(0,0,0,0) none repeat 0 0/auto auto padding-box border-box scroll}button.ext-ytomo.btn-done{background:#4a4c4a !important}button.ext-ytomo:hover{background:#02862b}.pavilion-sub-btn{color:#fff;border:none;border-radius:20px;padding:8px 16px;font-size:12px;white-space:nowrap;transition:all .2s ease}.pavilion-sub-btn.btn-enabled{background:#006821 !important;cursor:pointer !important;opacity:1 !important}.pavilion-sub-btn.btn-enabled:hover{background:#02862b !important;transform:scale(1.05) !important}.pavilion-sub-btn.btn-disabled,.pavilion-sub-btn.btn-loading{background:gray !important;cursor:not-allowed !important;opacity:.6 !important}.pavilion-sub-btn.btn-disabled:hover,.pavilion-sub-btn.btn-loading:hover{background:gray !important;transform:scale(1) !important}button.ext-ytomo.pavilion-sub-btn.btn-disabled,button.ext-ytomo.pavilion-sub-btn.btn-loading{background:gray !important;cursor:not-allowed !important;opacity:.6 !important}button.ext-ytomo.pavilion-sub-btn.btn-disabled:hover,button.ext-ytomo.pavilion-sub-btn.btn-loading:hover{background:gray !important;transform:scale(1) !important}.safe-none,.ytomo-none,.filter-none{display:none}button.ext-ytomo.monitor-btn{height:auto;min-height:20px;width:auto;min-width:35px;padding:1px 4px;color:#fff !important;margin-left:8px;font-size:10px;border:none !important;border-radius:2px;cursor:pointer !important;display:inline-block;vertical-align:middle;position:relative;z-index:10 !important;pointer-events:auto !important;opacity:1 !important;visibility:visible !important}button.ext-ytomo.monitor-btn.full-status{background:#228b22 !important}button.ext-ytomo.monitor-btn.full-status:hover{background:#32cd32 !important}button.ext-ytomo.monitor-btn.monitoring-status{background:#dc3545 !important}button.ext-ytomo.monitor-btn.monitoring-status:hover{background:#ff4554 !important}button.ext-ytomo.monitor-btn:disabled{cursor:not-allowed !important;opacity:.7 !important}button.ext-ytomo.monitor-btn:disabled.full-status{background:rgba(34,139,34,.5) !important;color:hsla(0,0%,100%,.9) !important}button.ext-ytomo.monitor-btn:disabled.monitoring-status{background:rgba(220,53,69,.5) !important;color:hsla(0,0%,100%,.9) !important}button.ext-ytomo.monitor-btn:disabled:not(.full-status):not(.monitoring-status){background:rgba(128,128,128,.7) !important;color:hsla(0,0%,100%,.9) !important}button.ext-ytomo.pavilion-sub-btn.ytomo-date-button.date-selected{border:2px solid #4caf50;box-shadow:0 0 8px rgba(76,175,80,.6)}div.div-flex{display:flex;justify-content:center;margin:5px}.js-show{display:block}.js-hide{display:none}.js-visible{visibility:visible}.js-invisible{visibility:hidden}.js-enabled{pointer-events:auto;opacity:1}.js-disabled{pointer-events:none;opacity:.6}.js-green{background:#228b22;color:#fff}.js-red{background:#dc3545;color:#fff}.js-gray{background:gray;color:#fff}.ytomo-header li.fab-toggle-li{display:inline-block;margin-right:8px}.ytomo-header li.fab-toggle-li button.fab-toggle-button{background:none;border:none;cursor:pointer;padding:0;color:#fff;transition:all .2s ease;display:flex;align-items:center;justify-content:center}.ytomo-header li.fab-toggle-li button.fab-toggle-button:hover{color:#ddd}.ytomo-header li.fab-toggle-li button.fab-toggle-button figure.fab-toggle-figure{width:auto;height:24px;display:flex;align-items:center;justify-content:center;padding:0 4px}.ytomo-pavilion-fab button.ytomo-fab{position:relative}.ytomo-pavilion-fab button.ytomo-fab:hover{transform:scale(1.15);box-shadow:0 8px 25px rgba(0,0,0,.5),0 4px 12px rgba(0,0,0,.3);border-width:4px}.ytomo-pavilion-fab .ytomo-fab-inner-content .pavilion-fab-expand-icon{font-size:8px;line-height:1;margin-bottom:1px;opacity:.8}.ytomo-pavilion-fab .ytomo-fab-inner-content .pavilion-fab-brand-text{font-size:7px;font-weight:normal;line-height:1;margin-bottom:2px;opacity:.7}.ytomo-pavilion-fab .ytomo-fab-inner-content .pavilion-fab-counts-text{font-size:12px;font-weight:bold;line-height:1}.ytomo-pavilion-fab .pavilion-sub-actions-container{display:none;flex-direction:column;gap:8px;align-items:flex-end;margin-bottom:8px}.ytomo-pavilion-fab .pavilion-sub-actions-container.expanded{display:flex}.ytomo-pavilion-fab .pavilion-sub-actions-container button.pavilion-sub-btn.base-style{color:#fff;border:none;border-radius:20px;padding:8px 16px;font-size:12px;white-space:nowrap;box-shadow:0 2px 8px rgba(0,0,0,.3);transition:all .2s ease}.ytomo-companion-dialog{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;z-index:99999;padding:20px;box-sizing:border-box}.ytomo-companion-dialog .dialog-content{background:#fff;border-radius:12px;padding:24px;width:100%;max-width:500px;max-height:90vh;overflow-y:auto;box-shadow:0 10px 40px rgba(0,0,0,.3)}@media(max-width: 768px){.ytomo-companion-dialog .dialog-content{max-width:95vw;max-height:85vh;padding:16px;border-radius:8px}}.ytomo-companion-dialog .dialog-content .input-row{display:flex;gap:8px;margin-bottom:12px}@media(max-width: 480px){.ytomo-companion-dialog .dialog-content .input-row{flex-direction:column;gap:12px}}.ytomo-companion-dialog .dialog-content .input-row input{padding:12px 8px;border:1px solid #ddd;border-radius:4px;font-size:16px}.ytomo-companion-dialog .dialog-content .input-row input:focus{outline:none;border-color:#4caf50;box-shadow:0 0 0 2px rgba(76,175,80,.2)}.ytomo-companion-dialog .dialog-content .input-row button{padding:12px 16px;background:#4caf50;color:#fff;border:none;border-radius:4px;cursor:pointer;font-size:14px;white-space:nowrap;min-width:60px}.ytomo-companion-dialog .dialog-content .input-row button:hover{background:#45a049}.ytomo-companion-dialog .dialog-content .input-row button:active{background:#3d8b40}.ytomo-fab{width:56px !important;height:56px !important;border-radius:50% !important;color:#fff !important;border:none !important;box-shadow:0 6px 20px rgba(0,0,0,.4),0 2px 8px rgba(0,0,0,.2) !important;border:3px solid hsla(0,0%,100%,.2) !important;display:flex !important;align-items:center !important;justify-content:center !important;font-size:14px !important;font-weight:bold !important;transition:all .3s ease !important;position:relative !important;overflow:hidden !important;pointer-events:auto !important}.ytomo-fab-enabled{background:#006821 !important;opacity:.9 !important;cursor:pointer !important;pointer-events:auto !important}.ytomo-fab-disabled{background:gray !important;opacity:.6 !important;cursor:not-allowed !important;pointer-events:none !important}.ytomo-fab-monitoring{background:#ff8c00 !important;opacity:.9 !important;cursor:pointer !important;pointer-events:auto !important}.ytomo-fab-running{background:#dc3545 !important;opacity:.6 !important;cursor:not-allowed !important;pointer-events:none !important}.ytomo-fab-container{position:fixed !important;bottom:20px !important;right:20px !important;z-index:9999 !important;display:flex !important;flex-direction:column-reverse !important;align-items:center !important;gap:12px !important;pointer-events:none !important}.ytomo-fab-container.visible{display:flex !important}.ytomo-fab-container.hidden{display:none !important}.ytomo-fab-content{position:relative !important;display:flex !important;flex-direction:column-reverse !important;align-items:center !important;gap:8px !important;opacity:0 !important;transform:scale(0.8) translateY(10px) !important;transition:all .3s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;pointer-events:none !important}.ytomo-fab-content.expanded{opacity:1 !important;transform:scale(1) translateY(0) !important;pointer-events:auto !important}.ytomo-sub-fab{width:45px !important;height:32px !important;border-radius:16px !important;background:rgba(0,104,33,.9) !important;color:#fff !important;border:none !important;font-size:11px !important;font-weight:bold !important;cursor:pointer !important;transition:all .2s ease !important;box-shadow:0 2px 8px rgba(0,0,0,.3) !important;display:flex !important;align-items:center !important;justify-content:center !important;pointer-events:auto !important}.ytomo-sub-fab:hover{background:rgba(2,134,43,.9) !important;transform:scale(1.1) !important;box-shadow:0 4px 12px rgba(0,0,0,.4) !important}.ytomo-sub-fab:active{transform:scale(0.95) !important}.ytomo-pavilion-fab-container{position:fixed !important;bottom:24px !important;right:24px !important;z-index:10000 !important;display:flex !important;flex-direction:column !important;gap:12px !important;align-items:flex-end !important;pointer-events:auto !important}.ytomo-fab-inner-content{display:flex !important;flex-direction:column !important;align-items:center !important;justify-content:center !important;height:100% !important;pointer-events:none !important}input.ext-tomo.search{height:50px;min-width:200px;max-width:min(300px,100%);font-family:quicksand;font-size:16px;-webkit-appearance:textfield;-moz-appearance:textfield;appearance:textfield;border:1px solid #222426;border-radius:25px;box-shadow:0 1px 0 0 #ccc;padding:0 0 0 10px;flex:1 1}.ytomo-icon.expand-icon{font-size:8px !important;line-height:1 !important;color:#fff !important;font-weight:bold !important;text-align:center !important;pointer-events:none !important}.ytomo-icon.countdown-text{font-size:6px !important;line-height:1 !important;color:#fff !important;font-weight:bold !important;text-align:center !important;margin-top:1px !important;pointer-events:none !important}.ytomo-toggle.toggle-li{position:fixed !important;bottom:10px !important;left:10px !important;z-index:1000 !important;list-style:none !important;margin:0 !important;padding:0 !important}.ytomo-toggle.toggle-button{width:50px !important;height:30px !important;background:rgba(255,140,0,.8) !important;border:none !important;border-radius:15px !important;cursor:pointer !important;transition:all .3s ease !important;display:flex !important;align-items:center !important;justify-content:center !important;font-size:12px !important;font-weight:bold !important;position:relative !important;overflow:hidden !important}.ytomo-toggle.toggle-button.enabled{color:#fff}.ytomo-toggle.toggle-button.disabled{color:#ddd}.ytomo-toggle.toggle-figure{width:100% !important;height:100% !important;margin:0 !important;padding:0 !important;border:none !important;background:rgba(0,0,0,0) !important;pointer-events:none !important}.ytomo-dialog.overlay{position:fixed !important;top:0 !important;left:0 !important;width:100% !important;height:100% !important;background-color:rgba(0,0,0,.5) !important;z-index:10000 !important;display:flex !important;justify-content:center !important;align-items:center !important}.ytomo-dialog.container{background:#fff !important;border-radius:8px !important;padding:20px !important;max-width:400px !important;width:90% !important;max-height:70vh !important;overflow-y:auto !important;box-shadow:0 4px 12px rgba(0,0,0,.3) !important}.ytomo-dialog.title{margin:0 0 16px 0 !important;color:#333 !important;font-size:18px !important;font-weight:bold !important}.ytomo-dialog.button-group{display:flex !important;justify-content:flex-end !important;gap:10px !important;margin-top:20px !important}.ytomo-dialog.primary-button{background:#006821 !important;color:#fff !important;border:none !important;padding:10px 20px !important;border-radius:4px !important;cursor:pointer !important;font-size:14px !important}.ytomo-dialog.primary-button:hover{background:#02862b !important}.ytomo-dialog.primary-button:disabled{background:gray !important;cursor:not-allowed !important}.ytomo-dialog.secondary-button{background:rgba(0,0,0,0) !important;color:#666 !important;border:1px solid #ccc !important;padding:10px 20px !important;border-radius:4px !important;cursor:pointer !important;font-size:14px !important}.ytomo-dialog.secondary-button:hover{background:#f5f5f5 !important}.ytomo-progress.counter{display:inline-block !important;margin-left:8px !important;padding:2px 6px !important;background:rgba(0,0,0,.3) !important;border-radius:10px !important;font-size:10px !important;color:#fff !important;font-weight:bold !important}`, ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -1319,11 +1319,38 @@ async function checkSlotAvailabilityAndReload() {
     }
     // まだ満員の場合はページリロード
     console.log('⏳ すべての監視対象がまだ満員です。ページを再読み込みします...');
-    // BAN対策：設定されたリロード間隔にランダム要素を追加
-    const baseInterval = 30000; // 30000ms (30秒) - EntranceReservationStateManagerで管理されている値
-    const randomVariation = Math.random() * 5000; // 0-5秒のランダム要素
-    const totalWaitTime = baseInterval + randomVariation;
-    const displaySeconds = Math.ceil(totalWaitTime / 1000);
+    let totalWaitTime;
+    let displaySeconds;
+    // 効率モード時は00秒/30秒に同期、通常時は従来のランダム要素付き
+    if (_entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_0__/* .entranceReservationStateManager */ .xx.isEfficiencyModeEnabled()) {
+        // 次の00秒または30秒までの時間を計算
+        let nextTarget = _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_0__/* .entranceReservationStateManager */ .xx.getNextSubmitTarget();
+        if (nextTarget) {
+            let remainingMs = nextTarget.getTime() - Date.now();
+            // 15秒未満の場合は30秒加算
+            if (remainingMs < 15000) {
+                console.log(`⚡ 効率監視: 猶予${Math.floor(remainingMs / 1000)}秒は短いため30秒加算`);
+                remainingMs += 30000; // 単純に30秒(30000ms)加算
+                console.log(`🕒 加算後猶予: ${Math.floor(remainingMs / 1000)}秒`);
+            }
+            totalWaitTime = Math.max(1000, remainingMs); // 最低1秒
+            displaySeconds = Math.ceil(totalWaitTime / 1000);
+        }
+        else {
+            // 標的時刻が設定されていない場合は通常処理
+            const baseInterval = 30000;
+            const randomVariation = Math.random() * 5000;
+            totalWaitTime = baseInterval + randomVariation;
+            displaySeconds = Math.ceil(totalWaitTime / 1000);
+        }
+    }
+    else {
+        // 通常モード: BAN対策のランダム要素付き
+        const baseInterval = 30000; // 30000ms (30秒)
+        const randomVariation = Math.random() * 5000; // 0-5秒のランダム要素
+        totalWaitTime = baseInterval + randomVariation;
+        displaySeconds = Math.ceil(totalWaitTime / 1000);
+    }
     // カウントダウンとリロードを統一実行（フラグ保存処理付き）
     scheduleReload(displaySeconds);
 }
@@ -1623,30 +1650,48 @@ function updateStatusBadge(mode) {
     let bgColor = 'rgba(0, 0, 0, 0.8)';
     switch (mode) {
         case 'monitoring':
+            const isEfficiencyEnabled = _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_0__/* .entranceReservationStateManager */ .xx?.isEfficiencyModeEnabled();
             message = '監視実行中';
             const remainingSeconds = _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_0__/* .entranceReservationStateManager */ .xx.getReloadSecondsRemaining();
             if (remainingSeconds !== null && remainingSeconds !== undefined) {
                 if (remainingSeconds <= 3) {
-                    message = `監視中\nリロード: ${remainingSeconds}秒`;
+                    message = `${isEfficiencyEnabled ? '効率' : ''}監視中\nリロード: ${remainingSeconds}秒`;
                     bgColor = 'rgba(255, 0, 0, 0.9)'; // 赤色（中断不可）
                 }
                 else {
-                    message = `監視中\nリロード: ${remainingSeconds}秒`;
+                    message = `${isEfficiencyEnabled ? '効率' : ''}監視中\nリロード: ${remainingSeconds}秒`;
                     bgColor = 'rgba(255, 140, 0, 0.9)'; // オレンジ色
                 }
             }
             else {
+                message = `${isEfficiencyEnabled ? '効率' : ''}監視実行中`;
                 bgColor = 'rgba(255, 140, 0, 0.9)'; // オレンジ色
             }
             break;
         case 'reservation-running':
-            // 経過時間と回数を表示（入場予約状態管理システムから取得）
-            const startTime = _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_0__/* .entranceReservationStateManager */ .xx.getReservationStartTime();
-            const elapsedMinutes = startTime ?
-                Math.floor((Date.now() - startTime) / 60000) : 0;
-            const attempts = _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_0__/* .entranceReservationStateManager */ .xx.getAttempts();
-            message = `予約実行中\n${elapsedMinutes}分 ${attempts}回`;
-            bgColor = 'rgba(255, 140, 0, 0.9)'; // オレンジ色
+            // 効率モードON時は標的時刻カウントダウン、通常時は経過時間と回数
+            if (_entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_0__/* .entranceReservationStateManager */ .xx.isEfficiencyModeEnabled()) {
+                const nextTarget = _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_0__/* .entranceReservationStateManager */ .xx.getNextSubmitTarget();
+                if (nextTarget) {
+                    const remainingMs = nextTarget.getTime() - Date.now();
+                    const remainingSeconds = Math.max(0, Math.floor(remainingMs / 1000));
+                    message = `効率予約実行中\n${remainingSeconds}秒後`;
+                    bgColor = 'rgba(255, 140, 0, 0.9)'; // オレンジ色
+                }
+                else {
+                    message = '効率予約実行中';
+                    bgColor = 'rgba(255, 140, 0, 0.9)';
+                }
+            }
+            else {
+                // 通常モード: 経過時間と回数を表示
+                const startTime = _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_0__/* .entranceReservationStateManager */ .xx.getReservationStartTime();
+                const elapsedMinutes = startTime ?
+                    Math.floor((Date.now() - startTime) / 60000) : 0;
+                const attempts = _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_0__/* .entranceReservationStateManager */ .xx.getAttempts();
+                message = `予約実行中\n${elapsedMinutes}分 ${attempts}回`;
+                bgColor = 'rgba(255, 140, 0, 0.9)'; // オレンジ色
+            }
             break;
         case 'selecting':
             message = '監視準備完了';
@@ -1675,6 +1720,23 @@ function updateStatusBadge(mode) {
         statusBadge.style.background = bgColor;
         statusBadge.style.display = 'block';
         statusBadge.style.whiteSpace = 'pre-line'; // 改行を有効にする
+        // 効率モードの5秒前警告（予約実行中・監視中両方）
+        if ((mode === 'reservation-running' || mode === 'monitoring') && _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_0__/* .entranceReservationStateManager */ .xx.isEfficiencyModeEnabled()) {
+            const nextTarget = _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_0__/* .entranceReservationStateManager */ .xx.getNextSubmitTarget();
+            if (nextTarget) {
+                const remainingMs = nextTarget.getTime() - Date.now();
+                const remainingSeconds = Math.max(0, Math.floor(remainingMs / 1000));
+                if (remainingSeconds <= 5) {
+                    statusBadge.classList.add('countdown-warning');
+                }
+                else {
+                    statusBadge.classList.remove('countdown-warning');
+                }
+            }
+        }
+        else {
+            statusBadge.classList.remove('countdown-warning');
+        }
     }
     else {
         statusBadge.style.display = 'none';
@@ -2710,6 +2772,11 @@ class EntranceReservationStateManager {
             reloadInterval: 30000,
             monitoringInterval: null
         };
+        // 効率モード設定管理
+        this.efficiencyMode = {
+            enabled: false,
+            nextSubmitTarget: null
+        };
         // リロードカウントダウン状態管理（旧reloadCountdownStateから統合）
         this.reloadCountdown = {
             totalSeconds: 30,
@@ -2734,10 +2801,6 @@ class EntranceReservationStateManager {
             countdownInterval: null,
             remainingSeconds: null
         };
-        // ============================================================================
-        // UI更新処理（自己完結型）
-        // ============================================================================
-        // 削除: updateCountdownDisplay()は統一FAB更新システム(updateFabDisplay)に統合済み
     }
     // ============================================================================
     // 実行状態管理
@@ -2761,6 +2824,11 @@ class EntranceReservationStateManager {
             return false;
         }
         this.executionState = ExecutionState.RESERVATION_RUNNING;
+        // 効率モード有効時は目標時刻を再計算
+        if (this.efficiencyMode.enabled) {
+            this.efficiencyMode.nextSubmitTarget = this.calculateNext00or30Seconds();
+            this.log('⚡ 効率モード: 予約開始時に目標時刻を再計算');
+        }
         this.log('🚀 予約処理を開始');
         return true;
     }
@@ -2774,6 +2842,11 @@ class EntranceReservationStateManager {
             return false;
         }
         this.executionState = ExecutionState.MONITORING_RUNNING;
+        // 効率モード有効時は目標時刻を再計算
+        if (this.efficiencyMode.enabled) {
+            this.efficiencyMode.nextSubmitTarget = this.calculateNext00or30Seconds();
+            this.log('⚡ 効率モード: 監視開始時に目標時刻を再計算');
+        }
         this.log('👁️ 監視処理を開始');
         return true;
     }
@@ -3622,35 +3695,185 @@ class EntranceReservationStateManager {
             case 'monitoring':
                 const remainingSeconds = this.getReloadSecondsRemaining();
                 if (this.isReloadCountdownActive() && remainingSeconds !== null) {
-                    statusBadge.innerText = `監視中\nリロード: ${remainingSeconds}秒`;
+                    const prefix = this.isEfficiencyModeEnabled() ? '効率' : '';
+                    statusBadge.innerText = `${prefix}監視中\nリロード: ${remainingSeconds}秒`;
+                    // リロード5秒前から警告クラスを追加
+                    if (remainingSeconds <= 5) {
+                        statusBadge.classList.add('countdown-warning');
+                    }
+                    else {
+                        statusBadge.classList.remove('countdown-warning');
+                    }
                     statusBadge.classList.remove('js-hide');
                 }
                 else {
-                    statusBadge.innerText = '監視待機中';
+                    const prefix = this.isEfficiencyModeEnabled() ? '効率' : '';
+                    statusBadge.innerText = `${prefix}監視待機中`;
+                    statusBadge.classList.remove('countdown-warning');
                     statusBadge.classList.remove('js-hide');
                 }
                 break;
             case 'reservation-running':
-                statusBadge.innerText = '予約実行中';
+                if (this.isEfficiencyModeEnabled()) {
+                    const nextTarget = this.getNextSubmitTarget();
+                    if (nextTarget) {
+                        const remainingMs = nextTarget.getTime() - Date.now();
+                        const remainingSeconds = Math.max(0, Math.floor(remainingMs / 1000));
+                        statusBadge.innerText = `効率予約実行中\n${remainingSeconds}秒後`;
+                        // 5秒前から警告色
+                        if (remainingSeconds <= 5) {
+                            statusBadge.classList.add('countdown-warning');
+                        }
+                        else {
+                            statusBadge.classList.remove('countdown-warning');
+                        }
+                    }
+                    else {
+                        statusBadge.innerText = '効率予約実行中';
+                        statusBadge.classList.remove('countdown-warning');
+                    }
+                }
+                else {
+                    const startTime = this.getReservationStartTime();
+                    const elapsedMinutes = startTime ?
+                        Math.floor((Date.now() - startTime) / 60000) : 0;
+                    const attempts = this.getAttempts();
+                    statusBadge.innerText = `予約実行中\n${elapsedMinutes}分 ${attempts}回`;
+                    statusBadge.classList.remove('countdown-warning');
+                }
                 statusBadge.classList.remove('js-hide');
                 break;
             case 'cooldown':
                 statusBadge.innerText = customText || '予約待機中';
+                statusBadge.classList.remove('countdown-warning');
                 statusBadge.classList.remove('js-hide');
                 break;
             case 'idle-monitoring':
                 statusBadge.innerText = '監視可能';
+                statusBadge.classList.remove('countdown-warning');
                 statusBadge.classList.remove('js-hide');
                 break;
             case 'idle-reservation':
                 statusBadge.innerText = '予約可能';
+                statusBadge.classList.remove('countdown-warning');
                 statusBadge.classList.remove('js-hide');
                 break;
             case 'idle':
             default:
                 statusBadge.innerText = '対象選択待ち';
+                statusBadge.classList.remove('countdown-warning');
                 statusBadge.classList.remove('js-hide');
                 break;
+        }
+    }
+    // ============================================================================
+    // UI更新処理（自己完結型）
+    // ============================================================================
+    // 削除: updateCountdownDisplay()は統一FAB更新システム(updateFabDisplay)に統合済み
+    // ============================================================================
+    // 効率モード管理
+    // ============================================================================
+    // 効率モードの有効/無効を切り替え
+    toggleEfficiencyMode() {
+        this.efficiencyMode.enabled = !this.efficiencyMode.enabled;
+        if (this.efficiencyMode.enabled) {
+            this.efficiencyMode.nextSubmitTarget = this.calculateNext00or30Seconds();
+            this.saveEfficiencyModeSettings();
+            this.log('🚀 効率モード有効化');
+        }
+        else {
+            this.efficiencyMode.nextSubmitTarget = null;
+            this.saveEfficiencyModeSettings();
+            this.log('⏸️ 効率モード無効化');
+        }
+        return this.efficiencyMode.enabled;
+    }
+    // 効率モードの状態を取得
+    isEfficiencyModeEnabled() {
+        return this.efficiencyMode.enabled;
+    }
+    // 次のsubmit標的時刻を取得
+    getNextSubmitTarget() {
+        return this.efficiencyMode.nextSubmitTarget;
+    }
+    // 次のsubmit標的時刻を設定
+    setNextSubmitTarget(target) {
+        this.efficiencyMode.nextSubmitTarget = target;
+    }
+    // 次の00秒/30秒を計算（15秒未満の場合は次の目標時刻を選択）
+    calculateNext00or30Seconds() {
+        const now = new Date();
+        const currentSeconds = now.getSeconds();
+        const nextTarget = new Date(now);
+        let targetSeconds;
+        let targetMinutes = nextTarget.getMinutes();
+        // 0-2秒で0秒側に比重のあるランダム時間を生成（二次分布）
+        const randomBuffer = Math.pow(Math.random(), 2) * 2; // 0～2秒、0側に比重
+        if (currentSeconds < 30) {
+            // 今の分の30秒 + ランダムバッファを候補とする
+            targetSeconds = 30 + randomBuffer;
+        }
+        else {
+            // 次の分の00秒 + ランダムバッファを候補とする
+            targetMinutes += 1;
+            targetSeconds = randomBuffer;
+        }
+        // 候補時刻までの猶予を計算
+        const candidateTarget = new Date(now);
+        candidateTarget.setMinutes(targetMinutes);
+        candidateTarget.setSeconds(Math.floor(targetSeconds));
+        candidateTarget.setMilliseconds((targetSeconds % 1) * 1000); // 小数部をミリ秒に
+        const remainingMs = candidateTarget.getTime() - now.getTime();
+        // 15秒未満の場合は次の目標時刻に変更
+        if (remainingMs < 15000) { // 15秒 = 15000ms
+            // 新しいランダムバッファを生成
+            const newRandomBuffer = Math.pow(Math.random(), 2) * 2;
+            if (currentSeconds < 30) {
+                // 元々00秒候補（現在時刻が30秒未満）だった場合、30秒 + ランダムバッファに変更
+                candidateTarget.setSeconds(Math.floor(30 + newRandomBuffer));
+                candidateTarget.setMilliseconds(((30 + newRandomBuffer) % 1) * 1000);
+            }
+            else {
+                // 元々30秒候補（現在時刻が30秒以上）だった場合、次の分の00秒 + ランダムバッファに変更
+                candidateTarget.setMinutes(candidateTarget.getMinutes() + 1);
+                candidateTarget.setSeconds(Math.floor(newRandomBuffer));
+                candidateTarget.setMilliseconds((newRandomBuffer % 1) * 1000);
+            }
+            this.log(`⚡ 効率モード: 猶予${Math.floor(remainingMs / 1000)}秒は短いため次の目標時刻に変更`);
+        }
+        return candidateTarget;
+    }
+    // 次の標的時刻を更新（submit後に呼び出し）
+    updateNextSubmitTarget() {
+        if (this.efficiencyMode.enabled) {
+            this.efficiencyMode.nextSubmitTarget = this.calculateNext00or30Seconds();
+        }
+    }
+    // 効率モード設定保存
+    saveEfficiencyModeSettings() {
+        try {
+            localStorage.setItem('ytomo-efficiency-mode', JSON.stringify({
+                enabled: this.efficiencyMode.enabled
+            }));
+        }
+        catch (error) {
+            console.error('効率モード設定保存エラー:', error);
+        }
+    }
+    // 効率モード設定読み込み
+    loadEfficiencyModeSettings() {
+        try {
+            const saved = localStorage.getItem('ytomo-efficiency-mode');
+            if (saved) {
+                const settings = JSON.parse(saved);
+                if (settings.enabled) {
+                    this.efficiencyMode.enabled = true;
+                    this.efficiencyMode.nextSubmitTarget = this.calculateNext00or30Seconds();
+                }
+            }
+        }
+        catch (error) {
+            console.error('効率モード設定読み込みエラー:', error);
         }
     }
 }
@@ -5070,12 +5293,35 @@ function createEntranceReservationUI() {
         return; // 明示的なreturnを追加
     }, true); // useCapture = true
     // FABコンテナに要素を追加（上から順：予約対象→監視対象→ステータス→ボタン）
+    // 効率モードトグルボタン
+    const efficiencyToggleButton = document.createElement('button');
+    efficiencyToggleButton.className = 'ytomo-efficiency-toggle';
+    // 効率モード状態に応じた初期表示
+    function updateEfficiencyToggleButton() {
+        const isEnabled = _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_4__/* .entranceReservationStateManager */ .xx.isEfficiencyModeEnabled();
+        efficiencyToggleButton.innerText = isEnabled ? '効率ON' : '効率OFF';
+        efficiencyToggleButton.classList.toggle('efficiency-enabled', isEnabled);
+        efficiencyToggleButton.classList.toggle('efficiency-disabled', !isEnabled);
+    }
+    updateEfficiencyToggleButton();
+    // 効率モードトグル処理
+    efficiencyToggleButton.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_4__/* .entranceReservationStateManager */ .xx.toggleEfficiencyMode();
+        updateEfficiencyToggleButton();
+    });
+    // ホバー効果はCSSで制御
     fabContainer.appendChild(reservationTargetDisplay);
     fabContainer.appendChild(monitoringTargetsDisplay);
     fabContainer.appendChild(statusBadge);
+    fabContainer.appendChild(efficiencyToggleButton);
     fabContainer.appendChild(fabButton);
     // DOMに追加（body直下）
     document.body.appendChild(fabContainer);
+    // 効率モード設定を読み込み
+    _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_4__/* .entranceReservationStateManager */ .xx.loadEfficiencyModeSettings();
+    updateEfficiencyToggleButton(); // ボタン表示を更新
     // 自動選択イベントリスナーを設定
     window.addEventListener('entrance-auto-select', async (event) => {
         console.log('🎯 自動選択イベントを受信:', event.detail);
@@ -5526,10 +5772,11 @@ async function entranceReservationHelper(config) {
             const submitButton = await (0,_pavilion_search_page__WEBPACK_IMPORTED_MODULE_0__/* .waitForElement */ .xk)(selectors.submit, timeouts.waitForSubmit, config);
             if (_entrance_page_state__WEBPACK_IMPORTED_MODULE_1__.entranceReservationState.shouldStop)
                 break;
-            console.log('submitボタンが見つかりました。クリックします。');
+            console.log('submitボタンが見つかりました。効率モードチェック中...');
             // submit押下時に回数を更新
             _entrance_page_state__WEBPACK_IMPORTED_MODULE_1__.entranceReservationState.attempts = attempts;
-            await (0,_pavilion_search_page__WEBPACK_IMPORTED_MODULE_0__/* .clickElement */ .jp)(submitButton, config);
+            // 効率モード対応のsubmitクリック実行
+            await executeSubmitWithEfficiencyTiming(submitButton, config);
             console.log('2. レスポンスを待機中...');
             const responseSelectors = {
                 change: selectors.change,
@@ -5542,7 +5789,7 @@ async function entranceReservationHelper(config) {
                 break;
             if (response.key === 'change') {
                 console.log('changeボタンをクリックします。');
-                await (0,_pavilion_search_page__WEBPACK_IMPORTED_MODULE_0__/* .clickElement */ .jp)(response.element, config);
+                await clickElementWithFixedDelay(response.element, config);
                 console.log('success/failureを待機中...');
                 const finalSelectors = {
                     success: selectors.success,
@@ -5561,7 +5808,7 @@ async function entranceReservationHelper(config) {
                     else {
                         console.log('予約失敗。closeボタンをクリックして再試行します。');
                         const closeButton = await (0,_pavilion_search_page__WEBPACK_IMPORTED_MODULE_0__/* .waitForElement */ .xk)(selectors.close, timeouts.waitForClose, config);
-                        await (0,_pavilion_search_page__WEBPACK_IMPORTED_MODULE_0__/* .clickElement */ .jp)(closeButton, config);
+                        await clickElementWithFixedDelay(closeButton, config);
                         await new Promise(resolve => setTimeout(resolve, (0,_pavilion_search_page__WEBPACK_IMPORTED_MODULE_0__/* .getRandomWaitTime */ .I1)(config.randomSettings.minRetryDelay, config.randomSettings.retryRandomRange, config)));
                     }
                 }
@@ -5578,7 +5825,7 @@ async function entranceReservationHelper(config) {
             else if (response.key === 'failure') {
                 console.log('予約失敗。closeボタンをクリックして再試行します。');
                 const closeButton = await (0,_pavilion_search_page__WEBPACK_IMPORTED_MODULE_0__/* .waitForElement */ .xk)(selectors.close, timeouts.waitForClose, config);
-                await (0,_pavilion_search_page__WEBPACK_IMPORTED_MODULE_0__/* .clickElement */ .jp)(closeButton, config);
+                await clickElementWithFixedDelay(closeButton, config);
                 await new Promise(resolve => setTimeout(resolve, (0,_pavilion_search_page__WEBPACK_IMPORTED_MODULE_0__/* .getRandomWaitTime */ .I1)(config.randomSettings.minRetryDelay, config.randomSettings.retryRandomRange, config)));
             }
         }
@@ -5605,6 +5852,44 @@ async function entranceReservationHelper(config) {
     // クールタイム開始
     _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_4__/* .entranceReservationStateManager */ .xx.startReservationCooldown();
     return { success: false, attempts, cooldownStarted: true };
+}
+// ============================================================================
+// 効率モード対応関数
+// ============================================================================
+// 効率モード対応のsubmit実行
+async function executeSubmitWithEfficiencyTiming(submitButton, config) {
+    const isEfficiencyMode = _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_4__/* .entranceReservationStateManager */ .xx.isEfficiencyModeEnabled();
+    if (!isEfficiencyMode) {
+        // 通常モード: そのままクリック
+        await (0,_pavilion_search_page__WEBPACK_IMPORTED_MODULE_0__/* .clickElement */ .jp)(submitButton, config);
+        return;
+    }
+    // 効率モード: 目標時間（00秒/30秒）への調整待機
+    console.log('🚀 効率モード: submit標的時刻調整開始');
+    // 次の00秒/30秒標的時刻を計算
+    const nextTarget = _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_4__/* .entranceReservationStateManager */ .xx.calculateNext00or30Seconds();
+    const adjustmentWaitMs = nextTarget.getTime() - Date.now();
+    if (adjustmentWaitMs > 1000) {
+        console.log(`🎯 標的時刻調整待機: ${Math.floor(adjustmentWaitMs / 1000)}秒 (目標: ${nextTarget.toLocaleTimeString()})`);
+        await new Promise(resolve => setTimeout(resolve, adjustmentWaitMs));
+    }
+    // 標的時刻でsubmitクリック実行
+    console.log(`🚀 submitクリック実行 (${new Date().toLocaleTimeString()})`);
+    await (0,_pavilion_search_page__WEBPACK_IMPORTED_MODULE_0__/* .clickElement */ .jp)(submitButton, config);
+    // 4. 次回標的時刻を更新
+    _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_4__/* .entranceReservationStateManager */ .xx.updateNextSubmitTarget();
+}
+// 効率モード対応の固定待機付きクリック（change、closeボタン用）
+async function clickElementWithFixedDelay(element, config) {
+    const isEfficiencyMode = _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_4__/* .entranceReservationStateManager */ .xx.isEfficiencyModeEnabled();
+    if (isEfficiencyMode) {
+        // 効率モード: 1.5-3秒の固定待機
+        const randomDelay = 1500 + Math.random() * 1500; // 1500~3000ms
+        console.log(`⏳ 効率モード固定待機: ${Math.round(randomDelay)}ms`);
+        await new Promise(resolve => setTimeout(resolve, randomDelay));
+    }
+    // 通常のクリック処理
+    await (0,_pavilion_search_page__WEBPACK_IMPORTED_MODULE_0__/* .clickElement */ .jp)(element, config);
 }
 // エクスポート
 

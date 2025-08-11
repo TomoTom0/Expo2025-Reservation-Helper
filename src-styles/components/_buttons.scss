@@ -5,6 +5,45 @@
   }
 }
 
+// 効率モードトグルボタン
+.ytomo-efficiency-toggle {
+  width: 45px !important;
+  height: 32px !important;
+  border-radius: 16px !important;
+  color: white !important;
+  border: none !important;
+  font-size: 10px !important;
+  font-weight: bold !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  pointer-events: auto !important;
+  margin-bottom: 8px !important;
+  
+  // 効率モード有効状態
+  &.efficiency-enabled {
+    background: rgba(255, 140, 0, 0.9) !important;
+  }
+  
+  // 効率モード無効状態  
+  &.efficiency-disabled {
+    background: rgba(128, 128, 128, 0.9) !important;
+  }
+  
+  // ホバー効果
+  &:hover {
+    transform: scale(1.1) !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4) !important;
+  }
+  
+  &:active {
+    transform: scale(0.95) !important;
+  }
+}
+
 // ボタン共通スタイル
 button.ext-ytomo {
   height: 40px;

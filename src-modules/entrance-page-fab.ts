@@ -422,13 +422,42 @@ function createEntranceReservationUI(): void {
 
 
     // FABコンテナに要素を追加（上から順：予約対象→監視対象→ステータス→ボタン）
+    // 効率モードトグルボタン
+    const efficiencyToggleButton = document.createElement('button');
+    efficiencyToggleButton.className = 'ytomo-efficiency-toggle';
+    
+    // 効率モード状態に応じた初期表示
+    function updateEfficiencyToggleButton() {
+        const isEnabled = entranceReservationStateManager.isEfficiencyModeEnabled();
+        efficiencyToggleButton.innerText = isEnabled ? '効率ON' : '効率OFF';
+        efficiencyToggleButton.classList.toggle('efficiency-enabled', isEnabled);
+        efficiencyToggleButton.classList.toggle('efficiency-disabled', !isEnabled);
+    }
+    updateEfficiencyToggleButton();
+    
+    // 効率モードトグル処理
+    efficiencyToggleButton.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        
+        entranceReservationStateManager.toggleEfficiencyMode();
+        updateEfficiencyToggleButton();
+    });
+    
+    // ホバー効果はCSSで制御
+
     fabContainer.appendChild(reservationTargetDisplay);
     fabContainer.appendChild(monitoringTargetsDisplay);
     fabContainer.appendChild(statusBadge);
+    fabContainer.appendChild(efficiencyToggleButton);
     fabContainer.appendChild(fabButton);
 
     // DOMに追加（body直下）
     document.body.appendChild(fabContainer);
+
+    // 効率モード設定を読み込み
+    entranceReservationStateManager.loadEfficiencyModeSettings();
+    updateEfficiencyToggleButton(); // ボタン表示を更新
 
     // 自動選択イベントリスナーを設定
     window.addEventListener('entrance-auto-select', async (event: any) => {
@@ -963,12 +992,13 @@ async function entranceReservationHelper(config: ReservationConfig): Promise<Res
             
             if (entranceReservationState.shouldStop) break;
             
-            console.log('submitボタンが見つかりました。クリックします。');
+            console.log('submitボタンが見つかりました。効率モードチェック中...');
             
             // submit押下時に回数を更新
             entranceReservationState.attempts = attempts;
             
-            await clickElement(submitButton, config);
+            // 効率モード対応のsubmitクリック実行
+            await executeSubmitWithEfficiencyTiming(submitButton as HTMLElement, config);
             
             console.log('2. レスポンスを待機中...');
             const responseSelectors = {
@@ -984,7 +1014,7 @@ async function entranceReservationHelper(config: ReservationConfig): Promise<Res
             
             if (response.key === 'change') {
                 console.log('changeボタンをクリックします。');
-                await clickElement(response.element, config);
+                await clickElementWithFixedDelay(response.element, config);
                 
                 console.log('success/failureを待機中...');
                 
@@ -1007,7 +1037,7 @@ async function entranceReservationHelper(config: ReservationConfig): Promise<Res
                     } else {
                         console.log('予約失敗。closeボタンをクリックして再試行します。');
                         const closeButton = await waitForElement(selectors.close, timeouts.waitForClose, config);
-                        await clickElement(closeButton, config);
+                        await clickElementWithFixedDelay(closeButton as HTMLElement, config);
                         await new Promise(resolve => setTimeout(resolve, getRandomWaitTime(config.randomSettings.minRetryDelay, config.randomSettings.retryRandomRange, config)));
                     }
                 } catch (waitError) {
@@ -1021,7 +1051,7 @@ async function entranceReservationHelper(config: ReservationConfig): Promise<Res
             } else if (response.key === 'failure') {
                 console.log('予約失敗。closeボタンをクリックして再試行します。');
                 const closeButton = await waitForElement(selectors.close, timeouts.waitForClose, config);
-                await clickElement(closeButton, config);
+                await clickElementWithFixedDelay(closeButton as HTMLElement, config);
                 await new Promise(resolve => setTimeout(resolve, getRandomWaitTime(config.randomSettings.minRetryDelay, config.randomSettings.retryRandomRange, config)));
             }
             
@@ -1053,6 +1083,55 @@ async function entranceReservationHelper(config: ReservationConfig): Promise<Res
     entranceReservationStateManager.startReservationCooldown();
     
     return { success: false, attempts, cooldownStarted: true };
+}
+
+// ============================================================================
+// 効率モード対応関数
+// ============================================================================
+
+// 効率モード対応のsubmit実行
+async function executeSubmitWithEfficiencyTiming(submitButton: HTMLElement, config: ReservationConfig): Promise<void> {
+    const isEfficiencyMode = entranceReservationStateManager.isEfficiencyModeEnabled();
+    
+    if (!isEfficiencyMode) {
+        // 通常モード: そのままクリック
+        await clickElement(submitButton, config);
+        return;
+    }
+    
+    // 効率モード: 目標時間（00秒/30秒）への調整待機
+    console.log('🚀 効率モード: submit標的時刻調整開始');
+    
+    // 次の00秒/30秒標的時刻を計算
+    const nextTarget = entranceReservationStateManager.calculateNext00or30Seconds();
+    const adjustmentWaitMs = nextTarget.getTime() - Date.now();
+    
+    if (adjustmentWaitMs > 1000) {
+        console.log(`🎯 標的時刻調整待機: ${Math.floor(adjustmentWaitMs/1000)}秒 (目標: ${nextTarget.toLocaleTimeString()})`);
+        await new Promise(resolve => setTimeout(resolve, adjustmentWaitMs));
+    }
+    
+    // 標的時刻でsubmitクリック実行
+    console.log(`🚀 submitクリック実行 (${new Date().toLocaleTimeString()})`);
+    await clickElement(submitButton, config);
+    
+    // 4. 次回標的時刻を更新
+    entranceReservationStateManager.updateNextSubmitTarget();
+}
+
+// 効率モード対応の固定待機付きクリック（change、closeボタン用）
+async function clickElementWithFixedDelay(element: HTMLElement, config: ReservationConfig): Promise<void> {
+    const isEfficiencyMode = entranceReservationStateManager.isEfficiencyModeEnabled();
+    
+    if (isEfficiencyMode) {
+        // 効率モード: 1.5-3秒の固定待機
+        const randomDelay = 1500 + Math.random() * 1500; // 1500~3000ms
+        console.log(`⏳ 効率モード固定待機: ${Math.round(randomDelay)}ms`);
+        await new Promise(resolve => setTimeout(resolve, randomDelay));
+    }
+    
+    // 通常のクリック処理
+    await clickElement(element, config);
 }
 
 // エクスポート
