@@ -147,7 +147,8 @@ export class EntranceReservationStateManager {
     // 効率モード設定管理
     private efficiencyMode = {
         enabled: false,
-        nextSubmitTarget: null as Date | null
+        nextSubmitTarget: null as Date | null,
+        updateTimer: null as number | null // FABボタン更新タイマー
     };
     
     // changeダイアログ検出・調整管理
@@ -212,10 +213,11 @@ export class EntranceReservationStateManager {
         
         this.executionState = ExecutionState.RESERVATION_RUNNING;
         
-        // 効率モード有効時は目標時刻を再計算
+        // 効率モード有効時は目標時刻を再計算とタイマー開始
         if (this.efficiencyMode.enabled) {
             this.efficiencyMode.nextSubmitTarget = this.calculateNext00or30Seconds();
             this.log('⚡ 効率モード: 予約開始時に目標時刻を再計算');
+            this.startEfficiencyModeUpdateTimer();
         }
         
         this.log('🚀 予約処理を開始');
@@ -248,6 +250,9 @@ export class EntranceReservationStateManager {
     stop(): void {
         const prevState = this.executionState;
         this.executionState = ExecutionState.IDLE;
+        
+        // 効率モードタイマーを停止
+        this.stopEfficiencyModeUpdateTimer();
         
         switch (prevState) {
             case ExecutionState.RESERVATION_RUNNING:
@@ -965,6 +970,15 @@ export class EntranceReservationStateManager {
     getFabButtonText(): string {
         switch (this.executionState) {
             case ExecutionState.RESERVATION_RUNNING:
+                // 効率モード実行中はカウントダウン表示
+                if (this.efficiencyMode.enabled && this.efficiencyMode.nextSubmitTarget) {
+                    const now = new Date();
+                    const remainingMs = this.efficiencyMode.nextSubmitTarget.getTime() - now.getTime();
+                    if (remainingMs > 0) {
+                        const remainingSec = Math.ceil(remainingMs / 1000);
+                        return `効率予約\n${remainingSec}秒`;
+                    }
+                }
                 return '予約\n中断';
             case ExecutionState.MONITORING_RUNNING:
                 return '監視\n中断';
@@ -1442,6 +1456,28 @@ export class EntranceReservationStateManager {
     updateNextSubmitTarget(): void {
         if (this.efficiencyMode.enabled) {
             this.efficiencyMode.nextSubmitTarget = this.calculateNext00or30Seconds();
+        }
+    }
+    
+    // 効率モードFAB更新タイマー開始
+    private startEfficiencyModeUpdateTimer(): void {
+        // 既存タイマーがあれば停止
+        this.stopEfficiencyModeUpdateTimer();
+        
+        // 1秒間隔でFABボタン更新
+        this.efficiencyMode.updateTimer = window.setInterval(() => {
+            this.updateFabDisplay();
+        }, 1000);
+        
+        console.log('⚡ 効率モードFAB更新タイマー開始');
+    }
+    
+    // 効率モードFAB更新タイマー停止
+    private stopEfficiencyModeUpdateTimer(): void {
+        if (this.efficiencyMode.updateTimer) {
+            clearInterval(this.efficiencyMode.updateTimer);
+            this.efficiencyMode.updateTimer = null;
+            console.log('⚡ 効率モードFAB更新タイマー停止');
         }
     }
     
