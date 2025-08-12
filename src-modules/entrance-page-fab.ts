@@ -157,11 +157,10 @@ function createEntranceReservationUI(): void {
             return;
         }
         
-        // 入場予約状態管理システムを使用した監視開始判定
+        // 入場予約状態管理システムを使用した開始判定
         const preferredAction = entranceReservationStateManager.getPreferredAction();
         // FABクリック処理開始
         
-        // 監視機能は削除されました - 満員時間帯も直接予約可能になったため監視不要
         if (preferredAction === 'reservation') {
             await startReservationProcess();
         } else {
@@ -171,7 +170,6 @@ function createEntranceReservationUI(): void {
         return;
     });
 
-    // 監視機能は無効化済み
 
     // 予約中断処理
     function stopReservationProcess(): void {
@@ -204,7 +202,7 @@ function createEntranceReservationUI(): void {
         const currentState = entranceReservationStateManager.getExecutionState();
         console.log(`🔄 [予約開始後] 実行状態: ${currentState}`);
         
-        // 監視中から予約に切り替わった場合にオーバーレイを更新
+        // 予約に切り替わった場合にオーバーレイを更新
         processingOverlay.show('reservation');
         
         showStatus('予約処理実行中...', 'blue');
@@ -310,7 +308,7 @@ function createEntranceReservationUI(): void {
     }, true); // useCapture = true
 
 
-    // FABコンテナに要素を追加（上から順：予約対象→監視対象→ステータス→ボタン）
+    // FABコンテナに要素を追加（上から順：予約対象→ステータス→ボタン）
     // 効率モードトグルボタン（非表示 - 効率モードは常時ON）
     const efficiencyToggleButton = document.createElement('button');
     efficiencyToggleButton.className = 'ytomo-efficiency-toggle js-hide'; // 非表示に設定
@@ -356,10 +354,9 @@ function createEntranceReservationUI(): void {
         
         try {
                 
-            // 監視機能は無効化済み - 監視対象削除不要
             
             // オーバーレイを確実に非表示にして状態をリセット
-            console.log('🛡️ 監視→予約移行: オーバーレイ状態をリセット');
+            console.log('🛡️ 予約移行: オーバーレイ状態をリセット');
             processingOverlay.hide();
             
             // 1. 時間帯要素をクリックして選択状態にする
@@ -407,7 +404,7 @@ function createEntranceReservationUI(): void {
         setupTimeSlotClickHandlers();
     });
     
-    // カレンダー変更監視は別途初期化処理で開始（キャッシュ復元後）
+    // カレンダー変更検知は別途初期化処理で開始（キャッシュ復元後）
 }
 
 
@@ -505,7 +502,7 @@ function checkInitialState(): void {
     entranceReservationStateManager.updateFabDisplay();
 }
 
-// カレンダー変更を監視して監視ボタンを再設置
+// カレンダー変更を検知してボタンを再設置
 function startCalendarWatcher(): void {
     if (calendarWatchState.isWatching) return;
     
@@ -518,7 +515,7 @@ function startCalendarWatcher(): void {
         console.log(`📅 初期化時の選択日付を設定: ${calendarWatchState.currentSelectedDate}`);
     }
     
-    console.log('📅 カレンダー変更監視を開始');
+    console.log('📅 カレンダー変更検知を開始');
     
     // MutationObserverでカレンダー変更・時間帯選択・ボタン状態変更を検出
     calendarWatchState.observer = new MutationObserver((mutations) => {
@@ -577,7 +574,7 @@ function startCalendarWatcher(): void {
         }
     });
     
-    // カレンダー要素全体を監視
+    // カレンダー要素全体を検知
     const observeTarget = document.body;
     calendarWatchState.observer.observe(observeTarget, {
         attributes: true,
@@ -607,25 +604,23 @@ async function handleCalendarChange(): Promise<void> {
             entranceReservationStateManager.setSelectedCalendarDate(newSelectedDate);
         }
         
-        // 実際に日付が変更された場合のみ監視状態をクリア
+        // 実際に日付が変更された場合のみ状態をクリア
         if (actualDateChanged) {
             console.log(`📅 実際の日付変更確認: ${stateManagerSelectedDate} → ${newSelectedDate}`);
             
             const hasReservationTarget = entranceReservationStateManager.hasReservationTarget();
-            // 監視機能は無効化済み - 監視対象は常に0個
             
             if (hasReservationTarget) {
                 console.log('📅 日付変更により予約対象をクリア');
                 entranceReservationStateManager.clearReservationTarget();
-                // 監視機能は無効化済み - clearAllMonitoringTargets呼び出し不要
             }
         } else {
-            console.log('📅 同じ日付への再クリックのため監視対象は維持');
+            console.log('📅 同じ日付への再クリック');
         }
         
         // 従来システムはもう使用しないため、このブロックは削除
         // if (multiTargetManager.hasTargets() && !timeSlotState.isMonitoring) {
-        //     console.log('📅 日付変更により従来システムの監視対象をクリア');
+        //     console.log('📅 日付変更により従来システムの対象をクリア');
         //     multiTargetManager.clearAll();
         //     timeSlotState.mode = 'idle';
         //     if (cacheManager) {
@@ -651,16 +646,16 @@ async function handleCalendarChange(): Promise<void> {
             updateMainButtonDisplay();
         }
         
-        // FABボタンの状態を更新（監視ボタンは再設置しない）
+        // FABボタンの状態を更新
         updateMainButtonDisplay();
     }
 }
 
-// 既存の監視ボタンをすべて削除
+// 既存のボタンをすべて削除
 function removeAllMonitorButtons(): void {
     const existingButtons = document.querySelectorAll('.monitor-btn.ext-ytomo');
     existingButtons.forEach(button => button.remove());
-    console.log(`🗑️ 既存の監視ボタンを${existingButtons.length}個削除しました`);
+    console.log(`🗜️ 既存のボタンを${existingButtons.length}個削除しました`);
 }
 
 // DOM上の選択状態から予約対象を同期

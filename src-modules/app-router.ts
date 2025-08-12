@@ -98,8 +98,7 @@ const initializeUnifiedStateManager = (): void => {
     }
     
     try {
-        // 既存システムからの状態移行
-        entranceReservationStateManager.migrateFromExisting();
+        // 状態管理システム初期化
         isUnifiedStateManagerInitialized = true;
         console.log('✅ 入場予約状態管理システム初期化完了');
     } catch (error) {

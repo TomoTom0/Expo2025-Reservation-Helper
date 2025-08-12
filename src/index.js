@@ -9,7 +9,7 @@
 // @run-at       document-end
 // ==/UserScript==
 
-// Built: 2025/08/13 00:27:57
+// Built: 2025/08/13 00:40:24
 
 
 (function webpackUniversalModuleDefinition(root, factory) {
@@ -346,12 +346,12 @@ let entranceReservationState = {
     startTime: null,
     attempts: 0
 };
-// 時間帯監視機能の状態管理
+// 時間帯機能の状態管理
 // timeSlotStateはEntranceReservationStateManagerに統合済み
 // let timeSlotState: TimeSlotState = {
 //     mode: 'idle',  // idle, selecting, monitoring, trying
 //     targetSlots: [],   // 複数選択対象の時間帯情報配列
-//     monitoringInterval: null,  // 監視用インターバル
+//     interval: null,  // インターバル
 //     isMonitoring: false,
 //     retryCount: 0,
 //     maxRetries: 100,
@@ -375,7 +375,7 @@ let entranceReservationState = {
 //     countdownInterval: null,
 //     reloadTimer: null
 // };
-// カレンダー監視状態管理
+// カレンダー検知状態管理
 const calendarWatchState = {
     isWatching: false,
     observer: null,
@@ -2503,10 +2503,6 @@ class EntranceReservationStateManager {
     // ============================================================================
     // 既存システムとの互換性
     // ============================================================================
-    // 既存のmultiTargetManagerから監視対象を移行（現在は不要）
-    migrateFromExisting() {
-        this.log('🔄 既存システムから状態を移行中... (スキップ - 既にmultiTargetManagerは削除済み)');
-    }
     // ============================================================================
     // UI連携用メソッド
     // ============================================================================
@@ -2571,7 +2567,6 @@ class EntranceReservationStateManager {
                 targetType: 'reservation'
             };
         }
-        // 監視対象がある場合は監視対象を表示 - 監視機能削除済み
         return {
             hasTarget: false,
             displayText: '',
@@ -3564,10 +3559,9 @@ function createEntranceReservationUI() {
             stopReservationProcess();
             return;
         }
-        // 入場予約状態管理システムを使用した監視開始判定
+        // 入場予約状態管理システムを使用した開始判定
         const preferredAction = _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_4__/* .entranceReservationStateManager */ .xx.getPreferredAction();
         // FABクリック処理開始
-        // 監視機能は削除されました - 満員時間帯も直接予約可能になったため監視不要
         if (preferredAction === 'reservation') {
             await startReservationProcess();
         }
@@ -3576,7 +3570,6 @@ function createEntranceReservationUI() {
         }
         return;
     });
-    // 監視機能は無効化済み
     // 予約中断処理
     function stopReservationProcess() {
         console.log('⏹️ 予約を中断');
@@ -3600,7 +3593,7 @@ function createEntranceReservationUI() {
         // デバッグ: 実行状態を確認
         const currentState = _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_4__/* .entranceReservationStateManager */ .xx.getExecutionState();
         console.log(`🔄 [予約開始後] 実行状態: ${currentState}`);
-        // 監視中から予約に切り替わった場合にオーバーレイを更新
+        // 予約に切り替わった場合にオーバーレイを更新
         _processing_overlay__WEBPACK_IMPORTED_MODULE_0__/* .processingOverlay */ .O.show('reservation');
         showStatus('予約処理実行中...', 'blue');
         (0,_entrance_page_ui_helpers__WEBPACK_IMPORTED_MODULE_5__/* .updateMainButtonDisplay */ .v)();
@@ -3700,7 +3693,7 @@ function createEntranceReservationUI() {
         }
         return; // 明示的なreturnを追加
     }, true); // useCapture = true
-    // FABコンテナに要素を追加（上から順：予約対象→監視対象→ステータス→ボタン）
+    // FABコンテナに要素を追加（上から順：予約対象→ステータス→ボタン）
     // 効率モードトグルボタン（非表示 - 効率モードは常時ON）
     const efficiencyToggleButton = document.createElement('button');
     efficiencyToggleButton.className = 'ytomo-efficiency-toggle js-hide'; // 非表示に設定
@@ -3736,9 +3729,8 @@ function createEntranceReservationUI() {
             return;
         }
         try {
-            // 監視機能は無効化済み - 監視対象削除不要
             // オーバーレイを確実に非表示にして状態をリセット
-            console.log('🛡️ 監視→予約移行: オーバーレイ状態をリセット');
+            console.log('🛡️ 予約移行: オーバーレイ状態をリセット');
             _processing_overlay__WEBPACK_IMPORTED_MODULE_0__/* .processingOverlay */ .O.hide();
             // 1. 時間帯要素をクリックして選択状態にする
             console.log(`🖱️ 自動選択: 時間帯をクリック ${slot.targetInfo.timeSlot}`);
@@ -3783,7 +3775,7 @@ function createEntranceReservationUI() {
     waitForTimeSlotTable(() => {
         setupTimeSlotClickHandlers();
     });
-    // カレンダー変更監視は別途初期化処理で開始（キャッシュ復元後）
+    // カレンダー変更検知は別途初期化処理で開始（キャッシュ復元後）
 }
 // 現在の予約対象時間帯を取得
 function getCurrentReservationTarget() {
@@ -3860,7 +3852,7 @@ function checkInitialState() {
     // 統一システムに状態更新を要求
     _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_4__/* .entranceReservationStateManager */ .xx.updateFabDisplay();
 }
-// カレンダー変更を監視して監視ボタンを再設置
+// カレンダー変更を検知してボタンを再設置
 function startCalendarWatcher() {
     if (_entrance_page_state__WEBPACK_IMPORTED_MODULE_1__.calendarWatchState.isWatching)
         return;
@@ -3871,7 +3863,7 @@ function startCalendarWatcher() {
         _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_4__/* .entranceReservationStateManager */ .xx.setSelectedCalendarDate(_entrance_page_state__WEBPACK_IMPORTED_MODULE_1__.calendarWatchState.currentSelectedDate);
         console.log(`📅 初期化時の選択日付を設定: ${_entrance_page_state__WEBPACK_IMPORTED_MODULE_1__.calendarWatchState.currentSelectedDate}`);
     }
-    console.log('📅 カレンダー変更監視を開始');
+    console.log('📅 カレンダー変更検知を開始');
     // MutationObserverでカレンダー変更・時間帯選択・ボタン状態変更を検出
     _entrance_page_state__WEBPACK_IMPORTED_MODULE_1__.calendarWatchState.observer = new MutationObserver((mutations) => {
         let shouldUpdate = false;
@@ -3922,7 +3914,7 @@ function startCalendarWatcher() {
             });
         }
     });
-    // カレンダー要素全体を監視
+    // カレンダー要素全体を検知
     const observeTarget = document.body;
     _entrance_page_state__WEBPACK_IMPORTED_MODULE_1__.calendarWatchState.observer.observe(observeTarget, {
         attributes: true,
@@ -3945,23 +3937,21 @@ async function handleCalendarChange() {
         if (newSelectedDate) {
             _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_4__/* .entranceReservationStateManager */ .xx.setSelectedCalendarDate(newSelectedDate);
         }
-        // 実際に日付が変更された場合のみ監視状態をクリア
+        // 実際に日付が変更された場合のみ状態をクリア
         if (actualDateChanged) {
             console.log(`📅 実際の日付変更確認: ${stateManagerSelectedDate} → ${newSelectedDate}`);
             const hasReservationTarget = _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_4__/* .entranceReservationStateManager */ .xx.hasReservationTarget();
-            // 監視機能は無効化済み - 監視対象は常に0個
             if (hasReservationTarget) {
                 console.log('📅 日付変更により予約対象をクリア');
                 _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_4__/* .entranceReservationStateManager */ .xx.clearReservationTarget();
-                // 監視機能は無効化済み - clearAllMonitoringTargets呼び出し不要
             }
         }
         else {
-            console.log('📅 同じ日付への再クリックのため監視対象は維持');
+            console.log('📅 同じ日付への再クリック');
         }
         // 従来システムはもう使用しないため、このブロックは削除
         // if (multiTargetManager.hasTargets() && !timeSlotState.isMonitoring) {
-        //     console.log('📅 日付変更により従来システムの監視対象をクリア');
+        //     console.log('📅 日付変更により従来システムの対象をクリア');
         //     multiTargetManager.clearAll();
         //     timeSlotState.mode = 'idle';
         //     if (cacheManager) {
@@ -3984,15 +3974,15 @@ async function handleCalendarChange() {
             // UI更新を確実に実行
             (0,_entrance_page_ui_helpers__WEBPACK_IMPORTED_MODULE_5__/* .updateMainButtonDisplay */ .v)();
         }
-        // FABボタンの状態を更新（監視ボタンは再設置しない）
+        // FABボタンの状態を更新
         (0,_entrance_page_ui_helpers__WEBPACK_IMPORTED_MODULE_5__/* .updateMainButtonDisplay */ .v)();
     }
 }
-// 既存の監視ボタンをすべて削除
+// 既存のボタンをすべて削除
 function removeAllMonitorButtons() {
     const existingButtons = document.querySelectorAll('.monitor-btn.ext-ytomo');
     existingButtons.forEach(button => button.remove());
-    console.log(`🗑️ 既存の監視ボタンを${existingButtons.length}個削除しました`);
+    console.log(`🗜️ 既存のボタンを${existingButtons.length}個削除しました`);
 }
 // DOM上の選択状態から予約対象を同期
 function syncReservationTargetFromDOM() {
@@ -6964,8 +6954,7 @@ const initializeUnifiedStateManager = () => {
         return;
     }
     try {
-        // 既存システムからの状態移行
-        entrance_reservation_state_manager/* entranceReservationStateManager */.xx.migrateFromExisting();
+        // 状態管理システム初期化
         isUnifiedStateManagerInitialized = true;
         console.log('✅ 入場予約状態管理システム初期化完了');
     }

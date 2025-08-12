@@ -17,12 +17,12 @@ let entranceReservationState: EntranceReservationState = {
     attempts: 0
 };
 
-// 時間帯監視機能の状態管理
+// 時間帯機能の状態管理
 // timeSlotStateはEntranceReservationStateManagerに統合済み
 // let timeSlotState: TimeSlotState = {
 //     mode: 'idle',  // idle, selecting, monitoring, trying
 //     targetSlots: [],   // 複数選択対象の時間帯情報配列
-//     monitoringInterval: null,  // 監視用インターバル
+//     interval: null,  // インターバル
 //     isMonitoring: false,
 //     retryCount: 0,
 //     maxRetries: 100,
@@ -50,7 +50,7 @@ let entranceReservationState: EntranceReservationState = {
 //     reloadTimer: null
 // };
 
-// カレンダー監視状態管理
+// カレンダー検知状態管理
 const calendarWatchState: CalendarWatchState = {
     isWatching: false,
     observer: null,
