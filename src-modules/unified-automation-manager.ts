@@ -450,7 +450,11 @@ export class UnifiedAutomationManager {
         console.log(`🚀 submitクリック実行 (${new Date().toLocaleTimeString()})`);
         await this.executeStandardClick(submitButton, config, signal);
         
-        // 注記: 次回標的時刻は毎回新規計算するため、更新処理は不要
+        // submitクリック後、次のサイクル用の目標時刻を即座に更新
+        if (this.stateManager && this.stateManager.updateNextSubmitTarget) {
+            this.stateManager.updateNextSubmitTarget();
+            console.log('⚡ 効率モード: submitクリック後に次回目標時刻を更新');
+        }
     }
 
     /**
