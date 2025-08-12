@@ -367,16 +367,14 @@ function createEntranceReservationUI(): void {
 
 
     // FABコンテナに要素を追加（上から順：予約対象→監視対象→ステータス→ボタン）
-    // 効率モードトグルボタン
+    // 効率モードトグルボタン（非表示 - 効率モードは常時ON）
     const efficiencyToggleButton = document.createElement('button');
-    efficiencyToggleButton.className = 'ytomo-efficiency-toggle';
+    efficiencyToggleButton.className = 'ytomo-efficiency-toggle js-hide'; // 非表示に設定
     
-    // 効率モード状態に応じた初期表示
+    // 効率モード状態に応じた初期表示（非表示のため更新不要）
     function updateEfficiencyToggleButton() {
-        const isEnabled = entranceReservationStateManager.isEfficiencyModeEnabled();
-        efficiencyToggleButton.innerText = isEnabled ? '効率ON' : '効率OFF';
-        efficiencyToggleButton.classList.toggle('efficiency-enabled', isEnabled);
-        efficiencyToggleButton.classList.toggle('efficiency-disabled', !isEnabled);
+        // 効率モード常時ONのため表示更新不要
+        return;
     }
     updateEfficiencyToggleButton();
     
@@ -424,6 +422,10 @@ function createEntranceReservationUI(): void {
             const timeSlot = slot.targetInfo.timeSlot;
             const locationIndex = slot.targetInfo.locationIndex;
             entranceReservationStateManager.removeMonitoringTarget(timeSlot, locationIndex);
+            
+            // オーバーレイを確実に非表示にして状態をリセット
+            console.log('🛡️ 監視→予約移行: オーバーレイ状態をリセット');
+            processingOverlay.hide();
             
             // 1. 時間帯要素をクリックして選択状態にする
             console.log(`🖱️ 自動選択: 時間帯をクリック ${timeSlot}`);

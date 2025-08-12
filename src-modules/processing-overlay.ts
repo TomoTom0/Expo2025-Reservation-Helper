@@ -5,11 +5,12 @@
  * 中断ボタン以外の操作を防ぐことで誤動作を防止
  */
 
-import { entranceReservationStateManager } from './entrance-reservation-state-manager';
+import { entranceReservationStateManager, ExecutionState } from './entrance-reservation-state-manager';
 
 export class ProcessingOverlay {
     private overlayElement: HTMLElement | null = null;
     private isActive: boolean = false;
+    private countdownTimer: number | null = null;
     
     constructor() {
         this.initializeOverlay();
@@ -43,6 +44,11 @@ export class ProcessingOverlay {
         targetText.className = 'processing-target-text';
         targetText.textContent = '';
         
+        // カウントダウン表示要素を追加
+        const countdownText = document.createElement('div');
+        countdownText.className = 'processing-countdown-text';
+        countdownText.textContent = '';
+        
         const warningText = document.createElement('div');
         warningText.className = 'processing-warning-text';
         warningText.textContent = '誤動作防止';
@@ -53,6 +59,7 @@ export class ProcessingOverlay {
         
         messageArea.appendChild(messageText);
         messageArea.appendChild(targetText);
+        messageArea.appendChild(countdownText);
         messageArea.appendChild(warningText);
         messageArea.appendChild(cancelArea);
         
@@ -143,9 +150,9 @@ export class ProcessingOverlay {
                 if (cachedData) {
                     const parsed = JSON.parse(cachedData);
                     if (parsed.targets && parsed.targets.length > 0) {
-                        // 日付情報を追加
+                        // 日付情報を追加（0paddingを除去）
                         const dateInfo = parsed.selectedDate || '';
-                        const dateDisplay = dateInfo ? dateInfo.split('-').slice(1).join('/') : '';
+                        const dateDisplay = dateInfo ? dateInfo.split('-').slice(1).map((part: string) => parseInt(part, 10).toString()).join('/') : '';
                         
                         const targets = parsed.targets.map((t: any) => {
                             const location = t.locationIndex === 0 ? '東' : '西';
@@ -209,6 +216,9 @@ export class ProcessingOverlay {
         }
         
         this.isActive = true;
+        
+        // カウントダウン監視開始
+        this.startCountdownMonitoring();
     }
     
     /**
@@ -230,6 +240,9 @@ export class ProcessingOverlay {
         }
         
         this.isActive = false;
+        
+        // カウントダウン監視停止
+        this.stopCountdownMonitoring();
     }
     
     /**
@@ -271,6 +284,104 @@ export class ProcessingOverlay {
     }
     
     /**
+     * カウントダウン表示を更新
+     * @param countdownText カウントダウン文字列
+     * @param isWarning 警告状態かどうか
+     */
+    public updateCountdown(countdownText: string, isWarning: boolean = false): void {
+        if (!this.overlayElement || !this.isActive) return;
+        
+        const countdownElement = this.overlayElement.querySelector('.processing-countdown-text');
+        if (countdownElement) {
+            countdownElement.textContent = countdownText;
+            
+            // 警告スタイルの切り替え
+            if (isWarning) {
+                countdownElement.classList.add('countdown-warning');
+            } else {
+                countdownElement.classList.remove('countdown-warning');
+            }
+        }
+    }
+    
+    /**
+     * カウントダウン表示をクリア
+     */
+    public clearCountdown(): void {
+        if (!this.overlayElement) return;
+        
+        const countdownElement = this.overlayElement.querySelector('.processing-countdown-text');
+        if (countdownElement) {
+            countdownElement.textContent = '';
+            countdownElement.classList.remove('countdown-warning');
+        }
+    }
+
+    /**
+     * カウントダウン監視開始
+     */
+    private startCountdownMonitoring(): void {
+        if (this.countdownTimer) return; // 既に監視中
+        
+        this.countdownTimer = window.setInterval(() => {
+            this.updateCountdownFromState();
+        }, 1000); // 1秒ごとに更新
+    }
+
+    /**
+     * カウントダウン監視停止
+     */
+    private stopCountdownMonitoring(): void {
+        if (this.countdownTimer) {
+            clearInterval(this.countdownTimer);
+            this.countdownTimer = null;
+        }
+    }
+
+    /**
+     * 状態管理からカウントダウン情報を取得して更新
+     */
+    private updateCountdownFromState(): void {
+        if (!this.isActive || !this.overlayElement) return;
+
+        try {
+            // 予約実行中の効率モードカウントダウン
+            if (entranceReservationStateManager.getExecutionState() === ExecutionState.RESERVATION_RUNNING) {
+                const nextTarget = entranceReservationStateManager.getNextSubmitTarget();
+                if (nextTarget) {
+                    const now = new Date();
+                    const remainingMs = nextTarget.getTime() - now.getTime();
+                    if (remainingMs > 0) {
+                        const remainingSec = Math.floor(remainingMs / 1000);
+                        const countdownText = `次回: ${remainingSec}秒後`;
+                        const isWarning = remainingSec <= 5;
+                        this.updateCountdown(countdownText, isWarning);
+                        return;
+                    }
+                }
+            }
+
+            // 監視中のリロードカウントダウン
+            if (entranceReservationStateManager.getExecutionState() === ExecutionState.MONITORING_RUNNING) {
+                if (entranceReservationStateManager.isReloadCountdownActive()) {
+                    const remainingSeconds = entranceReservationStateManager.getReloadSecondsRemaining();
+                    if (remainingSeconds !== null && remainingSeconds > 0) {
+                        const countdownText = `リロード: ${remainingSeconds}秒後`;
+                        const isWarning = remainingSeconds <= 5;
+                        this.updateCountdown(countdownText, isWarning);
+                        return;
+                    }
+                }
+            }
+
+            // カウントダウン対象がない場合はクリア
+            this.clearCountdown();
+        } catch (error) {
+            console.warn('カウントダウン更新エラー:', error);
+        }
+    }
+
+    /**
      * オーバーレイを破棄
      */
     public destroy(): void {
@@ -280,6 +391,7 @@ export class ProcessingOverlay {
         }
         
         document.removeEventListener('keydown', this.handleKeyDown.bind(this));
+        this.stopCountdownMonitoring();
         this.isActive = false;
         
         console.log('🛡️ 誤動作防止オーバーレイを破棄');

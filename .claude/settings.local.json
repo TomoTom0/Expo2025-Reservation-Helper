@@ -33,7 +33,8 @@
       "Bash(npm install)",
       "Bash(mise run build:*)",
       "Bash(grep:*)",
-      "Bash(git pull:*)"
+      "Bash(git pull:*)",
+      "Bash(find:*)"
     ],
     "deny": []
   }

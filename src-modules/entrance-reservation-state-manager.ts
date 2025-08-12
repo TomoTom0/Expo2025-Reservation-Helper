@@ -7,6 +7,7 @@
 import { timeSlotSelectors, generateUniqueTdSelector, extractTdStatus } from './entrance-page-dom-utils';
 import { getCurrentSelectedCalendarDate } from './entrance-page-core';
 import { UnifiedAutomationManager, CancellationError } from './unified-automation-manager';
+// processing-overlayへの依存を削除（循環依存解決）
 import type { ReservationConfig, ReservationResult } from '../types/index.js';
 
 // ============================================================================
@@ -162,9 +163,9 @@ export class EntranceReservationStateManager {
         monitoringInterval: null as number | null
     };
     
-    // 効率モード設定管理
+    // 効率モード設定管理（常時有効）
     private efficiencyMode = {
-        enabled: false,
+        enabled: true, // 常時有効に設定
         nextSubmitTarget: null as Date | null,
         updateTimer: null as number | null // FABボタン更新タイマー
     };
@@ -1055,19 +1056,21 @@ export class EntranceReservationStateManager {
         if (!this.isReloadCountdownActive() && !this.efficiencyMode.updateTimer) {
             // ログ削減: 頻繁に呼ばれるため削除
         }
-        // カレンダー選択日付を取得（MM/DD形式）
+        // カレンダー選択日付を取得（M/D形式、0paddingなし）
         const getDisplayDate = (): string => {
             if (this.selectedCalendarDate) {
-                // YYYY-MM-DD形式からMM/DD形式に変換
+                // YYYY-MM-DD形式からM/D形式に変換（0paddingを除去）
                 const parts = this.selectedCalendarDate.split('-');
                 if (parts.length === 3) {
-                    return `${parts[1]}/${parts[2]}`;
+                    const month = parseInt(parts[1], 10).toString();
+                    const day = parseInt(parts[2], 10).toString();
+                    return `${month}/${day}`;
                 }
             }
-            // フォールバック: 現在日付
+            // フォールバック: 現在日付（0paddingなし）
             const today = new Date();
-            const month = (today.getMonth() + 1).toString().padStart(2, '0');
-            const day = today.getDate().toString().padStart(2, '0');
+            const month = (today.getMonth() + 1).toString();
+            const day = today.getDate().toString();
             return `${month}/${day}`;
         };
 
@@ -1351,19 +1354,8 @@ export class EntranceReservationStateManager {
             case ExecutionState.RESERVATION_RUNNING:
                 span.innerText = fabText;
                 
-                // 効率モード実行中はステータスバッジでカウントダウン表示
-                if (this.efficiencyMode.enabled && this.efficiencyMode.nextSubmitTarget) {
-                    const now = new Date();
-                    const remainingMs = this.efficiencyMode.nextSubmitTarget.getTime() - now.getTime();
-                    if (remainingMs > 0) {
-                        const remainingSec = Math.floor(remainingMs / 1000);
-                        this.updateStatusBadgeFromUnified('reservation-running', `効率予約実行中 ${remainingSec}秒後`);
-                    } else {
-                        this.updateStatusBadgeFromUnified('reservation-running', '効率予約実行中');
-                    }
-                } else {
-                    this.updateStatusBadgeFromUnified('reservation-running');
-                }
+                // ステータスバッジは効率モード実行中表示のみ（カウントダウンなし）
+                this.updateStatusBadgeFromUnified('reservation-running', '効率予約実行中');
                 
                 mainButton.className = mainButton.className.replace(/state-\w+/g, '');
                 mainButton.classList.add('ytomo-fab-running');
@@ -1502,41 +1494,16 @@ export class EntranceReservationStateManager {
         switch (mode) {
             case 'monitoring':
                 statusBadge.classList.add('ytomo-status-monitoring');
-                const remainingSeconds = this.getReloadSecondsRemaining();
-                if (this.isReloadCountdownActive() && remainingSeconds !== null) {
-                    const prefix = this.isEfficiencyModeEnabled() ? '効率' : '';
-                    statusBadge.innerText = `${prefix}監視中\nリロード: ${remainingSeconds}秒`;
-                    // リロード5秒前から警告クラスを追加
-                    if (remainingSeconds <= 5) {
-                        statusBadge.classList.add('ytomo-status-countdown-warning');
-                    }
-                } else {
-                    const prefix = this.isEfficiencyModeEnabled() ? '効率' : '';
-                    statusBadge.innerText = `${prefix}監視待機中`;
-                }
+                const prefix = this.isEfficiencyModeEnabled() ? '効率' : '';
+                statusBadge.innerText = `${prefix}監視中`;
                 statusBadge.classList.remove('js-hide');
                 break;
             case 'reservation-running':
                 statusBadge.classList.add('ytomo-status-reservation');
-                if (this.isEfficiencyModeEnabled()) {
-                    const nextTarget = this.getNextSubmitTarget();
-                    if (nextTarget) {
-                        const remainingMs = nextTarget.getTime() - Date.now();
-                        const remainingSeconds = Math.max(0, Math.floor(remainingMs / 1000));
-                        statusBadge.innerText = `効率予約実行中\n${remainingSeconds}秒後`;
-                        // 5秒前から警告色
-                        if (remainingSeconds <= 5) {
-                            statusBadge.classList.add('ytomo-status-countdown-warning');
-                        }
-                    } else {
-                        statusBadge.innerText = '効率予約実行中';
-                    }
+                if (customText) {
+                    statusBadge.innerText = customText;
                 } else {
-                    const startTime = this.getReservationStartTime();
-                    const elapsedMinutes = startTime ? 
-                        Math.floor((Date.now() - startTime) / 60000) : 0;
-                    const attempts = this.getAttempts();
-                    statusBadge.innerText = `予約実行中\n${elapsedMinutes}分 ${attempts}回`;
+                    statusBadge.innerText = '効率予約実行中';
                 }
                 statusBadge.classList.remove('js-hide');
                 break;
@@ -1591,9 +1558,9 @@ export class EntranceReservationStateManager {
         return this.efficiencyMode.enabled;
     }
     
-    // 効率モードの状態を取得
+    // 効率モードの状態を取得（常にtrueを返す - 内部的に常時有効）
     isEfficiencyModeEnabled(): boolean {
-        return this.efficiencyMode.enabled;
+        return true; // 効率モードは常に有効
     }
     
     // 次のsubmit標的時刻を取得

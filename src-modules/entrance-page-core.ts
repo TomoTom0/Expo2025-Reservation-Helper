@@ -1362,10 +1362,10 @@ export function updateStatusBadge(mode: string): void {
             const remainingSeconds = entranceReservationStateManager.getReloadSecondsRemaining();
             if (remainingSeconds !== null && remainingSeconds !== undefined) {
                 if (remainingSeconds <= 3) {
-                    message = `${isEfficiencyEnabled ? '効率' : ''}監視中\nリロード: ${remainingSeconds}秒`;
+                    message = `${isEfficiencyEnabled ? '効率' : ''}監視中`;
                     bgClass = 'status-bg-red'; // 赤色（中断不可）
                 } else {
-                    message = `${isEfficiencyEnabled ? '効率' : ''}監視中\nリロード: ${remainingSeconds}秒`;
+                    message = `${isEfficiencyEnabled ? '効率' : ''}監視中`;
                     bgClass = 'status-bg-orange'; // オレンジ色
                 }
             } else {
