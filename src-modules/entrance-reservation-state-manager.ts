@@ -404,7 +404,7 @@ export class EntranceReservationStateManager {
     }
     
     // ============================================================================
-    // 監視実行情報管理（スタブ - 機能は無効化済み）
+    // 特殊実行情報管理（スタブ）
     // ============================================================================
     
     
@@ -606,9 +606,9 @@ export class EntranceReservationStateManager {
     
     getPreferredAction(): 'reservation' | 'none' {
         const canReserve = this.canStartReservation();
-        // 監視機能は削除されました - 満員時間帯も直接予約可能になったため監視不要
+        // 特殊機能は削除されました - 満員時間帯も直接予約可能
         
-        // 満員時間帯予約制限解除により、監視機能は不要になりました
+        // 満員時間帯予約制限解除により、特殊機能は不要になりました
         // 常に予約のみを返すように変更
         return canReserve ? 'reservation' : 'none';
     }
@@ -746,7 +746,7 @@ export class EntranceReservationStateManager {
     // 全ての対象をクリア（監視・予約両方）
     clearAllTargets(): void {
         const reservationCount = this.reservationTarget ? 1 : 0;
-        const monitoringCount = 0; // 監視機能削除済み
+        const monitoringCount = 0; // 削除済み
         
         this.reservationTarget = null;
         

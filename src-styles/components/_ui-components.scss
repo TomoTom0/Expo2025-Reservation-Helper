@@ -159,26 +159,6 @@
   }
 }
 
-// 監視・予約対象表示の背景色
-#ytomo-monitoring-targets {
-  // 監視対象の背景色（オレンジ系）
-  &.monitoring-targets {
-    background: rgba(255, 140, 0, 0.15);
-    border: 1px solid rgba(255, 140, 0, 0.3);
-    border-radius: 8px;
-    padding: 8px;
-    margin: 4px 0;
-  }
-  
-  // 予約対象の背景色（緑系）
-  &.reservation-target {
-    background: rgba(0, 104, 33, 0.15);
-    border: 1px solid rgba(0, 104, 33, 0.3);
-    border-radius: 8px;
-    padding: 8px;
-    margin: 4px 0;
-  }
-}
 
 // エラーメッセージ表示
 .ytomo-error-message {

@@ -52,7 +52,7 @@ function startTimeSlotTableObserver(): void {
     let isProcessing = false; // 処理中フラグでループ防止
     let lastTableContent = ''; // 前回のテーブル内容を記録
     
-    // MutationObserverで DOM変化を監視（フィルタリング強化版）
+    // MutationObserverで DOM変化を検知
     const observer = new MutationObserver((mutations) => {
         if (isProcessing) {
             console.log('⏭️ 処理中のため変更を無視');
@@ -68,7 +68,7 @@ function startTimeSlotTableObserver(): void {
                 const addedNodes = Array.from(mutation.addedNodes);
                 const removedNodes = Array.from(mutation.removedNodes);
                 
-                // 監視ボタン関連の変更は無視
+                // 割込ボタン関連の変更は無視
                 const isMonitorButtonChange = [...addedNodes, ...removedNodes].some(node => {
                     if (node.nodeType === Node.ELEMENT_NODE) {
                         const element = node as Element;
@@ -79,7 +79,7 @@ function startTimeSlotTableObserver(): void {
                 });
                 
                 if (isMonitorButtonChange) {
-                    console.log('🚫 監視ボタン関連の変更を無視');
+                    console.log('🚫 割込ボタン関連の変更を無視');
                     return;
                 }
                 
@@ -110,7 +110,7 @@ function startTimeSlotTableObserver(): void {
                     hasRelevantChange = true;
                 }
             } else if (mutation.type === 'attributes') {
-                // 属性変更も監視（data-disabled、src等）
+                // 属性変更も検知（data-disabled、src等）
                 const target = mutation.target as Element;
                 const attrName = mutation.attributeName;
                 
@@ -150,7 +150,7 @@ function startTimeSlotTableObserver(): void {
         }
     });
     
-    // 監視範囲を限定（属性変更も監視）
+    // 検知範囲を限定（属性変更も検知）
     observer.observe(document.body, {
         childList: true,
         subtree: true,
@@ -168,7 +168,7 @@ function startTimeSlotTableObserver(): void {
         }
     }, 1000);
     
-    console.log('継続的な時間帯テーブル監視を開始しました（ループ防止版）');
+    console.log('継続的な時間帯テーブル検知を開始しました（ループ防止版）');
 }
 
 // 時間帯テーブルの動的待機
@@ -836,9 +836,8 @@ async function clickCalendarDate(targetDate: string): Promise<boolean> {
 async function tryClickCalendarForTimeSlot(): Promise<boolean> {
     console.log('📅 時間帯表示のためのカレンダークリックを試行中...');
     
-    // 監視対象確認（情報表示のみ）
     if (entranceReservationStateManager && false) {
-        const targets: any[] = []; // 監視機能は無効化済み
+        const targets: any[] = []; // 削除済み
         const targetTexts = targets.map((t: any) => t.timeSlot).join(', ');
         console.log(`🎯 監視対象: ${targetTexts} (${targets.length}個)`);
     }
@@ -977,7 +976,6 @@ function getCurrentTableContent(): string {
 
 // 日付変更後の選択状態復元
 function restoreSelectionAfterUpdate(): void {
-    // 監視機能削除済み
     
     
     updateMainButtonDisplayHelper();
@@ -992,16 +990,16 @@ function checkAvailabilityAfterCacheRestore(): void {
     
     console.log('🔍 キャッシュ復元後のチェック完了');
     
-    const availableCount = 0; // 監視機能削除済み
+    const availableCount = 0; // 削除済み
     
     if (availableCount > 0) {
-        console.log(`🎉 ${availableCount}個の監視対象に空きが出ています - 既存処理に委ねます`);
+        console.log(`🎉 ${availableCount}個の対象に空きが出ています - 既存処理に委ねます`);
         
         // 既存の自動/手動リロード時の空き検出処理を呼び出す
         // これにより統一された空き検出・自動予約ロジックが動作する
         handleAvailabilityDetected();
     } else {
-        console.log('📋 すべての監視対象が満員状態です');
+        console.log('📋 空きなし');
     }
 }
 
@@ -1013,7 +1011,6 @@ function handleAvailabilityDetected(): void {
         return;
     }
     
-    // 監視機能削除済み
     const highestPriorityAvailable: any = null;
     
     if (highestPriorityAvailable) {
@@ -1023,7 +1020,7 @@ function handleAvailabilityDetected(): void {
         const isAutoReload = false || false;
         
         if (isAutoReload) {
-            console.log(`  → 自動リロード相当: 監視を終了し、自動選択+予約を開始`);
+            console.log(`  → 自動リロード相当: 自動選択+予約を開始`);
             
             // ボタン表示を更新（見つかりましたモード）
             window.dispatchEvent(new CustomEvent('entrance-ui-update', { 
@@ -1044,9 +1041,9 @@ function handleAvailabilityDetected(): void {
                 detail: { slot: slotInfo } 
             }));
         } else {
-            console.log(`  → 手動リロード相当: ステータス表示+監視対象削除+予約対象化`);
+            console.log(`  → 手動リロード相当: ステータス表示+予約対象化`);
             
-            // 手動リロード時の処理（監視対象から予約対象への移行）
+            // 手動リロード時の処理
             updateMainButtonDisplayHelper();
         }
     }

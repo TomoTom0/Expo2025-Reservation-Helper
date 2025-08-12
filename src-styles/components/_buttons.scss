@@ -125,71 +125,6 @@ button.ext-ytomo.pavilion-sub-btn {
   display: none;
 }
 
-// 時間帯監視ボタン
-button.ext-ytomo {
-  &.monitor-btn {
-    height: auto;
-    min-height: 20px;
-    width: auto;
-    min-width: 35px;
-    padding: 1px 4px;
-    color: white;
-    margin-left: 8px;
-    font-size: 10px;
-    border: none;
-    border-radius: 2px;
-    cursor: pointer;
-    display: inline-block;
-    vertical-align: middle;
-    position: relative;
-    z-index: 10;
-    pointer-events: auto;
-    opacity: 1;
-    visibility: visible;
-
-    // 満員状態（緑色）
-    &.full-status {
-      background: rgb(34, 139, 34);
-      
-      &:hover {
-        background: rgb(50, 205, 50);
-      }
-    }
-
-    // 監視中状態（赤色）
-    &.monitoring-status {
-      background: rgb(220, 53, 69);
-      
-      &:hover {
-        background: rgb(255, 69, 84);
-      }
-    }
-
-    // 無効状態 - 元の色の痕跡を残しつつ可読性を確保
-    &:disabled {
-      cursor: not-allowed;
-      opacity: 0.7;
-      
-      // 満員状態のdisabled
-      &.full-status {
-        background: rgba(34, 139, 34, 0.5);
-        color: rgba(255, 255, 255, 0.9);
-      }
-      
-      // 監視中状態のdisabled
-      &.monitoring-status {
-        background: rgba(220, 53, 69, 0.5);
-        color: rgba(255, 255, 255, 0.9);
-      }
-      
-      // 一般的なdisabled（色が指定されていない場合）
-      &:not(.full-status):not(.monitoring-status) {
-        background: rgba(128, 128, 128, 0.7);
-        color: rgba(255, 255, 255, 0.9);
-      }
-    }
-  }
-}
 
 // 日付選択ボタンの選択状態管理
 button.ext-ytomo.pavilion-sub-btn.ytomo-date-button {
@@ -284,13 +219,6 @@ div.div-flex {
     background: linear-gradient(135deg, rgba(0, 0, 0, 0.9), rgba(40, 40, 40, 0.9));
   }
   
-  &.ytomo-status-monitoring {
-    background: linear-gradient(135deg, rgba(0, 104, 33, 0.9), rgba(0, 150, 50, 0.9));
-    
-    &.ytomo-status-countdown-warning {
-      background: linear-gradient(135deg, rgba(255, 0, 0, 0.9), rgba(220, 53, 69, 0.9));
-    }
-  }
   
   &.ytomo-status-reservation {
     background: linear-gradient(135deg, rgba(255, 140, 0, 0.9), rgba(255, 165, 0, 0.9));
