@@ -32,10 +32,6 @@ export class ProcessingOverlay {
         const messageArea = document.createElement('div');
         messageArea.className = 'processing-message-area';
         
-        const statusIcon = document.createElement('div');
-        statusIcon.className = 'processing-status-icon';
-        statusIcon.innerHTML = '⚙️';
-        
         const messageText = document.createElement('div');
         messageText.className = 'processing-message-text';
         messageText.textContent = '自動処理実行中...';
@@ -48,7 +44,6 @@ export class ProcessingOverlay {
         cancelArea.className = 'processing-cancel-area';
         cancelArea.innerHTML = '中断は右下のFABボタンから可能です';
         
-        messageArea.appendChild(statusIcon);
         messageArea.appendChild(messageText);
         messageArea.appendChild(warningText);
         messageArea.appendChild(cancelArea);
@@ -120,14 +115,11 @@ export class ProcessingOverlay {
         
         // メッセージをプロセスタイプに応じて更新
         const messageText = this.overlayElement.querySelector('.processing-message-text');
-        const statusIcon = this.overlayElement.querySelector('.processing-status-icon');
         
         if (processType === 'monitoring') {
             if (messageText) messageText.textContent = '監視実行中...';
-            if (statusIcon) statusIcon.innerHTML = '👁️';
         } else {
             if (messageText) messageText.textContent = '予約実行中...';
-            if (statusIcon) statusIcon.innerHTML = '🚀';
         }
         
         // 表示アニメーション

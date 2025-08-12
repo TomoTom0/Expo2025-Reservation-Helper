@@ -47,17 +47,7 @@
     }
   }
   
-  // ステータスアイコン
-  .processing-status-icon {
-    font-size: 48px;
-    margin-bottom: 16px;
-    animation: rotate 2s linear infinite;
-    
-    @media (max-width: 768px) {
-      font-size: 36px;
-      margin-bottom: 12px;
-    }
-  }
+  // ステータスアイコンは削除済み
   
   // メインメッセージテキスト
   .processing-message-text {
@@ -104,15 +94,7 @@
     }
   }
   
-  // ローテーションアニメーション
-  @keyframes rotate {
-    0% {
-      transform: rotate(0deg);
-    }
-    100% {
-      transform: rotate(360deg);
-    }
-  }
+  // ローテーションアニメーション削除済み
   
   // フラッシュアニメーション
   @keyframes flash {
@@ -132,9 +114,6 @@
     background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(255, 248, 220, 0.95));
   }
   
-  .processing-status-icon {
-    color: #ff8c00;
-  }
   
   .processing-message-text {
     color: #e67e00;
@@ -148,9 +127,6 @@
     background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(240, 255, 240, 0.95));
   }
   
-  .processing-status-icon {
-    color: #006821;
-  }
   
   .processing-message-text {
     color: #004d1a;
@@ -160,9 +136,6 @@
 // アクセシビリティ: 動きを抑制する設定
 @media (prefers-reduced-motion: reduce) {
   .ytomo-processing-overlay {
-    .processing-status-icon {
-      animation: none;
-    }
     
     .processing-warning-text.warning-flash {
       animation: none;
