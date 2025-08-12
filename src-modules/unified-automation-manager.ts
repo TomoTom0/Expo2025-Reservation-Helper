@@ -260,6 +260,14 @@ export class UnifiedAutomationManager {
             // 中断チェック
             this.throwIfAborted(signal);
             
+            // 対象一貫性検証
+            if (this.stateManager && this.stateManager.validateTargetConsistency) {
+                if (!this.stateManager.validateTargetConsistency()) {
+                    console.error('🚨 予約対象が変更されたため処理を中断します');
+                    throw new Error('TargetConsistencyError');
+                }
+            }
+            
             // 状態表示更新
             const statusDiv = document.getElementById('reservation-status');
             if (statusDiv) {
@@ -304,6 +312,12 @@ export class UnifiedAutomationManager {
                 
                 if (response.key === 'change') {
                     console.log('変更ボタンをクリックして最終結果を待機...');
+                    
+                    // changeダイアログ出現を記録
+                    if (this.stateManager && this.stateManager.markChangeDialogAppeared) {
+                        this.stateManager.markChangeDialogAppeared();
+                    }
+                    
                     await this.executeFixedDelayClick(response.element, config, signal);
                     
                     console.log('success/failureを待機中...');
@@ -458,16 +472,56 @@ export class UnifiedAutomationManager {
     }
 
     /**
-     * 効率モード対応固定待機クリック実行（統一処理内部用）
+     * 効率モード対応changeダイアログクリック実行（統一処理内部用）
      */
     private async executeFixedDelayClick(element: HTMLElement, config: ReservationConfig, signal: AbortSignal): Promise<void> {
         const isEfficiencyMode = this.stateManager && this.stateManager.isEfficiencyModeEnabled ? 
             this.stateManager.isEfficiencyModeEnabled() : false;
         
-        if (isEfficiencyMode) {
-            // 効率モード: 1.5-3秒の固定待機（中断可能）
+        // 効率モードかつchangeダイアログのタイミング調整が必要な場合のみ時間調整
+        const needsTimingAdjustment = this.stateManager && this.stateManager.needsChangeDialogTimingAdjustment ? 
+            this.stateManager.needsChangeDialogTimingAdjustment() : false;
+        
+        console.log(`🔍 効率モード: ${isEfficiencyMode}, changeダイアログタイミング調整必要: ${needsTimingAdjustment}`);
+        
+        if (isEfficiencyMode && needsTimingAdjustment) {
+            // 効率モード: changeダイアログのタイミング調整が記録されている場合のみ00秒/30秒調整
+            console.log('🚀 統一効率モード: changeダイアログ標的時刻調整開始');
+            
+            // 効率モードで現在時刻から新しく目標時刻を計算
+            if (!this.stateManager || !this.stateManager.calculateNext00or30Seconds) {
+                console.error('⚠️ calculateNext00or30Secondsメソッドが利用できません');
+                await this.executeStandardClick(element, config, signal);
+                return;
+            }
+            
+            // 毎回新しく計算して最新の目標時刻を取得
+            const nextTarget = this.stateManager.calculateNext00or30Seconds();
+            console.log('🔄 効率モード: changeダイアログ用最新目標時刻を計算');
+            
+            const waitMs = nextTarget.getTime() - Date.now();
+            
+            console.log(`🎯 統一効率モード待機(change): 目標時刻 ${nextTarget.toLocaleTimeString()}`);
+            console.log(`🎯 待機時間(change): ${Math.floor(waitMs/1000)}秒`);
+            
+            if (waitMs < 0) {
+                console.warn('⚠️ 目標時刻が過去になっています - 即座実行');
+            } else if (waitMs < 15000) {
+                console.warn(`⚠️ 待機時間が15秒未満: ${Math.floor(waitMs/1000)}秒`);
+            }
+            
+            await this.waitForTargetTime(nextTarget, signal);
+            
+            console.log(`🚀 changeダイアログクリック実行 (${new Date().toLocaleTimeString()})`);
+            
+            // タイミング調整完了を記録
+            if (this.stateManager && this.stateManager.markChangeDialogTimingAdjusted) {
+                this.stateManager.markChangeDialogTimingAdjusted();
+            }
+        } else if (isEfficiencyMode) {
+            // 効率モードだがchangeダイアログのタイミング調整が不要な場合は通常の固定待機
             const randomDelay = 1500 + Math.random() * 1500; // 1500~3000ms
-            console.log(`⏳ 効率モード固定待機: ${Math.round(randomDelay)}ms`);
+            console.log(`⏳ 効率モード固定待機(changeダイアログ記録なし): ${Math.round(randomDelay)}ms`);
             
             await this.waitWithCancellation(randomDelay, signal);
         }

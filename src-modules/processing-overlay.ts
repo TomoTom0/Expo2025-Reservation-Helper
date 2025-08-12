@@ -38,11 +38,11 @@ export class ProcessingOverlay {
         
         const warningText = document.createElement('div');
         warningText.className = 'processing-warning-text';
-        warningText.textContent = '誤動作防止のため他の操作を制限しています';
+        warningText.textContent = '誤動作防止';
         
         const cancelArea = document.createElement('div');
         cancelArea.className = 'processing-cancel-area';
-        cancelArea.innerHTML = '中断は右下のFABボタンから可能です';
+        cancelArea.innerHTML = '右下のボタンで中断';
         
         messageArea.appendChild(messageText);
         messageArea.appendChild(warningText);

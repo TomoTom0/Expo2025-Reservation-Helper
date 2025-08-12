@@ -23,7 +23,7 @@ import {
 } from './entrance-page-core';
 
 // unified-stateからのimport
-import { LocationHelper, ExecutionState, entranceReservationStateManager } from './entrance-reservation-state-manager';
+import { LocationHelper, entranceReservationStateManager } from './entrance-reservation-state-manager';
 
 // Section 6からのimport  
 import {
@@ -35,7 +35,8 @@ import {
 import { updateMainButtonDisplay } from './entrance-page-ui-helpers';
 import {
     getCurrentSelectedCalendarDate,
-    stopSlotMonitoring
+    stopSlotMonitoring,
+    waitForValidCalendarDate
 } from './entrance-page-core';
 
 // 型定義のインポート
@@ -325,9 +326,15 @@ function createEntranceReservationUI(): void {
     async function startReservationProcess(): Promise<void> {
         console.log('🚀 入場予約状態管理システムによる予約開始');
         
-        // 入場予約状態管理システムで予約実行開始
-        entranceReservationStateManager.setExecutionState(ExecutionState.RESERVATION_RUNNING);
-        entranceReservationStateManager.startReservationExecution();
+        // DOM状態から予約対象を同期（予約開始前に必須）
+        syncReservationTargetFromDOM();
+        
+        // 統一予約開始処理
+        if (!entranceReservationStateManager.startReservation()) {
+            console.error('❌ 予約開始に失敗しました');
+            showStatus('予約開始失敗', 'red');
+            return;
+        }
         
         showStatus('予約処理実行中...', 'blue');
         updateMainButtonDisplay();
@@ -401,7 +408,12 @@ function createEntranceReservationUI(): void {
         } catch (error) {
             console.error('予約処理エラー:', error);
             const errorMessage = error instanceof Error ? error.message : String(error);
-            showStatus(`エラー: ${errorMessage}`, 'red');
+            
+            if (errorMessage === 'TargetConsistencyError') {
+                showStatus('🚨 予約対象変更のため中断', 'red');
+            } else {
+                showStatus(`エラー: ${errorMessage}`, 'red');
+            }
         } finally {
             // 入場予約状態管理システムで予約実行終了
             entranceReservationStateManager.stop();
@@ -728,8 +740,8 @@ function startCalendarWatcher(): void {
         
         if (shouldUpdate) {
             // DOM更新完了を待ってから処理
-            waitForTimeSlotTable(() => {
-                handleCalendarChange();
+            waitForTimeSlotTable(async () => {
+                await handleCalendarChange();
             });
         }
     });
@@ -744,8 +756,9 @@ function startCalendarWatcher(): void {
 }
 
 // カレンダー変更・状態変更時の処理
-function handleCalendarChange(): void {
-    const newSelectedDate = getCurrentSelectedCalendarDate();
+async function handleCalendarChange(): Promise<void> {
+    // 動的待機で日付を取得（遷移中の場合は適切に待機）
+    const newSelectedDate = await waitForValidCalendarDate(3000, 100);
     const calendarDateChanged = newSelectedDate !== calendarWatchState.currentSelectedDate;
     
     // 入場予約状態管理の管理している日付とも比較

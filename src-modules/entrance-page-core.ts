@@ -820,6 +820,13 @@ async function startSlotMonitoring(): Promise<void> {
     // 監視実行中は全ての監視ボタンを無効化
     disableAllMonitorButtons();
     
+    // 対象一貫性検証
+    if (!entranceReservationStateManager.validateTargetConsistency()) {
+        console.error('🚨 監視対象が変更されたため処理を中断します');
+        entranceReservationStateManager.stop();
+        return;
+    }
+    
     const targets = entranceReservationStateManager.getMonitoringTargets();
     const targetTexts = targets.map((t: any) => {
         const location = LocationHelper.getLocationFromIndex(t.locationIndex);
@@ -2432,8 +2439,8 @@ async function selectTimeSlotAndStartReservation(slotInfo: any): Promise<void> {
         // 通常の予約処理を開始（入場予約状態管理システム使用）
         const config = getCurrentEntranceConfig();
         if (config) {
-            entranceReservationStateManager.setExecutionState(ExecutionState.RESERVATION_RUNNING);
-            entranceReservationStateManager.startReservationExecution();
+            // 統一予約開始処理を使用
+            entranceReservationStateManager.startReservation();
             const result = await entranceReservationHelper(config);
             
             if (result.success) {
