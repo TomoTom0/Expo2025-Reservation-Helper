@@ -8,7 +8,7 @@ import { entranceReservationStateManager } from './entrance-reservation-state-ma
 // メインFABボタンの表示を更新（統一システムに委譲）
 export function updateMainButtonDisplay(): void {
     // カウントダウン中はログを削減
-    if (!entranceReservationStateManager.isReloadCountdownActive()) {
+    if (!false) {
         // ログ削減: 頻繁に呼ばれるため削除
     }
     entranceReservationStateManager.updateFabDisplay();
@@ -36,7 +36,3 @@ export function enableAllMonitorButtons(): void {
     });
 }
 
-// 監視対象表示を更新
-export function updateMonitoringTargetsDisplay(): void {
-    // 監視機能は無効化済み - 何も表示しない
-}

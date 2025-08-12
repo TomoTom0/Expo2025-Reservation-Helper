@@ -352,18 +352,6 @@ export class ProcessingOverlay {
                 }
             }
 
-            // 監視中のリロードカウントダウン
-            if (entranceReservationStateManager.getExecutionState() === ExecutionState.MONITORING_RUNNING) {
-                if (entranceReservationStateManager.isReloadCountdownActive()) {
-                    const remainingSeconds = entranceReservationStateManager.getReloadSecondsRemaining();
-                    if (remainingSeconds !== null && remainingSeconds > 0) {
-                        const countdownText = `リロード: ${remainingSeconds}秒後`;
-                        const isWarning = remainingSeconds <= 5;
-                        this.updateCountdown(countdownText, isWarning);
-                        return;
-                    }
-                }
-            }
 
             // カウントダウン対象がない場合はクリア
             this.clearCountdown();

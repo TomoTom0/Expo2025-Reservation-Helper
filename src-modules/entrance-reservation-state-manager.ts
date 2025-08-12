@@ -17,15 +17,13 @@ import type { ReservationConfig, ReservationResult } from '../types/index.js';
 // 実行状態（排他的）
 export enum ExecutionState {
     IDLE = 'idle',
-    RESERVATION_RUNNING = 'reservation_running',
-    MONITORING_RUNNING = 'monitoring_running'
+    RESERVATION_RUNNING = 'reservation_running'
 }
 
 // 優先実行モード
 export enum PriorityMode {
     AUTO = 'auto',                          // 自動判定（予約優先）
-    FORCE_RESERVATION = 'force_reservation', // 予約強制実行
-    FORCE_MONITORING = 'force_monitoring'    // 監視強制実行（スタブ）
+    FORCE_RESERVATION = 'force_reservation' // 予約強制実行
 }
 
 // 位置管理の定数
@@ -54,14 +52,6 @@ export interface ReservationSuccess {
     successTime: Date;       // 成功時刻
 }
 
-// 監視対象（スタブ - 機能は無効化済み）
-export interface MonitoringTarget {
-    timeSlot: string;        // '09:00-'
-    locationIndex: number;   // 0 or 1
-    selector: string;        // DOM selector
-    priority: number;        // 監視優先順位（1, 2, 3...）
-    status: 'full' | 'available';
-}
 
 
 // ============================================================================
@@ -122,7 +112,6 @@ export class EntranceReservationStateManager {
     // 開始時対象キャッシュ（検証用）
     private initialTargetCache: {
         reservationTarget: ReservationTarget | null;
-        monitoringTargets: MonitoringTarget[];
         timestamp: number;
     } | null = null;
     
@@ -137,7 +126,6 @@ export class EntranceReservationStateManager {
     
     // 対象管理
     private reservationTarget: ReservationTarget | null = null;
-    private monitoringTargets: MonitoringTarget[] = [];
     
     // 予約成功情報
     private reservationSuccess: ReservationSuccess | null = null;
@@ -155,13 +143,6 @@ export class EntranceReservationStateManager {
         attempts: 0
     };
 
-    // 監視実行情報（スタブ - 機能は無効化済み）
-    private monitoringExecution = {
-        retryCount: 0,
-        maxRetries: 100,
-        reloadInterval: 30000,
-        monitoringInterval: null as number | null
-    };
     
     
     // 効率モード設定管理（常時有効）
@@ -261,11 +242,6 @@ export class EntranceReservationStateManager {
     }
     
     
-    // 監視開始（スタブ - 常にfalseを返す）
-    startMonitoring(): boolean {
-        this.log('⚠️ 監視機能は無効化されています');
-        return false;
-    }
 
     stop(): void {
         const prevState = this.executionState;
@@ -284,14 +260,6 @@ export class EntranceReservationStateManager {
                 this.reservationExecution.shouldStop = false;
                 this.reservationExecution.startTime = null;
                 this.reservationExecution.attempts = 0;
-                break;
-            case ExecutionState.MONITORING_RUNNING:
-                this.log('⏹️ 監視処理を停止');
-                // 監視インターバルをクリア
-                if (this.monitoringExecution.monitoringInterval) {
-                    clearInterval(this.monitoringExecution.monitoringInterval);
-                    this.monitoringExecution.monitoringInterval = null;
-                }
                 break;
         }
     }
@@ -327,7 +295,6 @@ export class EntranceReservationStateManager {
     private saveInitialTargets(): void {
         this.initialTargetCache = {
             reservationTarget: this.reservationTarget ? { ...this.reservationTarget } : null,
-            monitoringTargets: [], // 監視機能は無効化済み
             timestamp: Date.now()
         };
         
@@ -442,52 +409,7 @@ export class EntranceReservationStateManager {
     // 監視実行情報管理（スタブ - 機能は無効化済み）
     // ============================================================================
     
-    // 監視実行中かどうか（スタブ - 常にfalseを返す）
-    isMonitoringRunning(): boolean {
-        return false;
-    }
     
-    // リトライ回数増加
-    incrementRetryCount(): void {
-        this.monitoringExecution.retryCount++;
-        this.log(`🔄 監視リトライ回数: ${this.monitoringExecution.retryCount}`);
-    }
-    
-    // リトライ回数取得
-    getRetryCount(): number {
-        return this.monitoringExecution.retryCount;
-    }
-    
-    // リトライ回数リセット
-    resetRetryCount(): void {
-        this.monitoringExecution.retryCount = 0;
-        this.log('🔄 監視リトライ回数をリセット');
-    }
-    
-    // 最大リトライ回数取得
-    getMaxRetries(): number {
-        return this.monitoringExecution.maxRetries;
-    }
-    
-    // 監視インターバル設定
-    setMonitoringInterval(intervalId: number): void {
-        this.monitoringExecution.monitoringInterval = intervalId;
-        this.log(`⏰ 監視インターバル設定: ${intervalId}`);
-    }
-    
-    // 監視インターバルクリア
-    clearMonitoringInterval(): void {
-        if (this.monitoringExecution.monitoringInterval) {
-            clearInterval(this.monitoringExecution.monitoringInterval);
-            this.monitoringExecution.monitoringInterval = null;
-            this.log('⏰ 監視インターバルをクリア');
-        }
-    }
-    
-    // 監視インターバル取得
-    getMonitoringInterval(): number | null {
-        return this.monitoringExecution.monitoringInterval;
-    }
     
     // ============================================================================
     // リロードカウントダウン管理（旧reloadCountdownStateから統合）
@@ -547,22 +469,6 @@ export class EntranceReservationStateManager {
         this.log('⏰ リロードカウントダウン停止');
     }
     
-    // カウントダウン中かどうか
-    isReloadCountdownActive(): boolean {
-        return this.reloadCountdown.secondsRemaining !== null && this.reloadCountdown.secondsRemaining !== undefined;
-    }
-    
-    // 残り秒数取得
-    getReloadSecondsRemaining(): number | null {
-        return this.reloadCountdown.secondsRemaining;
-    }
-    
-    // リロード直前（3秒以内）かどうか
-    isNearReload(): boolean {
-        return this.isReloadCountdownActive() && 
-               this.reloadCountdown.secondsRemaining !== null && 
-               this.reloadCountdown.secondsRemaining <= 3;
-    }
     
     // ============================================================================
     // ページ読み込み状態管理（旧pageLoadingStateから統合）
@@ -657,7 +563,7 @@ export class EntranceReservationStateManager {
     canStartReservation(): boolean {
         // 1. 予約対象の存在確認
         if (!this.reservationTarget || !this.reservationTarget.isValid) {
-            if (!this.isReloadCountdownActive()) {
+            if (!false) {
                 // 予約対象なし（ログ削減）
             }
             return false;
@@ -700,7 +606,7 @@ export class EntranceReservationStateManager {
     // 優先度判定
     // ============================================================================
     
-    getPreferredAction(): 'reservation' | 'monitoring' | 'none' {
+    getPreferredAction(): 'reservation' | 'none' {
         const canReserve = this.canStartReservation();
         // 監視機能は削除されました - 満員時間帯も直接予約可能になったため監視不要
         
@@ -728,12 +634,10 @@ export class EntranceReservationStateManager {
     // UI連携用メソッド
     // ============================================================================
     
-    getFabButtonState(): 'enabled' | 'disabled' | 'running' | 'monitoring' {
+    getFabButtonState(): 'enabled' | 'disabled' | 'running' {
         switch (this.executionState) {
             case ExecutionState.RESERVATION_RUNNING:
                 return 'running';
-            case ExecutionState.MONITORING_RUNNING:
-                return 'monitoring';
             case ExecutionState.IDLE:
                 const preferredAction = this.getPreferredAction();
                 return preferredAction !== 'none' ? 'enabled' : 'disabled';
@@ -741,9 +645,9 @@ export class EntranceReservationStateManager {
     }
     
     // FAB部分での予約対象情報表示用
-    getFabTargetDisplayInfo(): { hasTarget: boolean; displayText: string; targetType: 'reservation' | 'monitoring' | 'none' } {
+    getFabTargetDisplayInfo(): { hasTarget: boolean; displayText: string; targetType: 'reservation' | 'none' } {
         // カウントダウン中・効率モードタイマー実行中はログを削減
-        if (!this.isReloadCountdownActive() && !this.efficiencyMode.updateTimer) {
+        if (!false && !this.efficiencyMode.updateTimer) {
             // ログ削減: 頻繁に呼ばれるため削除
         }
         // カレンダー選択日付を取得（M/D形式、0paddingなし）
@@ -797,37 +701,7 @@ export class EntranceReservationStateManager {
             };
         }
         
-        // 監視対象がある場合は監視対象を表示
-        if (this.hasMonitoringTargets() && this.monitoringTargets.length > 0) {
-            if (!this.isReloadCountdownActive()) {
-                // ログ削減: 頻繁に呼ばれるため削除
-            }
-            
-            // 優先度順にソート（priority昇順）
-            const sortedTargets = [...this.monitoringTargets].sort((a, b) => a.priority - b.priority);
-            const dateText = getDisplayDate();
-            
-            // 監視対象の表示（1件でも複数件でも統一形式）
-            const targetTexts = sortedTargets.map(target => {
-                const location = LocationHelper.getLocationFromIndex(target.locationIndex);
-                const locationText = location === 'east' ? '東' : '西';
-                const result = `${locationText}${target.timeSlot}`;
-                if (!this.isReloadCountdownActive()) {
-                    // ログ削減: 頻繁に呼ばれるため削除
-                }
-                return result;
-            });
-            
-            const displayText = `${dateText}\n${targetTexts.join('\n')}`;
-            if (!this.isReloadCountdownActive()) {
-                // ログ削減: 頻繁に呼ばれるため削除
-            }
-            return {
-                hasTarget: true,
-                displayText: displayText,
-                targetType: 'monitoring'
-            };
-        }
+        // 監視対象がある場合は監視対象を表示 - 監視機能削除済み
         
         return {
             hasTarget: false,
@@ -840,14 +714,11 @@ export class EntranceReservationStateManager {
         switch (this.executionState) {
             case ExecutionState.RESERVATION_RUNNING:
                 return '予約\n中断';
-            case ExecutionState.MONITORING_RUNNING:
-                return '監視\n中断';
             case ExecutionState.IDLE:
                 const preferredAction = this.getPreferredAction();
                 switch (preferredAction) {
                     case 'reservation': return '予約\n開始';
-                    case 'monitoring': return '監視\n開始';
-                    default: return '待機中';
+                            default: return '待機中';
                 }
             default:
                 return '待機中';
@@ -863,36 +734,6 @@ export class EntranceReservationStateManager {
     }
     
     
-    // 監視機能のスタブメソッド群（すべて無効化済み）
-    getMonitoringTargets(): MonitoringTarget[] {
-        return [];
-    }
-
-    hasMonitoringTargets(): boolean {
-        return false;
-    }
-
-    addMonitoringTarget(_timeSlot: string, _locationIndex: number, _selector: string): boolean {
-        this.log('⚠️ 監視機能は無効化されています（addMonitoringTarget）');
-        return false;
-    }
-
-    removeMonitoringTarget(_timeSlot: string, _locationIndex: number): boolean {
-        this.log('⚠️ 監視機能は無効化されています（removeMonitoringTarget）');
-        return false;
-    }
-
-    isMonitoringTarget(_timeSlot: string, _locationIndex: number): boolean {
-        return false;
-    }
-
-    canStartMonitoring(): boolean {
-        return false;
-    }
-
-    clearAllMonitoringTargets(): void {
-        this.log('⚠️ 監視機能は無効化されています（clearAllMonitoringTargets）');
-    }
 
     getInitialTargetCache(): typeof this.initialTargetCache {
         return this.initialTargetCache;
@@ -907,10 +748,9 @@ export class EntranceReservationStateManager {
     // 全ての対象をクリア（監視・予約両方）
     clearAllTargets(): void {
         const reservationCount = this.reservationTarget ? 1 : 0;
-        const monitoringCount = this.monitoringTargets.length;
+        const monitoringCount = 0; // 監視機能削除済み
         
         this.reservationTarget = null;
-        this.monitoringTargets = [];
         
         this.log(`🗑️ 全対象クリア - 予約: ${reservationCount}個, 監視: ${monitoringCount}個`);
     }
@@ -937,7 +777,7 @@ export class EntranceReservationStateManager {
         
         // 成功時は予約対象と監視対象をクリア
         this.reservationTarget = null;
-        this.monitoringTargets = [];
+        // 監視機能削除済み = [];
         this.log(`✅ 予約成功により対象をクリア`);
     }
     
@@ -1011,17 +851,6 @@ export class EntranceReservationStateManager {
         // 実行状態に応じてボタン表示を更新
         switch (executionState) {
                 
-            case ExecutionState.MONITORING_RUNNING:
-                // メインボタンは基本テキストを表示
-                span.innerText = fabText;
-                
-                // 既存のupdateStatusBadge関数を使用
-                this.updateStatusBadgeFromUnified('monitoring');
-                mainButton.className = mainButton.className.replace(/state-\w+/g, '');
-                mainButton.classList.add('ytomo-fab-monitoring');
-                mainButton.title = '監視中断';
-                mainButton.disabled = false;
-                break;
                 
             case ExecutionState.RESERVATION_RUNNING:
                 span.innerText = fabText;
@@ -1046,17 +875,12 @@ export class EntranceReservationStateManager {
                 span.innerText = fabText;
                 
                 // 既存のupdateStatusBadge関数を使用  
-                const statusMode = preferredAction === 'monitoring' ? 'idle-monitoring' :
-                                 preferredAction === 'reservation' ? 'idle-reservation' : 'idle';
+                const statusMode = preferredAction === 'reservation' ? 'idle-reservation' : 'idle';
                 this.updateStatusBadgeFromUnified(statusMode);
                 
                 mainButton.className = mainButton.className.replace(/state-\w+/g, '');
                 
-                if (preferredAction === 'monitoring') {
-                    mainButton.classList.add('state-enabled', 'state-monitoring');
-                    mainButton.title = '監視開始';
-                    mainButton.disabled = false;
-                } else if (preferredAction === 'reservation') {
+                if (preferredAction === 'reservation') {
                     mainButton.classList.add('state-enabled', 'state-reservation');
                     mainButton.title = '予約開始';
                     mainButton.disabled = false;
@@ -1074,7 +898,7 @@ export class EntranceReservationStateManager {
         }
         
         // カウントダウン中は完了ログも削減
-        if (!this.isReloadCountdownActive()) {
+        if (!false) {
             // FAB更新完了ログを削減
         }
         
@@ -1087,17 +911,16 @@ export class EntranceReservationStateManager {
             }
         }
         
-        // 監視対象リスト表示も更新
-        this.updateMonitoringTargetsDisplay();
+        // 予約対象表示も更新
+        this.updateTargetDisplay();
     }
     
-    // 監視対象リストの表示を更新
-    private updateMonitoringTargetsDisplay(): void {
+    // 予約対象の表示を更新
+    private updateTargetDisplay(): void {
         const reservationTargetElement = document.getElementById('ytomo-reservation-target');
-        const monitoringTargetsElement = document.getElementById('ytomo-monitoring-targets');
         
-        if (!reservationTargetElement && !monitoringTargetsElement) {
-            console.log('🔍 [対象表示更新] 予約対象・監視対象要素が見つかりません');
+        if (!reservationTargetElement) {
+            console.log('🔍 [対象表示更新] 予約対象要素が見つかりません');
             return;
         }
         
@@ -1111,7 +934,7 @@ export class EntranceReservationStateManager {
                 reservationTargetElement.classList.add('visible');
                 
                 // カウントダウン中・効率モードタイマー実行中はログを削減
-                if (!this.isReloadCountdownActive() && !this.efficiencyMode.updateTimer) {
+                if (!false && !this.efficiencyMode.updateTimer) {
                     console.log(`🔍 [予約対象表示更新] 表示: "${displayInfo.displayText}"`);
                 }
             } else {
@@ -1121,24 +944,6 @@ export class EntranceReservationStateManager {
             }
         }
         
-        // 監視対象表示エリアの更新
-        if (monitoringTargetsElement) {
-            if (displayInfo.hasTarget && displayInfo.targetType === 'monitoring') {
-                monitoringTargetsElement.innerHTML = displayInfo.displayText.replace(/\n/g, '<br>');
-                // 表示状態の設定（背景色はSCSSで固定）
-                monitoringTargetsElement.classList.remove('hidden');
-                monitoringTargetsElement.classList.add('visible');
-                
-                // カウントダウン中はログを削減
-                if (!this.isReloadCountdownActive()) {
-                    console.log(`🔍 [監視対象表示更新] 表示: "${displayInfo.displayText}"`);
-                }
-            } else {
-                monitoringTargetsElement.classList.remove('visible');
-                monitoringTargetsElement.classList.add('hidden');
-                monitoringTargetsElement.innerHTML = '';
-            }
-        }
     }
     
     // デバッグ情報の出力
@@ -1147,9 +952,9 @@ export class EntranceReservationStateManager {
         console.log('実行状態:', this.executionState);
         console.log('優先度モード:', this.priorityMode);
         console.log('予約対象:', this.reservationTarget);
-        console.log('監視対象:', this.monitoringTargets);
+        console.log('監視対象:', []); // 監視機能削除済み
         console.log('予約可能:', this.canStartReservation());
-        console.log('監視可能:', this.canStartMonitoring());
+        console.log('監視可能:', false); // 監視機能削除済み
         console.log('推奨アクション:', this.getPreferredAction());
         console.groupEnd();
     }
@@ -1164,12 +969,6 @@ export class EntranceReservationStateManager {
         statusBadge.className = statusBadge.className.replace(/ytomo-status-\w+/g, '').trim();
         
         switch (mode) {
-            case 'monitoring':
-                statusBadge.classList.add('ytomo-status-monitoring');
-                const prefix = this.isEfficiencyModeEnabled() ? '効率' : '';
-                statusBadge.innerText = `${prefix}監視中`;
-                statusBadge.classList.remove('js-hide');
-                break;
             case 'reservation-running':
                 statusBadge.classList.add('ytomo-status-reservation');
                 if (customText) {
@@ -1177,11 +976,6 @@ export class EntranceReservationStateManager {
                 } else {
                     statusBadge.innerText = '効率予約実行中';
                 }
-                statusBadge.classList.remove('js-hide');
-                break;
-            case 'idle-monitoring':
-                statusBadge.classList.add('ytomo-status-waiting');
-                statusBadge.innerText = '監視可能';
                 statusBadge.classList.remove('js-hide');
                 break;
             case 'idle-reservation':

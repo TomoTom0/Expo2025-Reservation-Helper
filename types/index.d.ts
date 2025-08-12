@@ -113,9 +113,6 @@ export interface CacheManager {
   clearTargetSlots(): void;
   clearTargetSlot(): void;
   updateRetryCount(count: number): void;
-  setMonitoringFlag(isActive?: boolean): void;
-  getAndClearMonitoringFlag(): boolean;
-  clearMonitoringFlag(): void;
 }
 
 // =========================================================================

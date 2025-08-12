@@ -22,7 +22,6 @@ return {
     
     // 複数監視対象を保存
     saveTargetSlots(): void {
-        // 監視機能は無効化済み - 監視対象は常に0個のため何も保存しない
         return;
     },
     
@@ -116,68 +115,6 @@ return {
         }
     },
     
-    // 監視継続フラグを設定（リロード前に呼び出し）
-    setMonitoringFlag(isActive: boolean = true): void {
-        try {
-            const data = {
-                isMonitoring: isActive,
-                timestamp: Date.now()
-            };
-            const key = 'expo2025_monitoring_flag';
-            localStorage.setItem(key, JSON.stringify(data));
-            console.log(`🏃 監視継続フラグを設定: ${isActive}`);
-            console.log(`🔑 フラグ保存キー: ${key}`);
-            console.log(`💾 フラグ保存データ: ${JSON.stringify(data)}`);
-            
-            // 保存確認
-            const saved = localStorage.getItem(key);
-            console.log(`✅ フラグ保存確認: ${saved ? '成功' : '失敗'}`);
-        } catch (error) {
-            console.error('❌ 監視フラグ設定エラー:', error);
-        }
-    },
-    
-    // 監視継続フラグを取得し、即座にfalseに設定（暴走防止）
-    getAndClearMonitoringFlag(): boolean {
-        try {
-            const key = 'expo2025_monitoring_flag';
-            const data = localStorage.getItem(key);
-            console.log(`🔑 フラグ取得キー: ${key}`);
-            console.log(`📥 フラグ取得データ: ${data || 'null'}`);
-            
-            if (!data) {
-                console.log('❌ 監視継続フラグが見つかりません');
-                return false;
-            }
-            
-            const parsed = JSON.parse(data);
-            // 60秒以内のフラグのみ有効（リロード直後でないと無効）
-            // リロード間隔が30秒 + ランダム5秒 + ページロード時間 + 初期化時間を考慮
-            const isRecent = Date.now() - parsed.timestamp < 60 * 1000;
-            const shouldContinue = isRecent && parsed.isMonitoring;
-            
-            // フラグを即座にクリア（暴走防止）
-            this.clearMonitoringFlag();
-            
-            const timeDiff = (Date.now() - parsed.timestamp) / 1000;
-            console.log(`🔍 監視継続フラグチェック: ${shouldContinue} (recent: ${isRecent}, flag: ${parsed.isMonitoring}, 経過時間: ${timeDiff.toFixed(1)}秒)`);
-            console.log(`📅 フラグ設定時刻: ${new Date(parsed.timestamp).toLocaleTimeString()}, 現在時刻: ${new Date().toLocaleTimeString()}`);
-            return shouldContinue;
-        } catch (error) {
-            console.error('❌ 監視フラグ取得エラー:', error);
-            return false;
-        }
-    },
-    
-    // 監視継続フラグをクリア
-    clearMonitoringFlag(): void {
-        try {
-            localStorage.removeItem('expo2025_monitoring_flag');
-            console.log('🗑️ 監視継続フラグをクリア');
-        } catch (error) {
-            console.error('❌ 監視フラグクリアエラー:', error);
-        }
-    }
 };
 }; // createCacheManager の終了
 

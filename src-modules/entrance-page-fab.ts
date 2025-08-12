@@ -65,8 +65,7 @@ function showStatus(message: string, color: string = 'white'): void {
     statusBadge.className = statusBadge.className.replace(/ytomo-status-\w+/g, '').trim();
     
     // 新しい状態クラスを追加
-    const statusClass = color === 'green' ? 'ytomo-status-monitoring' :
-                       color === 'red' ? 'ytomo-status-countdown-warning' :
+    const statusClass = color === 'red' ? 'ytomo-status-countdown-warning' :
                        color === 'orange' ? 'ytomo-status-warning' :
                        color === 'blue' ? 'ytomo-status-reservation' :
                        'ytomo-status-waiting';
@@ -117,11 +116,6 @@ function createEntranceReservationUI(): void {
     reservationTargetDisplay.className = 'ytomo-reservation-target-display hidden';
     reservationTargetDisplay.title = '予約対象（クリックで詳細表示）';
     
-    // 監視対象表示エリア（目立つ表示）
-    const monitoringTargetsDisplay = document.createElement('div');
-    monitoringTargetsDisplay.id = 'ytomo-monitoring-targets';
-    monitoringTargetsDisplay.className = 'ytomo-monitoring-targets-display hidden';
-    monitoringTargetsDisplay.title = 'クリックで詳細表示';
     
     // ホバー効果はCSSで実装済み
 
@@ -159,7 +153,6 @@ function createEntranceReservationUI(): void {
         }
         
         
-        // 監視機能は無効化済み
         
         if (entranceReservationStateManager.isReservationRunning()) {
             stopReservationProcess();
@@ -275,7 +268,6 @@ function createEntranceReservationUI(): void {
                 
                 if (cacheManager) {
                     cacheManager.clearTargetSlots(); // 成功時はキャッシュクリア
-                    cacheManager.clearMonitoringFlag(); // 監視継続フラグもクリア
                 }
             } else {
                 if (result.cancelled) {
@@ -344,7 +336,6 @@ function createEntranceReservationUI(): void {
     // ホバー効果はCSSで制御
 
     fabContainer.appendChild(reservationTargetDisplay);
-    fabContainer.appendChild(monitoringTargetsDisplay);
     fabContainer.appendChild(statusBadge);
     fabContainer.appendChild(efficiencyToggleButton);
     fabContainer.appendChild(fabButton);
@@ -366,8 +357,7 @@ function createEntranceReservationUI(): void {
         }
         
         try {
-            // 監視機能は無効化済み
-            
+                
             // 監視機能は無効化済み - 監視対象削除不要
             
             // オーバーレイを確実に非表示にして状態をリセット
@@ -510,7 +500,7 @@ function checkInitialState(): void {
         return;
     }
     
-    if (preferredAction === 'monitoring' || preferredAction === 'reservation') {
+    if (preferredAction === 'reservation') {
         console.log(`🔄 統一システムがアクション決定済み (${preferredAction}) - 初期状態チェックをスキップ`);
         return;
     }
@@ -616,7 +606,6 @@ async function handleCalendarChange(): Promise<void> {
     if (calendarDateChanged) {
         console.log(`📅 カレンダー日付変更を検出: ${calendarWatchState.currentSelectedDate} → ${newSelectedDate}`);
         
-        // 監視機能は無効化済み
         
         calendarWatchState.currentSelectedDate = newSelectedDate;
         
