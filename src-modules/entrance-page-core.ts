@@ -401,16 +401,7 @@ export function getCurrentFabState(): string {
     const mode = getCurrentMode();
     const executionState = entranceReservationStateManager.getExecutionState();
     const hasReservation = entranceReservationStateManager.hasReservationTarget();
-    const hasMonitoring = false;
-    
-    // 監視対象の実際の内容を含める
-    const monitoringTargets: any[] = []; // 監視機能は無効化済み
-    const monitoringContent = monitoringTargets
-        .map((target: any) => `${target.locationIndex}:${target.timeSlot}`)
-        .sort()
-        .join('|');
-    
-    return `${mode}-${executionState}-${hasReservation}-${hasMonitoring}-${monitoringContent}`;
+    return `${mode}-${executionState}-${hasReservation}`;
 }
 
 // 古いupdateMainButtonDisplay関数は削除され、entrance-page-ui-helpersの関数を使用
@@ -434,7 +425,6 @@ export function getCurrentMode(): string {
     switch (executionState) {
         case 'reservation_running':
             return 'reservation-running';
-            return 'monitoring';
         case 'idle':
             // 推奨アクションを確認
             const preferredAction = entranceReservationStateManager.getPreferredAction();
@@ -484,7 +474,7 @@ export function updateStatusBadge(mode: string): void {
             break;
             
         case 'selecting':
-            message = '監視準備完了';
+            message = '準備完了';
             bgClass = 'status-bg-blue'; // 緑色
             break;
             
@@ -519,8 +509,8 @@ export function updateStatusBadge(mode: string): void {
         
         statusBadge.classList.remove('js-hide');
         
-        // 効率モードの5秒前警告（予約実行中・監視中両方）
-        if ((mode === 'reservation-running' || mode === 'monitoring') && entranceReservationStateManager.isEfficiencyModeEnabled()) {
+        // 効率モードの5秒前警告（予約実行中）
+        if (mode === 'reservation-running' && entranceReservationStateManager.isEfficiencyModeEnabled()) {
             const nextTarget = entranceReservationStateManager.getNextSubmitTarget();
             if (nextTarget) {
                 const remainingMs = nextTarget.getTime() - Date.now();
@@ -544,12 +534,10 @@ export function updateStatusBadge(mode: string): void {
 
 // 前の選択をリセット
 export function resetPreviousSelection(): void {
-    // すべての監視対象をクリア
+    // すべての対象をクリア
     if (entranceReservationStateManager) {
         entranceReservationStateManager.clearAllTargets();
     }
-    
-    // ボタンの表示を「満員」に戻す
 }
 
 
@@ -615,7 +603,6 @@ export function isInterruptionAllowed(): boolean {
 export async function restoreFromCache(): Promise<void> {
     if (!cacheManagerSection6) return;
     
-    const shouldContinueMonitoring = false;
     
     const cached = cacheManagerSection6.loadTargetSlots();
     if (!cached) return;
@@ -656,27 +643,6 @@ export async function restoreFromCache(): Promise<void> {
         }
     }
     
-    // 監視対象を統一状態管理システムに復元
-    if (cached.targets && cached.targets.length > 0) {
-        console.log(`🔄 監視対象を統一状態管理システムに復元: ${cached.targets.length}個`);
-        
-        // 各監視対象を統一状態管理システムに追加
-        for (const target of cached.targets) {
-            try {
-                const locationIndex = typeof target.locationIndex === 'number' ? target.locationIndex : 0;
-                const timeSlot = target.timeSlot; // キャッシュ保存と復元でキー名統一済み
-                
-                console.log(`🔍 キャッシュデータ: timeSlot=${timeSlot}, locationIndex=${target.locationIndex} → 使用値=${locationIndex}`);
-                
-                console.log(`✅ 監視対象追加: ${timeSlot} (位置: ${locationIndex})`);
-            } catch (error) {
-                console.error(`❌ 監視対象復元エラー: ${target.timeSlot}`, error);
-            }
-        }
-        
-        const totalTargets = 0; // 監視機能は無効化済み
-        console.log(`🎯 統一状態管理システムに復元完了: ${totalTargets}個の監視対象`);
-    }
     
     // カレンダー読み込み完了を待機（短縮: 5秒）
     const hasCalendar = await waitForCalendar(5000);
@@ -692,19 +658,9 @@ export async function restoreFromCache(): Promise<void> {
         // メインボタンの表示更新
         updateMainButtonDisplayHelper();
         
-        // 監視継続フラグが有効な場合は自動監視再開
-        if (shouldContinueMonitoring && false) {
-            console.log('🚀 監視継続フラグが有効 - 監視を自動再開します');
-            try {
-                updateMainButtonDisplayHelper();
-            } catch (error) {
-                console.error('❌ 監視自動再開エラー:', error);
-            }
-        }
-        
         console.log('✅ キャッシュ復元完了');
         
-    }, 200); // 監視ボタン更新のため遅延を少し延長
+    }, 200);
 }
 
 // waitForCalendar関数を追加（restoreFromCacheで使用）
@@ -1021,79 +977,7 @@ function getCurrentTableContent(): string {
 
 // 日付変更後の選択状態復元
 function restoreSelectionAfterUpdate(): void {
-    if (!entranceReservationStateManager || !false) return;
-    
-    const targets: any[] = []; // 監視機能は無効化済み
-    const targetTexts = targets.map((t: any) => t.timeSlot).join(', ');
-    console.log(`選択状態を復元中: ${targetTexts}`);
-    
-    // 該当する時間帯の監視ボタンを探して選択状態にする  
-    const monitorButtons = document.querySelectorAll('.monitor-btn');
-    console.log(`🔍 復元対象の監視ボタン数: ${monitorButtons.length}`);
-    let restoredCount = 0;
-    
-    targets.forEach((target: any) => {
-        console.log(`🔍 復元対象: ${target.timeSlot} (index: ${target.locationIndex}, selector: ${target.selector})`);
-        let foundMatch = false;
-        
-        // 1. セレクタで直接検索（必須）
-        if (target.selector) {
-            const targetElement = document.querySelector(target.selector) as HTMLTableCellElement;
-            if (targetElement) {
-                // 2. 時間帯セレクタでの厳密な時間確認（追加検証）
-                const timeSlotButton = targetElement.querySelector('div[role="button"] dt span');
-                const actualTimeSlot = timeSlotButton ? timeSlotButton.textContent?.trim() || '' : '';
-                const expectedTime = target.timeSlot;
-                
-                // 3. locationIndexの確認（追加検証）
-                const buttonInTargetTd = targetElement.querySelector('.monitor-btn') as HTMLElement;
-                if (buttonInTargetTd) {
-                    const actualLocationIndex = parseInt(buttonInTargetTd.getAttribute('data-location-index') || '0');
-                    
-                    // セレクタ、時間、locationIndexの三重チェック
-                    const selectorMatch = true; // セレクタで見つかっている
-                    const timeMatch = actualTimeSlot === expectedTime; // 厳密一致
-                    const indexMatch = actualLocationIndex === target.locationIndex;
-                    
-                    console.log(`🔍 検証結果: セレクタ=✅, 時間=${timeMatch ? '✅' : '❌'}(${actualTimeSlot}===${expectedTime}), index=${indexMatch ? '✅' : '❌'}(${actualLocationIndex}/${target.locationIndex})`);
-                    
-                    if (selectorMatch && timeMatch && indexMatch) {
-                        foundMatch = true;
-                        const span = buttonInTargetTd.querySelector('span') as HTMLSpanElement;
-                        if (span) {
-                            const priority = target.priority;
-                            span.innerText = `監視${priority}`;
-                            buttonInTargetTd.classList.remove('full-status');
-                            buttonInTargetTd.classList.add('monitoring-status');
-                            restoredCount++;
-                            console.log(`✅ 完全一致で復元成功: ${target.timeSlot} (index: ${target.locationIndex})`);
-                        }
-                    } else {
-                        console.log(`⚠️ 部分的不一致: セレクタは見つかったが時間またはindexが一致しません`);
-                    }
-                } else {
-                    console.log(`⚠️ セレクタは見つかったが監視ボタンが存在しません`);
-                }
-            } else {
-                console.log(`❌ セレクタで要素が見つかりません: ${target.selector}`);
-            }
-        } else {
-            console.log(`❌ セレクタが保存されていません`);
-        }
-        
-        if (!foundMatch) {
-            console.log(`❌ 復元対象が見つかりません: ${target.timeSlot} (index: ${target.locationIndex}, selector: ${target.selector})`);
-        }
-    });
-    
-    if (restoredCount === 0) {
-        console.log(`⚠️ 復元に失敗しましたが、監視対象はクリアしません: ${targetTexts}`);
-        console.log(`💡 DOM構造変化によるセレクタ無効化の可能性があります`);
-        console.log(`💡 次回の監視実行時に自動的にセレクタが更新されます`);
-        // 注意: 復元失敗でも監視対象をクリアしない（DOM構造変化の場合があるため）
-    } else {
-        console.log(`✅ 復元完了: ${restoredCount}/${targets.length}個の監視対象を復元しました`);
-    }
+    // 監視機能削除済み
     
     
     updateMainButtonDisplayHelper();
@@ -1106,27 +990,9 @@ function checkAvailabilityAfterCacheRestore(): void {
         return;
     }
     
-    console.log('🔍 キャッシュ復元後の監視対象可用性をチェック中...');
+    console.log('🔍 キャッシュ復元後のチェック完了');
     
-    const monitoringTargets: any[] = []; // 監視機能は無効化済み
-    let availableCount = 0;
-    
-    for (const target of monitoringTargets) {
-        const tdElement = document.querySelector(target.selector) as HTMLTableCellElement;
-        if (!tdElement) continue;
-        
-        const buttonElement = tdElement.querySelector('div[role="button"]') as HTMLElement;
-        if (!buttonElement) continue;
-        
-        // 満員かどうか確認（data-disabled属性の有無で判定）
-        const isDisabled = buttonElement.getAttribute('data-disabled') === 'true';
-        const isAvailable = !isDisabled;
-        
-        if (isAvailable) {
-            availableCount++;
-            console.log(`✅ 空きあり検出: ${target.timeSlot} (位置: ${target.locationIndex})`);
-        }
-    }
+    const availableCount = 0; // 監視機能削除済み
     
     if (availableCount > 0) {
         console.log(`🎉 ${availableCount}個の監視対象に空きが出ています - 既存処理に委ねます`);
@@ -1147,22 +1013,8 @@ function handleAvailabilityDetected(): void {
         return;
     }
     
-    // 優先度最高の空き監視対象を取得
-    const monitoringTargets: any[] = []; // 監視機能は無効化済み
-    let highestPriorityAvailable: any = null;
-    
-    for (const target of monitoringTargets) {
-        const tdElement = document.querySelector(target.selector) as HTMLTableCellElement;
-        if (!tdElement) continue;
-        
-        const buttonElement = tdElement.querySelector('div[role="button"]') as HTMLElement;
-        if (!buttonElement) continue;
-        
-        const isAvailable = buttonElement.getAttribute('data-disabled') !== 'true';
-        if (isAvailable && (!highestPriorityAvailable || target.priority < highestPriorityAvailable.priority)) {
-            highestPriorityAvailable = target;
-        }
-    }
+    // 監視機能削除済み
+    const highestPriorityAvailable: any = null;
     
     if (highestPriorityAvailable) {
         console.log(`🎯 優先度最高の空き時間帯を自動選択: ${highestPriorityAvailable.timeSlot}`);

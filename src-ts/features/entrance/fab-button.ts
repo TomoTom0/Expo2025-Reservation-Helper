@@ -13,7 +13,6 @@ export class FABButton {
   private fabButton?: HTMLButtonElement;
   private fabIcon?: HTMLSpanElement;
   private statusDisplay?: HTMLDivElement;
-  private monitoringTargetsDisplay?: HTMLDivElement;
   private callbacks: FABCallbacks;
 
   constructor(callbacks: FABCallbacks) {
@@ -123,25 +122,7 @@ export class FABButton {
     `;
     this.statusDisplay.innerText = '待機中';
 
-    // 監視対象表示を作成
-    this.monitoringTargetsDisplay = document.createElement('div');
-    this.monitoringTargetsDisplay.id = 'ytomo-monitoring-targets';
-    this.monitoringTargetsDisplay.style.cssText = `
-      background: rgba(255, 140, 0, 0.9) !important;
-      color: white !important;
-      padding: 6px 10px !important;
-      border-radius: 15px !important;
-      font-size: 11px !important;
-      font-weight: bold !important;
-      white-space: nowrap !important;
-      max-width: 180px !important;
-      text-align: center !important;
-      border: 1px solid rgba(255, 255, 255, 0.2) !important;
-      display: none !important;
-    `;
-
-    // FABコンテナに要素を追加（上から順：監視対象→ステータス→ボタン）
-    this.fabContainer.appendChild(this.monitoringTargetsDisplay);
+    // FABコンテナに要素を追加
     this.fabContainer.appendChild(this.statusDisplay);
     this.fabContainer.appendChild(this.fabButton);
 
@@ -230,22 +211,6 @@ export class FABButton {
     this.statusDisplay.innerText = statusText;
   }
 
-  /**
-   * 監視対象表示を更新
-   */
-  updateMonitoringTargets(targets: string[]): void {
-    if (!this.monitoringTargetsDisplay) return;
-
-    if (targets.length === 0) {
-      this.monitoringTargetsDisplay.style.display = 'none';
-    } else {
-      this.monitoringTargetsDisplay.style.display = 'block';
-      const targetsText = targets.length === 1 
-        ? `監視中: ${targets[0]}`
-        : `監視中: ${targets.length}件`;
-      this.monitoringTargetsDisplay.innerText = targetsText;
-    }
-  }
 
   /**
    * FABボタンを削除
@@ -260,7 +225,6 @@ export class FABButton {
     this.fabButton = undefined;
     this.fabIcon = undefined;
     this.statusDisplay = undefined;
-    this.monitoringTargetsDisplay = undefined;
   }
 
   /**

@@ -216,7 +216,7 @@ function createEntranceReservationUI(): void {
         if (mainButton) {
             console.log(`🔄 [予約開始後] FABボタン状態: disabled=${mainButton.disabled}, title="${mainButton.title}"`);
         }
-        updateMonitoringTargetsDisplay(); // 予約対象を表示
+        // 予約対象表示は統一システムで管理
         
         // 設定オブジェクトを作成
         const config: ReservationConfig = {
@@ -293,7 +293,7 @@ function createEntranceReservationUI(): void {
             entranceReservationStateManager.stop();
             
             updateMainButtonDisplay();
-            updateMonitoringTargetsDisplay(); // 予約終了時に表示更新
+            // 予約終了時の表示更新は統一システムで管理
         }
     }
     
@@ -411,11 +411,6 @@ function createEntranceReservationUI(): void {
     // カレンダー変更監視は別途初期化処理で開始（キャッシュ復元後）
 }
 
-// 監視対象表示を更新（統一システムに完全委譲）
-function updateMonitoringTargetsDisplay(): void {
-    console.log('🔄 [updateMonitoringTargetsDisplay] 統一システムに委譲');
-    entranceReservationStateManager.updateFabDisplay();
-}
 
 // 現在の予約対象時間帯を取得
 function getCurrentReservationTarget(): string | null {
@@ -858,7 +853,6 @@ async function entranceReservationHelper(config: ReservationConfig): Promise<Res
 // エクスポート
 export {
     createEntranceReservationUI,
-    updateMonitoringTargetsDisplay,
     getCurrentReservationTarget,
     checkVisitTimeButtonState,
     checkTimeSlotSelected,
