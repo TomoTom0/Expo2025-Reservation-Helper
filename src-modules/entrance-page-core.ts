@@ -13,8 +13,6 @@ import {
 // entrance-page-fabからのimport
 import { entranceReservationHelper } from './entrance-page-fab';
 
-// entrance-page-ui-helpersからのimport
-import { updateMainButtonDisplay as updateMainButtonDisplayHelper } from './entrance-page-ui-helpers';
 
 // entrance-page-ui-helpersからのimport
 
@@ -510,10 +508,8 @@ export function updateStatusBadge(mode: string): void {
             statusBadge.classList.remove('countdown-warning');
         }
     } else {
-        // 状態管理システムによる更新に委譲
-        if (entranceReservationStateManager) {
-            entranceReservationStateManager.updateFabDisplay();
-        }
+        // 統一状態管理システムによる更新
+        entranceReservationStateManager.updateFabDisplay();
     }
 }
 
@@ -543,7 +539,7 @@ export function scheduleReload(seconds: number = 30): void {
     
     
     // 即座に一度UI更新
-    updateMainButtonDisplayHelper();
+    entranceReservationStateManager.updateFabDisplay();
 }
 
 
@@ -570,7 +566,7 @@ export function setPageLoadingState(isLoading: boolean): void {
     if (entranceReservationStateManager) {
         entranceReservationStateManager.setPageLoadingState(isLoading);
     }
-    updateMainButtonDisplayHelper();
+    entranceReservationStateManager.updateFabDisplay();
 }
 
 // 中断操作が許可されているかチェック
@@ -641,7 +637,7 @@ export async function restoreFromCache(): Promise<void> {
     setTimeout(async () => {
         
         // メインボタンの表示更新
-        updateMainButtonDisplayHelper();
+        entranceReservationStateManager.updateFabDisplay();
         
         console.log('✅ キャッシュ復元完了');
         
@@ -958,7 +954,7 @@ function getCurrentTableContent(): string {
 function restoreSelectionAfterUpdate(): void {
     
     
-    updateMainButtonDisplayHelper();
+    entranceReservationStateManager.updateFabDisplay();
 }
 
 
@@ -1061,7 +1057,7 @@ async function selectTimeSlotAndStartReservation(slotInfo: any): Promise<void> {
                     const reservationTarget = entranceReservationStateManager.getReservationTarget();
                     if (reservationTarget) {
                         entranceReservationStateManager.setReservationSuccess(reservationTarget.timeSlot, reservationTarget.locationIndex);
-                        updateMainButtonDisplayHelper(); // FAB表示更新
+                        entranceReservationStateManager.updateFabDisplay(); // FAB表示更新
                     }
                 }
                 

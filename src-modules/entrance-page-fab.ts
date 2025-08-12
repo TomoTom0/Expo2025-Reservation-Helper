@@ -29,7 +29,6 @@ import {
 } from './entrance-page-core';
 
 // UI更新ヘルパーからのimport
-import { updateMainButtonDisplay } from './entrance-page-ui-helpers';
 import {
     getCurrentSelectedCalendarDate,
     waitForValidCalendarDate
@@ -178,7 +177,7 @@ function createEntranceReservationUI(): void {
         showStatus('予約処理を中断中...', 'orange');
         
         // 中断フラグ設定後、UIを即座に更新
-        updateMainButtonDisplay();
+        entranceReservationStateManager.updateFabDisplay();
     }
 
 
@@ -206,7 +205,7 @@ function createEntranceReservationUI(): void {
         processingOverlay.show('reservation');
         
         showStatus('予約処理実行中...', 'blue');
-        updateMainButtonDisplay();
+        entranceReservationStateManager.updateFabDisplay();
         
         // デバッグ: FABボタンの現在の状態を確認
         const mainButton = document.getElementById('ytomo-main-fab') as HTMLButtonElement;
@@ -256,7 +255,7 @@ function createEntranceReservationUI(): void {
                 // 予約開始前に保存した対象情報で成功情報を設定
                 if (reservationTarget) {
                     entranceReservationStateManager.setReservationSuccess(reservationTarget.timeSlot, reservationTarget.locationIndex);
-                    updateMainButtonDisplay(); // FAB表示更新
+                    entranceReservationStateManager.updateFabDisplay(); // FAB表示更新
                     console.log('✅ 予約成功UI更新完了');
                 } else {
                     console.warn('⚠️ 予約開始前の対象情報がnullのためUI更新をスキップ');
@@ -289,7 +288,7 @@ function createEntranceReservationUI(): void {
             // 入場予約状態管理システムで予約実行終了
             entranceReservationStateManager.stop();
             
-            updateMainButtonDisplay();
+            entranceReservationStateManager.updateFabDisplay();
             // 予約終了時の表示更新は統一システムで管理
         }
     }
@@ -547,7 +546,7 @@ function startCalendarWatcher(): void {
                         console.log(`🔄 時間帯選択状態を検出`);
                         setTimeout(() => {
                             syncReservationTargetFromDOM();
-                            updateMainButtonDisplay();
+                            entranceReservationStateManager.updateFabDisplay();
                         }, 50);
                     }
                     
@@ -620,7 +619,7 @@ async function handleCalendarChange(): Promise<void> {
         
         
         // 予約対象がクリアされたため、即座にFAB表示を更新
-        updateMainButtonDisplay();
+        entranceReservationStateManager.updateFabDisplay();
         
     } else {
         // 日付は変わっていない - FABボタンの状態のみ更新
@@ -634,11 +633,11 @@ async function handleCalendarChange(): Promise<void> {
             console.log('🔄 公式サイトによる選択解除を検出 - 入場予約状態管理を同期');
             entranceReservationStateManager.clearReservationTarget();
             // UI更新を確実に実行
-            updateMainButtonDisplay();
+            entranceReservationStateManager.updateFabDisplay();
         }
         
         // FABボタンの状態を更新
-        updateMainButtonDisplay();
+        entranceReservationStateManager.updateFabDisplay();
     }
 }
 
@@ -760,12 +759,12 @@ function setupTimeSlotClickHandlers(): void {
                 // 入場予約状態管理からも予約対象を削除
                 setTimeout(() => {
                     entranceReservationStateManager.clearReservationTarget();
-                    updateMainButtonDisplay();
+                    entranceReservationStateManager.updateFabDisplay();
                 }, 100);
             } else {
                 // フォールバック: 直接削除
                 entranceReservationStateManager.clearReservationTarget();
-                updateMainButtonDisplay();
+                entranceReservationStateManager.updateFabDisplay();
             }
             
         } else {
@@ -774,7 +773,7 @@ function setupTimeSlotClickHandlers(): void {
             // DOM上の選択状態から予約対象を同期
             setTimeout(() => {
                 syncReservationTargetFromDOM();
-                updateMainButtonDisplay();
+                entranceReservationStateManager.updateFabDisplay();
             }, 100);
         }
     };

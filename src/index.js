@@ -9,7 +9,7 @@
 // @run-at       document-end
 // ==/UserScript==
 
-// Built: 2025/08/13 00:49:31
+// Built: 2025/08/13 00:53:08
 
 
 (function webpackUniversalModuleDefinition(root, factory) {
@@ -276,26 +276,6 @@ async function waitForCalendar(timeout = 10000) {
     const allTimeElements = document.querySelectorAll('time');
     console.log(`🔍 最終状態: table=${allTables.length}, button=${allButtons.length}, time=${allTimeElements.length}`);
     return false;
-}
-
-
-/***/ }),
-
-/***/ 269:
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   v: () => (/* binding */ updateMainButtonDisplay)
-/* harmony export */ });
-/* harmony import */ var _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(374);
-/**
- * 入場予約UI更新ヘルパー関数
- * 循環参照を避けるために独立したモジュールとして分離
- */
-
-// メインFABボタンの表示を更新（統一システムに委譲）
-function updateMainButtonDisplay() {
-    _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_0__/* .entranceReservationStateManager */ .xx.updateFabDisplay();
 }
 
 
@@ -640,15 +620,12 @@ module.exports = function (cssWithMappingToString) {
 /* harmony import */ var _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(374);
 /* harmony import */ var _entrance_page_dom_utils__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(115);
 /* harmony import */ var _entrance_page_fab__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(982);
-/* harmony import */ var _entrance_page_ui_helpers__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(269);
 // entrance-page-stateからのimport（もう使用しません）
 // 入場予約状態管理システムからのimport
 
 // entrance-page-dom-utilsからのimport
 
 // entrance-page-fabからのimport
-
-// entrance-page-ui-helpersからのimport
 
 // 【5. 時間帯分析システム】
 // ============================================================================
@@ -1022,10 +999,8 @@ function updateStatusBadge(mode) {
         }
     }
     else {
-        // 状態管理システムによる更新に委譲
-        if (entranceReservationStateManager) {
-            entranceReservationStateManager.updateFabDisplay();
-        }
+        // 統一状態管理システムによる更新
+        entranceReservationStateManager.updateFabDisplay();
     }
 }
 // 前の選択をリセット
@@ -1044,7 +1019,7 @@ function scheduleReload(seconds = 30) {
         console.log(`📊 リロードスケジュール時の状態: ${entranceReservationStateManager.getExecutionState()}`);
     }
     // 即座に一度UI更新
-    updateMainButtonDisplayHelper();
+    entranceReservationStateManager.updateFabDisplay();
 }
 // 下位互換のためのstartReloadCountdown関数（scheduleReloadのエイリアス）
 function startReloadCountdown(seconds = 30) {
@@ -1066,7 +1041,7 @@ function setPageLoadingState(isLoading) {
     if (_entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_0__/* .entranceReservationStateManager */ .xx) {
         _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_0__/* .entranceReservationStateManager */ .xx.setPageLoadingState(isLoading);
     }
-    (0,_entrance_page_ui_helpers__WEBPACK_IMPORTED_MODULE_3__/* .updateMainButtonDisplay */ .v)();
+    _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_0__/* .entranceReservationStateManager */ .xx.updateFabDisplay();
 }
 // 中断操作が許可されているかチェック
 function isInterruptionAllowed() {
@@ -1123,7 +1098,7 @@ async function restoreFromCache() {
     // UI更新を最短遅延実行（DOM完成後）
     setTimeout(async () => {
         // メインボタンの表示更新
-        (0,_entrance_page_ui_helpers__WEBPACK_IMPORTED_MODULE_3__/* .updateMainButtonDisplay */ .v)();
+        _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_0__/* .entranceReservationStateManager */ .xx.updateFabDisplay();
         console.log('✅ キャッシュ復元完了');
     }, 200);
 }
@@ -1388,7 +1363,7 @@ function getCurrentTableContent() {
 }
 // 日付変更後の選択状態復元
 function restoreSelectionAfterUpdate() {
-    updateMainButtonDisplayHelper();
+    entranceReservationStateManager.updateFabDisplay();
 }
 // 時間帯を自動選択して予約開始
 async function selectTimeSlotAndStartReservation(slotInfo) {
@@ -1474,7 +1449,7 @@ async function selectTimeSlotAndStartReservation(slotInfo) {
                     const reservationTarget = entranceReservationStateManager.getReservationTarget();
                     if (reservationTarget) {
                         entranceReservationStateManager.setReservationSuccess(reservationTarget.timeSlot, reservationTarget.locationIndex);
-                        updateMainButtonDisplayHelper(); // FAB表示更新
+                        entranceReservationStateManager.updateFabDisplay(); // FAB表示更新
                     }
                 }
                 if (cacheManager) {
@@ -3425,7 +3400,6 @@ module.exports = domAPI;
 /* harmony import */ var _entrance_page_dom_utils__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(115);
 /* harmony import */ var _entrance_page_core__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(364);
 /* harmony import */ var _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(374);
-/* harmony import */ var _entrance_page_ui_helpers__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(269);
 // Phase 3: 統一処理移行により個別importは不要
 // entrance-page-stateからのimport
 
@@ -3439,7 +3413,6 @@ module.exports = domAPI;
 // Section 6からのimport  
 
 // UI更新ヘルパーからのimport
-
 
 // 【7. FAB・メインUI】
 // ============================================================================
@@ -3551,7 +3524,7 @@ function createEntranceReservationUI() {
         _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_4__/* .entranceReservationStateManager */ .xx.setShouldStop(true);
         showStatus('予約処理を中断中...', 'orange');
         // 中断フラグ設定後、UIを即座に更新
-        (0,_entrance_page_ui_helpers__WEBPACK_IMPORTED_MODULE_5__/* .updateMainButtonDisplay */ .v)();
+        _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_4__/* .entranceReservationStateManager */ .xx.updateFabDisplay();
     }
     // 予約開始処理
     async function startReservationProcess() {
@@ -3571,7 +3544,7 @@ function createEntranceReservationUI() {
         // 予約に切り替わった場合にオーバーレイを更新
         _processing_overlay__WEBPACK_IMPORTED_MODULE_0__/* .processingOverlay */ .O.show('reservation');
         showStatus('予約処理実行中...', 'blue');
-        (0,_entrance_page_ui_helpers__WEBPACK_IMPORTED_MODULE_5__/* .updateMainButtonDisplay */ .v)();
+        _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_4__/* .entranceReservationStateManager */ .xx.updateFabDisplay();
         // デバッグ: FABボタンの現在の状態を確認
         const mainButton = document.getElementById('ytomo-main-fab');
         if (mainButton) {
@@ -3616,7 +3589,7 @@ function createEntranceReservationUI() {
                 // 予約開始前に保存した対象情報で成功情報を設定
                 if (reservationTarget) {
                     _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_4__/* .entranceReservationStateManager */ .xx.setReservationSuccess(reservationTarget.timeSlot, reservationTarget.locationIndex);
-                    (0,_entrance_page_ui_helpers__WEBPACK_IMPORTED_MODULE_5__/* .updateMainButtonDisplay */ .v)(); // FAB表示更新
+                    _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_4__/* .entranceReservationStateManager */ .xx.updateFabDisplay(); // FAB表示更新
                     console.log('✅ 予約成功UI更新完了');
                 }
                 else {
@@ -3653,7 +3626,7 @@ function createEntranceReservationUI() {
         finally {
             // 入場予約状態管理システムで予約実行終了
             _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_4__/* .entranceReservationStateManager */ .xx.stop();
-            (0,_entrance_page_ui_helpers__WEBPACK_IMPORTED_MODULE_5__/* .updateMainButtonDisplay */ .v)();
+            _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_4__/* .entranceReservationStateManager */ .xx.updateFabDisplay();
             // 予約終了時の表示更新は統一システムで管理
         }
     }
@@ -3866,7 +3839,7 @@ function startCalendarWatcher() {
                         console.log(`🔄 時間帯選択状態を検出`);
                         setTimeout(() => {
                             syncReservationTargetFromDOM();
-                            (0,_entrance_page_ui_helpers__WEBPACK_IMPORTED_MODULE_5__/* .updateMainButtonDisplay */ .v)();
+                            _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_4__/* .entranceReservationStateManager */ .xx.updateFabDisplay();
                         }, 50);
                     }
                     shouldUpdate = true;
@@ -3925,7 +3898,7 @@ async function handleCalendarChange() {
             console.log('📅 同じ日付への再クリック');
         }
         // 予約対象がクリアされたため、即座にFAB表示を更新
-        (0,_entrance_page_ui_helpers__WEBPACK_IMPORTED_MODULE_5__/* .updateMainButtonDisplay */ .v)();
+        _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_4__/* .entranceReservationStateManager */ .xx.updateFabDisplay();
     }
     else {
         // 日付は変わっていない - FABボタンの状態のみ更新
@@ -3938,10 +3911,10 @@ async function handleCalendarChange() {
             console.log('🔄 公式サイトによる選択解除を検出 - 入場予約状態管理を同期');
             _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_4__/* .entranceReservationStateManager */ .xx.clearReservationTarget();
             // UI更新を確実に実行
-            (0,_entrance_page_ui_helpers__WEBPACK_IMPORTED_MODULE_5__/* .updateMainButtonDisplay */ .v)();
+            _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_4__/* .entranceReservationStateManager */ .xx.updateFabDisplay();
         }
         // FABボタンの状態を更新
-        (0,_entrance_page_ui_helpers__WEBPACK_IMPORTED_MODULE_5__/* .updateMainButtonDisplay */ .v)();
+        _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_4__/* .entranceReservationStateManager */ .xx.updateFabDisplay();
     }
 }
 // DOM上の選択状態から予約対象を同期
@@ -4040,13 +4013,13 @@ function setupTimeSlotClickHandlers() {
                 // 入場予約状態管理からも予約対象を削除
                 setTimeout(() => {
                     _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_4__/* .entranceReservationStateManager */ .xx.clearReservationTarget();
-                    (0,_entrance_page_ui_helpers__WEBPACK_IMPORTED_MODULE_5__/* .updateMainButtonDisplay */ .v)();
+                    _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_4__/* .entranceReservationStateManager */ .xx.updateFabDisplay();
                 }, 100);
             }
             else {
                 // フォールバック: 直接削除
                 _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_4__/* .entranceReservationStateManager */ .xx.clearReservationTarget();
-                (0,_entrance_page_ui_helpers__WEBPACK_IMPORTED_MODULE_5__/* .updateMainButtonDisplay */ .v)();
+                _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_4__/* .entranceReservationStateManager */ .xx.updateFabDisplay();
             }
         }
         else {
@@ -4054,7 +4027,7 @@ function setupTimeSlotClickHandlers() {
             // DOM上の選択状態から予約対象を同期
             setTimeout(() => {
                 syncReservationTargetFromDOM();
-                (0,_entrance_page_ui_helpers__WEBPACK_IMPORTED_MODULE_5__/* .updateMainButtonDisplay */ .v)();
+                _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_4__/* .entranceReservationStateManager */ .xx.updateFabDisplay();
             }, 100);
         }
     };
