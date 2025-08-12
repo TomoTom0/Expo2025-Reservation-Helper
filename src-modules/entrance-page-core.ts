@@ -8,12 +8,10 @@ import { LocationHelper, entranceReservationStateManager } from './entrance-rese
 import {
     timeSlotSelectors,
     generateUniqueTdSelector,
-    findSameTdElement,
     extractTdStatus
 } from './entrance-page-dom-utils';
 
 // entrance-page-fabからのimport
-import { processingOverlay } from './processing-overlay';
 import { entranceReservationHelper } from './entrance-page-fab';
 
 // entrance-page-ui-helpersからのimport
@@ -26,7 +24,6 @@ import { updateMainButtonDisplay as updateMainButtonDisplayHelper } from './entr
 // 型定義のインポート
 import type { 
     TimeSlotInfo,
-    TimeSlotTarget,
     CacheManager
 } from '../types/index.js';
 
@@ -356,76 +353,7 @@ function generateSelectorForElement(element: HTMLElement): string {
 
 
 
-// 手動リロード時の空き時間帯処理
-async function handleManualReloadAvailableSlot(_availableSlot: any): Promise<void> {
-    try {
-        console.log(`🎯 手動リロード: 優先度最高の空き時間帯を予約対象化`);
-        
-        // 利用可能な時間帯一覧を取得
-        const availableSlots = getAllAvailableTimeSlots();
-        if (availableSlots.length === 0) {
-            console.log('⚠️ 利用可能な時間帯がありません');
-            return;
-        }
-        
-        // 優先度最高（最も早い時間）を選択
-        const highestPrioritySlot = availableSlots[0];
-        console.log(`🥇 最優先時間帯を選択: ${highestPrioritySlot.timeText}`);
-        
-        // 該当時間帯をクリックして予約対象に設定
-        const targetElement = document.querySelector(highestPrioritySlot.tdSelector) as HTMLElement;
-        if (targetElement) {
-            const timeSlotButton = targetElement.querySelector('div[role="button"]') as HTMLElement;
-            if (timeSlotButton) {
-                console.log(`🖱️ 時間帯をクリック: ${highestPrioritySlot.timeText}`);
-                timeSlotButton.click();
-                
-                // 少し待機してから状態を確認
-                await new Promise(resolve => setTimeout(resolve, 500));
-                
-                // 予約対象として設定されたことを確認
-                const locationIndex = highestPrioritySlot.locationIndex || 0;
-                entranceReservationStateManager?.setReservationTarget(
-                    highestPrioritySlot.timeText, 
-                    locationIndex, 
-                    highestPrioritySlot.tdSelector
-                );
-                
-                console.log(`✅ 予約対象に設定完了: ${highestPrioritySlot.timeText}`);
-            }
-        }
-        
-    } catch (error) {
-        console.error('❌ 手動リロード処理エラー:', error);
-    }
-}
 
-// 利用可能な全時間帯を取得
-function getAllAvailableTimeSlots(): any[] {
-    const slots: any[] = [];
-    const allElements = document.querySelectorAll(timeSlotSelectors.timeSlotCells);
-    
-    allElements.forEach(element => {
-        const status = extractTimeSlotInfo(element as HTMLElement);
-        // 満員時間帯も予約対象として許可（強制選択機能）
-        if (status && status.isAvailable) {
-            const tdElement = element.closest('td[data-gray-out]') as HTMLTableCellElement;
-            if (tdElement) {
-                const locationIndex = Array.from(tdElement.parentElement?.children || []).indexOf(tdElement);
-                slots.push({
-                    timeText: status.timeText,
-                    tdSelector: generateUniqueTdSelector(tdElement),
-                    locationIndex: locationIndex,
-                    element: element,
-                    status: status
-                });
-            }
-        }
-    });
-    
-    // 時間順（早い時間が優先）でソート
-    return slots.sort((a, b) => a.timeText.localeCompare(b.timeText));
-}
 
 // エクスポート
 export {
