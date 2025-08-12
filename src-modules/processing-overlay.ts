@@ -163,17 +163,8 @@ export class ProcessingOverlay {
                         console.log('🔍 [中央オーバーレイ] キャッシュから対象情報取得:', targetInfo);
                     }
                 } else {
-                    // フォールバック: entranceReservationStateManagerから取得
-                    if (entranceReservationStateManager) {
-                        const monitoringTargets = entranceReservationStateManager.getMonitoringTargets() || [];
-                        console.log('🔍 [中央オーバーレイ] フォールバック監視対象:', monitoringTargets);
-                        if (monitoringTargets.length > 0) {
-                            targetInfo = monitoringTargets.map((t: any) => {
-                                const location = t.locationIndex === 0 ? '東' : '西';
-                                return `${location}${t.timeSlot}`;
-                            }).join(', ');
-                        }
-                    }
+                    // 監視機能は無効化済み - 監視対象なし
+                    targetInfo = '';
                 }
             } catch (error) {
                 console.error('🔍 [中央オーバーレイ] キャッシュ読み込みエラー:', error);

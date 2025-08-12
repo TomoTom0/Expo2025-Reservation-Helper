@@ -33,7 +33,7 @@ import {
 import { updateMainButtonDisplay } from './entrance-page-ui-helpers';
 import {
     getCurrentSelectedCalendarDate,
-    stopSlotMonitoring,
+    // stopSlotMonitoring, // 監視機能は無効化済み
     waitForValidCalendarDate
 } from './entrance-page-core';
 
@@ -159,11 +159,7 @@ function createEntranceReservationUI(): void {
         }
         
         
-        // 実行中の場合は中断処理（入場予約状態管理システム使用）
-        if (entranceReservationStateManager.isMonitoringRunning()) {
-            stopMonitoringProcess();
-            return;
-        }
+        // 監視機能は無効化済み
         
         if (entranceReservationStateManager.isReservationRunning()) {
             stopReservationProcess();
@@ -184,17 +180,7 @@ function createEntranceReservationUI(): void {
         return;
     });
 
-    // 監視中断処理
-    function stopMonitoringProcess(): void {
-        console.log('⏹️ 監視を中断');
-        stopSlotMonitoring();
-        
-        // 誤動作防止オーバーレイを非表示
-        processingOverlay.hide();
-        
-        showStatus('監視中断', 'orange');
-        updateMainButtonDisplay();
-    }
+    // 監視機能は無効化済み
 
     // 予約中断処理
     function stopReservationProcess(): void {
@@ -380,30 +366,23 @@ function createEntranceReservationUI(): void {
         }
         
         try {
-            // 監視を停止
-            if (entranceReservationStateManager.isMonitoringRunning()) {
-                console.log('🛑 監視を停止');
-                stopSlotMonitoring();
-            }
+            // 監視機能は無効化済み
             
-            // 該当監視対象を削除
-            const timeSlot = slot.targetInfo.timeSlot;
-            const locationIndex = slot.targetInfo.locationIndex;
-            entranceReservationStateManager.removeMonitoringTarget(timeSlot, locationIndex);
+            // 監視機能は無効化済み - 監視対象削除不要
             
             // オーバーレイを確実に非表示にして状態をリセット
             console.log('🛡️ 監視→予約移行: オーバーレイ状態をリセット');
             processingOverlay.hide();
             
             // 1. 時間帯要素をクリックして選択状態にする
-            console.log(`🖱️ 自動選択: 時間帯をクリック ${timeSlot}`);
+            console.log(`🖱️ 自動選択: 時間帯をクリック ${slot.targetInfo.timeSlot}`);
             const timeSlotElement = document.querySelector(slot.targetInfo.selector);
             if (timeSlotElement) {
                 const buttonElement = timeSlotElement.querySelector('div[role="button"]') as HTMLElement;
                 if (buttonElement) {
                     // 満員時間帯も強制選択可能（data-disabled属性に関係なく）
                     buttonElement.click();
-                    console.log(`✅ 時間帯選択完了: ${timeSlot}`);
+                    console.log(`✅ 時間帯選択完了: ${slot.targetInfo.timeSlot}`);
                     
                     // 2. 選択後、少し待ってから内部的に自動予約を開始
                     setTimeout(async () => {
@@ -415,7 +394,7 @@ function createEntranceReservationUI(): void {
                         }
                     }, 100);
                 } else {
-                    console.error(`❌ 時間帯ボタンが見つからないか無効: ${timeSlot}`);
+                    console.error(`❌ 時間帯ボタンが見つからないか無効: ${slot.targetInfo.timeSlot}`);
                 }
             } else {
                 console.error(`❌ 時間帯要素が見つからない: ${slot.targetInfo.selector}`);
@@ -637,11 +616,7 @@ async function handleCalendarChange(): Promise<void> {
     if (calendarDateChanged) {
         console.log(`📅 カレンダー日付変更を検出: ${calendarWatchState.currentSelectedDate} → ${newSelectedDate}`);
         
-        // 監視実行中は日付変更を無視
-        if (entranceReservationStateManager.isMonitoringRunning()) {
-            console.log('⚠️ 監視実行中のため日付変更を無視します');
-            return;
-        }
+        // 監視機能は無効化済み
         
         calendarWatchState.currentSelectedDate = newSelectedDate;
         
@@ -655,12 +630,12 @@ async function handleCalendarChange(): Promise<void> {
             console.log(`📅 実際の日付変更確認: ${stateManagerSelectedDate} → ${newSelectedDate}`);
             
             const hasReservationTarget = entranceReservationStateManager.hasReservationTarget();
-            const hasMonitoringTargets = entranceReservationStateManager.hasMonitoringTargets();
+            // 監視機能は無効化済み - 監視対象は常に0個
             
-            if (hasReservationTarget || hasMonitoringTargets) {
-                console.log('📅 日付変更により入場予約状態管理システムの対象をクリア');
+            if (hasReservationTarget) {
+                console.log('📅 日付変更により予約対象をクリア');
                 entranceReservationStateManager.clearReservationTarget();
-                entranceReservationStateManager.clearAllMonitoringTargets();
+                // 監視機能は無効化済み - clearAllMonitoringTargets呼び出し不要
             }
         } else {
             console.log('📅 同じ日付への再クリックのため監視対象は維持');

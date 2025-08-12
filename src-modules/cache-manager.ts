@@ -2,16 +2,15 @@
 // import { timeSlotState } from './entrance-page-state'; // 統合により不要
 
 
-// unified-stateからの直接インポート
-import { entranceReservationStateManager } from './entrance-reservation-state-manager';
+// 監視機能は無効化済み - entranceReservationStateManagerは使用しない
 
 // 型定義のインポート
 import type { CacheManager, Dependencies } from '../types/index.js';
 
 // ============================================================================
 // キャッシュ管理機能
-const createCacheManager = (dependencies: Dependencies = {}): CacheManager => {
-const { getCurrentSelectedCalendarDateFn } = dependencies;
+const createCacheManager = (_dependencies: Dependencies = {}): CacheManager => {
+// 監視機能は無効化済み - getCurrentSelectedCalendarDateFnは使用しない
 
 return {
     // キー生成（URLベース）
@@ -23,35 +22,8 @@ return {
     
     // 複数監視対象を保存
     saveTargetSlots(): void {
-        try {
-            if (!entranceReservationStateManager) return;
-            
-            const targets = entranceReservationStateManager.getMonitoringTargets();
-            if (targets.length === 0) return;
-            
-            // 現在選択されているカレンダー日付を取得
-            const selectedCalendarDate = getCurrentSelectedCalendarDateFn ? getCurrentSelectedCalendarDateFn() : null;
-            
-            const data = {
-                targets: targets.map((target: any) => ({
-                    timeSlot: target.timeSlot,    // 復元時と統一（timeText→timeSlot）
-                    tdSelector: target.selector,
-                    positionInfo: target.positionInfo || {},
-                    status: target.status || 'unknown',
-                    locationIndex: target.locationIndex
-                })),
-                selectedDate: selectedCalendarDate,
-                timestamp: Date.now(),
-                url: window.location.href,
-                retryCount: entranceReservationStateManager.getRetryCount() || 0
-            };
-            
-            localStorage.setItem(this.generateKey('target_slots'), JSON.stringify(data));
-            const targetTexts = targets.map((t: any) => t.timeSlot).join(', ');
-            console.log(`✅ 複数監視対象をキャッシュに保存: ${targetTexts} (${targets.length}個)`);
-        } catch (error) {
-            console.error('❌ 複数監視対象保存エラー:', error);
-        }
+        // 監視機能は無効化済み - 監視対象は常に0個のため何も保存しない
+        return;
     },
     
     // 後方互換性のため残す

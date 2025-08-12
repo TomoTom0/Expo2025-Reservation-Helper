@@ -273,8 +273,7 @@ function analyzeAndAddMonitorButtons(): void {
         const tdSelector = tdElement ? generateUniqueTdSelector(tdElement) : '';
         
         // 監視対象として設定済みの場合は削除しない（状態変化を追跡するため）
-        const locationIndex = LocationHelper.getIndexFromSelector(tdSelector);
-        const isMonitoringTarget = entranceReservationStateManager?.isMonitoringTarget(timeText, locationIndex) || false;
+        const isMonitoringTarget = false; // 監視機能は無効化済み
         
         if (isMonitoringTarget) {
             console.log(`🎯 監視対象のため保持: ${timeText} (状態変化を追跡中)`);
@@ -466,11 +465,11 @@ function getMonitorButtonText(slotInfo: TimeSlotInfo): string {
     
     // 既に監視対象として選択されているかチェック
     const locationIndex = LocationHelper.getIndexFromSelector(tdSelector);
-    const isSelected = entranceReservationStateManager?.isMonitoringTarget(slotInfo.timeText, locationIndex) || false;
+    const isSelected = false || false;
     
     if (isSelected) {
         // 監視対象リストでの位置を取得（1ベース）
-        const targets = entranceReservationStateManager?.getMonitoringTargets() || [];
+        const targets: any[] = []; // 監視機能は無効化済み
         const targetIndex = targets.findIndex(
             (target: any) => target.timeSlot === slotInfo.timeText && target.locationIndex === locationIndex
         );
@@ -487,7 +486,7 @@ function getMonitorButtonText(slotInfo: TimeSlotInfo): string {
 // すべての監視ボタンの優先順位を更新
 function updateAllMonitorButtonPriorities(): void {
     const allMonitorButtons = document.querySelectorAll('.monitor-btn');
-    const targets = entranceReservationStateManager?.getMonitoringTargets() || [];
+    const targets: any[] = []; // 監視機能は無効化済み
     
     allMonitorButtons.forEach(button => {
         const span = button.querySelector('span') as HTMLSpanElement;
@@ -626,7 +625,7 @@ function handleMonitorButtonClick(slotInfo: TimeSlotInfo, buttonElement: HTMLBut
     // 監視ボタンがクリックされました
     
     // 監視実行中は操作不可
-    if (entranceReservationStateManager.isMonitoringRunning()) {
+    if (false) {
         // 監視実行中のため操作不可
         return;
     }
@@ -643,12 +642,7 @@ function handleMonitorButtonClick(slotInfo: TimeSlotInfo, buttonElement: HTMLBut
         
         // 入場予約状態管理システムから削除
         if (entranceReservationStateManager) {
-            const unifiedRemoved = entranceReservationStateManager.removeMonitoringTarget(slotInfo.timeText, locationIndex);
-            if (unifiedRemoved) {
-                console.log(`✅ 入場予約状態管理から監視対象を削除: ${locationText}${slotInfo.timeText}`);
-            } else {
-                console.log(`⚠️ 入場予約状態管理からの削除失敗: ${locationText}${slotInfo.timeText}`);
-            }
+            // 監視機能は無効化済み - 監視対象削除不要
         } else {
             // 入場予約状態管理システムが利用できません
         }
@@ -661,7 +655,7 @@ function handleMonitorButtonClick(slotInfo: TimeSlotInfo, buttonElement: HTMLBut
         buttonElement.disabled = false;
         
         // 監視対象がすべてなくなった場合の処理
-        if (!entranceReservationStateManager || !entranceReservationStateManager.hasMonitoringTargets()) {
+        if (!entranceReservationStateManager || !false) {
             // EntranceReservationStateManagerで統合管理されているため、個別設定不要
             
             // キャッシュをクリア
@@ -704,9 +698,7 @@ function handleMonitorButtonClick(slotInfo: TimeSlotInfo, buttonElement: HTMLBut
         let added = false;
         if (entranceReservationStateManager) {
             // 既に監視対象に含まれている場合は解除処理を行う
-            const isAlreadyMonitoring = entranceReservationStateManager.getMonitoringTargets().some((target: any) => 
-                target.timeSlot === slotInfo.timeText && target.locationIndex === locationIndex
-            );
+            const isAlreadyMonitoring = false; // 監視機能は無効化済み
             
             if (isAlreadyMonitoring) {
                 console.log(`🗑️ 監視対象解除: ${locationText}${slotInfo.timeText}`);
@@ -753,7 +745,7 @@ function handleMonitorButtonClick(slotInfo: TimeSlotInfo, buttonElement: HTMLBut
         
         // ボタンの表示を変更（優先順位表示）
         if (entranceReservationStateManager) {
-            const targets = entranceReservationStateManager.getMonitoringTargets();
+            const targets: any[] = []; // 監視機能は無効化済み
             const target = targets.find((t: any) => t.timeSlot === slotInfo.timeText && t.selector === tdSelector);
             const priority = target ? target.priority : targets.length;
             buttonSpan.innerText = `監視${priority}`;
@@ -767,7 +759,7 @@ function handleMonitorButtonClick(slotInfo: TimeSlotInfo, buttonElement: HTMLBut
         
         // メインボタンの表示を更新
         if (entranceReservationStateManager) {
-            const targets = entranceReservationStateManager.getMonitoringTargets();
+            const targets: any[] = []; // 監視機能は無効化済み
             const targetCount = targets.length;
             console.log(`🔄 監視対象設定後のFAB更新を実行: targetSlots=${targetCount}個`);
             console.log('📊 入場予約状態管理の監視対象一覧:', targets.map((t: any) => `${LocationHelper.getLocationFromIndex(t.locationIndex) === 'east' ? '東' : '西'}${t.timeSlot}`));
@@ -787,7 +779,7 @@ function handleMonitorButtonClick(slotInfo: TimeSlotInfo, buttonElement: HTMLBut
 
 // 満員時間帯の可用性監視を開始
 async function startSlotMonitoring(): Promise<void> {
-    if (!entranceReservationStateManager || !entranceReservationStateManager.hasMonitoringTargets()) {
+    if (!entranceReservationStateManager || !false) {
         console.log('❌ 監視対象時間帯が設定されていません');
         return;
     }
@@ -818,7 +810,7 @@ async function startSlotMonitoring(): Promise<void> {
         return;
     }
     
-    const targets = entranceReservationStateManager.getMonitoringTargets();
+    const targets: any[] = []; // 監視機能は無効化済み
     const targetTexts = targets.map((t: any) => {
         const location = LocationHelper.getLocationFromIndex(t.locationIndex);
         const locationText = location === 'east' ? '東' : '西';
@@ -861,7 +853,7 @@ async function checkSlotAvailabilityAndReload(): Promise<void> {
     if (!(await checkTimeSlotTableExistsAsync())) return;
     
     // 複数監視対象の存在チェック
-    const targets = entranceReservationStateManager.getMonitoringTargets();
+    const targets: any[] = []; // 監視機能は無効化済み
     for (const target of targets) {
         if (!checkMonitoringTargetExists(target)) return;
     }
@@ -886,7 +878,7 @@ async function checkSlotAvailabilityAndReload(): Promise<void> {
         console.log(`🎉🎉 対象時間帯が利用可能になりました！: ${locationText}${currentSlot.targetInfo.timeSlot}`);
         
         // 自動リロードかどうかを判定（監視継続フラグの存在で判断）
-        const isAutoReload = entranceReservationStateManager?.isMonitoringRunning() || false;
+        const isAutoReload = false || false;
         
         if (isAutoReload) {
             console.log(`  → 自動リロード: 監視を終了し、自動選択+予約を開始します`);
@@ -966,11 +958,11 @@ async function checkSlotAvailabilityAndReload(): Promise<void> {
 
 // 入場予約状態管理対応版の監視対象検索関数
 function findTargetSlotInPageUnified(): any {
-    if (!entranceReservationStateManager || !entranceReservationStateManager.hasMonitoringTargets()) {
+    if (!entranceReservationStateManager || !false) {
         return null;
     }
     
-    const targets = entranceReservationStateManager.getMonitoringTargets();
+    const targets: any[] = []; // 監視機能は無効化済み
     
     // 複数監視対象をチェック
     for (const target of targets) {
@@ -1285,10 +1277,10 @@ export function getCurrentFabState(): string {
     const mode = getCurrentMode();
     const executionState = entranceReservationStateManager.getExecutionState();
     const hasReservation = entranceReservationStateManager.hasReservationTarget();
-    const hasMonitoring = entranceReservationStateManager.hasMonitoringTargets();
+    const hasMonitoring = false;
     
     // 監視対象の実際の内容を含める
-    const monitoringTargets = entranceReservationStateManager.getMonitoringTargets();
+    const monitoringTargets: any[] = []; // 監視機能は無効化済み
     const monitoringContent = monitoringTargets
         .map((target: any) => `${target.locationIndex}:${target.timeSlot}`)
         .sort()
@@ -1502,7 +1494,7 @@ export function getTargetDisplayInfo(): string {
         return '不明';
     }
     
-    const targets = entranceReservationStateManager.getMonitoringTargets();
+    const targets: any[] = []; // 監視機能は無効化済み
     if (targets.length === 0) {
         return '不明';
     }
@@ -1700,7 +1692,7 @@ export async function restoreFromCache(): Promise<void> {
             }
         }
         
-        const totalTargets = entranceReservationStateManager.getMonitoringTargets().length;
+        const totalTargets = 0; // 監視機能は無効化済み
         console.log(`🎯 統一状態管理システムに復元完了: ${totalTargets}個の監視対象`);
     }
     
@@ -1715,7 +1707,7 @@ export async function restoreFromCache(): Promise<void> {
     // UI更新を最短遅延実行（DOM完成後）
     setTimeout(async () => {
         // 監視対象が復元された場合は監視ボタンを更新
-        if (entranceReservationStateManager.hasMonitoringTargets()) {
+        if (false) {
             console.log('🔄 監視対象復元 - 監視ボタンを更新中...');
             try {
                 await analyzeAndAddMonitorButtons();
@@ -1733,7 +1725,7 @@ export async function restoreFromCache(): Promise<void> {
         updateMainButtonDisplayHelper();
         
         // 監視継続フラグが有効な場合は自動監視再開
-        if (shouldContinueMonitoring && entranceReservationStateManager.hasMonitoringTargets()) {
+        if (shouldContinueMonitoring && false) {
             console.log('🚀 監視継続フラグが有効 - 監視を自動再開します');
             try {
                 entranceReservationStateManager.startMonitoring();
@@ -1923,8 +1915,8 @@ async function tryClickCalendarForTimeSlot(): Promise<boolean> {
     console.log('📅 時間帯表示のためのカレンダークリックを試行中...');
     
     // 監視対象確認（情報表示のみ）
-    if (entranceReservationStateManager && entranceReservationStateManager.hasMonitoringTargets()) {
-        const targets = entranceReservationStateManager.getMonitoringTargets();
+    if (entranceReservationStateManager && false) {
+        const targets: any[] = []; // 監視機能は無効化済み
         const targetTexts = targets.map((t: any) => t.timeSlot).join(', ');
         console.log(`🎯 監視対象: ${targetTexts} (${targets.length}個)`);
     }
@@ -2141,9 +2133,9 @@ function shouldUpdateMonitorButtons(): boolean {
 
 // 日付変更後の選択状態復元
 function restoreSelectionAfterUpdate(): void {
-    if (!entranceReservationStateManager || !entranceReservationStateManager.hasMonitoringTargets()) return;
+    if (!entranceReservationStateManager || !false) return;
     
-    const targets = entranceReservationStateManager.getMonitoringTargets();
+    const targets: any[] = []; // 監視機能は無効化済み
     const targetTexts = targets.map((t: any) => t.timeSlot).join(', ');
     console.log(`選択状態を復元中: ${targetTexts}`);
     
@@ -2222,13 +2214,13 @@ function restoreSelectionAfterUpdate(): void {
 /* 
 // キャッシュ復元後の可用性チェック（一時的に無効化）
 function checkAvailabilityAfterCacheRestore(): void {
-    if (!entranceReservationStateManager || !entranceReservationStateManager.hasMonitoringTargets()) {
+    if (!entranceReservationStateManager || !false) {
         return;
     }
     
     console.log('🔍 キャッシュ復元後の監視対象可用性をチェック中...');
     
-    const monitoringTargets = entranceReservationStateManager.getMonitoringTargets();
+    const monitoringTargets: any[] = []; // 監視機能は無効化済み
     let availableCount = 0;
     
     for (const target of monitoringTargets) {
@@ -2263,12 +2255,12 @@ function checkAvailabilityAfterCacheRestore(): void {
 function handleAvailabilityDetected(): void {
     console.log('🔄 キャッシュ復元後の空き検出 - 既存の自動予約処理を実行');
     
-    if (!entranceReservationStateManager || !entranceReservationStateManager.hasMonitoringTargets()) {
+    if (!entranceReservationStateManager || !false) {
         return;
     }
     
     // 優先度最高の空き監視対象を取得
-    const monitoringTargets = entranceReservationStateManager.getMonitoringTargets();
+    const monitoringTargets: any[] = []; // 監視機能は無効化済み
     let highestPriorityAvailable: any = null;
     
     for (const target of monitoringTargets) {
@@ -2288,7 +2280,7 @@ function handleAvailabilityDetected(): void {
         console.log(`🎯 優先度最高の空き時間帯を自動選択: ${highestPriorityAvailable.timeSlot}`);
         
         // 自動リロードかどうかを判定
-        const isAutoReload = entranceReservationStateManager.isMonitoringRunning() || false;
+        const isAutoReload = false || false;
         
         if (isAutoReload) {
             console.log(`  → 自動リロード相当: 監視を終了し、自動選択+予約を開始`);

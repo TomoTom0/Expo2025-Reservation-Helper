@@ -38,12 +38,5 @@ export function enableAllMonitorButtons(): void {
 
 // 監視対象表示を更新
 export function updateMonitoringTargetsDisplay(): void {
-    // 監視対象の表示更新ロジック
-    const targets = entranceReservationStateManager.getMonitoringTargets();
-    
-    // カウントダウン中はログを削減（毎秒出力を避ける）
-    if (!entranceReservationStateManager.isReloadCountdownActive()) {
-        console.log(`🎯 監視対象表示更新: ${targets.length}個の対象`);
-    }
-    // TODO: 具体的な表示更新処理を実装
+    // 監視機能は無効化済み - 何も表示しない
 }
