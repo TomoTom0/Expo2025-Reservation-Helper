@@ -9,7 +9,7 @@ import { entranceReservationStateManager } from './entrance-reservation-state-ma
 export function updateMainButtonDisplay(): void {
     // カウントダウン中はログを削減
     if (!entranceReservationStateManager.isReloadCountdownActive()) {
-        console.log('🔄 [旧updateMainButtonDisplay] 統一システムに委譲');
+        // ログ削減: 頻繁に呼ばれるため削除
     }
     entranceReservationStateManager.updateFabDisplay();
 }

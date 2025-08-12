@@ -233,6 +233,10 @@ export class EntranceReservationStateManager {
         }
         
         // 【初回のみ初期化】試行回数（IDLE→RUNNINGの場合のみ）
+        if (this.executionState === ExecutionState.IDLE) {
+            // changeダイアログ状態をリセット（新しい予約処理開始時）
+            this.resetChangeDialogState();
+        }
         const isFirstTime = this.executionState === ExecutionState.IDLE;
         
         // 実行状態設定
@@ -621,7 +625,7 @@ export class EntranceReservationStateManager {
         
         this.reservationCooldown.isActive = true;
         this.reservationCooldown.startTime = Date.now();
-        this.reservationCooldown.remainingSeconds = Math.ceil(this.reservationCooldown.duration / 1000);
+        this.reservationCooldown.remainingSeconds = Math.floor(this.reservationCooldown.duration / 1000);
         
         // 実行状態は変更しない（手動操作を妨げないため）
         // this.executionState = ExecutionState.RESERVATION_COOLDOWN; // 削除
@@ -691,11 +695,11 @@ export class EntranceReservationStateManager {
         let displayText: string;
         if (remainingSeconds > 60) {
             // 1分単位表示
-            const minutes = Math.ceil(remainingSeconds / 60);
+            const minutes = Math.floor(remainingSeconds / 60);
             displayText = `予約待機中(${minutes}分)`;
         } else if (remainingSeconds > 10) {
             // 10秒単位表示
-            const tens = Math.ceil(remainingSeconds / 10) * 10;
+            const tens = Math.floor(remainingSeconds / 10) * 10;
             displayText = `予約待機中(${tens}秒)`;
         } else {
             // 1秒単位表示
@@ -717,12 +721,14 @@ export class EntranceReservationStateManager {
         
         if (remainingSeconds <= 5 && remainingSeconds > 0) {
             fabButton.textContent = '予約再開中止';
-            fabButton.style.backgroundColor = '#ff6b35'; // オレンジ色で警告
+            fabButton.className = fabButton.className.replace(/cooldown-\w+/g, '').trim();
+            fabButton.classList.add('cooldown-warning');
             fabButton.setAttribute('data-cooldown-cancel', 'true');
         } else {
             // 通常のクールタイム表示（手動操作可能状態）
             fabButton.textContent = '予約中断';
-            fabButton.style.backgroundColor = '#007bff'; // 通常の青色
+            fabButton.className = fabButton.className.replace(/cooldown-\w+/g, '').trim();
+            fabButton.classList.add('cooldown-normal');
             fabButton.removeAttribute('data-cooldown-cancel');
         }
     }
@@ -733,7 +739,7 @@ export class EntranceReservationStateManager {
         if (!fabButton) return;
         
         fabButton.removeAttribute('data-cooldown-cancel');
-        fabButton.style.backgroundColor = ''; // デフォルトスタイルに戻す
+        fabButton.className = fabButton.className.replace(/cooldown-\w+/g, '').trim();
         // ボタンテキストは updateMainButtonDisplay() で更新される
     }
     
@@ -975,7 +981,7 @@ export class EntranceReservationStateManager {
         // デバッグログ追加（効率モードタイマー実行中はログ削減）
         if (!this.isReloadCountdownActive() && !this.efficiencyMode.updateTimer) {
             // アクション判定（ログ削減）
-            console.log(`🔍 [getPreferredAction] 予約対象=${!!this.reservationTarget}, 監視対象=${this.monitoringTargets.length}個`);
+            // ログ削減: 頻繁に呼ばれるため基本ログは削除
         }
         
         switch (this.priorityMode) {
@@ -990,13 +996,22 @@ export class EntranceReservationStateManager {
                 // 予約優先（両方可能な場合は予約を選択）
                 if (canReserve) {
                     // 予約アクション選択（ログ削減）
+                    if (!this.isReloadCountdownActive() && !this.efficiencyMode.updateTimer) {
+                        // ログ削減: 戻り値ログを削除
+                    }
                     return 'reservation';
                 }
                 if (canMonitor) {
                     // 監視アクション選択（ログ削減）
+                    if (!this.isReloadCountdownActive() && !this.efficiencyMode.updateTimer) {
+                        // ログ削減: 戻り値ログを削除
+                    }
                     return 'monitoring';
                 }
                 // アクションなし（ログ削減）
+                if (!this.isReloadCountdownActive() && !this.efficiencyMode.updateTimer) {
+                    // ログ削減: 戻り値ログを削除
+                }
                 return 'none';
         }
     }
@@ -1038,7 +1053,7 @@ export class EntranceReservationStateManager {
     getFabTargetDisplayInfo(): { hasTarget: boolean; displayText: string; targetType: 'reservation' | 'monitoring' | 'none' } {
         // カウントダウン中・効率モードタイマー実行中はログを削減
         if (!this.isReloadCountdownActive() && !this.efficiencyMode.updateTimer) {
-            console.log(`[UnifiedState] getFabTargetDisplayInfo 呼び出し - 予約対象: ${this.hasReservationTarget()}, 監視対象: ${this.hasMonitoringTargets()}`);
+            // ログ削減: 頻繁に呼ばれるため削除
         }
         // カレンダー選択日付を取得（MM/DD形式）
         const getDisplayDate = (): string => {
@@ -1061,7 +1076,7 @@ export class EntranceReservationStateManager {
             const location = LocationHelper.getLocationFromIndex(this.reservationSuccess.locationIndex);
             const locationText = location === 'east' ? '東' : '西';
             const dateText = getDisplayDate();
-            const displayText = `予約成功🎉(${dateText})\n${locationText}${this.reservationSuccess.timeSlot}`;
+            const displayText = `${dateText}\n予約成功🎉${locationText}${this.reservationSuccess.timeSlot}`;
             console.log(`[UnifiedState] FAB予約成功表示テキスト: "${displayText}"`);
             return {
                 hasTarget: true,
@@ -1075,11 +1090,11 @@ export class EntranceReservationStateManager {
             const location = LocationHelper.getLocationFromIndex(this.reservationTarget.locationIndex);
             const locationText = location === 'east' ? '東' : '西';
             const dateText = getDisplayDate();
-            const displayText = `予約対象(${dateText})\n${locationText}${this.reservationTarget.timeSlot}`;
+            const displayText = `${dateText}\n${locationText}${this.reservationTarget.timeSlot}`;
             
             // 効率モードタイマー実行中はログ削減
             if (!this.efficiencyMode.updateTimer) {
-                console.log(`[UnifiedState] FAB予約対象表示テキスト: "${displayText}"`);
+                // ログ削減: 頻繁に呼ばれるため削除
             }
             
             return {
@@ -1092,8 +1107,7 @@ export class EntranceReservationStateManager {
         // 監視対象がある場合は監視対象を表示
         if (this.hasMonitoringTargets() && this.monitoringTargets.length > 0) {
             if (!this.isReloadCountdownActive()) {
-                console.log(`[UnifiedState] getFabTargetDisplayInfo: 監視対象数=${this.monitoringTargets.length}`);
-                console.log(`[UnifiedState] 監視対象詳細:`, this.monitoringTargets);
+                // ログ削減: 頻繁に呼ばれるため削除
             }
             
             // 優先度順にソート（priority昇順）
@@ -1106,15 +1120,14 @@ export class EntranceReservationStateManager {
                 const locationText = location === 'east' ? '東' : '西';
                 const result = `${locationText}${target.timeSlot}`;
                 if (!this.isReloadCountdownActive()) {
-                    console.log(`[UnifiedState] 監視対象→表示: ${JSON.stringify(target)} → "${result}"`);
+                    // ログ削減: 頻繁に呼ばれるため削除
                 }
                 return result;
             });
             
-            const displayText = `監視対象(${dateText})\n${targetTexts.join('\n')}`;
+            const displayText = `${dateText}\n${targetTexts.join('\n')}`;
             if (!this.isReloadCountdownActive()) {
-                console.log(`[UnifiedState] targetTexts配列:`, targetTexts);
-                console.log(`[UnifiedState] FAB表示テキスト: "${displayText}"`);
+                // ログ削減: 頻繁に呼ばれるため削除
             }
             return {
                 hasTarget: true,
@@ -1158,6 +1171,10 @@ export class EntranceReservationStateManager {
     
     getMonitoringTargets(): MonitoringTarget[] {
         return [...this.monitoringTargets];
+    }
+    
+    getInitialTargetCache(): typeof this.initialTargetCache {
+        return this.initialTargetCache;
     }
     
     hasReservationTarget(): boolean {
@@ -1312,8 +1329,8 @@ export class EntranceReservationStateManager {
                 
                 // 既存のupdateStatusBadge関数を使用
                 this.updateStatusBadgeFromUnified('cooldown');
-                mainButton.className = mainButton.className.replace(/ytomo-fab-\w+/g, '');
-                mainButton.classList.add('ytomo-fab-disabled');
+                mainButton.className = mainButton.className.replace(/state-\w+/g, '');
+                mainButton.classList.add('state-idle');
                 mainButton.title = 'クールタイム中（中断不可）';
                 mainButton.disabled = true;
                 console.log(`🔍 [FAB更新] クールダウン状態でdisabled=true設定: state=${executionState}`);
@@ -1325,7 +1342,7 @@ export class EntranceReservationStateManager {
                 
                 // 既存のupdateStatusBadge関数を使用
                 this.updateStatusBadgeFromUnified('monitoring');
-                mainButton.className = mainButton.className.replace(/ytomo-fab-\w+/g, '');
+                mainButton.className = mainButton.className.replace(/state-\w+/g, '');
                 mainButton.classList.add('ytomo-fab-monitoring');
                 mainButton.title = '監視中断';
                 mainButton.disabled = false;
@@ -1339,7 +1356,7 @@ export class EntranceReservationStateManager {
                     const now = new Date();
                     const remainingMs = this.efficiencyMode.nextSubmitTarget.getTime() - now.getTime();
                     if (remainingMs > 0) {
-                        const remainingSec = Math.ceil(remainingMs / 1000);
+                        const remainingSec = Math.floor(remainingMs / 1000);
                         this.updateStatusBadgeFromUnified('reservation-running', `効率予約実行中 ${remainingSec}秒後`);
                     } else {
                         this.updateStatusBadgeFromUnified('reservation-running', '効率予約実行中');
@@ -1348,10 +1365,11 @@ export class EntranceReservationStateManager {
                     this.updateStatusBadgeFromUnified('reservation-running');
                 }
                 
-                mainButton.className = mainButton.className.replace(/ytomo-fab-\w+/g, '');
+                mainButton.className = mainButton.className.replace(/state-\w+/g, '');
                 mainButton.classList.add('ytomo-fab-running');
                 mainButton.title = '予約中断';
                 mainButton.disabled = false; // 中断可能
+                // ログ削減: 頻繁に呼ばれるため削除
                 
                 // 効率モードタイマー実行中はログ削減
                 if (!this.efficiencyMode.updateTimer) {
@@ -1368,18 +1386,18 @@ export class EntranceReservationStateManager {
                                  preferredAction === 'reservation' ? 'idle-reservation' : 'idle';
                 this.updateStatusBadgeFromUnified(statusMode);
                 
-                mainButton.className = mainButton.className.replace(/ytomo-fab-\w+/g, '');
+                mainButton.className = mainButton.className.replace(/state-\w+/g, '');
                 
                 if (preferredAction === 'monitoring') {
-                    mainButton.classList.add('ytomo-fab-enabled');
+                    mainButton.classList.add('state-enabled', 'state-monitoring');
                     mainButton.title = '監視開始';
                     mainButton.disabled = false;
                 } else if (preferredAction === 'reservation') {
-                    mainButton.classList.add('ytomo-fab-enabled');
+                    mainButton.classList.add('state-enabled', 'state-reservation');
                     mainButton.title = '予約開始';
                     mainButton.disabled = false;
                 } else {
-                    mainButton.classList.add('ytomo-fab-idle');
+                    mainButton.classList.add('state-idle');
                     mainButton.title = '対象選択待ち';
                     mainButton.disabled = true;
                     
@@ -1394,6 +1412,15 @@ export class EntranceReservationStateManager {
         // カウントダウン中は完了ログも削減
         if (!this.isReloadCountdownActive()) {
             // FAB更新完了ログを削減
+        }
+        
+        // 【システム連動】オーバーレイ表示中はFABボタンを強制有効化
+        const processingOverlay = document.getElementById('ytomo-processing-overlay');
+        if (processingOverlay && !processingOverlay.classList.contains('hidden')) {
+            if (mainButton.disabled) {
+                mainButton.disabled = false;
+                console.log('🛡️ [システム連動] オーバーレイ表示中につき中断ボタンを強制有効化');
+            }
         }
         
         // 監視対象リスト表示も更新
@@ -1416,14 +1443,16 @@ export class EntranceReservationStateManager {
         if (reservationTargetElement) {
             if (displayInfo.hasTarget && displayInfo.targetType === 'reservation') {
                 reservationTargetElement.innerHTML = displayInfo.displayText.replace(/\n/g, '<br>');
-                reservationTargetElement.style.display = 'block';
+                reservationTargetElement.classList.remove('hidden');
+                reservationTargetElement.classList.add('visible');
                 
                 // カウントダウン中・効率モードタイマー実行中はログを削減
                 if (!this.isReloadCountdownActive() && !this.efficiencyMode.updateTimer) {
                     console.log(`🔍 [予約対象表示更新] 表示: "${displayInfo.displayText}"`);
                 }
             } else {
-                reservationTargetElement.style.display = 'none';
+                reservationTargetElement.classList.remove('visible');
+                reservationTargetElement.classList.add('hidden');
                 reservationTargetElement.innerHTML = '';
             }
         }
@@ -1432,18 +1461,17 @@ export class EntranceReservationStateManager {
         if (monitoringTargetsElement) {
             if (displayInfo.hasTarget && displayInfo.targetType === 'monitoring') {
                 monitoringTargetsElement.innerHTML = displayInfo.displayText.replace(/\n/g, '<br>');
-                monitoringTargetsElement.style.display = 'block';
-                
-                // 背景色の設定
-                monitoringTargetsElement.className = ''; // 既存のクラスをクリア
-                monitoringTargetsElement.classList.add('monitoring-targets');
+                // 表示状態の設定（背景色はSCSSで固定）
+                monitoringTargetsElement.classList.remove('hidden');
+                monitoringTargetsElement.classList.add('visible');
                 
                 // カウントダウン中はログを削減
                 if (!this.isReloadCountdownActive()) {
                     console.log(`🔍 [監視対象表示更新] 表示: "${displayInfo.displayText}"`);
                 }
             } else {
-                monitoringTargetsElement.style.display = 'none';
+                monitoringTargetsElement.classList.remove('visible');
+                monitoringTargetsElement.classList.add('hidden');
                 monitoringTargetsElement.innerHTML = '';
             }
         }
@@ -1468,27 +1496,28 @@ export class EntranceReservationStateManager {
         const statusBadge = document.querySelector('#ytomo-status-badge') as HTMLElement;
         if (!statusBadge) return;
         
+        // 既存の状態クラスをクリア
+        statusBadge.className = statusBadge.className.replace(/ytomo-status-\w+/g, '').trim();
+        
         switch (mode) {
             case 'monitoring':
+                statusBadge.classList.add('ytomo-status-monitoring');
                 const remainingSeconds = this.getReloadSecondsRemaining();
                 if (this.isReloadCountdownActive() && remainingSeconds !== null) {
                     const prefix = this.isEfficiencyModeEnabled() ? '効率' : '';
                     statusBadge.innerText = `${prefix}監視中\nリロード: ${remainingSeconds}秒`;
                     // リロード5秒前から警告クラスを追加
                     if (remainingSeconds <= 5) {
-                        statusBadge.classList.add('countdown-warning');
-                    } else {
-                        statusBadge.classList.remove('countdown-warning');
+                        statusBadge.classList.add('ytomo-status-countdown-warning');
                     }
-                    statusBadge.classList.remove('js-hide');
                 } else {
                     const prefix = this.isEfficiencyModeEnabled() ? '効率' : '';
                     statusBadge.innerText = `${prefix}監視待機中`;
-                    statusBadge.classList.remove('countdown-warning');
-                    statusBadge.classList.remove('js-hide');
                 }
+                statusBadge.classList.remove('js-hide');
                 break;
             case 'reservation-running':
+                statusBadge.classList.add('ytomo-status-reservation');
                 if (this.isEfficiencyModeEnabled()) {
                     const nextTarget = this.getNextSubmitTarget();
                     if (nextTarget) {
@@ -1497,13 +1526,10 @@ export class EntranceReservationStateManager {
                         statusBadge.innerText = `効率予約実行中\n${remainingSeconds}秒後`;
                         // 5秒前から警告色
                         if (remainingSeconds <= 5) {
-                            statusBadge.classList.add('countdown-warning');
-                        } else {
-                            statusBadge.classList.remove('countdown-warning');
+                            statusBadge.classList.add('ytomo-status-countdown-warning');
                         }
                     } else {
                         statusBadge.innerText = '効率予約実行中';
-                        statusBadge.classList.remove('countdown-warning');
                     }
                 } else {
                     const startTime = this.getReservationStartTime();
@@ -1511,29 +1537,28 @@ export class EntranceReservationStateManager {
                         Math.floor((Date.now() - startTime) / 60000) : 0;
                     const attempts = this.getAttempts();
                     statusBadge.innerText = `予約実行中\n${elapsedMinutes}分 ${attempts}回`;
-                    statusBadge.classList.remove('countdown-warning');
                 }
                 statusBadge.classList.remove('js-hide');
                 break;
             case 'cooldown':
+                statusBadge.classList.add('ytomo-status-cooldown');
                 statusBadge.innerText = customText || '予約待機中';
-                statusBadge.classList.remove('countdown-warning');
                 statusBadge.classList.remove('js-hide');
                 break;
             case 'idle-monitoring':
+                statusBadge.classList.add('ytomo-status-waiting');
                 statusBadge.innerText = '監視可能';
-                statusBadge.classList.remove('countdown-warning');
                 statusBadge.classList.remove('js-hide');
                 break;
             case 'idle-reservation':
+                statusBadge.classList.add('ytomo-status-waiting');
                 statusBadge.innerText = '予約可能';
-                statusBadge.classList.remove('countdown-warning');
                 statusBadge.classList.remove('js-hide');
                 break;
             case 'idle':
             default:
+                statusBadge.classList.add('ytomo-status-waiting');
                 statusBadge.innerText = '対象選択待ち';
-                statusBadge.classList.remove('countdown-warning');
                 statusBadge.classList.remove('js-hide');
                 break;
         }
@@ -1713,16 +1738,22 @@ export class EntranceReservationStateManager {
     
     // changeダイアログが表示されたことを記録
     markChangeDialogAppeared(): void {
-        if (!this.changeDialogState.hasAppeared) {
-            this.changeDialogState.hasAppeared = true;
-            this.changeDialogState.needsTimingAdjustment = true;
-            console.log('🔄 changeダイアログ出現を検出 - タイミング調整が必要');
-        }
+        console.log(`🔄 [markChangeDialogAppeared] 現在の状態: hasAppeared=${this.changeDialogState.hasAppeared}, needsTimingAdjustment=${this.changeDialogState.needsTimingAdjustment}`);
+        this.changeDialogState.hasAppeared = true;
+        this.changeDialogState.needsTimingAdjustment = true;
+        console.log('🔄 changeダイアログ出現を検出 - 毎回タイミング調整が必要');
+    }
+    
+    // changeダイアログが出現したかどうか
+    hasChangeDialogAppeared(): boolean {
+        return this.changeDialogState.hasAppeared;
     }
     
     // changeダイアログのタイミング調整が必要か
     needsChangeDialogTimingAdjustment(): boolean {
-        return this.changeDialogState.hasAppeared && this.changeDialogState.needsTimingAdjustment;
+        const result = this.changeDialogState.hasAppeared && this.changeDialogState.needsTimingAdjustment;
+        console.log(`🔄 [needsChangeDialogTimingAdjustment] hasAppeared=${this.changeDialogState.hasAppeared}, needsTimingAdjustment=${this.changeDialogState.needsTimingAdjustment}, result=${result}`);
+        return result;
     }
     
     // changeダイアログのタイミング調整用待機時間を計算
@@ -1744,7 +1775,7 @@ export class EntranceReservationStateManager {
         }
         
         const waitMs = ((targetSeconds - seconds) * 1000) - milliseconds;
-        const waitSeconds = Math.max(0, Math.ceil(waitMs / 1000));
+        const waitSeconds = Math.max(0, Math.floor(waitMs / 1000));
         
         console.log(`🔄 changeダイアログ待機時間計算: ${waitSeconds}秒 (現在: ${seconds}.${String(milliseconds).padStart(3, '0')}秒 → 目標: ${targetSeconds % 60}秒)`);
         return waitMs;

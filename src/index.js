@@ -9,6 +9,8 @@
 // @run-at       document-end
 // ==/UserScript==
 
+// Built: 2025/08/12 16:35:03
+
 
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -167,7 +169,7 @@ module.exports = styleTagTransform;
 function updateMainButtonDisplay() {
     // カウントダウン中はログを削減
     if (!_entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_0__/* .entranceReservationStateManager */ .xx.isReloadCountdownActive()) {
-        console.log('🔄 [旧updateMainButtonDisplay] 統一システムに委譲');
+        // ログ削減: 頻繁に呼ばれるため削除
     }
     _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_0__/* .entranceReservationStateManager */ .xx.updateFabDisplay();
 }
@@ -220,7 +222,7 @@ function updateMonitoringTargetsDisplay() {
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1___default()((_node_modules_css_loader_dist_runtime_noSourceMaps_js__WEBPACK_IMPORTED_MODULE_0___default()));
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, `#ytomo-status-badge.countdown-warning{background:rgba(255,0,0,.9)}.ytomo-efficiency-toggle{width:45px;height:32px;border-radius:16px;color:#fff;border:none;font-size:10px;font-weight:bold;cursor:pointer;transition:all .2s ease;box-shadow:0 2px 8px rgba(0,0,0,.3);display:flex;align-items:center;justify-content:center;pointer-events:auto;margin-bottom:8px}.ytomo-efficiency-toggle.efficiency-enabled{background:rgba(255,140,0,.9)}.ytomo-efficiency-toggle.efficiency-disabled{background:rgba(128,128,128,.9)}.ytomo-efficiency-toggle:hover{transform:scale(1.1);box-shadow:0 4px 12px rgba(0,0,0,.4)}.ytomo-efficiency-toggle:active{transform:scale(0.95)}button.ext-ytomo{height:40px;width:auto;min-width:60px;padding:0px 8px;background:#006821;color:#fff}button.ext-ytomo.no-after:after{background:rgba(0,0,0,0) none repeat 0 0/auto auto padding-box border-box scroll}button.ext-ytomo.btn-done{background:#4a4c4a}button.ext-ytomo:hover{background:#02862b}.pavilion-sub-btn{color:#fff;border:none;border-radius:20px;padding:8px 16px;font-size:12px;white-space:nowrap;transition:all .2s ease}.pavilion-sub-btn.btn-enabled{background:#006821;cursor:pointer;opacity:1}.pavilion-sub-btn.btn-enabled:hover{background:#02862b;transform:scale(1.05)}.pavilion-sub-btn.btn-disabled,.pavilion-sub-btn.btn-loading{background:gray;cursor:not-allowed;opacity:.6}.pavilion-sub-btn.btn-disabled:hover,.pavilion-sub-btn.btn-loading:hover{background:gray;transform:scale(1)}button.ext-ytomo.pavilion-sub-btn.btn-disabled,button.ext-ytomo.pavilion-sub-btn.btn-loading{background:gray;cursor:not-allowed;opacity:.6}button.ext-ytomo.pavilion-sub-btn.btn-disabled:hover,button.ext-ytomo.pavilion-sub-btn.btn-loading:hover{background:gray;transform:scale(1)}.safe-none,.ytomo-none,.filter-none{display:none}button.ext-ytomo.monitor-btn{height:auto;min-height:20px;width:auto;min-width:35px;padding:1px 4px;color:#fff;margin-left:8px;font-size:10px;border:none;border-radius:2px;cursor:pointer;display:inline-block;vertical-align:middle;position:relative;z-index:10;pointer-events:auto;opacity:1;visibility:visible}button.ext-ytomo.monitor-btn.full-status{background:#228b22}button.ext-ytomo.monitor-btn.full-status:hover{background:#32cd32}button.ext-ytomo.monitor-btn.monitoring-status{background:#dc3545}button.ext-ytomo.monitor-btn.monitoring-status:hover{background:#ff4554}button.ext-ytomo.monitor-btn:disabled{cursor:not-allowed;opacity:.7}button.ext-ytomo.monitor-btn:disabled.full-status{background:rgba(34,139,34,.5);color:hsla(0,0%,100%,.9)}button.ext-ytomo.monitor-btn:disabled.monitoring-status{background:rgba(220,53,69,.5);color:hsla(0,0%,100%,.9)}button.ext-ytomo.monitor-btn:disabled:not(.full-status):not(.monitoring-status){background:rgba(128,128,128,.7);color:hsla(0,0%,100%,.9)}button.ext-ytomo.pavilion-sub-btn.ytomo-date-button.date-selected{border:2px solid #4caf50;box-shadow:0 0 8px rgba(76,175,80,.6)}div.div-flex{display:flex;justify-content:center;margin:5px}.js-show{display:block}.js-hide{display:none}.js-visible{visibility:visible}.js-invisible{visibility:hidden}.js-enabled{pointer-events:auto;opacity:1}.js-disabled{pointer-events:none;opacity:.6}.js-green{background:#228b22;color:#fff}.js-red{background:#dc3545;color:#fff}.js-gray{background:gray;color:#fff}.btn-success-highlight{background:#00c800;color:#fff}.status-bg-green{background:rgba(0,128,0,.9)}.status-bg-red{background:rgba(255,0,0,.9)}.status-bg-orange{background:rgba(255,140,0,.9)}.status-bg-blue{background:rgba(0,104,33,.9)}.status-bg-default{background:rgba(0,0,0,.8)}.ytomo-header li.fab-toggle-li{display:inline-block;margin-right:8px}.ytomo-header li.fab-toggle-li button.fab-toggle-button{background:none;border:none;cursor:pointer;padding:0;color:#fff;transition:all .2s ease;display:flex;align-items:center;justify-content:center}.ytomo-header li.fab-toggle-li button.fab-toggle-button:hover{color:#ddd}.ytomo-header li.fab-toggle-li button.fab-toggle-button figure.fab-toggle-figure{width:auto;height:24px;display:flex;align-items:center;justify-content:center;padding:0 4px}.ytomo-pavilion-fab button.ytomo-fab{position:relative}.ytomo-pavilion-fab button.ytomo-fab:hover{transform:scale(1.15);box-shadow:0 8px 25px rgba(0,0,0,.5),0 4px 12px rgba(0,0,0,.3);border-width:4px}.ytomo-pavilion-fab .ytomo-fab-inner-content .pavilion-fab-expand-icon{font-size:8px;line-height:1;margin-bottom:1px;opacity:.8}.ytomo-pavilion-fab .ytomo-fab-inner-content .pavilion-fab-brand-text{font-size:7px;font-weight:normal;line-height:1;margin-bottom:2px;opacity:.7}.ytomo-pavilion-fab .ytomo-fab-inner-content .pavilion-fab-counts-text{font-size:12px;font-weight:bold;line-height:1}.ytomo-pavilion-fab .pavilion-sub-actions-container{display:none;flex-direction:column;gap:8px;align-items:flex-end;margin-bottom:8px}.ytomo-pavilion-fab .pavilion-sub-actions-container.expanded{display:flex}.ytomo-pavilion-fab .pavilion-sub-actions-container button.pavilion-sub-btn.base-style{color:#fff;border:none;border-radius:20px;padding:8px 16px;font-size:12px;white-space:nowrap;box-shadow:0 2px 8px rgba(0,0,0,.3);transition:all .2s ease}.ytomo-companion-dialog{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;z-index:99999;padding:20px;box-sizing:border-box}.ytomo-companion-dialog .dialog-content{background:#fff;border-radius:12px;padding:24px;width:100%;max-width:500px;max-height:90vh;overflow-y:auto;box-shadow:0 10px 40px rgba(0,0,0,.3)}@media(max-width: 768px){.ytomo-companion-dialog .dialog-content{max-width:95vw;max-height:85vh;padding:16px;border-radius:8px}}.ytomo-companion-dialog .dialog-content .input-row{display:flex;gap:8px;margin-bottom:12px}@media(max-width: 480px){.ytomo-companion-dialog .dialog-content .input-row{flex-direction:column;gap:12px}}.ytomo-companion-dialog .dialog-content .input-row input{padding:12px 8px;border:1px solid #ddd;border-radius:4px;font-size:16px}.ytomo-companion-dialog .dialog-content .input-row input:focus{outline:none;border-color:#4caf50;box-shadow:0 0 0 2px rgba(76,175,80,.2)}.ytomo-companion-dialog .dialog-content .input-row button{padding:12px 16px;background:#4caf50;color:#fff;border:none;border-radius:4px;cursor:pointer;font-size:14px;white-space:nowrap;min-width:60px}.ytomo-companion-dialog .dialog-content .input-row button:hover{background:#45a049}.ytomo-companion-dialog .dialog-content .input-row button:active{background:#3d8b40}.ytomo-fab{width:56px;height:56px;border-radius:50%;color:#fff;border:none;box-shadow:0 6px 20px rgba(0,0,0,.4),0 2px 8px rgba(0,0,0,.2);border:3px solid hsla(0,0%,100%,.2);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:bold;transition:all .3s ease;position:relative;overflow:hidden;pointer-events:auto}.ytomo-fab-enabled{background:#ff8c00;opacity:.9;cursor:pointer;pointer-events:auto}.ytomo-fab-disabled{background:gray;opacity:.6;cursor:not-allowed;pointer-events:none}.ytomo-fab-monitoring{background:#ff8c00;opacity:.9;cursor:pointer;pointer-events:auto}.ytomo-fab-running{background:#dc3545;opacity:.9;cursor:pointer;pointer-events:auto}.ytomo-fab.state-idle{background:gray;opacity:.6;cursor:not-allowed;pointer-events:none}.ytomo-fab.state-enabled{background:#ff8c00;opacity:.9;cursor:pointer;pointer-events:auto}.ytomo-fab.state-running{background:#dc3545;opacity:.9;cursor:pointer;pointer-events:auto}.ytomo-fab.state-monitoring{background:#ff8c00;opacity:.9;cursor:pointer;pointer-events:auto}.ytomo-fab:hover{transform:scale(1.15);box-shadow:0 8px 25px rgba(0,0,0,.5),0 4px 12px rgba(0,0,0,.3)}.ytomo-fab-container{position:fixed;bottom:24px;right:24px;z-index:10000;display:flex;flex-direction:column;align-items:flex-end;gap:12px;pointer-events:auto}.ytomo-fab-container.z-normal{z-index:10000}.ytomo-fab-container.z-above-overlay{z-index:100001}.ytomo-fab-container.visible{display:flex}.ytomo-fab-container.hidden{display:none}.ytomo-fab-content{position:relative;display:flex;flex-direction:column-reverse;align-items:center;gap:8px;opacity:0;transform:scale(0.8) translateY(10px);transition:all .3s cubic-bezier(0.175, 0.885, 0.32, 1.275);pointer-events:none}.ytomo-fab-content.expanded{opacity:1;transform:scale(1) translateY(0);pointer-events:auto}.ytomo-sub-fab{width:45px;height:32px;border-radius:16px;background:rgba(0,104,33,.9);color:#fff;border:none;font-size:11px;font-weight:bold;cursor:pointer;transition:all .2s ease;box-shadow:0 2px 8px rgba(0,0,0,.3);display:flex;align-items:center;justify-content:center;pointer-events:auto}.ytomo-sub-fab:hover{background:rgba(2,134,43,.9);transform:scale(1.1);box-shadow:0 4px 12px rgba(0,0,0,.4)}.ytomo-sub-fab:active{transform:scale(0.95)}.ytomo-pavilion-fab-container{position:fixed;bottom:24px;right:24px;z-index:10000;display:flex;flex-direction:column;gap:12px;align-items:flex-end;pointer-events:auto}.ytomo-fab-inner-content{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;pointer-events:none}.ytomo-reservation-target-display{background:linear-gradient(135deg, rgba(0, 123, 255, 0.95), rgba(0, 86, 179, 0.95));color:#fff;padding:8px 12px;border-radius:12px;font-size:12px;font-weight:bold;text-align:center;box-shadow:0 3px 10px rgba(0,0,0,.3);border:2px solid hsla(0,0%,100%,.3);min-width:80px;max-width:120px;white-space:pre-line;overflow:visible;text-overflow:clip;transition:all .3s ease;pointer-events:auto;cursor:pointer}.ytomo-reservation-target-display:hover{transform:scale(1.05);box-shadow:0 4px 14px rgba(0,0,0,.4)}.ytomo-reservation-target-display.hidden{display:none}.ytomo-reservation-target-display.visible{display:block}.ytomo-monitoring-targets-display{background:linear-gradient(135deg, rgba(0, 104, 33, 0.95), rgba(0, 150, 50, 0.95));color:#fff;padding:8px 12px;border-radius:12px;font-size:12px;font-weight:bold;text-align:center;box-shadow:0 3px 10px rgba(0,0,0,.3);border:2px solid hsla(0,0%,100%,.3);min-width:80px;max-width:120px;white-space:pre-line;overflow:visible;text-overflow:clip;transition:all .3s ease;pointer-events:auto;cursor:pointer}.ytomo-monitoring-targets-display:hover{transform:scale(1.05);box-shadow:0 4px 14px rgba(0,0,0,.4)}.ytomo-monitoring-targets-display.hidden{display:none}.ytomo-monitoring-targets-display.visible{display:block}input.ext-tomo.search{height:50px;min-width:200px;max-width:min(300px,100%);font-family:quicksand;font-size:16px;-webkit-appearance:textfield;-moz-appearance:textfield;appearance:textfield;border:1px solid #222426;border-radius:25px;box-shadow:0 1px 0 0 #ccc;padding:0 0 0 10px;flex:1 1}.ytomo-icon.expand-icon{font-size:8px;line-height:1;color:#fff;font-weight:bold;text-align:center;pointer-events:none}.ytomo-icon.countdown-text{font-size:6px;line-height:1;color:#fff;font-weight:bold;text-align:center;margin-top:1px;pointer-events:none}.ytomo-toggle.toggle-li{position:fixed;bottom:10px;left:10px;z-index:1000;list-style:none;margin:0;padding:0}.ytomo-toggle.toggle-button{width:50px;height:30px;background:rgba(255,140,0,.8);border:none;border-radius:15px;cursor:pointer;transition:all .3s ease;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:bold;position:relative;overflow:hidden}.ytomo-toggle.toggle-button.enabled{color:#fff}.ytomo-toggle.toggle-button.disabled{color:#ddd}.ytomo-toggle.toggle-figure{width:100%;height:100%;margin:0;padding:0;border:none;background:rgba(0,0,0,0);pointer-events:none}.ytomo-dialog.overlay{position:fixed;top:0;left:0;width:100%;height:100%;background-color:rgba(0,0,0,.5);z-index:10000;display:flex;justify-content:center;align-items:center}.ytomo-dialog.container{background:#fff;border-radius:8px;padding:20px;max-width:400px;width:90%;max-height:70vh;overflow-y:auto;box-shadow:0 4px 12px rgba(0,0,0,.3)}.ytomo-dialog.title{margin:0 0 16px 0;color:#333;font-size:18px;font-weight:bold}.ytomo-dialog.button-group{display:flex;justify-content:flex-end;gap:10px;margin-top:20px}.ytomo-dialog.primary-button{background:#006821;color:#fff;border:none;padding:10px 20px;border-radius:4px;cursor:pointer;font-size:14px}.ytomo-dialog.primary-button:hover{background:#02862b}.ytomo-dialog.primary-button:disabled{background:gray;cursor:not-allowed}.ytomo-dialog.secondary-button{background:rgba(0,0,0,0);color:#666;border:1px solid #ccc;padding:10px 20px;border-radius:4px;cursor:pointer;font-size:14px}.ytomo-dialog.secondary-button:hover{background:#f5f5f5}.ytomo-progress.counter{display:inline-block;margin-left:8px;padding:2px 6px;background:rgba(0,0,0,.3);border-radius:10px;font-size:10px;color:#fff;font-weight:bold}#ytomo-monitoring-targets.monitoring-targets{background:rgba(255,140,0,.15);border:1px solid rgba(255,140,0,.3);border-radius:8px;padding:8px;margin:4px 0}#ytomo-monitoring-targets.reservation-target{background:rgba(0,104,33,.15);border:1px solid rgba(0,104,33,.3);border-radius:8px;padding:8px;margin:4px 0}.ytomo-processing-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.3);z-index:100000;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(1px);transition:all .3s ease;pointer-events:auto}.ytomo-processing-overlay.z-normal{z-index:100000}.ytomo-processing-overlay.z-below-fab{z-index:99999}.ytomo-processing-overlay.hidden{opacity:0;visibility:hidden;pointer-events:none}.ytomo-processing-overlay.visible{opacity:1;visibility:visible;pointer-events:auto}.ytomo-processing-overlay .processing-message-area{background:hsla(0,0%,100%,.95);border-radius:12px;padding:24px 32px;text-align:center;box-shadow:0 8px 32px rgba(0,0,0,.3);border:2px solid rgba(255,140,0,.3);max-width:400px;margin:20px}@media(max-width: 768px){.ytomo-processing-overlay .processing-message-area{padding:20px 24px;margin:16px;max-width:90vw}}.ytomo-processing-overlay .processing-message-text{font-size:20px;font-weight:bold;color:#333;margin-bottom:12px}@media(max-width: 768px){.ytomo-processing-overlay .processing-message-text{font-size:18px;margin-bottom:10px}}.ytomo-processing-overlay .processing-warning-text{font-size:14px;color:#666;margin-bottom:16px;line-height:1.4;transition:all .3s ease}@media(max-width: 768px){.ytomo-processing-overlay .processing-warning-text{font-size:13px;margin-bottom:14px}}.ytomo-processing-overlay .processing-warning-text.warning-flash{color:#dc3545;font-weight:bold;transform:scale(1.05);animation:flash .5s ease-in-out 2}.ytomo-processing-overlay .processing-cancel-area{font-size:12px;color:#888;font-style:italic}@media(max-width: 768px){.ytomo-processing-overlay .processing-cancel-area{font-size:11px}}@keyframes flash{0%,100%{opacity:1}50%{opacity:.7}}.ytomo-processing-overlay.efficiency-mode .processing-message-area{border-color:rgba(255,140,0,.5);background:linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(255, 248, 220, 0.95))}.ytomo-processing-overlay.efficiency-mode .processing-message-text{color:#e67e00}.ytomo-processing-overlay.monitoring-mode .processing-message-area{border-color:rgba(0,104,33,.5);background:linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(240, 255, 240, 0.95))}.ytomo-processing-overlay.monitoring-mode .processing-message-text{color:#004d1a}@media(prefers-reduced-motion: reduce){.ytomo-processing-overlay{transition:none}.ytomo-processing-overlay .processing-warning-text.warning-flash{animation:none;transform:none}}`, ""]);
+___CSS_LOADER_EXPORT___.push([module.id, `#ytomo-status-badge.countdown-warning{background:rgba(255,0,0,.9)}.ytomo-efficiency-toggle{width:45px;height:32px;border-radius:16px;color:#fff;border:none;font-size:10px;font-weight:bold;cursor:pointer;transition:all .2s ease;box-shadow:0 2px 8px rgba(0,0,0,.3);display:flex;align-items:center;justify-content:center;pointer-events:auto;margin-bottom:8px}.ytomo-efficiency-toggle.efficiency-enabled{background:rgba(255,140,0,.9)}.ytomo-efficiency-toggle.efficiency-disabled{background:rgba(128,128,128,.9)}.ytomo-efficiency-toggle:hover{transform:scale(1.1);box-shadow:0 4px 12px rgba(0,0,0,.4)}.ytomo-efficiency-toggle:active{transform:scale(0.95)}button.ext-ytomo{height:40px;width:auto;min-width:60px;padding:0px 8px;background:#006821;color:#fff}button.ext-ytomo.no-after:after{background:rgba(0,0,0,0) none repeat 0 0/auto auto padding-box border-box scroll}button.ext-ytomo.btn-done{background:#4a4c4a}button.ext-ytomo:hover{background:#02862b}.pavilion-sub-btn{color:#fff;border:none;border-radius:20px;padding:8px 16px;font-size:12px;white-space:nowrap;transition:all .2s ease}.pavilion-sub-btn.btn-enabled{background:#006821;cursor:pointer;opacity:1}.pavilion-sub-btn.btn-enabled:hover{background:#02862b;transform:scale(1.05)}.pavilion-sub-btn.btn-disabled,.pavilion-sub-btn.btn-loading{background:gray;cursor:not-allowed;opacity:.6}.pavilion-sub-btn.btn-disabled:hover,.pavilion-sub-btn.btn-loading:hover{background:gray;transform:scale(1)}button.ext-ytomo.pavilion-sub-btn.btn-disabled,button.ext-ytomo.pavilion-sub-btn.btn-loading{background:gray;cursor:not-allowed;opacity:.6}button.ext-ytomo.pavilion-sub-btn.btn-disabled:hover,button.ext-ytomo.pavilion-sub-btn.btn-loading:hover{background:gray;transform:scale(1)}.safe-none,.ytomo-none,.filter-none{display:none}button.ext-ytomo.monitor-btn{height:auto;min-height:20px;width:auto;min-width:35px;padding:1px 4px;color:#fff;margin-left:8px;font-size:10px;border:none;border-radius:2px;cursor:pointer;display:inline-block;vertical-align:middle;position:relative;z-index:10;pointer-events:auto;opacity:1;visibility:visible}button.ext-ytomo.monitor-btn.full-status{background:#228b22}button.ext-ytomo.monitor-btn.full-status:hover{background:#32cd32}button.ext-ytomo.monitor-btn.monitoring-status{background:#dc3545}button.ext-ytomo.monitor-btn.monitoring-status:hover{background:#ff4554}button.ext-ytomo.monitor-btn:disabled{cursor:not-allowed;opacity:.7}button.ext-ytomo.monitor-btn:disabled.full-status{background:rgba(34,139,34,.5);color:hsla(0,0%,100%,.9)}button.ext-ytomo.monitor-btn:disabled.monitoring-status{background:rgba(220,53,69,.5);color:hsla(0,0%,100%,.9)}button.ext-ytomo.monitor-btn:disabled:not(.full-status):not(.monitoring-status){background:rgba(128,128,128,.7);color:hsla(0,0%,100%,.9)}button.ext-ytomo.pavilion-sub-btn.ytomo-date-button.date-selected{border:2px solid #4caf50;box-shadow:0 0 8px rgba(76,175,80,.6)}div.div-flex{display:flex;justify-content:center;margin:5px}.js-show{display:block}.js-hide{display:none}.js-visible{visibility:visible}.js-invisible{visibility:hidden}.js-enabled{pointer-events:auto;opacity:1}.js-disabled{pointer-events:none;opacity:.6}.js-green{background:#228b22;color:#fff}.js-red{background:#dc3545;color:#fff}.js-gray{background:gray;color:#fff}.btn-success-highlight{background:#00c800;color:#fff}.status-bg-green{background:rgba(0,128,0,.9)}.status-bg-red{background:rgba(255,0,0,.9)}.status-bg-orange{background:rgba(255,140,0,.9)}.status-bg-blue{background:rgba(0,104,33,.9)}.status-bg-default{background:rgba(0,0,0,.8)}#ytomo-status-badge{background:linear-gradient(135deg, rgba(0, 0, 0, 0.9), rgba(40, 40, 40, 0.9));color:#fff;padding:8px 16px;border-radius:20px;font-size:12px;font-weight:bold;white-space:pre-line;box-shadow:0 4px 12px rgba(0,0,0,.3),0 2px 6px rgba(0,0,0,.2);border:2px solid hsla(0,0%,100%,.15);pointer-events:none}#ytomo-status-badge.ytomo-status-waiting{background:linear-gradient(135deg, rgba(0, 0, 0, 0.9), rgba(40, 40, 40, 0.9))}#ytomo-status-badge.ytomo-status-monitoring{background:linear-gradient(135deg, rgba(0, 104, 33, 0.9), rgba(0, 150, 50, 0.9))}#ytomo-status-badge.ytomo-status-monitoring.ytomo-status-countdown-warning{background:linear-gradient(135deg, rgba(255, 0, 0, 0.9), rgba(220, 53, 69, 0.9))}#ytomo-status-badge.ytomo-status-reservation{background:linear-gradient(135deg, rgba(255, 140, 0, 0.9), rgba(255, 165, 0, 0.9))}#ytomo-status-badge.ytomo-status-reservation.ytomo-status-countdown-warning{background:linear-gradient(135deg, rgba(255, 0, 0, 0.9), rgba(220, 53, 69, 0.9))}#ytomo-status-badge.ytomo-status-cooldown{background:linear-gradient(135deg, rgba(255, 107, 53, 0.9), rgba(255, 140, 0, 0.9))}.ytomo-header li.fab-toggle-li{display:inline-block;margin-right:8px}.ytomo-header li.fab-toggle-li button.fab-toggle-button{background:none;border:none;cursor:pointer;padding:0;color:#fff;transition:all .2s ease;display:flex;align-items:center;justify-content:center}.ytomo-header li.fab-toggle-li button.fab-toggle-button:hover{color:#ddd}.ytomo-header li.fab-toggle-li button.fab-toggle-button figure.fab-toggle-figure{width:auto;height:24px;display:flex;align-items:center;justify-content:center;padding:0 4px}.ytomo-pavilion-fab button.ytomo-fab{position:relative}.ytomo-pavilion-fab button.ytomo-fab:hover{transform:scale(1.15);box-shadow:0 8px 25px rgba(0,0,0,.5),0 4px 12px rgba(0,0,0,.3);border-width:4px}.ytomo-pavilion-fab .ytomo-fab-inner-content .pavilion-fab-expand-icon{font-size:8px;line-height:1;margin-bottom:1px;opacity:.8}.ytomo-pavilion-fab .ytomo-fab-inner-content .pavilion-fab-brand-text{font-size:7px;font-weight:normal;line-height:1;margin-bottom:2px;opacity:.7}.ytomo-pavilion-fab .ytomo-fab-inner-content .pavilion-fab-counts-text{font-size:12px;font-weight:bold;line-height:1}.ytomo-pavilion-fab .pavilion-sub-actions-container{display:none;flex-direction:column;gap:8px;align-items:flex-end;margin-bottom:8px}.ytomo-pavilion-fab .pavilion-sub-actions-container.expanded{display:flex}.ytomo-pavilion-fab .pavilion-sub-actions-container button.pavilion-sub-btn.base-style{color:#fff;border:none;border-radius:20px;padding:8px 16px;font-size:12px;white-space:nowrap;box-shadow:0 2px 8px rgba(0,0,0,.3);transition:all .2s ease}.ytomo-companion-dialog{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;z-index:99999;padding:20px;box-sizing:border-box}.ytomo-companion-dialog .dialog-content{background:#fff;border-radius:12px;padding:24px;width:100%;max-width:500px;max-height:90vh;overflow-y:auto;box-shadow:0 10px 40px rgba(0,0,0,.3)}@media(max-width: 768px){.ytomo-companion-dialog .dialog-content{max-width:95vw;max-height:85vh;padding:16px;border-radius:8px}}.ytomo-companion-dialog .dialog-content .input-row{display:flex;gap:8px;margin-bottom:12px}@media(max-width: 480px){.ytomo-companion-dialog .dialog-content .input-row{flex-direction:column;gap:12px}}.ytomo-companion-dialog .dialog-content .input-row input{padding:12px 8px;border:1px solid #ddd;border-radius:4px;font-size:16px}.ytomo-companion-dialog .dialog-content .input-row input:focus{outline:none;border-color:#4caf50;box-shadow:0 0 0 2px rgba(76,175,80,.2)}.ytomo-companion-dialog .dialog-content .input-row button{padding:12px 16px;background:#4caf50;color:#fff;border:none;border-radius:4px;cursor:pointer;font-size:14px;white-space:nowrap;min-width:60px}.ytomo-companion-dialog .dialog-content .input-row button:hover{background:#45a049}.ytomo-companion-dialog .dialog-content .input-row button:active{background:#3d8b40}.ytomo-fab{width:56px;height:56px;border-radius:50%;color:#fff;border:none;box-shadow:0 6px 20px rgba(0,0,0,.4),0 2px 8px rgba(0,0,0,.2);border:3px solid hsla(0,0%,100%,.2);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:bold;transition:all .3s ease;position:relative;overflow:hidden;pointer-events:auto}.ytomo-fab-enabled{background:#ff8c00;opacity:.9;cursor:pointer;pointer-events:auto}.ytomo-fab-disabled{background:gray;opacity:.6;cursor:not-allowed;pointer-events:none}.ytomo-fab-monitoring{background:#ff8c00;opacity:.9;cursor:pointer;pointer-events:auto}.ytomo-fab-running{background:#dc3545;opacity:.9;cursor:pointer;pointer-events:auto}.ytomo-fab.state-idle{background:gray;opacity:.6;cursor:not-allowed;pointer-events:none}.ytomo-fab.pointer-events-none{pointer-events:none}.ytomo-fab.pointer-events-auto{pointer-events:auto}.ytomo-fab.state-enabled{background:#ff8c00;opacity:.9;cursor:pointer;pointer-events:auto}.ytomo-fab.state-running{background:#dc3545;opacity:.9;cursor:pointer;pointer-events:auto}.ytomo-fab.state-monitoring{background:#006821;opacity:.9;cursor:pointer;pointer-events:auto}.ytomo-fab.state-reservation{background:#ff8c00;opacity:.9;cursor:pointer;pointer-events:auto}.ytomo-fab:hover{transform:scale(1.15);box-shadow:0 8px 25px rgba(0,0,0,.5),0 4px 12px rgba(0,0,0,.3)}.ytomo-fab.reservation-enabled{background:#006821;opacity:.9;cursor:pointer}.ytomo-fab.reservation-disabled{background:gray;opacity:.9;cursor:not-allowed}.ytomo-fab.cooldown-warning{background:#ff6b35}.ytomo-fab.cooldown-normal{background:#007bff}.ytomo-fab-container{position:fixed;bottom:24px;right:24px;z-index:10000;display:flex;flex-direction:column;align-items:flex-end;gap:12px;pointer-events:auto}.ytomo-fab-container.z-normal{z-index:10000}.ytomo-fab-container.z-above-overlay{z-index:100001}.ytomo-fab-container.visible{display:flex}.ytomo-fab-container.hidden{display:none}.ytomo-fab-content{position:relative;display:flex;flex-direction:column-reverse;align-items:center;gap:8px;opacity:0;transform:scale(0.8) translateY(10px);transition:all .3s cubic-bezier(0.175, 0.885, 0.32, 1.275);pointer-events:none}.ytomo-fab-content.expanded{opacity:1;transform:scale(1) translateY(0);pointer-events:auto}.ytomo-sub-fab{width:45px;height:32px;border-radius:16px;background:rgba(0,104,33,.9);color:#fff;border:none;font-size:11px;font-weight:bold;cursor:pointer;transition:all .2s ease;box-shadow:0 2px 8px rgba(0,0,0,.3);display:flex;align-items:center;justify-content:center;pointer-events:auto}.ytomo-sub-fab:hover{background:rgba(2,134,43,.9);transform:scale(1.1);box-shadow:0 4px 12px rgba(0,0,0,.4)}.ytomo-sub-fab:active{transform:scale(0.95)}.ytomo-pavilion-fab-container{position:fixed;bottom:24px;right:24px;z-index:10000;display:flex;flex-direction:column;gap:12px;align-items:flex-end;pointer-events:auto}.ytomo-fab-inner-content{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;pointer-events:none}.ytomo-reservation-target-display{background:linear-gradient(135deg, rgba(0, 123, 255, 0.95), rgba(0, 86, 179, 0.95));color:#fff;padding:8px 12px;border-radius:12px;font-size:12px;font-weight:bold;text-align:center;box-shadow:0 3px 10px rgba(0,0,0,.3);border:2px solid hsla(0,0%,100%,.3);min-width:80px;max-width:120px;white-space:pre-line;overflow:visible;text-overflow:clip;transition:all .3s ease;pointer-events:auto;cursor:pointer}.ytomo-reservation-target-display:hover{transform:scale(1.05);box-shadow:0 4px 14px rgba(0,0,0,.4)}.ytomo-reservation-target-display.hidden{display:none}.ytomo-reservation-target-display.visible{display:block}.ytomo-monitoring-targets-display{background:linear-gradient(135deg, rgba(0, 104, 33, 0.95), rgba(0, 150, 50, 0.95));color:#fff;padding:8px 12px;border-radius:12px;font-size:12px;font-weight:bold;text-align:center;box-shadow:0 3px 10px rgba(0,0,0,.3);border:2px solid hsla(0,0%,100%,.3);min-width:80px;max-width:120px;white-space:pre-line;overflow:visible;text-overflow:clip;transition:all .3s ease;pointer-events:auto;cursor:pointer}.ytomo-monitoring-targets-display:hover{transform:scale(1.05);box-shadow:0 4px 14px rgba(0,0,0,.4)}.ytomo-monitoring-targets-display.hidden{display:none}.ytomo-monitoring-targets-display.visible{display:block}input.ext-tomo.search{height:50px;min-width:200px;max-width:min(300px,100%);font-family:quicksand;font-size:16px;-webkit-appearance:textfield;-moz-appearance:textfield;appearance:textfield;border:1px solid #222426;border-radius:25px;box-shadow:0 1px 0 0 #ccc;padding:0 0 0 10px;flex:1 1}.ytomo-icon.expand-icon{font-size:8px;line-height:1;color:#fff;font-weight:bold;text-align:center;pointer-events:none}.ytomo-icon.countdown-text{font-size:6px;line-height:1;color:#fff;font-weight:bold;text-align:center;margin-top:1px;pointer-events:none}.ytomo-toggle.toggle-li{position:fixed;bottom:10px;left:10px;z-index:1000;list-style:none;margin:0;padding:0}.ytomo-toggle.toggle-button{width:50px;height:30px;background:rgba(255,140,0,.8);border:none;border-radius:15px;cursor:pointer;transition:all .3s ease;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:bold;position:relative;overflow:hidden}.ytomo-toggle.toggle-button.enabled{color:#fff}.ytomo-toggle.toggle-button.disabled{color:#ddd}.ytomo-toggle.toggle-figure{width:100%;height:100%;margin:0;padding:0;border:none;background:rgba(0,0,0,0);pointer-events:none}.ytomo-dialog.overlay{position:fixed;top:0;left:0;width:100%;height:100%;background-color:rgba(0,0,0,.5);z-index:10000;display:flex;justify-content:center;align-items:center}.ytomo-dialog.container{background:#fff;border-radius:8px;padding:20px;max-width:400px;width:90%;max-height:70vh;overflow-y:auto;box-shadow:0 4px 12px rgba(0,0,0,.3)}.ytomo-dialog.title{margin:0 0 16px 0;color:#333;font-size:18px;font-weight:bold}.ytomo-dialog.button-group{display:flex;justify-content:flex-end;gap:10px;margin-top:20px}.ytomo-dialog.primary-button{background:#006821;color:#fff;border:none;padding:10px 20px;border-radius:4px;cursor:pointer;font-size:14px}.ytomo-dialog.primary-button:hover{background:#02862b}.ytomo-dialog.primary-button:disabled{background:gray;cursor:not-allowed}.ytomo-dialog.secondary-button{background:rgba(0,0,0,0);color:#666;border:1px solid #ccc;padding:10px 20px;border-radius:4px;cursor:pointer;font-size:14px}.ytomo-dialog.secondary-button:hover{background:#f5f5f5}.ytomo-progress.counter{display:inline-block;margin-left:8px;padding:2px 6px;background:rgba(0,0,0,.3);border-radius:10px;font-size:10px;color:#fff;font-weight:bold}#ytomo-monitoring-targets.monitoring-targets{background:rgba(255,140,0,.15);border:1px solid rgba(255,140,0,.3);border-radius:8px;padding:8px;margin:4px 0}#ytomo-monitoring-targets.reservation-target{background:rgba(0,104,33,.15);border:1px solid rgba(0,104,33,.3);border-radius:8px;padding:8px;margin:4px 0}.ytomo-error-message{position:fixed;top:20px;right:20px;background:#f44;color:#fff;padding:15px;border-radius:5px;box-shadow:0 2px 10px rgba(0,0,0,.3);z-index:10001;max-width:300px;font-size:14px;line-height:1.4}.ytomo-error-message .error-title{font-weight:bold;margin-bottom:5px}.ytomo-error-message .error-close-btn{margin-top:10px;padding:5px 10px;background:hsla(0,0%,100%,.2);border:none;border-radius:3px;color:#fff;cursor:pointer;font-size:12px}.ytomo-error-message .error-close-btn:hover{background:hsla(0,0%,100%,.3)}.ytomo-flex-column-center{display:flex;flex-direction:column;align-items:center}.ytomo-brand-text{font-size:8px;font-weight:bold;margin-top:2px}.ytomo-processing-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.3);z-index:100000;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(1px);transition:all .3s ease;pointer-events:auto}.ytomo-processing-overlay.z-normal{z-index:100000}.ytomo-processing-overlay.z-below-fab{z-index:99999}.ytomo-processing-overlay.hidden{opacity:0;visibility:hidden;pointer-events:none}.ytomo-processing-overlay.visible{opacity:1;visibility:visible;pointer-events:auto}.ytomo-processing-overlay .processing-message-area{background:hsla(0,0%,100%,.95);border-radius:12px;padding:24px 32px;text-align:center;box-shadow:0 8px 32px rgba(0,0,0,.3);border:2px solid rgba(255,140,0,.3);max-width:400px;margin:20px}@media(max-width: 768px){.ytomo-processing-overlay .processing-message-area{padding:20px 24px;margin:16px;max-width:90vw}}.ytomo-processing-overlay .processing-message-text{font-size:20px;font-weight:bold;color:#333;margin-bottom:8px;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}@media(max-width: 768px){.ytomo-processing-overlay .processing-message-text{font-size:18px;margin-bottom:6px}}.ytomo-processing-overlay .processing-target-text{font-size:16px;font-weight:600;color:#333;margin-bottom:12px;white-space:pre-line;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;text-align:center}@media(max-width: 768px){.ytomo-processing-overlay .processing-target-text{font-size:14px;margin-bottom:10px}}.ytomo-processing-overlay .processing-warning-text{font-size:14px;color:#666;margin-bottom:16px;line-height:1.4;transition:all .3s ease}@media(max-width: 768px){.ytomo-processing-overlay .processing-warning-text{font-size:13px;margin-bottom:14px}}.ytomo-processing-overlay .processing-warning-text.warning-flash{color:#dc3545;font-weight:bold;transform:scale(1.05);animation:flash .5s ease-in-out 2}.ytomo-processing-overlay .processing-cancel-area{font-size:12px;color:#888;font-style:italic}@media(max-width: 768px){.ytomo-processing-overlay .processing-cancel-area{font-size:11px}}@keyframes flash{0%,100%{opacity:1}50%{opacity:.7}}.ytomo-processing-overlay.efficiency-mode .processing-message-area{border-color:rgba(255,140,0,.5);background:linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(255, 248, 220, 0.95))}.ytomo-processing-overlay.efficiency-mode .processing-message-text{color:#e67e00}.ytomo-processing-overlay.monitoring-mode .processing-message-area{border-color:rgba(0,104,33,.5);background:linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(240, 255, 240, 0.95))}.ytomo-processing-overlay.monitoring-mode .processing-message-text{color:#004d1a}@media(prefers-reduced-motion: reduce){.ytomo-processing-overlay{transition:none}.ytomo-processing-overlay .processing-warning-text.warning-flash{animation:none;transform:none}}`, ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -413,9 +415,9 @@ function createFABToggleButton() {
                  <path d="M11.83,9L15,12.16C15,12.11 15,12.05 15,12A3,3 0 0,0 12,9C11.94,9 11.89,9 11.83,9M7.53,9.8L9.08,11.35C9.03,11.56 9,11.77 9,12A3,3 0 0,0 12,15C12.22,15 12.44,14.97 12.65,14.92L14.2,16.47C13.53,16.8 12.79,17 12,17A5,5 0 0,1 7,12C7,11.21 7.2,10.47 7.53,9.8M2,4.27L4.28,6.55L4.73,7C3.08,8.3 1.78,10 1,12C2.73,16.39 7,19.5 12,19.5C13.55,19.5 15.03,19.2 16.38,18.66L16.81,19.09L19.73,22L21,20.73L3.27,3M12,7A5,5 0 0,1 17,12C17,12.64 16.87,13.26 16.64,13.82L19.57,16.75C21.07,15.5 22.27,13.86 23,12C21.27,7.61 17,4.5 12,4.5C10.6,4.5 9.26,4.75 8,5.2L10.17,7.35C10.76,7.13 11.37,7 12,7Z" />
                </svg>`; // eye-off
         toggleButton.innerHTML = `
-            <div style="display: flex; flex-direction: column; align-items: center;">
+            <div class="ytomo-flex-column-center">
                 ${iconSvg}
-                <span style="font-size: 8px; font-weight: bold; margin-top: 2px;">YTomo</span>
+                <span class="ytomo-brand-text">YTomo</span>
             </div>
         `;
         toggleButton.title = fabVisibilityState.isVisible ? 'FABを非表示にする' : 'FABを表示する';
@@ -542,7 +544,6 @@ module.exports = function (cssWithMappingToString) {
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   H5: () => (/* binding */ checkTimeSlotTableExistsSync),
 /* harmony export */   Is: () => (/* binding */ isInterruptionAllowed),
 /* harmony export */   MM: () => (/* binding */ setCacheManagerForSection6),
 /* harmony export */   S9: () => (/* binding */ setCacheManager),
@@ -552,13 +553,12 @@ module.exports = function (cssWithMappingToString) {
 /* harmony export */   Zu: () => (/* binding */ restoreFromCache),
 /* harmony export */   fp: () => (/* binding */ startSlotMonitoring),
 /* harmony export */   p4: () => (/* binding */ waitForValidCalendarDate),
-/* harmony export */   pW: () => (/* binding */ updateStatusBadge),
 /* harmony export */   qy: () => (/* binding */ setUpdateMonitoringTargetsDisplay),
 /* harmony export */   rY: () => (/* binding */ getCurrentSelectedCalendarDate),
 /* harmony export */   startTimeSlotTableObserver: () => (/* binding */ startTimeSlotTableObserver),
 /* harmony export */   wj: () => (/* binding */ analyzeAndAddMonitorButtons)
 /* harmony export */ });
-/* unused harmony exports waitForTimeSlotTable, analyzeTimeSlots, extractTimeSlotInfo, generateSelectorForElement, addMonitorButtonsToFullSlots, getMonitorButtonText, updateAllMonitorButtonPriorities, createMonitorButton, handleMonitorButtonClick, checkSlotAvailabilityAndReload, findTargetSlotInPageUnified, terminateMonitoring, checkTargetElementExists, checkMonitoringTargetExists, checkTimeSlotTableExistsAsync, validatePageLoaded, checkMaxReloads, clickCalendarDate, tryClickCalendarForTimeSlot, showErrorMessage, resetMonitoringUI, enableAllMonitorButtons, getCurrentTableContent, shouldUpdateMonitorButtons, restoreSelectionAfterUpdate, selectTimeSlotAndStartReservation, getCurrentEntranceConfig, getCurrentFabState, getCurrentMode, resetPreviousSelection, disableOtherMonitorButtons, disableAllMonitorButtons, clearExistingMonitorButtons, getTargetDisplayInfo, scheduleReload, clearMonitoringFlagTimer, startReloadCountdown, stopReloadCountdown */
+/* unused harmony exports waitForTimeSlotTable, checkTimeSlotTableExistsSync, analyzeTimeSlots, extractTimeSlotInfo, generateSelectorForElement, addMonitorButtonsToFullSlots, getMonitorButtonText, updateAllMonitorButtonPriorities, createMonitorButton, handleMonitorButtonClick, checkSlotAvailabilityAndReload, findTargetSlotInPageUnified, terminateMonitoring, checkTargetElementExists, checkMonitoringTargetExists, checkTimeSlotTableExistsAsync, validatePageLoaded, checkMaxReloads, clickCalendarDate, tryClickCalendarForTimeSlot, showErrorMessage, resetMonitoringUI, enableAllMonitorButtons, getCurrentTableContent, shouldUpdateMonitorButtons, restoreSelectionAfterUpdate, selectTimeSlotAndStartReservation, getCurrentEntranceConfig, getCurrentFabState, getCurrentMode, updateStatusBadge, resetPreviousSelection, disableOtherMonitorButtons, disableAllMonitorButtons, clearExistingMonitorButtons, getTargetDisplayInfo, scheduleReload, clearMonitoringFlagTimer, startReloadCountdown, stopReloadCountdown */
 /* harmony import */ var _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(374);
 /* harmony import */ var _entrance_page_dom_utils__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(638);
 /* harmony import */ var _processing_overlay__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(624);
@@ -1228,7 +1228,7 @@ async function startSlotMonitoring() {
     // 監視対象表示も更新
     (0,_entrance_page_fab__WEBPACK_IMPORTED_MODULE_3__/* .updateMonitoringTargetsDisplay */ .yT)();
     // 誤動作防止オーバーレイを表示
-    _processing_overlay__WEBPACK_IMPORTED_MODULE_2__/* .processingOverlay */ .O.show('monitoring');
+    _processing_overlay__WEBPACK_IMPORTED_MODULE_2__/* .processingOverlay */ .OB.show('monitoring');
     // 監視実行中は全ての監視ボタンを無効化
     disableAllMonitorButtons();
     // 対象一貫性検証
@@ -1343,14 +1343,14 @@ async function checkSlotAvailabilityAndReload() {
                 console.log(`🕒 加算後猶予: ${Math.floor(remainingMs / 1000)}秒`);
             }
             totalWaitTime = Math.max(1000, remainingMs); // 最低1秒
-            displaySeconds = Math.ceil(totalWaitTime / 1000);
+            displaySeconds = Math.floor(totalWaitTime / 1000);
         }
         else {
             // 標的時刻が設定されていない場合は通常処理
             const baseInterval = 30000;
             const randomVariation = Math.random() * 5000;
             totalWaitTime = baseInterval + randomVariation;
-            displaySeconds = Math.ceil(totalWaitTime / 1000);
+            displaySeconds = Math.floor(totalWaitTime / 1000);
         }
     }
     else {
@@ -1358,7 +1358,7 @@ async function checkSlotAvailabilityAndReload() {
         const baseInterval = 30000; // 30000ms (30秒)
         const randomVariation = Math.random() * 5000; // 0-5秒のランダム要素
         totalWaitTime = baseInterval + randomVariation;
-        displaySeconds = Math.ceil(totalWaitTime / 1000);
+        displaySeconds = Math.floor(totalWaitTime / 1000);
     }
     // カウントダウンとリロードを統一実行（フラグ保存処理付き）
     scheduleReload(displaySeconds);
@@ -1656,82 +1656,83 @@ function updateStatusBadge(mode) {
     if (!statusBadge)
         return;
     let message = '';
-    let bgColor = 'rgba(0, 0, 0, 0.8)';
+    let bgClass = 'status-bg-default';
     switch (mode) {
         case 'monitoring':
-            const isEfficiencyEnabled = _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_0__/* .entranceReservationStateManager */ .xx?.isEfficiencyModeEnabled();
+            const isEfficiencyEnabled = entranceReservationStateManager?.isEfficiencyModeEnabled();
             message = '監視実行中';
-            const remainingSeconds = _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_0__/* .entranceReservationStateManager */ .xx.getReloadSecondsRemaining();
+            const remainingSeconds = entranceReservationStateManager.getReloadSecondsRemaining();
             if (remainingSeconds !== null && remainingSeconds !== undefined) {
                 if (remainingSeconds <= 3) {
                     message = `${isEfficiencyEnabled ? '効率' : ''}監視中\nリロード: ${remainingSeconds}秒`;
-                    bgColor = 'rgba(255, 0, 0, 0.9)'; // 赤色（中断不可）
+                    bgClass = 'status-bg-red'; // 赤色（中断不可）
                 }
                 else {
                     message = `${isEfficiencyEnabled ? '効率' : ''}監視中\nリロード: ${remainingSeconds}秒`;
-                    bgColor = 'rgba(255, 140, 0, 0.9)'; // オレンジ色
+                    bgClass = 'status-bg-orange'; // オレンジ色
                 }
             }
             else {
                 message = `${isEfficiencyEnabled ? '効率' : ''}監視実行中`;
-                bgColor = 'rgba(255, 140, 0, 0.9)'; // オレンジ色
+                bgClass = 'status-bg-orange'; // オレンジ色
             }
             break;
         case 'reservation-running':
             // 効率モードON時は標的時刻カウントダウン、通常時は経過時間と回数
-            if (_entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_0__/* .entranceReservationStateManager */ .xx.isEfficiencyModeEnabled()) {
-                const nextTarget = _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_0__/* .entranceReservationStateManager */ .xx.getNextSubmitTarget();
+            if (entranceReservationStateManager.isEfficiencyModeEnabled()) {
+                const nextTarget = entranceReservationStateManager.getNextSubmitTarget();
                 if (nextTarget) {
                     const remainingMs = nextTarget.getTime() - Date.now();
                     const remainingSeconds = Math.max(0, Math.floor(remainingMs / 1000));
                     message = `効率予約実行中\n${remainingSeconds}秒後`;
-                    bgColor = 'rgba(255, 140, 0, 0.9)'; // オレンジ色
+                    bgClass = 'status-bg-orange'; // オレンジ色
                 }
                 else {
                     message = '効率予約実行中';
-                    bgColor = 'rgba(255, 140, 0, 0.9)';
+                    bgClass = 'status-bg-orange';
                 }
             }
             else {
                 // 通常モード: 経過時間と回数を表示
-                const startTime = _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_0__/* .entranceReservationStateManager */ .xx.getReservationStartTime();
+                const startTime = entranceReservationStateManager.getReservationStartTime();
                 const elapsedMinutes = startTime ?
                     Math.floor((Date.now() - startTime) / 60000) : 0;
-                const attempts = _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_0__/* .entranceReservationStateManager */ .xx.getAttempts();
+                const attempts = entranceReservationStateManager.getAttempts();
                 message = `予約実行中\n${elapsedMinutes}分 ${attempts}回`;
-                bgColor = 'rgba(255, 140, 0, 0.9)'; // オレンジ色
+                bgClass = 'status-bg-orange'; // オレンジ色
             }
             break;
         case 'selecting':
             message = '監視準備完了';
-            bgColor = 'rgba(0, 104, 33, 0.9)'; // 緑色
+            bgClass = 'status-bg-blue'; // 緑色
             break;
         case 'found-available':
             message = '空きあり検出！\n予約実行中';
-            bgColor = 'rgba(0, 200, 0, 0.9)'; // 明るい緑色
+            bgClass = 'status-bg-green'; // 明るい緑色
             break;
         case 'loading':
             message = '情報読み込み中...';
-            bgColor = 'rgba(108, 117, 125, 0.9)'; // グレー色
+            bgClass = 'status-bg-default'; // グレー色
             break;
         case 'waiting':
             message = '待機中';
-            bgColor = 'rgba(128, 128, 128, 0.9)'; // グレー色
+            bgClass = 'status-bg-default'; // グレー色
             break;
         case 'idle':
         default:
             message = '待機中';
-            bgColor = 'rgba(0, 0, 0, 0.8)'; // 黒色
+            bgClass = 'status-bg-default'; // 黒色
             break;
     }
     if (message) {
         statusBadge.innerText = message;
-        statusBadge.style.background = bgColor;
-        statusBadge.style.display = 'block';
-        statusBadge.style.whiteSpace = 'pre-line'; // 改行を有効にする
+        // 既存の背景色クラスを削除してから新しいクラスを追加
+        statusBadge.className = statusBadge.className.replace(/status-bg-\w+/g, '');
+        statusBadge.classList.add(bgClass);
+        statusBadge.classList.remove('js-hide');
         // 効率モードの5秒前警告（予約実行中・監視中両方）
-        if ((mode === 'reservation-running' || mode === 'monitoring') && _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_0__/* .entranceReservationStateManager */ .xx.isEfficiencyModeEnabled()) {
-            const nextTarget = _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_0__/* .entranceReservationStateManager */ .xx.getNextSubmitTarget();
+        if ((mode === 'reservation-running' || mode === 'monitoring') && entranceReservationStateManager.isEfficiencyModeEnabled()) {
+            const nextTarget = entranceReservationStateManager.getNextSubmitTarget();
             if (nextTarget) {
                 const remainingMs = nextTarget.getTime() - Date.now();
                 const remainingSeconds = Math.max(0, Math.floor(remainingMs / 1000));
@@ -1748,7 +1749,10 @@ function updateStatusBadge(mode) {
         }
     }
     else {
-        statusBadge.style.display = 'none';
+        // 状態管理システムによる更新に委譲
+        if (entranceReservationStateManager) {
+            entranceReservationStateManager.updateFabDisplay();
+        }
     }
 }
 // 前の選択をリセット
@@ -2247,31 +2251,11 @@ function showErrorMessage(message) {
     // エラーメッセージ要素を作成
     const errorDiv = document.createElement('div');
     errorDiv.id = 'ytomo-error-message';
-    errorDiv.style.cssText = `
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        background: #ff4444;
-        color: white;
-        padding: 15px;
-        border-radius: 5px;
-        font-size: 14px;
-        z-index: 9999;
-        max-width: 300px;
-        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-    `;
+    errorDiv.className = 'ytomo-error-message';
     errorDiv.innerHTML = `
-        <div style="font-weight: bold; margin-bottom: 5px;">⚠️ 監視エラー</div>
+        <div class="error-title">⚠️ 監視エラー</div>
         <div>${message}</div>
-        <button onclick="this.parentElement.remove()" style="
-            background: transparent;
-            border: 1px solid white;
-            color: white;
-            padding: 5px 10px;
-            margin-top: 10px;
-            border-radius: 3px;
-            cursor: pointer;
-        ">閉じる</button>
+        <button class="error-close-btn" onclick="this.parentElement.remove()">閉じる</button>
     `;
     document.body.appendChild(errorDiv);
     // 10秒後に自動削除
@@ -2651,7 +2635,7 @@ function stopSlotMonitoring() {
     // リロードカウントダウンの停止（入場予約状態管理システムで管理）
     _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_0__/* .entranceReservationStateManager */ .xx.stopReloadCountdown();
     // 誤動作防止オーバーレイを非表示
-    _processing_overlay__WEBPACK_IMPORTED_MODULE_2__/* .processingOverlay */ .O.hide();
+    _processing_overlay__WEBPACK_IMPORTED_MODULE_2__/* .processingOverlay */ .OB.hide();
     // 監視ボタンを有効化（操作可能に戻す）
     enableAllMonitorButtons();
     // メインボタンの表示を更新
@@ -2751,7 +2735,7 @@ class UnifiedAutomationManager {
             console.log(`🚀 統一自動処理開始: ${processType}`);
             // 誤動作防止オーバーレイを表示（efficiency-waitは除外）
             if (processType !== 'efficiency-wait') {
-                processing_overlay/* processingOverlay */.O.show(processType);
+                processing_overlay/* processingOverlay */.OB.show(processType);
             }
             return await executor(this.controller.signal);
         }
@@ -2767,7 +2751,7 @@ class UnifiedAutomationManager {
         finally {
             // 誤動作防止オーバーレイを非表示
             if (processType !== 'efficiency-wait') {
-                processing_overlay/* processingOverlay */.O.hide();
+                processing_overlay/* processingOverlay */.OB.hide();
             }
             this.cleanup();
         }
@@ -2960,7 +2944,12 @@ class UnifiedAutomationManager {
                     console.log('変更ボタンをクリックして最終結果を待機...');
                     // changeダイアログ出現を記録
                     if (this.stateManager && this.stateManager.markChangeDialogAppeared) {
+                        console.log('🔄 changeダイアログ記録を実行...');
                         this.stateManager.markChangeDialogAppeared();
+                        console.log('🔄 changeダイアログ記録完了');
+                    }
+                    else {
+                        console.log('⚠️ stateManagerまたはmarkChangeDialogAppeared関数が見つからない');
                     }
                     await this.executeFixedDelayClick(response.element, config, signal);
                     console.log('success/failureを待機中...');
@@ -3031,12 +3020,19 @@ class UnifiedAutomationManager {
     async executeEfficiencyTimingSubmit(submitButton, config, signal) {
         const isEfficiencyMode = this.stateManager && this.stateManager.isEfficiencyModeEnabled ?
             this.stateManager.isEfficiencyModeEnabled() : false;
-        console.log(`🔍 効率モード状態確認: ${isEfficiencyMode}`);
-        console.log(`🔍 stateManager存在: ${!!this.stateManager}`);
-        console.log(`🔍 isEfficiencyModeEnabledメソッド存在: ${!!(this.stateManager && this.stateManager.isEfficiencyModeEnabled)}`);
+        // ログ削減: デバッグ情報は不要
         if (!isEfficiencyMode) {
             // 通常モード: そのままクリック
             console.log('⚡ 通常モード: 効率待機なしでクリック実行');
+            await this.executeStandardClick(submitButton, config, signal);
+            return;
+        }
+        // changeダイアログが既に出現している場合は即座押下
+        const hasChangeDialogAppeared = this.stateManager && this.stateManager.hasChangeDialogAppeared ?
+            this.stateManager.hasChangeDialogAppeared() : false;
+        if (hasChangeDialogAppeared) {
+            // changeダイアログが既に出現済み: submitは即座押下（changeでタイミング調整）
+            console.log('⚡ 効率モード: changeダイアログ出現済みのため即座押下');
             await this.executeStandardClick(submitButton, config, signal);
             return;
         }
@@ -3350,6 +3346,10 @@ class EntranceReservationStateManager {
             return false;
         }
         // 【初回のみ初期化】試行回数（IDLE→RUNNINGの場合のみ）
+        if (this.executionState === ExecutionState.IDLE) {
+            // changeダイアログ状態をリセット（新しい予約処理開始時）
+            this.resetChangeDialogState();
+        }
         const isFirstTime = this.executionState === ExecutionState.IDLE;
         // 実行状態設定
         this.executionState = ExecutionState.RESERVATION_RUNNING;
@@ -3669,7 +3669,7 @@ class EntranceReservationStateManager {
         }
         this.reservationCooldown.isActive = true;
         this.reservationCooldown.startTime = Date.now();
-        this.reservationCooldown.remainingSeconds = Math.ceil(this.reservationCooldown.duration / 1000);
+        this.reservationCooldown.remainingSeconds = Math.floor(this.reservationCooldown.duration / 1000);
         // 実行状態は変更しない（手動操作を妨げないため）
         // this.executionState = ExecutionState.RESERVATION_COOLDOWN; // 削除
         console.log(`⏳ 予約クールタイム開始: ${this.reservationCooldown.remainingSeconds}秒 (手動操作は可能)`);
@@ -3726,12 +3726,12 @@ class EntranceReservationStateManager {
         let displayText;
         if (remainingSeconds > 60) {
             // 1分単位表示
-            const minutes = Math.ceil(remainingSeconds / 60);
+            const minutes = Math.floor(remainingSeconds / 60);
             displayText = `予約待機中(${minutes}分)`;
         }
         else if (remainingSeconds > 10) {
             // 10秒単位表示
-            const tens = Math.ceil(remainingSeconds / 10) * 10;
+            const tens = Math.floor(remainingSeconds / 10) * 10;
             displayText = `予約待機中(${tens}秒)`;
         }
         else {
@@ -3751,13 +3751,15 @@ class EntranceReservationStateManager {
             return;
         if (remainingSeconds <= 5 && remainingSeconds > 0) {
             fabButton.textContent = '予約再開中止';
-            fabButton.style.backgroundColor = '#ff6b35'; // オレンジ色で警告
+            fabButton.className = fabButton.className.replace(/cooldown-\w+/g, '').trim();
+            fabButton.classList.add('cooldown-warning');
             fabButton.setAttribute('data-cooldown-cancel', 'true');
         }
         else {
             // 通常のクールタイム表示（手動操作可能状態）
             fabButton.textContent = '予約中断';
-            fabButton.style.backgroundColor = '#007bff'; // 通常の青色
+            fabButton.className = fabButton.className.replace(/cooldown-\w+/g, '').trim();
+            fabButton.classList.add('cooldown-normal');
             fabButton.removeAttribute('data-cooldown-cancel');
         }
     }
@@ -3767,7 +3769,7 @@ class EntranceReservationStateManager {
         if (!fabButton)
             return;
         fabButton.removeAttribute('data-cooldown-cancel');
-        fabButton.style.backgroundColor = ''; // デフォルトスタイルに戻す
+        fabButton.className = fabButton.className.replace(/cooldown-\w+/g, '').trim();
         // ボタンテキストは updateMainButtonDisplay() で更新される
     }
     // ============================================================================
@@ -3963,7 +3965,7 @@ class EntranceReservationStateManager {
         // デバッグログ追加（効率モードタイマー実行中はログ削減）
         if (!this.isReloadCountdownActive() && !this.efficiencyMode.updateTimer) {
             // アクション判定（ログ削減）
-            console.log(`🔍 [getPreferredAction] 予約対象=${!!this.reservationTarget}, 監視対象=${this.monitoringTargets.length}個`);
+            // ログ削減: 頻繁に呼ばれるため基本ログは削除
         }
         switch (this.priorityMode) {
             case PriorityMode.FORCE_RESERVATION:
@@ -3975,13 +3977,22 @@ class EntranceReservationStateManager {
                 // 予約優先（両方可能な場合は予約を選択）
                 if (canReserve) {
                     // 予約アクション選択（ログ削減）
+                    if (!this.isReloadCountdownActive() && !this.efficiencyMode.updateTimer) {
+                        // ログ削減: 戻り値ログを削除
+                    }
                     return 'reservation';
                 }
                 if (canMonitor) {
                     // 監視アクション選択（ログ削減）
+                    if (!this.isReloadCountdownActive() && !this.efficiencyMode.updateTimer) {
+                        // ログ削減: 戻り値ログを削除
+                    }
                     return 'monitoring';
                 }
                 // アクションなし（ログ削減）
+                if (!this.isReloadCountdownActive() && !this.efficiencyMode.updateTimer) {
+                    // ログ削減: 戻り値ログを削除
+                }
                 return 'none';
         }
     }
@@ -4016,7 +4027,7 @@ class EntranceReservationStateManager {
     getFabTargetDisplayInfo() {
         // カウントダウン中・効率モードタイマー実行中はログを削減
         if (!this.isReloadCountdownActive() && !this.efficiencyMode.updateTimer) {
-            console.log(`[UnifiedState] getFabTargetDisplayInfo 呼び出し - 予約対象: ${this.hasReservationTarget()}, 監視対象: ${this.hasMonitoringTargets()}`);
+            // ログ削減: 頻繁に呼ばれるため削除
         }
         // カレンダー選択日付を取得（MM/DD形式）
         const getDisplayDate = () => {
@@ -4038,7 +4049,7 @@ class EntranceReservationStateManager {
             const location = LocationHelper.getLocationFromIndex(this.reservationSuccess.locationIndex);
             const locationText = location === 'east' ? '東' : '西';
             const dateText = getDisplayDate();
-            const displayText = `予約成功🎉(${dateText})\n${locationText}${this.reservationSuccess.timeSlot}`;
+            const displayText = `${dateText}\n予約成功🎉${locationText}${this.reservationSuccess.timeSlot}`;
             console.log(`[UnifiedState] FAB予約成功表示テキスト: "${displayText}"`);
             return {
                 hasTarget: true,
@@ -4051,10 +4062,10 @@ class EntranceReservationStateManager {
             const location = LocationHelper.getLocationFromIndex(this.reservationTarget.locationIndex);
             const locationText = location === 'east' ? '東' : '西';
             const dateText = getDisplayDate();
-            const displayText = `予約対象(${dateText})\n${locationText}${this.reservationTarget.timeSlot}`;
+            const displayText = `${dateText}\n${locationText}${this.reservationTarget.timeSlot}`;
             // 効率モードタイマー実行中はログ削減
             if (!this.efficiencyMode.updateTimer) {
-                console.log(`[UnifiedState] FAB予約対象表示テキスト: "${displayText}"`);
+                // ログ削減: 頻繁に呼ばれるため削除
             }
             return {
                 hasTarget: true,
@@ -4065,8 +4076,7 @@ class EntranceReservationStateManager {
         // 監視対象がある場合は監視対象を表示
         if (this.hasMonitoringTargets() && this.monitoringTargets.length > 0) {
             if (!this.isReloadCountdownActive()) {
-                console.log(`[UnifiedState] getFabTargetDisplayInfo: 監視対象数=${this.monitoringTargets.length}`);
-                console.log(`[UnifiedState] 監視対象詳細:`, this.monitoringTargets);
+                // ログ削減: 頻繁に呼ばれるため削除
             }
             // 優先度順にソート（priority昇順）
             const sortedTargets = [...this.monitoringTargets].sort((a, b) => a.priority - b.priority);
@@ -4077,14 +4087,13 @@ class EntranceReservationStateManager {
                 const locationText = location === 'east' ? '東' : '西';
                 const result = `${locationText}${target.timeSlot}`;
                 if (!this.isReloadCountdownActive()) {
-                    console.log(`[UnifiedState] 監視対象→表示: ${JSON.stringify(target)} → "${result}"`);
+                    // ログ削減: 頻繁に呼ばれるため削除
                 }
                 return result;
             });
-            const displayText = `監視対象(${dateText})\n${targetTexts.join('\n')}`;
+            const displayText = `${dateText}\n${targetTexts.join('\n')}`;
             if (!this.isReloadCountdownActive()) {
-                console.log(`[UnifiedState] targetTexts配列:`, targetTexts);
-                console.log(`[UnifiedState] FAB表示テキスト: "${displayText}"`);
+                // ログ削減: 頻繁に呼ばれるため削除
             }
             return {
                 hasTarget: true,
@@ -4123,6 +4132,9 @@ class EntranceReservationStateManager {
     }
     getMonitoringTargets() {
         return [...this.monitoringTargets];
+    }
+    getInitialTargetCache() {
+        return this.initialTargetCache;
     }
     hasReservationTarget() {
         return this.reservationTarget !== null && this.reservationTarget.isValid;
@@ -4246,8 +4258,8 @@ class EntranceReservationStateManager {
                 span.innerText = 'クール\nタイム中';
                 // 既存のupdateStatusBadge関数を使用
                 this.updateStatusBadgeFromUnified('cooldown');
-                mainButton.className = mainButton.className.replace(/ytomo-fab-\w+/g, '');
-                mainButton.classList.add('ytomo-fab-disabled');
+                mainButton.className = mainButton.className.replace(/state-\w+/g, '');
+                mainButton.classList.add('state-idle');
                 mainButton.title = 'クールタイム中（中断不可）';
                 mainButton.disabled = true;
                 console.log(`🔍 [FAB更新] クールダウン状態でdisabled=true設定: state=${executionState}`);
@@ -4257,7 +4269,7 @@ class EntranceReservationStateManager {
                 span.innerText = fabText;
                 // 既存のupdateStatusBadge関数を使用
                 this.updateStatusBadgeFromUnified('monitoring');
-                mainButton.className = mainButton.className.replace(/ytomo-fab-\w+/g, '');
+                mainButton.className = mainButton.className.replace(/state-\w+/g, '');
                 mainButton.classList.add('ytomo-fab-monitoring');
                 mainButton.title = '監視中断';
                 mainButton.disabled = false;
@@ -4269,7 +4281,7 @@ class EntranceReservationStateManager {
                     const now = new Date();
                     const remainingMs = this.efficiencyMode.nextSubmitTarget.getTime() - now.getTime();
                     if (remainingMs > 0) {
-                        const remainingSec = Math.ceil(remainingMs / 1000);
+                        const remainingSec = Math.floor(remainingMs / 1000);
                         this.updateStatusBadgeFromUnified('reservation-running', `効率予約実行中 ${remainingSec}秒後`);
                     }
                     else {
@@ -4279,10 +4291,11 @@ class EntranceReservationStateManager {
                 else {
                     this.updateStatusBadgeFromUnified('reservation-running');
                 }
-                mainButton.className = mainButton.className.replace(/ytomo-fab-\w+/g, '');
+                mainButton.className = mainButton.className.replace(/state-\w+/g, '');
                 mainButton.classList.add('ytomo-fab-running');
                 mainButton.title = '予約中断';
                 mainButton.disabled = false; // 中断可能
+                // ログ削減: 頻繁に呼ばれるため削除
                 // 効率モードタイマー実行中はログ削減
                 if (!this.efficiencyMode.updateTimer) {
                     console.log(`🔍 [FAB更新] 予約実行中のdisabled設定完了: disabled=${mainButton.disabled}`);
@@ -4295,19 +4308,19 @@ class EntranceReservationStateManager {
                 const statusMode = preferredAction === 'monitoring' ? 'idle-monitoring' :
                     preferredAction === 'reservation' ? 'idle-reservation' : 'idle';
                 this.updateStatusBadgeFromUnified(statusMode);
-                mainButton.className = mainButton.className.replace(/ytomo-fab-\w+/g, '');
+                mainButton.className = mainButton.className.replace(/state-\w+/g, '');
                 if (preferredAction === 'monitoring') {
-                    mainButton.classList.add('ytomo-fab-enabled');
+                    mainButton.classList.add('state-enabled', 'state-monitoring');
                     mainButton.title = '監視開始';
                     mainButton.disabled = false;
                 }
                 else if (preferredAction === 'reservation') {
-                    mainButton.classList.add('ytomo-fab-enabled');
+                    mainButton.classList.add('state-enabled', 'state-reservation');
                     mainButton.title = '予約開始';
                     mainButton.disabled = false;
                 }
                 else {
-                    mainButton.classList.add('ytomo-fab-idle');
+                    mainButton.classList.add('state-idle');
                     mainButton.title = '対象選択待ち';
                     mainButton.disabled = true;
                     // 効率モードタイマー実行中はログ削減
@@ -4320,6 +4333,14 @@ class EntranceReservationStateManager {
         // カウントダウン中は完了ログも削減
         if (!this.isReloadCountdownActive()) {
             // FAB更新完了ログを削減
+        }
+        // 【システム連動】オーバーレイ表示中はFABボタンを強制有効化
+        const processingOverlay = document.getElementById('ytomo-processing-overlay');
+        if (processingOverlay && !processingOverlay.classList.contains('hidden')) {
+            if (mainButton.disabled) {
+                mainButton.disabled = false;
+                console.log('🛡️ [システム連動] オーバーレイ表示中につき中断ボタンを強制有効化');
+            }
         }
         // 監視対象リスト表示も更新
         this.updateMonitoringTargetsDisplay();
@@ -4337,14 +4358,16 @@ class EntranceReservationStateManager {
         if (reservationTargetElement) {
             if (displayInfo.hasTarget && displayInfo.targetType === 'reservation') {
                 reservationTargetElement.innerHTML = displayInfo.displayText.replace(/\n/g, '<br>');
-                reservationTargetElement.style.display = 'block';
+                reservationTargetElement.classList.remove('hidden');
+                reservationTargetElement.classList.add('visible');
                 // カウントダウン中・効率モードタイマー実行中はログを削減
                 if (!this.isReloadCountdownActive() && !this.efficiencyMode.updateTimer) {
                     console.log(`🔍 [予約対象表示更新] 表示: "${displayInfo.displayText}"`);
                 }
             }
             else {
-                reservationTargetElement.style.display = 'none';
+                reservationTargetElement.classList.remove('visible');
+                reservationTargetElement.classList.add('hidden');
                 reservationTargetElement.innerHTML = '';
             }
         }
@@ -4352,17 +4375,17 @@ class EntranceReservationStateManager {
         if (monitoringTargetsElement) {
             if (displayInfo.hasTarget && displayInfo.targetType === 'monitoring') {
                 monitoringTargetsElement.innerHTML = displayInfo.displayText.replace(/\n/g, '<br>');
-                monitoringTargetsElement.style.display = 'block';
-                // 背景色の設定
-                monitoringTargetsElement.className = ''; // 既存のクラスをクリア
-                monitoringTargetsElement.classList.add('monitoring-targets');
+                // 表示状態の設定（背景色はSCSSで固定）
+                monitoringTargetsElement.classList.remove('hidden');
+                monitoringTargetsElement.classList.add('visible');
                 // カウントダウン中はログを削減
                 if (!this.isReloadCountdownActive()) {
                     console.log(`🔍 [監視対象表示更新] 表示: "${displayInfo.displayText}"`);
                 }
             }
             else {
-                monitoringTargetsElement.style.display = 'none';
+                monitoringTargetsElement.classList.remove('visible');
+                monitoringTargetsElement.classList.add('hidden');
                 monitoringTargetsElement.innerHTML = '';
             }
         }
@@ -4385,29 +4408,28 @@ class EntranceReservationStateManager {
         const statusBadge = document.querySelector('#ytomo-status-badge');
         if (!statusBadge)
             return;
+        // 既存の状態クラスをクリア
+        statusBadge.className = statusBadge.className.replace(/ytomo-status-\w+/g, '').trim();
         switch (mode) {
             case 'monitoring':
+                statusBadge.classList.add('ytomo-status-monitoring');
                 const remainingSeconds = this.getReloadSecondsRemaining();
                 if (this.isReloadCountdownActive() && remainingSeconds !== null) {
                     const prefix = this.isEfficiencyModeEnabled() ? '効率' : '';
                     statusBadge.innerText = `${prefix}監視中\nリロード: ${remainingSeconds}秒`;
                     // リロード5秒前から警告クラスを追加
                     if (remainingSeconds <= 5) {
-                        statusBadge.classList.add('countdown-warning');
+                        statusBadge.classList.add('ytomo-status-countdown-warning');
                     }
-                    else {
-                        statusBadge.classList.remove('countdown-warning');
-                    }
-                    statusBadge.classList.remove('js-hide');
                 }
                 else {
                     const prefix = this.isEfficiencyModeEnabled() ? '効率' : '';
                     statusBadge.innerText = `${prefix}監視待機中`;
-                    statusBadge.classList.remove('countdown-warning');
-                    statusBadge.classList.remove('js-hide');
                 }
+                statusBadge.classList.remove('js-hide');
                 break;
             case 'reservation-running':
+                statusBadge.classList.add('ytomo-status-reservation');
                 if (this.isEfficiencyModeEnabled()) {
                     const nextTarget = this.getNextSubmitTarget();
                     if (nextTarget) {
@@ -4416,15 +4438,11 @@ class EntranceReservationStateManager {
                         statusBadge.innerText = `効率予約実行中\n${remainingSeconds}秒後`;
                         // 5秒前から警告色
                         if (remainingSeconds <= 5) {
-                            statusBadge.classList.add('countdown-warning');
-                        }
-                        else {
-                            statusBadge.classList.remove('countdown-warning');
+                            statusBadge.classList.add('ytomo-status-countdown-warning');
                         }
                     }
                     else {
                         statusBadge.innerText = '効率予約実行中';
-                        statusBadge.classList.remove('countdown-warning');
                     }
                 }
                 else {
@@ -4433,29 +4451,28 @@ class EntranceReservationStateManager {
                         Math.floor((Date.now() - startTime) / 60000) : 0;
                     const attempts = this.getAttempts();
                     statusBadge.innerText = `予約実行中\n${elapsedMinutes}分 ${attempts}回`;
-                    statusBadge.classList.remove('countdown-warning');
                 }
                 statusBadge.classList.remove('js-hide');
                 break;
             case 'cooldown':
+                statusBadge.classList.add('ytomo-status-cooldown');
                 statusBadge.innerText = customText || '予約待機中';
-                statusBadge.classList.remove('countdown-warning');
                 statusBadge.classList.remove('js-hide');
                 break;
             case 'idle-monitoring':
+                statusBadge.classList.add('ytomo-status-waiting');
                 statusBadge.innerText = '監視可能';
-                statusBadge.classList.remove('countdown-warning');
                 statusBadge.classList.remove('js-hide');
                 break;
             case 'idle-reservation':
+                statusBadge.classList.add('ytomo-status-waiting');
                 statusBadge.innerText = '予約可能';
-                statusBadge.classList.remove('countdown-warning');
                 statusBadge.classList.remove('js-hide');
                 break;
             case 'idle':
             default:
+                statusBadge.classList.add('ytomo-status-waiting');
                 statusBadge.innerText = '対象選択待ち';
-                statusBadge.classList.remove('countdown-warning');
                 statusBadge.classList.remove('js-hide');
                 break;
         }
@@ -4611,15 +4628,20 @@ class EntranceReservationStateManager {
     // ============================================================================
     // changeダイアログが表示されたことを記録
     markChangeDialogAppeared() {
-        if (!this.changeDialogState.hasAppeared) {
-            this.changeDialogState.hasAppeared = true;
-            this.changeDialogState.needsTimingAdjustment = true;
-            console.log('🔄 changeダイアログ出現を検出 - タイミング調整が必要');
-        }
+        console.log(`🔄 [markChangeDialogAppeared] 現在の状態: hasAppeared=${this.changeDialogState.hasAppeared}, needsTimingAdjustment=${this.changeDialogState.needsTimingAdjustment}`);
+        this.changeDialogState.hasAppeared = true;
+        this.changeDialogState.needsTimingAdjustment = true;
+        console.log('🔄 changeダイアログ出現を検出 - 毎回タイミング調整が必要');
+    }
+    // changeダイアログが出現したかどうか
+    hasChangeDialogAppeared() {
+        return this.changeDialogState.hasAppeared;
     }
     // changeダイアログのタイミング調整が必要か
     needsChangeDialogTimingAdjustment() {
-        return this.changeDialogState.hasAppeared && this.changeDialogState.needsTimingAdjustment;
+        const result = this.changeDialogState.hasAppeared && this.changeDialogState.needsTimingAdjustment;
+        console.log(`🔄 [needsChangeDialogTimingAdjustment] hasAppeared=${this.changeDialogState.hasAppeared}, needsTimingAdjustment=${this.changeDialogState.needsTimingAdjustment}, result=${result}`);
+        return result;
     }
     // changeダイアログのタイミング調整用待機時間を計算
     calculateChangeDialogWaitTime() {
@@ -4638,7 +4660,7 @@ class EntranceReservationStateManager {
             targetSeconds = 60; // 次の分の00秒
         }
         const waitMs = ((targetSeconds - seconds) * 1000) - milliseconds;
-        const waitSeconds = Math.max(0, Math.ceil(waitMs / 1000));
+        const waitSeconds = Math.max(0, Math.floor(waitMs / 1000));
         console.log(`🔄 changeダイアログ待機時間計算: ${waitSeconds}秒 (現在: ${seconds}.${String(milliseconds).padStart(3, '0')}秒 → 目標: ${targetSeconds % 60}秒)`);
         return waitMs;
     }
@@ -4691,15 +4713,18 @@ module.exports = function (i) {
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   O: () => (/* binding */ processingOverlay)
+/* harmony export */   Eh: () => (/* binding */ checkAndShowEarlyOverlay),
+/* harmony export */   OB: () => (/* binding */ processingOverlay)
 /* harmony export */ });
 /* unused harmony export ProcessingOverlay */
+/* harmony import */ var _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(374);
 /**
  * 自動処理中の誤動作防止オーバーレイシステム
  *
  * 予約実行中・監視中に画面全体を薄いオーバーレイで覆い、
  * 中断ボタン以外の操作を防ぐことで誤動作を防止
  */
+
 class ProcessingOverlay {
     constructor() {
         this.overlayElement = null;
@@ -4725,6 +4750,10 @@ class ProcessingOverlay {
         const messageText = document.createElement('div');
         messageText.className = 'processing-message-text';
         messageText.textContent = '自動処理実行中...';
+        // 対象情報表示用の要素を追加
+        const targetText = document.createElement('div');
+        targetText.className = 'processing-target-text';
+        targetText.textContent = '';
         const warningText = document.createElement('div');
         warningText.className = 'processing-warning-text';
         warningText.textContent = '誤動作防止';
@@ -4732,6 +4761,7 @@ class ProcessingOverlay {
         cancelArea.className = 'processing-cancel-area';
         cancelArea.innerHTML = '右下のボタンで中断';
         messageArea.appendChild(messageText);
+        messageArea.appendChild(targetText);
         messageArea.appendChild(warningText);
         messageArea.appendChild(cancelArea);
         this.overlayElement.appendChild(messageArea);
@@ -4790,13 +4820,70 @@ class ProcessingOverlay {
         console.log(`🛡️ 誤動作防止オーバーレイ表示: ${processType}`);
         // メッセージをプロセスタイプに応じて更新
         const messageText = this.overlayElement.querySelector('.processing-message-text');
+        const targetText = this.overlayElement.querySelector('.processing-target-text');
         if (processType === 'monitoring') {
+            // キャッシュから監視対象情報を取得（実行中の変動を避ける）
+            let targetInfo = '対象なし';
+            try {
+                // キャッシュから直接読み込み
+                const generateKey = (suffix = '') => {
+                    const url = new URL(window.location.href);
+                    const baseKey = `expo2025_entrance_${url.searchParams.get('reserve_id') || 'default'}`;
+                    return suffix ? `${baseKey}_${suffix}` : baseKey;
+                };
+                const cachedData = localStorage.getItem(generateKey('target_slots'));
+                console.log('🔍 [中央オーバーレイ] キャッシュデータ:', cachedData);
+                if (cachedData) {
+                    const parsed = JSON.parse(cachedData);
+                    if (parsed.targets && parsed.targets.length > 0) {
+                        // 日付情報を追加
+                        const dateInfo = parsed.selectedDate || '';
+                        const dateDisplay = dateInfo ? dateInfo.split('-').slice(1).join('/') : '';
+                        const targets = parsed.targets.map((t) => {
+                            const location = t.locationIndex === 0 ? '東' : '西';
+                            return `${location}${t.timeSlot}`;
+                        }).join(', ');
+                        targetInfo = `${dateDisplay}\n${targets}`;
+                        console.log('🔍 [中央オーバーレイ] キャッシュから対象情報取得:', targetInfo);
+                    }
+                }
+                else {
+                    // フォールバック: entranceReservationStateManagerから取得
+                    if (_entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_0__/* .entranceReservationStateManager */ .xx) {
+                        const monitoringTargets = _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_0__/* .entranceReservationStateManager */ .xx.getMonitoringTargets() || [];
+                        console.log('🔍 [中央オーバーレイ] フォールバック監視対象:', monitoringTargets);
+                        if (monitoringTargets.length > 0) {
+                            targetInfo = monitoringTargets.map((t) => {
+                                const location = t.locationIndex === 0 ? '東' : '西';
+                                return `${location}${t.timeSlot}`;
+                            }).join(', ');
+                        }
+                    }
+                }
+            }
+            catch (error) {
+                console.error('🔍 [中央オーバーレイ] キャッシュ読み込みエラー:', error);
+                targetInfo = '対象情報取得エラー';
+            }
+            // ログ削減: 最終テキストログを削除
             if (messageText)
                 messageText.textContent = '監視実行中...';
+            if (targetText)
+                targetText.textContent = targetInfo;
         }
         else {
+            // 予約対象の情報を取得
+            let targetInfo = '対象なし';
+            if (_entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_0__/* .entranceReservationStateManager */ .xx && _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_0__/* .entranceReservationStateManager */ .xx.getFabTargetDisplayInfo) {
+                const displayInfo = _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_0__/* .entranceReservationStateManager */ .xx.getFabTargetDisplayInfo();
+                if (displayInfo && displayInfo.hasTarget && displayInfo.targetType === 'reservation') {
+                    targetInfo = displayInfo.displayText;
+                }
+            }
             if (messageText)
                 messageText.textContent = '予約実行中...';
+            if (targetText)
+                targetText.textContent = targetInfo;
         }
         // 表示アニメーション
         this.overlayElement.classList.remove('hidden');
@@ -4805,6 +4892,12 @@ class ProcessingOverlay {
         const fabContainer = document.getElementById('ytomo-fab-container');
         if (fabContainer) {
             fabContainer.className = fabContainer.className.replace(/z-\w+/g, '').trim() + ' z-above-overlay';
+        }
+        // 【システム連動】オーバーレイ表示中は必ずFABボタンを有効化（中断可能にする）
+        const mainFabButton = document.getElementById('ytomo-main-fab');
+        if (mainFabButton) {
+            mainFabButton.disabled = false;
+            console.log('🛡️ [システム連動] オーバーレイ表示につき中断ボタンを強制有効化');
         }
         this.isActive = true;
     }
@@ -4870,6 +4963,46 @@ class ProcessingOverlay {
         document.removeEventListener('keydown', this.handleKeyDown.bind(this));
         this.isActive = false;
         console.log('🛡️ 誤動作防止オーバーレイを破棄');
+    }
+}
+// 早期初期化関数（リロード直後の誤操作防止）
+function checkAndShowEarlyOverlay() {
+    try {
+        // 監視フラグをチェック
+        const flagData = localStorage.getItem('expo2025_monitoring_flag');
+        if (!flagData)
+            return;
+        const parsed = JSON.parse(flagData);
+        if (!parsed.isMonitoring)
+            return;
+        // フラグの有効期限チェック（10分以内）
+        const elapsed = Date.now() - parsed.timestamp;
+        if (elapsed > 10 * 60 * 1000) {
+            localStorage.removeItem('expo2025_monitoring_flag');
+            return;
+        }
+        console.log('🚨 リロード直後: 監視継続フラグを検出、即座にオーバーレイ表示');
+        // 早期オーバーレイを表示
+        const overlay = new ProcessingOverlay();
+        overlay.show('monitoring');
+        // 【システム連動】早期オーバーレイでもFABボタンを有効化
+        setTimeout(() => {
+            const mainFabButton = document.getElementById('ytomo-main-fab');
+            if (mainFabButton) {
+                mainFabButton.disabled = false;
+                console.log('🚨 [早期システム連動] 中断ボタンを強制有効化');
+            }
+        }, 100);
+        // 一定時間後に通常の初期化で引き継がれるまで維持
+        setTimeout(() => {
+            // 通常の初期化が完了していない場合のみ非表示
+            if (!document.getElementById('ytomo-fab-container')) {
+                console.log('🚨 早期オーバーレイ: 通常初期化が遅れているため維持継続');
+            }
+        }, 3000);
+    }
+    catch (error) {
+        console.error('🚨 早期オーバーレイ表示エラー:', error);
     }
 }
 // グローバルインスタンス
@@ -5247,20 +5380,23 @@ function showStatus(message, color = 'white') {
     if (!statusBadge)
         return;
     statusBadge.innerText = message;
-    // 既存の背景色クラスを削除
-    statusBadge.className = statusBadge.className.replace(/status-bg-\w+/g, '');
-    // 新しい背景色クラスを追加
-    const bgClass = color === 'green' ? 'status-bg-green' :
-        color === 'red' ? 'status-bg-red' :
-            color === 'orange' ? 'status-bg-orange' :
-                color === 'blue' ? 'status-bg-blue' :
-                    'status-bg-default';
-    statusBadge.classList.add(bgClass);
+    // 既存の状態クラスを削除
+    statusBadge.className = statusBadge.className.replace(/ytomo-status-\w+/g, '').trim();
+    // 新しい状態クラスを追加
+    const statusClass = color === 'green' ? 'ytomo-status-monitoring' :
+        color === 'red' ? 'ytomo-status-countdown-warning' :
+            color === 'orange' ? 'ytomo-status-cooldown' :
+                color === 'blue' ? 'ytomo-status-reservation' :
+                    'ytomo-status-waiting';
+    statusBadge.classList.add(statusClass);
     statusBadge.classList.remove('js-hide');
-    // 一定時間後に自動で隠す（エラー、成功、中断メッセージ以外）
+    // 一定時間後に状態管理システムに更新を委譲（エラー、成功、中断メッセージ以外）
     if (color !== 'red' && color !== 'green' && color !== 'orange') {
         setTimeout(() => {
-            statusBadge.classList.add('js-hide');
+            // 状態管理システムによる更新に委譲
+            if (_entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_4__/* .entranceReservationStateManager */ .xx) {
+                _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_4__/* .entranceReservationStateManager */ .xx.updateFabDisplay();
+            }
         }, 3000);
     }
 }
@@ -5277,11 +5413,10 @@ function createEntranceReservationUI() {
     // メインFABボタンを作成
     const fabButton = document.createElement('button');
     fabButton.id = 'ytomo-main-fab';
-    fabButton.classList.add('ext-ytomo', 'ytomo-fab', 'ytomo-fab-disabled');
+    fabButton.classList.add('ext-ytomo', 'ytomo-fab', 'state-idle');
     // FABボタンのステータス表示
     const fabIcon = document.createElement('span');
-    fabIcon.classList.add('ext-ytomo', 'ytomo-fab-status');
-    fabIcon.className = 'ytomo-fab-inner-content';
+    fabIcon.classList.add('ext-ytomo', 'ytomo-fab-status', 'ytomo-fab-inner-content');
     fabIcon.innerText = '待機中';
     fabButton.appendChild(fabIcon);
     // 初期状態はytomo-fabクラスで制御
@@ -5300,21 +5435,7 @@ function createEntranceReservationUI() {
     // ステータス表示（コンパクト）
     const statusBadge = document.createElement('div');
     statusBadge.id = 'ytomo-status-badge';
-    statusBadge.style.cssText = `
-        background: linear-gradient(135deg, rgba(0, 0, 0, 0.9), rgba(40, 40, 40, 0.9)) !important;
-        color: white !important;
-        padding: 8px 16px !important;
-        border-radius: 20px !important;
-        font-size: 12px !important;
-        font-weight: bold !important;
-        white-space: pre-line !important;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3), 0 2px 6px rgba(0, 0, 0, 0.2) !important;
-        border: 2px solid rgba(255, 255, 255, 0.15) !important;
-        display: none !important;
-        pointer-events: none !important;
-        text-align: center !important;
-        line-height: 1.3 !important;
-    `;
+    statusBadge.className = '';
     statusBadge.innerText = '待機中';
     // メインFABボタンにイベントリスナーを設定
     fabButton.addEventListener('click', async (event) => {
@@ -5326,8 +5447,8 @@ function createEntranceReservationUI() {
             event.stopImmediatePropagation();
             return false;
         }
-        // 追加のstyle確認（CSS disabled状態もチェック）
-        if (fabButton.style.pointerEvents === 'none') {
+        // 追加のクラス確認（CSS disabled状態もチェック）
+        if (fabButton.classList.contains('pointer-events-none')) {
             // pointer-events:noneのためクリック無視
             event.preventDefault();
             event.stopPropagation();
@@ -5377,7 +5498,7 @@ function createEntranceReservationUI() {
         console.log('⏹️ 監視を中断');
         (0,_entrance_page_core__WEBPACK_IMPORTED_MODULE_3__/* .stopSlotMonitoring */ .XG)();
         // 誤動作防止オーバーレイを非表示
-        _processing_overlay__WEBPACK_IMPORTED_MODULE_0__/* .processingOverlay */ .O.hide();
+        _processing_overlay__WEBPACK_IMPORTED_MODULE_0__/* .processingOverlay */ .OB.hide();
         showStatus('監視中断', 'orange');
         (0,_entrance_page_ui_helpers__WEBPACK_IMPORTED_MODULE_5__/* .updateMainButtonDisplay */ .vp)();
     }
@@ -5415,8 +5536,19 @@ function createEntranceReservationUI() {
             showStatus('予約開始失敗', 'red');
             return;
         }
+        console.log('🔄 予約開始成功、FABボタン状態更新中...');
+        // デバッグ: 実行状態を確認
+        const currentState = _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_4__/* .entranceReservationStateManager */ .xx.getExecutionState();
+        console.log(`🔄 [予約開始後] 実行状態: ${currentState}`);
+        // 監視中から予約に切り替わった場合にオーバーレイを更新
+        _processing_overlay__WEBPACK_IMPORTED_MODULE_0__/* .processingOverlay */ .OB.show('reservation');
         showStatus('予約処理実行中...', 'blue');
         (0,_entrance_page_ui_helpers__WEBPACK_IMPORTED_MODULE_5__/* .updateMainButtonDisplay */ .vp)();
+        // デバッグ: FABボタンの現在の状態を確認
+        const mainButton = document.getElementById('ytomo-main-fab');
+        if (mainButton) {
+            console.log(`🔄 [予約開始後] FABボタン状態: disabled=${mainButton.disabled}, title="${mainButton.title}"`);
+        }
         updateMonitoringTargetsDisplay(); // 予約対象を表示
         // 設定オブジェクトを作成
         const config = {
@@ -5504,7 +5636,7 @@ function createEntranceReservationUI() {
     }
     // disabled状態でのクリックを確実に防ぐため、キャプチャーフェーズでも処理
     fabButton.addEventListener('click', (event) => {
-        if (fabButton.disabled || fabButton.hasAttribute('disabled') || fabButton.style.pointerEvents === 'none') {
+        if (fabButton.disabled || fabButton.hasAttribute('disabled') || fabButton.classList.contains('pointer-events-none')) {
             console.log('🚫 キャプチャーフェーズでdisabledクリックを阻止');
             event.preventDefault();
             event.stopPropagation();
@@ -5642,7 +5774,7 @@ function checkVisitTimeButtonState() {
 // 時間帯が選択されているかチェック
 function checkTimeSlotSelected() {
     // 選択された時間帯（aria-pressed="true"）をチェック
-    const selectedTimeSlot = document.querySelector(_entrance_page_dom_utils__WEBPACK_IMPORTED_MODULE_2__/* .timeSlotSelectors */ .eN.selectedSlot);
+    const selectedTimeSlot = document.querySelector(timeSlotSelectors.selectedSlot);
     if (!selectedTimeSlot) {
         console.log('⚠️ 時間帯が選択されていません');
         return false;
@@ -5651,7 +5783,7 @@ function checkTimeSlotSelected() {
     const tdElement = selectedTimeSlot.closest('td');
     if (!tdElement)
         return false;
-    const status = (0,_entrance_page_dom_utils__WEBPACK_IMPORTED_MODULE_2__/* .extractTdStatus */ .SE)(tdElement);
+    const status = extractTdStatus(tdElement);
     if (status && status.isFull) {
         console.log('⚠️ 選択された時間帯は満員です');
         return false;
@@ -5661,7 +5793,7 @@ function checkTimeSlotSelected() {
 }
 // 予約開始可能かどうかの総合判定
 function canStartReservation() {
-    const hasTimeSlotTable = (0,_entrance_page_core__WEBPACK_IMPORTED_MODULE_3__/* .checkTimeSlotTableExistsSync */ .H5)();
+    const hasTimeSlotTable = checkTimeSlotTableExistsSync();
     const isTimeSlotSelected = checkTimeSlotSelected();
     const isVisitTimeButtonEnabled = checkVisitTimeButtonState();
     console.log(`📊 予約開始条件チェック:`);
@@ -5673,46 +5805,21 @@ function canStartReservation() {
 // 初期状態をチェックしてFABを適切に設定
 function checkInitialState() {
     console.log('🔍 初期状態をチェック中...');
-    // カレンダーで日付が選択されているかチェック
-    const selectedDate = (0,_entrance_page_core__WEBPACK_IMPORTED_MODULE_3__/* .getCurrentSelectedCalendarDate */ .rY)();
-    const hasTimeSlotTable = (0,_entrance_page_core__WEBPACK_IMPORTED_MODULE_3__/* .checkTimeSlotTableExistsSync */ .H5)();
-    console.log(`📅 選択日付: ${selectedDate || 'なし'}`);
-    console.log(`🗓️ 時間帯テーブル: ${hasTimeSlotTable ? 'あり' : 'なし'}`);
-    if (selectedDate && hasTimeSlotTable) {
-        // 時間帯テーブルがある場合、予約開始可能かチェック
-        const canStart = canStartReservation();
-        console.log(`✅ 日付選択済み、時間帯テーブル表示中 - ${canStart ? '予約開始可能' : '条件未満'}`);
-        // FABボタンの状態を設定
-        const fabButton = document.querySelector('#ytomo-main-fab');
-        const fabIcon = fabButton?.querySelector('.ytomo-fab-status');
-        if (fabButton && fabIcon) {
-            // 常に「予約開始」と表示
-            fabIcon.innerText = '予約\n開始';
-            if (canStart) {
-                // 予約開始可能
-                fabButton.style.background = 'rgb(0, 104, 33) !important';
-                fabButton.style.opacity = '0.9 !important';
-                fabButton.style.cursor = 'pointer !important';
-                fabButton.disabled = false;
-                fabButton.title = '予約開始';
-            }
-            else {
-                // 条件未満足 - disabled状態（グレー色）
-                fabButton.style.background = 'rgb(128, 128, 128) !important';
-                fabButton.style.opacity = '0.9 !important';
-                fabButton.style.cursor = 'not-allowed !important';
-                fabButton.disabled = true;
-                fabButton.title = '時間帯を選択し、来場日時設定ボタンが有効になるまでお待ちください';
-            }
-        }
-        // ステータスも更新
-        (0,_entrance_page_core__WEBPACK_IMPORTED_MODULE_3__/* .updateStatusBadge */ .pW)(canStart ? 'idle' : 'waiting');
+    // 【統一システム連動】統一システムが責任を持つ場合はスキップ
+    const currentState = _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_4__/* .entranceReservationStateManager */ .xx.getExecutionState();
+    const preferredAction = _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_4__/* .entranceReservationStateManager */ .xx.getPreferredAction();
+    if (currentState !== _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_4__/* .ExecutionState */ .si.IDLE) {
+        console.log(`🔄 統一システム実行中 (${currentState}) - 初期状態チェックをスキップ`);
+        return;
     }
-    else {
-        // カレンダー未選択または時間帯テーブル未表示の場合は待機中のまま
-        console.log('⏳ カレンダー未選択または時間帯テーブル未表示 - 待機中を維持');
-        (0,_entrance_page_core__WEBPACK_IMPORTED_MODULE_3__/* .updateStatusBadge */ .pW)('idle');
+    if (preferredAction === 'monitoring' || preferredAction === 'reservation') {
+        console.log(`🔄 統一システムがアクション決定済み (${preferredAction}) - 初期状態チェックをスキップ`);
+        return;
     }
+    // 【統一システム完全委譲】FABボタン状態は統一システムが一元管理
+    console.log('🔄 FABボタン状態は統一システムに完全委譲');
+    // 統一システムに状態更新を要求
+    _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_4__/* .entranceReservationStateManager */ .xx.updateFabDisplay();
 }
 // カレンダー変更を監視して監視ボタンを再設置
 function startCalendarWatcher() {
@@ -8848,6 +8955,8 @@ function initCompanionTicketFeature() {
     console.log('🎫 同行者追加機能初期化完了');
 }
 
+// EXTERNAL MODULE: ./src-modules/processing-overlay.ts
+var processing_overlay = __webpack_require__(624);
 ;// ./src-modules/app-router.ts
 // 各モジュールからのimport
 
@@ -8861,6 +8970,8 @@ function initCompanionTicketFeature() {
 
  // 同行者追加機能
 // 入場予約状態管理システムのimport
+
+// 早期オーバーレイのimport
 
 // Window型の拡張（beforeunloadハンドラー削除により不要）
 // 【8. ページ判定・初期化】
@@ -9162,6 +9273,8 @@ function initializeExtension() {
         // alert(e);
     }
 }
+// 即座に早期オーバーレイをチェック（DOM構築前でも実行可能）
+(0,processing_overlay/* checkAndShowEarlyOverlay */.Eh)();
 // DOM準備完了を待機して初期化実行
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', initializeExtension);

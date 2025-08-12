@@ -1,8 +1,18 @@
 const path = require('path');
 const webpack = require('webpack');
 
-// UserScriptヘッダー
-const userScriptHeader = `// ==UserScript==
+// UserScriptヘッダー（ビルド時に動的生成）
+const generateUserScriptHeader = () => {
+  const buildTime = new Date().toLocaleString('ja-JP', {
+    year: 'numeric',
+    month: '2-digit', 
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit'
+  });
+
+  return `// ==UserScript==
 // @name         yt-Expo2025-Reservation-Helper
 // @namespace    http://staybrowser.com/
 // @version      0.5.4
@@ -13,7 +23,10 @@ const userScriptHeader = `// ==UserScript==
 // @run-at       document-end
 // ==/UserScript==
 
+// Built: ${buildTime}
+
 `;
+};
 
 module.exports = {
   entry: './src-modules/main.ts', // TypeScript完全移行完了
@@ -38,7 +51,7 @@ module.exports = {
   devtool: false, // ソースマップ無効化
   plugins: [
     new webpack.BannerPlugin({
-      banner: userScriptHeader,
+      banner: generateUserScriptHeader(),
       raw: true, // コメント形式として扱わない
       entryOnly: true
     })

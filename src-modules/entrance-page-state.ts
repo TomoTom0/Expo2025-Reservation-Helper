@@ -209,9 +209,9 @@ export function createFABToggleButton(): void {
                </svg>`; // eye-off
         
         toggleButton.innerHTML = `
-            <div style="display: flex; flex-direction: column; align-items: center;">
+            <div class="ytomo-flex-column-center">
                 ${iconSvg}
-                <span style="font-size: 8px; font-weight: bold; margin-top: 2px;">YTomo</span>
+                <span class="ytomo-brand-text">YTomo</span>
             </div>
         `;
         toggleButton.title = fabVisibilityState.isVisible ? 'FABを非表示にする' : 'FABを表示する';

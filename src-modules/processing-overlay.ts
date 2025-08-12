@@ -5,6 +5,8 @@
  * 中断ボタン以外の操作を防ぐことで誤動作を防止
  */
 
+import { entranceReservationStateManager } from './entrance-reservation-state-manager';
+
 export class ProcessingOverlay {
     private overlayElement: HTMLElement | null = null;
     private isActive: boolean = false;
@@ -36,6 +38,11 @@ export class ProcessingOverlay {
         messageText.className = 'processing-message-text';
         messageText.textContent = '自動処理実行中...';
         
+        // 対象情報表示用の要素を追加
+        const targetText = document.createElement('div');
+        targetText.className = 'processing-target-text';
+        targetText.textContent = '';
+        
         const warningText = document.createElement('div');
         warningText.className = 'processing-warning-text';
         warningText.textContent = '誤動作防止';
@@ -45,6 +52,7 @@ export class ProcessingOverlay {
         cancelArea.innerHTML = '右下のボタンで中断';
         
         messageArea.appendChild(messageText);
+        messageArea.appendChild(targetText);
         messageArea.appendChild(warningText);
         messageArea.appendChild(cancelArea);
         
@@ -115,11 +123,72 @@ export class ProcessingOverlay {
         
         // メッセージをプロセスタイプに応じて更新
         const messageText = this.overlayElement.querySelector('.processing-message-text');
+        const targetText = this.overlayElement.querySelector('.processing-target-text');
         
         if (processType === 'monitoring') {
+            // キャッシュから監視対象情報を取得（実行中の変動を避ける）
+            let targetInfo = '対象なし';
+            
+            try {
+                // キャッシュから直接読み込み
+                const generateKey = (suffix: string = '') => {
+                    const url = new URL(window.location.href);
+                    const baseKey = `expo2025_entrance_${url.searchParams.get('reserve_id') || 'default'}`;
+                    return suffix ? `${baseKey}_${suffix}` : baseKey;
+                };
+                
+                const cachedData = localStorage.getItem(generateKey('target_slots'));
+                console.log('🔍 [中央オーバーレイ] キャッシュデータ:', cachedData);
+                
+                if (cachedData) {
+                    const parsed = JSON.parse(cachedData);
+                    if (parsed.targets && parsed.targets.length > 0) {
+                        // 日付情報を追加
+                        const dateInfo = parsed.selectedDate || '';
+                        const dateDisplay = dateInfo ? dateInfo.split('-').slice(1).join('/') : '';
+                        
+                        const targets = parsed.targets.map((t: any) => {
+                            const location = t.locationIndex === 0 ? '東' : '西';
+                            return `${location}${t.timeSlot}`;
+                        }).join(', ');
+                        
+                        targetInfo = `${dateDisplay}\n${targets}`;
+                        console.log('🔍 [中央オーバーレイ] キャッシュから対象情報取得:', targetInfo);
+                    }
+                } else {
+                    // フォールバック: entranceReservationStateManagerから取得
+                    if (entranceReservationStateManager) {
+                        const monitoringTargets = entranceReservationStateManager.getMonitoringTargets() || [];
+                        console.log('🔍 [中央オーバーレイ] フォールバック監視対象:', monitoringTargets);
+                        if (monitoringTargets.length > 0) {
+                            targetInfo = monitoringTargets.map((t: any) => {
+                                const location = t.locationIndex === 0 ? '東' : '西';
+                                return `${location}${t.timeSlot}`;
+                            }).join(', ');
+                        }
+                    }
+                }
+            } catch (error) {
+                console.error('🔍 [中央オーバーレイ] キャッシュ読み込みエラー:', error);
+                targetInfo = '対象情報取得エラー';
+            }
+            
+            // ログ削減: 最終テキストログを削除
             if (messageText) messageText.textContent = '監視実行中...';
+            if (targetText) targetText.textContent = targetInfo;
         } else {
+            // 予約対象の情報を取得
+            let targetInfo = '対象なし';
+            
+            if (entranceReservationStateManager && entranceReservationStateManager.getFabTargetDisplayInfo) {
+                const displayInfo = entranceReservationStateManager.getFabTargetDisplayInfo();
+                if (displayInfo && displayInfo.hasTarget && displayInfo.targetType === 'reservation') {
+                    targetInfo = displayInfo.displayText;
+                }
+            }
+            
             if (messageText) messageText.textContent = '予約実行中...';
+            if (targetText) targetText.textContent = targetInfo;
         }
         
         // 表示アニメーション
@@ -130,6 +199,13 @@ export class ProcessingOverlay {
         const fabContainer = document.getElementById('ytomo-fab-container');
         if (fabContainer) {
             fabContainer.className = fabContainer.className.replace(/z-\w+/g, '').trim() + ' z-above-overlay';
+        }
+        
+        // 【システム連動】オーバーレイ表示中は必ずFABボタンを有効化（中断可能にする）
+        const mainFabButton = document.getElementById('ytomo-main-fab') as HTMLButtonElement;
+        if (mainFabButton) {
+            mainFabButton.disabled = false;
+            console.log('🛡️ [システム連動] オーバーレイ表示につき中断ボタンを強制有効化');
         }
         
         this.isActive = true;
@@ -207,6 +283,51 @@ export class ProcessingOverlay {
         this.isActive = false;
         
         console.log('🛡️ 誤動作防止オーバーレイを破棄');
+    }
+}
+
+// 早期初期化関数（リロード直後の誤操作防止）
+export function checkAndShowEarlyOverlay(): void {
+    try {
+        // 監視フラグをチェック
+        const flagData = localStorage.getItem('expo2025_monitoring_flag');
+        if (!flagData) return;
+        
+        const parsed = JSON.parse(flagData);
+        if (!parsed.isMonitoring) return;
+        
+        // フラグの有効期限チェック（10分以内）
+        const elapsed = Date.now() - parsed.timestamp;
+        if (elapsed > 10 * 60 * 1000) {
+            localStorage.removeItem('expo2025_monitoring_flag');
+            return;
+        }
+        
+        console.log('🚨 リロード直後: 監視継続フラグを検出、即座にオーバーレイ表示');
+        
+        // 早期オーバーレイを表示
+        const overlay = new ProcessingOverlay();
+        overlay.show('monitoring');
+        
+        // 【システム連動】早期オーバーレイでもFABボタンを有効化
+        setTimeout(() => {
+            const mainFabButton = document.getElementById('ytomo-main-fab') as HTMLButtonElement;
+            if (mainFabButton) {
+                mainFabButton.disabled = false;
+                console.log('🚨 [早期システム連動] 中断ボタンを強制有効化');
+            }
+        }, 100);
+        
+        // 一定時間後に通常の初期化で引き継がれるまで維持
+        setTimeout(() => {
+            // 通常の初期化が完了していない場合のみ非表示
+            if (!document.getElementById('ytomo-fab-container')) {
+                console.log('🚨 早期オーバーレイ: 通常初期化が遅れているため維持継続');
+            }
+        }, 3000);
+        
+    } catch (error) {
+        console.error('🚨 早期オーバーレイ表示エラー:', error);
     }
 }
 

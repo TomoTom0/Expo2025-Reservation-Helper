@@ -950,20 +950,20 @@ async function checkSlotAvailabilityAndReload(): Promise<void> {
             }
             
             totalWaitTime = Math.max(1000, remainingMs); // 最低1秒
-            displaySeconds = Math.ceil(totalWaitTime / 1000);
+            displaySeconds = Math.floor(totalWaitTime / 1000);
         } else {
             // 標的時刻が設定されていない場合は通常処理
             const baseInterval = 30000;
             const randomVariation = Math.random() * 5000;
             totalWaitTime = baseInterval + randomVariation;
-            displaySeconds = Math.ceil(totalWaitTime / 1000);
+            displaySeconds = Math.floor(totalWaitTime / 1000);
         }
     } else {
         // 通常モード: BAN対策のランダム要素付き
         const baseInterval = 30000; // 30000ms (30秒)
         const randomVariation = Math.random() * 5000; // 0-5秒のランダム要素
         totalWaitTime = baseInterval + randomVariation;
-        displaySeconds = Math.ceil(totalWaitTime / 1000);
+        displaySeconds = Math.floor(totalWaitTime / 1000);
     }
     
     // カウントダウンとリロードを統一実行（フラグ保存処理付き）
@@ -1352,7 +1352,7 @@ export function updateStatusBadge(mode: string): void {
     if (!statusBadge) return;
     
     let message = '';
-    let bgColor = 'rgba(0, 0, 0, 0.8)';
+    let bgClass = 'status-bg-default';
     
     switch (mode) {
         case 'monitoring':
@@ -1363,14 +1363,14 @@ export function updateStatusBadge(mode: string): void {
             if (remainingSeconds !== null && remainingSeconds !== undefined) {
                 if (remainingSeconds <= 3) {
                     message = `${isEfficiencyEnabled ? '効率' : ''}監視中\nリロード: ${remainingSeconds}秒`;
-                    bgColor = 'rgba(255, 0, 0, 0.9)'; // 赤色（中断不可）
+                    bgClass = 'status-bg-red'; // 赤色（中断不可）
                 } else {
                     message = `${isEfficiencyEnabled ? '効率' : ''}監視中\nリロード: ${remainingSeconds}秒`;
-                    bgColor = 'rgba(255, 140, 0, 0.9)'; // オレンジ色
+                    bgClass = 'status-bg-orange'; // オレンジ色
                 }
             } else {
                 message = `${isEfficiencyEnabled ? '効率' : ''}監視実行中`;
-                bgColor = 'rgba(255, 140, 0, 0.9)'; // オレンジ色
+                bgClass = 'status-bg-orange'; // オレンジ色
             }
             break;
             
@@ -1382,10 +1382,10 @@ export function updateStatusBadge(mode: string): void {
                     const remainingMs = nextTarget.getTime() - Date.now();
                     const remainingSeconds = Math.max(0, Math.floor(remainingMs / 1000));
                     message = `効率予約実行中\n${remainingSeconds}秒後`;
-                    bgColor = 'rgba(255, 140, 0, 0.9)'; // オレンジ色
+                    bgClass = 'status-bg-orange'; // オレンジ色
                 } else {
                     message = '効率予約実行中';
-                    bgColor = 'rgba(255, 140, 0, 0.9)';
+                    bgClass = 'status-bg-orange';
                 }
             } else {
                 // 通常モード: 経過時間と回数を表示
@@ -1394,42 +1394,45 @@ export function updateStatusBadge(mode: string): void {
                     Math.floor((Date.now() - startTime) / 60000) : 0;
                 const attempts = entranceReservationStateManager.getAttempts();
                 message = `予約実行中\n${elapsedMinutes}分 ${attempts}回`;
-                bgColor = 'rgba(255, 140, 0, 0.9)'; // オレンジ色
+                bgClass = 'status-bg-orange'; // オレンジ色
             }
             break;
             
         case 'selecting':
             message = '監視準備完了';
-            bgColor = 'rgba(0, 104, 33, 0.9)'; // 緑色
+            bgClass = 'status-bg-blue'; // 緑色
             break;
             
         case 'found-available':
             message = '空きあり検出！\n予約実行中';
-            bgColor = 'rgba(0, 200, 0, 0.9)'; // 明るい緑色
+            bgClass = 'status-bg-green'; // 明るい緑色
             break;
             
         case 'loading':
             message = '情報読み込み中...';
-            bgColor = 'rgba(108, 117, 125, 0.9)'; // グレー色
+            bgClass = 'status-bg-default'; // グレー色
             break;
             
         case 'waiting':
             message = '待機中';
-            bgColor = 'rgba(128, 128, 128, 0.9)'; // グレー色
+            bgClass = 'status-bg-default'; // グレー色
             break;
             
         case 'idle':
         default:
             message = '待機中';
-            bgColor = 'rgba(0, 0, 0, 0.8)'; // 黒色
+            bgClass = 'status-bg-default'; // 黒色
             break;
     }
     
     if (message) {
         statusBadge.innerText = message;
-        statusBadge.style.background = bgColor;
-        statusBadge.style.display = 'block';
-        statusBadge.style.whiteSpace = 'pre-line'; // 改行を有効にする
+        
+        // 既存の背景色クラスを削除してから新しいクラスを追加
+        statusBadge.className = statusBadge.className.replace(/status-bg-\w+/g, '');
+        statusBadge.classList.add(bgClass);
+        
+        statusBadge.classList.remove('js-hide');
         
         // 効率モードの5秒前警告（予約実行中・監視中両方）
         if ((mode === 'reservation-running' || mode === 'monitoring') && entranceReservationStateManager.isEfficiencyModeEnabled()) {
@@ -1447,7 +1450,10 @@ export function updateStatusBadge(mode: string): void {
             statusBadge.classList.remove('countdown-warning');
         }
     } else {
-        statusBadge.style.display = 'none';
+        // 状態管理システムによる更新に委譲
+        if (entranceReservationStateManager) {
+            entranceReservationStateManager.updateFabDisplay();
+        }
     }
 }
 
@@ -2023,31 +2029,12 @@ function showErrorMessage(message: string): void {
     // エラーメッセージ要素を作成
     const errorDiv = document.createElement('div');
     errorDiv.id = 'ytomo-error-message';
-    errorDiv.style.cssText = `
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        background: #ff4444;
-        color: white;
-        padding: 15px;
-        border-radius: 5px;
-        font-size: 14px;
-        z-index: 9999;
-        max-width: 300px;
-        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-    `;
+    errorDiv.className = 'ytomo-error-message';
+    
     errorDiv.innerHTML = `
-        <div style="font-weight: bold; margin-bottom: 5px;">⚠️ 監視エラー</div>
+        <div class="error-title">⚠️ 監視エラー</div>
         <div>${message}</div>
-        <button onclick="this.parentElement.remove()" style="
-            background: transparent;
-            border: 1px solid white;
-            color: white;
-            padding: 5px 10px;
-            margin-top: 10px;
-            border-radius: 3px;
-            cursor: pointer;
-        ">閉じる</button>
+        <button class="error-close-btn" onclick="this.parentElement.remove()">閉じる</button>
     `;
     
     document.body.appendChild(errorDiv);

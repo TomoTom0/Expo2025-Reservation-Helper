@@ -23,11 +23,10 @@ import {
 } from './entrance-page-core';
 
 // unified-stateからのimport
-import { LocationHelper, entranceReservationStateManager } from './entrance-reservation-state-manager';
+import { LocationHelper, entranceReservationStateManager, ExecutionState } from './entrance-reservation-state-manager';
 
 // Section 6からのimport  
 import {
-    updateStatusBadge,
     isInterruptionAllowed
 } from './entrance-page-core';
 
@@ -63,22 +62,25 @@ function showStatus(message: string, color: string = 'white'): void {
     if (!statusBadge) return;
     
     statusBadge.innerText = message;
-    // 既存の背景色クラスを削除
-    statusBadge.className = statusBadge.className.replace(/status-bg-\w+/g, '');
+    // 既存の状態クラスを削除
+    statusBadge.className = statusBadge.className.replace(/ytomo-status-\w+/g, '').trim();
     
-    // 新しい背景色クラスを追加
-    const bgClass = color === 'green' ? 'status-bg-green' :
-                   color === 'red' ? 'status-bg-red' :
-                   color === 'orange' ? 'status-bg-orange' :
-                   color === 'blue' ? 'status-bg-blue' :
-                   'status-bg-default';
-    statusBadge.classList.add(bgClass);
+    // 新しい状態クラスを追加
+    const statusClass = color === 'green' ? 'ytomo-status-monitoring' :
+                       color === 'red' ? 'ytomo-status-countdown-warning' :
+                       color === 'orange' ? 'ytomo-status-cooldown' :
+                       color === 'blue' ? 'ytomo-status-reservation' :
+                       'ytomo-status-waiting';
+    statusBadge.classList.add(statusClass);
     statusBadge.classList.remove('js-hide');
     
-    // 一定時間後に自動で隠す（エラー、成功、中断メッセージ以外）
+    // 一定時間後に状態管理システムに更新を委譲（エラー、成功、中断メッセージ以外）
     if (color !== 'red' && color !== 'green' && color !== 'orange') {
         setTimeout(() => {
-            statusBadge.classList.add('js-hide');
+            // 状態管理システムによる更新に委譲
+            if (entranceReservationStateManager) {
+                entranceReservationStateManager.updateFabDisplay();
+            }
         }, 3000);
     }
 }
@@ -99,12 +101,11 @@ function createEntranceReservationUI(): void {
     // メインFABボタンを作成
     const fabButton = document.createElement('button');
     fabButton.id = 'ytomo-main-fab';
-    fabButton.classList.add('ext-ytomo', 'ytomo-fab', 'ytomo-fab-disabled');
+    fabButton.classList.add('ext-ytomo', 'ytomo-fab', 'state-idle');
 
     // FABボタンのステータス表示
     const fabIcon = document.createElement('span');
-    fabIcon.classList.add('ext-ytomo', 'ytomo-fab-status');
-    fabIcon.className = 'ytomo-fab-inner-content';
+    fabIcon.classList.add('ext-ytomo', 'ytomo-fab-status', 'ytomo-fab-inner-content');
     fabIcon.innerText = '待機中';
     fabButton.appendChild(fabIcon);
     
@@ -128,21 +129,7 @@ function createEntranceReservationUI(): void {
     // ステータス表示（コンパクト）
     const statusBadge = document.createElement('div');
     statusBadge.id = 'ytomo-status-badge';
-    statusBadge.style.cssText = `
-        background: linear-gradient(135deg, rgba(0, 0, 0, 0.9), rgba(40, 40, 40, 0.9)) !important;
-        color: white !important;
-        padding: 8px 16px !important;
-        border-radius: 20px !important;
-        font-size: 12px !important;
-        font-weight: bold !important;
-        white-space: pre-line !important;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3), 0 2px 6px rgba(0, 0, 0, 0.2) !important;
-        border: 2px solid rgba(255, 255, 255, 0.15) !important;
-        display: none !important;
-        pointer-events: none !important;
-        text-align: center !important;
-        line-height: 1.3 !important;
-    `;
+    statusBadge.className = '';
     statusBadge.innerText = '待機中';
 
     // メインFABボタンにイベントリスナーを設定
@@ -156,8 +143,8 @@ function createEntranceReservationUI(): void {
             return false;
         }
         
-        // 追加のstyle確認（CSS disabled状態もチェック）
-        if (fabButton.style.pointerEvents === 'none') {
+        // 追加のクラス確認（CSS disabled状態もチェック）
+        if (fabButton.classList.contains('pointer-events-none')) {
             // pointer-events:noneのためクリック無視
             event.preventDefault();
             event.stopPropagation();
@@ -263,8 +250,23 @@ function createEntranceReservationUI(): void {
             return;
         }
         
+        console.log('🔄 予約開始成功、FABボタン状態更新中...');
+        
+        // デバッグ: 実行状態を確認
+        const currentState = entranceReservationStateManager.getExecutionState();
+        console.log(`🔄 [予約開始後] 実行状態: ${currentState}`);
+        
+        // 監視中から予約に切り替わった場合にオーバーレイを更新
+        processingOverlay.show('reservation');
+        
         showStatus('予約処理実行中...', 'blue');
         updateMainButtonDisplay();
+        
+        // デバッグ: FABボタンの現在の状態を確認
+        const mainButton = document.getElementById('ytomo-main-fab') as HTMLButtonElement;
+        if (mainButton) {
+            console.log(`🔄 [予約開始後] FABボタン状態: disabled=${mainButton.disabled}, title="${mainButton.title}"`);
+        }
         updateMonitoringTargetsDisplay(); // 予約対象を表示
         
         // 設定オブジェクトを作成
@@ -352,7 +354,7 @@ function createEntranceReservationUI(): void {
     
     // disabled状態でのクリックを確実に防ぐため、キャプチャーフェーズでも処理
     fabButton.addEventListener('click', (event) => {
-        if (fabButton.disabled || fabButton.hasAttribute('disabled') || fabButton.style.pointerEvents === 'none') {
+        if (fabButton.disabled || fabButton.hasAttribute('disabled') || fabButton.classList.contains('pointer-events-none')) {
             console.log('🚫 キャプチャーフェーズでdisabledクリックを阻止');
             event.preventDefault();
             event.stopPropagation();
@@ -553,52 +555,25 @@ function canStartReservation(): boolean {
 function checkInitialState(): void {
     console.log('🔍 初期状態をチェック中...');
     
-    // カレンダーで日付が選択されているかチェック
-    const selectedDate = getCurrentSelectedCalendarDate();
-    const hasTimeSlotTable = checkTimeSlotTableExistsSync();
+    // 【統一システム連動】統一システムが責任を持つ場合はスキップ
+    const currentState = entranceReservationStateManager.getExecutionState();
+    const preferredAction = entranceReservationStateManager.getPreferredAction();
     
-    console.log(`📅 選択日付: ${selectedDate || 'なし'}`);
-    console.log(`🗓️ 時間帯テーブル: ${hasTimeSlotTable ? 'あり' : 'なし'}`);
-    
-    if (selectedDate && hasTimeSlotTable) {
-        // 時間帯テーブルがある場合、予約開始可能かチェック
-        const canStart = canStartReservation();
-        
-        console.log(`✅ 日付選択済み、時間帯テーブル表示中 - ${canStart ? '予約開始可能' : '条件未満'}`);
-        
-        // FABボタンの状態を設定
-        const fabButton = document.querySelector('#ytomo-main-fab') as HTMLButtonElement;
-        const fabIcon = fabButton?.querySelector('.ytomo-fab-status') as HTMLSpanElement;
-        
-        if (fabButton && fabIcon) {
-            // 常に「予約開始」と表示
-            fabIcon.innerText = '予約\n開始';
-            
-            if (canStart) {
-                // 予約開始可能
-                fabButton.style.background = 'rgb(0, 104, 33) !important';
-                fabButton.style.opacity = '0.9 !important';
-                fabButton.style.cursor = 'pointer !important';
-                fabButton.disabled = false;
-                fabButton.title = '予約開始';
-            } else {
-                // 条件未満足 - disabled状態（グレー色）
-                fabButton.style.background = 'rgb(128, 128, 128) !important';
-                fabButton.style.opacity = '0.9 !important';
-                fabButton.style.cursor = 'not-allowed !important';
-                fabButton.disabled = true;
-                fabButton.title = '時間帯を選択し、来場日時設定ボタンが有効になるまでお待ちください';
-            }
-        }
-        
-        // ステータスも更新
-        updateStatusBadge(canStart ? 'idle' : 'waiting');
-        
-    } else {
-        // カレンダー未選択または時間帯テーブル未表示の場合は待機中のまま
-        console.log('⏳ カレンダー未選択または時間帯テーブル未表示 - 待機中を維持');
-        updateStatusBadge('idle');
+    if (currentState !== ExecutionState.IDLE) {
+        console.log(`🔄 統一システム実行中 (${currentState}) - 初期状態チェックをスキップ`);
+        return;
     }
+    
+    if (preferredAction === 'monitoring' || preferredAction === 'reservation') {
+        console.log(`🔄 統一システムがアクション決定済み (${preferredAction}) - 初期状態チェックをスキップ`);
+        return;
+    }
+    
+    // 【統一システム完全委譲】FABボタン状態は統一システムが一元管理
+    console.log('🔄 FABボタン状態は統一システムに完全委譲');
+    
+    // 統一システムに状態更新を要求
+    entranceReservationStateManager.updateFabDisplay();
 }
 
 // カレンダー変更を監視して監視ボタンを再設置

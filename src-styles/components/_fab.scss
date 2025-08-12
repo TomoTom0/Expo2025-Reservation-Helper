@@ -54,6 +54,15 @@
     pointer-events: none;
   }
   
+  // pointer-events判定用クラス
+  &.pointer-events-none {
+    pointer-events: none;
+  }
+  
+  &.pointer-events-auto {
+    pointer-events: auto;
+  }
+  
   &.state-enabled {
     background: rgb(255, 140, 0);
     opacity: 0.9; 
@@ -69,7 +78,14 @@
   }
   
   &.state-monitoring {
-    background: rgb(255, 140, 0);
+    background: rgb(0, 104, 33); // 監視は緑色
+    opacity: 0.9;
+    cursor: pointer;
+    pointer-events: auto;
+  }
+  
+  &.state-reservation {
+    background: rgb(255, 140, 0); // 予約はオレンジ色
     opacity: 0.9;
     cursor: pointer;
     pointer-events: auto;
@@ -79,6 +95,32 @@
   &:hover {
     transform: scale(1.15);
     box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5), 0 4px 12px rgba(0, 0, 0, 0.3);
+  }
+  
+  // 予約状態管理
+  &.reservation {
+    &-enabled {
+      background: rgb(0, 104, 33);
+      opacity: 0.9;
+      cursor: pointer;
+    }
+    
+    &-disabled {
+      background: rgb(128, 128, 128);
+      opacity: 0.9;
+      cursor: not-allowed;
+    }
+  }
+  
+  // クールタイム状態管理
+  &.cooldown {
+    &-warning {
+      background: #ff6b35; // オレンジ色で警告
+    }
+    
+    &-normal {
+      background: #007bff; // 通常の青色
+    }
   }
 }
 

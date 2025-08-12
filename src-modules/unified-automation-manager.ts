@@ -315,7 +315,11 @@ export class UnifiedAutomationManager {
                     
                     // changeダイアログ出現を記録
                     if (this.stateManager && this.stateManager.markChangeDialogAppeared) {
+                        console.log('🔄 changeダイアログ記録を実行...');
                         this.stateManager.markChangeDialogAppeared();
+                        console.log('🔄 changeダイアログ記録完了');
+                    } else {
+                        console.log('⚠️ stateManagerまたはmarkChangeDialogAppeared関数が見つからない');
                     }
                     
                     await this.executeFixedDelayClick(response.element, config, signal);
@@ -420,13 +424,22 @@ export class UnifiedAutomationManager {
         const isEfficiencyMode = this.stateManager && this.stateManager.isEfficiencyModeEnabled ? 
             this.stateManager.isEfficiencyModeEnabled() : false;
         
-        console.log(`🔍 効率モード状態確認: ${isEfficiencyMode}`);
-        console.log(`🔍 stateManager存在: ${!!this.stateManager}`);
-        console.log(`🔍 isEfficiencyModeEnabledメソッド存在: ${!!(this.stateManager && this.stateManager.isEfficiencyModeEnabled)}`);
+        // ログ削減: デバッグ情報は不要
         
         if (!isEfficiencyMode) {
             // 通常モード: そのままクリック
             console.log('⚡ 通常モード: 効率待機なしでクリック実行');
+            await this.executeStandardClick(submitButton, config, signal);
+            return;
+        }
+        
+        // changeダイアログが既に出現している場合は即座押下
+        const hasChangeDialogAppeared = this.stateManager && this.stateManager.hasChangeDialogAppeared ?
+            this.stateManager.hasChangeDialogAppeared() : false;
+        
+        if (hasChangeDialogAppeared) {
+            // changeダイアログが既に出現済み: submitは即座押下（changeでタイミング調整）
+            console.log('⚡ 効率モード: changeダイアログ出現済みのため即座押下');
             await this.executeStandardClick(submitButton, config, signal);
             return;
         }
