@@ -369,82 +369,99 @@ class CompanionProcessManager {
         }
     }
 
-    // iPhone Safari IMEイベント完全シミュレーション（gemini -p最新推奨）
+    // Gemini推奨: Direct React Internals Manipulation（最も信頼性が高い）
     private async setReactValueDirectly(inputField: HTMLInputElement, value: string): Promise<boolean> {
-        console.log('🍎 iPhone Safari IMEイベントシーケンスシミュレーション開始');
+        console.log('⚛️ Gemini推奨: React内部直接操作方式開始');
         
         try {
-            // 1. ネイティブのvalueプロパティセッターを取得
-            const nativeInputValueSetter = Object.getOwnPropertyDescriptor(
-                HTMLInputElement.prototype,
-                'value'
-            )?.set;
+            // Method 1: React Props Key方式（Geminiの最推奨）
+            console.log('🔍 React props key検索中...');
+            const reactPropsKey = Object.keys(inputField).find(key => key.startsWith('__reactProps$'));
             
-            if (!nativeInputValueSetter) {
-                console.error('❌ ネイティブInputValueSetterが取得できません');
-                return false;
+            if (reactPropsKey) {
+                console.log(`✅ React props key発見: ${reactPropsKey}`);
+                const props = (inputField as any)[reactPropsKey];
+                const onChange = props?.onChange;
+                
+                if (onChange && typeof onChange === 'function') {
+                    console.log('⚛️ React onChange直接呼び出し実行中...');
+                    
+                    // Native value setter
+                    const nativeInputValueSetter = Object.getOwnPropertyDescriptor(
+                        window.HTMLInputElement.prototype,
+                        "value"
+                    )?.set;
+                    
+                    if (nativeInputValueSetter) {
+                        nativeInputValueSetter.call(inputField, value);
+                    }
+                    
+                    // Value tracker update (React内部状態同期)
+                    const tracker = (inputField as any)._valueTracker;
+                    if (tracker) {
+                        tracker.setValue(value);
+                    }
+                    
+                    // Call onChange with proper target
+                    onChange({ target: inputField });
+                    
+                    await new Promise(resolve => setTimeout(resolve, 100));
+                    const success = inputField.value === value;
+                    console.log(`⚛️ React props直接操作結果: ${success ? '成功' : '失敗'}`);
+                    if (success) return true;
+                }
             }
             
-            console.log('🎯 ネイティブセッター取得成功');
+            // Method 2: React Fiber Key方式（フォールバック）
+            console.log('🔍 React fiber key検索中...');
+            const reactFiberKey = Object.keys(inputField).find(key => key.startsWith('__reactFiber$'));
             
-            // 2. フォーカス確立
-            inputField.focus();
-            console.log('🔍 フォーカス設定完了');
-            
-            // 3. Composition Event開始（IME入力開始）
-            console.log('⌨️ CompositionStart発火中...');
-            inputField.dispatchEvent(new CompositionEvent('compositionstart', {
-                bubbles: true,
-                cancelable: true,
-            }));
-            
-            // 4. ネイティブセッター経由で値を設定
-            console.log(`📝 ネイティブセッター経由で値設定中: "${value}"`);
-            nativeInputValueSetter.call(inputField, value);
-            
-            // 5. inputイベント発火（Reactが変更を検知）
-            console.log('📡 inputイベント発火中...');
-            inputField.dispatchEvent(new Event('input', { bubbles: true }));
-            
-            // 6. Composition Event終了（IME入力確定）
-            console.log('✅ CompositionEnd発火中...');
-            inputField.dispatchEvent(new CompositionEvent('compositionend', {
-                bubbles: true,
-                cancelable: true,
-                data: value, // ★ 確定した値をdataプロパティに設定
-            }));
-            
-            // 7. changeイベント発火（念のため）
-            console.log('🔄 changeイベント発火中...');
-            inputField.dispatchEvent(new Event('change', { bubbles: true }));
-            
-            // 8. フォーカスを外す
-            inputField.blur();
-            console.log('👁️ フォーカス解除完了');
-            
-            // 9. 短い待機後に値を検証
-            await new Promise(resolve => setTimeout(resolve, 200));
-            
-            const finalValue = inputField.value;
-            const success = finalValue === value;
-            
-            if (success) {
-                console.log('✅ iPhone Safari IMEシミュレーションで入力成功');
-            } else {
-                console.warn(`⚠️ 値の不一致: 期待="${value}", 実際="${finalValue}"`);
+            if (reactFiberKey) {
+                console.log(`✅ React fiber key発見: ${reactFiberKey}`);
+                const fiberInstance = (inputField as any)[reactFiberKey];
+                const onChange = fiberInstance?.memoizedProps?.onChange;
+                
+                if (onChange && typeof onChange === 'function') {
+                    console.log('⚛️ React Fiber直接呼び出し実行中...');
+                    
+                    // Native value setter
+                    const nativeInputValueSetter = Object.getOwnPropertyDescriptor(
+                        window.HTMLInputElement.prototype,
+                        "value"
+                    )?.set;
+                    
+                    if (nativeInputValueSetter) {
+                        nativeInputValueSetter.call(inputField, value);
+                    }
+                    
+                    // Value tracker update
+                    const tracker = (inputField as any)._valueTracker;
+                    if (tracker) {
+                        tracker.setValue(value);
+                    }
+                    
+                    // Call onChange
+                    onChange({ target: inputField, currentTarget: inputField });
+                    
+                    await new Promise(resolve => setTimeout(resolve, 100));
+                    const success = inputField.value === value;
+                    console.log(`⚛️ React fiber直接操作結果: ${success ? '成功' : '失敗'}`);
+                    if (success) return true;
+                }
             }
             
-            return success;
+            console.warn('⚠️ React内部直接操作が利用できません');
+            return false;
             
         } catch (error) {
-            console.error('❌ iPhone Safari IMEシミュレーションエラー:', error);
+            console.error('❌ React内部直接操作エラー:', error);
             return false;
         }
     }
     
-    // React onChange直接呼び出し方式（フォールバック用）
+    // Gemini推奨: iOS Safari対応のEvent Sequence
     private async callReactOnChangeDirectly(inputField: HTMLInputElement, value: string): Promise<boolean> {
-        console.log('⚛️ React onChangeハンドラ直接呼び出し（フォールバック）');
+        console.log('🍎 Gemini推奨: iOS Safari対応イベントシーケンス開始');
         
         try {
             const fiberKey = Object.keys(inputField).find(key => key.startsWith('__reactFiber$'));
