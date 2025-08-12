@@ -7,14 +7,15 @@
 
 ## wip
 
-自動予約の統一開始処理の実装中。
-初回予約開始と2サイクル目以降の予約継続を同じstartReservation()メソッドで統一する。
+スタイル設計の大幅リファクタリング実装中。
+TypeScript内の直接スタイル設定(cssText, style.property)をSCSSクラス切り替えに変更し、過剰な!important使用(247個)を削減する。
 
 詳細設計:
-- startReservation()メソッドを改良し、初回も2サイクル目以降も同じ処理パスを通るようにする
-- FABクリック処理を複雑な状態設定からシンプルなstartReservation()呼び出しに変更  
-- 試行回数は累積、効率モード目標時刻と中断フラグは毎サイクル更新
-- 予約対象情報と実行状態は継続維持
+- FABボタンシステム: 状態管理をstate-idle, state-enabled等のクラス切り替えに変更
+- Processing Overlay: z-index制御をクラスベースに変更  
+- ボタン状態管理: opacity, cursor等の直接設定をbtn-state-enabled等のクラスに統一
+- !important削減: 新規要素には不要、247個→20個程度に削減
+- 一貫したCSS設計パターン確立でメンテナンス性向上
 
 ## プロジェクト概要
 
