@@ -3353,6 +3353,12 @@ class EntranceReservationStateManager {
         this.reservationExecution.shouldStop = false;
         this.reservationExecution.startTime = Date.now();
         this.reservationExecution.attempts = 0;
+        // 効率モード有効時は目標時刻を再計算とタイマー開始
+        if (this.efficiencyMode.enabled) {
+            this.efficiencyMode.nextSubmitTarget = this.calculateNext00or30Seconds();
+            this.log('⚡ 効率モード: 予約実行開始時に目標時刻を再計算');
+            this.startEfficiencyModeUpdateTimer();
+        }
         this.log('🚀 予約実行情報を初期化');
     }
     // 予約中断フラグ設定
