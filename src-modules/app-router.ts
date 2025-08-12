@@ -19,8 +19,6 @@ import { initCompanionTicketFeature, initializeTicketSelectionPage, initializeAg
 // 入場予約状態管理システムのimport
 import { entranceReservationStateManager } from './entrance-reservation-state-manager';
 
-// 早期オーバーレイのimport
-import { checkAndShowEarlyOverlay } from './processing-overlay';
 
 // 型定義のインポート
 import type { CacheManager } from '../types/index.js';
@@ -357,7 +355,6 @@ function initializeExtension() {
 }
 
 // 即座に早期オーバーレイをチェック（DOM構築前でも実行可能）
-checkAndShowEarlyOverlay();
 
 // DOM準備完了を待機して初期化実行
 if (document.readyState === 'loading') {

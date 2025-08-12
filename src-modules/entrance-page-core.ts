@@ -30,7 +30,7 @@ import type {
     CacheManager
 } from '../types/index.js';
 
-// 【5. 時間帯監視・分析システム】
+// 【5. 時間帯分析システム】
 // ============================================================================
 
 // 依存注入用のcacheManager参照
@@ -635,7 +635,7 @@ async function startSlotMonitoring(): Promise<void> {
     
     
     // 誤動作防止オーバーレイを表示
-    processingOverlay.show('monitoring');
+    processingOverlay.show();
     
     // 監視実行中は全ての監視ボタンを無効化
     disableAllMonitorButtons();

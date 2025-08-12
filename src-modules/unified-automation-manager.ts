@@ -1,7 +1,7 @@
 /**
  * 統一自動処理管理システム
  * 
- * 全ての自動処理（予約、監視、効率モード待機）を統一管理し、
+ * 全ての自動処理（予約、効率モード待機）を統一管理し、
  * AbortController による即座中断を実現
  */
 
@@ -20,7 +20,7 @@ export class CancellationError extends Error {
 // 統一自動処理管理クラス
 export class UnifiedAutomationManager {
     private controller: AbortController | null = null;
-    private currentProcess: 'idle' | 'reservation' | 'monitoring' | 'efficiency-wait' = 'idle';
+    private currentProcess: 'idle' | 'reservation' | 'efficiency-wait' = 'idle';
     private stateManager: any; // EntranceReservationStateManager への循環参照回避
 
     constructor(stateManager: any) {
@@ -39,7 +39,7 @@ export class UnifiedAutomationManager {
      * @returns 処理結果
      */
     private async runWithCancellation<T>(
-        processType: 'reservation' | 'monitoring' | 'efficiency-wait',
+        processType: 'reservation' | 'efficiency-wait',
         executor: (signal: AbortSignal) => Promise<T>
     ): Promise<T> {
         this.currentProcess = processType;
@@ -86,9 +86,7 @@ export class UnifiedAutomationManager {
      * 統一監視処理実行（将来実装）
      */
     async executeMonitoringProcess(): Promise<void> {
-        return await this.runWithCancellation('monitoring', async (signal) => {
-            return await this.monitoringLoop(signal);
-        });
+        throw new Error('機能は削除済み');
     }
 
     /**
@@ -402,13 +400,6 @@ export class UnifiedAutomationManager {
         return { success: false, attempts };
     }
 
-    /**
-     * 監視処理ループ（将来実装予定）
-     */
-    private async monitoringLoop(_signal: AbortSignal): Promise<void> {
-        // 将来の監視処理統一時に実装
-        console.log('🚧 監視処理ループ - 将来実装予定');
-    }
 
     /**
      * 効率モード対応submitクリック実行（統一処理内部用）

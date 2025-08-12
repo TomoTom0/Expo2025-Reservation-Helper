@@ -14,25 +14,4 @@ export function updateMainButtonDisplay(): void {
     entranceReservationStateManager.updateFabDisplay();
 }
 
-// 監視ボタンを無効化
-export function disableAllMonitorButtons(): void {
-    const monitorButtons = document.querySelectorAll('.monitor-btn');
-    monitorButtons.forEach((button: Element) => {
-        const htmlButton = button as HTMLButtonElement;
-        htmlButton.disabled = true;
-        htmlButton.classList.add('js-disabled');
-        htmlButton.classList.remove('js-enabled');
-    });
-}
-
-// 監視ボタンを有効化
-export function enableAllMonitorButtons(): void {
-    const monitorButtons = document.querySelectorAll('.monitor-btn');
-    monitorButtons.forEach((button: Element) => {
-        const htmlButton = button as HTMLButtonElement;
-        htmlButton.disabled = false;
-        htmlButton.classList.add('js-enabled');
-        htmlButton.classList.remove('js-disabled');
-    });
-}
 

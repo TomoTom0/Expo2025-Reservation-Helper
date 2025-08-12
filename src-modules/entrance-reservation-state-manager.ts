@@ -332,8 +332,6 @@ export class EntranceReservationStateManager {
             return false;
         }
         
-        // 監視対象の検証（スタブ - 監視機能は無効化済み）
-        // 監視機能が無効化されているため検証不要
         
         // すべての検証をパス
         return true;

@@ -2,7 +2,6 @@
 // import { timeSlotState } from './entrance-page-state'; // 統合により不要
 
 
-// 監視機能は無効化済み - entranceReservationStateManagerは使用しない
 
 // 型定義のインポート
 import type { CacheManager, Dependencies } from '../types/index.js';
@@ -10,7 +9,6 @@ import type { CacheManager, Dependencies } from '../types/index.js';
 // ============================================================================
 // キャッシュ管理機能
 const createCacheManager = (_dependencies: Dependencies = {}): CacheManager => {
-// 監視機能は無効化済み - getCurrentSelectedCalendarDateFnは使用しない
 
 return {
     // キー生成（URLベース）
@@ -20,7 +18,7 @@ return {
         return suffix ? `${baseKey}_${suffix}` : baseKey;
     },
     
-    // 複数監視対象を保存
+    // 空の保存処理
     saveTargetSlots(): void {
         return;
     },
@@ -30,7 +28,7 @@ return {
         this.saveTargetSlots();
     },
     
-    // 監視対象時間帯を読み込み
+    // キャッシュ時間帯を読み込み
     loadTargetSlot(): any | null {
         try {
             const data = localStorage.getItem(this.generateKey('target_slot'));
@@ -43,7 +41,7 @@ return {
                 return null;
             }
             
-            console.log('📖 キャッシュから監視対象時間帯を読み込み:', parsed.timeSlot);
+            console.log('📖 キャッシュから時間帯を読み込み:', parsed.timeSlot);
             return parsed;
         } catch (error) {
             console.error('❌ キャッシュ読み込みエラー:', error);
@@ -51,10 +49,10 @@ return {
         }
     },
     
-    // 複数監視対象を読み込み（後方互換性あり）
+    // 複数キャッシュを読み込み（後方互換性あり）
     loadTargetSlots(): any | null {
         try {
-            // 新形式の複数対象キャッシュを確認
+            // 新形式の複数キャッシュを確認
             const newData = localStorage.getItem(this.generateKey('target_slots'));
             if (newData) {
                 const parsed = JSON.parse(newData);
@@ -65,14 +63,14 @@ return {
                 }
                 
                 const targetTexts = parsed.targets?.map((t: any) => t.timeSlot).join(', ') || '不明';
-                console.log(`📖 複数監視対象キャッシュを読み込み: ${targetTexts} (${parsed.targets?.length || 0}個)`);
+                console.log(`📖 複数キャッシュを読み込み: ${targetTexts} (${parsed.targets?.length || 0}個)`);
                 return parsed;
             }
             
-            // 後方互換性：古い単一対象キャッシュを確認
+            // 後方互換性：古い単一キャッシュを確認
             const oldData = this.loadTargetSlot();
             if (oldData) {
-                console.log('📖 単一対象キャッシュを複数対象形式に変換中...');
+                console.log('📖 単一キャッシュを複数形式に変換中...');
                 return {
                     targets: [oldData],
                     selectedDate: oldData.selectedDate,
@@ -84,19 +82,19 @@ return {
             
             return null;
         } catch (error) {
-            console.error('❌ 複数監視対象読み込みエラー:', error);
+            console.error('❌ 複数キャッシュ読み込みエラー:', error);
             return null;
         }
     },
     
-    // 複数監視対象をクリア
+    // 複数キャッシュをクリア
     clearTargetSlots(): void {
         try {
             localStorage.removeItem(this.generateKey('target_slots'));
             localStorage.removeItem(this.generateKey('target_slot')); // 古い形式もクリア
-            console.log('🗑️ 複数監視対象キャッシュをクリア');
+            console.log('🗑️ 複数キャッシュをクリア');
         } catch (error) {
-            console.error('❌ 複数監視対象クリアエラー:', error);
+            console.error('❌ 複数キャッシュクリアエラー:', error);
         }
     },
     
