@@ -9,7 +9,7 @@
 // @run-at       document-end
 // ==/UserScript==
 
-// Built: 2025/08/13 00:19:09
+// Built: 2025/08/13 00:27:57
 
 
 (function webpackUniversalModuleDefinition(root, factory) {
@@ -295,10 +295,6 @@ async function waitForCalendar(timeout = 10000) {
 
 // メインFABボタンの表示を更新（統一システムに委譲）
 function updateMainButtonDisplay() {
-    // カウントダウン中はログを削減
-    if (true) {
-        // ログ削減: 頻繁に呼ばれるため削除
-    }
     _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_0__/* .entranceReservationStateManager */ .xx.updateFabDisplay();
 }
 
@@ -679,7 +675,7 @@ function startTimeSlotTableObserver() {
     console.log('時間帯テーブルの動的生成検出を開始');
     let isProcessing = false; // 処理中フラグでループ防止
     let lastTableContent = ''; // 前回のテーブル内容を記録
-    // MutationObserverで DOM変化を監視（フィルタリング強化版）
+    // MutationObserverで DOM変化を検知
     const observer = new MutationObserver((mutations) => {
         if (isProcessing) {
             console.log('⏭️ 処理中のため変更を無視');
@@ -691,7 +687,7 @@ function startTimeSlotTableObserver() {
             if (mutation.type === 'childList') {
                 const addedNodes = Array.from(mutation.addedNodes);
                 const removedNodes = Array.from(mutation.removedNodes);
-                // 監視ボタン関連の変更は無視
+                // 割込ボタン関連の変更は無視
                 const isMonitorButtonChange = [...addedNodes, ...removedNodes].some(node => {
                     if (node.nodeType === Node.ELEMENT_NODE) {
                         const element = node;
@@ -701,7 +697,7 @@ function startTimeSlotTableObserver() {
                     return false;
                 });
                 if (isMonitorButtonChange) {
-                    console.log('🚫 監視ボタン関連の変更を無視');
+                    console.log('🚫 割込ボタン関連の変更を無視');
                     return;
                 }
                 // 時間帯テーブル関連の変更のみ検出
@@ -728,7 +724,7 @@ function startTimeSlotTableObserver() {
                 }
             }
             else if (mutation.type === 'attributes') {
-                // 属性変更も監視（data-disabled、src等）
+                // 属性変更も検知（data-disabled、src等）
                 const target = mutation.target;
                 const attrName = mutation.attributeName;
                 if (target.nodeType === Node.ELEMENT_NODE) {
@@ -760,7 +756,7 @@ function startTimeSlotTableObserver() {
             }, 800);
         }
     });
-    // 監視範囲を限定（属性変更も監視）
+    // 検知範囲を限定（属性変更も検知）
     observer.observe(document.body, {
         childList: true,
         subtree: true,
@@ -776,7 +772,7 @@ function startTimeSlotTableObserver() {
             isProcessing = false;
         }
     }, 1000);
-    console.log('継続的な時間帯テーブル監視を開始しました（ループ防止版）');
+    console.log('継続的な時間帯テーブル検知を開始しました（ループ防止版）');
 }
 // 時間帯テーブルの動的待機
 async function waitForTimeSlotTable(timeout = 10000) {
@@ -1306,9 +1302,6 @@ async function clickCalendarDate(targetDate) {
 // 時間帯表示のためのカレンダー自動クリック機能
 async function tryClickCalendarForTimeSlot() {
     console.log('📅 時間帯表示のためのカレンダークリックを試行中...');
-    // 監視対象確認（情報表示のみ）
-    if (entranceReservationStateManager && false) // removed by dead control flow
-{}
     // 1. カレンダー要素を検索
     const calendarSelectors = [
         '.style_main__calendar__HRSsz',
@@ -1420,78 +1413,8 @@ function getCurrentTableContent() {
 }
 // 日付変更後の選択状態復元
 function restoreSelectionAfterUpdate() {
-    // 監視機能削除済み
     updateMainButtonDisplayHelper();
 }
-/*
-// キャッシュ復元後の可用性チェック（一時的に無効化）
-function checkAvailabilityAfterCacheRestore(): void {
-    if (!entranceReservationStateManager || !false) {
-        return;
-    }
-    
-    console.log('🔍 キャッシュ復元後のチェック完了');
-    
-    const availableCount = 0; // 監視機能削除済み
-    
-    if (availableCount > 0) {
-        console.log(`🎉 ${availableCount}個の監視対象に空きが出ています - 既存処理に委ねます`);
-        
-        // 既存の自動/手動リロード時の空き検出処理を呼び出す
-        // これにより統一された空き検出・自動予約ロジックが動作する
-        handleAvailabilityDetected();
-    } else {
-        console.log('📋 すべての監視対象が満員状態です');
-    }
-}
-
-// 空き検出時の処理（既存の自動/手動リロード処理と統合）
-function handleAvailabilityDetected(): void {
-    console.log('🔄 キャッシュ復元後の空き検出 - 既存の自動予約処理を実行');
-    
-    if (!entranceReservationStateManager || !false) {
-        return;
-    }
-    
-    // 監視機能削除済み
-    const highestPriorityAvailable: any = null;
-    
-    if (highestPriorityAvailable) {
-        console.log(`🎯 優先度最高の空き時間帯を自動選択: ${highestPriorityAvailable.timeSlot}`);
-        
-        // 自動リロードかどうかを判定
-        const isAutoReload = false || false;
-        
-        if (isAutoReload) {
-            console.log(`  → 自動リロード相当: 監視を終了し、自動選択+予約を開始`);
-            
-            // ボタン表示を更新（見つかりましたモード）
-            window.dispatchEvent(new CustomEvent('entrance-ui-update', {
-                detail: { type: 'main-button', mode: 'found-available' }
-            }));
-            
-            // 自動選択イベントを発火
-            const slotInfo = {
-                targetInfo: {
-                    timeSlot: highestPriorityAvailable.timeSlot,
-                    tdSelector: highestPriorityAvailable.selector,
-                    locationIndex: highestPriorityAvailable.locationIndex
-                },
-                timeText: highestPriorityAvailable.timeSlot
-            };
-            
-            window.dispatchEvent(new CustomEvent('entrance-auto-select', {
-                detail: { slot: slotInfo }
-            }));
-        } else {
-            console.log(`  → 手動リロード相当: ステータス表示+監視対象削除+予約対象化`);
-            
-            // 手動リロード時の処理（監視対象から予約対象への移行）
-            updateMainButtonDisplayHelper();
-        }
-    }
-}
-*/
 // 時間帯を自動選択して予約開始
 async function selectTimeSlotAndStartReservation(slotInfo) {
     const location = LocationHelper.getLocationFromIndex(LocationHelper.getIndexFromSelector(slotInfo.targetInfo.tdSelector));
@@ -2413,7 +2336,7 @@ class EntranceReservationStateManager {
         return this.executionState === ExecutionState.RESERVATION_RUNNING;
     }
     // ============================================================================
-    // 監視実行情報管理（スタブ - 機能は無効化済み）
+    // 特殊実行情報管理（スタブ）
     // ============================================================================
     // ============================================================================
     // リロードカウントダウン管理（旧reloadCountdownStateから統合）
@@ -2536,9 +2459,6 @@ class EntranceReservationStateManager {
     canStartReservation() {
         // 1. 予約対象の存在確認
         if (!this.reservationTarget || !this.reservationTarget.isValid) {
-            if (true) {
-                // 予約対象なし（ログ削減）
-            }
             return false;
         }
         // 2. 時間帯選択状態の確認
@@ -2571,8 +2491,8 @@ class EntranceReservationStateManager {
     // ============================================================================
     getPreferredAction() {
         const canReserve = this.canStartReservation();
-        // 監視機能は削除されました - 満員時間帯も直接予約可能になったため監視不要
-        // 満員時間帯予約制限解除により、監視機能は不要になりました
+        // 特殊機能は削除されました - 満員時間帯も直接予約可能
+        // 満員時間帯予約制限解除により、特殊機能は不要になりました
         // 常に予約のみを返すように変更
         return canReserve ? 'reservation' : 'none';
     }
@@ -2684,12 +2604,11 @@ class EntranceReservationStateManager {
     hasReservationTarget() {
         return this.reservationTarget !== null && this.reservationTarget.isValid;
     }
-    // 全ての対象をクリア（監視・予約両方）
+    // 全ての対象をクリア
     clearAllTargets() {
         const reservationCount = this.reservationTarget ? 1 : 0;
-        const monitoringCount = 0; // 監視機能削除済み
         this.reservationTarget = null;
-        this.log(`🗑️ 全対象クリア - 予約: ${reservationCount}個, 監視: ${monitoringCount}個`);
+        this.log(`🗑️ 全対象クリア - 予約: ${reservationCount}個`);
     }
     // カレンダー日付の設定・取得
     setSelectedCalendarDate(date) {
@@ -2707,9 +2626,8 @@ class EntranceReservationStateManager {
             successTime: new Date()
         };
         this.log(`🎉 予約成功情報設定: ${LocationHelper.formatTargetInfo(timeSlot, locationIndex)}`);
-        // 成功時は予約対象と監視対象をクリア
+        // 成功時は予約対象をクリア
         this.reservationTarget = null;
-        // 監視機能削除済み = [];
         this.log(`✅ 予約成功により対象をクリア`);
     }
     getReservationSuccess() {
@@ -2801,10 +2719,6 @@ class EntranceReservationStateManager {
                 }
                 break;
         }
-        // カウントダウン中は完了ログも削減
-        if (true) {
-            // FAB更新完了ログを削減
-        }
         // 【システム連動】オーバーレイ表示中はFABボタンを強制有効化
         const processingOverlay = document.getElementById('ytomo-processing-overlay');
         if (processingOverlay && !processingOverlay.classList.contains('hidden')) {
@@ -2848,9 +2762,7 @@ class EntranceReservationStateManager {
         console.log('実行状態:', this.executionState);
         console.log('優先度モード:', this.priorityMode);
         console.log('予約対象:', this.reservationTarget);
-        console.log('監視対象:', []); // 監視機能削除済み
         console.log('予約可能:', this.canStartReservation());
-        console.log('監視可能:', false); // 監視機能削除済み
         console.log('推奨アクション:', this.getPreferredAction());
         console.groupEnd();
     }

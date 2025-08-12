@@ -32,7 +32,6 @@ import {
 import { updateMainButtonDisplay } from './entrance-page-ui-helpers';
 import {
     getCurrentSelectedCalendarDate,
-    // stopSlotMonitoring, // 監視機能は無効化済み
     waitForValidCalendarDate
 } from './entrance-page-core';
 

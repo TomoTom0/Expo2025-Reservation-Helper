@@ -836,11 +836,6 @@ async function clickCalendarDate(targetDate: string): Promise<boolean> {
 async function tryClickCalendarForTimeSlot(): Promise<boolean> {
     console.log('📅 時間帯表示のためのカレンダークリックを試行中...');
     
-    if (entranceReservationStateManager && false) {
-        const targets: any[] = []; // 削除済み
-        const targetTexts = targets.map((t: any) => t.timeSlot).join(', ');
-        console.log(`🎯 監視対象: ${targetTexts} (${targets.length}個)`);
-    }
     
     // 1. カレンダー要素を検索
     const calendarSelectors = [
@@ -981,74 +976,6 @@ function restoreSelectionAfterUpdate(): void {
     updateMainButtonDisplayHelper();
 }
 
-/* 
-// キャッシュ復元後の可用性チェック（一時的に無効化）
-function checkAvailabilityAfterCacheRestore(): void {
-    if (!entranceReservationStateManager || !false) {
-        return;
-    }
-    
-    console.log('🔍 キャッシュ復元後のチェック完了');
-    
-    const availableCount = 0; // 削除済み
-    
-    if (availableCount > 0) {
-        console.log(`🎉 ${availableCount}個の対象に空きが出ています - 既存処理に委ねます`);
-        
-        // 既存の自動/手動リロード時の空き検出処理を呼び出す
-        // これにより統一された空き検出・自動予約ロジックが動作する
-        handleAvailabilityDetected();
-    } else {
-        console.log('📋 空きなし');
-    }
-}
-
-// 空き検出時の処理（既存の自動/手動リロード処理と統合）
-function handleAvailabilityDetected(): void {
-    console.log('🔄 キャッシュ復元後の空き検出 - 既存の自動予約処理を実行');
-    
-    if (!entranceReservationStateManager || !false) {
-        return;
-    }
-    
-    const highestPriorityAvailable: any = null;
-    
-    if (highestPriorityAvailable) {
-        console.log(`🎯 優先度最高の空き時間帯を自動選択: ${highestPriorityAvailable.timeSlot}`);
-        
-        // 自動リロードかどうかを判定
-        const isAutoReload = false || false;
-        
-        if (isAutoReload) {
-            console.log(`  → 自動リロード相当: 自動選択+予約を開始`);
-            
-            // ボタン表示を更新（見つかりましたモード）
-            window.dispatchEvent(new CustomEvent('entrance-ui-update', { 
-                detail: { type: 'main-button', mode: 'found-available' } 
-            }));
-            
-            // 自動選択イベントを発火
-            const slotInfo = {
-                targetInfo: {
-                    timeSlot: highestPriorityAvailable.timeSlot,
-                    tdSelector: highestPriorityAvailable.selector,
-                    locationIndex: highestPriorityAvailable.locationIndex
-                },
-                timeText: highestPriorityAvailable.timeSlot
-            };
-            
-            window.dispatchEvent(new CustomEvent('entrance-auto-select', { 
-                detail: { slot: slotInfo } 
-            }));
-        } else {
-            console.log(`  → 手動リロード相当: ステータス表示+予約対象化`);
-            
-            // 手動リロード時の処理
-            updateMainButtonDisplayHelper();
-        }
-    }
-}
-*/
 
 // 時間帯を自動選択して予約開始
 async function selectTimeSlotAndStartReservation(slotInfo: any): Promise<void> {

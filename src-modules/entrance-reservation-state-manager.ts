@@ -561,9 +561,6 @@ export class EntranceReservationStateManager {
     canStartReservation(): boolean {
         // 1. 予約対象の存在確認
         if (!this.reservationTarget || !this.reservationTarget.isValid) {
-            if (!false) {
-                // 予約対象なし（ログ削減）
-            }
             return false;
         }
         
@@ -743,14 +740,13 @@ export class EntranceReservationStateManager {
     
     
     
-    // 全ての対象をクリア（監視・予約両方）
+    // 全ての対象をクリア
     clearAllTargets(): void {
         const reservationCount = this.reservationTarget ? 1 : 0;
-        const monitoringCount = 0; // 削除済み
         
         this.reservationTarget = null;
         
-        this.log(`🗑️ 全対象クリア - 予約: ${reservationCount}個, 監視: ${monitoringCount}個`);
+        this.log(`🗑️ 全対象クリア - 予約: ${reservationCount}個`);
     }
     
     // カレンダー日付の設定・取得
@@ -773,9 +769,8 @@ export class EntranceReservationStateManager {
         };
         this.log(`🎉 予約成功情報設定: ${LocationHelper.formatTargetInfo(timeSlot, locationIndex)}`);
         
-        // 成功時は予約対象と監視対象をクリア
+        // 成功時は予約対象をクリア
         this.reservationTarget = null;
-        // 監視機能削除済み = [];
         this.log(`✅ 予約成功により対象をクリア`);
     }
     
@@ -895,10 +890,6 @@ export class EntranceReservationStateManager {
                 break;
         }
         
-        // カウントダウン中は完了ログも削減
-        if (!false) {
-            // FAB更新完了ログを削減
-        }
         
         // 【システム連動】オーバーレイ表示中はFABボタンを強制有効化
         const processingOverlay = document.getElementById('ytomo-processing-overlay');
@@ -950,9 +941,7 @@ export class EntranceReservationStateManager {
         console.log('実行状態:', this.executionState);
         console.log('優先度モード:', this.priorityMode);
         console.log('予約対象:', this.reservationTarget);
-        console.log('監視対象:', []); // 監視機能削除済み
         console.log('予約可能:', this.canStartReservation());
-        console.log('監視可能:', false); // 監視機能削除済み
         console.log('推奨アクション:', this.getPreferredAction());
         console.groupEnd();
     }
