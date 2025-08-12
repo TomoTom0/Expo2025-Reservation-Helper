@@ -36,7 +36,9 @@
       "Bash(git pull:*)",
       "Bash(find:*)",
       "Bash(cat:*)",
-      "Bash(gh release view:*)"
+      "Bash(gh release view:*)",
+      "Bash(zip:*)",
+      "Bash(tar:*)"
     ],
     "deny": []
   }

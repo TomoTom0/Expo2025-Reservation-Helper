@@ -49,7 +49,7 @@
     ],
     "collectCoverageFrom": [
       "dist/**/*.js",
-      "src-modules/**/*.ts",
+      "ts/modules/**/*.ts",
       "!src/manifest.json"
     ],
     "moduleNameMapper": {

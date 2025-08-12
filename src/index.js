@@ -9,7 +9,7 @@
 // @run-at       document-end
 // ==/UserScript==
 
-// Built: 2025/08/13 01:09:03
+// Built: 2025/08/13 02:21:50
 
 
 (function webpackUniversalModuleDefinition(root, factory) {
@@ -26,284 +26,7 @@ return /******/ (() => { // webpackBootstrap
 /******/ 	"use strict";
 /******/ 	var __webpack_modules__ = ({
 
-/***/ 56:
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
-
-
-
-/* istanbul ignore next  */
-function setAttributesWithoutAttributes(styleElement) {
-  var nonce =  true ? __webpack_require__.nc : 0;
-  if (nonce) {
-    styleElement.setAttribute("nonce", nonce);
-  }
-}
-module.exports = setAttributesWithoutAttributes;
-
-/***/ }),
-
-/***/ 72:
-/***/ ((module) => {
-
-
-
-var stylesInDOM = [];
-function getIndexByIdentifier(identifier) {
-  var result = -1;
-  for (var i = 0; i < stylesInDOM.length; i++) {
-    if (stylesInDOM[i].identifier === identifier) {
-      result = i;
-      break;
-    }
-  }
-  return result;
-}
-function modulesToDom(list, options) {
-  var idCountMap = {};
-  var identifiers = [];
-  for (var i = 0; i < list.length; i++) {
-    var item = list[i];
-    var id = options.base ? item[0] + options.base : item[0];
-    var count = idCountMap[id] || 0;
-    var identifier = "".concat(id, " ").concat(count);
-    idCountMap[id] = count + 1;
-    var indexByIdentifier = getIndexByIdentifier(identifier);
-    var obj = {
-      css: item[1],
-      media: item[2],
-      sourceMap: item[3],
-      supports: item[4],
-      layer: item[5]
-    };
-    if (indexByIdentifier !== -1) {
-      stylesInDOM[indexByIdentifier].references++;
-      stylesInDOM[indexByIdentifier].updater(obj);
-    } else {
-      var updater = addElementStyle(obj, options);
-      options.byIndex = i;
-      stylesInDOM.splice(i, 0, {
-        identifier: identifier,
-        updater: updater,
-        references: 1
-      });
-    }
-    identifiers.push(identifier);
-  }
-  return identifiers;
-}
-function addElementStyle(obj, options) {
-  var api = options.domAPI(options);
-  api.update(obj);
-  var updater = function updater(newObj) {
-    if (newObj) {
-      if (newObj.css === obj.css && newObj.media === obj.media && newObj.sourceMap === obj.sourceMap && newObj.supports === obj.supports && newObj.layer === obj.layer) {
-        return;
-      }
-      api.update(obj = newObj);
-    } else {
-      api.remove();
-    }
-  };
-  return updater;
-}
-module.exports = function (list, options) {
-  options = options || {};
-  list = list || [];
-  var lastIdentifiers = modulesToDom(list, options);
-  return function update(newList) {
-    newList = newList || [];
-    for (var i = 0; i < lastIdentifiers.length; i++) {
-      var identifier = lastIdentifiers[i];
-      var index = getIndexByIdentifier(identifier);
-      stylesInDOM[index].references--;
-    }
-    var newLastIdentifiers = modulesToDom(newList, options);
-    for (var _i = 0; _i < lastIdentifiers.length; _i++) {
-      var _identifier = lastIdentifiers[_i];
-      var _index = getIndexByIdentifier(_identifier);
-      if (stylesInDOM[_index].references === 0) {
-        stylesInDOM[_index].updater();
-        stylesInDOM.splice(_index, 1);
-      }
-    }
-    lastIdentifiers = newLastIdentifiers;
-  };
-};
-
-/***/ }),
-
-/***/ 113:
-/***/ ((module) => {
-
-
-
-/* istanbul ignore next  */
-function styleTagTransform(css, styleElement) {
-  if (styleElement.styleSheet) {
-    styleElement.styleSheet.cssText = css;
-  } else {
-    while (styleElement.firstChild) {
-      styleElement.removeChild(styleElement.firstChild);
-    }
-    styleElement.appendChild(document.createTextNode(css));
-  }
-}
-module.exports = styleTagTransform;
-
-/***/ }),
-
-/***/ 115:
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   eN: () => (/* binding */ timeSlotSelectors),
-/* harmony export */   sN: () => (/* binding */ generateUniqueTdSelector)
-/* harmony export */ });
-/* unused harmony exports tableSelectors, getTdPositionInfo, findSameTdElement, extractTdStatus, waitForCalendar */
-// ============================================================================
-// 【入場予約DOM操作ユーティリティ】 
-// ============================================================================
-// 循環参照解決のための基盤モジュール
-// DOM操作、セレクタ定義、基本的な待機関数を提供
-// 統一時間帯状態判定関数をimport
-
-// テーブルセレクタ辞書
-const tableSelectors = {
-    timeSlotTable: "table[class*='style_main__timetable__']",
-    calendarTable: "table[class*='style_main__calendar__']"
-};
-// 時間帯セレクタ定義（設計書の固定DOM構造に基づく）
-const timeSlotSelectors = {
-    // 時間帯選択エリア
-    timeSlotContainer: tableSelectors.timeSlotTable,
-    timeSlotCells: "td[data-gray-out] div[role='button']",
-    // 状態判定 - 設計書の構造に基づく正確な定義
-    availableSlots: "td[data-gray-out] div[role='button']:not([data-disabled='true'])",
-    fullSlots: "td[data-gray-out] div[role='button'][data-disabled='true']",
-    selectedSlot: "td[data-gray-out] div[role='button'][aria-pressed='true']",
-    // アイコン判定 - img要素は div[role='button'] 内の dd 要素内に存在
-    lowIcon: "img[src*='ico_scale_low.svg']",
-    highIcon: "img[src*='ico_scale_high.svg']",
-    fullIcon: "img[src*='calendar_ng.svg']"
-};
-// td要素の一意特定機能
-function generateUniqueTdSelector(tdElement) {
-    // td要素の親要素（tr）内での位置を取得
-    const row = tdElement.parentElement;
-    const rowIndex = Array.from(row.parentElement.children).indexOf(row);
-    const cellIndex = Array.from(row.children).indexOf(tdElement);
-    // 時間帯テーブル専用の固有セレクタ
-    return `${tableSelectors.timeSlotTable} tbody tr:nth-child(${rowIndex + 1}) td:nth-child(${cellIndex + 1})`;
-}
-function getTdPositionInfo(tdElement) {
-    const row = tdElement.parentElement;
-    const rowIndex = Array.from(row.parentElement.children).indexOf(row);
-    const cellIndex = Array.from(row.children).indexOf(tdElement);
-    return { rowIndex, cellIndex };
-}
-function findSameTdElement(targetInfo) {
-    // 1. セレクタベースでの検索を優先
-    if (targetInfo.tdSelector) {
-        const element = document.querySelector(targetInfo.tdSelector);
-        if (element) {
-            return element;
-        }
-    }
-    // 2. フォールバック: 位置情報による検索
-    if (targetInfo.positionInfo &&
-        targetInfo.positionInfo.rowIndex !== undefined &&
-        targetInfo.positionInfo.cellIndex !== undefined) {
-        const table = document.querySelector(timeSlotSelectors.timeSlotContainer);
-        if (table) {
-            const rows = table.querySelectorAll('tr');
-            if (rows[targetInfo.positionInfo.rowIndex]) {
-                // 時間帯セルのみを対象（data-gray-out属性の有無に関係なく）
-                const allCells = rows[targetInfo.positionInfo.rowIndex].querySelectorAll('td');
-                const cells = Array.from(allCells).filter(cell => cell.querySelector('div[role="button"]'));
-                if (cells[targetInfo.positionInfo.cellIndex]) {
-                    return cells[targetInfo.positionInfo.cellIndex];
-                }
-            }
-        }
-    }
-    return null;
-}
-function extractTdStatus(tdElement) {
-    // 統一状態判定関数を使用
-    const result = detectTimeslotStatus(tdElement);
-    if (!result)
-        return null;
-    // DOM構造: .btnDivまたはdiv[role="button"]のどちらでも対応
-    const buttonDiv = (tdElement.querySelector('.btnDiv') || tdElement.querySelector('div[role="button"]'));
-    if (!buttonDiv)
-        return null;
-    return {
-        timeText: result.timeText,
-        isFull: result.isFull,
-        isAvailable: result.isAvailable,
-        isSelected: result.isSelected,
-        status: result.statusType,
-        element: buttonDiv,
-        tdElement
-    };
-}
-// カレンダーの動的待機（time要素の存在も確認）
-async function waitForCalendar(timeout = 10000) {
-    const startTime = Date.now();
-    const checkInterval = 100; // 待機間隔を長めに設定
-    console.log('カレンダーとtime要素の出現を待機中...');
-    while (Date.now() - startTime < timeout) {
-        // time[datetime]要素が実際に存在するかを確認
-        const timeElements = document.querySelectorAll('time[datetime]');
-        if (timeElements.length > 0) {
-            console.log(`✅ カレンダーとtime要素が見つかりました (${timeElements.length}個のtime要素)`);
-            // 追加待機: time要素が見つかってもすぐに使用せず、少し待つ
-            await new Promise(resolve => setTimeout(resolve, 200));
-            return true;
-        }
-        // デバッグ: 現在の状況を確認
-        const tables = document.querySelectorAll('table');
-        const buttons = document.querySelectorAll('[role="button"]');
-        if (tables.length > 0 || buttons.length > 10) {
-            // DOM要素待機中（ログ削減）
-        }
-        await new Promise(resolve => setTimeout(resolve, checkInterval));
-    }
-    console.log('⏰ カレンダー待機がタイムアウトしました');
-    // デバッグ情報
-    const allTables = document.querySelectorAll('table');
-    const allButtons = document.querySelectorAll('[role="button"]');
-    const allTimeElements = document.querySelectorAll('time');
-    console.log(`🔍 最終状態: table=${allTables.length}, button=${allButtons.length}, time=${allTimeElements.length}`);
-    return false;
-}
-
-
-/***/ }),
-
-/***/ 270:
-/***/ ((module, __webpack_exports__, __webpack_require__) => {
-
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   A: () => (__WEBPACK_DEFAULT_EXPORT__)
-/* harmony export */ });
-/* harmony import */ var _node_modules_css_loader_dist_runtime_noSourceMaps_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(601);
-/* harmony import */ var _node_modules_css_loader_dist_runtime_noSourceMaps_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_css_loader_dist_runtime_noSourceMaps_js__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(314);
-/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1__);
-// Imports
-
-
-var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1___default()((_node_modules_css_loader_dist_runtime_noSourceMaps_js__WEBPACK_IMPORTED_MODULE_0___default()));
-// Module
-___CSS_LOADER_EXPORT___.push([module.id, `#ytomo-status-badge.countdown-warning{background:rgba(255,0,0,.9)}.ytomo-efficiency-toggle{width:45px;height:32px;border-radius:16px;color:#fff;border:none;font-size:10px;font-weight:bold;cursor:pointer;transition:all .2s ease;box-shadow:0 2px 8px rgba(0,0,0,.3);display:flex;align-items:center;justify-content:center;pointer-events:auto;margin-bottom:8px}.ytomo-efficiency-toggle.efficiency-enabled{background:rgba(255,140,0,.9)}.ytomo-efficiency-toggle.efficiency-disabled{background:rgba(128,128,128,.9)}.ytomo-efficiency-toggle:hover{transform:scale(1.1);box-shadow:0 4px 12px rgba(0,0,0,.4)}.ytomo-efficiency-toggle:active{transform:scale(0.95)}button.ext-ytomo{height:40px;width:auto;min-width:60px;padding:0px 8px;background:#006821;color:#fff}button.ext-ytomo.no-after:after{background:rgba(0,0,0,0) none repeat 0 0/auto auto padding-box border-box scroll}button.ext-ytomo.btn-done{background:#4a4c4a}button.ext-ytomo:hover{background:#02862b}.pavilion-sub-btn{color:#fff;border:none;border-radius:20px;padding:8px 16px;font-size:12px;white-space:nowrap;transition:all .2s ease}.pavilion-sub-btn.btn-enabled{background:#006821;cursor:pointer;opacity:1}.pavilion-sub-btn.btn-enabled:hover{background:#02862b;transform:scale(1.05)}.pavilion-sub-btn.btn-disabled,.pavilion-sub-btn.btn-loading{background:gray;cursor:not-allowed;opacity:.6}.pavilion-sub-btn.btn-disabled:hover,.pavilion-sub-btn.btn-loading:hover{background:gray;transform:scale(1)}button.ext-ytomo.pavilion-sub-btn.btn-disabled,button.ext-ytomo.pavilion-sub-btn.btn-loading{background:gray;cursor:not-allowed;opacity:.6}button.ext-ytomo.pavilion-sub-btn.btn-disabled:hover,button.ext-ytomo.pavilion-sub-btn.btn-loading:hover{background:gray;transform:scale(1)}.safe-none,.ytomo-none,.filter-none{display:none}button.ext-ytomo.pavilion-sub-btn.ytomo-date-button.date-selected{border:2px solid #4caf50;box-shadow:0 0 8px rgba(76,175,80,.6)}div.div-flex{display:flex;justify-content:center;margin:5px}.js-show{display:block}.js-hide{display:none}.js-visible{visibility:visible}.js-invisible{visibility:hidden}.js-enabled{pointer-events:auto;opacity:1}.js-disabled{pointer-events:none;opacity:.6}.js-green{background:#228b22;color:#fff}.js-red{background:#dc3545;color:#fff}.js-gray{background:gray;color:#fff}.btn-success-highlight{background:#00c800;color:#fff}.status-bg-green{background:rgba(0,128,0,.9)}.status-bg-red{background:rgba(255,0,0,.9)}.status-bg-orange{background:rgba(255,140,0,.9)}.status-bg-blue{background:rgba(0,104,33,.9)}.status-bg-default{background:rgba(0,0,0,.8)}#ytomo-status-badge{background:linear-gradient(135deg, rgba(0, 0, 0, 0.9), rgba(40, 40, 40, 0.9));color:#fff;padding:8px 16px;border-radius:20px;font-size:12px;font-weight:bold;white-space:pre-line;box-shadow:0 4px 12px rgba(0,0,0,.3),0 2px 6px rgba(0,0,0,.2);border:2px solid hsla(0,0%,100%,.15);pointer-events:none}#ytomo-status-badge.ytomo-status-waiting{background:linear-gradient(135deg, rgba(0, 0, 0, 0.9), rgba(40, 40, 40, 0.9))}#ytomo-status-badge.ytomo-status-reservation{background:linear-gradient(135deg, rgba(255, 140, 0, 0.9), rgba(255, 165, 0, 0.9))}#ytomo-status-badge.ytomo-status-reservation.ytomo-status-countdown-warning{background:linear-gradient(135deg, rgba(255, 0, 0, 0.9), rgba(220, 53, 69, 0.9))}#ytomo-status-badge.ytomo-status-cooldown{background:linear-gradient(135deg, rgba(255, 107, 53, 0.9), rgba(255, 140, 0, 0.9))}.ytomo-header li.fab-toggle-li{display:inline-block;margin-right:8px}.ytomo-header li.fab-toggle-li button.fab-toggle-button{background:none;border:none;cursor:pointer;padding:0;color:#fff;transition:all .2s ease;display:flex;align-items:center;justify-content:center}.ytomo-header li.fab-toggle-li button.fab-toggle-button:hover{color:#ddd}.ytomo-header li.fab-toggle-li button.fab-toggle-button figure.fab-toggle-figure{width:auto;height:24px;display:flex;align-items:center;justify-content:center;padding:0 4px}.ytomo-pavilion-fab button.ytomo-fab{position:relative}.ytomo-pavilion-fab button.ytomo-fab:hover{transform:scale(1.15);box-shadow:0 8px 25px rgba(0,0,0,.5),0 4px 12px rgba(0,0,0,.3);border-width:4px}.ytomo-pavilion-fab .ytomo-fab-inner-content .pavilion-fab-expand-icon{font-size:8px;line-height:1;margin-bottom:1px;opacity:.8}.ytomo-pavilion-fab .ytomo-fab-inner-content .pavilion-fab-brand-text{font-size:7px;font-weight:normal;line-height:1;margin-bottom:2px;opacity:.7}.ytomo-pavilion-fab .ytomo-fab-inner-content .pavilion-fab-counts-text{font-size:12px;font-weight:bold;line-height:1}.ytomo-pavilion-fab .pavilion-sub-actions-container{display:none;flex-direction:column;gap:8px;align-items:flex-end;margin-bottom:8px}.ytomo-pavilion-fab .pavilion-sub-actions-container.expanded{display:flex}.ytomo-pavilion-fab .pavilion-sub-actions-container button.pavilion-sub-btn.base-style{color:#fff;border:none;border-radius:20px;padding:8px 16px;font-size:12px;white-space:nowrap;box-shadow:0 2px 8px rgba(0,0,0,.3);transition:all .2s ease}.ytomo-companion-dialog{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;z-index:99999;padding:20px;box-sizing:border-box}.ytomo-companion-dialog .dialog-content{background:#fff;border-radius:12px;padding:24px;width:100%;max-width:500px;max-height:90vh;overflow-y:auto;box-shadow:0 10px 40px rgba(0,0,0,.3)}@media(max-width: 768px){.ytomo-companion-dialog .dialog-content{max-width:95vw;max-height:85vh;padding:16px;border-radius:8px}}.ytomo-companion-dialog .dialog-content .input-row{display:flex;gap:8px;margin-bottom:12px}@media(max-width: 480px){.ytomo-companion-dialog .dialog-content .input-row{flex-direction:column;gap:12px}}.ytomo-companion-dialog .dialog-content .input-row input{padding:12px 8px;border:1px solid #ddd;border-radius:4px;font-size:16px}.ytomo-companion-dialog .dialog-content .input-row input:focus{outline:none;border-color:#4caf50;box-shadow:0 0 0 2px rgba(76,175,80,.2)}.ytomo-companion-dialog .dialog-content .input-row button{padding:12px 16px;background:#4caf50;color:#fff;border:none;border-radius:4px;cursor:pointer;font-size:14px;white-space:nowrap;min-width:60px}.ytomo-companion-dialog .dialog-content .input-row button:hover{background:#45a049}.ytomo-companion-dialog .dialog-content .input-row button:active{background:#3d8b40}.ytomo-fab{width:56px;height:56px;border-radius:50%;color:#fff;border:none;box-shadow:0 6px 20px rgba(0,0,0,.4),0 2px 8px rgba(0,0,0,.2);border:3px solid hsla(0,0%,100%,.2);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:bold;transition:all .3s ease;position:relative;overflow:hidden;pointer-events:auto}.ytomo-fab-enabled{background:#ff8c00;opacity:.9;cursor:pointer;pointer-events:auto}.ytomo-fab-disabled{background:gray;opacity:.6;cursor:not-allowed;pointer-events:none}.ytomo-fab-running{background:#dc3545;opacity:.9;cursor:pointer;pointer-events:auto}.ytomo-fab.state-idle{background:gray;opacity:.6;cursor:not-allowed;pointer-events:none}.ytomo-fab.pointer-events-none{pointer-events:none}.ytomo-fab.pointer-events-auto{pointer-events:auto}.ytomo-fab.state-enabled{background:#ff8c00;opacity:.9;cursor:pointer;pointer-events:auto}.ytomo-fab.state-running{background:#dc3545;opacity:.9;cursor:pointer;pointer-events:auto}.ytomo-fab.state-reservation{background:#ff8c00;opacity:.9;cursor:pointer;pointer-events:auto}.ytomo-fab:hover{transform:scale(1.15);box-shadow:0 8px 25px rgba(0,0,0,.5),0 4px 12px rgba(0,0,0,.3)}.ytomo-fab.reservation-enabled{background:#006821;opacity:.9;cursor:pointer}.ytomo-fab.reservation-disabled{background:gray;opacity:.9;cursor:not-allowed}.ytomo-fab.cooldown-warning{background:#ff6b35}.ytomo-fab.cooldown-normal{background:#007bff}.ytomo-fab-container{position:fixed;bottom:24px;right:24px;z-index:10000;display:flex;flex-direction:column;align-items:flex-end;gap:12px;pointer-events:auto}.ytomo-fab-container.z-normal{z-index:10000}.ytomo-fab-container.z-above-overlay{z-index:100001}.ytomo-fab-container.visible{display:flex}.ytomo-fab-container.hidden{display:none}.ytomo-fab-content{position:relative;display:flex;flex-direction:column-reverse;align-items:center;gap:8px;opacity:0;transform:scale(0.8) translateY(10px);transition:all .3s cubic-bezier(0.175, 0.885, 0.32, 1.275);pointer-events:none}.ytomo-fab-content.expanded{opacity:1;transform:scale(1) translateY(0);pointer-events:auto}.ytomo-sub-fab{width:45px;height:32px;border-radius:16px;background:rgba(0,104,33,.9);color:#fff;border:none;font-size:11px;font-weight:bold;cursor:pointer;transition:all .2s ease;box-shadow:0 2px 8px rgba(0,0,0,.3);display:flex;align-items:center;justify-content:center;pointer-events:auto}.ytomo-sub-fab:hover{background:rgba(2,134,43,.9);transform:scale(1.1);box-shadow:0 4px 12px rgba(0,0,0,.4)}.ytomo-sub-fab:active{transform:scale(0.95)}.ytomo-pavilion-fab-container{position:fixed;bottom:24px;right:24px;z-index:10000;display:flex;flex-direction:column;gap:12px;align-items:flex-end;pointer-events:auto}.ytomo-fab-inner-content{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;pointer-events:none}.ytomo-reservation-target-display{background:linear-gradient(135deg, rgba(0, 123, 255, 0.95), rgba(0, 86, 179, 0.95));color:#fff;padding:8px 12px;border-radius:12px;font-size:12px;font-weight:bold;text-align:center;box-shadow:0 3px 10px rgba(0,0,0,.3);border:2px solid hsla(0,0%,100%,.3);min-width:80px;max-width:120px;white-space:pre-line;overflow:visible;text-overflow:clip;transition:all .3s ease;pointer-events:auto;cursor:pointer}.ytomo-reservation-target-display:hover{transform:scale(1.05);box-shadow:0 4px 14px rgba(0,0,0,.4)}.ytomo-reservation-target-display.hidden{display:none}.ytomo-reservation-target-display.visible{display:block}input.ext-tomo.search{height:50px;min-width:200px;max-width:min(300px,100%);font-family:quicksand;font-size:16px;-webkit-appearance:textfield;-moz-appearance:textfield;appearance:textfield;border:1px solid #222426;border-radius:25px;box-shadow:0 1px 0 0 #ccc;padding:0 0 0 10px;flex:1 1}.ytomo-icon.expand-icon{font-size:8px;line-height:1;color:#fff;font-weight:bold;text-align:center;pointer-events:none}.ytomo-icon.countdown-text{font-size:6px;line-height:1;color:#fff;font-weight:bold;text-align:center;margin-top:1px;pointer-events:none}.ytomo-toggle.toggle-li{position:fixed;bottom:10px;left:10px;z-index:1000;list-style:none;margin:0;padding:0}.ytomo-toggle.toggle-button{width:50px;height:30px;background:rgba(255,140,0,.8);border:none;border-radius:15px;cursor:pointer;transition:all .3s ease;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:bold;position:relative;overflow:hidden}.ytomo-toggle.toggle-button.enabled{color:#fff}.ytomo-toggle.toggle-button.disabled{color:#ddd}.ytomo-toggle.toggle-figure{width:100%;height:100%;margin:0;padding:0;border:none;background:rgba(0,0,0,0);pointer-events:none}.ytomo-dialog.overlay{position:fixed;top:0;left:0;width:100%;height:100%;background-color:rgba(0,0,0,.5);z-index:10000;display:flex;justify-content:center;align-items:center}.ytomo-dialog.container{background:#fff;border-radius:8px;padding:20px;max-width:400px;width:90%;max-height:70vh;overflow-y:auto;box-shadow:0 4px 12px rgba(0,0,0,.3)}.ytomo-dialog.title{margin:0 0 16px 0;color:#333;font-size:18px;font-weight:bold}.ytomo-dialog.button-group{display:flex;justify-content:flex-end;gap:10px;margin-top:20px}.ytomo-dialog.primary-button{background:#006821;color:#fff;border:none;padding:10px 20px;border-radius:4px;cursor:pointer;font-size:14px}.ytomo-dialog.primary-button:hover{background:#02862b}.ytomo-dialog.primary-button:disabled{background:gray;cursor:not-allowed}.ytomo-dialog.secondary-button{background:rgba(0,0,0,0);color:#666;border:1px solid #ccc;padding:10px 20px;border-radius:4px;cursor:pointer;font-size:14px}.ytomo-dialog.secondary-button:hover{background:#f5f5f5}.ytomo-progress.counter{display:inline-block;margin-left:8px;padding:2px 6px;background:rgba(0,0,0,.3);border-radius:10px;font-size:10px;color:#fff;font-weight:bold}.ytomo-error-message{position:fixed;top:20px;right:20px;background:#f44;color:#fff;padding:15px;border-radius:5px;box-shadow:0 2px 10px rgba(0,0,0,.3);z-index:10001;max-width:300px;font-size:14px;line-height:1.4}.ytomo-error-message .error-title{font-weight:bold;margin-bottom:5px}.ytomo-error-message .error-close-btn{margin-top:10px;padding:5px 10px;background:hsla(0,0%,100%,.2);border:none;border-radius:3px;color:#fff;cursor:pointer;font-size:12px}.ytomo-error-message .error-close-btn:hover{background:hsla(0,0%,100%,.3)}.ytomo-flex-column-center{display:flex;flex-direction:column;align-items:center}.ytomo-brand-text{font-size:8px;font-weight:bold;margin-top:2px}.ytomo-processing-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.3);z-index:100000;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(1px);transition:all .3s ease;pointer-events:auto}.ytomo-processing-overlay.z-normal{z-index:100000}.ytomo-processing-overlay.z-below-fab{z-index:99999}.ytomo-processing-overlay.hidden{opacity:0;visibility:hidden;pointer-events:none}.ytomo-processing-overlay.visible{opacity:1;visibility:visible;pointer-events:auto}.ytomo-processing-overlay .processing-message-area{background:hsla(0,0%,100%,.95);border-radius:12px;padding:24px 32px;text-align:center;box-shadow:0 8px 32px rgba(0,0,0,.3);border:2px solid rgba(255,140,0,.3);max-width:400px;margin:20px}@media(max-width: 768px){.ytomo-processing-overlay .processing-message-area{padding:20px 24px;margin:16px;max-width:90vw}}.ytomo-processing-overlay .processing-message-text{font-size:20px;font-weight:bold;color:#333;margin-bottom:8px;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}@media(max-width: 768px){.ytomo-processing-overlay .processing-message-text{font-size:18px;margin-bottom:6px}}.ytomo-processing-overlay .processing-target-text{font-size:16px;font-weight:600;color:#333;margin-bottom:12px;white-space:pre-line;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;text-align:center}@media(max-width: 768px){.ytomo-processing-overlay .processing-target-text{font-size:14px;margin-bottom:10px}}.ytomo-processing-overlay .processing-countdown-text{font-size:18px;font-weight:bold;color:#e67e00;margin-bottom:12px;font-family:"SF Mono","Monaco","Consolas",monospace;text-align:center;text-shadow:0 1px 2px rgba(0,0,0,.1)}@media(max-width: 768px){.ytomo-processing-overlay .processing-countdown-text{font-size:16px;margin-bottom:10px}}.ytomo-processing-overlay .processing-countdown-text.countdown-warning{color:#dc3545;animation:countdownPulse 1s ease-in-out infinite;text-shadow:0 0 8px rgba(220,53,69,.4)}.ytomo-processing-overlay .processing-warning-text{font-size:14px;color:#666;margin-bottom:16px;line-height:1.4;transition:all .3s ease}@media(max-width: 768px){.ytomo-processing-overlay .processing-warning-text{font-size:13px;margin-bottom:14px}}.ytomo-processing-overlay .processing-warning-text.warning-flash{color:#dc3545;font-weight:bold;transform:scale(1.05);animation:flash .5s ease-in-out 2}.ytomo-processing-overlay .processing-cancel-area{font-size:12px;color:#888;font-style:italic}@media(max-width: 768px){.ytomo-processing-overlay .processing-cancel-area{font-size:11px}}@keyframes flash{0%,100%{opacity:1}50%{opacity:.7}}@keyframes countdownPulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.8;transform:scale(1.05)}}.ytomo-processing-overlay.efficiency-mode .processing-message-area{border-color:rgba(255,140,0,.5);background:linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(255, 248, 220, 0.95))}.ytomo-processing-overlay.efficiency-mode .processing-message-text{color:#e67e00}.ytomo-processing-overlay.monitoring-mode .processing-message-area{border-color:rgba(0,104,33,.5);background:linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(240, 255, 240, 0.95))}.ytomo-processing-overlay.monitoring-mode .processing-message-text{color:#004d1a}@media(prefers-reduced-motion: reduce){.ytomo-processing-overlay{transition:none}.ytomo-processing-overlay .processing-warning-text.warning-flash{animation:none;transform:none}}table[class*=style_main__timetable__] td[data-gray-out] div[role=button][data-disabled=true]{pointer-events:auto !important;cursor:pointer !important}`, ""]);
-// Exports
-/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
-
-
-/***/ }),
-
-/***/ 278:
+/***/ 31:
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
@@ -494,990 +217,242 @@ function createFABToggleButton() {
 
 /***/ }),
 
-/***/ 314:
+/***/ 38:
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   eN: () => (/* binding */ timeSlotSelectors),
+/* harmony export */   sN: () => (/* binding */ generateUniqueTdSelector)
+/* harmony export */ });
+/* unused harmony exports tableSelectors, getTdPositionInfo, findSameTdElement, extractTdStatus, waitForCalendar */
+// ============================================================================
+// 【入場予約DOM操作ユーティリティ】 
+// ============================================================================
+// 循環参照解決のための基盤モジュール
+// DOM操作、セレクタ定義、基本的な待機関数を提供
+// 統一時間帯状態判定関数をimport
+
+// テーブルセレクタ辞書
+const tableSelectors = {
+    timeSlotTable: "table[class*='style_main__timetable__']",
+    calendarTable: "table[class*='style_main__calendar__']"
+};
+// 時間帯セレクタ定義（設計書の固定DOM構造に基づく）
+const timeSlotSelectors = {
+    // 時間帯選択エリア
+    timeSlotContainer: tableSelectors.timeSlotTable,
+    timeSlotCells: "td[data-gray-out] div[role='button']",
+    // 状態判定 - 設計書の構造に基づく正確な定義
+    availableSlots: "td[data-gray-out] div[role='button']:not([data-disabled='true'])",
+    fullSlots: "td[data-gray-out] div[role='button'][data-disabled='true']",
+    selectedSlot: "td[data-gray-out] div[role='button'][aria-pressed='true']",
+    // アイコン判定 - img要素は div[role='button'] 内の dd 要素内に存在
+    lowIcon: "img[src*='ico_scale_low.svg']",
+    highIcon: "img[src*='ico_scale_high.svg']",
+    fullIcon: "img[src*='calendar_ng.svg']"
+};
+// td要素の一意特定機能
+function generateUniqueTdSelector(tdElement) {
+    // td要素の親要素（tr）内での位置を取得
+    const row = tdElement.parentElement;
+    const rowIndex = Array.from(row.parentElement.children).indexOf(row);
+    const cellIndex = Array.from(row.children).indexOf(tdElement);
+    // 時間帯テーブル専用の固有セレクタ
+    return `${tableSelectors.timeSlotTable} tbody tr:nth-child(${rowIndex + 1}) td:nth-child(${cellIndex + 1})`;
+}
+function getTdPositionInfo(tdElement) {
+    const row = tdElement.parentElement;
+    const rowIndex = Array.from(row.parentElement.children).indexOf(row);
+    const cellIndex = Array.from(row.children).indexOf(tdElement);
+    return { rowIndex, cellIndex };
+}
+function findSameTdElement(targetInfo) {
+    // 1. セレクタベースでの検索を優先
+    if (targetInfo.tdSelector) {
+        const element = document.querySelector(targetInfo.tdSelector);
+        if (element) {
+            return element;
+        }
+    }
+    // 2. フォールバック: 位置情報による検索
+    if (targetInfo.positionInfo &&
+        targetInfo.positionInfo.rowIndex !== undefined &&
+        targetInfo.positionInfo.cellIndex !== undefined) {
+        const table = document.querySelector(timeSlotSelectors.timeSlotContainer);
+        if (table) {
+            const rows = table.querySelectorAll('tr');
+            if (rows[targetInfo.positionInfo.rowIndex]) {
+                // 時間帯セルのみを対象（data-gray-out属性の有無に関係なく）
+                const allCells = rows[targetInfo.positionInfo.rowIndex].querySelectorAll('td');
+                const cells = Array.from(allCells).filter(cell => cell.querySelector('div[role="button"]'));
+                if (cells[targetInfo.positionInfo.cellIndex]) {
+                    return cells[targetInfo.positionInfo.cellIndex];
+                }
+            }
+        }
+    }
+    return null;
+}
+function extractTdStatus(tdElement) {
+    // 統一状態判定関数を使用
+    const result = detectTimeslotStatus(tdElement);
+    if (!result)
+        return null;
+    // DOM構造: .btnDivまたはdiv[role="button"]のどちらでも対応
+    const buttonDiv = (tdElement.querySelector('.btnDiv') || tdElement.querySelector('div[role="button"]'));
+    if (!buttonDiv)
+        return null;
+    return {
+        timeText: result.timeText,
+        isFull: result.isFull,
+        isAvailable: result.isAvailable,
+        isSelected: result.isSelected,
+        status: result.statusType,
+        element: buttonDiv,
+        tdElement
+    };
+}
+// カレンダーの動的待機（time要素の存在も確認）
+async function waitForCalendar(timeout = 10000) {
+    const startTime = Date.now();
+    const checkInterval = 100; // 待機間隔を長めに設定
+    console.log('カレンダーとtime要素の出現を待機中...');
+    while (Date.now() - startTime < timeout) {
+        // time[datetime]要素が実際に存在するかを確認
+        const timeElements = document.querySelectorAll('time[datetime]');
+        if (timeElements.length > 0) {
+            console.log(`✅ カレンダーとtime要素が見つかりました (${timeElements.length}個のtime要素)`);
+            // 追加待機: time要素が見つかってもすぐに使用せず、少し待つ
+            await new Promise(resolve => setTimeout(resolve, 200));
+            return true;
+        }
+        // デバッグ: 現在の状況を確認
+        const tables = document.querySelectorAll('table');
+        const buttons = document.querySelectorAll('[role="button"]');
+        if (tables.length > 0 || buttons.length > 10) {
+            // DOM要素待機中（ログ削減）
+        }
+        await new Promise(resolve => setTimeout(resolve, checkInterval));
+    }
+    console.log('⏰ カレンダー待機がタイムアウトしました');
+    // デバッグ情報
+    const allTables = document.querySelectorAll('table');
+    const allButtons = document.querySelectorAll('[role="button"]');
+    const allTimeElements = document.querySelectorAll('time');
+    console.log(`🔍 最終状態: table=${allTables.length}, button=${allButtons.length}, time=${allTimeElements.length}`);
+    return false;
+}
+
+
+/***/ }),
+
+/***/ 56:
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+
+
+/* istanbul ignore next  */
+function setAttributesWithoutAttributes(styleElement) {
+  var nonce =  true ? __webpack_require__.nc : 0;
+  if (nonce) {
+    styleElement.setAttribute("nonce", nonce);
+  }
+}
+module.exports = setAttributesWithoutAttributes;
+
+/***/ }),
+
+/***/ 72:
 /***/ ((module) => {
 
 
 
-/*
-  MIT License http://www.opensource.org/licenses/mit-license.php
-  Author Tobias Koppers @sokra
-*/
-module.exports = function (cssWithMappingToString) {
-  var list = [];
-
-  // return the list of modules as css string
-  list.toString = function toString() {
-    return this.map(function (item) {
-      var content = "";
-      var needLayer = typeof item[5] !== "undefined";
-      if (item[4]) {
-        content += "@supports (".concat(item[4], ") {");
-      }
-      if (item[2]) {
-        content += "@media ".concat(item[2], " {");
-      }
-      if (needLayer) {
-        content += "@layer".concat(item[5].length > 0 ? " ".concat(item[5]) : "", " {");
-      }
-      content += cssWithMappingToString(item);
-      if (needLayer) {
-        content += "}";
-      }
-      if (item[2]) {
-        content += "}";
-      }
-      if (item[4]) {
-        content += "}";
-      }
-      return content;
-    }).join("");
-  };
-
-  // import a list of modules into the list
-  list.i = function i(modules, media, dedupe, supports, layer) {
-    if (typeof modules === "string") {
-      modules = [[null, modules, undefined]];
+var stylesInDOM = [];
+function getIndexByIdentifier(identifier) {
+  var result = -1;
+  for (var i = 0; i < stylesInDOM.length; i++) {
+    if (stylesInDOM[i].identifier === identifier) {
+      result = i;
+      break;
     }
-    var alreadyImportedModules = {};
-    if (dedupe) {
-      for (var k = 0; k < this.length; k++) {
-        var id = this[k][0];
-        if (id != null) {
-          alreadyImportedModules[id] = true;
-        }
-      }
+  }
+  return result;
+}
+function modulesToDom(list, options) {
+  var idCountMap = {};
+  var identifiers = [];
+  for (var i = 0; i < list.length; i++) {
+    var item = list[i];
+    var id = options.base ? item[0] + options.base : item[0];
+    var count = idCountMap[id] || 0;
+    var identifier = "".concat(id, " ").concat(count);
+    idCountMap[id] = count + 1;
+    var indexByIdentifier = getIndexByIdentifier(identifier);
+    var obj = {
+      css: item[1],
+      media: item[2],
+      sourceMap: item[3],
+      supports: item[4],
+      layer: item[5]
+    };
+    if (indexByIdentifier !== -1) {
+      stylesInDOM[indexByIdentifier].references++;
+      stylesInDOM[indexByIdentifier].updater(obj);
+    } else {
+      var updater = addElementStyle(obj, options);
+      options.byIndex = i;
+      stylesInDOM.splice(i, 0, {
+        identifier: identifier,
+        updater: updater,
+        references: 1
+      });
     }
-    for (var _k = 0; _k < modules.length; _k++) {
-      var item = [].concat(modules[_k]);
-      if (dedupe && alreadyImportedModules[item[0]]) {
-        continue;
+    identifiers.push(identifier);
+  }
+  return identifiers;
+}
+function addElementStyle(obj, options) {
+  var api = options.domAPI(options);
+  api.update(obj);
+  var updater = function updater(newObj) {
+    if (newObj) {
+      if (newObj.css === obj.css && newObj.media === obj.media && newObj.sourceMap === obj.sourceMap && newObj.supports === obj.supports && newObj.layer === obj.layer) {
+        return;
       }
-      if (typeof layer !== "undefined") {
-        if (typeof item[5] === "undefined") {
-          item[5] = layer;
-        } else {
-          item[1] = "@layer".concat(item[5].length > 0 ? " ".concat(item[5]) : "", " {").concat(item[1], "}");
-          item[5] = layer;
-        }
-      }
-      if (media) {
-        if (!item[2]) {
-          item[2] = media;
-        } else {
-          item[1] = "@media ".concat(item[2], " {").concat(item[1], "}");
-          item[2] = media;
-        }
-      }
-      if (supports) {
-        if (!item[4]) {
-          item[4] = "".concat(supports);
-        } else {
-          item[1] = "@supports (".concat(item[4], ") {").concat(item[1], "}");
-          item[4] = supports;
-        }
-      }
-      list.push(item);
+      api.update(obj = newObj);
+    } else {
+      api.remove();
     }
   };
-  return list;
+  return updater;
+}
+module.exports = function (list, options) {
+  options = options || {};
+  list = list || [];
+  var lastIdentifiers = modulesToDom(list, options);
+  return function update(newList) {
+    newList = newList || [];
+    for (var i = 0; i < lastIdentifiers.length; i++) {
+      var identifier = lastIdentifiers[i];
+      var index = getIndexByIdentifier(identifier);
+      stylesInDOM[index].references--;
+    }
+    var newLastIdentifiers = modulesToDom(newList, options);
+    for (var _i = 0; _i < lastIdentifiers.length; _i++) {
+      var _identifier = lastIdentifiers[_i];
+      var _index = getIndexByIdentifier(_identifier);
+      if (stylesInDOM[_index].references === 0) {
+        stylesInDOM[_index].updater();
+        stylesInDOM.splice(_index, 1);
+      }
+    }
+    lastIdentifiers = newLastIdentifiers;
+  };
 };
 
 /***/ }),
 
-/***/ 364:
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   Is: () => (/* binding */ isInterruptionAllowed),
-/* harmony export */   MM: () => (/* binding */ setCacheManagerForSection6),
-/* harmony export */   S9: () => (/* binding */ setCacheManager),
-/* harmony export */   XP: () => (/* binding */ setEntranceReservationHelper),
-/* harmony export */   ZK: () => (/* binding */ setPageLoadingState),
-/* harmony export */   Zu: () => (/* binding */ restoreFromCache),
-/* harmony export */   p4: () => (/* binding */ waitForValidCalendarDate),
-/* harmony export */   rY: () => (/* binding */ getCurrentSelectedCalendarDate)
-/* harmony export */ });
-/* unused harmony exports startTimeSlotTableObserver, waitForTimeSlotTable, checkTimeSlotTableExistsSync, analyzeTimeSlots, extractTimeSlotInfo, generateSelectorForElement, clickCalendarDate, tryClickCalendarForTimeSlot, showErrorMessage, restoreSelectionAfterUpdate, selectTimeSlotAndStartReservation, getCurrentEntranceConfig, getCurrentFabState, getCurrentMode, updateStatusBadge, resetPreviousSelection, scheduleReload, startReloadCountdown, stopReloadCountdown */
-/* harmony import */ var _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(374);
-/* harmony import */ var _entrance_page_dom_utils__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(115);
-/* harmony import */ var _entrance_page_fab__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(982);
-// entrance-page-stateからのimport（もう使用しません）
-// 入場予約状態管理システムからのimport
-
-// entrance-page-dom-utilsからのimport
-
-// entrance-page-fabからのimport
-
-// 【5. 時間帯分析システム】
-// ============================================================================
-// 依存注入用のcacheManager参照
-let cacheManager = null;
-// cacheManagerを設定するヘルパー関数
-const setCacheManager = (cm) => {
-    cacheManager = cm;
-};
-// 時間帯テーブルの動的生成を検出（ループ防止版）
-function startTimeSlotTableObserver() {
-    console.log('時間帯テーブルの動的生成検出を開始');
-    let isProcessing = false; // 処理中フラグでループ防止
-    let lastTableContent = ''; // 前回のテーブル内容を記録
-    // MutationObserverで DOM変化を検知
-    const observer = new MutationObserver((mutations) => {
-        if (isProcessing) {
-            console.log('⏭️ 処理中のため変更を無視');
-            return;
-        }
-        let hasRelevantChange = false;
-        mutations.forEach((mutation) => {
-            // console.log(`📊 DOM変更検出: type=${mutation.type}, target=${mutation.target.tagName}`, mutation);
-            if (mutation.type === 'childList') {
-                const addedNodes = Array.from(mutation.addedNodes);
-                const removedNodes = Array.from(mutation.removedNodes);
-                // 時間帯テーブル関連の変更のみ検出
-                const hasTableChange = [...addedNodes, ...removedNodes].some(node => {
-                    if (node.nodeType === Node.ELEMENT_NODE) {
-                        const element = node;
-                        const isRelevant = element.tagName === 'TABLE' ||
-                            element.tagName === 'TD' ||
-                            element.tagName === 'IMG' || // アイコン変更も検出
-                            (element.querySelector && (element.querySelector('table') ||
-                                element.querySelector('td[data-gray-out]') ||
-                                element.querySelector('div[role="button"]') ||
-                                element.querySelector('img[src*="calendar_ng.svg"]') ||
-                                element.querySelector('img[src*="ico_scale"]')));
-                        if (isRelevant) {
-                            // console.log(`🔍 テーブル関連の変更を検出: ${element.tagName}`, element);
-                        }
-                        return isRelevant;
-                    }
-                    return false;
-                });
-                if (hasTableChange) {
-                    hasRelevantChange = true;
-                }
-            }
-            else if (mutation.type === 'attributes') {
-                // 属性変更も検知（data-disabled、src等）
-                const target = mutation.target;
-                const attrName = mutation.attributeName;
-                if (target.nodeType === Node.ELEMENT_NODE) {
-                    const isRelevantAttr = ((attrName === 'data-disabled' && target.tagName === 'DIV' && target.getAttribute('role') === 'button') ||
-                        (attrName === 'src' && target.tagName === 'IMG') ||
-                        (attrName === 'aria-pressed' && target.tagName === 'DIV' && target.getAttribute('role') === 'button'));
-                    if (isRelevantAttr) {
-                        // console.log(`🔄 属性変更を検出: ${attrName}=${target.getAttribute(attrName)}`, target);
-                        hasRelevantChange = true;
-                    }
-                }
-            }
-        });
-        if (hasRelevantChange) {
-            // デバウンス処理
-            clearTimeout(window.timeSlotCheckTimeout);
-            window.timeSlotCheckTimeout = window.setTimeout(() => {
-                // 現在のテーブル内容をチェック
-                const currentTableContent = getCurrentTableContent();
-                if (currentTableContent === lastTableContent) {
-                    console.log('📋 テーブル内容に変化なし、処理をスキップ');
-                    return;
-                }
-                // console.log('🔍 有効な時間帯テーブル変更を検出');
-                isProcessing = true;
-                // テーブル内容を記録
-                lastTableContent = getCurrentTableContent();
-                isProcessing = false;
-            }, 800);
-        }
-    });
-    // 検知範囲を限定（属性変更も検知）
-    observer.observe(document.body, {
-        childList: true,
-        subtree: true,
-        attributes: true,
-        attributeFilter: ['data-disabled', 'src', 'aria-pressed']
-    });
-    // 初回チェック
-    setTimeout(() => {
-        if (checkTimeSlotTableExistsSync()) {
-            // console.log('既存の時間帯テーブルを検出');
-            isProcessing = true;
-            lastTableContent = getCurrentTableContent();
-            isProcessing = false;
-        }
-    }, 1000);
-    console.log('継続的な時間帯テーブル検知を開始しました（ループ防止版）');
-}
-// 時間帯テーブルの動的待機
-async function waitForTimeSlotTable(timeout = 10000) {
-    const startTime = Date.now();
-    const checkInterval = 50; // 50msで高速チェック
-    console.log('時間帯テーブルの出現を待機中...');
-    while (Date.now() - startTime < timeout) {
-        if (checkTimeSlotTableExistsSync()) {
-            console.log('時間帯テーブルを検出しました');
-            return true;
-        }
-        // ランダム待機時間で次のチェック
-        const waitTime = checkInterval + Math.floor(Math.random() * 200);
-        await new Promise(resolve => setTimeout(resolve, waitTime));
-    }
-    console.log(`時間帯テーブルの待機がタイムアウトしました (${timeout}ms)`);
-    return false;
-}
-// 時間帯テーブルの存在確認（同期版）
-function checkTimeSlotTableExistsSync() {
-    // 実際の時間帯要素をチェック（時間を含むもの）
-    const allElements = document.querySelectorAll(_entrance_page_dom_utils__WEBPACK_IMPORTED_MODULE_1__/* .timeSlotSelectors */ .eN.timeSlotCells);
-    const actualTimeSlots = [];
-    allElements.forEach(el => {
-        const text = el.textContent?.trim();
-        // 時間帯の形式をチェック（例: "9:00-", "11:00-", "13時"など）
-        if (text && (text.includes(':') && text.includes('-') || text.includes('時'))) {
-            actualTimeSlots.push(el);
-        }
-    });
-    if (actualTimeSlots.length > 0) {
-        // ログを削除
-        // console.log(`✅ 実際の時間帯要素を${actualTimeSlots.length}個検出`);
-        return true;
-    }
-    // console.log('❌ 実際の時間帯要素が見つかりません（カレンダー日付のみ）');
-    return false;
-}
-// 全時間帯の状態分析
-function analyzeTimeSlots() {
-    const available = [];
-    const full = [];
-    const selected = [];
-    // 全てのtd要素を取得（時間帯テーブル内）
-    const allTdElements = document.querySelectorAll(timeSlotSelectors.timeSlotContainer + ' td[data-gray-out]');
-    // console.log(`📊 時間帯分析開始: ${allTdElements.length}個のtd要素を確認`);
-    allTdElements.forEach(tdElement => {
-        const status = extractTdStatus(tdElement);
-        if (status && status.timeText) {
-            const isFull = status.isFull;
-            const isAvailable = status.isAvailable;
-            const isSelected = status.element.getAttribute('aria-pressed') === 'true';
-            let statusType = 'unknown';
-            if (isFull) {
-                statusType = 'full';
-            }
-            else if (isSelected) {
-                statusType = 'selected';
-            }
-            else if (isAvailable) {
-                statusType = 'available';
-            }
-            // console.log(`📊 ${status.timeText}: ${statusType} (満員:${isFull}, 利用可能:${isAvailable}, 選択:${isSelected})`);
-            const timeInfo = {
-                element: status.element,
-                tdElement: status.tdElement,
-                timeText: status.timeText,
-                isAvailable: isAvailable,
-                isFull: isFull,
-                tdSelector: generateUniqueTdSelector(status.tdElement)
-            };
-            if (statusType === 'full') {
-                full.push(timeInfo);
-            }
-            else if (statusType === 'selected') {
-                selected.push(timeInfo);
-            }
-            else if (statusType === 'available') {
-                available.push(timeInfo);
-            }
-        }
-    });
-    // console.log(`📊 分析結果: 利用可能=${available.length}, 満員=${full.length}, 選択=${selected.length}`);
-    return { available, full, selected };
-}
-// 時間帯要素から情報を抽出
-function extractTimeSlotInfo(buttonElement) {
-    const tdElement = buttonElement.closest('td');
-    if (!tdElement)
-        return null;
-    // 時間テキストを取得
-    const timeSpan = buttonElement.querySelector('dt span');
-    const timeText = timeSpan ? timeSpan.textContent?.trim() || '' : '';
-    // デバッグ用：要素の状態を詳細表示
-    const dataDisabled = buttonElement.getAttribute('data-disabled');
-    const ariaPressed = buttonElement.getAttribute('aria-pressed');
-    // アイコンによる満員判定（calendar_ng.svgが最も確実）
-    const fullIcon = buttonElement.querySelector('img[src*="calendar_ng.svg"]');
-    const lowIcon = buttonElement.querySelector('img[src*="ico_scale_low.svg"]');
-    const highIcon = buttonElement.querySelector('img[src*="ico_scale_high.svg"]');
-    let iconType = 'unknown';
-    let isAvailable = false;
-    let isFull = false;
-    // アイコンベースでの判定
-    if (fullIcon) {
-        iconType = 'full';
-        isFull = true;
-    }
-    else if (highIcon) {
-        iconType = 'high';
-        isAvailable = true;
-    }
-    else if (lowIcon) {
-        iconType = 'low';
-        isAvailable = true;
-    }
-    // data-disabled属性での追加確認
-    if (dataDisabled === 'true') {
-        isFull = true;
-        isAvailable = false;
-    }
-    // デバッグ情報
-    console.log(`時間帯解析: ${timeText} - isFull: ${isFull}, isAvailable: ${isAvailable}, iconType: ${iconType}, disabled: ${dataDisabled}, pressed: ${ariaPressed}, hasFullIcon: ${!!fullIcon}`);
-    return {
-        element: buttonElement,
-        tdElement: tdElement,
-        timeText: timeText,
-        isAvailable: isAvailable,
-        isFull: isFull,
-        tdSelector: generateSelectorForElement(buttonElement)
-    };
-}
-// 要素のセレクタを生成（フォールバック用）
-function generateSelectorForElement(element) {
-    const timeSpan = element.querySelector('dt span');
-    const timeText = timeSpan ? timeSpan.textContent?.trim() || '' : '';
-    return `td[data-gray-out] div[role='button'] dt span:contains('${timeText}')`;
-}
-// エクスポート
-
-// 【6. カレンダー・UI状態管理】（entrance-page-ui.tsから統合）
-// ============================================================================
-// 依存注入用の参照
-let cacheManagerSection6 = null;
-// cacheManagerを設定するヘルパー関数
-const setCacheManagerForSection6 = (cm) => {
-    cacheManagerSection6 = cm;
-};
-// entranceReservationHelperを設定するヘルパー関数（互換性のため保持）
-const setEntranceReservationHelper = (helper) => {
-    // 必要な場合は、entrance-page-coreに設定
-    console.log('setEntranceReservationHelper called:', typeof helper);
-};
-// メインボタンの表示更新（FAB形式対応）
-// FAB更新の状態管理（統一状態管理システムで管理）
-// 現在のFAB状態を文字列として取得
-function getCurrentFabState() {
-    if (!entranceReservationStateManager)
-        return 'no-manager';
-    const mode = getCurrentMode();
-    const executionState = entranceReservationStateManager.getExecutionState();
-    const hasReservation = entranceReservationStateManager.hasReservationTarget();
-    return `${mode}-${executionState}-${hasReservation}`;
-}
-// FAB表示更新は統一状態管理システムで直接処理
-// 現在のモードを取得するヘルパー関数（予約優先ロジック組み込み）
-function getCurrentMode() {
-    // 入場予約状態管理システムを取得（必須）
-    if (!entranceReservationStateManager) {
-        console.warn('⚠️ EntranceReservationStateManager が利用できません');
-        return 'idle';
-    }
-    // ページローディング状態の確認
-    if (entranceReservationStateManager.isPageLoading()) {
-        return 'loading';
-    }
-    // 入場予約状態管理システムの実行状態を確認
-    const executionState = entranceReservationStateManager.getExecutionState();
-    switch (executionState) {
-        case 'reservation_running':
-            return 'reservation-running';
-        case 'idle':
-            // 推奨アクションを確認
-            const preferredAction = entranceReservationStateManager.getPreferredAction();
-            switch (preferredAction) {
-                case 'reservation':
-                    return 'idle'; // 予約可能状態
-                default:
-                    return 'idle';
-            }
-        default:
-            return 'idle';
-    }
-}
-// ステータスバッジの更新
-function updateStatusBadge(mode) {
-    const statusBadge = document.querySelector('#ytomo-status-badge');
-    if (!statusBadge)
-        return;
-    let message = '';
-    let bgClass = 'status-bg-default';
-    switch (mode) {
-        case 'reservation-running':
-            // 効率モードON時は標的時刻カウントダウン、通常時は経過時間と回数
-            if (entranceReservationStateManager.isEfficiencyModeEnabled()) {
-                const nextTarget = entranceReservationStateManager.getNextSubmitTarget();
-                if (nextTarget) {
-                    const remainingMs = nextTarget.getTime() - Date.now();
-                    const remainingSeconds = Math.max(0, Math.floor(remainingMs / 1000));
-                    message = `効率予約実行中\n${remainingSeconds}秒後`;
-                    bgClass = 'status-bg-orange'; // オレンジ色
-                }
-                else {
-                    message = '効率予約実行中';
-                    bgClass = 'status-bg-orange';
-                }
-            }
-            else {
-                // 通常モード: 経過時間と回数を表示
-                const startTime = entranceReservationStateManager.getReservationStartTime();
-                const elapsedMinutes = startTime ?
-                    Math.floor((Date.now() - startTime) / 60000) : 0;
-                const attempts = entranceReservationStateManager.getAttempts();
-                message = `予約実行中\n${elapsedMinutes}分 ${attempts}回`;
-                bgClass = 'status-bg-orange'; // オレンジ色
-            }
-            break;
-        case 'selecting':
-            message = '準備完了';
-            bgClass = 'status-bg-blue'; // 緑色
-            break;
-        case 'found-available':
-            message = '空きあり検出！\n予約実行中';
-            bgClass = 'status-bg-green'; // 明るい緑色
-            break;
-        case 'loading':
-            message = '情報読み込み中...';
-            bgClass = 'status-bg-default'; // グレー色
-            break;
-        case 'waiting':
-            message = '待機中';
-            bgClass = 'status-bg-default'; // グレー色
-            break;
-        case 'idle':
-        default:
-            message = '待機中';
-            bgClass = 'status-bg-default'; // 黒色
-            break;
-    }
-    if (message) {
-        statusBadge.innerText = message;
-        // 既存の背景色クラスを削除してから新しいクラスを追加
-        statusBadge.className = statusBadge.className.replace(/status-bg-\w+/g, '');
-        statusBadge.classList.add(bgClass);
-        statusBadge.classList.remove('js-hide');
-        // 効率モードの5秒前警告（予約実行中）
-        if (mode === 'reservation-running' && entranceReservationStateManager.isEfficiencyModeEnabled()) {
-            const nextTarget = entranceReservationStateManager.getNextSubmitTarget();
-            if (nextTarget) {
-                const remainingMs = nextTarget.getTime() - Date.now();
-                const remainingSeconds = Math.max(0, Math.floor(remainingMs / 1000));
-                if (remainingSeconds <= 5) {
-                    statusBadge.classList.add('countdown-warning');
-                }
-                else {
-                    statusBadge.classList.remove('countdown-warning');
-                }
-            }
-        }
-        else {
-            statusBadge.classList.remove('countdown-warning');
-        }
-    }
-    else {
-        // 統一状態管理システムによる更新
-        entranceReservationStateManager.updateFabDisplay();
-    }
-}
-// 前の選択をリセット
-function resetPreviousSelection() {
-    // すべての対象をクリア
-    if (entranceReservationStateManager) {
-        entranceReservationStateManager.clearAllTargets();
-    }
-}
-// 統一されたリロードスケジュール関数
-function scheduleReload(seconds = 30) {
-    console.log(`🔄 統一リロードスケジュール開始: ${seconds}秒`);
-    // 入場予約状態管理システムでリロードカウントダウンを開始
-    if (entranceReservationStateManager) {
-        entranceReservationStateManager.scheduleReload(seconds);
-        console.log(`📊 リロードスケジュール時の状態: ${entranceReservationStateManager.getExecutionState()}`);
-    }
-    // 即座に一度UI更新
-    entranceReservationStateManager.updateFabDisplay();
-}
-// 下位互換のためのstartReloadCountdown関数（scheduleReloadのエイリアス）
-function startReloadCountdown(seconds = 30) {
-    scheduleReload(seconds);
-}
-// カウントダウン停止関数
-function stopReloadCountdown() {
-    // 呼び出し元を特定するためのスタックトレース
-    const stack = new Error().stack;
-    const caller = stack?.split('\n')[2]?.trim() || 'unknown';
-    console.log(`🛑 stopReloadCountdown() 呼び出し元: ${caller}`);
-    // 入場予約状態管理システムでリロードカウントダウンを停止
-    if (entranceReservationStateManager) {
-        entranceReservationStateManager.stopReloadCountdown();
-    }
-}
-// ページ読み込み状態を設定
-function setPageLoadingState(isLoading) {
-    if (_entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_0__/* .entranceReservationStateManager */ .xx) {
-        _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_0__/* .entranceReservationStateManager */ .xx.setPageLoadingState(isLoading);
-    }
-    _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_0__/* .entranceReservationStateManager */ .xx.updateFabDisplay();
-}
-// 中断操作が許可されているかチェック
-function isInterruptionAllowed() {
-    // リロード直前3秒間は中断不可（時間を短縮して中断可能期間を延長）
-    if (_entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_0__/* .entranceReservationStateManager */ .xx) {
-        const isNearReload = false;
-        // console.log(`🔍 中断可否チェック: nearReload=${isNearReload}`);
-        return !isNearReload;
-    }
-    return true; // フォールバック：統合システムが利用できない場合は中断を許可
-}
-// ページ読み込み時のキャッシュ復元
-async function restoreFromCache() {
-    if (!cacheManagerSection6)
-        return;
-    const cached = cacheManagerSection6.loadTargetSlots();
-    if (!cached)
-        return;
-    console.log('🔄 キャッシュから状態を復元中...');
-    // キャッシュされた日付と現在のカレンダー日付を比較し、必要に応じて日付移動を実行
-    if (cached.selectedDate && cached.targets && cached.targets.length > 0) {
-        const currentSelectedDate = getCurrentSelectedCalendarDate();
-        console.log(`📅 日付比較: キャッシュ=${cached.selectedDate}, 現在=${currentSelectedDate}`);
-        if (cached.selectedDate !== currentSelectedDate) {
-            console.log(`📅 キャッシュされた日付への移動が必要: ${cached.selectedDate}`);
-            // カレンダーが利用可能になるまで待機
-            const calendarReady = await waitForCalendar(5000);
-            if (!calendarReady) {
-                console.error('❌ カレンダーの準備完了を待機中にタイムアウトしました');
-                return;
-            }
-            // 指定日付のカレンダーをクリック
-            const dateClickSuccess = await clickCalendarDate(cached.selectedDate);
-            if (!dateClickSuccess) {
-                console.error(`❌ キャッシュされた日付への移動に失敗: ${cached.selectedDate}`);
-                return;
-            }
-            console.log(`✅ キャッシュされた日付に移動完了: ${cached.selectedDate}`);
-            // 日付移動後、時間帯テーブルが更新されるまで待機
-            const tableReady = await waitForTimeSlotTable(5000);
-            if (!tableReady) {
-                console.error('❌ 時間帯テーブルの更新完了を待機中にタイムアウトしました');
-                return;
-            }
-        }
-    }
-    // カレンダー読み込み完了を待機（短縮: 5秒）
-    const hasCalendar = await waitForCalendar(5000);
-    if (!hasCalendar) {
-        console.log('❌ カレンダーの読み込みがタイムアウトしました');
-        cacheManagerSection6.clearTargetSlots();
-        return;
-    }
-    // UI更新を最短遅延実行（DOM完成後）
-    setTimeout(async () => {
-        // メインボタンの表示更新
-        _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_0__/* .entranceReservationStateManager */ .xx.updateFabDisplay();
-        console.log('✅ キャッシュ復元完了');
-    }, 200);
-}
-// waitForCalendar関数を追加（restoreFromCacheで使用）
-async function waitForCalendar(timeout) {
-    const startTime = Date.now();
-    while (Date.now() - startTime < timeout) {
-        const selectedDate = document.querySelector('[aria-pressed="true"] time[datetime]');
-        if (selectedDate?.getAttribute('datetime') && selectedDate.getAttribute('datetime') !== 'N/A') {
-            return true;
-        }
-        await new Promise(resolve => setTimeout(resolve, 100));
-    }
-    return false;
-}
-// ============================================================================
-// 【UIファイルからの統合】カレンダー・UI状態管理機能
-// ============================================================================
-// 現在選択中のカレンダー日付を取得
-function getCurrentSelectedCalendarDate() {
-    try {
-        let hasNADatetime = false;
-        // 安定したセレクタで選択済み要素を検索
-        const selectedSelectors = [
-            '[aria-pressed="true"] time[datetime]',
-            '[class*="selector_date"] time[datetime]'
-        ];
-        for (const selector of selectedSelectors) {
-            const timeElement = document.querySelector(selector);
-            if (timeElement) {
-                const datetime = timeElement.getAttribute('datetime');
-                if (datetime && datetime !== 'N/A') {
-                    return datetime;
-                }
-                else if (datetime === 'N/A') {
-                    hasNADatetime = true;
-                    console.log(`📅 datetime="N/A"を検出 - DOM更新待機中...`);
-                }
-            }
-        }
-        // さらなるフォールバック: 任意のaria-pressed="true"要素内のtime要素
-        const anySelected = document.querySelectorAll('[aria-pressed="true"]');
-        for (const el of anySelected) {
-            const timeElement = el.querySelector('time[datetime]');
-            if (timeElement) {
-                const datetime = timeElement.getAttribute('datetime');
-                if (datetime && datetime !== 'N/A') {
-                    console.log(`📅 現在選択中のカレンダー日付（フォールバック）: ${datetime}`);
-                    return datetime;
-                }
-                else if (datetime === 'N/A') {
-                    hasNADatetime = true;
-                }
-            }
-        }
-        if (hasNADatetime) {
-            console.log('⚠️ datetime="N/A"のため日付取得を待機中...');
-        }
-        else {
-            console.log('⚠️ 選択中のカレンダー日付が見つかりません');
-        }
-        return null;
-    }
-    catch (error) {
-        console.error('❌ カレンダー日付取得エラー:', error);
-        return null;
-    }
-}
-// 動的待機版のカレンダー日付取得（強化版）
-async function waitForValidCalendarDate(maxRetries = 30, interval = 200) {
-    console.log('📅 カレンダー日付取得の動的待機を開始...');
-    for (let i = 0; i < maxRetries; i++) {
-        // まずtime要素の存在を確認
-        const timeElements = document.querySelectorAll('time[datetime]');
-        if (timeElements.length === 0) {
-            console.log(`⏳ time要素がまだ存在しません (${i + 1}/${maxRetries}) - さらに待機`);
-            await new Promise(resolve => setTimeout(resolve, interval));
-            continue;
-        }
-        const date = getCurrentSelectedCalendarDate();
-        if (date) {
-            console.log(`📅 動的待機で日付取得成功: ${date} (${i + 1}回目)`);
-            return date;
-        }
-        console.log(`⏳ 日付取得リトライ中 (${i + 1}/${maxRetries}) - time要素は${timeElements.length}個存在`);
-        if (i < maxRetries - 1) {
-            await new Promise(resolve => setTimeout(resolve, interval));
-        }
-    }
-    console.log(`⚠️ ${maxRetries}回の動的待機後も日付取得に失敗`);
-    return null;
-}
-// 指定された日付のカレンダーをクリック
-async function clickCalendarDate(targetDate) {
-    console.log(`📅 指定日付のカレンダークリックを試行: ${targetDate}`);
-    try {
-        // 指定日付のカレンダー要素を検索（実際のHTML構造に基づく）
-        const timeElement = document.querySelector(`time[datetime="${targetDate}"]`);
-        if (!timeElement) {
-            console.log(`❌ 指定日付のtime要素が見つかりません: ${targetDate}`);
-            // デバッグ: 利用可能なカレンダー要素を表示
-            const allCalendarElements = document.querySelectorAll('time[datetime]');
-            console.log(`🔍 利用可能なカレンダー要素数: ${allCalendarElements.length}`);
-            allCalendarElements.forEach((el, i) => {
-                if (i < 5) { // 最初の5個だけ表示
-                    const datetime = el.getAttribute('datetime');
-                    console.log(`  [${i}] datetime="${datetime}" (${el.tagName})`);
-                }
-            });
-            return false;
-        }
-        // time要素の親のdivボタンを取得
-        const targetElement = timeElement.closest('div[role="button"]');
-        if (!targetElement) {
-            console.log(`❌ 指定日付のボタン要素が見つかりません: ${targetDate}`);
-            return false;
-        }
-        // クリック可能かチェック
-        if (targetElement.getAttribute('tabindex') === '-1' || targetElement.hasAttribute('data-pointer-none')) {
-            console.log(`❌ 指定日付はクリック不可です: ${targetDate}`);
-            return false;
-        }
-        // クリック実行
-        console.log(`🖱️ 日付をクリック: ${targetDate}`);
-        const clickEvent = new MouseEvent('click', {
-            view: window,
-            bubbles: true,
-            cancelable: true
-        });
-        targetElement.dispatchEvent(clickEvent);
-        // クリック結果を待機（短縮）
-        await new Promise(resolve => setTimeout(resolve, 300));
-        // クリック成功確認
-        const isNowSelected = targetElement.getAttribute('aria-pressed') === 'true' ||
-            targetElement.classList.contains('selected') ||
-            targetElement.querySelector('time')?.getAttribute('datetime') === targetDate;
-        if (isNowSelected) {
-            console.log('✅ カレンダー日付のクリックが成功しました');
-            return true;
-        }
-        else {
-            console.log('⚠️ カレンダークリックは実行されましたが、選択状態の確認ができません');
-            return true; // 実行は成功したとして進行
-        }
-    }
-    catch (error) {
-        console.error('❌ カレンダー日付クリックエラー:', error);
-        return false;
-    }
-}
-// 時間帯表示のためのカレンダー自動クリック機能
-async function tryClickCalendarForTimeSlot() {
-    console.log('📅 時間帯表示のためのカレンダークリックを試行中...');
-    // 1. カレンダー要素を検索
-    const calendarSelectors = [
-        '.style_main__calendar__HRSsz',
-        '[class*="calendar"]',
-        'button[role="button"]:has(.style_main__calendar__HRSsz)',
-        'div[class*="calendar"] button'
-    ];
-    let calendarElement = null;
-    for (const selector of calendarSelectors) {
-        calendarElement = document.querySelector(selector);
-        if (calendarElement) {
-            console.log(`📅 カレンダー要素を発見: ${selector}`);
-            break;
-        }
-    }
-    if (!calendarElement) {
-        console.log('❌ カレンダー要素が見つかりません');
-        return false;
-    }
-    // 2. 現在選択されている日付のみを検索
-    const dateSelectors = [
-        '.style_main__calendar__HRSsz button',
-        '.style_main__calendar__HRSsz [role="button"]',
-        '[class*="calendar"] button:not([disabled])',
-        '[class*="date"]:not([disabled])'
-    ];
-    let clickableDate = null;
-    // 現在選択されている日付を探す（これのみが対象）
-    for (const selector of dateSelectors) {
-        const dates = document.querySelectorAll(selector);
-        for (const date of dates) {
-            if (date.classList.contains('selected') ||
-                date.classList.contains('active') ||
-                date.getAttribute('aria-selected') === 'true') {
-                clickableDate = date;
-                console.log(`📅 現在選択中の日付を発見: ${date.textContent?.trim()}`);
-                break;
-            }
-        }
-        if (clickableDate)
-            break;
-    }
-    // ユーザーが選択した日付のみがクリック対象
-    if (!clickableDate) {
-        console.log('❌ ユーザーが選択した日付が見つかりません');
-        console.log('💡 現在選択中の日付のみクリック可能です');
-        return false;
-    }
-    // 3. 選択中の日付をクリック
-    try {
-        console.log(`🖱️ 日付をクリック: "${clickableDate.textContent?.trim()}"`);
-        // マウスイベントを発火
-        const clickEvent = new MouseEvent('click', {
-            view: window,
-            bubbles: true,
-            cancelable: true
-        });
-        clickableDate.dispatchEvent(clickEvent);
-        // 少し待機してクリック結果を確認（短縮）
-        await new Promise(resolve => setTimeout(resolve, 200));
-        console.log('✅ カレンダー日付のクリックを実行しました');
-        return true;
-    }
-    catch (error) {
-        console.error('❌ カレンダークリック中にエラー:', error);
-        return false;
-    }
-}
-// エラー表示機能
-function showErrorMessage(message) {
-    // 既存のエラーメッセージがあれば削除
-    const existingError = document.getElementById('ytomo-error-message');
-    if (existingError) {
-        existingError.remove();
-    }
-    // エラーメッセージ要素を作成
-    const errorDiv = document.createElement('div');
-    errorDiv.id = 'ytomo-error-message';
-    errorDiv.className = 'ytomo-error-message';
-    errorDiv.innerHTML = `
-        <div class="error-title">⚠️ 監視エラー</div>
-        <div>${message}</div>
-        <button class="error-close-btn" onclick="this.parentElement.remove()">閉じる</button>
-    `;
-    document.body.appendChild(errorDiv);
-    // 10秒後に自動削除
-    setTimeout(() => {
-        if (errorDiv && errorDiv.parentElement) {
-            errorDiv.remove();
-        }
-    }, 10000);
-}
-// 現在のテーブル内容を取得（変化検出用）
-function getCurrentTableContent() {
-    const tables = document.querySelectorAll('table');
-    let content = '';
-    tables.forEach(table => {
-        const timeSlots = table.querySelectorAll('td div[role="button"]');
-        timeSlots.forEach(slot => {
-            const timeText = slot.querySelector('dt span')?.textContent?.trim();
-            const disabled = slot.getAttribute('data-disabled');
-            const pressed = slot.getAttribute('aria-pressed');
-            if (timeText && (timeText.includes(':') || timeText.includes('時'))) {
-                content += `${timeText}-${disabled}-${pressed}|`;
-            }
-        });
-    });
-    return content;
-}
-// 日付変更後の選択状態復元
-function restoreSelectionAfterUpdate() {
-    entranceReservationStateManager.updateFabDisplay();
-}
-// 時間帯を自動選択して予約開始
-async function selectTimeSlotAndStartReservation(slotInfo) {
-    const location = LocationHelper.getLocationFromIndex(LocationHelper.getIndexFromSelector(slotInfo.targetInfo.tdSelector));
-    console.log(`🎯 時間帯を自動選択します: ${location}${slotInfo.timeText}`);
-    // クリック対象のdl要素を探す
-    let clickTarget = null;
-    // TD要素の場合はdl要素を探す
-    if (slotInfo.element.tagName === 'TD') {
-        clickTarget = slotInfo.element.querySelector('div[role="button"] dl');
-        if (clickTarget) {
-            console.log('🔧 TD要素内のdl要素を発見しました');
-        }
-        else {
-            console.error('❌ TD要素内にdl要素が見つかりません');
-            return;
-        }
-    }
-    else {
-        // TD以外の場合はdl要素を探す
-        clickTarget = slotInfo.element.querySelector('dl');
-        if (!clickTarget) {
-            console.error('❌ 要素内にdl要素が見つかりません');
-            return;
-        }
-    }
-    // 時間帯を確実に選択
-    console.log(`🖱️ dl要素をクリックします: ${clickTarget.tagName}`);
-    // 複数の方法で確実にクリック
-    try {
-        // まず通常のクリック
-        clickTarget.click();
-        // さらにイベントディスパッチでクリック
-        const clickEvent = new MouseEvent('click', {
-            bubbles: true,
-            cancelable: true,
-            view: window
-        });
-        clickTarget.dispatchEvent(clickEvent);
-        console.log(`✅ dl要素のクリック完了`);
-    }
-    catch (error) {
-        console.error(`❌ dl要素クリックエラー:`, error);
-    }
-    // 選択状態確認のため少し待つ（短縮）
-    await new Promise(resolve => setTimeout(resolve, 100));
-    // 選択状態を確認（ボタン要素の状態をチェック）
-    const buttonElement = slotInfo.element.querySelector('div[role="button"]');
-    const isSelected = buttonElement && (Array.from(buttonElement.classList).some(className => className.includes('style_active__')) ||
-        buttonElement.getAttribute('aria-pressed') === 'true');
-    console.log(`🔍 時間帯選択状態確認: ${isSelected ? '選択済み' : '未選択'}`);
-    if (!isSelected) {
-        console.warn(`⚠️ 時間帯が選択されていません。再試行します`);
-        // 再試行 - dl要素を再度クリック
-        clickTarget.click();
-        await new Promise(resolve => setTimeout(resolve, 100));
-    }
-    // 少し待ってから予約処理開始
-    setTimeout(async () => {
-        console.log('🚀 予約処理を開始します');
-        // 予約開始前に時間帯選択を最終確認（timeSlotSelectorsを使用）
-        const selectedTimeSlot = document.querySelector(timeSlotSelectors.selectedSlot);
-        const finalCheck = !!selectedTimeSlot;
-        console.log(`🔍 予約開始前最終確認: 時間帯選択=${finalCheck ? '✅選択済み' : '❌未選択'}`);
-        if (selectedTimeSlot) {
-            const tdElement = selectedTimeSlot.closest('td');
-            const status = extractTdStatus(tdElement);
-            console.log(`🔍 選択された時間帯: ${status?.timeText || 'unknown'} (満員: ${status?.isFull ? 'はい' : 'いいえ'})`);
-        }
-        if (!finalCheck) {
-            console.error(`❌ 時間帯が選択されていないため予約処理を中止します`);
-            return;
-        }
-        // 通常の予約処理を開始（入場予約状態管理システム使用）
-        const config = getCurrentEntranceConfig();
-        if (config) {
-            // 統一予約開始処理を使用
-            entranceReservationStateManager.startReservation();
-            const result = await entranceReservationHelper(config);
-            if (result.success) {
-                // 入場予約状態管理に予約成功情報を設定
-                if (entranceReservationStateManager) {
-                    const reservationTarget = entranceReservationStateManager.getReservationTarget();
-                    if (reservationTarget) {
-                        entranceReservationStateManager.setReservationSuccess(reservationTarget.timeSlot, reservationTarget.locationIndex);
-                        entranceReservationStateManager.updateFabDisplay(); // FAB表示更新
-                    }
-                }
-                if (cacheManager) {
-                    cacheManager.clearTargetSlots(); // 成功時はキャッシュクリア
-                }
-                console.log('✅ 予約が成功しました！');
-            }
-        }
-    }, 1000);
-}
-// 現在の設定を取得（ヘルパー関数）
-function getCurrentEntranceConfig() {
-    // 既存の設定と同じものを返す
-    return {
-        selectors: {
-            submit: "#__next > div > div > main > div > div.style_main__add_cart_button__DCOw8 > button",
-            change: "body > div > div > div > div > div > div > button",
-            success: "#reservation_modal_title",
-            failure: "#reservation_fail_modal_title",
-            close: "body > div.style_buy-modal__1JZtS > div > div > div > div > ul > li > a"
-        },
-        selectorTexts: {
-            change: "来場日時を変更する"
-        },
-        timeouts: {
-            waitForSubmit: 5000,
-            waitForResponse: 10000,
-            waitForClose: 3000,
-            retryInterval: 1000
-        },
-        randomSettings: {
-            minCheckInterval: 500,
-            checkRandomRange: 200,
-            minClickDelay: 500,
-            clickRandomRange: 200,
-            minRetryDelay: 1000,
-            retryRandomRange: 300
-        }
-    };
-}
-// ============================================================================
-
-
-/***/ }),
-
-/***/ 374:
+/***/ 79:
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 
@@ -1490,13 +465,13 @@ __webpack_require__.d(__webpack_exports__, {
 
 // UNUSED EXPORTS: EntranceReservationStateManager, PriorityMode
 
-// EXTERNAL MODULE: ./src-modules/entrance-page-dom-utils.ts
-var entrance_page_dom_utils = __webpack_require__(115);
-// EXTERNAL MODULE: ./src-modules/entrance-page-core.ts
-var entrance_page_core = __webpack_require__(364);
-// EXTERNAL MODULE: ./src-modules/processing-overlay.ts
-var processing_overlay = __webpack_require__(624);
-;// ./src-modules/unified-automation-manager.ts
+// EXTERNAL MODULE: ./ts/modules/entrance-page-dom-utils.ts
+var entrance_page_dom_utils = __webpack_require__(38);
+// EXTERNAL MODULE: ./ts/modules/entrance-page-core.ts
+var entrance_page_core = __webpack_require__(271);
+// EXTERNAL MODULE: ./ts/modules/processing-overlay.ts
+var processing_overlay = __webpack_require__(307);
+;// ./ts/modules/unified-automation-manager.ts
 /**
  * 統一自動処理管理システム
  *
@@ -1956,7 +931,7 @@ class UnifiedAutomationManager {
     }
 }
 
-;// ./src-modules/entrance-reservation-state-manager.ts
+;// ./ts/modules/entrance-reservation-state-manager.ts
 /**
  * 入場予約状態管理システム
  * 入場予約の状態と対象を管理
@@ -2930,41 +1905,926 @@ const entranceReservationStateManager = new EntranceReservationStateManager();
 
 /***/ }),
 
-/***/ 540:
+/***/ 113:
 /***/ ((module) => {
 
 
 
 /* istanbul ignore next  */
-function insertStyleElement(options) {
-  var element = document.createElement("style");
-  options.setAttributes(element, options.attributes);
-  options.insert(element, options.options);
-  return element;
+function styleTagTransform(css, styleElement) {
+  if (styleElement.styleSheet) {
+    styleElement.styleSheet.cssText = css;
+  } else {
+    while (styleElement.firstChild) {
+      styleElement.removeChild(styleElement.firstChild);
+    }
+    styleElement.appendChild(document.createTextNode(css));
+  }
 }
-module.exports = insertStyleElement;
+module.exports = styleTagTransform;
 
 /***/ }),
 
-/***/ 601:
-/***/ ((module) => {
+/***/ 271:
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   Is: () => (/* binding */ isInterruptionAllowed),
+/* harmony export */   MM: () => (/* binding */ setCacheManagerForSection6),
+/* harmony export */   S9: () => (/* binding */ setCacheManager),
+/* harmony export */   XP: () => (/* binding */ setEntranceReservationHelper),
+/* harmony export */   ZK: () => (/* binding */ setPageLoadingState),
+/* harmony export */   Zu: () => (/* binding */ restoreFromCache),
+/* harmony export */   p4: () => (/* binding */ waitForValidCalendarDate),
+/* harmony export */   rY: () => (/* binding */ getCurrentSelectedCalendarDate)
+/* harmony export */ });
+/* unused harmony exports startTimeSlotTableObserver, waitForTimeSlotTable, checkTimeSlotTableExistsSync, analyzeTimeSlots, extractTimeSlotInfo, generateSelectorForElement, clickCalendarDate, tryClickCalendarForTimeSlot, showErrorMessage, restoreSelectionAfterUpdate, selectTimeSlotAndStartReservation, getCurrentEntranceConfig, getCurrentFabState, getCurrentMode, updateStatusBadge, resetPreviousSelection, scheduleReload, startReloadCountdown, stopReloadCountdown */
+/* harmony import */ var _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(79);
+/* harmony import */ var _entrance_page_dom_utils__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(38);
+/* harmony import */ var _entrance_page_fab__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(975);
+// entrance-page-stateからのimport（もう使用しません）
+// 入場予約状態管理システムからのimport
 
+// entrance-page-dom-utilsからのimport
 
-module.exports = function (i) {
-  return i[1];
+// entrance-page-fabからのimport
+
+// 【5. 時間帯分析システム】
+// ============================================================================
+// 依存注入用のcacheManager参照
+let cacheManager = null;
+// cacheManagerを設定するヘルパー関数
+const setCacheManager = (cm) => {
+    cacheManager = cm;
 };
+// 時間帯テーブルの動的生成を検出（ループ防止版）
+function startTimeSlotTableObserver() {
+    console.log('時間帯テーブルの動的生成検出を開始');
+    let isProcessing = false; // 処理中フラグでループ防止
+    let lastTableContent = ''; // 前回のテーブル内容を記録
+    // MutationObserverで DOM変化を検知
+    const observer = new MutationObserver((mutations) => {
+        if (isProcessing) {
+            console.log('⏭️ 処理中のため変更を無視');
+            return;
+        }
+        let hasRelevantChange = false;
+        mutations.forEach((mutation) => {
+            // console.log(`📊 DOM変更検出: type=${mutation.type}, target=${mutation.target.tagName}`, mutation);
+            if (mutation.type === 'childList') {
+                const addedNodes = Array.from(mutation.addedNodes);
+                const removedNodes = Array.from(mutation.removedNodes);
+                // 時間帯テーブル関連の変更のみ検出
+                const hasTableChange = [...addedNodes, ...removedNodes].some(node => {
+                    if (node.nodeType === Node.ELEMENT_NODE) {
+                        const element = node;
+                        const isRelevant = element.tagName === 'TABLE' ||
+                            element.tagName === 'TD' ||
+                            element.tagName === 'IMG' || // アイコン変更も検出
+                            (element.querySelector && (element.querySelector('table') ||
+                                element.querySelector('td[data-gray-out]') ||
+                                element.querySelector('div[role="button"]') ||
+                                element.querySelector('img[src*="calendar_ng.svg"]') ||
+                                element.querySelector('img[src*="ico_scale"]')));
+                        if (isRelevant) {
+                            // console.log(`🔍 テーブル関連の変更を検出: ${element.tagName}`, element);
+                        }
+                        return isRelevant;
+                    }
+                    return false;
+                });
+                if (hasTableChange) {
+                    hasRelevantChange = true;
+                }
+            }
+            else if (mutation.type === 'attributes') {
+                // 属性変更も検知（data-disabled、src等）
+                const target = mutation.target;
+                const attrName = mutation.attributeName;
+                if (target.nodeType === Node.ELEMENT_NODE) {
+                    const isRelevantAttr = ((attrName === 'data-disabled' && target.tagName === 'DIV' && target.getAttribute('role') === 'button') ||
+                        (attrName === 'src' && target.tagName === 'IMG') ||
+                        (attrName === 'aria-pressed' && target.tagName === 'DIV' && target.getAttribute('role') === 'button'));
+                    if (isRelevantAttr) {
+                        // console.log(`🔄 属性変更を検出: ${attrName}=${target.getAttribute(attrName)}`, target);
+                        hasRelevantChange = true;
+                    }
+                }
+            }
+        });
+        if (hasRelevantChange) {
+            // デバウンス処理
+            clearTimeout(window.timeSlotCheckTimeout);
+            window.timeSlotCheckTimeout = window.setTimeout(() => {
+                // 現在のテーブル内容をチェック
+                const currentTableContent = getCurrentTableContent();
+                if (currentTableContent === lastTableContent) {
+                    console.log('📋 テーブル内容に変化なし、処理をスキップ');
+                    return;
+                }
+                // console.log('🔍 有効な時間帯テーブル変更を検出');
+                isProcessing = true;
+                // テーブル内容を記録
+                lastTableContent = getCurrentTableContent();
+                isProcessing = false;
+            }, 800);
+        }
+    });
+    // 検知範囲を限定（属性変更も検知）
+    observer.observe(document.body, {
+        childList: true,
+        subtree: true,
+        attributes: true,
+        attributeFilter: ['data-disabled', 'src', 'aria-pressed']
+    });
+    // 初回チェック
+    setTimeout(() => {
+        if (checkTimeSlotTableExistsSync()) {
+            // console.log('既存の時間帯テーブルを検出');
+            isProcessing = true;
+            lastTableContent = getCurrentTableContent();
+            isProcessing = false;
+        }
+    }, 1000);
+    console.log('継続的な時間帯テーブル検知を開始しました（ループ防止版）');
+}
+// 時間帯テーブルの動的待機
+async function waitForTimeSlotTable(timeout = 10000) {
+    const startTime = Date.now();
+    const checkInterval = 50; // 50msで高速チェック
+    console.log('時間帯テーブルの出現を待機中...');
+    while (Date.now() - startTime < timeout) {
+        if (checkTimeSlotTableExistsSync()) {
+            console.log('時間帯テーブルを検出しました');
+            return true;
+        }
+        // ランダム待機時間で次のチェック
+        const waitTime = checkInterval + Math.floor(Math.random() * 200);
+        await new Promise(resolve => setTimeout(resolve, waitTime));
+    }
+    console.log(`時間帯テーブルの待機がタイムアウトしました (${timeout}ms)`);
+    return false;
+}
+// 時間帯テーブルの存在確認（同期版）
+function checkTimeSlotTableExistsSync() {
+    // 実際の時間帯要素をチェック（時間を含むもの）
+    const allElements = document.querySelectorAll(_entrance_page_dom_utils__WEBPACK_IMPORTED_MODULE_1__/* .timeSlotSelectors */ .eN.timeSlotCells);
+    const actualTimeSlots = [];
+    allElements.forEach(el => {
+        const text = el.textContent?.trim();
+        // 時間帯の形式をチェック（例: "9:00-", "11:00-", "13時"など）
+        if (text && (text.includes(':') && text.includes('-') || text.includes('時'))) {
+            actualTimeSlots.push(el);
+        }
+    });
+    if (actualTimeSlots.length > 0) {
+        // ログを削除
+        // console.log(`✅ 実際の時間帯要素を${actualTimeSlots.length}個検出`);
+        return true;
+    }
+    // console.log('❌ 実際の時間帯要素が見つかりません（カレンダー日付のみ）');
+    return false;
+}
+// 全時間帯の状態分析
+function analyzeTimeSlots() {
+    const available = [];
+    const full = [];
+    const selected = [];
+    // 全てのtd要素を取得（時間帯テーブル内）
+    const allTdElements = document.querySelectorAll(timeSlotSelectors.timeSlotContainer + ' td[data-gray-out]');
+    // console.log(`📊 時間帯分析開始: ${allTdElements.length}個のtd要素を確認`);
+    allTdElements.forEach(tdElement => {
+        const status = extractTdStatus(tdElement);
+        if (status && status.timeText) {
+            const isFull = status.isFull;
+            const isAvailable = status.isAvailable;
+            const isSelected = status.element.getAttribute('aria-pressed') === 'true';
+            let statusType = 'unknown';
+            if (isFull) {
+                statusType = 'full';
+            }
+            else if (isSelected) {
+                statusType = 'selected';
+            }
+            else if (isAvailable) {
+                statusType = 'available';
+            }
+            // console.log(`📊 ${status.timeText}: ${statusType} (満員:${isFull}, 利用可能:${isAvailable}, 選択:${isSelected})`);
+            const timeInfo = {
+                element: status.element,
+                tdElement: status.tdElement,
+                timeText: status.timeText,
+                isAvailable: isAvailable,
+                isFull: isFull,
+                tdSelector: generateUniqueTdSelector(status.tdElement)
+            };
+            if (statusType === 'full') {
+                full.push(timeInfo);
+            }
+            else if (statusType === 'selected') {
+                selected.push(timeInfo);
+            }
+            else if (statusType === 'available') {
+                available.push(timeInfo);
+            }
+        }
+    });
+    // console.log(`📊 分析結果: 利用可能=${available.length}, 満員=${full.length}, 選択=${selected.length}`);
+    return { available, full, selected };
+}
+// 時間帯要素から情報を抽出
+function extractTimeSlotInfo(buttonElement) {
+    const tdElement = buttonElement.closest('td');
+    if (!tdElement)
+        return null;
+    // 時間テキストを取得
+    const timeSpan = buttonElement.querySelector('dt span');
+    const timeText = timeSpan ? timeSpan.textContent?.trim() || '' : '';
+    // デバッグ用：要素の状態を詳細表示
+    const dataDisabled = buttonElement.getAttribute('data-disabled');
+    const ariaPressed = buttonElement.getAttribute('aria-pressed');
+    // アイコンによる満員判定（calendar_ng.svgが最も確実）
+    const fullIcon = buttonElement.querySelector('img[src*="calendar_ng.svg"]');
+    const lowIcon = buttonElement.querySelector('img[src*="ico_scale_low.svg"]');
+    const highIcon = buttonElement.querySelector('img[src*="ico_scale_high.svg"]');
+    let iconType = 'unknown';
+    let isAvailable = false;
+    let isFull = false;
+    // アイコンベースでの判定
+    if (fullIcon) {
+        iconType = 'full';
+        isFull = true;
+    }
+    else if (highIcon) {
+        iconType = 'high';
+        isAvailable = true;
+    }
+    else if (lowIcon) {
+        iconType = 'low';
+        isAvailable = true;
+    }
+    // data-disabled属性での追加確認
+    if (dataDisabled === 'true') {
+        isFull = true;
+        isAvailable = false;
+    }
+    // デバッグ情報
+    console.log(`時間帯解析: ${timeText} - isFull: ${isFull}, isAvailable: ${isAvailable}, iconType: ${iconType}, disabled: ${dataDisabled}, pressed: ${ariaPressed}, hasFullIcon: ${!!fullIcon}`);
+    return {
+        element: buttonElement,
+        tdElement: tdElement,
+        timeText: timeText,
+        isAvailable: isAvailable,
+        isFull: isFull,
+        tdSelector: generateSelectorForElement(buttonElement)
+    };
+}
+// 要素のセレクタを生成（フォールバック用）
+function generateSelectorForElement(element) {
+    const timeSpan = element.querySelector('dt span');
+    const timeText = timeSpan ? timeSpan.textContent?.trim() || '' : '';
+    return `td[data-gray-out] div[role='button'] dt span:contains('${timeText}')`;
+}
+// エクスポート
+
+// 【6. カレンダー・UI状態管理】（entrance-page-ui.tsから統合）
+// ============================================================================
+// 依存注入用の参照
+let cacheManagerSection6 = null;
+// cacheManagerを設定するヘルパー関数
+const setCacheManagerForSection6 = (cm) => {
+    cacheManagerSection6 = cm;
+};
+// entranceReservationHelperを設定するヘルパー関数（互換性のため保持）
+const setEntranceReservationHelper = (helper) => {
+    // 必要な場合は、entrance-page-coreに設定
+    console.log('setEntranceReservationHelper called:', typeof helper);
+};
+// メインボタンの表示更新（FAB形式対応）
+// FAB更新の状態管理（統一状態管理システムで管理）
+// 現在のFAB状態を文字列として取得
+function getCurrentFabState() {
+    if (!entranceReservationStateManager)
+        return 'no-manager';
+    const mode = getCurrentMode();
+    const executionState = entranceReservationStateManager.getExecutionState();
+    const hasReservation = entranceReservationStateManager.hasReservationTarget();
+    return `${mode}-${executionState}-${hasReservation}`;
+}
+// FAB表示更新は統一状態管理システムで直接処理
+// 現在のモードを取得するヘルパー関数（予約優先ロジック組み込み）
+function getCurrentMode() {
+    // 入場予約状態管理システムを取得（必須）
+    if (!entranceReservationStateManager) {
+        console.warn('⚠️ EntranceReservationStateManager が利用できません');
+        return 'idle';
+    }
+    // ページローディング状態の確認
+    if (entranceReservationStateManager.isPageLoading()) {
+        return 'loading';
+    }
+    // 入場予約状態管理システムの実行状態を確認
+    const executionState = entranceReservationStateManager.getExecutionState();
+    switch (executionState) {
+        case 'reservation_running':
+            return 'reservation-running';
+        case 'idle':
+            // 推奨アクションを確認
+            const preferredAction = entranceReservationStateManager.getPreferredAction();
+            switch (preferredAction) {
+                case 'reservation':
+                    return 'idle'; // 予約可能状態
+                default:
+                    return 'idle';
+            }
+        default:
+            return 'idle';
+    }
+}
+// ステータスバッジの更新
+function updateStatusBadge(mode) {
+    const statusBadge = document.querySelector('#ytomo-status-badge');
+    if (!statusBadge)
+        return;
+    let message = '';
+    let bgClass = 'status-bg-default';
+    switch (mode) {
+        case 'reservation-running':
+            // 効率モードON時は標的時刻カウントダウン、通常時は経過時間と回数
+            if (entranceReservationStateManager.isEfficiencyModeEnabled()) {
+                const nextTarget = entranceReservationStateManager.getNextSubmitTarget();
+                if (nextTarget) {
+                    const remainingMs = nextTarget.getTime() - Date.now();
+                    const remainingSeconds = Math.max(0, Math.floor(remainingMs / 1000));
+                    message = `効率予約実行中\n${remainingSeconds}秒後`;
+                    bgClass = 'status-bg-orange'; // オレンジ色
+                }
+                else {
+                    message = '効率予約実行中';
+                    bgClass = 'status-bg-orange';
+                }
+            }
+            else {
+                // 通常モード: 経過時間と回数を表示
+                const startTime = entranceReservationStateManager.getReservationStartTime();
+                const elapsedMinutes = startTime ?
+                    Math.floor((Date.now() - startTime) / 60000) : 0;
+                const attempts = entranceReservationStateManager.getAttempts();
+                message = `予約実行中\n${elapsedMinutes}分 ${attempts}回`;
+                bgClass = 'status-bg-orange'; // オレンジ色
+            }
+            break;
+        case 'selecting':
+            message = '準備完了';
+            bgClass = 'status-bg-blue'; // 緑色
+            break;
+        case 'found-available':
+            message = '空きあり検出！\n予約実行中';
+            bgClass = 'status-bg-green'; // 明るい緑色
+            break;
+        case 'loading':
+            message = '情報読み込み中...';
+            bgClass = 'status-bg-default'; // グレー色
+            break;
+        case 'waiting':
+            message = '待機中';
+            bgClass = 'status-bg-default'; // グレー色
+            break;
+        case 'idle':
+        default:
+            message = '待機中';
+            bgClass = 'status-bg-default'; // 黒色
+            break;
+    }
+    if (message) {
+        statusBadge.innerText = message;
+        // 既存の背景色クラスを削除してから新しいクラスを追加
+        statusBadge.className = statusBadge.className.replace(/status-bg-\w+/g, '');
+        statusBadge.classList.add(bgClass);
+        statusBadge.classList.remove('js-hide');
+        // 効率モードの5秒前警告（予約実行中）
+        if (mode === 'reservation-running' && entranceReservationStateManager.isEfficiencyModeEnabled()) {
+            const nextTarget = entranceReservationStateManager.getNextSubmitTarget();
+            if (nextTarget) {
+                const remainingMs = nextTarget.getTime() - Date.now();
+                const remainingSeconds = Math.max(0, Math.floor(remainingMs / 1000));
+                if (remainingSeconds <= 5) {
+                    statusBadge.classList.add('countdown-warning');
+                }
+                else {
+                    statusBadge.classList.remove('countdown-warning');
+                }
+            }
+        }
+        else {
+            statusBadge.classList.remove('countdown-warning');
+        }
+    }
+    else {
+        // 統一状態管理システムによる更新
+        entranceReservationStateManager.updateFabDisplay();
+    }
+}
+// 前の選択をリセット
+function resetPreviousSelection() {
+    // すべての対象をクリア
+    if (entranceReservationStateManager) {
+        entranceReservationStateManager.clearAllTargets();
+    }
+}
+// 統一されたリロードスケジュール関数
+function scheduleReload(seconds = 30) {
+    console.log(`🔄 統一リロードスケジュール開始: ${seconds}秒`);
+    // 入場予約状態管理システムでリロードカウントダウンを開始
+    if (entranceReservationStateManager) {
+        entranceReservationStateManager.scheduleReload(seconds);
+        console.log(`📊 リロードスケジュール時の状態: ${entranceReservationStateManager.getExecutionState()}`);
+    }
+    // 即座に一度UI更新
+    entranceReservationStateManager.updateFabDisplay();
+}
+// 下位互換のためのstartReloadCountdown関数（scheduleReloadのエイリアス）
+function startReloadCountdown(seconds = 30) {
+    scheduleReload(seconds);
+}
+// カウントダウン停止関数
+function stopReloadCountdown() {
+    // 呼び出し元を特定するためのスタックトレース
+    const stack = new Error().stack;
+    const caller = stack?.split('\n')[2]?.trim() || 'unknown';
+    console.log(`🛑 stopReloadCountdown() 呼び出し元: ${caller}`);
+    // 入場予約状態管理システムでリロードカウントダウンを停止
+    if (entranceReservationStateManager) {
+        entranceReservationStateManager.stopReloadCountdown();
+    }
+}
+// ページ読み込み状態を設定
+function setPageLoadingState(isLoading) {
+    if (_entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_0__/* .entranceReservationStateManager */ .xx) {
+        _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_0__/* .entranceReservationStateManager */ .xx.setPageLoadingState(isLoading);
+    }
+    _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_0__/* .entranceReservationStateManager */ .xx.updateFabDisplay();
+}
+// 中断操作が許可されているかチェック
+function isInterruptionAllowed() {
+    // リロード直前3秒間は中断不可（時間を短縮して中断可能期間を延長）
+    if (_entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_0__/* .entranceReservationStateManager */ .xx) {
+        const isNearReload = false;
+        // console.log(`🔍 中断可否チェック: nearReload=${isNearReload}`);
+        return !isNearReload;
+    }
+    return true; // フォールバック：統合システムが利用できない場合は中断を許可
+}
+// ページ読み込み時のキャッシュ復元
+async function restoreFromCache() {
+    if (!cacheManagerSection6)
+        return;
+    const cached = cacheManagerSection6.loadTargetSlots();
+    if (!cached)
+        return;
+    console.log('🔄 キャッシュから状態を復元中...');
+    // キャッシュされた日付と現在のカレンダー日付を比較し、必要に応じて日付移動を実行
+    if (cached.selectedDate && cached.targets && cached.targets.length > 0) {
+        const currentSelectedDate = getCurrentSelectedCalendarDate();
+        console.log(`📅 日付比較: キャッシュ=${cached.selectedDate}, 現在=${currentSelectedDate}`);
+        if (cached.selectedDate !== currentSelectedDate) {
+            console.log(`📅 キャッシュされた日付への移動が必要: ${cached.selectedDate}`);
+            // カレンダーが利用可能になるまで待機
+            const calendarReady = await waitForCalendar(5000);
+            if (!calendarReady) {
+                console.error('❌ カレンダーの準備完了を待機中にタイムアウトしました');
+                return;
+            }
+            // 指定日付のカレンダーをクリック
+            const dateClickSuccess = await clickCalendarDate(cached.selectedDate);
+            if (!dateClickSuccess) {
+                console.error(`❌ キャッシュされた日付への移動に失敗: ${cached.selectedDate}`);
+                return;
+            }
+            console.log(`✅ キャッシュされた日付に移動完了: ${cached.selectedDate}`);
+            // 日付移動後、時間帯テーブルが更新されるまで待機
+            const tableReady = await waitForTimeSlotTable(5000);
+            if (!tableReady) {
+                console.error('❌ 時間帯テーブルの更新完了を待機中にタイムアウトしました');
+                return;
+            }
+        }
+    }
+    // カレンダー読み込み完了を待機（短縮: 5秒）
+    const hasCalendar = await waitForCalendar(5000);
+    if (!hasCalendar) {
+        console.log('❌ カレンダーの読み込みがタイムアウトしました');
+        cacheManagerSection6.clearTargetSlots();
+        return;
+    }
+    // UI更新を最短遅延実行（DOM完成後）
+    setTimeout(async () => {
+        // メインボタンの表示更新
+        _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_0__/* .entranceReservationStateManager */ .xx.updateFabDisplay();
+        console.log('✅ キャッシュ復元完了');
+    }, 200);
+}
+// waitForCalendar関数を追加（restoreFromCacheで使用）
+async function waitForCalendar(timeout) {
+    const startTime = Date.now();
+    while (Date.now() - startTime < timeout) {
+        const selectedDate = document.querySelector('[aria-pressed="true"] time[datetime]');
+        if (selectedDate?.getAttribute('datetime') && selectedDate.getAttribute('datetime') !== 'N/A') {
+            return true;
+        }
+        await new Promise(resolve => setTimeout(resolve, 100));
+    }
+    return false;
+}
+// ============================================================================
+// 【UIファイルからの統合】カレンダー・UI状態管理機能
+// ============================================================================
+// 現在選択中のカレンダー日付を取得
+function getCurrentSelectedCalendarDate() {
+    try {
+        let hasNADatetime = false;
+        // 安定したセレクタで選択済み要素を検索
+        const selectedSelectors = [
+            '[aria-pressed="true"] time[datetime]',
+            '[class*="selector_date"] time[datetime]'
+        ];
+        for (const selector of selectedSelectors) {
+            const timeElement = document.querySelector(selector);
+            if (timeElement) {
+                const datetime = timeElement.getAttribute('datetime');
+                if (datetime && datetime !== 'N/A') {
+                    return datetime;
+                }
+                else if (datetime === 'N/A') {
+                    hasNADatetime = true;
+                    console.log(`📅 datetime="N/A"を検出 - DOM更新待機中...`);
+                }
+            }
+        }
+        // さらなるフォールバック: 任意のaria-pressed="true"要素内のtime要素
+        const anySelected = document.querySelectorAll('[aria-pressed="true"]');
+        for (const el of anySelected) {
+            const timeElement = el.querySelector('time[datetime]');
+            if (timeElement) {
+                const datetime = timeElement.getAttribute('datetime');
+                if (datetime && datetime !== 'N/A') {
+                    console.log(`📅 現在選択中のカレンダー日付（フォールバック）: ${datetime}`);
+                    return datetime;
+                }
+                else if (datetime === 'N/A') {
+                    hasNADatetime = true;
+                }
+            }
+        }
+        if (hasNADatetime) {
+            console.log('⚠️ datetime="N/A"のため日付取得を待機中...');
+        }
+        else {
+            console.log('⚠️ 選択中のカレンダー日付が見つかりません');
+        }
+        return null;
+    }
+    catch (error) {
+        console.error('❌ カレンダー日付取得エラー:', error);
+        return null;
+    }
+}
+// 動的待機版のカレンダー日付取得（強化版）
+async function waitForValidCalendarDate(maxRetries = 30, interval = 200) {
+    console.log('📅 カレンダー日付取得の動的待機を開始...');
+    for (let i = 0; i < maxRetries; i++) {
+        // まずtime要素の存在を確認
+        const timeElements = document.querySelectorAll('time[datetime]');
+        if (timeElements.length === 0) {
+            console.log(`⏳ time要素がまだ存在しません (${i + 1}/${maxRetries}) - さらに待機`);
+            await new Promise(resolve => setTimeout(resolve, interval));
+            continue;
+        }
+        const date = getCurrentSelectedCalendarDate();
+        if (date) {
+            console.log(`📅 動的待機で日付取得成功: ${date} (${i + 1}回目)`);
+            return date;
+        }
+        console.log(`⏳ 日付取得リトライ中 (${i + 1}/${maxRetries}) - time要素は${timeElements.length}個存在`);
+        if (i < maxRetries - 1) {
+            await new Promise(resolve => setTimeout(resolve, interval));
+        }
+    }
+    console.log(`⚠️ ${maxRetries}回の動的待機後も日付取得に失敗`);
+    return null;
+}
+// 指定された日付のカレンダーをクリック
+async function clickCalendarDate(targetDate) {
+    console.log(`📅 指定日付のカレンダークリックを試行: ${targetDate}`);
+    try {
+        // 指定日付のカレンダー要素を検索（実際のHTML構造に基づく）
+        const timeElement = document.querySelector(`time[datetime="${targetDate}"]`);
+        if (!timeElement) {
+            console.log(`❌ 指定日付のtime要素が見つかりません: ${targetDate}`);
+            // デバッグ: 利用可能なカレンダー要素を表示
+            const allCalendarElements = document.querySelectorAll('time[datetime]');
+            console.log(`🔍 利用可能なカレンダー要素数: ${allCalendarElements.length}`);
+            allCalendarElements.forEach((el, i) => {
+                if (i < 5) { // 最初の5個だけ表示
+                    const datetime = el.getAttribute('datetime');
+                    console.log(`  [${i}] datetime="${datetime}" (${el.tagName})`);
+                }
+            });
+            return false;
+        }
+        // time要素の親のdivボタンを取得
+        const targetElement = timeElement.closest('div[role="button"]');
+        if (!targetElement) {
+            console.log(`❌ 指定日付のボタン要素が見つかりません: ${targetDate}`);
+            return false;
+        }
+        // クリック可能かチェック
+        if (targetElement.getAttribute('tabindex') === '-1' || targetElement.hasAttribute('data-pointer-none')) {
+            console.log(`❌ 指定日付はクリック不可です: ${targetDate}`);
+            return false;
+        }
+        // クリック実行
+        console.log(`🖱️ 日付をクリック: ${targetDate}`);
+        const clickEvent = new MouseEvent('click', {
+            view: window,
+            bubbles: true,
+            cancelable: true
+        });
+        targetElement.dispatchEvent(clickEvent);
+        // クリック結果を待機（短縮）
+        await new Promise(resolve => setTimeout(resolve, 300));
+        // クリック成功確認
+        const isNowSelected = targetElement.getAttribute('aria-pressed') === 'true' ||
+            targetElement.classList.contains('selected') ||
+            targetElement.querySelector('time')?.getAttribute('datetime') === targetDate;
+        if (isNowSelected) {
+            console.log('✅ カレンダー日付のクリックが成功しました');
+            return true;
+        }
+        else {
+            console.log('⚠️ カレンダークリックは実行されましたが、選択状態の確認ができません');
+            return true; // 実行は成功したとして進行
+        }
+    }
+    catch (error) {
+        console.error('❌ カレンダー日付クリックエラー:', error);
+        return false;
+    }
+}
+// 時間帯表示のためのカレンダー自動クリック機能
+async function tryClickCalendarForTimeSlot() {
+    console.log('📅 時間帯表示のためのカレンダークリックを試行中...');
+    // 1. カレンダー要素を検索
+    const calendarSelectors = [
+        '.style_main__calendar__HRSsz',
+        '[class*="calendar"]',
+        'button[role="button"]:has(.style_main__calendar__HRSsz)',
+        'div[class*="calendar"] button'
+    ];
+    let calendarElement = null;
+    for (const selector of calendarSelectors) {
+        calendarElement = document.querySelector(selector);
+        if (calendarElement) {
+            console.log(`📅 カレンダー要素を発見: ${selector}`);
+            break;
+        }
+    }
+    if (!calendarElement) {
+        console.log('❌ カレンダー要素が見つかりません');
+        return false;
+    }
+    // 2. 現在選択されている日付のみを検索
+    const dateSelectors = [
+        '.style_main__calendar__HRSsz button',
+        '.style_main__calendar__HRSsz [role="button"]',
+        '[class*="calendar"] button:not([disabled])',
+        '[class*="date"]:not([disabled])'
+    ];
+    let clickableDate = null;
+    // 現在選択されている日付を探す（これのみが対象）
+    for (const selector of dateSelectors) {
+        const dates = document.querySelectorAll(selector);
+        for (const date of dates) {
+            if (date.classList.contains('selected') ||
+                date.classList.contains('active') ||
+                date.getAttribute('aria-selected') === 'true') {
+                clickableDate = date;
+                console.log(`📅 現在選択中の日付を発見: ${date.textContent?.trim()}`);
+                break;
+            }
+        }
+        if (clickableDate)
+            break;
+    }
+    // ユーザーが選択した日付のみがクリック対象
+    if (!clickableDate) {
+        console.log('❌ ユーザーが選択した日付が見つかりません');
+        console.log('💡 現在選択中の日付のみクリック可能です');
+        return false;
+    }
+    // 3. 選択中の日付をクリック
+    try {
+        console.log(`🖱️ 日付をクリック: "${clickableDate.textContent?.trim()}"`);
+        // マウスイベントを発火
+        const clickEvent = new MouseEvent('click', {
+            view: window,
+            bubbles: true,
+            cancelable: true
+        });
+        clickableDate.dispatchEvent(clickEvent);
+        // 少し待機してクリック結果を確認（短縮）
+        await new Promise(resolve => setTimeout(resolve, 200));
+        console.log('✅ カレンダー日付のクリックを実行しました');
+        return true;
+    }
+    catch (error) {
+        console.error('❌ カレンダークリック中にエラー:', error);
+        return false;
+    }
+}
+// エラー表示機能
+function showErrorMessage(message) {
+    // 既存のエラーメッセージがあれば削除
+    const existingError = document.getElementById('ytomo-error-message');
+    if (existingError) {
+        existingError.remove();
+    }
+    // エラーメッセージ要素を作成
+    const errorDiv = document.createElement('div');
+    errorDiv.id = 'ytomo-error-message';
+    errorDiv.className = 'ytomo-error-message';
+    errorDiv.innerHTML = `
+        <div class="error-title">⚠️ 監視エラー</div>
+        <div>${message}</div>
+        <button class="error-close-btn" onclick="this.parentElement.remove()">閉じる</button>
+    `;
+    document.body.appendChild(errorDiv);
+    // 10秒後に自動削除
+    setTimeout(() => {
+        if (errorDiv && errorDiv.parentElement) {
+            errorDiv.remove();
+        }
+    }, 10000);
+}
+// 現在のテーブル内容を取得（変化検出用）
+function getCurrentTableContent() {
+    const tables = document.querySelectorAll('table');
+    let content = '';
+    tables.forEach(table => {
+        const timeSlots = table.querySelectorAll('td div[role="button"]');
+        timeSlots.forEach(slot => {
+            const timeText = slot.querySelector('dt span')?.textContent?.trim();
+            const disabled = slot.getAttribute('data-disabled');
+            const pressed = slot.getAttribute('aria-pressed');
+            if (timeText && (timeText.includes(':') || timeText.includes('時'))) {
+                content += `${timeText}-${disabled}-${pressed}|`;
+            }
+        });
+    });
+    return content;
+}
+// 日付変更後の選択状態復元
+function restoreSelectionAfterUpdate() {
+    entranceReservationStateManager.updateFabDisplay();
+}
+// 時間帯を自動選択して予約開始
+async function selectTimeSlotAndStartReservation(slotInfo) {
+    const location = LocationHelper.getLocationFromIndex(LocationHelper.getIndexFromSelector(slotInfo.targetInfo.tdSelector));
+    console.log(`🎯 時間帯を自動選択します: ${location}${slotInfo.timeText}`);
+    // クリック対象のdl要素を探す
+    let clickTarget = null;
+    // TD要素の場合はdl要素を探す
+    if (slotInfo.element.tagName === 'TD') {
+        clickTarget = slotInfo.element.querySelector('div[role="button"] dl');
+        if (clickTarget) {
+            console.log('🔧 TD要素内のdl要素を発見しました');
+        }
+        else {
+            console.error('❌ TD要素内にdl要素が見つかりません');
+            return;
+        }
+    }
+    else {
+        // TD以外の場合はdl要素を探す
+        clickTarget = slotInfo.element.querySelector('dl');
+        if (!clickTarget) {
+            console.error('❌ 要素内にdl要素が見つかりません');
+            return;
+        }
+    }
+    // 時間帯を確実に選択
+    console.log(`🖱️ dl要素をクリックします: ${clickTarget.tagName}`);
+    // 複数の方法で確実にクリック
+    try {
+        // まず通常のクリック
+        clickTarget.click();
+        // さらにイベントディスパッチでクリック
+        const clickEvent = new MouseEvent('click', {
+            bubbles: true,
+            cancelable: true,
+            view: window
+        });
+        clickTarget.dispatchEvent(clickEvent);
+        console.log(`✅ dl要素のクリック完了`);
+    }
+    catch (error) {
+        console.error(`❌ dl要素クリックエラー:`, error);
+    }
+    // 選択状態確認のため少し待つ（短縮）
+    await new Promise(resolve => setTimeout(resolve, 100));
+    // 選択状態を確認（ボタン要素の状態をチェック）
+    const buttonElement = slotInfo.element.querySelector('div[role="button"]');
+    const isSelected = buttonElement && (Array.from(buttonElement.classList).some(className => className.includes('style_active__')) ||
+        buttonElement.getAttribute('aria-pressed') === 'true');
+    console.log(`🔍 時間帯選択状態確認: ${isSelected ? '選択済み' : '未選択'}`);
+    if (!isSelected) {
+        console.warn(`⚠️ 時間帯が選択されていません。再試行します`);
+        // 再試行 - dl要素を再度クリック
+        clickTarget.click();
+        await new Promise(resolve => setTimeout(resolve, 100));
+    }
+    // 少し待ってから予約処理開始
+    setTimeout(async () => {
+        console.log('🚀 予約処理を開始します');
+        // 予約開始前に時間帯選択を最終確認（timeSlotSelectorsを使用）
+        const selectedTimeSlot = document.querySelector(timeSlotSelectors.selectedSlot);
+        const finalCheck = !!selectedTimeSlot;
+        console.log(`🔍 予約開始前最終確認: 時間帯選択=${finalCheck ? '✅選択済み' : '❌未選択'}`);
+        if (selectedTimeSlot) {
+            const tdElement = selectedTimeSlot.closest('td');
+            const status = extractTdStatus(tdElement);
+            console.log(`🔍 選択された時間帯: ${status?.timeText || 'unknown'} (満員: ${status?.isFull ? 'はい' : 'いいえ'})`);
+        }
+        if (!finalCheck) {
+            console.error(`❌ 時間帯が選択されていないため予約処理を中止します`);
+            return;
+        }
+        // 通常の予約処理を開始（入場予約状態管理システム使用）
+        const config = getCurrentEntranceConfig();
+        if (config) {
+            // 統一予約開始処理を使用
+            entranceReservationStateManager.startReservation();
+            const result = await entranceReservationHelper(config);
+            if (result.success) {
+                // 入場予約状態管理に予約成功情報を設定
+                if (entranceReservationStateManager) {
+                    const reservationTarget = entranceReservationStateManager.getReservationTarget();
+                    if (reservationTarget) {
+                        entranceReservationStateManager.setReservationSuccess(reservationTarget.timeSlot, reservationTarget.locationIndex);
+                        entranceReservationStateManager.updateFabDisplay(); // FAB表示更新
+                    }
+                }
+                if (cacheManager) {
+                    cacheManager.clearTargetSlots(); // 成功時はキャッシュクリア
+                }
+                console.log('✅ 予約が成功しました！');
+            }
+        }
+    }, 1000);
+}
+// 現在の設定を取得（ヘルパー関数）
+function getCurrentEntranceConfig() {
+    // 既存の設定と同じものを返す
+    return {
+        selectors: {
+            submit: "#__next > div > div > main > div > div.style_main__add_cart_button__DCOw8 > button",
+            change: "body > div > div > div > div > div > div > button",
+            success: "#reservation_modal_title",
+            failure: "#reservation_fail_modal_title",
+            close: "body > div.style_buy-modal__1JZtS > div > div > div > div > ul > li > a"
+        },
+        selectorTexts: {
+            change: "来場日時を変更する"
+        },
+        timeouts: {
+            waitForSubmit: 5000,
+            waitForResponse: 10000,
+            waitForClose: 3000,
+            retryInterval: 1000
+        },
+        randomSettings: {
+            minCheckInterval: 500,
+            checkRandomRange: 200,
+            minClickDelay: 500,
+            clickRandomRange: 200,
+            minRetryDelay: 1000,
+            retryRandomRange: 300
+        }
+    };
+}
+// ============================================================================
+
 
 /***/ }),
 
-/***/ 624:
+/***/ 307:
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   O: () => (/* binding */ processingOverlay)
 /* harmony export */ });
 /* unused harmony export ProcessingOverlay */
-/* harmony import */ var _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(374);
+/* harmony import */ var _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(79);
 /**
  * 自動処理中の誤動作防止オーバーレイシステム
  *
@@ -3259,6 +3119,146 @@ const processingOverlay = new ProcessingOverlay();
 
 /***/ }),
 
+/***/ 314:
+/***/ ((module) => {
+
+
+
+/*
+  MIT License http://www.opensource.org/licenses/mit-license.php
+  Author Tobias Koppers @sokra
+*/
+module.exports = function (cssWithMappingToString) {
+  var list = [];
+
+  // return the list of modules as css string
+  list.toString = function toString() {
+    return this.map(function (item) {
+      var content = "";
+      var needLayer = typeof item[5] !== "undefined";
+      if (item[4]) {
+        content += "@supports (".concat(item[4], ") {");
+      }
+      if (item[2]) {
+        content += "@media ".concat(item[2], " {");
+      }
+      if (needLayer) {
+        content += "@layer".concat(item[5].length > 0 ? " ".concat(item[5]) : "", " {");
+      }
+      content += cssWithMappingToString(item);
+      if (needLayer) {
+        content += "}";
+      }
+      if (item[2]) {
+        content += "}";
+      }
+      if (item[4]) {
+        content += "}";
+      }
+      return content;
+    }).join("");
+  };
+
+  // import a list of modules into the list
+  list.i = function i(modules, media, dedupe, supports, layer) {
+    if (typeof modules === "string") {
+      modules = [[null, modules, undefined]];
+    }
+    var alreadyImportedModules = {};
+    if (dedupe) {
+      for (var k = 0; k < this.length; k++) {
+        var id = this[k][0];
+        if (id != null) {
+          alreadyImportedModules[id] = true;
+        }
+      }
+    }
+    for (var _k = 0; _k < modules.length; _k++) {
+      var item = [].concat(modules[_k]);
+      if (dedupe && alreadyImportedModules[item[0]]) {
+        continue;
+      }
+      if (typeof layer !== "undefined") {
+        if (typeof item[5] === "undefined") {
+          item[5] = layer;
+        } else {
+          item[1] = "@layer".concat(item[5].length > 0 ? " ".concat(item[5]) : "", " {").concat(item[1], "}");
+          item[5] = layer;
+        }
+      }
+      if (media) {
+        if (!item[2]) {
+          item[2] = media;
+        } else {
+          item[1] = "@media ".concat(item[2], " {").concat(item[1], "}");
+          item[2] = media;
+        }
+      }
+      if (supports) {
+        if (!item[4]) {
+          item[4] = "".concat(supports);
+        } else {
+          item[1] = "@supports (".concat(item[4], ") {").concat(item[1], "}");
+          item[4] = supports;
+        }
+      }
+      list.push(item);
+    }
+  };
+  return list;
+};
+
+/***/ }),
+
+/***/ 357:
+/***/ ((module, __webpack_exports__, __webpack_require__) => {
+
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   A: () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _node_modules_css_loader_dist_runtime_noSourceMaps_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(601);
+/* harmony import */ var _node_modules_css_loader_dist_runtime_noSourceMaps_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_css_loader_dist_runtime_noSourceMaps_js__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(314);
+/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1__);
+// Imports
+
+
+var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1___default()((_node_modules_css_loader_dist_runtime_noSourceMaps_js__WEBPACK_IMPORTED_MODULE_0___default()));
+// Module
+___CSS_LOADER_EXPORT___.push([module.id, `#ytomo-status-badge.countdown-warning{background:rgba(255,0,0,.9)}.ytomo-efficiency-toggle{width:45px;height:32px;border-radius:16px;color:#fff;border:none;font-size:10px;font-weight:bold;cursor:pointer;transition:all .2s ease;box-shadow:0 2px 8px rgba(0,0,0,.3);display:flex;align-items:center;justify-content:center;pointer-events:auto;margin-bottom:8px}.ytomo-efficiency-toggle.efficiency-enabled{background:rgba(255,140,0,.9)}.ytomo-efficiency-toggle.efficiency-disabled{background:rgba(128,128,128,.9)}.ytomo-efficiency-toggle:hover{transform:scale(1.1);box-shadow:0 4px 12px rgba(0,0,0,.4)}.ytomo-efficiency-toggle:active{transform:scale(0.95)}button.ext-ytomo{height:40px;width:auto;min-width:60px;padding:0px 8px;background:#006821;color:#fff}button.ext-ytomo.no-after:after{background:rgba(0,0,0,0) none repeat 0 0/auto auto padding-box border-box scroll}button.ext-ytomo.btn-done{background:#4a4c4a}button.ext-ytomo:hover{background:#02862b}.pavilion-sub-btn{color:#fff;border:none;border-radius:20px;padding:8px 16px;font-size:12px;white-space:nowrap;transition:all .2s ease}.pavilion-sub-btn.btn-enabled{background:#006821;cursor:pointer;opacity:1}.pavilion-sub-btn.btn-enabled:hover{background:#02862b;transform:scale(1.05)}.pavilion-sub-btn.btn-disabled,.pavilion-sub-btn.btn-loading{background:gray;cursor:not-allowed;opacity:.6}.pavilion-sub-btn.btn-disabled:hover,.pavilion-sub-btn.btn-loading:hover{background:gray;transform:scale(1)}button.ext-ytomo.pavilion-sub-btn.btn-disabled,button.ext-ytomo.pavilion-sub-btn.btn-loading{background:gray;cursor:not-allowed;opacity:.6}button.ext-ytomo.pavilion-sub-btn.btn-disabled:hover,button.ext-ytomo.pavilion-sub-btn.btn-loading:hover{background:gray;transform:scale(1)}.safe-none,.ytomo-none,.filter-none{display:none}button.ext-ytomo.pavilion-sub-btn.ytomo-date-button.date-selected{border:2px solid #4caf50;box-shadow:0 0 8px rgba(76,175,80,.6)}div.div-flex{display:flex;justify-content:center;margin:5px}.js-show{display:block}.js-hide{display:none}.js-visible{visibility:visible}.js-invisible{visibility:hidden}.js-enabled{pointer-events:auto;opacity:1}.js-disabled{pointer-events:none;opacity:.6}.js-green{background:#228b22;color:#fff}.js-red{background:#dc3545;color:#fff}.js-gray{background:gray;color:#fff}.btn-success-highlight{background:#00c800;color:#fff}.status-bg-green{background:rgba(0,128,0,.9)}.status-bg-red{background:rgba(255,0,0,.9)}.status-bg-orange{background:rgba(255,140,0,.9)}.status-bg-blue{background:rgba(0,104,33,.9)}.status-bg-default{background:rgba(0,0,0,.8)}#ytomo-status-badge{background:linear-gradient(135deg, rgba(0, 0, 0, 0.9), rgba(40, 40, 40, 0.9));color:#fff;padding:8px 16px;border-radius:20px;font-size:12px;font-weight:bold;white-space:pre-line;box-shadow:0 4px 12px rgba(0,0,0,.3),0 2px 6px rgba(0,0,0,.2);border:2px solid hsla(0,0%,100%,.15);pointer-events:none}#ytomo-status-badge.ytomo-status-waiting{background:linear-gradient(135deg, rgba(0, 0, 0, 0.9), rgba(40, 40, 40, 0.9))}#ytomo-status-badge.ytomo-status-reservation{background:linear-gradient(135deg, rgba(255, 140, 0, 0.9), rgba(255, 165, 0, 0.9))}#ytomo-status-badge.ytomo-status-reservation.ytomo-status-countdown-warning{background:linear-gradient(135deg, rgba(255, 0, 0, 0.9), rgba(220, 53, 69, 0.9))}#ytomo-status-badge.ytomo-status-cooldown{background:linear-gradient(135deg, rgba(255, 107, 53, 0.9), rgba(255, 140, 0, 0.9))}.ytomo-header li.fab-toggle-li{display:inline-block;margin-right:8px}.ytomo-header li.fab-toggle-li button.fab-toggle-button{background:none;border:none;cursor:pointer;padding:0;color:#fff;transition:all .2s ease;display:flex;align-items:center;justify-content:center}.ytomo-header li.fab-toggle-li button.fab-toggle-button:hover{color:#ddd}.ytomo-header li.fab-toggle-li button.fab-toggle-button figure.fab-toggle-figure{width:auto;height:24px;display:flex;align-items:center;justify-content:center;padding:0 4px}.ytomo-pavilion-fab button.ytomo-fab{position:relative}.ytomo-pavilion-fab button.ytomo-fab:hover{transform:scale(1.15);box-shadow:0 8px 25px rgba(0,0,0,.5),0 4px 12px rgba(0,0,0,.3);border-width:4px}.ytomo-pavilion-fab .ytomo-fab-inner-content .pavilion-fab-expand-icon{font-size:8px;line-height:1;margin-bottom:1px;opacity:.8}.ytomo-pavilion-fab .ytomo-fab-inner-content .pavilion-fab-brand-text{font-size:7px;font-weight:normal;line-height:1;margin-bottom:2px;opacity:.7}.ytomo-pavilion-fab .ytomo-fab-inner-content .pavilion-fab-counts-text{font-size:12px;font-weight:bold;line-height:1}.ytomo-pavilion-fab .pavilion-sub-actions-container{display:none;flex-direction:column;gap:8px;align-items:flex-end;margin-bottom:8px}.ytomo-pavilion-fab .pavilion-sub-actions-container.expanded{display:flex}.ytomo-pavilion-fab .pavilion-sub-actions-container button.pavilion-sub-btn.base-style{color:#fff;border:none;border-radius:20px;padding:8px 16px;font-size:12px;white-space:nowrap;box-shadow:0 2px 8px rgba(0,0,0,.3);transition:all .2s ease}.ytomo-companion-dialog{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;z-index:99999;padding:20px;box-sizing:border-box}.ytomo-companion-dialog .dialog-content{background:#fff;border-radius:12px;padding:24px;width:100%;max-width:500px;max-height:90vh;overflow-y:auto;box-shadow:0 10px 40px rgba(0,0,0,.3)}@media(max-width: 768px){.ytomo-companion-dialog .dialog-content{max-width:95vw;max-height:85vh;padding:16px;border-radius:8px}}.ytomo-companion-dialog .dialog-content .input-row{display:flex;gap:8px;margin-bottom:12px}@media(max-width: 480px){.ytomo-companion-dialog .dialog-content .input-row{flex-direction:column;gap:12px}}.ytomo-companion-dialog .dialog-content .input-row input{padding:12px 8px;border:1px solid #ddd;border-radius:4px;font-size:16px}.ytomo-companion-dialog .dialog-content .input-row input:focus{outline:none;border-color:#4caf50;box-shadow:0 0 0 2px rgba(76,175,80,.2)}.ytomo-companion-dialog .dialog-content .input-row button{padding:12px 16px;background:#4caf50;color:#fff;border:none;border-radius:4px;cursor:pointer;font-size:14px;white-space:nowrap;min-width:60px}.ytomo-companion-dialog .dialog-content .input-row button:hover{background:#45a049}.ytomo-companion-dialog .dialog-content .input-row button:active{background:#3d8b40}.ytomo-fab{width:56px;height:56px;border-radius:50%;color:#fff;border:none;box-shadow:0 6px 20px rgba(0,0,0,.4),0 2px 8px rgba(0,0,0,.2);border:3px solid hsla(0,0%,100%,.2);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:bold;transition:all .3s ease;position:relative;overflow:hidden;pointer-events:auto}.ytomo-fab-enabled{background:#ff8c00;opacity:.9;cursor:pointer;pointer-events:auto}.ytomo-fab-disabled{background:gray;opacity:.6;cursor:not-allowed;pointer-events:none}.ytomo-fab-running{background:#dc3545;opacity:.9;cursor:pointer;pointer-events:auto}.ytomo-fab.state-idle{background:gray;opacity:.6;cursor:not-allowed;pointer-events:none}.ytomo-fab.pointer-events-none{pointer-events:none}.ytomo-fab.pointer-events-auto{pointer-events:auto}.ytomo-fab.state-enabled{background:#ff8c00;opacity:.9;cursor:pointer;pointer-events:auto}.ytomo-fab.state-running{background:#dc3545;opacity:.9;cursor:pointer;pointer-events:auto}.ytomo-fab.state-reservation{background:#ff8c00;opacity:.9;cursor:pointer;pointer-events:auto}.ytomo-fab:hover{transform:scale(1.15);box-shadow:0 8px 25px rgba(0,0,0,.5),0 4px 12px rgba(0,0,0,.3)}.ytomo-fab.reservation-enabled{background:#006821;opacity:.9;cursor:pointer}.ytomo-fab.reservation-disabled{background:gray;opacity:.9;cursor:not-allowed}.ytomo-fab.cooldown-warning{background:#ff6b35}.ytomo-fab.cooldown-normal{background:#007bff}.ytomo-fab-container{position:fixed;bottom:24px;right:24px;z-index:10000;display:flex;flex-direction:column;align-items:flex-end;gap:12px;pointer-events:auto}.ytomo-fab-container.z-normal{z-index:10000}.ytomo-fab-container.z-above-overlay{z-index:100001}.ytomo-fab-container.visible{display:flex}.ytomo-fab-container.hidden{display:none}.ytomo-fab-content{position:relative;display:flex;flex-direction:column-reverse;align-items:center;gap:8px;opacity:0;transform:scale(0.8) translateY(10px);transition:all .3s cubic-bezier(0.175, 0.885, 0.32, 1.275);pointer-events:none}.ytomo-fab-content.expanded{opacity:1;transform:scale(1) translateY(0);pointer-events:auto}.ytomo-sub-fab{width:45px;height:32px;border-radius:16px;background:rgba(0,104,33,.9);color:#fff;border:none;font-size:11px;font-weight:bold;cursor:pointer;transition:all .2s ease;box-shadow:0 2px 8px rgba(0,0,0,.3);display:flex;align-items:center;justify-content:center;pointer-events:auto}.ytomo-sub-fab:hover{background:rgba(2,134,43,.9);transform:scale(1.1);box-shadow:0 4px 12px rgba(0,0,0,.4)}.ytomo-sub-fab:active{transform:scale(0.95)}.ytomo-pavilion-fab-container{position:fixed;bottom:24px;right:24px;z-index:10000;display:flex;flex-direction:column;gap:12px;align-items:flex-end;pointer-events:auto}.ytomo-fab-inner-content{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;pointer-events:none}.ytomo-reservation-target-display{background:linear-gradient(135deg, rgba(0, 123, 255, 0.95), rgba(0, 86, 179, 0.95));color:#fff;padding:8px 12px;border-radius:12px;font-size:12px;font-weight:bold;text-align:center;box-shadow:0 3px 10px rgba(0,0,0,.3);border:2px solid hsla(0,0%,100%,.3);min-width:80px;max-width:120px;white-space:pre-line;overflow:visible;text-overflow:clip;transition:all .3s ease;pointer-events:auto;cursor:pointer}.ytomo-reservation-target-display:hover{transform:scale(1.05);box-shadow:0 4px 14px rgba(0,0,0,.4)}.ytomo-reservation-target-display.hidden{display:none}.ytomo-reservation-target-display.visible{display:block}input.ext-tomo.search{height:50px;min-width:200px;max-width:min(300px,100%);font-family:quicksand;font-size:16px;-webkit-appearance:textfield;-moz-appearance:textfield;appearance:textfield;border:1px solid #222426;border-radius:25px;box-shadow:0 1px 0 0 #ccc;padding:0 0 0 10px;flex:1 1}.ytomo-icon.expand-icon{font-size:8px;line-height:1;color:#fff;font-weight:bold;text-align:center;pointer-events:none}.ytomo-icon.countdown-text{font-size:6px;line-height:1;color:#fff;font-weight:bold;text-align:center;margin-top:1px;pointer-events:none}.ytomo-toggle.toggle-li{position:fixed;bottom:10px;left:10px;z-index:1000;list-style:none;margin:0;padding:0}.ytomo-toggle.toggle-button{width:50px;height:30px;background:rgba(255,140,0,.8);border:none;border-radius:15px;cursor:pointer;transition:all .3s ease;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:bold;position:relative;overflow:hidden}.ytomo-toggle.toggle-button.enabled{color:#fff}.ytomo-toggle.toggle-button.disabled{color:#ddd}.ytomo-toggle.toggle-figure{width:100%;height:100%;margin:0;padding:0;border:none;background:rgba(0,0,0,0);pointer-events:none}.ytomo-dialog.overlay{position:fixed;top:0;left:0;width:100%;height:100%;background-color:rgba(0,0,0,.5);z-index:10000;display:flex;justify-content:center;align-items:center}.ytomo-dialog.container{background:#fff;border-radius:8px;padding:20px;max-width:400px;width:90%;max-height:70vh;overflow-y:auto;box-shadow:0 4px 12px rgba(0,0,0,.3)}.ytomo-dialog.title{margin:0 0 16px 0;color:#333;font-size:18px;font-weight:bold}.ytomo-dialog.button-group{display:flex;justify-content:flex-end;gap:10px;margin-top:20px}.ytomo-dialog.primary-button{background:#006821;color:#fff;border:none;padding:10px 20px;border-radius:4px;cursor:pointer;font-size:14px}.ytomo-dialog.primary-button:hover{background:#02862b}.ytomo-dialog.primary-button:disabled{background:gray;cursor:not-allowed}.ytomo-dialog.secondary-button{background:rgba(0,0,0,0);color:#666;border:1px solid #ccc;padding:10px 20px;border-radius:4px;cursor:pointer;font-size:14px}.ytomo-dialog.secondary-button:hover{background:#f5f5f5}.ytomo-progress.counter{display:inline-block;margin-left:8px;padding:2px 6px;background:rgba(0,0,0,.3);border-radius:10px;font-size:10px;color:#fff;font-weight:bold}.ytomo-error-message{position:fixed;top:20px;right:20px;background:#f44;color:#fff;padding:15px;border-radius:5px;box-shadow:0 2px 10px rgba(0,0,0,.3);z-index:10001;max-width:300px;font-size:14px;line-height:1.4}.ytomo-error-message .error-title{font-weight:bold;margin-bottom:5px}.ytomo-error-message .error-close-btn{margin-top:10px;padding:5px 10px;background:hsla(0,0%,100%,.2);border:none;border-radius:3px;color:#fff;cursor:pointer;font-size:12px}.ytomo-error-message .error-close-btn:hover{background:hsla(0,0%,100%,.3)}.ytomo-flex-column-center{display:flex;flex-direction:column;align-items:center}.ytomo-brand-text{font-size:8px;font-weight:bold;margin-top:2px}.ytomo-processing-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.3);z-index:100000;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(1px);transition:all .3s ease;pointer-events:auto}.ytomo-processing-overlay.z-normal{z-index:100000}.ytomo-processing-overlay.z-below-fab{z-index:99999}.ytomo-processing-overlay.hidden{opacity:0;visibility:hidden;pointer-events:none}.ytomo-processing-overlay.visible{opacity:1;visibility:visible;pointer-events:auto}.ytomo-processing-overlay .processing-message-area{background:hsla(0,0%,100%,.95);border-radius:12px;padding:24px 32px;text-align:center;box-shadow:0 8px 32px rgba(0,0,0,.3);border:2px solid rgba(255,140,0,.3);max-width:400px;margin:20px}@media(max-width: 768px){.ytomo-processing-overlay .processing-message-area{padding:20px 24px;margin:16px;max-width:90vw}}.ytomo-processing-overlay .processing-message-text{font-size:20px;font-weight:bold;color:#333;margin-bottom:8px;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}@media(max-width: 768px){.ytomo-processing-overlay .processing-message-text{font-size:18px;margin-bottom:6px}}.ytomo-processing-overlay .processing-target-text{font-size:16px;font-weight:600;color:#333;margin-bottom:12px;white-space:pre-line;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;text-align:center}@media(max-width: 768px){.ytomo-processing-overlay .processing-target-text{font-size:14px;margin-bottom:10px}}.ytomo-processing-overlay .processing-countdown-text{font-size:18px;font-weight:bold;color:#e67e00;margin-bottom:12px;font-family:"SF Mono","Monaco","Consolas",monospace;text-align:center;text-shadow:0 1px 2px rgba(0,0,0,.1)}@media(max-width: 768px){.ytomo-processing-overlay .processing-countdown-text{font-size:16px;margin-bottom:10px}}.ytomo-processing-overlay .processing-countdown-text.countdown-warning{color:#dc3545;animation:countdownPulse 1s ease-in-out infinite;text-shadow:0 0 8px rgba(220,53,69,.4)}.ytomo-processing-overlay .processing-warning-text{font-size:14px;color:#666;margin-bottom:16px;line-height:1.4;transition:all .3s ease}@media(max-width: 768px){.ytomo-processing-overlay .processing-warning-text{font-size:13px;margin-bottom:14px}}.ytomo-processing-overlay .processing-warning-text.warning-flash{color:#dc3545;font-weight:bold;transform:scale(1.05);animation:flash .5s ease-in-out 2}.ytomo-processing-overlay .processing-cancel-area{font-size:12px;color:#888;font-style:italic}@media(max-width: 768px){.ytomo-processing-overlay .processing-cancel-area{font-size:11px}}@keyframes flash{0%,100%{opacity:1}50%{opacity:.7}}@keyframes countdownPulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.8;transform:scale(1.05)}}.ytomo-processing-overlay.efficiency-mode .processing-message-area{border-color:rgba(255,140,0,.5);background:linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(255, 248, 220, 0.95))}.ytomo-processing-overlay.efficiency-mode .processing-message-text{color:#e67e00}.ytomo-processing-overlay.monitoring-mode .processing-message-area{border-color:rgba(0,104,33,.5);background:linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(240, 255, 240, 0.95))}.ytomo-processing-overlay.monitoring-mode .processing-message-text{color:#004d1a}@media(prefers-reduced-motion: reduce){.ytomo-processing-overlay{transition:none}.ytomo-processing-overlay .processing-warning-text.warning-flash{animation:none;transform:none}}table[class*=style_main__timetable__] td[data-gray-out] div[role=button][data-disabled=true]{pointer-events:auto !important;cursor:pointer !important}`, ""]);
+// Exports
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
+
+
+/***/ }),
+
+/***/ 540:
+/***/ ((module) => {
+
+
+
+/* istanbul ignore next  */
+function insertStyleElement(options) {
+  var element = document.createElement("style");
+  options.setAttributes(element, options.attributes);
+  options.insert(element, options.options);
+  return element;
+}
+module.exports = insertStyleElement;
+
+/***/ }),
+
+/***/ 601:
+/***/ ((module) => {
+
+
+
+module.exports = function (i) {
+  return i[1];
+};
+
+/***/ }),
+
 /***/ 659:
 /***/ ((module) => {
 
@@ -3366,7 +3366,7 @@ module.exports = domAPI;
 
 /***/ }),
 
-/***/ 982:
+/***/ 975:
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
@@ -3377,11 +3377,11 @@ module.exports = domAPI;
 /* harmony export */   startCalendarWatcher: () => (/* binding */ startCalendarWatcher)
 /* harmony export */ });
 /* unused harmony exports getCurrentReservationTarget, checkVisitTimeButtonState, checkTimeSlotSelected, canStartReservation, checkInitialState, handleCalendarChange */
-/* harmony import */ var _processing_overlay__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(624);
-/* harmony import */ var _entrance_page_state__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(278);
-/* harmony import */ var _entrance_page_dom_utils__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(115);
-/* harmony import */ var _entrance_page_core__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(364);
-/* harmony import */ var _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(374);
+/* harmony import */ var _processing_overlay__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(307);
+/* harmony import */ var _entrance_page_state__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(31);
+/* harmony import */ var _entrance_page_dom_utils__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(38);
+/* harmony import */ var _entrance_page_core__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(271);
+/* harmony import */ var _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(79);
 // 統一処理移行により個別importは不要
 // entrance-page-stateからのimport
 
@@ -4155,9 +4155,9 @@ var insertStyleElement_default = /*#__PURE__*/__webpack_require__.n(insertStyleE
 // EXTERNAL MODULE: ./node_modules/style-loader/dist/runtime/styleTagTransform.js
 var styleTagTransform = __webpack_require__(113);
 var styleTagTransform_default = /*#__PURE__*/__webpack_require__.n(styleTagTransform);
-// EXTERNAL MODULE: ./node_modules/css-loader/dist/cjs.js!./node_modules/sass-loader/dist/cjs.js!./src-styles/main.scss
-var main = __webpack_require__(270);
-;// ./src-styles/main.scss
+// EXTERNAL MODULE: ./node_modules/css-loader/dist/cjs.js!./node_modules/sass-loader/dist/cjs.js!./ts/styles/main.scss
+var main = __webpack_require__(357);
+;// ./ts/styles/main.scss
 
       
       
@@ -4182,9 +4182,9 @@ var update = injectStylesIntoStyleTag_default()(main/* default */.A, options);
 
 
 
-       /* harmony default export */ const src_styles_main = (main/* default */.A && main/* default */.A.locals ? main/* default */.A.locals : undefined);
+       /* harmony default export */ const styles_main = (main/* default */.A && main/* default */.A.locals ? main/* default */.A.locals : undefined);
 
-;// ./src-modules/pavilion-search-page.ts
+;// ./ts/modules/pavilion-search-page.ts
 // 【1. 基本機能・ユーティリティ】
 // ============================================================================
 // スタイルのインポート
@@ -4291,7 +4291,7 @@ const prepare_filter = (val_search) => {
 const init_page = () => {
     // ヘッダーにFAB切替ボタンを追加（DOM構築完了を待つ）
     setTimeout(() => {
-        Promise.resolve(/* import() */).then(__webpack_require__.bind(__webpack_require__, 278)).then((entrancePageState) => {
+        Promise.resolve(/* import() */).then(__webpack_require__.bind(__webpack_require__, 31)).then((entrancePageState) => {
             entrancePageState.createFABToggleButton();
         });
     }, 1000);
@@ -4814,15 +4814,15 @@ async function clickElement(element, config) {
 // エクスポート
 
 
-// EXTERNAL MODULE: ./src-modules/entrance-page-state.ts
-var entrance_page_state = __webpack_require__(278);
-// EXTERNAL MODULE: ./src-modules/entrance-page-dom-utils.ts
-var entrance_page_dom_utils = __webpack_require__(115);
-// EXTERNAL MODULE: ./src-modules/entrance-page-core.ts
-var entrance_page_core = __webpack_require__(364);
-// EXTERNAL MODULE: ./src-modules/entrance-page-fab.ts
-var entrance_page_fab = __webpack_require__(982);
-;// ./src-modules/entrance-page-init.ts
+// EXTERNAL MODULE: ./ts/modules/entrance-page-state.ts
+var entrance_page_state = __webpack_require__(31);
+// EXTERNAL MODULE: ./ts/modules/entrance-page-dom-utils.ts
+var entrance_page_dom_utils = __webpack_require__(38);
+// EXTERNAL MODULE: ./ts/modules/entrance-page-core.ts
+var entrance_page_core = __webpack_require__(271);
+// EXTERNAL MODULE: ./ts/modules/entrance-page-fab.ts
+var entrance_page_fab = __webpack_require__(975);
+;// ./ts/modules/entrance-page-init.ts
 // ============================================================================
 // 【入場予約画面初期化】
 // ============================================================================
@@ -4836,7 +4836,7 @@ const init_entrance_page = (dependencies = {}) => {
     const { setPageLoadingStateFn, createEntranceReservationUIFn, restoreFromCacheFn } = dependencies;
     // ヘッダーにFAB切替ボタンを追加（DOM構築完了を待つ）
     setTimeout(() => {
-        Promise.resolve(/* import() */).then(__webpack_require__.bind(__webpack_require__, 278)).then((entrancePageState) => {
+        Promise.resolve(/* import() */).then(__webpack_require__.bind(__webpack_require__, 31)).then((entrancePageState) => {
             entrancePageState.createFABToggleButton();
         });
     }, 1000);
@@ -4879,7 +4879,7 @@ const init_entrance_page = (dependencies = {}) => {
         if (restoreFromCacheFn)
             await restoreFromCacheFn();
         // キャッシュ復元後にカレンダー変更を開始
-        const { startCalendarWatcher } = await Promise.resolve(/* import() */).then(__webpack_require__.bind(__webpack_require__, 982));
+        const { startCalendarWatcher } = await Promise.resolve(/* import() */).then(__webpack_require__.bind(__webpack_require__, 975));
         startCalendarWatcher();
         // 初期化完了時に読み込み状態を解除
         if (setPageLoadingStateFn)
@@ -4888,7 +4888,7 @@ const init_entrance_page = (dependencies = {}) => {
     console.log("入場予約機能の初期化完了");
 };
 
-;// ./src-modules/cache-manager.ts
+;// ./ts/modules/cache-manager.ts
 // ============================================================================
 // キャッシュ管理機能
 const createCacheManager = (_dependencies = {}) => {
@@ -4992,7 +4992,7 @@ const createCacheManager = (_dependencies = {}) => {
 
 // ============================================================================
 
-;// ./src-modules/companion-ticket-page.ts
+;// ./ts/modules/companion-ticket-page.ts
 // ====================================================================================
 // 【9. 同行者追加機能】- Companion Ticket Management
 // ====================================================================================
@@ -6788,9 +6788,9 @@ function initCompanionTicketFeature() {
     console.log('🎫 同行者追加機能初期化完了');
 }
 
-// EXTERNAL MODULE: ./src-modules/entrance-reservation-state-manager.ts + 1 modules
-var entrance_reservation_state_manager = __webpack_require__(374);
-;// ./src-modules/app-router.ts
+// EXTERNAL MODULE: ./ts/modules/entrance-reservation-state-manager.ts + 1 modules
+var entrance_reservation_state_manager = __webpack_require__(79);
+;// ./ts/modules/app-router.ts
 // 各モジュールからのimport
 
 
@@ -7111,7 +7111,7 @@ else {
 // TypeScript環境では module.exports は使用しない
 // 必要に応じてES6のexportを使用する
 
-;// ./src-modules/main.ts
+;// ./ts/modules/main.ts
 /**
  * メインエントリーポイント
  * 各sectionモジュールをimportすることで、webpackで統合されたバンドルを作成

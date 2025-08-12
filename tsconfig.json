@@ -8,7 +8,7 @@
     "checkJs": false,
     "declaration": true,
     "outDir": "./dist",
-    "rootDir": "./src-modules",
+    "rootDir": "./ts",
     "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
@@ -24,6 +24,11 @@
     
     // Chrome拡張固有設定
     "types": ["chrome", "node"],
+    
+    // パスマッピング
+    "paths": {
+      "@/*": ["./ts/*"]
+    },
     
     // 厳密な型チェック（段階的に強化）
     "noImplicitAny": true,
@@ -41,8 +46,7 @@
     "noPropertyAccessFromIndexSignature": true
   },
   "include": [
-    "src-modules/**/*",
-    "types/**/*"
+    "ts/**/*"
   ],
   "exclude": [
     "node_modules",

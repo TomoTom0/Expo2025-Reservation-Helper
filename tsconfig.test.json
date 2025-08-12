@@ -10,7 +10,7 @@
     "sourceMap": false
   },
   "include": [
-    "src-modules/test-export-helper.ts",
-    "src-modules/**/*"
+    "ts/modules/test-export-helper.ts",
+    "ts/**/*"
   ]
 }

@@ -42,7 +42,7 @@ const generateUserScriptHeader = () => {
 };
 
 module.exports = {
-  entry: './src-modules/main.ts', // TypeScript完全移行完了
+  entry: './ts/modules/main.ts', // TypeScript完全移行完了
   output: {
     filename: 'index.js',
     path: path.resolve(__dirname, 'src'),
