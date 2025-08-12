@@ -4178,41 +4178,45 @@ class EntranceReservationStateManager {
     }
     // 監視対象リストの表示を更新
     updateMonitoringTargetsDisplay() {
+        const reservationTargetElement = document.getElementById('ytomo-reservation-target');
         const monitoringTargetsElement = document.getElementById('ytomo-monitoring-targets');
-        if (!monitoringTargetsElement) {
-            console.log('🔍 [監視対象更新] #ytomo-monitoring-targets要素が見つかりません');
+        if (!reservationTargetElement && !monitoringTargetsElement) {
+            console.log('🔍 [対象表示更新] 予約対象・監視対象要素が見つかりません');
             return;
         }
-        if (!this.hasMonitoringTargets()) {
-            // 監視対象がない場合は非表示
-            monitoringTargetsElement.style.display = 'none';
-            monitoringTargetsElement.innerHTML = '';
-            console.log('🔍 [監視対象更新] 監視対象なし - 非表示に設定');
-            return;
-        }
-        // 監視対象表示エリアは監視対象のみを表示（カウントダウンはFABボタンに表示）
-        // 予約対象または監視対象を表示
         const displayInfo = this.getFabTargetDisplayInfo();
-        if (displayInfo.hasTarget) {
-            monitoringTargetsElement.innerHTML = displayInfo.displayText.replace(/\n/g, '<br>');
-            monitoringTargetsElement.style.display = 'block';
-            // 背景色の設定
-            monitoringTargetsElement.className = ''; // 既存のクラスをクリア
-            if (displayInfo.targetType === 'reservation') {
-                monitoringTargetsElement.classList.add('reservation-target');
+        // 予約対象表示エリアの更新
+        if (reservationTargetElement) {
+            if (displayInfo.hasTarget && displayInfo.targetType === 'reservation') {
+                reservationTargetElement.innerHTML = displayInfo.displayText.replace(/\n/g, '<br>');
+                reservationTargetElement.style.display = 'block';
+                // カウントダウン中はログを削減
+                if (!this.isReloadCountdownActive()) {
+                    console.log(`🔍 [予約対象表示更新] 表示: "${displayInfo.displayText}"`);
+                }
             }
-            else if (displayInfo.targetType === 'monitoring') {
-                monitoringTargetsElement.classList.add('monitoring-targets');
-            }
-            // カウントダウン中はログを削減
-            if (!this.isReloadCountdownActive()) {
-                console.log(`🔍 [対象表示更新] 表示タイプ: ${displayInfo.targetType}`);
+            else {
+                reservationTargetElement.style.display = 'none';
+                reservationTargetElement.innerHTML = '';
             }
         }
-        else {
-            monitoringTargetsElement.style.display = 'none';
-            monitoringTargetsElement.innerHTML = '';
-            console.log('🔍 [対象表示更新] 対象なしで非表示');
+        // 監視対象表示エリアの更新
+        if (monitoringTargetsElement) {
+            if (displayInfo.hasTarget && displayInfo.targetType === 'monitoring') {
+                monitoringTargetsElement.innerHTML = displayInfo.displayText.replace(/\n/g, '<br>');
+                monitoringTargetsElement.style.display = 'block';
+                // 背景色の設定
+                monitoringTargetsElement.className = ''; // 既存のクラスをクリア
+                monitoringTargetsElement.classList.add('monitoring-targets');
+                // カウントダウン中はログを削減
+                if (!this.isReloadCountdownActive()) {
+                    console.log(`🔍 [監視対象表示更新] 表示: "${displayInfo.displayText}"`);
+                }
+            }
+            else {
+                monitoringTargetsElement.style.display = 'none';
+                monitoringTargetsElement.innerHTML = '';
+            }
         }
     }
     // デバッグ情報の出力
