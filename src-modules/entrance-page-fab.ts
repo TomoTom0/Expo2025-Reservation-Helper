@@ -18,8 +18,7 @@ import {
 // entrance-page-monitorからのimport
 import {
     checkTimeSlotTableExistsSync,
-    analyzeAndAddMonitorButtons,
-    startSlotMonitoring
+    analyzeAndAddMonitorButtons
 } from './entrance-page-core';
 
 // unified-stateからのimport
@@ -175,9 +174,8 @@ function createEntranceReservationUI(): void {
         const preferredAction = entranceReservationStateManager.getPreferredAction();
         // FABクリック処理開始
         
-        if (preferredAction === 'monitoring') {
-            await startMonitoringProcess();
-        } else if (preferredAction === 'reservation') {
+        // 監視機能は削除されました - 満員時間帯も直接予約可能になったため監視不要
+        if (preferredAction === 'reservation') {
             await startReservationProcess();
         } else {
             console.log('⚠️ 入場予約状態管理システム: 実行可能なアクションなし');
@@ -208,24 +206,6 @@ function createEntranceReservationUI(): void {
         updateMainButtonDisplay();
     }
 
-    // 監視開始処理
-    async function startMonitoringProcess(): Promise<void> {
-        console.log('📡 入場予約状態管理システムによる監視開始');
-        
-        // 状態変更前の確認
-        console.log(`🔍 [FAB] 監視開始前の状態: ${entranceReservationStateManager.getExecutionState()}`);
-        console.log(`🔍 [FAB] 監視対象数: ${entranceReservationStateManager.getMonitoringTargetCount()}`);
-        console.log(`🔍 [FAB] 監視開始可能: ${entranceReservationStateManager.canStartMonitoring()}`);
-        
-        // 実行状態を監視中に変更
-        const startSuccess = entranceReservationStateManager.startMonitoring();
-        console.log(`🔍 [FAB] startMonitoring結果: ${startSuccess}`);
-        console.log(`🔍 [FAB] 監視開始後の状態: ${entranceReservationStateManager.getExecutionState()}`);
-        
-        // 即座にUI更新してから監視開始
-        updateMainButtonDisplay();
-        await startSlotMonitoring();
-    }
 
     // 予約開始処理
     async function startReservationProcess(): Promise<void> {

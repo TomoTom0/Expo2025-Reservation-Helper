@@ -824,44 +824,11 @@ export class EntranceReservationStateManager {
     
     getPreferredAction(): 'reservation' | 'monitoring' | 'none' {
         const canReserve = this.canStartReservation();
-        const canMonitor = this.canStartMonitoring();
+        // 監視機能は削除されました - 満員時間帯も直接予約可能になったため監視不要
         
-        // デバッグログ追加（効率モードタイマー実行中はログ削減）
-        if (!this.isReloadCountdownActive() && !this.efficiencyMode.updateTimer) {
-            // アクション判定（ログ削減）
-            // ログ削減: 頻繁に呼ばれるため基本ログは削除
-        }
-        
-        switch (this.priorityMode) {
-            case PriorityMode.FORCE_RESERVATION:
-                return canReserve ? 'reservation' : 'none';
-                
-            case PriorityMode.FORCE_MONITORING:
-                return canMonitor ? 'monitoring' : 'none';
-                
-            case PriorityMode.AUTO:
-            default:
-                // 予約優先（両方可能な場合は予約を選択）
-                if (canReserve) {
-                    // 予約アクション選択（ログ削減）
-                    if (!this.isReloadCountdownActive() && !this.efficiencyMode.updateTimer) {
-                        // ログ削減: 戻り値ログを削除
-                    }
-                    return 'reservation';
-                }
-                if (canMonitor) {
-                    // 監視アクション選択（ログ削減）
-                    if (!this.isReloadCountdownActive() && !this.efficiencyMode.updateTimer) {
-                        // ログ削減: 戻り値ログを削除
-                    }
-                    return 'monitoring';
-                }
-                // アクションなし（ログ削減）
-                if (!this.isReloadCountdownActive() && !this.efficiencyMode.updateTimer) {
-                    // ログ削減: 戻り値ログを削除
-                }
-                return 'none';
-        }
+        // 満員時間帯予約制限解除により、監視機能は不要になりました
+        // 常に予約のみを返すように変更
+        return canReserve ? 'reservation' : 'none';
     }
     
     setPriorityMode(mode: PriorityMode): void {

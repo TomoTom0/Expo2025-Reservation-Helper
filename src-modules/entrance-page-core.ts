@@ -453,11 +453,10 @@ function generateSelectorForElement(element: HTMLElement): string {
     return `td[data-gray-out] div[role='button'] dt span:contains('${timeText}')`;
 }
 
-// 満員時間帯にモニタリングボタンを追加
-function addMonitorButtonsToFullSlots(fullSlots: TimeSlotInfo[]): void {
-    fullSlots.forEach(slotInfo => {
-        createMonitorButton(slotInfo);
-    });
+// 満員時間帯にモニタリングボタンを追加（監視機能削除により無効化）
+function addMonitorButtonsToFullSlots(_fullSlots: TimeSlotInfo[]): void {
+    // 監視機能は削除されました - 満員時間帯も直接予約可能になったため監視不要
+    return;
 }
 
 // 監視ボタンのテキストを決定（優先順位表示）
