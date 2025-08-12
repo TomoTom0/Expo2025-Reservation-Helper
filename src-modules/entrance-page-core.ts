@@ -48,9 +48,9 @@ declare global {
     }
 }
 
-// 時間帯テーブルの動的生成を監視（ループ防止版）
+// 時間帯テーブルの動的生成を検出（ループ防止版）
 function startTimeSlotTableObserver(): void {
-    console.log('時間帯テーブルの動的生成監視を開始');
+    console.log('時間帯テーブルの動的生成検出を開始');
     
     let isProcessing = false; // 処理中フラグでループ防止
     let lastTableContent = ''; // 前回のテーブル内容を記録
