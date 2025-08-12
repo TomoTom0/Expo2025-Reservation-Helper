@@ -9,7 +9,7 @@
 // @run-at       document-end
 // ==/UserScript==
 
-// Built: 2025/08/13 00:53:08
+// Built: 2025/08/13 01:00:28
 
 
 (function webpackUniversalModuleDefinition(root, factory) {
@@ -326,24 +326,6 @@ let entranceReservationState = {
     startTime: null,
     attempts: 0
 };
-// ページ読み込み状態管理（EntranceReservationStateManagerに統合済み）
-// const pageLoadingState: PageLoadingState = {
-//     isLoading: false,
-//     startTime: null,
-//     timeout: 10000
-// };
-// リロードカウントダウン状態管理（EntranceReservationStateManagerに統合済み）
-// const reloadCountdownState: ReloadCountdownState = {
-//     isActive: false,
-//     timeLeft: 0,
-//     intervalId: null,
-//     onComplete: null,
-//     totalSeconds: 30,
-//     secondsRemaining: null,
-//     startTime: null,
-//     countdownInterval: null,
-//     reloadTimer: null
-// };
 // カレンダー検知状態管理
 const calendarWatchState = {
     isWatching: false,
@@ -879,7 +861,7 @@ const setEntranceReservationHelper = (helper) => {
     console.log('setEntranceReservationHelper called:', typeof helper);
 };
 // メインボタンの表示更新（FAB形式対応）
-// FAB更新の状態管理（削除済み - entrance-page-ui-helpersで管理）
+// FAB更新の状態管理（統一状態管理システムで管理）
 // 現在のFAB状態を文字列として取得
 function getCurrentFabState() {
     if (!entranceReservationStateManager)
@@ -889,7 +871,7 @@ function getCurrentFabState() {
     const hasReservation = entranceReservationStateManager.hasReservationTarget();
     return `${mode}-${executionState}-${hasReservation}`;
 }
-// 古いupdateMainButtonDisplay関数は削除され、entrance-page-ui-helpersの関数を使用
+// FAB表示更新は統一状態管理システムで直接処理
 // 現在のモードを取得するヘルパー関数（予約優先ロジック組み込み）
 function getCurrentMode() {
     // 入場予約状態管理システムを取得（必須）
@@ -3400,13 +3382,12 @@ module.exports = domAPI;
 /* harmony import */ var _entrance_page_dom_utils__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(115);
 /* harmony import */ var _entrance_page_core__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(364);
 /* harmony import */ var _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(374);
-// Phase 3: 統一処理移行により個別importは不要
+// 統一処理移行により個別importは不要
 // entrance-page-stateからのimport
 
 
 // entrance-page-dom-utilsからのimport
 
-// entrance-page-ui-helpersからのimport
 
 // unified-stateからのimport
 
@@ -4071,9 +4052,9 @@ async function entranceReservationHelper(config) {
 // Phase 3: 統一自動処理管理により予約処理ループを完全に置換完了
 // ============================================================================
 // ============================================================================
-// エクスポート（Phase 3で統一処理移行により最小限に）
+// エクスポート（統一処理移行により最小限に）
 // ============================================================================
-// Phase 3完了: 統一自動処理管理により個別関数は不要
+// 統一自動処理管理により個別関数は不要
 // エクスポート
 
 // ============================================================================
@@ -6423,7 +6404,7 @@ function startTicketSelectionMonitoring() {
 }
 // デバウンス用のタイムアウト
 let updateTimeout;
-// 同行者追加画面ではFABは不要なため削除済み
+// 同行者追加画面ではFAB不要
 // 同行者チケット管理ダイアログ表示
 function showCompanionTicketDialog() {
     // 既存ダイアログ削除
@@ -6899,7 +6880,7 @@ const initializeUnifiedStateManager = () => {
 (0,entrance_page_fab/* setCacheManagerForSection7 */.TP)(cacheManager);
 // entrance-page-uiに必要な関数を注入
 (0,entrance_page_core/* setEntranceReservationHelper */.XP)(entrance_page_fab/* entranceReservationHelper */.FX);
-// 依存注入は削除済み - 各モジュールで直接インポートを使用
+// 各モジュールで直接インポートを使用
 // URL判定とページタイプ識別
 const identify_page_type = (url) => {
     try {
@@ -6979,7 +6960,6 @@ const trigger_init = (url_record) => {
                 (0,entrance_page_fab/* waitForTimeSlotTable */.il)(() => {
                     initializeUnifiedStateManager();
                 });
-                // beforeunloadハンドラーは削除済み
                 // 必要に応じて状態同期を実行（頻度を下げて負荷軽減）
                 setInterval(() => {
                     // 初期化済みの場合はスキップ

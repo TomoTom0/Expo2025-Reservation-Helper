@@ -114,7 +114,7 @@ setCacheManagerForSection7(cacheManager);
 // entrance-page-uiに必要な関数を注入
 setEntranceReservationHelper(entranceReservationHelper);
 
-// 依存注入は削除済み - 各モジュールで直接インポートを使用
+// 各モジュールで直接インポートを使用
 
 // URL判定とページタイプ識別
 const identify_page_type = (url: string): string | null => {
@@ -199,7 +199,6 @@ const trigger_init = (url_record: string): void => {
                     initializeUnifiedStateManager();
                 });
                 
-                // beforeunloadハンドラーは削除済み
                 
                 // 必要に応じて状態同期を実行（頻度を下げて負荷軽減）
                 setInterval(() => {

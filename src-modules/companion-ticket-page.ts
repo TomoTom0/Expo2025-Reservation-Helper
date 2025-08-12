@@ -1675,7 +1675,7 @@ function startTicketSelectionMonitoring(): void {
 // デバウンス用のタイムアウト
 let updateTimeout: NodeJS.Timeout | undefined;
 
-// 同行者追加画面ではFABは不要なため削除済み
+// 同行者追加画面ではFAB不要
 
 // 同行者チケット管理ダイアログ表示
 function showCompanionTicketDialog(): void {

@@ -14,7 +14,6 @@ import {
 import { entranceReservationHelper } from './entrance-page-fab';
 
 
-// entrance-page-ui-helpersからのimport
 
 // UI更新ヘルパー関数は外部関数として設定される
 
@@ -375,7 +374,7 @@ export const setEntranceReservationHelper = (helper: Function): void => {
 
 
 // メインボタンの表示更新（FAB形式対応）
-// FAB更新の状態管理（削除済み - entrance-page-ui-helpersで管理）
+// FAB更新の状態管理（統一状態管理システムで管理）
 
 // 現在のFAB状態を文字列として取得
 export function getCurrentFabState(): string {
@@ -387,7 +386,7 @@ export function getCurrentFabState(): string {
     return `${mode}-${executionState}-${hasReservation}`;
 }
 
-// 古いupdateMainButtonDisplay関数は削除され、entrance-page-ui-helpersの関数を使用
+// FAB表示更新は統一状態管理システムで直接処理
 
 // 現在のモードを取得するヘルパー関数（予約優先ロジック組み込み）
 export function getCurrentMode(): string {

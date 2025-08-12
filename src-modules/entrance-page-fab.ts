@@ -1,4 +1,4 @@
-// Phase 3: 統一処理移行により個別importは不要
+// 統一処理移行により個別importは不要
 
 // entrance-page-stateからのimport
 import { processingOverlay } from './processing-overlay';
@@ -15,7 +15,6 @@ import {
     extractTdStatus
 } from './entrance-page-dom-utils';
 
-// entrance-page-ui-helpersからのimport
 import {
     checkTimeSlotTableExistsSync
 } from './entrance-page-core';
@@ -824,9 +823,9 @@ async function entranceReservationHelper(config: ReservationConfig): Promise<Res
 // ============================================================================
 
 // ============================================================================
-// エクスポート（Phase 3で統一処理移行により最小限に）
+// エクスポート（統一処理移行により最小限に）
 // ============================================================================
-// Phase 3完了: 統一自動処理管理により個別関数は不要
+// 統一自動処理管理により個別関数は不要
 
 // エクスポート
 export {
