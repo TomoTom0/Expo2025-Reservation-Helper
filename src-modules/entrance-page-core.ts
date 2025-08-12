@@ -68,20 +68,6 @@ function startTimeSlotTableObserver(): void {
                 const addedNodes = Array.from(mutation.addedNodes);
                 const removedNodes = Array.from(mutation.removedNodes);
                 
-                // 割込ボタン関連の変更は無視
-                const isMonitorButtonChange = [...addedNodes, ...removedNodes].some(node => {
-                    if (node.nodeType === Node.ELEMENT_NODE) {
-                        const element = node as Element;
-                        return element.classList?.contains('monitor-btn') ||
-                               element.querySelector?.('.monitor-btn');
-                    }
-                    return false;
-                });
-                
-                if (isMonitorButtonChange) {
-                    console.log('🚫 割込ボタン関連の変更を無視');
-                    return;
-                }
                 
                 // 時間帯テーブル関連の変更のみ検出
                 const hasTableChange = [...addedNodes, ...removedNodes].some(node => {
@@ -93,7 +79,7 @@ function startTimeSlotTableObserver(): void {
                                (element.querySelector && (
                                    element.querySelector('table') ||
                                    element.querySelector('td[data-gray-out]') ||
-                                   element.querySelector('div[role="button"]:not(.monitor-btn)') ||
+                                   element.querySelector('div[role="button"]') ||
                                    element.querySelector('img[src*="calendar_ng.svg"]') ||
                                    element.querySelector('img[src*="ico_scale"]')
                                ));

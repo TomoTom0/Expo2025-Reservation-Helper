@@ -9,7 +9,7 @@
 // @run-at       document-end
 // ==/UserScript==
 
-// Built: 2025/08/13 00:40:24
+// Built: 2025/08/13 00:44:53
 
 
 (function webpackUniversalModuleDefinition(root, factory) {
@@ -346,17 +346,6 @@ let entranceReservationState = {
     startTime: null,
     attempts: 0
 };
-// 時間帯機能の状態管理
-// timeSlotStateはEntranceReservationStateManagerに統合済み
-// let timeSlotState: TimeSlotState = {
-//     mode: 'idle',  // idle, selecting, monitoring, trying
-//     targetSlots: [],   // 複数選択対象の時間帯情報配列
-//     interval: null,  // インターバル
-//     isMonitoring: false,
-//     retryCount: 0,
-//     maxRetries: 100,
-//     reloadInterval: 30000  // 30秒間隔
-// };
 // ページ読み込み状態管理（EntranceReservationStateManagerに統合済み）
 // const pageLoadingState: PageLoadingState = {
 //     isLoading: false,
@@ -687,19 +676,6 @@ function startTimeSlotTableObserver() {
             if (mutation.type === 'childList') {
                 const addedNodes = Array.from(mutation.addedNodes);
                 const removedNodes = Array.from(mutation.removedNodes);
-                // 割込ボタン関連の変更は無視
-                const isMonitorButtonChange = [...addedNodes, ...removedNodes].some(node => {
-                    if (node.nodeType === Node.ELEMENT_NODE) {
-                        const element = node;
-                        return element.classList?.contains('monitor-btn') ||
-                            element.querySelector?.('.monitor-btn');
-                    }
-                    return false;
-                });
-                if (isMonitorButtonChange) {
-                    console.log('🚫 割込ボタン関連の変更を無視');
-                    return;
-                }
                 // 時間帯テーブル関連の変更のみ検出
                 const hasTableChange = [...addedNodes, ...removedNodes].some(node => {
                     if (node.nodeType === Node.ELEMENT_NODE) {
@@ -709,7 +685,7 @@ function startTimeSlotTableObserver() {
                             element.tagName === 'IMG' || // アイコン変更も検出
                             (element.querySelector && (element.querySelector('table') ||
                                 element.querySelector('td[data-gray-out]') ||
-                                element.querySelector('div[role="button"]:not(.monitor-btn)') ||
+                                element.querySelector('div[role="button"]') ||
                                 element.querySelector('img[src*="calendar_ng.svg"]') ||
                                 element.querySelector('img[src*="ico_scale"]')));
                         if (isRelevant) {
@@ -3444,7 +3420,7 @@ module.exports = domAPI;
 /* harmony export */   il: () => (/* binding */ waitForTimeSlotTable),
 /* harmony export */   startCalendarWatcher: () => (/* binding */ startCalendarWatcher)
 /* harmony export */ });
-/* unused harmony exports getCurrentReservationTarget, checkVisitTimeButtonState, checkTimeSlotSelected, canStartReservation, checkInitialState, handleCalendarChange, removeAllMonitorButtons */
+/* unused harmony exports getCurrentReservationTarget, checkVisitTimeButtonState, checkTimeSlotSelected, canStartReservation, checkInitialState, handleCalendarChange */
 /* harmony import */ var _processing_overlay__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(624);
 /* harmony import */ var _entrance_page_state__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(278);
 /* harmony import */ var _entrance_page_dom_utils__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(115);
@@ -3457,7 +3433,7 @@ module.exports = domAPI;
 
 // entrance-page-dom-utilsからのimport
 
-// entrance-page-monitorからのimport
+// entrance-page-ui-helpersからのimport
 
 // unified-stateからのimport
 
@@ -3977,12 +3953,6 @@ async function handleCalendarChange() {
         // FABボタンの状態を更新
         (0,_entrance_page_ui_helpers__WEBPACK_IMPORTED_MODULE_5__/* .updateMainButtonDisplay */ .v)();
     }
-}
-// 既存のボタンをすべて削除
-function removeAllMonitorButtons() {
-    const existingButtons = document.querySelectorAll('.monitor-btn.ext-ytomo');
-    existingButtons.forEach(button => button.remove());
-    console.log(`🗜️ 既存のボタンを${existingButtons.length}個削除しました`);
 }
 // DOM上の選択状態から予約対象を同期
 function syncReservationTargetFromDOM() {
@@ -6962,7 +6932,7 @@ const initializeUnifiedStateManager = () => {
         console.error('⚠️ 入場予約状態管理システム初期化エラー:', error);
     }
 };
-// entrance-page-monitor、entrance-page-ui、entrance-page-fabにcacheManagerを設定
+// entrance-page-ui、entrance-page-fabにcacheManagerを設定
 (0,entrance_page_core/* setCacheManager */.S9)(cacheManager);
 (0,entrance_page_core/* setCacheManagerForSection6 */.MM)(cacheManager);
 (0,entrance_page_fab/* setCacheManagerForSection7 */.TP)(cacheManager);

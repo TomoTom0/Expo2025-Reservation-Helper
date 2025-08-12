@@ -15,7 +15,7 @@ import {
     extractTdStatus
 } from './entrance-page-dom-utils';
 
-// entrance-page-monitorからのimport
+// entrance-page-ui-helpersからのimport
 import {
     checkTimeSlotTableExistsSync
 } from './entrance-page-core';
@@ -651,12 +651,6 @@ async function handleCalendarChange(): Promise<void> {
     }
 }
 
-// 既存のボタンをすべて削除
-function removeAllMonitorButtons(): void {
-    const existingButtons = document.querySelectorAll('.monitor-btn.ext-ytomo');
-    existingButtons.forEach(button => button.remove());
-    console.log(`🗜️ 既存のボタンを${existingButtons.length}個削除しました`);
-}
 
 // DOM上の選択状態から予約対象を同期
 function syncReservationTargetFromDOM(): void {
@@ -854,7 +848,6 @@ export {
     checkInitialState,
     startCalendarWatcher,
     handleCalendarChange,
-    removeAllMonitorButtons,
     waitForTimeSlotTable,
     entranceReservationHelper
 };

@@ -106,7 +106,7 @@ const initializeUnifiedStateManager = (): void => {
     }
 };
 
-// entrance-page-monitor、entrance-page-ui、entrance-page-fabにcacheManagerを設定
+// entrance-page-ui、entrance-page-fabにcacheManagerを設定
 setCacheManager(cacheManager);
 setCacheManagerForSection6(cacheManager);
 setCacheManagerForSection7(cacheManager);

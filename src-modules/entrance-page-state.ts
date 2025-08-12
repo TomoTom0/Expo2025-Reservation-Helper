@@ -17,17 +17,6 @@ let entranceReservationState: EntranceReservationState = {
     attempts: 0
 };
 
-// 時間帯機能の状態管理
-// timeSlotStateはEntranceReservationStateManagerに統合済み
-// let timeSlotState: TimeSlotState = {
-//     mode: 'idle',  // idle, selecting, monitoring, trying
-//     targetSlots: [],   // 複数選択対象の時間帯情報配列
-//     interval: null,  // インターバル
-//     isMonitoring: false,
-//     retryCount: 0,
-//     maxRetries: 100,
-//     reloadInterval: 30000  // 30秒間隔
-// };
 
 
 // ページ読み込み状態管理（EntranceReservationStateManagerに統合済み）
