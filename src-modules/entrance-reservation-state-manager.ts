@@ -4,7 +4,7 @@
  */
 
 // 必要なimport
-import { timeSlotSelectors, generateUniqueTdSelector, extractTdStatus } from './entrance-page-dom-utils';
+import { timeSlotSelectors, generateUniqueTdSelector } from './entrance-page-dom-utils';
 import { getCurrentSelectedCalendarDate } from './entrance-page-core';
 import { UnifiedAutomationManager, CancellationError } from './unified-automation-manager';
 // processing-overlayへの依存を削除（循環依存解決）
@@ -18,8 +18,7 @@ import type { ReservationConfig, ReservationResult } from '../types/index.js';
 export enum ExecutionState {
     IDLE = 'idle',
     RESERVATION_RUNNING = 'reservation_running',
-    MONITORING_RUNNING = 'monitoring_running',
-    RESERVATION_COOLDOWN = 'reservation_cooldown'
+    MONITORING_RUNNING = 'monitoring_running'
 }
 
 // 優先実行モード
@@ -195,14 +194,6 @@ export class EntranceReservationStateManager {
     // デバッグフラグ（本番環境では詳細ログを抑制）
     private debugMode: boolean = true;
     
-    // 予約クールタイム管理
-    private reservationCooldown = {
-        isActive: false,
-        startTime: null as number | null,
-        duration: 180000, // 3分（180秒）のクールタイム
-        countdownInterval: null as number | null,
-        remainingSeconds: null as number | null
-    };
     
     // ============================================================================
     // 実行状態管理
@@ -613,138 +604,6 @@ export class EntranceReservationStateManager {
     }
     
     // ============================================================================
-    // 予約クールタイム管理
-    // ============================================================================
-    
-    // クールタイム開始（100回試行後に呼び出される）
-    startReservationCooldown(): void {
-        // 効率モード中はクールタイム不要
-        if (this.efficiencyMode.enabled) {
-            console.log('⚡ 効率モード中のためクールタイムをスキップ');
-            return;
-        }
-        
-        this.reservationCooldown.isActive = true;
-        this.reservationCooldown.startTime = Date.now();
-        this.reservationCooldown.remainingSeconds = Math.floor(this.reservationCooldown.duration / 1000);
-        
-        // 実行状態は変更しない（手動操作を妨げないため）
-        // this.executionState = ExecutionState.RESERVATION_COOLDOWN; // 削除
-        
-        console.log(`⏳ 予約クールタイム開始: ${this.reservationCooldown.remainingSeconds}秒 (手動操作は可能)`);
-        
-        // カウントダウンインターバル設定
-        this.reservationCooldown.countdownInterval = window.setInterval(() => {
-            if (this.reservationCooldown.remainingSeconds !== null) {
-                this.reservationCooldown.remainingSeconds--;
-                
-                if (this.reservationCooldown.remainingSeconds <= 0) {
-                    this.endReservationCooldown();
-                } else {
-                    // UI更新（ステータスバッジ）
-                    this.updateCooldownDisplay();
-                }
-            }
-        }, 1000);
-        
-        // 初回UI更新
-        this.updateCooldownDisplay();
-    }
-    
-    // クールタイム終了
-    endReservationCooldown(): void {
-        if (this.reservationCooldown.countdownInterval) {
-            clearInterval(this.reservationCooldown.countdownInterval);
-            this.reservationCooldown.countdownInterval = null;
-        }
-        
-        this.reservationCooldown.isActive = false;
-        this.reservationCooldown.startTime = null;
-        this.reservationCooldown.remainingSeconds = null;
-        
-        // クールタイム終了（実行状態は既にIDLEのまま）
-        
-        console.log('✅ クールタイム終了 - 予約再開可能');
-        
-        // FABボタンを通常状態に戻す
-        this.resetFABButtonFromCooldown();
-        
-        // 予約対象がある場合は自動的に予約再開
-        if (this.hasReservationTarget()) {
-            console.log('🔄 予約対象があるため予約を自動再開');
-            this.startReservation();
-            // 予約処理は外部のFABクリック処理に委譲
-        }
-    }
-    
-    // クールタイム中かどうか
-    isReservationCooldownActive(): boolean {
-        return this.reservationCooldown.isActive;
-    }
-    
-    // 残りクールタイム秒数を取得
-    getCooldownSecondsRemaining(): number | null {
-        return this.reservationCooldown.remainingSeconds;
-    }
-    
-    // クールタイム表示を更新
-    private updateCooldownDisplay(): void {
-        const remainingSeconds = this.reservationCooldown.remainingSeconds;
-        if (remainingSeconds === null) return;
-        
-        // 段階別精度でカウントダウン表示
-        let displayText: string;
-        if (remainingSeconds > 60) {
-            // 1分単位表示
-            const minutes = Math.floor(remainingSeconds / 60);
-            displayText = `予約待機中(${minutes}分)`;
-        } else if (remainingSeconds > 10) {
-            // 10秒単位表示
-            const tens = Math.floor(remainingSeconds / 10) * 10;
-            displayText = `予約待機中(${tens}秒)`;
-        } else {
-            // 1秒単位表示
-            displayText = `予約待機中(${remainingSeconds}秒)`;
-        }
-        
-        // ステータスバッジを更新
-        this.updateStatusBadgeFromUnified('cooldown', displayText);
-        
-        // FABメインボタンの表示制御
-        this.updateFABButtonForCooldown(remainingSeconds);
-    }
-    
-    // クールタイム中のFABボタン表示を更新
-    private updateFABButtonForCooldown(remainingSeconds: number): void {
-        // 5秒前からは「予約再開中止」ボタンに変更
-        const fabButton = document.querySelector('#ytomo-fab') as HTMLElement;
-        if (!fabButton) return;
-        
-        if (remainingSeconds <= 5 && remainingSeconds > 0) {
-            fabButton.textContent = '予約再開中止';
-            fabButton.className = fabButton.className.replace(/cooldown-\w+/g, '').trim();
-            fabButton.classList.add('cooldown-warning');
-            fabButton.setAttribute('data-cooldown-cancel', 'true');
-        } else {
-            // 通常のクールタイム表示（手動操作可能状態）
-            fabButton.textContent = '予約中断';
-            fabButton.className = fabButton.className.replace(/cooldown-\w+/g, '').trim();
-            fabButton.classList.add('cooldown-normal');
-            fabButton.removeAttribute('data-cooldown-cancel');
-        }
-    }
-    
-    // クールタイム終了時にFABボタンを通常状態に戻す
-    private resetFABButtonFromCooldown(): void {
-        const fabButton = document.querySelector('#ytomo-fab') as HTMLElement;
-        if (!fabButton) return;
-        
-        fabButton.removeAttribute('data-cooldown-cancel');
-        fabButton.className = fabButton.className.replace(/cooldown-\w+/g, '').trim();
-        // ボタンテキストは updateMainButtonDisplay() で更新される
-    }
-    
-    // ============================================================================
     // ページ読み込み状態管理（旧pageLoadingStateから統合）
     // ============================================================================
     
@@ -799,11 +658,6 @@ export class EntranceReservationStateManager {
             isValid: true
         };
         
-        // 予約対象が変更された場合はクールタイムを解除
-        if (this.isReservationCooldownActive()) {
-            console.log('🔄 予約対象変更により予約再開待ち状態を解除');
-            this.endReservationCooldown();
-        }
         
         this.log(`✅ 予約対象設定: ${LocationHelper.formatTargetInfo(timeSlot, locationIndex)}`);
     }
@@ -930,14 +784,7 @@ export class EntranceReservationStateManager {
         
         // 予約対象あり（ログ削減）
         
-        // 3. 選択時間帯の満員状態確認
-        const tdElement = selectedSlot.closest('td[data-gray-out]') as HTMLTableCellElement;
-        if (tdElement) {
-            const status = extractTdStatus(tdElement);
-            if (status?.isFull) {
-                return false;
-            }
-        }
+        // 3. 選択時間帯の確認（満員制限は撤廃）
         
         // 4. 来場日時ボタンの有効性確認
         const visitTimeButton = document.querySelector('button.basic-btn.type2.style_full__ptzZq') as HTMLButtonElement;
@@ -1036,14 +883,12 @@ export class EntranceReservationStateManager {
     // UI連携用メソッド
     // ============================================================================
     
-    getFabButtonState(): 'enabled' | 'disabled' | 'running' | 'monitoring' | 'cooldown' {
+    getFabButtonState(): 'enabled' | 'disabled' | 'running' | 'monitoring' {
         switch (this.executionState) {
             case ExecutionState.RESERVATION_RUNNING:
                 return 'running';
             case ExecutionState.MONITORING_RUNNING:
                 return 'monitoring';
-            case ExecutionState.RESERVATION_COOLDOWN:
-                return 'cooldown';
             case ExecutionState.IDLE:
                 const preferredAction = this.getPreferredAction();
                 return preferredAction !== 'none' ? 'enabled' : 'disabled';
@@ -1152,8 +997,6 @@ export class EntranceReservationStateManager {
                 return '予約\n中断';
             case ExecutionState.MONITORING_RUNNING:
                 return '監視\n中断';
-            case ExecutionState.RESERVATION_COOLDOWN:
-                return 'クール\nタイム中';
             case ExecutionState.IDLE:
                 const preferredAction = this.getPreferredAction();
                 switch (preferredAction) {
@@ -1161,6 +1004,8 @@ export class EntranceReservationStateManager {
                     case 'monitoring': return '監視\n開始';
                     default: return '待機中';
                 }
+            default:
+                return '待機中';
         }
     }
     
@@ -1205,15 +1050,9 @@ export class EntranceReservationStateManager {
     
     // カレンダー日付の設定・取得
     setSelectedCalendarDate(date: string): void {
-        const previousDate = this.selectedCalendarDate;
         this.selectedCalendarDate = date;
         this.log(`📅 カレンダー日付設定: ${date}`);
         
-        // 日付が変更された場合はクールタイムを解除
-        if (previousDate && previousDate !== date && this.isReservationCooldownActive()) {
-            console.log(`🔄 日付変更 (${previousDate} → ${date}) により予約再開待ち状態を解除`);
-            this.endReservationCooldown();
-        }
     }
     
     getSelectedCalendarDate(): string | null {
@@ -1326,18 +1165,6 @@ export class EntranceReservationStateManager {
         
         // 実行状態に応じてボタン表示を更新
         switch (executionState) {
-            case ExecutionState.RESERVATION_COOLDOWN:
-                // クールタイム中は中断不可
-                span.innerText = 'クール\nタイム中';
-                
-                // 既存のupdateStatusBadge関数を使用
-                this.updateStatusBadgeFromUnified('cooldown');
-                mainButton.className = mainButton.className.replace(/state-\w+/g, '');
-                mainButton.classList.add('state-idle');
-                mainButton.title = 'クールタイム中（中断不可）';
-                mainButton.disabled = true;
-                console.log(`🔍 [FAB更新] クールダウン状態でdisabled=true設定: state=${executionState}`);
-                break;
                 
             case ExecutionState.MONITORING_RUNNING:
                 // メインボタンは基本テキストを表示
@@ -1505,11 +1332,6 @@ export class EntranceReservationStateManager {
                 } else {
                     statusBadge.innerText = '効率予約実行中';
                 }
-                statusBadge.classList.remove('js-hide');
-                break;
-            case 'cooldown':
-                statusBadge.classList.add('ytomo-status-cooldown');
-                statusBadge.innerText = customText || '予約待機中';
                 statusBadge.classList.remove('js-hide');
                 break;
             case 'idle-monitoring':

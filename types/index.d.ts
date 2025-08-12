@@ -167,7 +167,6 @@ export interface ReservationResult {
   success: boolean;
   attempts: number;
   cancelled?: boolean;
-  cooldownStarted?: boolean;
   abnormalTermination?: boolean;
 }
 

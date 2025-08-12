@@ -4,3 +4,11 @@
 @use './components/input';
 @use './components/ui-components';
 @use './components/processing-overlay';
+
+// 時間帯テーブル内の満員時間帯を常にクリック可能にする
+table[class*='style_main__timetable__'] {
+  td[data-gray-out] div[role="button"][data-disabled="true"] {
+    pointer-events: auto !important;
+    cursor: pointer !important;
+  }
+}

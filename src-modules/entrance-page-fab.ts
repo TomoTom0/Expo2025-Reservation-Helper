@@ -68,7 +68,7 @@ function showStatus(message: string, color: string = 'white'): void {
     // 新しい状態クラスを追加
     const statusClass = color === 'green' ? 'ytomo-status-monitoring' :
                        color === 'red' ? 'ytomo-status-countdown-warning' :
-                       color === 'orange' ? 'ytomo-status-cooldown' :
+                       color === 'orange' ? 'ytomo-status-warning' :
                        color === 'blue' ? 'ytomo-status-reservation' :
                        'ytomo-status-waiting';
     statusBadge.classList.add(statusClass);
@@ -159,15 +159,6 @@ function createEntranceReservationUI(): void {
             return;
         }
         
-        // クールタイム中の予約再開中止処理
-        if (fabButton.hasAttribute('data-cooldown-cancel')) {
-            if (confirm('予約の自動再開を中止しますか？\n\n手動での予約開始は引き続き可能です。')) {
-                entranceReservationStateManager.endReservationCooldown();
-                showStatus('予約再開を中止しました', 'orange');
-                updateMainButtonDisplay();
-            }
-            return;
-        }
         
         // 実行中の場合は中断処理（入場予約状態管理システム使用）
         if (entranceReservationStateManager.isMonitoringRunning()) {
@@ -327,9 +318,6 @@ function createEntranceReservationUI(): void {
                 } else if (result.abnormalTermination) {
                     showStatus(`🚨 異常終了 (${result.attempts}回試行) - システム停止`, 'red');
                     console.log('🚨 予約処理が異常終了しました。システムを停止します');
-                } else if (result.cooldownStarted) {
-                    showStatus(`予約失敗 (${result.attempts}回試行) - クールタイム開始`, 'orange');
-                    console.log('🛑 100回試行後、クールタイムが開始されました');
                 } else {
                     showStatus(`予約失敗 (${result.attempts}回試行)`, 'red');
                 }
@@ -432,7 +420,8 @@ function createEntranceReservationUI(): void {
             const timeSlotElement = document.querySelector(slot.targetInfo.selector);
             if (timeSlotElement) {
                 const buttonElement = timeSlotElement.querySelector('div[role="button"]') as HTMLElement;
-                if (buttonElement && buttonElement.getAttribute('data-disabled') !== 'true') {
+                if (buttonElement) {
+                    // 満員時間帯も強制選択可能（data-disabled属性に関係なく）
                     buttonElement.click();
                     console.log(`✅ 時間帯選択完了: ${timeSlot}`);
                     
@@ -530,10 +519,6 @@ function checkTimeSlotSelected(): boolean {
     const tdElement = selectedTimeSlot.closest('td');
     if (!tdElement) return false;
     const status = extractTdStatus(tdElement);
-    if (status && status.isFull) {
-        console.log('⚠️ 選択された時間帯は満員です');
-        return false;
-    }
     
     console.log(`✅ 時間帯選択済み: ${status?.timeText || 'unknown'}`);
     return true;
@@ -912,8 +897,6 @@ async function entranceReservationHelper(config: ReservationConfig): Promise<Res
         } else if (result.abnormalTermination) {
             console.error('🚨 統一予約処理異常終了');
             entranceReservationStateManager.setShouldStop(true);
-        } else if (result.cooldownStarted) {
-            console.log('⏰ 統一予約処理クールタイム開始');
         }
         
         return result;

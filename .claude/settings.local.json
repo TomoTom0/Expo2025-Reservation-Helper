@@ -34,7 +34,8 @@
       "Bash(mise run build:*)",
       "Bash(grep:*)",
       "Bash(git pull:*)",
-      "Bash(find:*)"
+      "Bash(find:*)",
+      "Bash(cat:*)"
     ],
     "deny": []
   }

@@ -249,11 +249,10 @@ export class UnifiedAutomationManager {
     private async reservationLoop(config: ReservationConfig, signal: AbortSignal): Promise<ReservationResult> {
         const { selectors, selectorTexts, timeouts } = config;
         let attempts = 0;
-        const maxAttempts = 100;
         
         console.log('🚀 統一予約処理ループを開始します...');
         
-        while (attempts < maxAttempts) {
+        while (true) {
             attempts++;
             console.log(`試行回数: ${attempts}`);
             
@@ -399,14 +398,8 @@ export class UnifiedAutomationManager {
             }
         }
         
-        console.log(`最大試行回数 (${maxAttempts}) に達しました。クールタイムを開始します。`);
-        
-        // クールタイム開始（状態管理経由）
-        if (this.stateManager && this.stateManager.startReservationCooldown) {
-            this.stateManager.startReservationCooldown();
-        }
-        
-        return { success: false, attempts, cooldownStarted: true };
+        // このコードは実行されない（while(true)のため）
+        return { success: false, attempts };
     }
 
     /**

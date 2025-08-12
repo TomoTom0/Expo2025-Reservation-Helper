@@ -1206,7 +1206,8 @@ function getAllAvailableTimeSlots(): any[] {
     
     allElements.forEach(element => {
         const status = extractTimeSlotInfo(element as HTMLElement);
-        if (status && status.isAvailable && !status.isFull) {
+        // 満員時間帯も予約対象として許可（強制選択機能）
+        if (status && status.isAvailable) {
             const tdElement = element.closest('td[data-gray-out]') as HTMLTableCellElement;
             if (tdElement) {
                 const locationIndex = Array.from(tdElement.parentElement?.children || []).indexOf(tdElement);
