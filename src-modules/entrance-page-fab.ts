@@ -17,8 +17,7 @@ import {
 
 // entrance-page-monitorからのimport
 import {
-    checkTimeSlotTableExistsSync,
-    analyzeAndAddMonitorButtons
+    checkTimeSlotTableExistsSync
 } from './entrance-page-core';
 
 // unified-stateからのimport
@@ -643,16 +642,6 @@ async function handleCalendarChange(): Promise<void> {
         // 予約対象がクリアされたため、即座にFAB表示を更新
         updateMainButtonDisplay();
         
-        // 監視ボタンを再設置（動的待機を使用）
-        waitForTimeSlotTable(() => {
-            removeAllMonitorButtons();
-            analyzeAndAddMonitorButtons();
-            
-            // 監視ボタン設置後も再度FABボタンの状態を更新
-            updateMainButtonDisplay();
-            
-            console.log('🔄 監視ボタンとFABを再設置しました');
-        });
     } else {
         // 日付は変わっていない - FABボタンの状態のみ更新
         console.log('📅 日付変更なし - FABボタンの状態のみ更新');

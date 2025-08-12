@@ -146,33 +146,9 @@ function startTimeSlotTableObserver(): void {
                 // console.log('🔍 有効な時間帯テーブル変更を検出');
                 isProcessing = true;
                 
-                const hasTimeSlot = checkTimeSlotTableExistsSync();
-                if (hasTimeSlot) {
-                    // 現在の監視ボタンの状態をチェック
-                    if (shouldUpdateMonitorButtons()) {
-                        console.log('🎯 監視ボタンの更新が必要です');
-                        
-                        setTimeout(() => {
-                            // 差分更新処理（不要なボタン削除と新規ボタン追加）
-                            analyzeAndAddMonitorButtons();
-                            
-                            // 選択状態を復元
-                            setTimeout(() => {
-                                restoreSelectionAfterUpdate();
-                                
-                                // テーブル内容を記録
-                                lastTableContent = getCurrentTableContent();
-                                isProcessing = false;
-                            }, 200);
-                        }, 300);
-                    } else {
-                        console.log('✅ 監視ボタンは既に適切に配置されています');
-                        lastTableContent = getCurrentTableContent();
-                        isProcessing = false;
-                    }
-                } else {
-                    isProcessing = false;
-                }
+                // テーブル内容を記録
+                lastTableContent = getCurrentTableContent();
+                isProcessing = false;
             }, 800);
         }
     });
@@ -190,7 +166,6 @@ function startTimeSlotTableObserver(): void {
         if (checkTimeSlotTableExistsSync()) {
             // console.log('既存の時間帯テーブルを検出');
             isProcessing = true;
-            analyzeAndAddMonitorButtons(); // 差分更新で処理
             lastTableContent = getCurrentTableContent();
             isProcessing = false;
         }
@@ -246,91 +221,6 @@ function checkTimeSlotTableExistsSync(): boolean {
 }
 
 // 時間帯分析とボタン追加のメイン処理
-function analyzeAndAddMonitorButtons(): void {
-    const analysis = analyzeTimeSlots();
-    console.log('時間帯分析結果:', {
-        available: analysis.available.length,
-        full: analysis.full.length,
-        selected: analysis.selected.length
-    });
-    
-    // 既存のボタンとの差分を計算（時間+位置で判定）
-    const existingButtons = document.querySelectorAll('.monitor-btn');
-    const existingSlots = Array.from(existingButtons).map(btn => {
-        const timeText = btn.getAttribute('data-target-time') || '';
-        const tdElement = btn.closest('td[data-gray-out]') as HTMLTableCellElement;
-        const tdSelector = tdElement ? generateUniqueTdSelector(tdElement) : '';
-        return { timeText, tdSelector };
-    });
-    
-    console.log(`📋 差分計算: 既存ボタン数=${existingButtons.length}個 vs 満員時間帯数=${analysis.full.length}個`);
-    
-    // 不要なボタンを削除（時間+位置で判定）
-    let removedCount = 0;
-    existingButtons.forEach(button => {
-        const timeText = button.getAttribute('data-target-time') || '';
-        const tdElement = button.closest('td[data-gray-out]') as HTMLTableCellElement;
-        const tdSelector = tdElement ? generateUniqueTdSelector(tdElement) : '';
-        
-        // 監視対象として設定済みの場合は削除しない（状態変化を追跡するため）
-        const isMonitoringTarget = false; // 監視機能は無効化済み
-        
-        if (isMonitoringTarget) {
-            console.log(`🎯 監視対象のため保持: ${timeText} (状態変化を追跡中)`);
-            
-            // 監視対象の状態が変わった場合はボタンテキストを更新
-            const currentTd = button.closest('td[data-gray-out]') as HTMLTableCellElement;
-            const currentStatus = extractTdStatus(currentTd);
-            if (currentStatus && currentStatus.isAvailable) {
-                const span = button.querySelector('span') as HTMLSpanElement;
-                if (span) {
-                    span.innerText = '空きあり';
-                    (button as HTMLElement).classList.add('btn-success-highlight');
-                    console.log(`✅ 監視対象が空きありに変化: ${timeText}`);
-                }
-            }
-        } else {
-            // 現在の満員時間帯に対応するものがあるかチェック
-            const stillExists = analysis.full.some(slot => {
-                const slotTdElement = slot.element.closest('td[data-gray-out]') as HTMLTableCellElement;
-                const slotTdSelector = generateUniqueTdSelector(slotTdElement);
-                return slot.timeText === timeText && slotTdSelector === tdSelector;
-            });
-            
-            if (!stillExists) {
-                console.log(`🗑️ 不要な監視ボタンを削除: ${timeText} (位置も不一致)`);
-                button.remove();
-                removedCount++;
-            }
-        }
-    });
-    
-    // 新しい満員時間帯にボタンを追加（時間+位置で判定）
-    const newFullSlots = analysis.full.filter(slot => {
-        const slotTdElement = slot.element.closest('td[data-gray-out]') as HTMLTableCellElement;
-        const slotTdSelector = generateUniqueTdSelector(slotTdElement);
-        return !existingSlots.some(existing => 
-            existing.timeText === slot.timeText && existing.tdSelector === slotTdSelector
-        );
-    });
-    
-    if (newFullSlots.length > 0) {
-        console.log(`${newFullSlots.length}個の新しい満員時間帯に監視ボタンを追加します`);
-        addMonitorButtonsToFullSlots(newFullSlots);
-    }
-    
-    // 結果サマリー
-    if (analysis.full.length === 0) {
-        console.log('現在満員の時間帯はありません');
-        if (existingButtons.length > 0) {
-            console.log(`${existingButtons.length}個の既存ボタンを削除しました`);
-        }
-    } else if (newFullSlots.length === 0 && removedCount === 0) {
-        console.log('監視ボタンは既に適切に配置されています');
-    } else {
-        console.log(`✅ 監視ボタン更新完了: 削除=${removedCount}個, 追加=${newFullSlots.length}個`);
-    }
-}
 
 // 時間帯の分析結果の型定義
 interface AnalysisResult {
@@ -452,303 +342,19 @@ function generateSelectorForElement(element: HTMLElement): string {
     return `td[data-gray-out] div[role='button'] dt span:contains('${timeText}')`;
 }
 
-// 満員時間帯にモニタリングボタンを追加（監視機能削除により無効化）
-function addMonitorButtonsToFullSlots(_fullSlots: TimeSlotInfo[]): void {
-    // 監視機能は削除されました - 満員時間帯も直接予約可能になったため監視不要
-    return;
-}
 
 
 
 
 
 
-// 時間帯の可用性チェックとページ再読み込み
-async function checkSlotAvailabilityAndReload(): Promise<void> {
-    return; // 監視機能削除済み
-    
-    // バリデーションチェック
-    if (!validatePageLoaded()) return;
-    if (!(await checkTimeSlotTableExistsAsync())) return;
-    
-    // 複数監視対象の存在チェック
-    const targets: any[] = []; // 監視機能は無効化済み
-    for (const target of targets) {
-        if (!checkMonitoringTargetExists(target)) return;
-    }
-    if (!checkMaxReloads(0)) return;
-    
-        if (cacheManager) {
-        cacheManager?.updateRetryCount(0);
-    }
-    
-    const targetTexts = targets.map((t: any) => t.timeSlot).join(', ');
-    console.log(`🔍 可用性チェック (${0}回目): ${targetTexts}`);
-    
-    // 現在の時間帯をチェック
-    const currentSlot = findTargetSlotInPageUnified();
-    
-    console.log(`📊 監視チェック結果: currentSlot=${!!currentSlot}, status=${currentSlot?.status}`);
-    
-    if (currentSlot && currentSlot.status === 'available') {
-        const location = LocationHelper.getLocationFromIndex(currentSlot.targetInfo.locationIndex);
-        const locationText = location === 'east' ? '東' : '西';
-        console.log(`🎉🎉 対象時間帯が利用可能になりました！: ${locationText}${currentSlot.targetInfo.timeSlot}`);
-        
-        // 自動リロードかどうかを判定（監視継続フラグの存在で判断）
-        const isAutoReload = false || false;
-        
-        if (isAutoReload) {
-            console.log(`  → 自動リロード: 監視を終了し、自動選択+予約を開始します`);
-            
-            // ボタン表示を更新（見つかりましたモード）
-            window.dispatchEvent(new CustomEvent('entrance-ui-update', { 
-                detail: { type: 'main-button', mode: 'found-available' } 
-            }));
-            
-            // 自動選択
-            window.dispatchEvent(new CustomEvent('entrance-auto-select', { 
-                detail: { slot: currentSlot } 
-            }));
-        } else {
-            console.log(`  → 手動リロード: ステータス表示+監視対象削除+予約対象化`);
-            
-            // ステータスバッジに空き検出を表示
-            const statusBadge = document.querySelector('#ytomo-status-badge') as HTMLElement;
-            if (statusBadge) {
-                statusBadge.innerText = `監視対象に空きが出ました\n${locationText}${currentSlot.targetInfo.timeSlot}`;
-                statusBadge.classList.remove('js-hide');
-            }
-            
-            
-            // 優先度最高の空き時間帯を予約対象として自動選択（自動予約は行わない）
-            await handleManualReloadAvailableSlot(currentSlot);
-        }
-        return;
-    }
-    
-    // まだ満員の場合はページリロード
-    console.log('⏳ すべての監視対象がまだ満員です。ページを再読み込みします...');
-    
-    let totalWaitTime: number;
-    let displaySeconds: number;
-    
-    // 効率モード時は00秒/30秒に同期、通常時は従来のランダム要素付き
-    if (entranceReservationStateManager.isEfficiencyModeEnabled()) {
-        // 次の00秒または30秒までの時間を計算
-        let nextTarget = entranceReservationStateManager.getNextSubmitTarget();
-        if (nextTarget) {
-            let remainingMs = nextTarget!.getTime() - Date.now();
-            
-            // 15秒未満の場合は30秒加算
-            if (remainingMs < 15000) {
-                console.log(`⚡ 効率監視: 猶予${Math.floor(remainingMs/1000)}秒は短いため30秒加算`);
-                remainingMs += 30000; // 単純に30秒(30000ms)加算
-                console.log(`🕒 加算後猶予: ${Math.floor(remainingMs/1000)}秒`);
-            }
-            
-            totalWaitTime = Math.max(1000, remainingMs); // 最低1秒
-            displaySeconds = Math.floor(totalWaitTime / 1000);
-        } else {
-            // 標的時刻が設定されていない場合は通常処理
-            const baseInterval = 30000;
-            const randomVariation = Math.random() * 5000;
-            totalWaitTime = baseInterval + randomVariation;
-            displaySeconds = Math.floor(totalWaitTime / 1000);
-        }
-    } else {
-        // 通常モード: BAN対策のランダム要素付き
-        const baseInterval = 30000; // 30000ms (30秒)
-        const randomVariation = Math.random() * 5000; // 0-5秒のランダム要素
-        totalWaitTime = baseInterval + randomVariation;
-        displaySeconds = Math.floor(totalWaitTime / 1000);
-    }
-    
-    // カウントダウンとリロードを統一実行（フラグ保存処理付き）
-    scheduleReload(displaySeconds);
-}
 
 
-// 入場予約状態管理対応版の監視対象検索関数
-function findTargetSlotInPageUnified(): any {
-    if (!entranceReservationStateManager || !false) {
-        return null;
-    }
-    
-    const targets: any[] = []; // 監視機能は無効化済み
-    
-    // 複数監視対象をチェック
-    for (const target of targets) {
-        // selectorが保存されている場合はそれを使用、ない場合は検索
-        let targetTd: HTMLTableCellElement | null = null;
-        if (target.selector) {
-            targetTd = document.querySelector(target.selector) as HTMLTableCellElement;
-        } else {
-            // selectorがない場合は、時間帯とlocationIndexから要素を検索
-            const timeElements = document.querySelectorAll('.time-text');
-            for (const timeEl of timeElements) {
-                if (timeEl.textContent?.includes(target.timeSlot)) {
-                    const tdElement = timeEl.closest('td[data-gray-out]') as HTMLTableCellElement;
-                    if (tdElement) {
-                        const elementIndex = LocationHelper.getIndexFromElement(tdElement);
-                        if (elementIndex === target.locationIndex) {
-                            targetTd = tdElement;
-                            break;
-                        }
-                    }
-                }
-            }
-        }
-        
-        if (targetTd) {
-            // 同一td要素の現在の状態を取得
-            const currentStatus = extractTdStatus(targetTd);
-            const location = LocationHelper.getLocationFromIndex(target.locationIndex);
-            const locationText = location === 'east' ? '東' : '西';
-            
-            // 利用可能になったかチェック
-            if (currentStatus && currentStatus.isAvailable) {
-                console.log(`🎉 監視対象要素が利用可能になりました！: ${locationText}${target.timeSlot}`);
-                console.log(`  → 監視を終了して自動選択を開始します`);
-                return { ...currentStatus, targetInfo: target, status: 'available' };
-            } else if (currentStatus && currentStatus.isFull) {
-                console.log(`⏳ 監視対象要素はまだ満員: ${locationText}${target.timeSlot}`);
-            } else {
-                // 満員でも利用可能でもない場合（通常は満員状態での監視継続）
-                if (currentStatus) {
-                    console.log(`🔍 監視継続中: ${locationText}${target.timeSlot} (満員:${currentStatus.isFull}, 利用可能:${currentStatus.isAvailable}, 選択:${currentStatus.isSelected})`);
-                } else {
-                    console.log(`❓ 監視対象要素の状態が不明: ${locationText}${target.timeSlot} (status取得失敗)`);
-                }
-            }
-        } else {
-            // 要素が見つからない場合
-            const location = LocationHelper.getLocationFromIndex(target.locationIndex);
-            const locationText = location === 'east' ? '東' : '西';
-            console.log(`❌ 監視対象要素が見つかりません: ${locationText}${target.timeSlot}`);
-        }
-    }
-    
-    // すべて満員または見つからない場合
-    console.log('⏳ すべての監視対象要素はまだ満員です');
-    return null;
-}
 
-// 異常終了処理の統一関数
-function terminateMonitoring(errorCode: string, errorMessage: string): void {
-    console.error(`[監視異常終了] ${errorCode}: ${errorMessage}`);
-    
-    // 状態クリア
-    if (cacheManager) {
-        cacheManager.clearTargetSlots();
-    }
-    
-    // 入場予約状態管理システムでインターバル停止と状態リセット
-    if (entranceReservationStateManager) {
-                entranceReservationStateManager.stop();
-    }
-    
-    // UI状態リセット
-    resetMonitoringUI();
-    updateMainButtonDisplayHelper();
-    
-    // エラー表示
-    showErrorMessage(errorMessage);
-    
-    // 入場予約状態管理で監視停止
-    if (entranceReservationStateManager) {
-        entranceReservationStateManager.stop();
-        console.log('🛑 入場予約状態管理で監視を停止しました');
-    }
-    
-    // 入場予約状態管理をクリア
-    if (entranceReservationStateManager) {
-        entranceReservationStateManager.clearAllTargets();
-    }
-    
-    // リトライ回数もEntranceReservationStateManagerでリセット
-    if (entranceReservationStateManager) {
-            }
-}
 
-// 監視バリデーション関数群
-function checkTargetElementExists(targetInfo: TimeSlotTarget): boolean {
-    const element = findSameTdElement(targetInfo);
-    if (!element) {
-        terminateMonitoring('ERROR_TARGET_NOT_FOUND', 
-            `監視対象の時間帯 ${targetInfo.timeText} が見つかりません`);
-        return false;
-    }
-    return true;
-}
 
-// 入場予約状態管理用の監視対象存在チェック
-function checkMonitoringTargetExists(target: any): boolean {
-    // MonitoringTargetをTimeSlotTarget形式に変換
-    const targetInfo = {
-        timeText: target.timeSlot,
-        tdSelector: target.selector
-    };
-    
-    const element = findSameTdElement(targetInfo);
-    if (!element) {
-        terminateMonitoring('ERROR_TARGET_NOT_FOUND', 
-            `監視対象の時間帯 ${target.timeSlot} が見つかりません`);
-        return false;
-    }
-    return true;
-}
 
-async function checkTimeSlotTableExistsAsync(): Promise<boolean> {
-    const table = document.querySelector(timeSlotSelectors.timeSlotContainer);
-    if (!table) {
-        // テーブルが見つからない場合、カレンダークリックを試行
-        console.log('⚠️ 時間帯テーブルが見つからないため、カレンダークリックを試行します');
-        const calendarClicked = await tryClickCalendarForTimeSlot();
-        if (calendarClicked) {
-            // カレンダークリック後、再度テーブルをチェック
-            const tableAppeared = await waitForTimeSlotTable(3000);
-            if (tableAppeared) {
-                console.log('✅ カレンダークリック後にテーブルが表示されました');
-                return true;
-            }
-        }
-        
-        terminateMonitoring('ERROR_TABLE_NOT_FOUND', 
-            '時間帯選択テーブルが見つかりません（カレンダークリック後も表示されず）');
-        return false;
-    }
-    return true;
-}
 
-function validatePageLoaded(): boolean {
-    // URL確認
-    if (!window.location.href.includes('ticket_visiting_reservation')) {
-        terminateMonitoring('ERROR_WRONG_PAGE', 
-            '予期しないページに遷移しました');
-        return false;
-    }
-    
-    // 基本要素の存在確認
-    const mainContent = document.querySelector('#__next');
-    if (!mainContent) {
-        terminateMonitoring('ERROR_PAGE_LOAD_FAILED', 
-            'ページの読み込みが完了していません');
-        return false;
-    }
-    
-    return true;
-}
-
-function checkMaxReloads(currentCount: number): boolean {
-    const MAX_RELOAD_COUNT = 100; // 50分間（30秒×100回）
-    if (currentCount >= MAX_RELOAD_COUNT) {
-        terminateMonitoring('ERROR_MAX_RETRIES_REACHED', 
-            `最大試行回数 ${MAX_RELOAD_COUNT} に達しました`);
-        return false;
-    }
-    return true;
-}
 
 // 手動リロード時の空き時間帯処理
 async function handleManualReloadAvailableSlot(_availableSlot: any): Promise<void> {
@@ -826,31 +432,16 @@ export {
     startTimeSlotTableObserver,
     waitForTimeSlotTable,
     checkTimeSlotTableExistsSync,
-    analyzeAndAddMonitorButtons,
     analyzeTimeSlots,
     extractTimeSlotInfo,
     generateSelectorForElement,
-    addMonitorButtonsToFullSlots,
-    checkSlotAvailabilityAndReload,
-    findTargetSlotInPageUnified,
-    terminateMonitoring,
-    checkTargetElementExists,
-    checkMonitoringTargetExists,
-    checkTimeSlotTableExistsAsync,
-    validatePageLoaded,
-    checkMaxReloads,
     getCurrentSelectedCalendarDate,
     waitForValidCalendarDate,
     clickCalendarDate,
     tryClickCalendarForTimeSlot,
     showErrorMessage,
-    resetMonitoringUI,
-    enableAllMonitorButtons,
-    getCurrentTableContent,
-    shouldUpdateMonitorButtons,
     restoreSelectionAfterUpdate,
     selectTimeSlotAndStartReservation,
-    stopSlotMonitoring,
     getCurrentEntranceConfig
 };
 
@@ -939,24 +530,6 @@ export function updateStatusBadge(mode: string): void {
     let bgClass = 'status-bg-default';
     
     switch (mode) {
-        case 'monitoring':
-            const isEfficiencyEnabled = entranceReservationStateManager?.isEfficiencyModeEnabled();
-            
-            message = '監視実行中';
-            const remainingSeconds = null;
-            if (remainingSeconds !== null && remainingSeconds !== undefined) {
-                if (remainingSeconds <= 3) {
-                    message = `${isEfficiencyEnabled ? '効率' : ''}監視中`;
-                    bgClass = 'status-bg-red'; // 赤色（中断不可）
-                } else {
-                    message = `${isEfficiencyEnabled ? '効率' : ''}監視中`;
-                    bgClass = 'status-bg-orange'; // オレンジ色
-                }
-            } else {
-                message = `${isEfficiencyEnabled ? '効率' : ''}監視実行中`;
-                bgClass = 'status-bg-orange'; // オレンジ色
-            }
-            break;
             
         case 'reservation-running':
             // 効率モードON時は標的時刻カウントダウン、通常時は経過時間と回数
@@ -1051,92 +624,9 @@ export function resetPreviousSelection(): void {
     // ボタンの表示を「満員」に戻す
 }
 
-// 他の監視ボタンを無効化（複数監視対象対応版）
-export function disableOtherMonitorButtons(selectedTimeText: string, selectedTdSelector: string): void {
-    const allMonitorButtons = document.querySelectorAll('.monitor-btn');
-    allMonitorButtons.forEach(button => {
-        const targetTime = button.getAttribute('data-target-time') || '';
-        const buttonTd = button.closest('td[data-gray-out]') as HTMLTableCellElement;
-        const buttonTdSelector = buttonTd ? generateUniqueTdSelector(buttonTd) : '';
-        
-        // 同じ時間+位置でない場合は無効化
-        if (!(targetTime === selectedTimeText && buttonTdSelector === selectedTdSelector)) {
-            (button as HTMLElement).classList.add('js-disabled');
-            (button as HTMLButtonElement).disabled = true;
-        }
-    });
-}
 
-// 全ての監視ボタンを無効化（監視実行中用）
-export function disableAllMonitorButtons(): void {
-    const allMonitorButtons = document.querySelectorAll('.monitor-btn');
-    allMonitorButtons.forEach(button => {
-        (button as HTMLElement).classList.add('js-disabled');
-        (button as HTMLButtonElement).disabled = true;
-        
-        // ツールチップで理由を表示
-        (button as HTMLElement).title = '監視実行中のため操作できません';
-    });
-    console.log('🔒 すべての監視ボタンを無効化しました（監視実行中）');
-}
 
-// 既存の監視ボタンをクリア（日付変更時など）
-export function clearExistingMonitorButtons(): void {
-    const existingButtons = document.querySelectorAll('.monitor-btn');
-    console.log(`${existingButtons.length}個の既存監視ボタンをクリアします`);
-    existingButtons.forEach(button => {
-        button.remove();
-    });
-}
 
-// 監視/予約対象の表示情報を取得（簡潔版）
-export function getTargetDisplayInfo(): string {
-    if (!entranceReservationStateManager) {
-        return '不明';
-    }
-    
-    const targets: any[] = []; // 監視機能は無効化済み
-    if (targets.length === 0) {
-        return '不明';
-    }
-    
-    const selectedDate = document.querySelector('[aria-pressed="true"] time[datetime]') as HTMLTimeElement;
-    
-    // 各監視対象の東西を個別に判定（東/西時間の形式で統一）
-    if (targets.length > 1) {
-        const timeLocationTexts = targets.map((target: any) => {
-            const location = LocationHelper.getLocationFromIndex(target.locationIndex);
-            const locationText = location === 'east' ? '東' : '西';
-            return `${locationText}${target.timeSlot || '不明'}`;
-        }).join('\n');
-        
-        if (selectedDate) {
-            const datetime = selectedDate.getAttribute('datetime');
-            if (datetime) {
-                const date = new Date(datetime);
-                const dateStr = `${date.getMonth() + 1}/${date.getDate()}`;
-                return `${dateStr}\n${timeLocationTexts}`;
-            }
-        }
-        return timeLocationTexts;
-    } else {
-        // 単一監視対象の場合
-        const target = targets[0];
-        const location = LocationHelper.getLocationFromIndex(target.locationIndex);
-        const locationText = location === 'east' ? '東' : '西';
-        const timeText = target.timeSlot || '不明';
-        
-        if (selectedDate) {
-            const datetime = selectedDate.getAttribute('datetime');
-            if (datetime) {
-                const date = new Date(datetime);
-                const dateStr = `${date.getMonth() + 1}/${date.getDate()}`;
-                return `${dateStr} ${locationText}${timeText}`;
-            }
-        }
-        return `${locationText}${timeText}`;
-    }
-}
 
 
 // 統一されたリロードスケジュール関数
@@ -1202,12 +692,7 @@ export async function restoreFromCache(): Promise<void> {
     const cached = cacheManagerSection6.loadTargetSlots();
     if (!cached) return;
     
-    console.log('🔄 キャッシュから複数監視状態を復元中...');
-    if (shouldContinueMonitoring) {
-        console.log('✅ 監視継続フラグ: 有効 - 監視を自動再開します');
-    } else {
-        console.log('⚠️ 監視継続フラグ: 無効 - 監視は手動開始待ちです');
-    }
+    console.log('🔄 キャッシュから状態を復元中...');
     
     // キャッシュされた日付と現在のカレンダー日付を比較し、必要に応じて日付移動を実行
     if (cached.selectedDate && cached.targets && cached.targets.length > 0) {
@@ -1216,7 +701,7 @@ export async function restoreFromCache(): Promise<void> {
         console.log(`📅 日付比較: キャッシュ=${cached.selectedDate}, 現在=${currentSelectedDate}`);
         
         if (cached.selectedDate !== currentSelectedDate) {
-            console.log(`📅 監視対象の日付への移動が必要: ${cached.selectedDate}`);
+            console.log(`📅 キャッシュされた日付への移動が必要: ${cached.selectedDate}`);
             
             // カレンダーが利用可能になるまで待機
             const calendarReady = await waitForCalendar(5000);
@@ -1228,11 +713,11 @@ export async function restoreFromCache(): Promise<void> {
             // 指定日付のカレンダーをクリック
             const dateClickSuccess = await clickCalendarDate(cached.selectedDate);
             if (!dateClickSuccess) {
-                console.error(`❌ 監視対象の日付への移動に失敗: ${cached.selectedDate}`);
+                console.error(`❌ キャッシュされた日付への移動に失敗: ${cached.selectedDate}`);
                 return;
             }
             
-            console.log(`✅ 監視対象の日付に移動完了: ${cached.selectedDate}`);
+            console.log(`✅ キャッシュされた日付に移動完了: ${cached.selectedDate}`);
             
             // 日付移動後、時間帯テーブルが更新されるまで待機
             const tableReady = await waitForTimeSlotTable(5000);
@@ -1275,20 +760,6 @@ export async function restoreFromCache(): Promise<void> {
     
     // UI更新を最短遅延実行（DOM完成後）
     setTimeout(async () => {
-        // 監視対象が復元された場合は監視ボタンを更新
-        if (false) {
-            console.log('🔄 監視対象復元 - 監視ボタンを更新中...');
-            try {
-                await analyzeAndAddMonitorButtons();
-                console.log('✅ 監視ボタン更新完了');
-                
-                // キャッシュ復元後、監視対象復元のタイミングでFABの監視対象とともに満員ボタンの状態も復元
-                restoreSelectionAfterUpdate();
-                console.log('✅ 監視ボタン状態復元完了');
-            } catch (error) {
-                console.error('❌ 監視ボタン更新エラー:', error);
-            }
-        }
         
         // メインボタンの表示更新
         updateMainButtonDisplayHelper();
@@ -1596,46 +1067,7 @@ function showErrorMessage(message: string): void {
     }, 10000);
 }
 
-// 監視UI状態のリセット
-function resetMonitoringUI(): void {
-    // すべての監視ボタンを有効化
-    enableAllMonitorButtons();
-    
-    // 選択中の監視ボタンを元に戻す
-    const selectedButtons = document.querySelectorAll('.ext-ytomo.monitor-btn');
-    selectedButtons.forEach(button => {
-        const span = button.querySelector('span') as HTMLSpanElement;
-        if (span && span.innerText.startsWith('監視')) {
-            span.innerText = '満員';
-            (button as HTMLElement).classList.remove('monitoring-status');
-            (button as HTMLElement).classList.add('full-status');
-            (button as HTMLButtonElement).disabled = false;
-        }
-    });
-}
 
-// 全ての監視ボタンを有効化
-function enableAllMonitorButtons(): void {
-    const allMonitorButtons = document.querySelectorAll('.monitor-btn');
-    allMonitorButtons.forEach(button => {
-        const span = button.querySelector('span') as HTMLSpanElement;
-        
-        // すべてのボタンを有効化
-        (button as HTMLElement).classList.remove('js-disabled');
-        (button as HTMLElement).classList.add('js-enabled');
-        (button as HTMLButtonElement).disabled = false;
-        
-        // 監視対象のボタンは赤色を維持
-        if (span && span.innerText.startsWith('監視')) {
-            (button as HTMLElement).classList.remove('full-status');
-            (button as HTMLElement).classList.add('monitoring-status');
-        }
-        
-        // ツールチップをクリア
-        (button as HTMLElement).title = '';
-    });
-    console.log('✅ すべての監視ボタンを有効化しました（選択中も含む）');
-}
 
 // 現在のテーブル内容を取得（変化検出用）
 function getCurrentTableContent(): string {
@@ -1658,45 +1090,6 @@ function getCurrentTableContent(): string {
     return content;
 }
 
-// 監視ボタンの更新が必要かチェック
-function shouldUpdateMonitorButtons(): boolean {
-    const analysis = analyzeTimeSlots();
-    const existingButtons = document.querySelectorAll('.monitor-btn');
-    
-    console.log(`満員時間帯数: ${analysis.full.length}, 既存ボタン数: ${existingButtons.length}`);
-    
-    // 満員時間帯の数と既存ボタン数が異なる場合は更新が必要
-    if (analysis.full.length !== existingButtons.length) {
-        console.log('📊 満員時間帯数と監視ボタン数が不一致');
-        return true;
-    }
-    
-    // 満員時間帯がない場合はボタンも不要
-    if (analysis.full.length === 0) {
-        console.log('📭 満員時間帯なし、ボタン不要');
-        return false;
-    }
-    
-    // 各満員時間帯に対応するボタンが存在するかチェック
-    const fullTimeTexts = analysis.full.map(slot => slot.timeText);
-    const buttonTimeTexts = Array.from(existingButtons).map(btn => btn.getAttribute('data-target-time') || '');
-    
-    const missingButtons = fullTimeTexts.filter(time => !buttonTimeTexts.includes(time));
-    const extraButtons = buttonTimeTexts.filter(time => !fullTimeTexts.includes(time));
-    
-    if (missingButtons.length > 0) {
-        console.log('📌 不足している監視ボタン:', missingButtons);
-        return true;
-    }
-    
-    if (extraButtons.length > 0) {
-        console.log('🗑️ 不要な監視ボタン:', extraButtons);
-        return true;
-    }
-    
-    console.log('✅ 監視ボタンは適切に配置されています');
-    return false;
-}
 
 // 日付変更後の選択状態復元
 function restoreSelectionAfterUpdate(): void {
@@ -1965,8 +1358,6 @@ async function selectTimeSlotAndStartReservation(slotInfo: any): Promise<void> {
             return;
         }
         
-        // 監視停止
-        stopSlotMonitoring();
         
         // 通常の予約処理を開始（入場予約状態管理システム使用）
         const config = getCurrentEntranceConfig();
@@ -1994,29 +1385,6 @@ async function selectTimeSlotAndStartReservation(slotInfo: any): Promise<void> {
     }, 1000);
 }
 
-// 監視停止（監視対象選択は維持）
-function stopSlotMonitoring(): void {
-    // 入場予約状態管理システムの実行状態を停止
-    if (entranceReservationStateManager) {
-        entranceReservationStateManager.stop();
-    }
-    
-    
-    
-    // リロードカウントダウンの停止（入場予約状態管理システムで管理）
-    entranceReservationStateManager.stopReloadCountdown();
-    
-    // 誤動作防止オーバーレイを非表示
-    processingOverlay.hide();
-    
-    // 監視ボタンを有効化（操作可能に戻す）
-    enableAllMonitorButtons();
-    
-    // メインボタンの表示を更新
-    updateMainButtonDisplayHelper();
-    
-    console.log('⏹️ 時間帯監視を停止しました（監視対象選択は維持）');
-}
 
 // 現在の設定を取得（ヘルパー関数）
 function getCurrentEntranceConfig(): any {

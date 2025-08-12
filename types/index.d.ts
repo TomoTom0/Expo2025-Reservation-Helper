@@ -12,10 +12,8 @@ export interface EntranceReservationState {
 }
 
 export interface TimeSlotState {
-  mode: 'idle' | 'selecting' | 'monitoring' | 'trying';
+  mode: 'idle' | 'selecting' | 'trying';
   targetSlots: TimeSlotTarget[];
-  monitoringInterval: number | null;
-  isMonitoring: boolean;
   retryCount: number;
   maxRetries: number;
   reloadInterval: number;

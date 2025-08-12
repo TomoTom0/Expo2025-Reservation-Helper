@@ -6,7 +6,7 @@
 // 必要なモジュールをインポート
 // import { timeSlotState } from './entrance-page-state'; // 統合により不要
 import { generateUniqueTdSelector, getTdPositionInfo, findSameTdElement, extractTdStatus, timeSlotSelectors } from './entrance-page-dom-utils';
-import { checkTimeSlotTableExistsSync, validatePageLoaded } from './entrance-page-core';
+import { checkTimeSlotTableExistsSync } from './entrance-page-core';
 import { isInterruptionAllowed } from './entrance-page-core';
 import { checkVisitTimeButtonState, canStartReservation } from './entrance-page-fab';
 
@@ -27,7 +27,6 @@ module.exports = {
     
     // Section 5からの関数
     checkTimeSlotTableExistsSync,
-    validatePageLoaded,
     
     // Section 6からの関数
     isInterruptionAllowed,
