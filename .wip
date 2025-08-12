@@ -1,26 +1,48 @@
-## 現在の作業: UI表示システム改善（2025-08-12）
+## 現在の作業: 監視機能完全削除（2025-08-12）
 
 ### 🔄 最新作業状況
 
-#### 現在の作業: 新機能検討フェーズ
-**作業内容**:
-- 満員時間帯の選択制限回避機能の技術検討
-- React内部設定操作による満員スロット有効化手法の研究
-- disabledスタイルやClick制約の動的変更方法の検討
+#### 現在の作業: 監視機能完全削除フェーズ
+**背景**:
+- v0.6.0で満員時間帯予約制限解除機能を実装完了
+- 満員時間帯も直接予約可能になったため、監視機能が不要になった
+- 監視機能を段階的に完全削除してコードベースを簡素化
 
-### ✅ 前回完了作業: CSS/SCSS設計リファクタリング
-**概要**:
-TypeScript内の直接スタイル設定(cssText, style.property)をSCSSクラス切り替えに変更し、過剰な!important使用(247個)を削減する。
+**Phase 1完了**: 監視機能の無効化
+- ✅ 監視ボタン作成を無効化（addMonitorButtonsToFullSlots関数）
+- ✅ 監視機能優先判定を削除（getPreferredActionで予約のみ返す）
+- ✅ FABでの監視処理分岐を削除
+- ✅ 監視関連の未使用インポート・関数を削除
+- ✅ ビルド成功・動作確認完了
 
-**実装完了**:
-- ✅ Phase 1: FABボタンシステム修正（状態管理クラス化）- 完了
-- ✅ Phase 2: Processing Overlay修正（z-index制御クラス化）- 完了  
-- ✅ Phase 3: ボタン状態管理統一（opacity, cursor等クラス化）- 完了
-- ✅ Phase 4: !important削減（247個→0個）- 完了
-- ✅ Phase 5: 入場予約画面の残存直接スタイル操作をSCSSクラス管理に移行（25件）
+**Phase 2計画**: 監視機能の完全削除
+**削除対象調査完了**:
+- **型定義**: MonitoringTarget, ExecutionState.MONITORING_RUNNING, PriorityMode.FORCE_MONITORING
+- **主要メソッド**: startMonitoring, isMonitoringRunning, getMonitoringTargets, addMonitoringTarget等
+- **CSS**: .monitor-btn, .ytomo-monitoring-targets-display, #ytomo-monitoring-targets
+- **参照ファイル**: 7ファイルで監視関連コードを確認
+
+**削除アプローチ**: 
+1. 参照している側のコード削除 → 2. 実装側削除 → 3. 型定義削除 → 4. CSS削除 → 5. 動作確認
+
+### ✅ 前回完了作業: 満員時間帯予約制限解除機能（v0.6.0）
+
+**実装完了内容**:
+- ✅ 満員時間帯のクリック制限をCSS上書きで解除
+- ✅ 予約対象選別処理から満員時間帯除外ロジックを削除  
+- ✅ クールタイムシステム完全削除（3分待機・100回制限撤廃）
+- ✅ バージョン管理をversion.datから動的読み込み
+- ✅ 不要ログメッセージ削除
+
+**技術実装**:
+- CSS: `pointer-events: auto !important` で満員時間帯をクリック可能化
+- JavaScript: `!status.isFull` チェックを削除して満員時間帯も予約対象に含める
+- 予約ループ: 100回制限を削除して成功まで無限ループ化
 
 **期待効果**:
-- 保守性向上、一貫性確保、デバッグ効率向上
+- ユーザーは満員時間帯も直接予約できるため監視不要
+- よりシンプルで使いやすいUI
+- コードベース簡素化
 
 ### 効率モード機能（実装完了）
 **概要**: 入場予約の空き開放タイミング（毎分00秒・30秒）に合わせたsubmit実行機能
@@ -55,97 +77,19 @@ TypeScript内の直接スタイル設定(cssText, style.property)をSCSSクラ�
 - 既にSCSSで適切な可読性確保済み（opacity: 0.7、背景色alpha: 0.5、テキスト色alpha: 0.9）
 - 元の色の痕跡を残しつつ無効状態を表現
 
-#### 2. 入場予約で予約対象解除時の監視対象全削除問題
-**症状**:
-- 入場予約画面で予約対象を解除すると、監視対象もすべて解除される
-- 期待動作：予約対象の解除は監視対象に影響を与えるべきではない
+### ✅ 最新完了作業: CSS/SCSS設計リファクタリング
+**概要**:
+TypeScript内の直接スタイル設定(cssText, style.property)をSCSSクラス切り替えに変更し、過剰な!important使用(247個)を削減する。
 
-#### 2. スマホ環境での監視開始問題（新規）- 修正完了
-**症状**:
-- スマホで監視ボタン押下後、カウントダウンが開始しない
-- デスクトップでは正常動作
-- 監視処理自体の開始に問題がある可能性
+**実装完了**:
+- ✅ Phase 1: FABボタンシステム修正（状態管理クラス化）- 完了
+- ✅ Phase 2: Processing Overlay修正（z-index制御クラス化）- 完了  
+- ✅ Phase 3: ボタン状態管理統一（opacity, cursor等クラス化）- 完了
+- ✅ Phase 4: !important削減（247個→0個）- 完了
+- ✅ Phase 5: 入場予約画面の残存直接スタイル操作をSCSSクラス管理に移行（25件）
 
-**修正内容（2025-08-10）**:
-- **循環依存解決**: entrance-page-monitor.ts と entrance-page-ui.ts を entrance-page-core.ts に統合
-- **監視継続修正**: checkSlotAvailabilityAndReload()内の間違った関数呼び出しを修正
-- **FAB認識修正**: DOM セレクター `.ytomo-fab-inner-content` → `span` に修正  
-- **日付移動実装**: キャッシュ復元時に監視対象の日付への自動移動機能を追加
-- **フラグタイミング復元**: 監視継続フラグ設定をリロード5秒前に復元（誤って即座実行に変更していた部分を修正）
-
-#### 3. 同行者追加処理の入力認識問題（重要）- 未解決
-**症状（5回目の報告）**:
-- チケットIDを同行者追加画面で入力した直後で処理が止まる
-- 入力欄に文字は表示されるが、入力値として認識されていない
-- 一度文字を消してから再入力して送信する必要がある
-- 手動で追加ボタンを押しても解決しない（追加ボタンの問題ではない）
-
-**根本原因解明と修正内容（2025-08-08）**:
-- **問題の特定**: DOMイベントシミュレーションではReactの制御されたコンポーネント（Controlled Component）のstate更新ができない
-- **修正実装**: gemini -p推奨のReact onChangeハンドラ直接呼び出し方式
-  1. React Fiber instanceから`onChange`ハンドラを取得
-  2. Reactが期待するイベント形式（`{target: {value}}`）でモックイベント作成
-  3. `onChange`ハンドラを直接実行してReact stateを更新
-  4. フォールバック処理（従来のpasteイベント方式）
-- **技術詳細**: React合成イベントシステムとControlled Componentの特性を考慮した根本的解決
-
-#### 2. UI改善問題
-- **入場予約画面**: disabledの満員ボタンと監視ボタンの見た目が同じで区別困難
-- **改善案**: 灰色寄りにしても元の色の名残を出すべき
-
-#### 3. 技術的クリーンアップ
-- **main.ts**: 古いUserScriptHeaderが残存している可能性
-
-### 最新完了作業: キャッシュ復元処理改善（2025-08-10）
-
-#### キャッシュ復元時の監視ボタン状態統合
-- **問題**: キャッシュ復元時に監視ボタンが「満員」状態のままで「監視X」状態にならない
-- **修正**: 復元処理を適切に統合し、`analyzeAndAddMonitorButtons()` 後に `restoreSelectionAfterUpdate()` を直接実行
-- **技術**: 「強制実行」ではなく適切な処理タイミングでの状態復元を実現
-- **結果**: キャッシュ復元時に監視ボタンが正しく監視状態に復元されるように改善
-
-### 前回完了作業: 状態管理統合 & FABクリーンアップ改善（2025-08-08）
-
-#### 状態管理の完全統合
-- **entranceReservationState** → EntranceReservationStateManager統合
-- **timeSlotState** → EntranceReservationStateManager統合  
-- **reloadCountdownState** → EntranceReservationStateManager統合
-- **pageLoadingState** → EntranceReservationStateManager統合
-- 4つの分散した状態管理を1つのクラスに統合、二重管理を完全解消
-
-#### FABクリーンアップ機能改善
-- ページ遷移時のFAB残存問題（特にスマホ）を修正
-- `cleanupAllFABs()`統一関数実装
-- 全FAB（入場予約、パビリオン、チケット選択）の一括削除
-- モバイル向け遅延削除処理追加（100ms後の残存チェック）
-
-### 完了した作業: CSS管理システム改善（2025-08-07）
-
-#### Phase 1: 静的スタイルのSCSS移行（完了）
-- cssText（29箇所）→ SCSSクラス化完了
-- ヘッダートグル、パビリオンFAB、サブボタンのクラス化
-- 階層構造による適切な詳細度管理（.ytomo-header、.ytomo-pavilion-fab）
-- JavaScript display制御 → classList.toggle('js-hide')に変更
-
-#### Phase 2: ホバーエフェクトのCSS移行（完了）
-- ヘッダートグルボタン: JavaScript → CSS :hover
-- パビリオンFABボタン: JavaScript → CSS :hover
-- マウスイベントリスナー削除によるパフォーマンス改善
-
-#### Phase 3: 動的制御部分のクラスベース管理（完了）
-- JavaScript制御用の基本クラスセット作成
-- .js-show/.js-hide、.js-enabled/.js-disabled
-- .js-green/.js-red/.js-gray 状態管理クラス
-
-### 技術的成果
-- CSS管理の完全刷新: 直接スタイル操作からクラスベース管理へ
-- 階層構造による詳細度管理: !important使用を最小化
-- パフォーマンス改善: イベントリスナー削減
-- 保守性向上: SCSS構造による統一的なスタイル管理
-
-### 完了した前回作業: アーキテクチャリファクタリング（2025-08-07）
-- 循環参照解決、監視継続失敗修正、UI改善完了
-- 詳細は.doneファイル参照
+**期待効果**:
+- 保守性向上、一貫性確保、デバッグ効率向上
 
 ---
 

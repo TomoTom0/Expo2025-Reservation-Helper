@@ -1,6 +1,6 @@
 /**
  * 入場予約状態管理システム
- * 入場予約・監視の状態と対象を管理
+ * 入場予約の状態と対象を管理
  */
 
 // 必要なimport
@@ -25,7 +25,7 @@ export enum ExecutionState {
 export enum PriorityMode {
     AUTO = 'auto',                          // 自動判定（予約優先）
     FORCE_RESERVATION = 'force_reservation', // 予約強制実行
-    FORCE_MONITORING = 'force_monitoring'    // 監視強制実行
+    FORCE_MONITORING = 'force_monitoring'    // 監視強制実行（スタブ）
 }
 
 // 位置管理の定数
@@ -54,7 +54,7 @@ export interface ReservationSuccess {
     successTime: Date;       // 成功時刻
 }
 
-// 監視対象（複数可能）
+// 監視対象（スタブ - 機能は無効化済み）
 export interface MonitoringTarget {
     timeSlot: string;        // '09:00-'
     locationIndex: number;   // 0 or 1
@@ -62,6 +62,7 @@ export interface MonitoringTarget {
     priority: number;        // 監視優先順位（1, 2, 3...）
     status: 'full' | 'available';
 }
+
 
 // ============================================================================
 // 位置管理ヘルパークラス
@@ -153,14 +154,15 @@ export class EntranceReservationStateManager {
         startTime: null as number | null,
         attempts: 0
     };
-    
-    // 監視実行情報（旧timeSlotStateから統合）
+
+    // 監視実行情報（スタブ - 機能は無効化済み）
     private monitoringExecution = {
         retryCount: 0,
         maxRetries: 100,
         reloadInterval: 30000,
         monitoringInterval: null as number | null
     };
+    
     
     // 効率モード設定管理（常時有効）
     private efficiencyMode = {
@@ -258,32 +260,13 @@ export class EntranceReservationStateManager {
         return true;
     }
     
-    startMonitoring(): boolean {
-        if (this.executionState !== ExecutionState.IDLE) {
-            this.log('⚠️ 監視開始失敗: 他の処理が実行中');
-            return false;
-        }
-        
-        if (!this.canStartMonitoring()) {
-            this.log('⚠️ 監視開始失敗: 監視対象なし');
-            return false;
-        }
-        
-        this.executionState = ExecutionState.MONITORING_RUNNING;
-        
-        // 初回開始時の対象をキャッシュに保存
-        this.saveInitialTargets();
-        
-        // 効率モード有効時は目標時刻を再計算
-        if (this.efficiencyMode.enabled) {
-            this.efficiencyMode.nextSubmitTarget = this.calculateNext00or30Seconds();
-            this.log('⚡ 効率モード: 監視開始時に目標時刻を再計算');
-        }
-        
-        this.log('👁️ 監視処理を開始');
-        return true;
-    }
     
+    // 監視開始（スタブ - 常にfalseを返す）
+    startMonitoring(): boolean {
+        this.log('⚠️ 監視機能は無効化されています');
+        return false;
+    }
+
     stop(): void {
         const prevState = this.executionState;
         this.executionState = ExecutionState.IDLE;
@@ -344,13 +327,12 @@ export class EntranceReservationStateManager {
     private saveInitialTargets(): void {
         this.initialTargetCache = {
             reservationTarget: this.reservationTarget ? { ...this.reservationTarget } : null,
-            monitoringTargets: this.monitoringTargets.map(target => ({ ...target })),
+            monitoringTargets: [], // 監視機能は無効化済み
             timestamp: Date.now()
         };
         
         console.log('💾 初回開始時対象をキャッシュに保存');
         console.log('💾 予約対象:', this.initialTargetCache.reservationTarget);
-        console.log('💾 監視対象:', this.initialTargetCache.monitoringTargets);
     }
     
     /**
@@ -383,29 +365,8 @@ export class EntranceReservationStateManager {
             return false;
         }
         
-        // 監視対象の検証
-        const initialMonitoring = this.initialTargetCache.monitoringTargets;
-        const currentMonitoring = this.monitoringTargets;
-        
-        if (initialMonitoring.length !== currentMonitoring.length) {
-            console.error('🚨 監視対象数が変更されました！');
-            console.error('🚨 初回:', initialMonitoring.length, '個');
-            console.error('🚨 現在:', currentMonitoring.length, '個');
-            return false;
-        }
-        
-        // 監視対象の詳細検証
-        for (let i = 0; i < initialMonitoring.length; i++) {
-            const initial = initialMonitoring[i];
-            const current = currentMonitoring.find(t => 
-                t.timeSlot === initial.timeSlot && t.locationIndex === initial.locationIndex);
-            
-            if (!current) {
-                console.error('🚨 監視対象が削除されました！');
-                console.error('🚨 削除された対象:', initial);
-                return false;
-            }
-        }
+        // 監視対象の検証（スタブ - 監視機能は無効化済み）
+        // 監視機能が無効化されているため検証不要
         
         // すべての検証をパス
         return true;
@@ -478,12 +439,12 @@ export class EntranceReservationStateManager {
     }
     
     // ============================================================================
-    // 監視実行情報管理（旧timeSlotStateから統合）
+    // 監視実行情報管理（スタブ - 機能は無効化済み）
     // ============================================================================
     
-    // 監視実行中かどうか
+    // 監視実行中かどうか（スタブ - 常にfalseを返す）
     isMonitoringRunning(): boolean {
-        return this.executionState === ExecutionState.MONITORING_RUNNING;
+        return false;
     }
     
     // リトライ回数増加
@@ -669,12 +630,6 @@ export class EntranceReservationStateManager {
                this.reservationTarget.locationIndex === locationIndex;
     }
     
-    // 指定した時間帯・位置が現在の監視対象かどうかを判定
-    isMonitoringTarget(timeSlot: string, locationIndex: number): boolean {
-        return this.monitoringTargets.some(target => 
-            target.timeSlot === timeSlot && target.locationIndex === locationIndex
-        );
-    }
     
     clearReservationTarget(): void {
         if (this.reservationTarget) {
@@ -686,19 +641,9 @@ export class EntranceReservationStateManager {
             this.log(`🗑️ 予約対象クリア: ${info}`);
             
             // 解除後の状態復帰ログ出力
-            const hasMonitoringTargets = this.hasMonitoringTargets();
-            const canMonitor = this.canStartMonitoring();
             const preferredAction = this.getPreferredAction();
             this.log(`🔄 予約対象解除後の状態:`);
-            this.log(`  - 監視対象数: ${this.monitoringTargets.length}`);
-            this.log(`  - 監視開始可能: ${canMonitor}`);
             this.log(`  - 推奨アクション: ${preferredAction}`);
-            
-            if (hasMonitoringTargets && preferredAction === 'monitoring') {
-                this.log(`✅ 監視対象が残っているため「監視予約開始」状態に復帰`);
-            } else if (hasMonitoringTargets && preferredAction !== 'monitoring') {
-                this.log(`⚠️ 監視対象があるが推奨アクションが${preferredAction}になっています`);
-            }
         }
     }
     
@@ -984,10 +929,38 @@ export class EntranceReservationStateManager {
         return this.reservationTarget;
     }
     
-    getMonitoringTargets(): MonitoringTarget[] {
-        return [...this.monitoringTargets];
-    }
     
+    // 監視機能のスタブメソッド群（すべて無効化済み）
+    getMonitoringTargets(): MonitoringTarget[] {
+        return [];
+    }
+
+    hasMonitoringTargets(): boolean {
+        return false;
+    }
+
+    addMonitoringTarget(_timeSlot: string, _locationIndex: number, _selector: string): boolean {
+        this.log('⚠️ 監視機能は無効化されています（addMonitoringTarget）');
+        return false;
+    }
+
+    removeMonitoringTarget(_timeSlot: string, _locationIndex: number): boolean {
+        this.log('⚠️ 監視機能は無効化されています（removeMonitoringTarget）');
+        return false;
+    }
+
+    isMonitoringTarget(_timeSlot: string, _locationIndex: number): boolean {
+        return false;
+    }
+
+    canStartMonitoring(): boolean {
+        return false;
+    }
+
+    clearAllMonitoringTargets(): void {
+        this.log('⚠️ 監視機能は無効化されています（clearAllMonitoringTargets）');
+    }
+
     getInitialTargetCache(): typeof this.initialTargetCache {
         return this.initialTargetCache;
     }
@@ -996,13 +969,7 @@ export class EntranceReservationStateManager {
         return this.reservationTarget !== null && this.reservationTarget.isValid;
     }
     
-    hasMonitoringTargets(): boolean {
-        return this.monitoringTargets.length > 0;
-    }
     
-    getMonitoringTargetCount(): number {
-        return this.monitoringTargets.length;
-    }
     
     // 全ての対象をクリア（監視・予約両方）
     clearAllTargets(): void {

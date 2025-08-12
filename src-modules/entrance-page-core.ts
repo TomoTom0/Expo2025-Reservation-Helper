@@ -14,7 +14,7 @@ import {
 
 // entrance-page-fabからのimport
 import { processingOverlay } from './processing-overlay';
-import { updateMonitoringTargetsDisplay, entranceReservationHelper } from './entrance-page-fab';
+import { entranceReservationHelper } from './entrance-page-fab';
 
 // entrance-page-ui-helpersからのimport
 import { updateMainButtonDisplay as updateMainButtonDisplayHelper } from './entrance-page-ui-helpers';
@@ -685,8 +685,6 @@ function handleMonitorButtonClick(slotInfo: TimeSlotInfo, buttonElement: HTMLBut
         // メインボタンの表示を更新
         updateMainButtonDisplayHelper();
         
-        // 監視対象表示も更新
-        updateMonitoringTargetsDisplay();
         
         // 監視対象を解除完了
     } else {
@@ -776,8 +774,6 @@ function handleMonitorButtonClick(slotInfo: TimeSlotInfo, buttonElement: HTMLBut
         }
         updateMainButtonDisplayHelper();
         
-        // 監視対象表示も更新
-        updateMonitoringTargetsDisplay();
         
         // 更新後の状態も確認
         setTimeout(() => {
@@ -808,8 +804,6 @@ async function startSlotMonitoring(): Promise<void> {
     // UI更新（監視開始状態を反映）- カウントダウン保護機能付き
     updateMainButtonDisplayHelper();
     
-    // 監視対象表示も更新
-    updateMonitoringTargetsDisplay();
     
     // 誤動作防止オーバーレイを表示
     processingOverlay.show('monitoring');
@@ -1280,10 +1274,6 @@ export const setEntranceReservationHelper = (helper: Function): void => {
     console.log('setEntranceReservationHelper called:', typeof helper);
 };
 
-// updateMonitoringTargetsDisplayを設定するヘルパー関数（互換性のため保持）
-export const setUpdateMonitoringTargetsDisplay = (fn: Function): void => {
-    console.log('setUpdateMonitoringTargetsDisplay called:', typeof fn);
-};
 
 // メインボタンの表示更新（FAB形式対応）
 // FAB更新の状態管理（削除済み - entrance-page-ui-helpersで管理）

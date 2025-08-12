@@ -6,12 +6,11 @@ import { createCacheManager } from './cache-manager';
 import { setCacheManager } from './entrance-page-core';
 import { 
     setPageLoadingState,
-    restoreFromCache, setCacheManagerForSection6, setEntranceReservationHelper,
-    setUpdateMonitoringTargetsDisplay
+    restoreFromCache, setCacheManagerForSection6, setEntranceReservationHelper
 } from './entrance-page-core';
 import { getCurrentSelectedCalendarDate } from './entrance-page-core';
 import { 
-    updateMonitoringTargetsDisplay, createEntranceReservationUI, setCacheManagerForSection7,
+    createEntranceReservationUI, setCacheManagerForSection7,
     entranceReservationHelper, waitForTimeSlotTable
 } from './entrance-page-fab';
 import { initTimeSlotMonitoring } from './entrance-page-dom-utils';
@@ -118,7 +117,6 @@ setCacheManagerForSection7(cacheManager);
 
 // entrance-page-uiに必要な関数を注入
 setEntranceReservationHelper(entranceReservationHelper);
-setUpdateMonitoringTargetsDisplay(updateMonitoringTargetsDisplay);
 
 // 依存注入は削除済み - 各モジュールで直接インポートを使用
 
