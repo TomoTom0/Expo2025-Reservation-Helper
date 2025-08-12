@@ -13,7 +13,6 @@ import {
     createEntranceReservationUI, setCacheManagerForSection7,
     entranceReservationHelper, waitForTimeSlotTable
 } from './entrance-page-fab';
-import { initTimeSlotMonitoring } from './entrance-page-dom-utils';
 import { initCompanionTicketFeature, initializeTicketSelectionPage, initializeAgentTicketPage } from './companion-ticket-page'; // 同行者追加機能
 
 // 入場予約状態管理システムのimport
@@ -193,7 +192,6 @@ const trigger_init = (url_record: string): void => {
                 init_entrance_page({
                     setPageLoadingStateFn: setPageLoadingState,
                     createEntranceReservationUIFn: createEntranceReservationUI,
-                    initTimeSlotMonitoringFn: initTimeSlotMonitoring,
                     restoreFromCacheFn: restoreFromCache
                 });
                 

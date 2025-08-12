@@ -16,7 +16,6 @@ export const init_entrance_page = (dependencies: Dependencies = {}): void => {
     const {
         setPageLoadingStateFn,
         createEntranceReservationUIFn,
-        initTimeSlotMonitoringFn,
         restoreFromCacheFn
     } = dependencies;
     
@@ -61,14 +60,13 @@ export const init_entrance_page = (dependencies: Dependencies = {}): void => {
     // UIを即座に作成（読み込み状態表示のため）
     if (createEntranceReservationUIFn) createEntranceReservationUIFn(entranceReservationConfig);
     
-    // 時間帯監視機能の初期化（動的待機）
+    // 時間帯テーブル初期化（動的待機）
     (async () => {
-        if (initTimeSlotMonitoringFn) await initTimeSlotMonitoringFn();
         
         // キャッシュからの状態復元（カレンダー読み込み完了後に実行）
         if (restoreFromCacheFn) await restoreFromCacheFn();
         
-        // キャッシュ復元後にカレンダー変更監視を開始
+        // キャッシュ復元後にカレンダー変更を開始
         const { startCalendarWatcher } = await import('./entrance-page-fab');
         startCalendarWatcher();
         

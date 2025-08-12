@@ -458,226 +458,10 @@ function addMonitorButtonsToFullSlots(_fullSlots: TimeSlotInfo[]): void {
     return;
 }
 
-// 監視ボタンのテキストを決定（優先順位表示）
-function getMonitorButtonText(slotInfo: TimeSlotInfo): string {
-    const tdElement = slotInfo.element.closest('td[data-gray-out]') as HTMLTableCellElement;
-    const tdSelector = generateUniqueTdSelector(tdElement);
-    
-    // 既に監視対象として選択されているかチェック
-    const locationIndex = LocationHelper.getIndexFromSelector(tdSelector);
-    const isSelected = false || false;
-    
-    if (isSelected) {
-        // 監視対象リストでの位置を取得（1ベース）
-        const targets: any[] = []; // 監視機能は無効化済み
-        const targetIndex = targets.findIndex(
-            (target: any) => target.timeSlot === slotInfo.timeText && target.locationIndex === locationIndex
-        );
-        
-        if (targetIndex >= 0) {
-            const priority = targetIndex + 1; // 1ベースの優先順位
-            return `監視${priority}`;
-        }
-    }
-    
-    return '満員';
-}
-
-// すべての監視ボタンの優先順位を更新
-function updateAllMonitorButtonPriorities(): void {
-    const allMonitorButtons = document.querySelectorAll('.monitor-btn');
-    const targets: any[] = []; // 監視機能は無効化済み
-    
-    allMonitorButtons.forEach(button => {
-        const span = button.querySelector('span') as HTMLSpanElement;
-        const timeText = button.getAttribute('data-target-time') || '';
-        
-        if (span && timeText) {
-            // このボタンの時間帯と位置情報を特定
-            const tdElement = button.closest('td[data-gray-out]') as HTMLTableCellElement;
-            if (tdElement) {
-                const tdSelector = generateUniqueTdSelector(tdElement);
-                
-                // 監視対象リストでの位置を検索
-                const locationIndex = LocationHelper.getIndexFromSelector(tdSelector);
-                const targetIndex = targets.findIndex(
-                    (target: any) => target.timeSlot === timeText && target.locationIndex === locationIndex
-                );
-                
-                if (targetIndex >= 0) {
-                    // 監視対象として選択されている場合、優先順位を表示
-                    const priority = targetIndex + 1;
-                    span.innerText = `監視${priority}`;
-                    (button as HTMLElement).classList.remove('full-status');
-                    (button as HTMLElement).classList.add('monitoring-status');
-                } else {
-                    // 監視対象でない場合は「満員」
-                    span.innerText = '満員';
-                    (button as HTMLElement).classList.remove('monitoring-status');
-                    (button as HTMLElement).classList.add('full-status');
-                }
-            }
-        }
-    });
-    
-    console.log(`✅ すべての監視ボタンの優先順位を更新しました (${targets.length}個の監視対象)`);
-}
-
-// 個別監視ボタンの作成（満員要素のみ）
-function createMonitorButton(slotInfo: TimeSlotInfo): void {
-    const { element, timeText } = slotInfo;
-    
-    // 満員要素以外にはボタンを追加しない
-    if (!slotInfo.isFull) {
-        console.log(`満員ではないためボタンを追加しません: ${timeText} (isFull: ${slotInfo.isFull})`);
-        return;
-    }
-    
-    // dt要素を探す
-    const dtElement = element.querySelector('dt');
-    if (!dtElement) {
-        console.log(`dt要素が見つかりません: ${timeText}`);
-        return;
-    }
-    
-    // 既にボタンが存在するかチェック
-    const existingButton = dtElement.querySelector('.monitor-btn');
-    if (existingButton) {
-        console.log(`監視ボタンは既に存在します: ${timeText}`);
-        return;
-    }
-    
-    // 監視ボタンを作成（満員要素のクリック制限を回避）
-    const monitorButton = document.createElement('button');
-    monitorButton.classList.add('ext-ytomo', 'monitor-btn');
-    monitorButton.setAttribute('data-target-time', timeText);
-    
-    // ボタンテキストとイベントリスナー
-    const buttonSpan = document.createElement('span');
-    buttonSpan.classList.add('ext-ytomo');
-    
-    // 優先順位形式でボタンテキストを設定
-    const buttonText = getMonitorButtonText(slotInfo);
-    buttonSpan.innerText = buttonText;
-    monitorButton.appendChild(buttonSpan);
-    
-    // クリックイベント（確実な処理のため）
-    monitorButton.addEventListener('click', (event) => {
-        event.preventDefault();
-        event.stopPropagation();
-        event.stopImmediatePropagation();
-        
-        const tdElement = slotInfo.element.closest('td[data-gray-out]') as HTMLTableCellElement;
-        const tdSelector = generateUniqueTdSelector(tdElement);
-        const locationIndex = LocationHelper.getIndexFromSelector(tdSelector);
-        const location = LocationHelper.getLocationFromIndex(locationIndex);
-        const locationText = location === 'east' ? '東' : '西';
-        console.log(`🖱️ 監視ボタンクリック検出: ${locationText}${slotInfo.timeText}`);
-        
-        // ボタン要素の確認
-        const span = monitorButton.querySelector('span') as HTMLSpanElement;
-        console.log(`現在のボタンテキスト: "${span?.innerText}"`);
-        console.log(`ボタンdisabled状態: ${monitorButton.disabled}`);
-        
-        // 監視機能は削除済み
-    }, true); // useCapture = true で確実にキャッチ
-    
-    // マウスイベントも制御
-    monitorButton.addEventListener('mousedown', (event) => {
-        event.preventDefault();
-        event.stopPropagation();
-        event.stopImmediatePropagation();
-    });
-    
-    // ダブルクリック防止
-    monitorButton.addEventListener('dblclick', (event) => {
-        event.preventDefault();
-        event.stopPropagation();
-    });
-    
-    monitorButton.addEventListener('mouseup', (event) => {
-        event.preventDefault();
-        event.stopPropagation();
-        event.stopImmediatePropagation();
-    });
-    
-    // 初期状態のクラス設定（満員状態）
-    const initialButtonText = getMonitorButtonText(slotInfo);
-    if (initialButtonText.startsWith('監視')) {
-        monitorButton.classList.add('monitoring-status');
-    } else {
-        monitorButton.classList.add('full-status');
-    }
-    
-    // dt要素内に追加（spanの後）
-    dtElement.appendChild(monitorButton);
-    
-    // 満員時間帯に監視ボタンを追加完了
-}
 
 
-// 満員時間帯の可用性監視を開始
-async function startSlotMonitoring(): Promise<void> {
-    if (!entranceReservationStateManager || !false) {
-        console.log('❌ 監視対象時間帯が設定されていません');
-        return;
-    }
-    
-    // 状態確認（監視開始は呼び出し元で既に実行済み）
-    const currentState = entranceReservationStateManager.getExecutionState();
-    console.log(`📊 監視開始処理開始時の実行状態: ${currentState}`);
-    
-    console.log('⚠️ 監視機能は削除済み - 処理を中止');
-    return;
-    
-    // UI更新（監視開始状態を反映）- カウントダウン保護機能付き
-    updateMainButtonDisplayHelper();
-    
-    
-    // 誤動作防止オーバーレイを表示
-    processingOverlay.show();
-    
-    // 監視実行中は全ての監視ボタンを無効化
-    disableAllMonitorButtons();
-    
-    // 対象一貫性検証
-    if (!entranceReservationStateManager.validateTargetConsistency()) {
-        console.error('🚨 監視対象が変更されたため処理を中断します');
-        entranceReservationStateManager.stop();
-        return;
-    }
-    
-    const targets: any[] = []; // 監視機能は無効化済み
-    const targetTexts = targets.map((t: any) => {
-        const location = LocationHelper.getLocationFromIndex(t.locationIndex);
-        const locationText = location === 'east' ? '東' : '西';
-        return `${locationText}${t.timeSlot}`;
-    }).join(', ');
-    console.log(`🔄 時間帯監視を開始: ${targetTexts} (${targets.length}個)`);
-    
-    // 監視対象をキャッシュに保存（リロード後の復元用）
-    if (cacheManagerSection6 && targets.length > 0) {
-        try {
-            const currentDate = getCurrentSelectedCalendarDate();
-            if (currentDate) {
-                // キャッシュに保存（統一状態管理システムから自動取得）
-                
-                cacheManagerSection6?.saveTargetSlots();
-                console.log(`💾 監視対象をキャッシュに保存: ${targets.length}個`);
-            } else {
-                console.log('⚠️ カレンダー日付が不明のためキャッシュ保存をスキップ');
-            }
-        } catch (error) {
-            console.error('❌ 監視対象キャッシュ保存エラー:', error);
-        }
-    }
-    
-    // 監視は一回のチェック→リロード→新しいページで再開のサイクル
-    // 定期インターバルは不要（リロード間隔と同じため無意味）
-    setTimeout(() => {
-        checkSlotAvailabilityAndReload();
-    }, 500);
-}
+
+
 
 // 時間帯の可用性チェックとページ再読み込み
 async function checkSlotAvailabilityAndReload(): Promise<void> {
@@ -1047,10 +831,6 @@ export {
     extractTimeSlotInfo,
     generateSelectorForElement,
     addMonitorButtonsToFullSlots,
-    getMonitorButtonText,
-    updateAllMonitorButtonPriorities,
-    createMonitorButton,
-    startSlotMonitoring,
     checkSlotAvailabilityAndReload,
     findTargetSlotInPageUnified,
     terminateMonitoring,
@@ -1269,7 +1049,6 @@ export function resetPreviousSelection(): void {
     }
     
     // ボタンの表示を「満員」に戻す
-    updateAllMonitorButtonPriorities();
 }
 
 // 他の監視ボタンを無効化（複数監視対象対応版）
@@ -1519,7 +1298,6 @@ export async function restoreFromCache(): Promise<void> {
             console.log('🚀 監視継続フラグが有効 - 監視を自動再開します');
             try {
                 updateMainButtonDisplayHelper();
-                await startSlotMonitoring();
             } catch (error) {
                 console.error('❌ 監視自動再開エラー:', error);
             }

@@ -82,12 +82,6 @@ export class UnifiedAutomationManager {
         });
     }
 
-    /**
-     * 統一監視処理実行（将来実装）
-     */
-    async executeMonitoringProcess(): Promise<void> {
-        throw new Error('機能は削除済み');
-    }
 
     /**
      * 統一効率モード待機処理実行

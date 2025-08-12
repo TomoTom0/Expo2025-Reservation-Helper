@@ -149,21 +149,3 @@ export async function waitForCalendar(timeout: number = 10000): Promise<boolean>
     return false;
 }
 
-// 時間帯監視機能の初期化
-export async function initTimeSlotMonitoring(): Promise<void> {
-    console.log('時間帯監視機能を初期化中...');
-    
-    // カレンダーの存在確認
-    const hasCalendar = await waitForCalendar();
-    if (!hasCalendar) {
-        console.log('カレンダーが見つかりません');
-        return;
-    }
-    
-    // DOM変化監視を開始（時間帯テーブルの動的生成を検出）
-    // startTimeSlotTableObserverを動的importで取得（循環参照回避）
-    const { startTimeSlotTableObserver } = await import('./entrance-page-core');
-    startTimeSlotTableObserver();
-    
-    console.log('時間帯監視機能の初期化完了（カレンダー監視中）');
-}
