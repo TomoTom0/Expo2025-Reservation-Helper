@@ -660,7 +660,7 @@ async function handleCalendarChange(): Promise<void> {
             if (hasReservationTarget || hasMonitoringTargets) {
                 console.log('📅 日付変更により入場予約状態管理システムの対象をクリア');
                 entranceReservationStateManager.clearReservationTarget();
-                entranceReservationStateManager.clearMonitoringTargets();
+                entranceReservationStateManager.clearAllMonitoringTargets();
             }
         } else {
             console.log('📅 同じ日付への再クリックのため監視対象は維持');

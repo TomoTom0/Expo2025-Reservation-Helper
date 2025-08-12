@@ -647,65 +647,8 @@ export class EntranceReservationStateManager {
         }
     }
     
-    addMonitoringTarget(timeSlot: string, locationIndex: number, selector: string): boolean {
-        const key = LocationHelper.generateTimeLocationKey(timeSlot, locationIndex);
-        const existing = this.monitoringTargets.find(target => 
-            LocationHelper.generateTimeLocationKey(target.timeSlot, target.locationIndex) === key
-        );
-        
-        if (existing) {
-            this.log(`⚠️ 監視対象は既に存在: ${LocationHelper.formatTargetInfo(timeSlot, locationIndex)}`);
-            return false;
-        }
-        
-        const newTarget: MonitoringTarget = {
-            timeSlot,
-            locationIndex,
-            selector,
-            priority: this.monitoringTargets.length + 1,
-            status: 'full' // 通常満員の時間帯を監視対象にする
-        };
-        
-        this.monitoringTargets.push(newTarget);
-        this.log(`✅ 監視対象追加: ${LocationHelper.formatTargetInfo(timeSlot, locationIndex)} (優先度: ${newTarget.priority})`);
-        
-        // キャッシュに同期
-        this.syncToCache();
-        return true;
-    }
     
-    removeMonitoringTarget(timeSlot: string, locationIndex: number): boolean {
-        const key = LocationHelper.generateTimeLocationKey(timeSlot, locationIndex);
-        const initialLength = this.monitoringTargets.length;
-        
-        this.monitoringTargets = this.monitoringTargets.filter(target => 
-            LocationHelper.generateTimeLocationKey(target.timeSlot, target.locationIndex) !== key
-        );
-        
-        if (this.monitoringTargets.length < initialLength) {
-            // 優先度を再計算
-            this.monitoringTargets.forEach((target, index) => {
-                target.priority = index + 1;
-            });
-            
-            this.log(`✅ 監視対象削除: ${LocationHelper.formatTargetInfo(timeSlot, locationIndex)} (残り: ${this.monitoringTargets.length})`);
-            
-            // キャッシュに同期
-            this.syncToCache();
-            return true;
-        }
-        
-        return false;
-    }
     
-    clearMonitoringTargets(): void {
-        const count = this.monitoringTargets.length;
-        this.monitoringTargets = [];
-        this.log(`🗑️ 全監視対象クリア (${count}個)`);
-        
-        // キャッシュに同期
-        this.syncToCache();
-    }
     
     // ============================================================================
     // 状態判定
@@ -748,16 +691,6 @@ export class EntranceReservationStateManager {
         return true;
     }
     
-    canStartMonitoring(): boolean {
-        const result = this.monitoringTargets.length > 0;
-        if (!this.isReloadCountdownActive()) {
-            // 監視開始可否チェック（ログ削減）
-        }
-        if (!result && !this.efficiencyMode.updateTimer) {
-            this.log(`❌ 監視開始不可: 監視対象数=${this.monitoringTargets.length}`);
-        }
-        return result;
-    }
     
     canInterrupt(): boolean {
         return this.executionState !== ExecutionState.IDLE;
@@ -1038,28 +971,6 @@ export class EntranceReservationStateManager {
     }
     
     
-    // キャッシュ同期
-    private syncToCache(): void {
-        try {
-            // cacheManagerが利用可能な場合のみ同期
-            if (typeof window !== 'undefined' && (window as any).cacheManager) {
-                const cacheManager = (window as any).cacheManager;
-                
-                // 現在の監視対象をキャッシュに保存（キー名を復元時と統一）
-                const cacheData = this.monitoringTargets.map(target => ({
-                    timeSlot: target.timeSlot,    // 復元時と同じキー名を使用
-                    tdSelector: target.selector,
-                    locationIndex: target.locationIndex,
-                    priority: target.priority
-                }));
-                
-                cacheManager.saveTargetSlots(cacheData);
-                this.log(`🔄 キャッシュ同期完了: ${cacheData.length}個の監視対象`);
-            }
-        } catch (error) {
-            console.warn('⚠️ キャッシュ同期に失敗:', error);
-        }
-    }
     
     // ============================================================================
     // FAB表示制御統一メソッド（UI分散問題の解決）

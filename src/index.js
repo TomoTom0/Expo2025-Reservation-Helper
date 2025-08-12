@@ -9,7 +9,7 @@
 // @run-at       document-end
 // ==/UserScript==
 
-// Built: 2025/08/12 21:25:37
+// Built: 2025/08/12 21:44:56
 
 
 (function webpackUniversalModuleDefinition(root, factory) {
@@ -552,7 +552,6 @@ module.exports = function (cssWithMappingToString) {
 /* harmony export */   ZK: () => (/* binding */ setPageLoadingState),
 /* harmony export */   Zu: () => (/* binding */ restoreFromCache),
 /* harmony export */   p4: () => (/* binding */ waitForValidCalendarDate),
-/* harmony export */   qy: () => (/* binding */ setUpdateMonitoringTargetsDisplay),
 /* harmony export */   rY: () => (/* binding */ getCurrentSelectedCalendarDate),
 /* harmony export */   startTimeSlotTableObserver: () => (/* binding */ startTimeSlotTableObserver),
 /* harmony export */   wj: () => (/* binding */ analyzeAndAddMonitorButtons)
@@ -1117,8 +1116,6 @@ function handleMonitorButtonClick(slotInfo, buttonElement) {
         }
         // メインボタンの表示を更新
         updateMainButtonDisplayHelper();
-        // 監視対象表示も更新
-        updateMonitoringTargetsDisplay();
         // 監視対象を解除完了
     }
     else {
@@ -1198,8 +1195,6 @@ function handleMonitorButtonClick(slotInfo, buttonElement) {
             console.log('📊 入場予約状態管理の監視対象一覧:', targets.map((t) => `${LocationHelper.getLocationFromIndex(t.locationIndex) === 'east' ? '東' : '西'}${t.timeSlot}`));
         }
         updateMainButtonDisplayHelper();
-        // 監視対象表示も更新
-        updateMonitoringTargetsDisplay();
         // 更新後の状態も確認
         setTimeout(() => {
             const fabButton = document.querySelector('#ytomo-main-fab');
@@ -1223,8 +1218,6 @@ async function startSlotMonitoring() {
     }
     // UI更新（監視開始状態を反映）- カウントダウン保護機能付き
     (0,_entrance_page_ui_helpers__WEBPACK_IMPORTED_MODULE_4__/* .updateMainButtonDisplay */ .vp)();
-    // 監視対象表示も更新
-    (0,_entrance_page_fab__WEBPACK_IMPORTED_MODULE_3__/* .updateMonitoringTargetsDisplay */ .yT)();
     // 誤動作防止オーバーレイを表示
     _processing_overlay__WEBPACK_IMPORTED_MODULE_2__/* .processingOverlay */ .OB.show('monitoring');
     // 監視実行中は全ての監視ボタンを無効化
@@ -1592,10 +1585,6 @@ const setCacheManagerForSection6 = (cm) => {
 const setEntranceReservationHelper = (helper) => {
     // 必要な場合は、entrance-page-coreに設定
     console.log('setEntranceReservationHelper called:', typeof helper);
-};
-// updateMonitoringTargetsDisplayを設定するヘルパー関数（互換性のため保持）
-const setUpdateMonitoringTargetsDisplay = (fn) => {
-    console.log('setUpdateMonitoringTargetsDisplay called:', typeof fn);
 };
 // メインボタンの表示更新（FAB形式対応）
 // FAB更新の状態管理（削除済み - entrance-page-ui-helpersで管理）
@@ -3173,7 +3162,7 @@ class UnifiedAutomationManager {
 ;// ./src-modules/entrance-reservation-state-manager.ts
 /**
  * 入場予約状態管理システム
- * 入場予約・監視の状態と対象を管理
+ * 入場予約の状態と対象を管理
  */
 // 必要なimport
 
@@ -3194,7 +3183,7 @@ var PriorityMode;
 (function (PriorityMode) {
     PriorityMode["AUTO"] = "auto";
     PriorityMode["FORCE_RESERVATION"] = "force_reservation";
-    PriorityMode["FORCE_MONITORING"] = "force_monitoring"; // 監視強制実行
+    PriorityMode["FORCE_MONITORING"] = "force_monitoring"; // 監視強制実行（スタブ）
 })(PriorityMode || (PriorityMode = {}));
 // 位置管理の定数
 const LOCATION_MAP = {
@@ -3268,7 +3257,7 @@ class EntranceReservationStateManager {
             startTime: null,
             attempts: 0
         };
-        // 監視実行情報（旧timeSlotStateから統合）
+        // 監視実行情報（スタブ - 機能は無効化済み）
         this.monitoringExecution = {
             retryCount: 0,
             maxRetries: 100,
@@ -3357,25 +3346,10 @@ class EntranceReservationStateManager {
         this.log(`🚀 予約処理を開始 (${cycleType})`);
         return true;
     }
+    // 監視開始（スタブ - 常にfalseを返す）
     startMonitoring() {
-        if (this.executionState !== ExecutionState.IDLE) {
-            this.log('⚠️ 監視開始失敗: 他の処理が実行中');
-            return false;
-        }
-        if (!this.canStartMonitoring()) {
-            this.log('⚠️ 監視開始失敗: 監視対象なし');
-            return false;
-        }
-        this.executionState = ExecutionState.MONITORING_RUNNING;
-        // 初回開始時の対象をキャッシュに保存
-        this.saveInitialTargets();
-        // 効率モード有効時は目標時刻を再計算
-        if (this.efficiencyMode.enabled) {
-            this.efficiencyMode.nextSubmitTarget = this.calculateNext00or30Seconds();
-            this.log('⚡ 効率モード: 監視開始時に目標時刻を再計算');
-        }
-        this.log('👁️ 監視処理を開始');
-        return true;
+        this.log('⚠️ 監視機能は無効化されています');
+        return false;
     }
     stop() {
         const prevState = this.executionState;
@@ -3427,12 +3401,11 @@ class EntranceReservationStateManager {
     saveInitialTargets() {
         this.initialTargetCache = {
             reservationTarget: this.reservationTarget ? { ...this.reservationTarget } : null,
-            monitoringTargets: this.monitoringTargets.map(target => ({ ...target })),
+            monitoringTargets: [], // 監視機能は無効化済み
             timestamp: Date.now()
         };
         console.log('💾 初回開始時対象をキャッシュに保存');
         console.log('💾 予約対象:', this.initialTargetCache.reservationTarget);
-        console.log('💾 監視対象:', this.initialTargetCache.monitoringTargets);
     }
     /**
      * 現在の対象が初回開始時と一致するかを検証
@@ -3462,25 +3435,8 @@ class EntranceReservationStateManager {
             console.error('🚨 現在:', currentReservation);
             return false;
         }
-        // 監視対象の検証
-        const initialMonitoring = this.initialTargetCache.monitoringTargets;
-        const currentMonitoring = this.monitoringTargets;
-        if (initialMonitoring.length !== currentMonitoring.length) {
-            console.error('🚨 監視対象数が変更されました！');
-            console.error('🚨 初回:', initialMonitoring.length, '個');
-            console.error('🚨 現在:', currentMonitoring.length, '個');
-            return false;
-        }
-        // 監視対象の詳細検証
-        for (let i = 0; i < initialMonitoring.length; i++) {
-            const initial = initialMonitoring[i];
-            const current = currentMonitoring.find(t => t.timeSlot === initial.timeSlot && t.locationIndex === initial.locationIndex);
-            if (!current) {
-                console.error('🚨 監視対象が削除されました！');
-                console.error('🚨 削除された対象:', initial);
-                return false;
-            }
-        }
+        // 監視対象の検証（スタブ - 監視機能は無効化済み）
+        // 監視機能が無効化されているため検証不要
         // すべての検証をパス
         return true;
     }
@@ -3541,11 +3497,11 @@ class EntranceReservationStateManager {
         return this.executionState === ExecutionState.RESERVATION_RUNNING;
     }
     // ============================================================================
-    // 監視実行情報管理（旧timeSlotStateから統合）
+    // 監視実行情報管理（スタブ - 機能は無効化済み）
     // ============================================================================
-    // 監視実行中かどうか
+    // 監視実行中かどうか（スタブ - 常にfalseを返す）
     isMonitoringRunning() {
-        return this.executionState === ExecutionState.MONITORING_RUNNING;
+        return false;
     }
     // リトライ回数増加
     incrementRetryCount() {
@@ -3700,73 +3656,16 @@ class EntranceReservationStateManager {
         return this.reservationTarget.timeSlot === timeSlot &&
             this.reservationTarget.locationIndex === locationIndex;
     }
-    // 指定した時間帯・位置が現在の監視対象かどうかを判定
-    isMonitoringTarget(timeSlot, locationIndex) {
-        return this.monitoringTargets.some(target => target.timeSlot === timeSlot && target.locationIndex === locationIndex);
-    }
     clearReservationTarget() {
         if (this.reservationTarget) {
             const info = LocationHelper.formatTargetInfo(this.reservationTarget.timeSlot, this.reservationTarget.locationIndex);
             this.reservationTarget = null;
             this.log(`🗑️ 予約対象クリア: ${info}`);
             // 解除後の状態復帰ログ出力
-            const hasMonitoringTargets = this.hasMonitoringTargets();
-            const canMonitor = this.canStartMonitoring();
             const preferredAction = this.getPreferredAction();
             this.log(`🔄 予約対象解除後の状態:`);
-            this.log(`  - 監視対象数: ${this.monitoringTargets.length}`);
-            this.log(`  - 監視開始可能: ${canMonitor}`);
             this.log(`  - 推奨アクション: ${preferredAction}`);
-            if (hasMonitoringTargets && preferredAction === 'monitoring') {
-                this.log(`✅ 監視対象が残っているため「監視予約開始」状態に復帰`);
-            }
-            else if (hasMonitoringTargets && preferredAction !== 'monitoring') {
-                this.log(`⚠️ 監視対象があるが推奨アクションが${preferredAction}になっています`);
-            }
         }
-    }
-    addMonitoringTarget(timeSlot, locationIndex, selector) {
-        const key = LocationHelper.generateTimeLocationKey(timeSlot, locationIndex);
-        const existing = this.monitoringTargets.find(target => LocationHelper.generateTimeLocationKey(target.timeSlot, target.locationIndex) === key);
-        if (existing) {
-            this.log(`⚠️ 監視対象は既に存在: ${LocationHelper.formatTargetInfo(timeSlot, locationIndex)}`);
-            return false;
-        }
-        const newTarget = {
-            timeSlot,
-            locationIndex,
-            selector,
-            priority: this.monitoringTargets.length + 1,
-            status: 'full' // 通常満員の時間帯を監視対象にする
-        };
-        this.monitoringTargets.push(newTarget);
-        this.log(`✅ 監視対象追加: ${LocationHelper.formatTargetInfo(timeSlot, locationIndex)} (優先度: ${newTarget.priority})`);
-        // キャッシュに同期
-        this.syncToCache();
-        return true;
-    }
-    removeMonitoringTarget(timeSlot, locationIndex) {
-        const key = LocationHelper.generateTimeLocationKey(timeSlot, locationIndex);
-        const initialLength = this.monitoringTargets.length;
-        this.monitoringTargets = this.monitoringTargets.filter(target => LocationHelper.generateTimeLocationKey(target.timeSlot, target.locationIndex) !== key);
-        if (this.monitoringTargets.length < initialLength) {
-            // 優先度を再計算
-            this.monitoringTargets.forEach((target, index) => {
-                target.priority = index + 1;
-            });
-            this.log(`✅ 監視対象削除: ${LocationHelper.formatTargetInfo(timeSlot, locationIndex)} (残り: ${this.monitoringTargets.length})`);
-            // キャッシュに同期
-            this.syncToCache();
-            return true;
-        }
-        return false;
-    }
-    clearMonitoringTargets() {
-        const count = this.monitoringTargets.length;
-        this.monitoringTargets = [];
-        this.log(`🗑️ 全監視対象クリア (${count}個)`);
-        // キャッシュに同期
-        this.syncToCache();
     }
     // ============================================================================
     // 状態判定
@@ -3800,16 +3699,6 @@ class EntranceReservationStateManager {
             return false;
         }
         return true;
-    }
-    canStartMonitoring() {
-        const result = this.monitoringTargets.length > 0;
-        if (!this.isReloadCountdownActive()) {
-            // 監視開始可否チェック（ログ削減）
-        }
-        if (!result && !this.efficiencyMode.updateTimer) {
-            this.log(`❌ 監視開始不可: 監視対象数=${this.monitoringTargets.length}`);
-        }
-        return result;
     }
     canInterrupt() {
         return this.executionState !== ExecutionState.IDLE;
@@ -3958,20 +3847,35 @@ class EntranceReservationStateManager {
     getReservationTarget() {
         return this.reservationTarget;
     }
+    // 監視機能のスタブメソッド群（すべて無効化済み）
     getMonitoringTargets() {
-        return [...this.monitoringTargets];
+        return [];
+    }
+    hasMonitoringTargets() {
+        return false;
+    }
+    addMonitoringTarget(_timeSlot, _locationIndex, _selector) {
+        this.log('⚠️ 監視機能は無効化されています（addMonitoringTarget）');
+        return false;
+    }
+    removeMonitoringTarget(_timeSlot, _locationIndex) {
+        this.log('⚠️ 監視機能は無効化されています（removeMonitoringTarget）');
+        return false;
+    }
+    isMonitoringTarget(_timeSlot, _locationIndex) {
+        return false;
+    }
+    canStartMonitoring() {
+        return false;
+    }
+    clearAllMonitoringTargets() {
+        this.log('⚠️ 監視機能は無効化されています（clearAllMonitoringTargets）');
     }
     getInitialTargetCache() {
         return this.initialTargetCache;
     }
     hasReservationTarget() {
         return this.reservationTarget !== null && this.reservationTarget.isValid;
-    }
-    hasMonitoringTargets() {
-        return this.monitoringTargets.length > 0;
-    }
-    getMonitoringTargetCount() {
-        return this.monitoringTargets.length;
     }
     // 全ての対象をクリア（監視・予約両方）
     clearAllTargets() {
@@ -4021,27 +3925,6 @@ class EntranceReservationStateManager {
     log(message) {
         if (this.debugMode) {
             console.log(`[UnifiedState] ${message}`);
-        }
-    }
-    // キャッシュ同期
-    syncToCache() {
-        try {
-            // cacheManagerが利用可能な場合のみ同期
-            if (typeof window !== 'undefined' && window.cacheManager) {
-                const cacheManager = window.cacheManager;
-                // 現在の監視対象をキャッシュに保存（キー名を復元時と統一）
-                const cacheData = this.monitoringTargets.map(target => ({
-                    timeSlot: target.timeSlot, // 復元時と同じキー名を使用
-                    tdSelector: target.selector,
-                    locationIndex: target.locationIndex,
-                    priority: target.priority
-                }));
-                cacheManager.saveTargetSlots(cacheData);
-                this.log(`🔄 キャッシュ同期完了: ${cacheData.length}個の監視対象`);
-            }
-        }
-        catch (error) {
-            console.warn('⚠️ キャッシュ同期に失敗:', error);
         }
     }
     // ============================================================================
@@ -5210,10 +5093,9 @@ module.exports = domAPI;
 /* harmony export */   FX: () => (/* binding */ entranceReservationHelper),
 /* harmony export */   TP: () => (/* binding */ setCacheManagerForSection7),
 /* harmony export */   il: () => (/* binding */ waitForTimeSlotTable),
-/* harmony export */   startCalendarWatcher: () => (/* binding */ startCalendarWatcher),
-/* harmony export */   yT: () => (/* binding */ updateMonitoringTargetsDisplay)
+/* harmony export */   startCalendarWatcher: () => (/* binding */ startCalendarWatcher)
 /* harmony export */ });
-/* unused harmony exports getCurrentReservationTarget, checkVisitTimeButtonState, checkTimeSlotSelected, canStartReservation, checkInitialState, handleCalendarChange, removeAllMonitorButtons */
+/* unused harmony exports updateMonitoringTargetsDisplay, getCurrentReservationTarget, checkVisitTimeButtonState, checkTimeSlotSelected, canStartReservation, checkInitialState, handleCalendarChange, removeAllMonitorButtons */
 /* harmony import */ var _processing_overlay__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(624);
 /* harmony import */ var _entrance_page_state__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(278);
 /* harmony import */ var _entrance_page_dom_utils__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(638);
@@ -5756,7 +5638,7 @@ async function handleCalendarChange() {
             if (hasReservationTarget || hasMonitoringTargets) {
                 console.log('📅 日付変更により入場予約状態管理システムの対象をクリア');
                 _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_4__/* .entranceReservationStateManager */ .xx.clearReservationTarget();
-                _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_4__/* .entranceReservationStateManager */ .xx.clearMonitoringTargets();
+                _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_4__/* .entranceReservationStateManager */ .xx.clearAllMonitoringTargets();
             }
         }
         else {
@@ -8885,7 +8767,6 @@ const initializeUnifiedStateManager = () => {
 (0,entrance_page_fab/* setCacheManagerForSection7 */.TP)(cacheManager);
 // entrance-page-uiに必要な関数を注入
 (0,entrance_page_core/* setEntranceReservationHelper */.XP)(entrance_page_fab/* entranceReservationHelper */.FX);
-(0,entrance_page_core/* setUpdateMonitoringTargetsDisplay */.qy)(entrance_page_fab/* updateMonitoringTargetsDisplay */.yT);
 // 依存注入は削除済み - 各モジュールで直接インポートを使用
 // URL判定とページタイプ識別
 const identify_page_type = (url) => {
