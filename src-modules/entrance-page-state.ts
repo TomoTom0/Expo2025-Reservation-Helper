@@ -232,7 +232,6 @@ export function createFABToggleButton(): void {
 // エクスポート
 export {
     entranceReservationState,
-    // timeSlotState, // EntranceReservationStateManagerに統合済み
     // pageLoadingState, // EntranceReservationStateManagerに統合済み
     // reloadCountdownState, // EntranceReservationStateManagerに統合済み
     calendarWatchState,

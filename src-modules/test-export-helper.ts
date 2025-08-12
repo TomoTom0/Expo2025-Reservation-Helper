@@ -4,7 +4,6 @@
  */
 
 // 必要なモジュールをインポート
-// import { timeSlotState } from './entrance-page-state'; // 統合により不要
 import { generateUniqueTdSelector, getTdPositionInfo, extractTdStatus, timeSlotSelectors } from './entrance-page-dom-utils';
 import { checkTimeSlotTableExistsSync } from './entrance-page-core';
 import { isInterruptionAllowed } from './entrance-page-core';

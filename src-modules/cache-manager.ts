@@ -1,5 +1,3 @@
-// entrance-page-stateからのimport
-// import { timeSlotState } from './entrance-page-state'; // 統合により不要
 
 
 

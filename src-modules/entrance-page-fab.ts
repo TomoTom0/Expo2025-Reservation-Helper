@@ -618,15 +618,6 @@ async function handleCalendarChange(): Promise<void> {
             console.log('📅 同じ日付への再クリック');
         }
         
-        // 従来システムはもう使用しないため、このブロックは削除
-        // if (multiTargetManager.hasTargets() && !timeSlotState.isMonitoring) {
-        //     console.log('📅 日付変更により従来システムの対象をクリア');
-        //     multiTargetManager.clearAll();
-        //     timeSlotState.mode = 'idle';
-        //     if (cacheManager) {
-        //         cacheManager.clearTargetSlots();
-        //     }
-        // }
         
         // 予約対象がクリアされたため、即座にFAB表示を更新
         updateMainButtonDisplay();

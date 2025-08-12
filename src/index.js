@@ -9,7 +9,7 @@
 // @run-at       document-end
 // ==/UserScript==
 
-// Built: 2025/08/13 00:44:53
+// Built: 2025/08/13 00:49:31
 
 
 (function webpackUniversalModuleDefinition(root, factory) {
@@ -642,7 +642,6 @@ module.exports = function (cssWithMappingToString) {
 /* harmony import */ var _entrance_page_fab__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(982);
 /* harmony import */ var _entrance_page_ui_helpers__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(269);
 // entrance-page-stateからのimport（もう使用しません）
-// import { timeSlotState } from './entrance-page-state';
 // 入場予約状態管理システムからのimport
 
 // entrance-page-dom-utilsからのimport
@@ -3925,15 +3924,6 @@ async function handleCalendarChange() {
         else {
             console.log('📅 同じ日付への再クリック');
         }
-        // 従来システムはもう使用しないため、このブロックは削除
-        // if (multiTargetManager.hasTargets() && !timeSlotState.isMonitoring) {
-        //     console.log('📅 日付変更により従来システムの対象をクリア');
-        //     multiTargetManager.clearAll();
-        //     timeSlotState.mode = 'idle';
-        //     if (cacheManager) {
-        //         cacheManager.clearTargetSlots();
-        //     }
-        // }
         // 予約対象がクリアされたため、即座にFAB表示を更新
         (0,_entrance_page_ui_helpers__WEBPACK_IMPORTED_MODULE_5__/* .updateMainButtonDisplay */ .v)();
     }
@@ -4945,8 +4935,6 @@ const init_entrance_page = (dependencies = {}) => {
 };
 
 ;// ./src-modules/cache-manager.ts
-// entrance-page-stateからのimport
-// import { timeSlotState } from './entrance-page-state'; // 統合により不要
 // ============================================================================
 // キャッシュ管理機能
 const createCacheManager = (_dependencies = {}) => {

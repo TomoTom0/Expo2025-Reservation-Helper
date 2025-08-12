@@ -1,5 +1,4 @@
 // entrance-page-stateからのimport（もう使用しません）
-// import { timeSlotState } from './entrance-page-state';
 
 // 入場予約状態管理システムからのimport
 import { LocationHelper, entranceReservationStateManager } from './entrance-reservation-state-manager';
@@ -17,7 +16,7 @@ import { entranceReservationHelper } from './entrance-page-fab';
 // entrance-page-ui-helpersからのimport
 import { updateMainButtonDisplay as updateMainButtonDisplayHelper } from './entrance-page-ui-helpers';
 
-// entrance-page-ui-helpersからのimport（enableAllMonitorButtonsはこのファイル内で定義済み）
+// entrance-page-ui-helpersからのimport
 
 // UI更新ヘルパー関数は外部関数として設定される
 
