@@ -286,7 +286,7 @@ function analyzeAndAddMonitorButtons(): void {
                 const span = button.querySelector('span') as HTMLSpanElement;
                 if (span) {
                     span.innerText = '空きあり';
-                    (button as HTMLElement).style.background = 'rgb(0, 200, 0)'; // より明るい緑
+                    (button as HTMLElement).classList.add('btn-success-highlight');
                     console.log(`✅ 監視対象が空きありに変化: ${timeText}`);
                 }
             }
@@ -658,8 +658,7 @@ function handleMonitorButtonClick(slotInfo: TimeSlotInfo, buttonElement: HTMLBut
         buttonSpan.innerText = '満員';
         buttonElement.classList.remove('monitoring-status');
         buttonElement.classList.add('full-status');
-        buttonElement.style.opacity = '1';
-        buttonElement.style.cursor = 'pointer';
+        buttonElement.classList.add('js-enabled');
         buttonElement.disabled = false;
         
         // 監視対象がすべてなくなった場合の処理
@@ -766,8 +765,7 @@ function handleMonitorButtonClick(slotInfo: TimeSlotInfo, buttonElement: HTMLBut
         }
         buttonElement.classList.remove('full-status');
         buttonElement.classList.add('monitoring-status');
-        buttonElement.style.opacity = '1';
-        buttonElement.style.cursor = 'pointer';
+        buttonElement.classList.add('js-enabled');
         buttonElement.disabled = false; // クリックで解除できるように
         
         // メインボタンの表示を更新
@@ -1474,8 +1472,7 @@ export function disableOtherMonitorButtons(selectedTimeText: string, selectedTdS
         
         // 同じ時間+位置でない場合は無効化
         if (!(targetTime === selectedTimeText && buttonTdSelector === selectedTdSelector)) {
-            (button as HTMLElement).style.opacity = '0.5';
-            (button as HTMLElement).style.cursor = 'not-allowed';
+            (button as HTMLElement).classList.add('js-disabled');
             (button as HTMLButtonElement).disabled = true;
         }
     });
@@ -1485,8 +1482,7 @@ export function disableOtherMonitorButtons(selectedTimeText: string, selectedTdS
 export function disableAllMonitorButtons(): void {
     const allMonitorButtons = document.querySelectorAll('.monitor-btn');
     allMonitorButtons.forEach(button => {
-        (button as HTMLElement).style.opacity = '0.5';
-        (button as HTMLElement).style.cursor = 'not-allowed';
+        (button as HTMLElement).classList.add('js-disabled');
         (button as HTMLButtonElement).disabled = true;
         
         // ツールチップで理由を表示
@@ -2089,8 +2085,8 @@ function enableAllMonitorButtons(): void {
         const span = button.querySelector('span') as HTMLSpanElement;
         
         // すべてのボタンを有効化
-        (button as HTMLElement).style.opacity = '1';
-        (button as HTMLElement).style.cursor = 'pointer';
+        (button as HTMLElement).classList.remove('js-disabled');
+        (button as HTMLElement).classList.add('js-enabled');
         (button as HTMLButtonElement).disabled = false;
         
         // 監視対象のボタンは赤色を維持

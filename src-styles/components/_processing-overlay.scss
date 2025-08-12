@@ -6,13 +6,17 @@
   right: 0;
   bottom: 0;
   background: rgba(0, 0, 0, 0.3); // 薄い黒のオーバーレイ
-  z-index: 100000 !important; // FABより少し低く設定（FABは100001に調整される）
+  z-index: 100000;
   display: flex;
   align-items: center;
   justify-content: center;
   backdrop-filter: blur(1px); // わずかなブラー効果
   transition: all 0.3s ease;
   pointer-events: auto; // クリックをキャッチする
+  
+  // z-index状態管理
+  &.z-normal { z-index: 100000; }
+  &.z-below-fab { z-index: 99999; }
   
   // 初期状態（非表示）
   &.hidden {

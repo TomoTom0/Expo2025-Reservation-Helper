@@ -63,11 +63,16 @@ function showStatus(message: string, color: string = 'white'): void {
     if (!statusBadge) return;
     
     statusBadge.innerText = message;
-    statusBadge.style.background = color === 'green' ? 'rgba(0, 128, 0, 0.9)' :
-                                  color === 'red' ? 'rgba(255, 0, 0, 0.9)' :
-                                  color === 'orange' ? 'rgba(255, 140, 0, 0.9)' :
-                                  color === 'blue' ? 'rgba(0, 104, 33, 0.9)' :
-                                  'rgba(0, 0, 0, 0.8)';
+    // 既存の背景色クラスを削除
+    statusBadge.className = statusBadge.className.replace(/status-bg-\w+/g, '');
+    
+    // 新しい背景色クラスを追加
+    const bgClass = color === 'green' ? 'status-bg-green' :
+                   color === 'red' ? 'status-bg-red' :
+                   color === 'orange' ? 'status-bg-orange' :
+                   color === 'blue' ? 'status-bg-blue' :
+                   'status-bg-default';
+    statusBadge.classList.add(bgClass);
     statusBadge.classList.remove('js-hide');
     
     // 一定時間後に自動で隠す（エラー、成功、中断メッセージ以外）
@@ -88,17 +93,7 @@ function createEntranceReservationUI(): void {
     // FABコンテナを作成（右下固定）
     const fabContainer = document.createElement('div');
     fabContainer.id = 'ytomo-fab-container';
-    fabContainer.style.cssText = `
-        position: fixed !important;
-        bottom: 24px !important;
-        right: 24px !important;
-        z-index: 10000 !important;
-        display: flex !important;
-        flex-direction: column !important;
-        gap: 12px !important;
-        align-items: flex-end !important;
-        pointer-events: auto !important;
-    `;
+    fabContainer.className = 'ytomo-fab-container z-normal';
 
 
     // メインFABボタンを作成
@@ -109,94 +104,26 @@ function createEntranceReservationUI(): void {
     // FABボタンのステータス表示
     const fabIcon = document.createElement('span');
     fabIcon.classList.add('ext-ytomo', 'ytomo-fab-status');
-    fabIcon.style.cssText = `
-        font-size: 12px !important;
-        text-align: center !important;
-        line-height: 1.2 !important;
-        white-space: nowrap !important;
-        pointer-events: none !important;
-    `;
+    fabIcon.className = 'ytomo-fab-inner-content';
     fabIcon.innerText = '待機中';
     fabButton.appendChild(fabIcon);
     
-    // FABボタンにrelative positionを設定（折りたたみボタン配置用）
-    fabButton.style.position = 'relative';
-    
-    // 初期状態は ytomo-fab-disabled クラスで制御
-
-    // ホバー効果（強化版）
-    fabButton.addEventListener('mouseenter', () => {
-        fabButton.style.transform = 'scale(1.15)';
-        fabButton.style.boxShadow = '0 8px 25px rgba(0, 0, 0, 0.5), 0 4px 12px rgba(0, 0, 0, 0.3)';
-        fabButton.style.borderWidth = '4px';
-    });
-
-    fabButton.addEventListener('mouseleave', () => {
-        fabButton.style.transform = 'scale(1)';
-        fabButton.style.boxShadow = '0 6px 20px rgba(0, 0, 0, 0.4), 0 2px 8px rgba(0, 0, 0, 0.2)';
-        fabButton.style.borderWidth = '3px';
-    });
+    // 初期状態はytomo-fabクラスで制御
+    fabButton.className = 'ytomo-fab state-idle';
 
     // 予約対象情報表示エリア（新規追加）
     const reservationTargetDisplay = document.createElement('div');
     reservationTargetDisplay.id = 'ytomo-reservation-target';
-    reservationTargetDisplay.style.cssText = `
-        background: linear-gradient(135deg, rgba(0, 123, 255, 0.95), rgba(0, 86, 179, 0.95)) !important;
-        color: white !important;
-        padding: 8px 12px !important;
-        border-radius: 12px !important;
-        font-size: 12px !important;
-        font-weight: bold !important;
-        text-align: center !important;
-        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3) !important;
-        border: 2px solid rgba(255, 255, 255, 0.3) !important;
-        min-width: 80px !important;
-        max-width: 120px !important;
-        display: none !important;
-        white-space: pre-line !important;
-        overflow: visible !important;
-        text-overflow: clip !important;
-        pointer-events: auto !important;
-        cursor: pointer !important;
-        transition: all 0.3s ease !important;
-    `;
+    reservationTargetDisplay.className = 'ytomo-reservation-target-display hidden';
     reservationTargetDisplay.title = '予約対象（クリックで詳細表示）';
     
     // 監視対象表示エリア（目立つ表示）
     const monitoringTargetsDisplay = document.createElement('div');
     monitoringTargetsDisplay.id = 'ytomo-monitoring-targets';
-    monitoringTargetsDisplay.style.cssText = `
-        background: linear-gradient(135deg, rgba(0, 104, 33, 0.95), rgba(0, 150, 50, 0.95)) !important;
-        color: white !important;
-        padding: 8px 12px !important;
-        border-radius: 12px !important;
-        font-size: 12px !important;
-        font-weight: bold !important;
-        text-align: center !important;
-        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3) !important;
-        border: 2px solid rgba(255, 255, 255, 0.3) !important;
-        min-width: 80px !important;
-        max-width: 120px !important;
-        display: none !important;
-        white-space: pre-line !important;
-        overflow: visible !important;
-        text-overflow: clip !important;
-        pointer-events: auto !important;
-        cursor: pointer !important;
-        transition: all 0.3s ease !important;
-    `;
+    monitoringTargetsDisplay.className = 'ytomo-monitoring-targets-display hidden';
     monitoringTargetsDisplay.title = 'クリックで詳細表示';
     
-    // ホバー効果
-    monitoringTargetsDisplay.addEventListener('mouseenter', () => {
-        monitoringTargetsDisplay.style.transform = 'scale(1.05)';
-        monitoringTargetsDisplay.style.boxShadow = '0 4px 14px rgba(0, 0, 0, 0.4)';
-    });
-    
-    monitoringTargetsDisplay.addEventListener('mouseleave', () => {
-        monitoringTargetsDisplay.style.transform = 'scale(1)';
-        monitoringTargetsDisplay.style.boxShadow = '0 3px 10px rgba(0, 0, 0, 0.3)';
-    });
+    // ホバー効果はCSSで実装済み
 
     // ステータス表示（コンパクト）
     const statusBadge = document.createElement('div');

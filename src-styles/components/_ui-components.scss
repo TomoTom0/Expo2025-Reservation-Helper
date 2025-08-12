@@ -25,10 +25,10 @@
 // トグル系
 .ytomo-toggle {
   &.toggle-li {
-    position: fixed !important;  // 必要: サイトレイアウトをオーバーライド
-    bottom: 10px !important;     // 必要: サイトレイアウトをオーバーライド
-    left: 10px !important;       // 必要: サイトレイアウトをオーバーライド
-    z-index: 1000 !important;    // 必要: レイヤー順序を確実に制御
+    position: fixed;
+    bottom: 10px;
+    left: 10px;
+    z-index: 1000;
     list-style: none;
     margin: 0;
     padding: 0;
@@ -74,13 +74,13 @@
 // ダイアログ系
 .ytomo-dialog {
   &.overlay {
-    position: fixed !important;  // 必要: サイトレイアウトをオーバーライド
-    top: 0 !important;           // 必要: サイトレイアウトをオーバーライド
-    left: 0 !important;          // 必要: サイトレイアウトをオーバーライド
-    width: 100% !important;      // 必要: サイトレイアウトをオーバーライド
-    height: 100% !important;     // 必要: サイトレイアウトをオーバーライド
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
     background-color: rgba(0, 0, 0, 0.5);
-    z-index: 10000 !important;   // 必要: レイヤー順序を確実に制御
+    z-index: 10000;
     display: flex;
     justify-content: center;
     align-items: center;

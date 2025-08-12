@@ -45,19 +45,58 @@
     cursor: pointer;
     pointer-events: auto;
   }
+
+  // 動的状態クラス（新規追加）
+  &.state-idle { 
+    background: rgb(128, 128, 128);
+    opacity: 0.6;
+    cursor: not-allowed;
+    pointer-events: none;
+  }
+  
+  &.state-enabled {
+    background: rgb(255, 140, 0);
+    opacity: 0.9; 
+    cursor: pointer;
+    pointer-events: auto;
+  }
+  
+  &.state-running {
+    background: rgb(220, 53, 69);
+    opacity: 0.9;
+    cursor: pointer;
+    pointer-events: auto;
+  }
+  
+  &.state-monitoring {
+    background: rgb(255, 140, 0);
+    opacity: 0.9;
+    cursor: pointer;
+    pointer-events: auto;
+  }
+
+  // ホバー効果
+  &:hover {
+    transform: scale(1.15);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5), 0 4px 12px rgba(0, 0, 0, 0.3);
+  }
 }
 
 // FABコンテナ
 .ytomo-fab-container {
-  position: fixed !important;  // 必要: サイトレイアウトをオーバーライド
-  bottom: 20px !important;     // 必要: サイトレイアウトをオーバーライド
-  right: 20px !important;      // 必要: サイトレイアウトをオーバーライド
-  z-index: 9999 !important;    // 必要: レイヤー順序を確実に制御
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 10000;
   display: flex;
-  flex-direction: column-reverse;
-  align-items: center;
+  flex-direction: column;
+  align-items: flex-end;
   gap: 12px;
-  pointer-events: none;
+  pointer-events: auto;
+
+  // z-index状態管理  
+  &.z-normal { z-index: 10000; }
+  &.z-above-overlay { z-index: 100001; }
 
   // 表示状態管理
   &.visible {
@@ -120,10 +159,10 @@
 
 // パビリオンFABコンテナ（特別な配置）
 .ytomo-pavilion-fab-container {
-  position: fixed !important;  // 必要: サイトレイアウトをオーバーライド
-  bottom: 24px !important;     // 必要: サイトレイアウトをオーバーライド 
-  right: 24px !important;      // 必要: サイトレイアウトをオーバーライド
-  z-index: 10000 !important;   // 必要: レイヤー順序を確実に制御
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 10000;
   display: flex;
   flex-direction: column;
   gap: 12px;
@@ -139,4 +178,62 @@
   justify-content: center;
   height: 100%;
   pointer-events: none;
+}
+
+// 予約対象表示
+.ytomo-reservation-target-display {
+  background: linear-gradient(135deg, rgba(0, 123, 255, 0.95), rgba(0, 86, 179, 0.95));
+  color: white;
+  padding: 8px 12px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: bold;
+  text-align: center;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  min-width: 80px;
+  max-width: 120px;
+  white-space: pre-line;
+  overflow: visible;
+  text-overflow: clip;
+  transition: all 0.3s ease;
+  pointer-events: auto;
+  cursor: pointer;
+  
+  &:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
+  }
+  
+  &.hidden { display: none; }
+  &.visible { display: block; }
+}
+
+// 監視対象表示  
+.ytomo-monitoring-targets-display {
+  background: linear-gradient(135deg, rgba(0, 104, 33, 0.95), rgba(0, 150, 50, 0.95));
+  color: white;
+  padding: 8px 12px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: bold;
+  text-align: center;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  min-width: 80px;
+  max-width: 120px;
+  white-space: pre-line;
+  overflow: visible;
+  text-overflow: clip;
+  transition: all 0.3s ease;
+  pointer-events: auto;
+  cursor: pointer;
+  
+  &:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
+  }
+  
+  &.hidden { display: none; }
+  &.visible { display: block; }
 }

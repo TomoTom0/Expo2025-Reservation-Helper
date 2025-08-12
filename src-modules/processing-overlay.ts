@@ -26,7 +26,7 @@ export class ProcessingOverlay {
         // オーバーレイ要素を作成
         this.overlayElement = document.createElement('div');
         this.overlayElement.id = 'ytomo-processing-overlay';
-        this.overlayElement.className = 'ytomo-processing-overlay hidden';
+        this.overlayElement.className = 'ytomo-processing-overlay hidden z-normal';
         
         // メッセージエリア
         const messageArea = document.createElement('div');
@@ -129,7 +129,7 @@ export class ProcessingOverlay {
         // FABボタンのz-indexを調整（オーバーレイより前面に）
         const fabContainer = document.getElementById('ytomo-fab-container');
         if (fabContainer) {
-            fabContainer.style.zIndex = '100001';
+            fabContainer.className = fabContainer.className.replace(/z-\w+/g, '').trim() + ' z-above-overlay';
         }
         
         this.isActive = true;
@@ -150,7 +150,7 @@ export class ProcessingOverlay {
         // FABボタンのz-indexを元に戻す
         const fabContainer = document.getElementById('ytomo-fab-container');
         if (fabContainer) {
-            fabContainer.style.zIndex = '9999';
+            fabContainer.className = fabContainer.className.replace(/z-\w+/g, '').trim() + ' z-normal';
         }
         
         this.isActive = false;

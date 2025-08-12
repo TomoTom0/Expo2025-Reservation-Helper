@@ -220,7 +220,7 @@ function updateMonitoringTargetsDisplay() {
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1___default()((_node_modules_css_loader_dist_runtime_noSourceMaps_js__WEBPACK_IMPORTED_MODULE_0___default()));
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, `#ytomo-status-badge.countdown-warning{background:rgba(255,0,0,.9) !important}.ytomo-efficiency-toggle{width:45px;height:32px;border-radius:16px;color:#fff;border:none;font-size:10px;font-weight:bold;cursor:pointer;transition:all .2s ease;box-shadow:0 2px 8px rgba(0,0,0,.3);display:flex;align-items:center;justify-content:center;pointer-events:auto;margin-bottom:8px}.ytomo-efficiency-toggle.efficiency-enabled{background:rgba(255,140,0,.9)}.ytomo-efficiency-toggle.efficiency-disabled{background:rgba(128,128,128,.9)}.ytomo-efficiency-toggle:hover{transform:scale(1.1);box-shadow:0 4px 12px rgba(0,0,0,.4)}.ytomo-efficiency-toggle:active{transform:scale(0.95)}button.ext-ytomo{height:40px;width:auto;min-width:60px;padding:0px 8px;background:#006821;color:#fff}button.ext-ytomo.no-after:after{background:rgba(0,0,0,0) none repeat 0 0/auto auto padding-box border-box scroll}button.ext-ytomo.btn-done{background:#4a4c4a}button.ext-ytomo:hover{background:#02862b}.pavilion-sub-btn{color:#fff;border:none;border-radius:20px;padding:8px 16px;font-size:12px;white-space:nowrap;transition:all .2s ease}.pavilion-sub-btn.btn-enabled{background:#006821;cursor:pointer;opacity:1}.pavilion-sub-btn.btn-enabled:hover{background:#02862b;transform:scale(1.05)}.pavilion-sub-btn.btn-disabled,.pavilion-sub-btn.btn-loading{background:gray;cursor:not-allowed;opacity:.6}.pavilion-sub-btn.btn-disabled:hover,.pavilion-sub-btn.btn-loading:hover{background:gray;transform:scale(1)}button.ext-ytomo.pavilion-sub-btn.btn-disabled,button.ext-ytomo.pavilion-sub-btn.btn-loading{background:gray;cursor:not-allowed;opacity:.6}button.ext-ytomo.pavilion-sub-btn.btn-disabled:hover,button.ext-ytomo.pavilion-sub-btn.btn-loading:hover{background:gray;transform:scale(1)}.safe-none,.ytomo-none,.filter-none{display:none}button.ext-ytomo.monitor-btn{height:auto;min-height:20px;width:auto;min-width:35px;padding:1px 4px;color:#fff;margin-left:8px;font-size:10px;border:none;border-radius:2px;cursor:pointer;display:inline-block;vertical-align:middle;position:relative;z-index:10 !important;pointer-events:auto;opacity:1;visibility:visible}button.ext-ytomo.monitor-btn.full-status{background:#228b22}button.ext-ytomo.monitor-btn.full-status:hover{background:#32cd32}button.ext-ytomo.monitor-btn.monitoring-status{background:#dc3545}button.ext-ytomo.monitor-btn.monitoring-status:hover{background:#ff4554}button.ext-ytomo.monitor-btn:disabled{cursor:not-allowed;opacity:.7}button.ext-ytomo.monitor-btn:disabled.full-status{background:rgba(34,139,34,.5);color:hsla(0,0%,100%,.9)}button.ext-ytomo.monitor-btn:disabled.monitoring-status{background:rgba(220,53,69,.5);color:hsla(0,0%,100%,.9)}button.ext-ytomo.monitor-btn:disabled:not(.full-status):not(.monitoring-status){background:rgba(128,128,128,.7);color:hsla(0,0%,100%,.9)}button.ext-ytomo.pavilion-sub-btn.ytomo-date-button.date-selected{border:2px solid #4caf50;box-shadow:0 0 8px rgba(76,175,80,.6)}div.div-flex{display:flex;justify-content:center;margin:5px}.js-show{display:block}.js-hide{display:none}.js-visible{visibility:visible}.js-invisible{visibility:hidden}.js-enabled{pointer-events:auto;opacity:1}.js-disabled{pointer-events:none;opacity:.6}.js-green{background:#228b22;color:#fff}.js-red{background:#dc3545;color:#fff}.js-gray{background:gray;color:#fff}.ytomo-header li.fab-toggle-li{display:inline-block;margin-right:8px}.ytomo-header li.fab-toggle-li button.fab-toggle-button{background:none;border:none;cursor:pointer;padding:0;color:#fff;transition:all .2s ease;display:flex;align-items:center;justify-content:center}.ytomo-header li.fab-toggle-li button.fab-toggle-button:hover{color:#ddd}.ytomo-header li.fab-toggle-li button.fab-toggle-button figure.fab-toggle-figure{width:auto;height:24px;display:flex;align-items:center;justify-content:center;padding:0 4px}.ytomo-pavilion-fab button.ytomo-fab{position:relative}.ytomo-pavilion-fab button.ytomo-fab:hover{transform:scale(1.15);box-shadow:0 8px 25px rgba(0,0,0,.5),0 4px 12px rgba(0,0,0,.3);border-width:4px}.ytomo-pavilion-fab .ytomo-fab-inner-content .pavilion-fab-expand-icon{font-size:8px;line-height:1;margin-bottom:1px;opacity:.8}.ytomo-pavilion-fab .ytomo-fab-inner-content .pavilion-fab-brand-text{font-size:7px;font-weight:normal;line-height:1;margin-bottom:2px;opacity:.7}.ytomo-pavilion-fab .ytomo-fab-inner-content .pavilion-fab-counts-text{font-size:12px;font-weight:bold;line-height:1}.ytomo-pavilion-fab .pavilion-sub-actions-container{display:none;flex-direction:column;gap:8px;align-items:flex-end;margin-bottom:8px}.ytomo-pavilion-fab .pavilion-sub-actions-container.expanded{display:flex}.ytomo-pavilion-fab .pavilion-sub-actions-container button.pavilion-sub-btn.base-style{color:#fff;border:none;border-radius:20px;padding:8px 16px;font-size:12px;white-space:nowrap;box-shadow:0 2px 8px rgba(0,0,0,.3);transition:all .2s ease}.ytomo-companion-dialog{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;z-index:99999 !important;padding:20px;box-sizing:border-box}.ytomo-companion-dialog .dialog-content{background:#fff;border-radius:12px;padding:24px;width:100%;max-width:500px;max-height:90vh;overflow-y:auto;box-shadow:0 10px 40px rgba(0,0,0,.3)}@media(max-width: 768px){.ytomo-companion-dialog .dialog-content{max-width:95vw;max-height:85vh;padding:16px;border-radius:8px}}.ytomo-companion-dialog .dialog-content .input-row{display:flex;gap:8px;margin-bottom:12px}@media(max-width: 480px){.ytomo-companion-dialog .dialog-content .input-row{flex-direction:column;gap:12px}}.ytomo-companion-dialog .dialog-content .input-row input{padding:12px 8px;border:1px solid #ddd;border-radius:4px;font-size:16px}.ytomo-companion-dialog .dialog-content .input-row input:focus{outline:none;border-color:#4caf50;box-shadow:0 0 0 2px rgba(76,175,80,.2)}.ytomo-companion-dialog .dialog-content .input-row button{padding:12px 16px;background:#4caf50;color:#fff;border:none;border-radius:4px;cursor:pointer;font-size:14px;white-space:nowrap;min-width:60px}.ytomo-companion-dialog .dialog-content .input-row button:hover{background:#45a049}.ytomo-companion-dialog .dialog-content .input-row button:active{background:#3d8b40}.ytomo-fab{width:56px;height:56px;border-radius:50%;color:#fff;border:none;box-shadow:0 6px 20px rgba(0,0,0,.4),0 2px 8px rgba(0,0,0,.2);border:3px solid hsla(0,0%,100%,.2);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:bold;transition:all .3s ease;position:relative;overflow:hidden;pointer-events:auto}.ytomo-fab-enabled{background:#ff8c00;opacity:.9;cursor:pointer;pointer-events:auto}.ytomo-fab-disabled{background:gray;opacity:.6;cursor:not-allowed;pointer-events:none}.ytomo-fab-monitoring{background:#ff8c00;opacity:.9;cursor:pointer;pointer-events:auto}.ytomo-fab-running{background:#dc3545;opacity:.9;cursor:pointer;pointer-events:auto}.ytomo-fab-container{position:fixed !important;bottom:20px !important;right:20px !important;z-index:9999 !important;display:flex;flex-direction:column-reverse;align-items:center;gap:12px;pointer-events:none}.ytomo-fab-container.visible{display:flex}.ytomo-fab-container.hidden{display:none}.ytomo-fab-content{position:relative;display:flex;flex-direction:column-reverse;align-items:center;gap:8px;opacity:0;transform:scale(0.8) translateY(10px);transition:all .3s cubic-bezier(0.175, 0.885, 0.32, 1.275);pointer-events:none}.ytomo-fab-content.expanded{opacity:1;transform:scale(1) translateY(0);pointer-events:auto}.ytomo-sub-fab{width:45px;height:32px;border-radius:16px;background:rgba(0,104,33,.9);color:#fff;border:none;font-size:11px;font-weight:bold;cursor:pointer;transition:all .2s ease;box-shadow:0 2px 8px rgba(0,0,0,.3);display:flex;align-items:center;justify-content:center;pointer-events:auto}.ytomo-sub-fab:hover{background:rgba(2,134,43,.9);transform:scale(1.1);box-shadow:0 4px 12px rgba(0,0,0,.4)}.ytomo-sub-fab:active{transform:scale(0.95)}.ytomo-pavilion-fab-container{position:fixed !important;bottom:24px !important;right:24px !important;z-index:10000 !important;display:flex;flex-direction:column;gap:12px;align-items:flex-end;pointer-events:auto}.ytomo-fab-inner-content{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;pointer-events:none}input.ext-tomo.search{height:50px;min-width:200px;max-width:min(300px,100%);font-family:quicksand;font-size:16px;-webkit-appearance:textfield;-moz-appearance:textfield;appearance:textfield;border:1px solid #222426;border-radius:25px;box-shadow:0 1px 0 0 #ccc;padding:0 0 0 10px;flex:1 1}.ytomo-icon.expand-icon{font-size:8px;line-height:1;color:#fff;font-weight:bold;text-align:center;pointer-events:none}.ytomo-icon.countdown-text{font-size:6px;line-height:1;color:#fff;font-weight:bold;text-align:center;margin-top:1px;pointer-events:none}.ytomo-toggle.toggle-li{position:fixed !important;bottom:10px !important;left:10px !important;z-index:1000 !important;list-style:none;margin:0;padding:0}.ytomo-toggle.toggle-button{width:50px;height:30px;background:rgba(255,140,0,.8);border:none;border-radius:15px;cursor:pointer;transition:all .3s ease;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:bold;position:relative;overflow:hidden}.ytomo-toggle.toggle-button.enabled{color:#fff}.ytomo-toggle.toggle-button.disabled{color:#ddd}.ytomo-toggle.toggle-figure{width:100%;height:100%;margin:0;padding:0;border:none;background:rgba(0,0,0,0);pointer-events:none}.ytomo-dialog.overlay{position:fixed !important;top:0 !important;left:0 !important;width:100% !important;height:100% !important;background-color:rgba(0,0,0,.5);z-index:10000 !important;display:flex;justify-content:center;align-items:center}.ytomo-dialog.container{background:#fff;border-radius:8px;padding:20px;max-width:400px;width:90%;max-height:70vh;overflow-y:auto;box-shadow:0 4px 12px rgba(0,0,0,.3)}.ytomo-dialog.title{margin:0 0 16px 0;color:#333;font-size:18px;font-weight:bold}.ytomo-dialog.button-group{display:flex;justify-content:flex-end;gap:10px;margin-top:20px}.ytomo-dialog.primary-button{background:#006821;color:#fff;border:none;padding:10px 20px;border-radius:4px;cursor:pointer;font-size:14px}.ytomo-dialog.primary-button:hover{background:#02862b}.ytomo-dialog.primary-button:disabled{background:gray;cursor:not-allowed}.ytomo-dialog.secondary-button{background:rgba(0,0,0,0);color:#666;border:1px solid #ccc;padding:10px 20px;border-radius:4px;cursor:pointer;font-size:14px}.ytomo-dialog.secondary-button:hover{background:#f5f5f5}.ytomo-progress.counter{display:inline-block;margin-left:8px;padding:2px 6px;background:rgba(0,0,0,.3);border-radius:10px;font-size:10px;color:#fff;font-weight:bold}#ytomo-monitoring-targets.monitoring-targets{background:rgba(255,140,0,.15);border:1px solid rgba(255,140,0,.3);border-radius:8px;padding:8px;margin:4px 0}#ytomo-monitoring-targets.reservation-target{background:rgba(0,104,33,.15);border:1px solid rgba(0,104,33,.3);border-radius:8px;padding:8px;margin:4px 0}.ytomo-processing-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.3);z-index:100000 !important;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(1px);transition:all .3s ease;pointer-events:auto}.ytomo-processing-overlay.hidden{opacity:0;visibility:hidden;pointer-events:none}.ytomo-processing-overlay.visible{opacity:1;visibility:visible;pointer-events:auto}.ytomo-processing-overlay .processing-message-area{background:hsla(0,0%,100%,.95);border-radius:12px;padding:24px 32px;text-align:center;box-shadow:0 8px 32px rgba(0,0,0,.3);border:2px solid rgba(255,140,0,.3);max-width:400px;margin:20px}@media(max-width: 768px){.ytomo-processing-overlay .processing-message-area{padding:20px 24px;margin:16px;max-width:90vw}}.ytomo-processing-overlay .processing-message-text{font-size:20px;font-weight:bold;color:#333;margin-bottom:12px}@media(max-width: 768px){.ytomo-processing-overlay .processing-message-text{font-size:18px;margin-bottom:10px}}.ytomo-processing-overlay .processing-warning-text{font-size:14px;color:#666;margin-bottom:16px;line-height:1.4;transition:all .3s ease}@media(max-width: 768px){.ytomo-processing-overlay .processing-warning-text{font-size:13px;margin-bottom:14px}}.ytomo-processing-overlay .processing-warning-text.warning-flash{color:#dc3545;font-weight:bold;transform:scale(1.05);animation:flash .5s ease-in-out 2}.ytomo-processing-overlay .processing-cancel-area{font-size:12px;color:#888;font-style:italic}@media(max-width: 768px){.ytomo-processing-overlay .processing-cancel-area{font-size:11px}}@keyframes flash{0%,100%{opacity:1}50%{opacity:.7}}.ytomo-processing-overlay.efficiency-mode .processing-message-area{border-color:rgba(255,140,0,.5);background:linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(255, 248, 220, 0.95))}.ytomo-processing-overlay.efficiency-mode .processing-message-text{color:#e67e00}.ytomo-processing-overlay.monitoring-mode .processing-message-area{border-color:rgba(0,104,33,.5);background:linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(240, 255, 240, 0.95))}.ytomo-processing-overlay.monitoring-mode .processing-message-text{color:#004d1a}@media(prefers-reduced-motion: reduce){.ytomo-processing-overlay{transition:none}.ytomo-processing-overlay .processing-warning-text.warning-flash{animation:none;transform:none}}`, ""]);
+___CSS_LOADER_EXPORT___.push([module.id, `#ytomo-status-badge.countdown-warning{background:rgba(255,0,0,.9)}.ytomo-efficiency-toggle{width:45px;height:32px;border-radius:16px;color:#fff;border:none;font-size:10px;font-weight:bold;cursor:pointer;transition:all .2s ease;box-shadow:0 2px 8px rgba(0,0,0,.3);display:flex;align-items:center;justify-content:center;pointer-events:auto;margin-bottom:8px}.ytomo-efficiency-toggle.efficiency-enabled{background:rgba(255,140,0,.9)}.ytomo-efficiency-toggle.efficiency-disabled{background:rgba(128,128,128,.9)}.ytomo-efficiency-toggle:hover{transform:scale(1.1);box-shadow:0 4px 12px rgba(0,0,0,.4)}.ytomo-efficiency-toggle:active{transform:scale(0.95)}button.ext-ytomo{height:40px;width:auto;min-width:60px;padding:0px 8px;background:#006821;color:#fff}button.ext-ytomo.no-after:after{background:rgba(0,0,0,0) none repeat 0 0/auto auto padding-box border-box scroll}button.ext-ytomo.btn-done{background:#4a4c4a}button.ext-ytomo:hover{background:#02862b}.pavilion-sub-btn{color:#fff;border:none;border-radius:20px;padding:8px 16px;font-size:12px;white-space:nowrap;transition:all .2s ease}.pavilion-sub-btn.btn-enabled{background:#006821;cursor:pointer;opacity:1}.pavilion-sub-btn.btn-enabled:hover{background:#02862b;transform:scale(1.05)}.pavilion-sub-btn.btn-disabled,.pavilion-sub-btn.btn-loading{background:gray;cursor:not-allowed;opacity:.6}.pavilion-sub-btn.btn-disabled:hover,.pavilion-sub-btn.btn-loading:hover{background:gray;transform:scale(1)}button.ext-ytomo.pavilion-sub-btn.btn-disabled,button.ext-ytomo.pavilion-sub-btn.btn-loading{background:gray;cursor:not-allowed;opacity:.6}button.ext-ytomo.pavilion-sub-btn.btn-disabled:hover,button.ext-ytomo.pavilion-sub-btn.btn-loading:hover{background:gray;transform:scale(1)}.safe-none,.ytomo-none,.filter-none{display:none}button.ext-ytomo.monitor-btn{height:auto;min-height:20px;width:auto;min-width:35px;padding:1px 4px;color:#fff;margin-left:8px;font-size:10px;border:none;border-radius:2px;cursor:pointer;display:inline-block;vertical-align:middle;position:relative;z-index:10;pointer-events:auto;opacity:1;visibility:visible}button.ext-ytomo.monitor-btn.full-status{background:#228b22}button.ext-ytomo.monitor-btn.full-status:hover{background:#32cd32}button.ext-ytomo.monitor-btn.monitoring-status{background:#dc3545}button.ext-ytomo.monitor-btn.monitoring-status:hover{background:#ff4554}button.ext-ytomo.monitor-btn:disabled{cursor:not-allowed;opacity:.7}button.ext-ytomo.monitor-btn:disabled.full-status{background:rgba(34,139,34,.5);color:hsla(0,0%,100%,.9)}button.ext-ytomo.monitor-btn:disabled.monitoring-status{background:rgba(220,53,69,.5);color:hsla(0,0%,100%,.9)}button.ext-ytomo.monitor-btn:disabled:not(.full-status):not(.monitoring-status){background:rgba(128,128,128,.7);color:hsla(0,0%,100%,.9)}button.ext-ytomo.pavilion-sub-btn.ytomo-date-button.date-selected{border:2px solid #4caf50;box-shadow:0 0 8px rgba(76,175,80,.6)}div.div-flex{display:flex;justify-content:center;margin:5px}.js-show{display:block}.js-hide{display:none}.js-visible{visibility:visible}.js-invisible{visibility:hidden}.js-enabled{pointer-events:auto;opacity:1}.js-disabled{pointer-events:none;opacity:.6}.js-green{background:#228b22;color:#fff}.js-red{background:#dc3545;color:#fff}.js-gray{background:gray;color:#fff}.btn-success-highlight{background:#00c800;color:#fff}.status-bg-green{background:rgba(0,128,0,.9)}.status-bg-red{background:rgba(255,0,0,.9)}.status-bg-orange{background:rgba(255,140,0,.9)}.status-bg-blue{background:rgba(0,104,33,.9)}.status-bg-default{background:rgba(0,0,0,.8)}.ytomo-header li.fab-toggle-li{display:inline-block;margin-right:8px}.ytomo-header li.fab-toggle-li button.fab-toggle-button{background:none;border:none;cursor:pointer;padding:0;color:#fff;transition:all .2s ease;display:flex;align-items:center;justify-content:center}.ytomo-header li.fab-toggle-li button.fab-toggle-button:hover{color:#ddd}.ytomo-header li.fab-toggle-li button.fab-toggle-button figure.fab-toggle-figure{width:auto;height:24px;display:flex;align-items:center;justify-content:center;padding:0 4px}.ytomo-pavilion-fab button.ytomo-fab{position:relative}.ytomo-pavilion-fab button.ytomo-fab:hover{transform:scale(1.15);box-shadow:0 8px 25px rgba(0,0,0,.5),0 4px 12px rgba(0,0,0,.3);border-width:4px}.ytomo-pavilion-fab .ytomo-fab-inner-content .pavilion-fab-expand-icon{font-size:8px;line-height:1;margin-bottom:1px;opacity:.8}.ytomo-pavilion-fab .ytomo-fab-inner-content .pavilion-fab-brand-text{font-size:7px;font-weight:normal;line-height:1;margin-bottom:2px;opacity:.7}.ytomo-pavilion-fab .ytomo-fab-inner-content .pavilion-fab-counts-text{font-size:12px;font-weight:bold;line-height:1}.ytomo-pavilion-fab .pavilion-sub-actions-container{display:none;flex-direction:column;gap:8px;align-items:flex-end;margin-bottom:8px}.ytomo-pavilion-fab .pavilion-sub-actions-container.expanded{display:flex}.ytomo-pavilion-fab .pavilion-sub-actions-container button.pavilion-sub-btn.base-style{color:#fff;border:none;border-radius:20px;padding:8px 16px;font-size:12px;white-space:nowrap;box-shadow:0 2px 8px rgba(0,0,0,.3);transition:all .2s ease}.ytomo-companion-dialog{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;z-index:99999;padding:20px;box-sizing:border-box}.ytomo-companion-dialog .dialog-content{background:#fff;border-radius:12px;padding:24px;width:100%;max-width:500px;max-height:90vh;overflow-y:auto;box-shadow:0 10px 40px rgba(0,0,0,.3)}@media(max-width: 768px){.ytomo-companion-dialog .dialog-content{max-width:95vw;max-height:85vh;padding:16px;border-radius:8px}}.ytomo-companion-dialog .dialog-content .input-row{display:flex;gap:8px;margin-bottom:12px}@media(max-width: 480px){.ytomo-companion-dialog .dialog-content .input-row{flex-direction:column;gap:12px}}.ytomo-companion-dialog .dialog-content .input-row input{padding:12px 8px;border:1px solid #ddd;border-radius:4px;font-size:16px}.ytomo-companion-dialog .dialog-content .input-row input:focus{outline:none;border-color:#4caf50;box-shadow:0 0 0 2px rgba(76,175,80,.2)}.ytomo-companion-dialog .dialog-content .input-row button{padding:12px 16px;background:#4caf50;color:#fff;border:none;border-radius:4px;cursor:pointer;font-size:14px;white-space:nowrap;min-width:60px}.ytomo-companion-dialog .dialog-content .input-row button:hover{background:#45a049}.ytomo-companion-dialog .dialog-content .input-row button:active{background:#3d8b40}.ytomo-fab{width:56px;height:56px;border-radius:50%;color:#fff;border:none;box-shadow:0 6px 20px rgba(0,0,0,.4),0 2px 8px rgba(0,0,0,.2);border:3px solid hsla(0,0%,100%,.2);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:bold;transition:all .3s ease;position:relative;overflow:hidden;pointer-events:auto}.ytomo-fab-enabled{background:#ff8c00;opacity:.9;cursor:pointer;pointer-events:auto}.ytomo-fab-disabled{background:gray;opacity:.6;cursor:not-allowed;pointer-events:none}.ytomo-fab-monitoring{background:#ff8c00;opacity:.9;cursor:pointer;pointer-events:auto}.ytomo-fab-running{background:#dc3545;opacity:.9;cursor:pointer;pointer-events:auto}.ytomo-fab.state-idle{background:gray;opacity:.6;cursor:not-allowed;pointer-events:none}.ytomo-fab.state-enabled{background:#ff8c00;opacity:.9;cursor:pointer;pointer-events:auto}.ytomo-fab.state-running{background:#dc3545;opacity:.9;cursor:pointer;pointer-events:auto}.ytomo-fab.state-monitoring{background:#ff8c00;opacity:.9;cursor:pointer;pointer-events:auto}.ytomo-fab:hover{transform:scale(1.15);box-shadow:0 8px 25px rgba(0,0,0,.5),0 4px 12px rgba(0,0,0,.3)}.ytomo-fab-container{position:fixed;bottom:24px;right:24px;z-index:10000;display:flex;flex-direction:column;align-items:flex-end;gap:12px;pointer-events:auto}.ytomo-fab-container.z-normal{z-index:10000}.ytomo-fab-container.z-above-overlay{z-index:100001}.ytomo-fab-container.visible{display:flex}.ytomo-fab-container.hidden{display:none}.ytomo-fab-content{position:relative;display:flex;flex-direction:column-reverse;align-items:center;gap:8px;opacity:0;transform:scale(0.8) translateY(10px);transition:all .3s cubic-bezier(0.175, 0.885, 0.32, 1.275);pointer-events:none}.ytomo-fab-content.expanded{opacity:1;transform:scale(1) translateY(0);pointer-events:auto}.ytomo-sub-fab{width:45px;height:32px;border-radius:16px;background:rgba(0,104,33,.9);color:#fff;border:none;font-size:11px;font-weight:bold;cursor:pointer;transition:all .2s ease;box-shadow:0 2px 8px rgba(0,0,0,.3);display:flex;align-items:center;justify-content:center;pointer-events:auto}.ytomo-sub-fab:hover{background:rgba(2,134,43,.9);transform:scale(1.1);box-shadow:0 4px 12px rgba(0,0,0,.4)}.ytomo-sub-fab:active{transform:scale(0.95)}.ytomo-pavilion-fab-container{position:fixed;bottom:24px;right:24px;z-index:10000;display:flex;flex-direction:column;gap:12px;align-items:flex-end;pointer-events:auto}.ytomo-fab-inner-content{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;pointer-events:none}.ytomo-reservation-target-display{background:linear-gradient(135deg, rgba(0, 123, 255, 0.95), rgba(0, 86, 179, 0.95));color:#fff;padding:8px 12px;border-radius:12px;font-size:12px;font-weight:bold;text-align:center;box-shadow:0 3px 10px rgba(0,0,0,.3);border:2px solid hsla(0,0%,100%,.3);min-width:80px;max-width:120px;white-space:pre-line;overflow:visible;text-overflow:clip;transition:all .3s ease;pointer-events:auto;cursor:pointer}.ytomo-reservation-target-display:hover{transform:scale(1.05);box-shadow:0 4px 14px rgba(0,0,0,.4)}.ytomo-reservation-target-display.hidden{display:none}.ytomo-reservation-target-display.visible{display:block}.ytomo-monitoring-targets-display{background:linear-gradient(135deg, rgba(0, 104, 33, 0.95), rgba(0, 150, 50, 0.95));color:#fff;padding:8px 12px;border-radius:12px;font-size:12px;font-weight:bold;text-align:center;box-shadow:0 3px 10px rgba(0,0,0,.3);border:2px solid hsla(0,0%,100%,.3);min-width:80px;max-width:120px;white-space:pre-line;overflow:visible;text-overflow:clip;transition:all .3s ease;pointer-events:auto;cursor:pointer}.ytomo-monitoring-targets-display:hover{transform:scale(1.05);box-shadow:0 4px 14px rgba(0,0,0,.4)}.ytomo-monitoring-targets-display.hidden{display:none}.ytomo-monitoring-targets-display.visible{display:block}input.ext-tomo.search{height:50px;min-width:200px;max-width:min(300px,100%);font-family:quicksand;font-size:16px;-webkit-appearance:textfield;-moz-appearance:textfield;appearance:textfield;border:1px solid #222426;border-radius:25px;box-shadow:0 1px 0 0 #ccc;padding:0 0 0 10px;flex:1 1}.ytomo-icon.expand-icon{font-size:8px;line-height:1;color:#fff;font-weight:bold;text-align:center;pointer-events:none}.ytomo-icon.countdown-text{font-size:6px;line-height:1;color:#fff;font-weight:bold;text-align:center;margin-top:1px;pointer-events:none}.ytomo-toggle.toggle-li{position:fixed;bottom:10px;left:10px;z-index:1000;list-style:none;margin:0;padding:0}.ytomo-toggle.toggle-button{width:50px;height:30px;background:rgba(255,140,0,.8);border:none;border-radius:15px;cursor:pointer;transition:all .3s ease;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:bold;position:relative;overflow:hidden}.ytomo-toggle.toggle-button.enabled{color:#fff}.ytomo-toggle.toggle-button.disabled{color:#ddd}.ytomo-toggle.toggle-figure{width:100%;height:100%;margin:0;padding:0;border:none;background:rgba(0,0,0,0);pointer-events:none}.ytomo-dialog.overlay{position:fixed;top:0;left:0;width:100%;height:100%;background-color:rgba(0,0,0,.5);z-index:10000;display:flex;justify-content:center;align-items:center}.ytomo-dialog.container{background:#fff;border-radius:8px;padding:20px;max-width:400px;width:90%;max-height:70vh;overflow-y:auto;box-shadow:0 4px 12px rgba(0,0,0,.3)}.ytomo-dialog.title{margin:0 0 16px 0;color:#333;font-size:18px;font-weight:bold}.ytomo-dialog.button-group{display:flex;justify-content:flex-end;gap:10px;margin-top:20px}.ytomo-dialog.primary-button{background:#006821;color:#fff;border:none;padding:10px 20px;border-radius:4px;cursor:pointer;font-size:14px}.ytomo-dialog.primary-button:hover{background:#02862b}.ytomo-dialog.primary-button:disabled{background:gray;cursor:not-allowed}.ytomo-dialog.secondary-button{background:rgba(0,0,0,0);color:#666;border:1px solid #ccc;padding:10px 20px;border-radius:4px;cursor:pointer;font-size:14px}.ytomo-dialog.secondary-button:hover{background:#f5f5f5}.ytomo-progress.counter{display:inline-block;margin-left:8px;padding:2px 6px;background:rgba(0,0,0,.3);border-radius:10px;font-size:10px;color:#fff;font-weight:bold}#ytomo-monitoring-targets.monitoring-targets{background:rgba(255,140,0,.15);border:1px solid rgba(255,140,0,.3);border-radius:8px;padding:8px;margin:4px 0}#ytomo-monitoring-targets.reservation-target{background:rgba(0,104,33,.15);border:1px solid rgba(0,104,33,.3);border-radius:8px;padding:8px;margin:4px 0}.ytomo-processing-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.3);z-index:100000;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(1px);transition:all .3s ease;pointer-events:auto}.ytomo-processing-overlay.z-normal{z-index:100000}.ytomo-processing-overlay.z-below-fab{z-index:99999}.ytomo-processing-overlay.hidden{opacity:0;visibility:hidden;pointer-events:none}.ytomo-processing-overlay.visible{opacity:1;visibility:visible;pointer-events:auto}.ytomo-processing-overlay .processing-message-area{background:hsla(0,0%,100%,.95);border-radius:12px;padding:24px 32px;text-align:center;box-shadow:0 8px 32px rgba(0,0,0,.3);border:2px solid rgba(255,140,0,.3);max-width:400px;margin:20px}@media(max-width: 768px){.ytomo-processing-overlay .processing-message-area{padding:20px 24px;margin:16px;max-width:90vw}}.ytomo-processing-overlay .processing-message-text{font-size:20px;font-weight:bold;color:#333;margin-bottom:12px}@media(max-width: 768px){.ytomo-processing-overlay .processing-message-text{font-size:18px;margin-bottom:10px}}.ytomo-processing-overlay .processing-warning-text{font-size:14px;color:#666;margin-bottom:16px;line-height:1.4;transition:all .3s ease}@media(max-width: 768px){.ytomo-processing-overlay .processing-warning-text{font-size:13px;margin-bottom:14px}}.ytomo-processing-overlay .processing-warning-text.warning-flash{color:#dc3545;font-weight:bold;transform:scale(1.05);animation:flash .5s ease-in-out 2}.ytomo-processing-overlay .processing-cancel-area{font-size:12px;color:#888;font-style:italic}@media(max-width: 768px){.ytomo-processing-overlay .processing-cancel-area{font-size:11px}}@keyframes flash{0%,100%{opacity:1}50%{opacity:.7}}.ytomo-processing-overlay.efficiency-mode .processing-message-area{border-color:rgba(255,140,0,.5);background:linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(255, 248, 220, 0.95))}.ytomo-processing-overlay.efficiency-mode .processing-message-text{color:#e67e00}.ytomo-processing-overlay.monitoring-mode .processing-message-area{border-color:rgba(0,104,33,.5);background:linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(240, 255, 240, 0.95))}.ytomo-processing-overlay.monitoring-mode .processing-message-text{color:#004d1a}@media(prefers-reduced-motion: reduce){.ytomo-processing-overlay{transition:none}.ytomo-processing-overlay .processing-warning-text.warning-flash{animation:none;transform:none}}`, ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -783,7 +783,7 @@ function analyzeAndAddMonitorButtons() {
                 const span = button.querySelector('span');
                 if (span) {
                     span.innerText = '空きあり';
-                    button.style.background = 'rgb(0, 200, 0)'; // より明るい緑
+                    button.classList.add('btn-success-highlight');
                     console.log(`✅ 監視対象が空きありに変化: ${timeText}`);
                 }
             }
@@ -1096,8 +1096,7 @@ function handleMonitorButtonClick(slotInfo, buttonElement) {
         buttonSpan.innerText = '満員';
         buttonElement.classList.remove('monitoring-status');
         buttonElement.classList.add('full-status');
-        buttonElement.style.opacity = '1';
-        buttonElement.style.cursor = 'pointer';
+        buttonElement.classList.add('js-enabled');
         buttonElement.disabled = false;
         // 監視対象がすべてなくなった場合の処理
         if (!_entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_0__/* .entranceReservationStateManager */ .xx || !_entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_0__/* .entranceReservationStateManager */ .xx.hasMonitoringTargets()) {
@@ -1191,8 +1190,7 @@ function handleMonitorButtonClick(slotInfo, buttonElement) {
         }
         buttonElement.classList.remove('full-status');
         buttonElement.classList.add('monitoring-status');
-        buttonElement.style.opacity = '1';
-        buttonElement.style.cursor = 'pointer';
+        buttonElement.classList.add('js-enabled');
         buttonElement.disabled = false; // クリックで解除できるように
         // メインボタンの表示を更新
         if (_entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_0__/* .entranceReservationStateManager */ .xx) {
@@ -1771,8 +1769,7 @@ function disableOtherMonitorButtons(selectedTimeText, selectedTdSelector) {
         const buttonTdSelector = buttonTd ? generateUniqueTdSelector(buttonTd) : '';
         // 同じ時間+位置でない場合は無効化
         if (!(targetTime === selectedTimeText && buttonTdSelector === selectedTdSelector)) {
-            button.style.opacity = '0.5';
-            button.style.cursor = 'not-allowed';
+            button.classList.add('js-disabled');
             button.disabled = true;
         }
     });
@@ -1781,8 +1778,7 @@ function disableOtherMonitorButtons(selectedTimeText, selectedTdSelector) {
 function disableAllMonitorButtons() {
     const allMonitorButtons = document.querySelectorAll('.monitor-btn');
     allMonitorButtons.forEach(button => {
-        button.style.opacity = '0.5';
-        button.style.cursor = 'not-allowed';
+        button.classList.add('js-disabled');
         button.disabled = true;
         // ツールチップで理由を表示
         button.title = '監視実行中のため操作できません';
@@ -2307,8 +2303,8 @@ function enableAllMonitorButtons() {
     allMonitorButtons.forEach(button => {
         const span = button.querySelector('span');
         // すべてのボタンを有効化
-        button.style.opacity = '1';
-        button.style.cursor = 'pointer';
+        button.classList.remove('js-disabled');
+        button.classList.add('js-enabled');
         button.disabled = false;
         // 監視対象のボタンは赤色を維持
         if (span && span.innerText.startsWith('監視')) {
@@ -4722,7 +4718,7 @@ class ProcessingOverlay {
         // オーバーレイ要素を作成
         this.overlayElement = document.createElement('div');
         this.overlayElement.id = 'ytomo-processing-overlay';
-        this.overlayElement.className = 'ytomo-processing-overlay hidden';
+        this.overlayElement.className = 'ytomo-processing-overlay hidden z-normal';
         // メッセージエリア
         const messageArea = document.createElement('div');
         messageArea.className = 'processing-message-area';
@@ -4731,10 +4727,10 @@ class ProcessingOverlay {
         messageText.textContent = '自動処理実行中...';
         const warningText = document.createElement('div');
         warningText.className = 'processing-warning-text';
-        warningText.textContent = '誤動作防止のため他の操作を制限しています';
+        warningText.textContent = '誤動作防止';
         const cancelArea = document.createElement('div');
         cancelArea.className = 'processing-cancel-area';
-        cancelArea.innerHTML = '中断は右下のFABボタンから可能です';
+        cancelArea.innerHTML = '右下のボタンで中断';
         messageArea.appendChild(messageText);
         messageArea.appendChild(warningText);
         messageArea.appendChild(cancelArea);
@@ -4808,7 +4804,7 @@ class ProcessingOverlay {
         // FABボタンのz-indexを調整（オーバーレイより前面に）
         const fabContainer = document.getElementById('ytomo-fab-container');
         if (fabContainer) {
-            fabContainer.style.zIndex = '100001';
+            fabContainer.className = fabContainer.className.replace(/z-\w+/g, '').trim() + ' z-above-overlay';
         }
         this.isActive = true;
     }
@@ -4825,7 +4821,7 @@ class ProcessingOverlay {
         // FABボタンのz-indexを元に戻す
         const fabContainer = document.getElementById('ytomo-fab-container');
         if (fabContainer) {
-            fabContainer.style.zIndex = '9999';
+            fabContainer.className = fabContainer.className.replace(/z-\w+/g, '').trim() + ' z-normal';
         }
         this.isActive = false;
     }
@@ -5251,11 +5247,15 @@ function showStatus(message, color = 'white') {
     if (!statusBadge)
         return;
     statusBadge.innerText = message;
-    statusBadge.style.background = color === 'green' ? 'rgba(0, 128, 0, 0.9)' :
-        color === 'red' ? 'rgba(255, 0, 0, 0.9)' :
-            color === 'orange' ? 'rgba(255, 140, 0, 0.9)' :
-                color === 'blue' ? 'rgba(0, 104, 33, 0.9)' :
-                    'rgba(0, 0, 0, 0.8)';
+    // 既存の背景色クラスを削除
+    statusBadge.className = statusBadge.className.replace(/status-bg-\w+/g, '');
+    // 新しい背景色クラスを追加
+    const bgClass = color === 'green' ? 'status-bg-green' :
+        color === 'red' ? 'status-bg-red' :
+            color === 'orange' ? 'status-bg-orange' :
+                color === 'blue' ? 'status-bg-blue' :
+                    'status-bg-default';
+    statusBadge.classList.add(bgClass);
     statusBadge.classList.remove('js-hide');
     // 一定時間後に自動で隠す（エラー、成功、中断メッセージ以外）
     if (color !== 'red' && color !== 'green' && color !== 'orange') {
@@ -5273,17 +5273,7 @@ function createEntranceReservationUI() {
     // FABコンテナを作成（右下固定）
     const fabContainer = document.createElement('div');
     fabContainer.id = 'ytomo-fab-container';
-    fabContainer.style.cssText = `
-        position: fixed !important;
-        bottom: 24px !important;
-        right: 24px !important;
-        z-index: 10000 !important;
-        display: flex !important;
-        flex-direction: column !important;
-        gap: 12px !important;
-        align-items: flex-end !important;
-        pointer-events: auto !important;
-    `;
+    fabContainer.className = 'ytomo-fab-container z-normal';
     // メインFABボタンを作成
     const fabButton = document.createElement('button');
     fabButton.id = 'ytomo-main-fab';
@@ -5291,86 +5281,22 @@ function createEntranceReservationUI() {
     // FABボタンのステータス表示
     const fabIcon = document.createElement('span');
     fabIcon.classList.add('ext-ytomo', 'ytomo-fab-status');
-    fabIcon.style.cssText = `
-        font-size: 12px !important;
-        text-align: center !important;
-        line-height: 1.2 !important;
-        white-space: nowrap !important;
-        pointer-events: none !important;
-    `;
+    fabIcon.className = 'ytomo-fab-inner-content';
     fabIcon.innerText = '待機中';
     fabButton.appendChild(fabIcon);
-    // FABボタンにrelative positionを設定（折りたたみボタン配置用）
-    fabButton.style.position = 'relative';
-    // 初期状態は ytomo-fab-disabled クラスで制御
-    // ホバー効果（強化版）
-    fabButton.addEventListener('mouseenter', () => {
-        fabButton.style.transform = 'scale(1.15)';
-        fabButton.style.boxShadow = '0 8px 25px rgba(0, 0, 0, 0.5), 0 4px 12px rgba(0, 0, 0, 0.3)';
-        fabButton.style.borderWidth = '4px';
-    });
-    fabButton.addEventListener('mouseleave', () => {
-        fabButton.style.transform = 'scale(1)';
-        fabButton.style.boxShadow = '0 6px 20px rgba(0, 0, 0, 0.4), 0 2px 8px rgba(0, 0, 0, 0.2)';
-        fabButton.style.borderWidth = '3px';
-    });
+    // 初期状態はytomo-fabクラスで制御
+    fabButton.className = 'ytomo-fab state-idle';
     // 予約対象情報表示エリア（新規追加）
     const reservationTargetDisplay = document.createElement('div');
     reservationTargetDisplay.id = 'ytomo-reservation-target';
-    reservationTargetDisplay.style.cssText = `
-        background: linear-gradient(135deg, rgba(0, 123, 255, 0.95), rgba(0, 86, 179, 0.95)) !important;
-        color: white !important;
-        padding: 8px 12px !important;
-        border-radius: 12px !important;
-        font-size: 12px !important;
-        font-weight: bold !important;
-        text-align: center !important;
-        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3) !important;
-        border: 2px solid rgba(255, 255, 255, 0.3) !important;
-        min-width: 80px !important;
-        max-width: 120px !important;
-        display: none !important;
-        white-space: pre-line !important;
-        overflow: visible !important;
-        text-overflow: clip !important;
-        pointer-events: auto !important;
-        cursor: pointer !important;
-        transition: all 0.3s ease !important;
-    `;
+    reservationTargetDisplay.className = 'ytomo-reservation-target-display hidden';
     reservationTargetDisplay.title = '予約対象（クリックで詳細表示）';
     // 監視対象表示エリア（目立つ表示）
     const monitoringTargetsDisplay = document.createElement('div');
     monitoringTargetsDisplay.id = 'ytomo-monitoring-targets';
-    monitoringTargetsDisplay.style.cssText = `
-        background: linear-gradient(135deg, rgba(0, 104, 33, 0.95), rgba(0, 150, 50, 0.95)) !important;
-        color: white !important;
-        padding: 8px 12px !important;
-        border-radius: 12px !important;
-        font-size: 12px !important;
-        font-weight: bold !important;
-        text-align: center !important;
-        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3) !important;
-        border: 2px solid rgba(255, 255, 255, 0.3) !important;
-        min-width: 80px !important;
-        max-width: 120px !important;
-        display: none !important;
-        white-space: pre-line !important;
-        overflow: visible !important;
-        text-overflow: clip !important;
-        pointer-events: auto !important;
-        cursor: pointer !important;
-        transition: all 0.3s ease !important;
-    `;
+    monitoringTargetsDisplay.className = 'ytomo-monitoring-targets-display hidden';
     monitoringTargetsDisplay.title = 'クリックで詳細表示';
-    // ホバー効果
-    monitoringTargetsDisplay.addEventListener('mouseenter', () => {
-        monitoringTargetsDisplay.style.transform = 'scale(1.05)';
-        monitoringTargetsDisplay.style.boxShadow = '0 4px 14px rgba(0, 0, 0, 0.4)';
-    });
-    monitoringTargetsDisplay.addEventListener('mouseleave', () => {
-        monitoringTargetsDisplay.style.transform = 'scale(1)';
-        monitoringTargetsDisplay.style.boxShadow = '0 3px 10px rgba(0, 0, 0, 0.3)';
-    });
+    // ホバー効果はCSSで実装済み
     // ステータス表示（コンパクト）
     const statusBadge = document.createElement('div');
     statusBadge.id = 'ytomo-status-badge';

@@ -1,7 +1,7 @@
 // FABステータスバッジのカウントダウン警告スタイル
 #ytomo-status-badge {
   &.countdown-warning {
-    background: rgba(255, 0, 0, 0.9) !important;
+    background: rgba(255, 0, 0, 0.9);
   }
 }
 
@@ -142,7 +142,7 @@ button.ext-ytomo {
     display: inline-block;
     vertical-align: middle;
     position: relative;
-    z-index: 10 !important; // 必要: サイトダイアログより上に表示
+    z-index: 10;
     pointer-events: auto;
     opacity: 1;
     visibility: visible;
@@ -253,6 +253,19 @@ div.div-flex {
   color: white;
 }
 
+// 成功ハイライトクラス
+.btn-success-highlight {
+  background: rgb(0, 200, 0);
+  color: white;
+}
+
+// ステータスバッジ背景色クラス
+.status-bg-green { background: rgba(0, 128, 0, 0.9); }
+.status-bg-red { background: rgba(255, 0, 0, 0.9); }
+.status-bg-orange { background: rgba(255, 140, 0, 0.9); }
+.status-bg-blue { background: rgba(0, 104, 33, 0.9); }
+.status-bg-default { background: rgba(0, 0, 0, 0.8); }
+
 // ヘッダートグル関連の階層構造
 .ytomo-header {
   li.fab-toggle-li {
@@ -359,7 +372,7 @@ div.div-flex {
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 99999 !important; // 必要: FABより確実に前面に
+  z-index: 99999;
   padding: 20px;
   box-sizing: border-box;
 
