@@ -460,7 +460,8 @@ export class ProcessingOverlay {
         
         // companion-ticket-pageのプロセスマネージャーを停止
         try {
-            // companionProcessManagerにアクセス（window経由でグローバルアクセス）
+            // 適切なimportを使用するべきだが、現在はモジュール構造上の制約でwindow経由でアクセス
+            // TODO: 将来的にはcompanion-ticket-pageから直接importするようにリファクタリングが必要
             const companionProcessManager = (window as any).companionProcessManager;
             if (companionProcessManager && typeof companionProcessManager.stopProcess === 'function') {
                 companionProcessManager.stopProcess();

@@ -499,6 +499,7 @@ const init_page = (): void => {
     createPavilionFAB();
     
     // 状態更新関数をグローバルに公開
+    // TODO: 適切なmodule構造で置き換えるべき
     (window as any).updateLoadAllButtonState = updateLoadAllButtonState;
     
     // ページ読み込み完了後に状態をチェック（複数回、より頻繁に）

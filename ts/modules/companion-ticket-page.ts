@@ -779,6 +779,7 @@ class CompanionProcessManager {
 export const companionProcessManager = new CompanionProcessManager();
 
 // グローバルアクセス用にwindowオブジェクトに登録
+// TODO: 適切なmodule export/import構造で置き換えるべき
 (window as any).companionProcessManager = companionProcessManager;
 
 // ページタイプごとの初期化関数
@@ -2142,6 +2143,7 @@ function updateExecuteButtonState(): void {
 }
 
 // グローバルスコープでアクセス可能にする
+// TODO: 適切なmodule構造で置き換えるべき
 (window as any).updateTicketRowSelection = updateTicketRowSelection;
 
 // 選択されたチケットID取得

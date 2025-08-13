@@ -25,12 +25,7 @@ export const setCacheManager = (_cm: CacheManager): void => {
     // 必要に応じて使用
 };
 
-// WindowにtimeSlotCheckTimeoutプロパティを追加
-declare global {
-    interface Window {
-        timeSlotCheckTimeout?: number;
-    }
-}
+
 
 
 // 時間帯テーブルの動的待機
@@ -126,18 +121,10 @@ export const setEntranceReservationHelper = (helper: Function): void => {
 };
 
 
+
 // メインボタンの表示更新（FAB形式対応）
 // FAB更新の状態管理（統一状態管理システムで管理）
 
-// 現在のFAB状態を文字列として取得
-export function getCurrentFabState(): string {
-    if (!entranceReservationStateManager) return 'no-manager';
-    
-    const mode = getCurrentMode();
-    const executionState = entranceReservationStateManager.getExecutionState();
-    const hasReservation = entranceReservationStateManager.hasReservationTarget();
-    return `${mode}-${executionState}-${hasReservation}`;
-}
 
 // FAB表示更新は統一状態管理システムで直接処理
 
@@ -265,13 +252,6 @@ export function updateStatusBadge(mode: string): void {
     }
 }
 
-// 前の選択をリセット
-export function resetPreviousSelection(): void {
-    // すべての対象をクリア
-    if (entranceReservationStateManager) {
-        entranceReservationStateManager.clearAllTargets();
-    }
-}
 
 
 
@@ -295,10 +275,6 @@ export function scheduleReload(seconds: number = 30): void {
 }
 
 
-// 下位互換のためのstartReloadCountdown関数（scheduleReloadのエイリアス）
-export function startReloadCountdown(seconds: number = 30): void {
-    scheduleReload(seconds);
-}
 
 // カウントダウン停止関数
 export function stopReloadCountdown(): void {
