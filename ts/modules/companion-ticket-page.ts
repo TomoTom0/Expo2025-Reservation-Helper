@@ -237,9 +237,14 @@ class CompanionProcessManager {
                 throw new Error('追加ボタンのクリックに失敗');
             }
 
-            // 結果判定
-            const result = await this.checkResult();
-            return result;
+            // 処理完了待機と結果判定を統合
+            try {
+                const result = await this.waitForProcessingComplete();
+                return result;
+            } catch (error) {
+                console.error('❌ 処理完了待機でタイムアウト:', error);
+                return false;
+            }
 
         } catch (error) {
             console.error(`❌ チケットID ${ticketId} の処理エラー:`, error);
@@ -346,30 +351,83 @@ class CompanionProcessManager {
         return this.performInput(inputField, ticketId);
     }
     
-    // 実際の入力処理（ReactのonChangeハンドラ直接呼び出し方式）
+    // Gemini推奨: 統一されたReact対応入力処理
     private async performInput(inputField: HTMLInputElement, ticketId: string): Promise<boolean> {
         try {
             console.log(`🎯 チケットID入力開始: "${ticketId}"`);
-            console.log('⚛️ ReactのonChangeハンドラ直接呼び出し方式を実行中...');
+            console.log('⚛️ Gemini推奨: 統一React入力処理を実行中...');
             
-            // Method 1: ReactのonChangeハンドラを直接呼び出す (推奨方式)
-            const reactSuccess = await this.setReactValueDirectly(inputField, ticketId);
-            if (reactSuccess) {
-                console.log('✅ React onChangeハンドラ直接呼び出しで成功');
-                return true;
-            }
-            
-            // Method 2: フォールバック - 従来の方法
-            console.log('⚠️ React直接呼び出しが失敗、フォールバック処理中...');
-            return await this.fallbackInputMethod(inputField, ticketId);
+            return await this.unifiedReactInput(inputField, ticketId);
             
         } catch (error) {
             console.error('❌ チケットID入力エラー:', error);
             return false;
         }
     }
+    
+    // Gemini推奨: 統一されたReact入力処理（最も信頼性が高い）
+    private async unifiedReactInput(inputField: HTMLInputElement, value: string): Promise<boolean> {
+        console.log('🔄 統一React入力処理開始');
+        
+        try {
+            // Step 1: Native value setter (React wrappersをバイパス)
+            const nativeInputValueSetter = Object.getOwnPropertyDescriptor(
+                window.HTMLInputElement.prototype,
+                "value"
+            )?.set;
+            
+            if (!nativeInputValueSetter) {
+                console.error('❌ ネイティブvalueセッターが見つかりません');
+                return false;
+            }
+            
+            // Step 2: Focus the input
+            inputField.focus();
+            
+            // Step 3: Set value using native setter
+            nativeInputValueSetter.call(inputField, value);
+            console.log(`📝 ネイティブセッターで値設定完了: "${value}"`);
+            
+            // Step 4: Find React Fiber instance for onChange
+            const reactFiberKey = Object.keys(inputField).find(key => 
+                key.startsWith('__reactFiber$') || key.startsWith('__reactInternalInstance$')
+            );
+            
+            if (reactFiberKey) {
+                const fiberInstance = (inputField as any)[reactFiberKey];
+                const onChange = fiberInstance?.memoizedProps?.onChange || 
+                                fiberInstance?.pendingProps?.onChange;
+                
+                if (onChange && typeof onChange === 'function') {
+                    console.log('⚛️ React onChange直接呼び出し実行中...');
+                    onChange({ target: inputField, currentTarget: inputField });
+                }
+            }
+            
+            // Step 5: Dispatch input event (React標準の変更検知)
+            const inputEvent = new Event('input', { bubbles: true });
+            inputField.dispatchEvent(inputEvent);
+            
+            // Step 6: Brief wait for React state update
+            await new Promise(resolve => setTimeout(resolve, 100));
+            
+            // Step 7: Verify success
+            const success = inputField.value === value;
+            console.log(`🔄 統一React入力結果: ${success ? '✅ 成功' : '❌ 失敗'}`);
+            
+            if (!success) {
+                console.warn(`⚠️ 値の不一致: 期待="${value}", 実際="${inputField.value}"`);
+            }
+            
+            return success;
+            
+        } catch (error) {
+            console.error('❌ 統一React入力処理エラー:', error);
+            return false;
+        }
+    }
 
-    // Gemini推奨: Direct React Internals Manipulation（最も信頼性が高い）
+    // [DEPRECATED] Gemini推奨: Direct React Internals Manipulation（統一処理に移行済み）
     private async setReactValueDirectly(inputField: HTMLInputElement, value: string): Promise<boolean> {
         console.log('⚛️ Gemini推奨: React内部直接操作方式開始');
         
@@ -586,38 +644,44 @@ class CompanionProcessManager {
         try {
             addButton.click();
             console.log('✅ 追加ボタンをクリックしました');
-            
-            // 処理完了を待機
-            await this.waitForProcessingComplete();
-            return true;
+            return true; // クリック成功のみを返す（処理完了は上位で待機）
         } catch (error) {
             console.error('❌ 追加ボタンのクリックでエラー:', error);
             return false;
         }
     }
 
-    // 処理完了を待機
-    private async waitForProcessingComplete(): Promise<void> {
+    // Gemini推奨: 処理完了を待機（明確な成功/失敗判定）
+    private async waitForProcessingComplete(): Promise<boolean> {
         const maxWaitTime = 10000; // 10秒
         const checkInterval = 500;
         let elapsed = 0;
 
-        return new Promise((resolve) => {
+        return new Promise((resolve, reject) => {
             const checkComplete = () => {
-                // エラーメッセージまたは成功画面の存在を確認
+                // エラーメッセージをチェック（失敗）
                 const errorMessage = document.querySelector('.style_main__error_message__oE5HC');
+                if (errorMessage) {
+                    const errorText = errorMessage.textContent?.trim() || '不明なエラー';
+                    console.log(`❌ 処理エラー検出: ${errorText}`);
+                    resolve(false); // 明確な失敗
+                    return;
+                }
+                
+                // 成功画面をチェック（成功）
                 const successArea = document.querySelector('.style_main__head__LLhtg');
                 const nextButton = document.querySelector('button.basic-btn.type2:not(.style_main__register_btn__FHBxM)');
-
-                if (errorMessage || successArea || nextButton) {
-                    resolve();
+                
+                if (successArea || nextButton) {
+                    console.log('✅ 処理成功を検出');
+                    resolve(true); // 明確な成功
                     return;
                 }
 
                 elapsed += checkInterval;
                 if (elapsed >= maxWaitTime) {
-                    console.warn('処理完了の確認がタイムアウトしました');
-                    resolve();
+                    console.warn('⚠️ 処理完了の確認がタイムアウトしました');
+                    reject(new Error('処理完了タイムアウト')); // タイムアウトは失敗扱い
                     return;
                 }
 
