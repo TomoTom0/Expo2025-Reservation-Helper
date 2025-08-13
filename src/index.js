@@ -9,7 +9,7 @@
 // @run-at       document-end
 // ==/UserScript==
 
-// Built: 2025/08/13 16:26:41
+// Built: 2025/08/13 16:34:15
 
 
 (function webpackUniversalModuleDefinition(root, factory) {
@@ -1455,7 +1455,7 @@ class EntranceReservationStateManager {
             const location = LocationHelper.getLocationFromIndex(this.reservationSuccess.locationIndex);
             const locationText = location === 'east' ? '東' : '西';
             const dateText = getDisplayDate();
-            const displayText = `${dateText}\n予約成功🎉${locationText}${this.reservationSuccess.timeSlot}`;
+            const displayText = `${dateText}\n予約成功🎉\n${locationText}${this.reservationSuccess.timeSlot}`;
             console.log(`[UnifiedState] FAB予約成功表示テキスト: "${displayText}"`);
             return {
                 hasTarget: true,
@@ -2018,26 +2018,19 @@ const identify_page_type = (url) => {
 /* harmony export */   p4: () => (/* binding */ waitForValidCalendarDate),
 /* harmony export */   rY: () => (/* binding */ getCurrentSelectedCalendarDate)
 /* harmony export */ });
-/* unused harmony exports startTimeSlotTableObserver, waitForTimeSlotTable, checkTimeSlotTableExistsSync, analyzeTimeSlots, extractTimeSlotInfo, generateSelectorForElement, clickCalendarDate, tryClickCalendarForTimeSlot, showErrorMessage, restoreSelectionAfterUpdate, selectTimeSlotAndStartReservation, getCurrentEntranceConfig, getCurrentFabState, getCurrentMode, updateStatusBadge, resetPreviousSelection, scheduleReload, startReloadCountdown, stopReloadCountdown */
+/* unused harmony exports startTimeSlotTableObserver, waitForTimeSlotTable, checkTimeSlotTableExistsSync, analyzeTimeSlots, extractTimeSlotInfo, generateSelectorForElement, clickCalendarDate, tryClickCalendarForTimeSlot, showErrorMessage, restoreSelectionAfterUpdate, getCurrentEntranceConfig, getCurrentFabState, getCurrentMode, updateStatusBadge, resetPreviousSelection, scheduleReload, startReloadCountdown, stopReloadCountdown */
 /* harmony import */ var _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(79);
 /* harmony import */ var _entrance_page_dom_utils__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(38);
-/* harmony import */ var _entrance_page_fab__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(851);
 // entrance-page-stateからのimport（もう使用しません）
 // 入場予約状態管理システムからのimport
 
 // entrance-page-dom-utilsからのimport
 
-// entrance-page-fabからのimport
-
-// audio-playerからのimport
-
 // 【5. 時間帯分析システム】
 // ============================================================================
-// 依存注入用のcacheManager参照
-let cacheManager = null;
-// cacheManagerを設定するヘルパー関数
-const setCacheManager = (cm) => {
-    cacheManager = cm;
+// cacheManagerを設定するヘルパー関数（互換性のため保持）
+const setCacheManager = (_cm) => {
+    // 必要に応じて使用
 };
 // 時間帯テーブルの動的生成を検出（ループ防止版）
 function startTimeSlotTableObserver() {
@@ -2773,116 +2766,6 @@ function restoreSelectionAfterUpdate() {
     entranceReservationStateManager.updateFabDisplay();
 }
 // 時間帯を自動選択して予約開始
-async function selectTimeSlotAndStartReservation(slotInfo) {
-    const location = LocationHelper.getLocationFromIndex(LocationHelper.getIndexFromSelector(slotInfo.targetInfo.tdSelector));
-    console.log(`🎯 時間帯を自動選択します: ${location}${slotInfo.timeText}`);
-    // クリック対象のdl要素を探す
-    let clickTarget = null;
-    // TD要素の場合はdl要素を探す
-    if (slotInfo.element.tagName === 'TD') {
-        clickTarget = slotInfo.element.querySelector('div[role="button"] dl');
-        if (clickTarget) {
-            console.log('🔧 TD要素内のdl要素を発見しました');
-        }
-        else {
-            console.error('❌ TD要素内にdl要素が見つかりません');
-            return;
-        }
-    }
-    else {
-        // TD以外の場合はdl要素を探す
-        clickTarget = slotInfo.element.querySelector('dl');
-        if (!clickTarget) {
-            console.error('❌ 要素内にdl要素が見つかりません');
-            return;
-        }
-    }
-    // 時間帯を確実に選択
-    console.log(`🖱️ dl要素をクリックします: ${clickTarget.tagName}`);
-    // 複数の方法で確実にクリック
-    try {
-        // まず通常のクリック
-        clickTarget.click();
-        // さらにイベントディスパッチでクリック
-        const clickEvent = new MouseEvent('click', {
-            bubbles: true,
-            cancelable: true,
-            view: window
-        });
-        clickTarget.dispatchEvent(clickEvent);
-        console.log(`✅ dl要素のクリック完了`);
-    }
-    catch (error) {
-        console.error(`❌ dl要素クリックエラー:`, error);
-    }
-    // 選択状態確認のため少し待つ（短縮）
-    await new Promise(resolve => setTimeout(resolve, 100));
-    // 選択状態を確認（ボタン要素の状態をチェック）
-    const buttonElement = slotInfo.element.querySelector('div[role="button"]');
-    const isSelected = buttonElement && (Array.from(buttonElement.classList).some(className => className.includes('style_active__')) ||
-        buttonElement.getAttribute('aria-pressed') === 'true');
-    console.log(`🔍 時間帯選択状態確認: ${isSelected ? '選択済み' : '未選択'}`);
-    if (!isSelected) {
-        console.warn(`⚠️ 時間帯が選択されていません。再試行します`);
-        // 再試行 - dl要素を再度クリック
-        clickTarget.click();
-        await new Promise(resolve => setTimeout(resolve, 100));
-    }
-    // 少し待ってから予約処理開始
-    setTimeout(async () => {
-        console.log('🚀 予約処理を開始します');
-        // 予約開始前に時間帯選択を最終確認（timeSlotSelectorsを使用）
-        const selectedTimeSlot = document.querySelector(timeSlotSelectors.selectedSlot);
-        const finalCheck = !!selectedTimeSlot;
-        console.log(`🔍 予約開始前最終確認: 時間帯選択=${finalCheck ? '✅選択済み' : '❌未選択'}`);
-        if (selectedTimeSlot) {
-            const tdElement = selectedTimeSlot.closest('td');
-            const status = extractTdStatus(tdElement);
-            console.log(`🔍 選択された時間帯: ${status?.timeText || 'unknown'} (満員: ${status?.isFull ? 'はい' : 'いいえ'})`);
-        }
-        if (!finalCheck) {
-            console.error(`❌ 時間帯が選択されていないため予約処理を中止します`);
-            return;
-        }
-        // 通常の予約処理を開始（入場予約状態管理システム使用）
-        const config = getCurrentEntranceConfig();
-        if (config) {
-            // 統一予約開始処理を使用
-            entranceReservationStateManager.startReservation();
-            const result = await entranceReservationHelper(config);
-            if (result.success) {
-                // 入場予約状態管理に予約成功情報を設定
-                if (entranceReservationStateManager) {
-                    const reservationTarget = entranceReservationStateManager.getReservationTarget();
-                    if (reservationTarget) {
-                        entranceReservationStateManager.setReservationSuccess(reservationTarget.timeSlot, reservationTarget.locationIndex);
-                        entranceReservationStateManager.updateFabDisplay(); // FAB表示更新
-                        // 通知音が有効な場合は成功音を再生
-                        const soundEnabled = entranceReservationStateManager.isNotificationSoundEnabled();
-                        console.log(`🔍 予約成功時の通知音設定チェック: ${soundEnabled ? '有効' : '無効'}`);
-                        if (soundEnabled) {
-                            console.log('🎵 予約成功 - 通知音を再生');
-                            try {
-                                AudioPlayer.playSuccessSound();
-                                console.log('✅ 通知音再生完了');
-                            }
-                            catch (error) {
-                                console.error('❌ 通知音再生エラー:', error);
-                            }
-                        }
-                        else {
-                            console.log('🔇 予約成功 - 通知音は無効のため再生なし');
-                        }
-                    }
-                }
-                if (cacheManager) {
-                    cacheManager.clearTargetSlots(); // 成功時はキャッシュクリア
-                }
-                console.log('✅ 予約が成功しました！');
-            }
-        }
-    }, 1000);
-}
 // 現在の設定を取得（ヘルパー関数）
 function getCurrentEntranceConfig() {
     // 既存の設定と同じものを返す

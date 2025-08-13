@@ -672,7 +672,7 @@ export class EntranceReservationStateManager {
             const location = LocationHelper.getLocationFromIndex(this.reservationSuccess.locationIndex);
             const locationText = location === 'east' ? '東' : '西';
             const dateText = getDisplayDate();
-            const displayText = `${dateText}\n予約成功🎉${locationText}${this.reservationSuccess.timeSlot}`;
+            const displayText = `${dateText}\n予約成功🎉\n${locationText}${this.reservationSuccess.timeSlot}`;
             console.log(`[UnifiedState] FAB予約成功表示テキスト: "${displayText}"`);
             return {
                 hasTarget: true,
