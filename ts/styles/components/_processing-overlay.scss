@@ -127,6 +127,60 @@
     }
   }
   
+  // 通知音トグルボタン（単独）
+  .notification-toggle-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    margin-bottom: 16px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+    // 絵文字アイコン
+    font-size: 20px;
+    line-height: 1;
+    
+    @media (max-width: 768px) {
+      width: 36px;
+      height: 36px;
+      margin-bottom: 14px;
+      font-size: 18px;
+    }
+    
+    &:hover {
+      transform: scale(1.05);
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    }
+    
+    &:active {
+      transform: scale(0.95);
+    }
+    
+    // 有効状態（音声あり）
+    &.enabled {
+      background: #4caf50;
+      color: white;
+      
+      &:hover {
+        background: #45a049;
+      }
+    }
+    
+    // 無効状態（ミュート）
+    &.muted {
+      background: #f44336;
+      color: white;
+      
+      &:hover {
+        background: #e53935;
+      }
+    }
+  }
+  
   // 中断案内エリア
   .processing-cancel-area {
     font-size: 12px;

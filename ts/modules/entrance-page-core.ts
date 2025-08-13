@@ -13,6 +13,9 @@ import {
 // entrance-page-fabからのimport
 import { entranceReservationHelper } from './entrance-page-fab';
 
+// audio-playerからのimport
+import { AudioPlayer } from './audio-player';
+
 
 
 // UI更新ヘルパー関数は外部関数として設定される
@@ -721,7 +724,10 @@ async function waitForValidCalendarDate(maxRetries: number = 30, interval: numbe
         const timeElements = document.querySelectorAll('time[datetime]');
         
         if (timeElements.length === 0) {
-            console.log(`⏳ time要素がまだ存在しません (${i + 1}/${maxRetries}) - さらに待機`);
+            // 50回に1回だけログ出力（過剰ログ防止）
+            if ((i + 1) % 50 === 0) {
+                console.log(`⏳ time要素待機中 (${i + 1}/${maxRetries})`);
+            }
             await new Promise(resolve => setTimeout(resolve, interval));
             continue;
         }
@@ -1057,6 +1063,22 @@ async function selectTimeSlotAndStartReservation(slotInfo: any): Promise<void> {
                     if (reservationTarget) {
                         entranceReservationStateManager.setReservationSuccess(reservationTarget.timeSlot, reservationTarget.locationIndex);
                         entranceReservationStateManager.updateFabDisplay(); // FAB表示更新
+                        
+                        // 通知音が有効な場合は成功音を再生
+                        const soundEnabled = entranceReservationStateManager.isNotificationSoundEnabled();
+                        console.log(`🔍 予約成功時の通知音設定チェック: ${soundEnabled ? '有効' : '無効'}`);
+                        
+                        if (soundEnabled) {
+                            console.log('🎵 予約成功 - 通知音を再生');
+                            try {
+                                AudioPlayer.playSuccessSound();
+                                console.log('✅ 通知音再生完了');
+                            } catch (error) {
+                                console.error('❌ 通知音再生エラー:', error);
+                            }
+                        } else {
+                            console.log('🔇 予約成功 - 通知音は無効のため再生なし');
+                        }
                     }
                 }
                 

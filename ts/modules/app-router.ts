@@ -116,27 +116,8 @@ setEntranceReservationHelper(entranceReservationHelper);
 
 // 各モジュールで直接インポートを使用
 
-// URL判定とページタイプ識別
-const identify_page_type = (url: string): string | null => {
-    try {
-        const urlObj = new URL(url);
-        const pathname = urlObj.pathname;
-        
-        if (pathname === '/ticket_visiting_reservation/') {
-            return "entrance_reservation";
-        } else if (pathname === '/event_search/') {
-            return "pavilion_reservation";
-        } else if (pathname === '/ticket_selection/') {
-            return "ticket_selection";
-        } else if (pathname === '/agent_ticket/') {
-            return "agent_ticket";
-        }
-    } catch (error) {
-        console.error(`URL解析エラー: ${error}`);
-    }
-    
-    return null;
-}
+// URL判定とページタイプ識別（共通utilityに移動）
+import { identify_page_type } from './page-utils';
 
 // ページ遷移時の初期化トリガー
 const trigger_init = (url_record: string): void => {

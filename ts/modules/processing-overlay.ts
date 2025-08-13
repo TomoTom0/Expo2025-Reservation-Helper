@@ -6,6 +6,7 @@
  */
 
 import { entranceReservationStateManager, ExecutionState } from './entrance-reservation-state-manager';
+import { identify_page_type } from './page-utils';
 
 export class ProcessingOverlay {
     private overlayElement: HTMLElement | null = null;
@@ -55,6 +56,7 @@ export class ProcessingOverlay {
         const warningText = document.createElement('div');
         warningText.className = 'processing-warning-text';
         warningText.textContent = '誤動作防止';
+        
         
         const cancelArea = document.createElement('div');
         cancelArea.className = 'processing-cancel-area';
@@ -218,6 +220,16 @@ export class ProcessingOverlay {
             
             if (messageText) messageText.textContent = '予約実行中...';
             if (targetText) targetText.textContent = targetInfo;
+        }
+        
+        // 通知音トグルボタンが存在しない場合は追加（入場予約画面でのみ）
+        const currentPageType = identify_page_type(window.location.href);
+        if (processType === 'reservation' && currentPageType === 'entrance_reservation') {
+            const existingNotificationToggle = this.overlayElement.querySelector('#ytomo-notification-toggle');
+            if (!existingNotificationToggle) {
+                console.log('🔊 show()で通知音トグルボタンを追加中...');
+                this.addNotificationToggleButton();
+            }
         }
         
         // 表示アニメーション
@@ -628,6 +640,78 @@ export class ProcessingOverlay {
 
         overlay.appendChild(dialog);
         document.body.appendChild(overlay);
+    }
+    
+    /**
+     * 通知音トグルボタンのクリック処理
+     */
+    private handleNotificationToggle(): void {
+        const isEnabled = entranceReservationStateManager.toggleNotificationSound();
+        console.log(`🔊 通知音設定変更: ${isEnabled ? '有効' : '無効'}`);
+        
+        // ボタンの表示を更新
+        const toggleButton = document.getElementById('ytomo-notification-toggle');
+        if (toggleButton) {
+            this.updateNotificationToggleButton(toggleButton);
+        }
+    }
+    
+    
+    /**
+     * 通知音トグルボタンを動的に追加
+     */
+    private addNotificationToggleButton(): void {
+        if (!this.overlayElement) return;
+        
+        const messageArea = this.overlayElement.querySelector('.processing-message-area');
+        if (!messageArea) return;
+        
+        console.log('🔊 通知音トグルボタンを動的に追加中...');
+        
+        const notificationToggle = document.createElement('button');
+        notificationToggle.id = 'ytomo-notification-toggle';
+        notificationToggle.className = 'notification-toggle-btn';
+        
+        // MDIアイコンとトグル状態を設定
+        this.updateNotificationToggleButton(notificationToggle);
+        
+        // トグルボタンのクリックイベント
+        notificationToggle.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            this.handleNotificationToggle();
+        });
+        
+        // warningTextの後、cancelAreaの前に挿入
+        const warningText = messageArea.querySelector('.processing-warning-text');
+        const cancelArea = messageArea.querySelector('.processing-cancel-area');
+        
+        if (warningText && cancelArea) {
+            messageArea.insertBefore(notificationToggle, cancelArea);
+            console.log('✅ 通知音トグルボタンを動的に追加完了');
+        } else {
+            console.warn('⚠️ 挿入位置要素が見つかりません');
+        }
+    }
+    
+    /**
+     * 通知音トグルボタンの表示を更新
+     */
+    private updateNotificationToggleButton(button: HTMLElement): void {
+        const isEnabled = entranceReservationStateManager.isNotificationSoundEnabled();
+        
+        // シンプルなテキストアイコンを設定
+        if (isEnabled) {
+            button.innerHTML = '🔊';
+            button.title = '通知音有効（クリックで無効化）';
+            button.classList.remove('muted');
+            button.classList.add('enabled');
+        } else {
+            button.innerHTML = '🔇';
+            button.title = '通知音無効（クリックで有効化）';
+            button.classList.remove('enabled');
+            button.classList.add('muted');
+        }
     }
     
     /**

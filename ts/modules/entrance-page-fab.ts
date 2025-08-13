@@ -1,5 +1,8 @@
 // 統一処理移行により個別importは不要
 
+// 音声再生用import
+import { AudioPlayer } from './audio-player';
+
 // entrance-page-stateからのimport
 import { processingOverlay } from './processing-overlay';
 import { 
@@ -255,6 +258,23 @@ function createEntranceReservationUI(): void {
                 if (reservationTarget) {
                     entranceReservationStateManager.setReservationSuccess(reservationTarget.timeSlot, reservationTarget.locationIndex);
                     entranceReservationStateManager.updateFabDisplay(); // FAB表示更新
+                    
+                    // 通知音が有効な場合は成功音を再生
+                    const soundEnabled = entranceReservationStateManager.isNotificationSoundEnabled();
+                    console.log(`🔍 予約成功時の通知音設定チェック: ${soundEnabled ? '有効' : '無効'}`);
+                    
+                    if (soundEnabled) {
+                        console.log('🎵 予約成功 - 通知音を再生');
+                        try {
+                            AudioPlayer.playSuccessSound();
+                            console.log('✅ 通知音再生完了');
+                        } catch (error) {
+                            console.error('❌ 通知音再生エラー:', error);
+                        }
+                    } else {
+                        console.log('🔇 予約成功 - 通知音は無効のため再生なし');
+                    }
+                    
                     console.log('✅ 予約成功UI更新完了');
                 } else {
                     console.warn('⚠️ 予約開始前の対象情報がnullのためUI更新をスキップ');

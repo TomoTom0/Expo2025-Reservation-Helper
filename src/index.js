@@ -9,7 +9,7 @@
 // @run-at       document-end
 // ==/UserScript==
 
-// Built: 2025/08/13 14:47:14
+// Built: 2025/08/13 16:26:41
 
 
 (function webpackUniversalModuleDefinition(root, factory) {
@@ -1053,8 +1053,14 @@ class EntranceReservationStateManager {
         };
         // デバッグフラグ（本番環境では詳細ログを抑制）
         this.debugMode = true;
+        // 通知音設定
+        this.notificationSound = {
+            enabled: true // デフォルトで有効
+        };
         // 統一自動処理管理を初期化
         this.automationManager = new UnifiedAutomationManager(this);
+        // 保存された設定を読み込み
+        this.loadNotificationSoundSettings();
         console.log('📋 統一状態管理システム初期化完了');
     }
     // ============================================================================
@@ -1379,8 +1385,7 @@ class EntranceReservationStateManager {
         // 4. 来場日時ボタンの有効性確認
         const visitTimeButton = document.querySelector('button.basic-btn.type2.style_full__ptzZq');
         if (!visitTimeButton || visitTimeButton.disabled) {
-            console.log(`⚠️ 来場日時ボタンが無効: exists=${!!visitTimeButton}, disabled=${visitTimeButton?.disabled}`);
-            console.log(`📵 すでに予約取得済みまたは予約不可能な状態のため予約開始を阻止`);
+            // 過剰ログ防止のため削除
             return false;
         }
         // 5. カレンダー選択確認
@@ -1847,6 +1852,44 @@ class EntranceReservationStateManager {
         }
     }
     // ============================================================================
+    // 通知音設定管理
+    // ============================================================================
+    // 通知音の有効/無効を切り替え
+    toggleNotificationSound() {
+        this.notificationSound.enabled = !this.notificationSound.enabled;
+        this.saveNotificationSoundSettings();
+        this.log(`🔊 通知音設定変更: ${this.notificationSound.enabled ? '有効' : '無効'}`);
+        return this.notificationSound.enabled;
+    }
+    // 通知音が有効かどうか
+    isNotificationSoundEnabled() {
+        return this.notificationSound.enabled;
+    }
+    // 通知音設定を保存
+    saveNotificationSoundSettings() {
+        try {
+            localStorage.setItem('ytomo-notification-sound', JSON.stringify({
+                enabled: this.notificationSound.enabled
+            }));
+        }
+        catch (error) {
+            console.error('通知音設定保存エラー:', error);
+        }
+    }
+    // 通知音設定を読み込み
+    loadNotificationSoundSettings() {
+        try {
+            const saved = localStorage.getItem('ytomo-notification-sound');
+            if (saved) {
+                const settings = JSON.parse(saved);
+                this.notificationSound.enabled = settings.enabled !== false; // デフォルトは有効
+            }
+        }
+        catch (error) {
+            console.error('通知音設定読み込みエラー:', error);
+        }
+    }
+    // ============================================================================
     // changeダイアログ管理
     // ============================================================================
     // changeダイアログが表示されたことを記録
@@ -1925,6 +1968,43 @@ module.exports = styleTagTransform;
 
 /***/ }),
 
+/***/ 214:
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   a: () => (/* binding */ identify_page_type)
+/* harmony export */ });
+/**
+ * ページ関連のユーティリティ関数
+ * 循環import回避のための共通モジュール
+ */
+// URL判定とページタイプ識別
+const identify_page_type = (url) => {
+    try {
+        const urlObj = new URL(url);
+        const pathname = urlObj.pathname;
+        if (pathname === '/ticket_visiting_reservation/') {
+            return "entrance_reservation";
+        }
+        else if (pathname === '/event_search/') {
+            return "pavilion_reservation";
+        }
+        else if (pathname === '/ticket_selection/') {
+            return "ticket_selection";
+        }
+        else if (pathname === '/agent_ticket/') {
+            return "agent_ticket";
+        }
+    }
+    catch (error) {
+        console.error(`URL解析エラー: ${error}`);
+    }
+    return null;
+};
+
+
+/***/ }),
+
 /***/ 271:
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
@@ -1941,13 +2021,15 @@ module.exports = styleTagTransform;
 /* unused harmony exports startTimeSlotTableObserver, waitForTimeSlotTable, checkTimeSlotTableExistsSync, analyzeTimeSlots, extractTimeSlotInfo, generateSelectorForElement, clickCalendarDate, tryClickCalendarForTimeSlot, showErrorMessage, restoreSelectionAfterUpdate, selectTimeSlotAndStartReservation, getCurrentEntranceConfig, getCurrentFabState, getCurrentMode, updateStatusBadge, resetPreviousSelection, scheduleReload, startReloadCountdown, stopReloadCountdown */
 /* harmony import */ var _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(79);
 /* harmony import */ var _entrance_page_dom_utils__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(38);
-/* harmony import */ var _entrance_page_fab__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(975);
+/* harmony import */ var _entrance_page_fab__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(851);
 // entrance-page-stateからのimport（もう使用しません）
 // 入場予約状態管理システムからのimport
 
 // entrance-page-dom-utilsからのimport
 
 // entrance-page-fabからのimport
+
+// audio-playerからのimport
 
 // 【5. 時間帯分析システム】
 // ============================================================================
@@ -2496,7 +2578,10 @@ async function waitForValidCalendarDate(maxRetries = 30, interval = 200) {
         // まずtime要素の存在を確認
         const timeElements = document.querySelectorAll('time[datetime]');
         if (timeElements.length === 0) {
-            console.log(`⏳ time要素がまだ存在しません (${i + 1}/${maxRetries}) - さらに待機`);
+            // 50回に1回だけログ出力（過剰ログ防止）
+            if ((i + 1) % 50 === 0) {
+                console.log(`⏳ time要素待機中 (${i + 1}/${maxRetries})`);
+            }
             await new Promise(resolve => setTimeout(resolve, interval));
             continue;
         }
@@ -2772,6 +2857,22 @@ async function selectTimeSlotAndStartReservation(slotInfo) {
                     if (reservationTarget) {
                         entranceReservationStateManager.setReservationSuccess(reservationTarget.timeSlot, reservationTarget.locationIndex);
                         entranceReservationStateManager.updateFabDisplay(); // FAB表示更新
+                        // 通知音が有効な場合は成功音を再生
+                        const soundEnabled = entranceReservationStateManager.isNotificationSoundEnabled();
+                        console.log(`🔍 予約成功時の通知音設定チェック: ${soundEnabled ? '有効' : '無効'}`);
+                        if (soundEnabled) {
+                            console.log('🎵 予約成功 - 通知音を再生');
+                            try {
+                                AudioPlayer.playSuccessSound();
+                                console.log('✅ 通知音再生完了');
+                            }
+                            catch (error) {
+                                console.error('❌ 通知音再生エラー:', error);
+                            }
+                        }
+                        else {
+                            console.log('🔇 予約成功 - 通知音は無効のため再生なし');
+                        }
                     }
                 }
                 if (cacheManager) {
@@ -2825,12 +2926,14 @@ function getCurrentEntranceConfig() {
 /* harmony export */ });
 /* unused harmony export ProcessingOverlay */
 /* harmony import */ var _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(79);
+/* harmony import */ var _page_utils__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(214);
 /**
  * 自動処理中の誤動作防止オーバーレイシステム
  *
  * 予約実行中に画面全体を薄いオーバーレイで覆い、
  * 中断ボタン以外の操作を防ぐことで誤動作を防止
  */
+
 
 class ProcessingOverlay {
     constructor() {
@@ -3011,6 +3114,15 @@ class ProcessingOverlay {
                 messageText.textContent = '予約実行中...';
             if (targetText)
                 targetText.textContent = targetInfo;
+        }
+        // 通知音トグルボタンが存在しない場合は追加（入場予約画面でのみ）
+        const currentPageType = (0,_page_utils__WEBPACK_IMPORTED_MODULE_1__/* .identify_page_type */ .a)(window.location.href);
+        if (processType === 'reservation' && currentPageType === 'entrance_reservation') {
+            const existingNotificationToggle = this.overlayElement.querySelector('#ytomo-notification-toggle');
+            if (!existingNotificationToggle) {
+                console.log('🔊 show()で通知音トグルボタンを追加中...');
+                this.addNotificationToggleButton();
+            }
         }
         // 表示アニメーション
         this.overlayElement.classList.remove('hidden');
@@ -3379,6 +3491,69 @@ class ProcessingOverlay {
         document.body.appendChild(overlay);
     }
     /**
+     * 通知音トグルボタンのクリック処理
+     */
+    handleNotificationToggle() {
+        const isEnabled = _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_0__/* .entranceReservationStateManager */ .xx.toggleNotificationSound();
+        console.log(`🔊 通知音設定変更: ${isEnabled ? '有効' : '無効'}`);
+        // ボタンの表示を更新
+        const toggleButton = document.getElementById('ytomo-notification-toggle');
+        if (toggleButton) {
+            this.updateNotificationToggleButton(toggleButton);
+        }
+    }
+    /**
+     * 通知音トグルボタンを動的に追加
+     */
+    addNotificationToggleButton() {
+        if (!this.overlayElement)
+            return;
+        const messageArea = this.overlayElement.querySelector('.processing-message-area');
+        if (!messageArea)
+            return;
+        console.log('🔊 通知音トグルボタンを動的に追加中...');
+        const notificationToggle = document.createElement('button');
+        notificationToggle.id = 'ytomo-notification-toggle';
+        notificationToggle.className = 'notification-toggle-btn';
+        // MDIアイコンとトグル状態を設定
+        this.updateNotificationToggleButton(notificationToggle);
+        // トグルボタンのクリックイベント
+        notificationToggle.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            this.handleNotificationToggle();
+        });
+        // warningTextの後、cancelAreaの前に挿入
+        const warningText = messageArea.querySelector('.processing-warning-text');
+        const cancelArea = messageArea.querySelector('.processing-cancel-area');
+        if (warningText && cancelArea) {
+            messageArea.insertBefore(notificationToggle, cancelArea);
+            console.log('✅ 通知音トグルボタンを動的に追加完了');
+        }
+        else {
+            console.warn('⚠️ 挿入位置要素が見つかりません');
+        }
+    }
+    /**
+     * 通知音トグルボタンの表示を更新
+     */
+    updateNotificationToggleButton(button) {
+        const isEnabled = _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_0__/* .entranceReservationStateManager */ .xx.isNotificationSoundEnabled();
+        // シンプルなテキストアイコンを設定
+        if (isEnabled) {
+            button.innerHTML = '🔊';
+            button.title = '通知音有効（クリックで無効化）';
+            button.classList.remove('muted');
+            button.classList.add('enabled');
+        }
+        else {
+            button.innerHTML = '🔇';
+            button.title = '通知音無効（クリックで有効化）';
+            button.classList.remove('enabled');
+            button.classList.add('muted');
+        }
+    }
+    /**
      * オーバーレイを破棄
      */
     destroy() {
@@ -3504,7 +3679,7 @@ module.exports = function (cssWithMappingToString) {
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1___default()((_node_modules_css_loader_dist_runtime_noSourceMaps_js__WEBPACK_IMPORTED_MODULE_0___default()));
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, `#ytomo-status-badge.countdown-warning{background:rgba(255,0,0,.9)}.ytomo-efficiency-toggle{width:45px;height:32px;border-radius:16px;color:#fff;border:none;font-size:10px;font-weight:bold;cursor:pointer;transition:all .2s ease;box-shadow:0 2px 8px rgba(0,0,0,.3);display:flex;align-items:center;justify-content:center;pointer-events:auto;margin-bottom:8px}.ytomo-efficiency-toggle.efficiency-enabled{background:rgba(255,140,0,.9)}.ytomo-efficiency-toggle.efficiency-disabled{background:rgba(128,128,128,.9)}.ytomo-efficiency-toggle:hover{transform:scale(1.1);box-shadow:0 4px 12px rgba(0,0,0,.4)}.ytomo-efficiency-toggle:active{transform:scale(0.95)}button.ext-ytomo{height:40px;width:auto;min-width:60px;padding:0px 8px;background:#006821;color:#fff}button.ext-ytomo.no-after:after{background:rgba(0,0,0,0) none repeat 0 0/auto auto padding-box border-box scroll}button.ext-ytomo.btn-done{background:#4a4c4a}button.ext-ytomo:hover{background:#02862b}.pavilion-sub-btn{color:#fff;border:none;border-radius:20px;padding:8px 16px;font-size:12px;white-space:nowrap;transition:all .2s ease}.pavilion-sub-btn.btn-enabled{background:#006821;cursor:pointer;opacity:1}.pavilion-sub-btn.btn-enabled:hover{background:#02862b;transform:scale(1.05)}.pavilion-sub-btn.btn-disabled,.pavilion-sub-btn.btn-loading{background:gray;cursor:not-allowed;opacity:.6}.pavilion-sub-btn.btn-disabled:hover,.pavilion-sub-btn.btn-loading:hover{background:gray;transform:scale(1)}.pavilion-sub-btn:disabled{background:gray !important;cursor:not-allowed !important;opacity:.6 !important}.pavilion-sub-btn:disabled:hover{background:gray !important;transform:scale(1) !important}button.ext-ytomo.pavilion-sub-btn.btn-disabled,button.ext-ytomo.pavilion-sub-btn.btn-loading{background:gray;cursor:not-allowed;opacity:.6}button.ext-ytomo.pavilion-sub-btn.btn-disabled:hover,button.ext-ytomo.pavilion-sub-btn.btn-loading:hover{background:gray;transform:scale(1)}.safe-none,.ytomo-none,.filter-none{display:none}button.ext-ytomo.pavilion-sub-btn.ytomo-date-button.date-selected{border:2px solid #4caf50;box-shadow:0 0 8px rgba(76,175,80,.6)}div.div-flex{display:flex;justify-content:center;margin:5px}.js-show{display:block}.js-hide{display:none}.js-visible{visibility:visible}.js-invisible{visibility:hidden}.js-enabled{pointer-events:auto;opacity:1}.js-disabled{pointer-events:none;opacity:.6}.js-green{background:#228b22;color:#fff}.js-red{background:#dc3545;color:#fff}.js-gray{background:gray;color:#fff}.btn-success-highlight{background:#00c800;color:#fff}.status-bg-green{background:rgba(0,128,0,.9)}.status-bg-red{background:rgba(255,0,0,.9)}.status-bg-orange{background:rgba(255,140,0,.9)}.status-bg-blue{background:rgba(0,104,33,.9)}.status-bg-default{background:rgba(0,0,0,.8)}#ytomo-status-badge{background:linear-gradient(135deg, rgba(0, 0, 0, 0.9), rgba(40, 40, 40, 0.9));color:#fff;padding:8px 16px;border-radius:20px;font-size:12px;font-weight:bold;white-space:pre-line;box-shadow:0 4px 12px rgba(0,0,0,.3),0 2px 6px rgba(0,0,0,.2);border:2px solid hsla(0,0%,100%,.15);pointer-events:none}#ytomo-status-badge.ytomo-status-waiting{background:linear-gradient(135deg, rgba(0, 0, 0, 0.9), rgba(40, 40, 40, 0.9))}#ytomo-status-badge.ytomo-status-reservation{background:linear-gradient(135deg, rgba(255, 140, 0, 0.9), rgba(255, 165, 0, 0.9))}#ytomo-status-badge.ytomo-status-reservation.ytomo-status-countdown-warning{background:linear-gradient(135deg, rgba(255, 0, 0, 0.9), rgba(220, 53, 69, 0.9))}#ytomo-status-badge.ytomo-status-cooldown{background:linear-gradient(135deg, rgba(255, 107, 53, 0.9), rgba(255, 140, 0, 0.9))}.ytomo-header li.fab-toggle-li{display:inline-block;margin-right:8px}.ytomo-header li.fab-toggle-li button.fab-toggle-button{background:none;border:none;cursor:pointer;padding:0;color:#fff;transition:all .2s ease;display:flex;align-items:center;justify-content:center}.ytomo-header li.fab-toggle-li button.fab-toggle-button:hover{color:#ddd}.ytomo-header li.fab-toggle-li button.fab-toggle-button figure.fab-toggle-figure{width:auto;height:24px;display:flex;align-items:center;justify-content:center;padding:0 4px}.ytomo-pavilion-fab button.ytomo-fab{position:relative}.ytomo-pavilion-fab button.ytomo-fab:hover{transform:scale(1.15);box-shadow:0 8px 25px rgba(0,0,0,.5),0 4px 12px rgba(0,0,0,.3);border-width:4px}.ytomo-pavilion-fab .ytomo-fab-inner-content .pavilion-fab-expand-icon{font-size:8px;line-height:1;margin-bottom:1px;opacity:.8}.ytomo-pavilion-fab .ytomo-fab-inner-content .pavilion-fab-brand-text{font-size:7px;font-weight:normal;line-height:1;margin-bottom:2px;opacity:.7}.ytomo-pavilion-fab .ytomo-fab-inner-content .pavilion-fab-counts-text{font-size:12px;font-weight:bold;line-height:1}.ytomo-pavilion-fab .pavilion-sub-actions-container{display:none;flex-direction:column;gap:8px;align-items:flex-end;margin-bottom:8px}.ytomo-pavilion-fab .pavilion-sub-actions-container.expanded{display:flex}.ytomo-pavilion-fab .pavilion-sub-actions-container button.pavilion-sub-btn.base-style{color:#fff;border:none;border-radius:20px;padding:8px 16px;font-size:12px;white-space:nowrap;box-shadow:0 2px 8px rgba(0,0,0,.3);transition:all .2s ease}.ytomo-companion-dialog{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;z-index:99999;padding:20px;box-sizing:border-box}.ytomo-companion-dialog .dialog-content{background:#fff;border-radius:12px;padding:24px;width:100%;max-width:500px;max-height:90vh;overflow-y:auto;box-shadow:0 10px 40px rgba(0,0,0,.3)}@media(max-width: 768px){.ytomo-companion-dialog .dialog-content{max-width:95vw;max-height:85vh;padding:16px;border-radius:8px}}.ytomo-companion-dialog .dialog-content .input-row{display:flex;gap:8px;margin-bottom:12px}@media(max-width: 480px){.ytomo-companion-dialog .dialog-content .input-row{flex-direction:column;gap:12px}}.ytomo-companion-dialog .dialog-content .input-row input{padding:12px 8px;border:1px solid #ddd;border-radius:4px;font-size:16px}.ytomo-companion-dialog .dialog-content .input-row input:focus{outline:none;border-color:#4caf50;box-shadow:0 0 0 2px rgba(76,175,80,.2)}.ytomo-companion-dialog .dialog-content .input-row button{padding:12px 16px;background:#4caf50;color:#fff;border:none;border-radius:4px;cursor:pointer;font-size:14px;white-space:nowrap;min-width:60px}.ytomo-companion-dialog .dialog-content .input-row button:hover{background:#45a049}.ytomo-companion-dialog .dialog-content .input-row button:active{background:#3d8b40}.ytomo-abort-button{position:fixed;bottom:100px;right:24px;z-index:100001;background:#f44336;color:#fff;border:none;border-radius:50%;width:64px;height:64px;font-size:12px;font-weight:bold;cursor:pointer;box-shadow:0 4px 12px rgba(244,67,54,.4);transition:all .3s ease;display:flex;align-items:center;justify-content:center}.ytomo-abort-button:hover{transform:scale(1.1);box-shadow:0 6px 20px rgba(244,67,54,.6)}.ytomo-abort-button:active{transform:scale(0.95)}.copy-ticket-btn{margin-left:8px;padding:6px;background:#f0f0f0;border:1px solid #ddd;border-radius:4px;cursor:pointer;display:flex;align-items:center;justify-content:center;min-width:32px;height:32px;transition:all .3s ease}.copy-ticket-btn:hover{background:#e0e0e0;border-color:#ccc}.copy-ticket-btn:active{transform:scale(0.95)}.copy-ticket-btn svg{color:#666;transition:all .3s ease}.copy-ticket-btn.copy-success{background:rgba(76,175,80,.1);border-color:#4caf50}.copy-ticket-btn.copy-success svg{color:#4caf50}.dialog-btn{padding:8px 16px;border:none;border-radius:4px;cursor:pointer;font-size:14px;font-weight:bold;transition:all .2s ease}.dialog-btn.btn-cancel{background:#666;color:#fff}.dialog-btn.btn-cancel:hover{background:#555}.dialog-btn.btn-delete{background:#f44336;color:#fff}.dialog-btn.btn-delete:hover{background:#d32f2f}.dialog-btn.btn-execute{background:#2196f3;color:#fff}.dialog-btn.btn-execute:hover{background:#1976d2}.dialog-btn.btn-execute.btn-disabled{background:#ccc;color:#666;cursor:not-allowed}.dialog-btn.btn-execute.btn-disabled:hover{background:#ccc}.ticket-row{display:flex;align-items:center;padding:8px;border-bottom:1px solid #eee;transition:background-color .2s ease;cursor:pointer}.ticket-row:last-child{border-bottom:none}.ticket-row.already-added{position:relative;opacity:.6;background:repeating-linear-gradient(45deg, transparent, transparent 8px, rgba(255, 140, 0, 0.1) 8px, rgba(255, 140, 0, 0.1) 16px)}.ticket-row.already-added::after{content:"追加済み";position:absolute;top:4px;right:40px;background:rgba(255,140,0,.9);color:#fff;font-size:10px;font-weight:bold;padding:2px 6px;border-radius:3px;pointer-events:none}.ticket-row.already-added input[type=checkbox]{opacity:.5;cursor:not-allowed}.ticket-row.already-added .copy-ticket-btn{opacity:1;background:#f8f8f8;border-color:#bbb}.ticket-row.already-added .copy-ticket-btn:hover{background:#e8e8e8;border-color:#999}.ytomo-fab{width:56px;height:56px;border-radius:50%;color:#fff;border:none;box-shadow:0 6px 20px rgba(0,0,0,.4),0 2px 8px rgba(0,0,0,.2);border:3px solid hsla(0,0%,100%,.2);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:bold;transition:all .3s ease;position:relative;overflow:hidden;pointer-events:auto}.ytomo-fab-enabled{background:#ff8c00;opacity:.9;cursor:pointer;pointer-events:auto}.ytomo-fab-disabled{background:gray;opacity:.6;cursor:not-allowed;pointer-events:none}.ytomo-fab-running{background:#dc3545;opacity:.9;cursor:pointer;pointer-events:auto}.ytomo-fab.state-idle{background:gray;opacity:.6;cursor:not-allowed;pointer-events:none}.ytomo-fab.pointer-events-none{pointer-events:none}.ytomo-fab.pointer-events-auto{pointer-events:auto}.ytomo-fab.state-enabled{background:#ff8c00;opacity:.9;cursor:pointer;pointer-events:auto}.ytomo-fab.state-running{background:#dc3545;opacity:.9;cursor:pointer;pointer-events:auto}.ytomo-fab.state-reservation{background:#ff8c00;opacity:.9;cursor:pointer;pointer-events:auto}.ytomo-fab:hover{transform:scale(1.15);box-shadow:0 8px 25px rgba(0,0,0,.5),0 4px 12px rgba(0,0,0,.3)}.ytomo-fab.reservation-enabled{background:#006821;opacity:.9;cursor:pointer}.ytomo-fab.reservation-disabled{background:gray;opacity:.9;cursor:not-allowed}.ytomo-fab.cooldown-warning{background:#ff6b35}.ytomo-fab.cooldown-normal{background:#007bff}.ytomo-fab-container{position:fixed;bottom:100px;right:24px;z-index:10000;display:flex;flex-direction:column;align-items:flex-end;gap:12px;pointer-events:auto}.ytomo-fab-container.z-normal{z-index:10000}.ytomo-fab-container.z-above-overlay{z-index:100001}.ytomo-fab-container.visible{display:flex}.ytomo-fab-container.hidden{display:none}.ytomo-fab-content{position:relative;display:flex;flex-direction:column-reverse;align-items:center;gap:8px;opacity:0;transform:scale(0.8) translateY(10px);transition:all .3s cubic-bezier(0.175, 0.885, 0.32, 1.275);pointer-events:none}.ytomo-fab-content.expanded{opacity:1;transform:scale(1) translateY(0);pointer-events:auto}.ytomo-sub-fab{width:45px;height:32px;border-radius:16px;background:rgba(0,104,33,.9);color:#fff;border:none;font-size:11px;font-weight:bold;cursor:pointer;transition:all .2s ease;box-shadow:0 2px 8px rgba(0,0,0,.3);display:flex;align-items:center;justify-content:center;pointer-events:auto}.ytomo-sub-fab:hover{background:rgba(2,134,43,.9);transform:scale(1.1);box-shadow:0 4px 12px rgba(0,0,0,.4)}.ytomo-sub-fab:active{transform:scale(0.95)}.ytomo-pavilion-fab-container{position:fixed;bottom:100px;right:24px;z-index:10000;display:flex;flex-direction:column;gap:12px;align-items:flex-end;pointer-events:auto}.ytomo-ticket-selection-fab-container{position:fixed;bottom:100px;right:24px;z-index:10000;display:flex;flex-direction:column;gap:12px;align-items:flex-end;pointer-events:auto}.ytomo-ticket-selection-fab-container.z-normal{z-index:10000}.ytomo-ticket-selection-fab-container.z-above-overlay{z-index:100001}.ytomo-ticket-selection-fab-container #ytomo-companion-sub-buttons{display:flex;flex-direction:column;gap:8px;align-items:flex-end;transition:all .3s ease}.ytomo-fab-inner-content{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;pointer-events:none}.ytomo-reservation-target-display{background:linear-gradient(135deg, rgba(0, 123, 255, 0.95), rgba(0, 86, 179, 0.95));color:#fff;padding:8px 12px;border-radius:12px;font-size:12px;font-weight:bold;text-align:center;box-shadow:0 3px 10px rgba(0,0,0,.3);border:2px solid hsla(0,0%,100%,.3);min-width:80px;max-width:120px;white-space:pre-line;overflow:visible;text-overflow:clip;transition:all .3s ease;pointer-events:auto;cursor:pointer}.ytomo-reservation-target-display:hover{transform:scale(1.05);box-shadow:0 4px 14px rgba(0,0,0,.4)}.ytomo-reservation-target-display.hidden{display:none}.ytomo-reservation-target-display.visible{display:block}input.ext-tomo.search{height:50px;min-width:200px;max-width:min(300px,100%);font-family:quicksand;font-size:16px;-webkit-appearance:textfield;-moz-appearance:textfield;appearance:textfield;border:1px solid #222426;border-radius:25px;box-shadow:0 1px 0 0 #ccc;padding:0 0 0 10px;flex:1 1}.ytomo-icon.expand-icon{font-size:8px;line-height:1;color:#fff;font-weight:bold;text-align:center;pointer-events:none}.ytomo-icon.countdown-text{font-size:6px;line-height:1;color:#fff;font-weight:bold;text-align:center;margin-top:1px;pointer-events:none}.ytomo-toggle.toggle-li{position:fixed;bottom:10px;left:10px;z-index:1000;list-style:none;margin:0;padding:0}.ytomo-toggle.toggle-button{width:50px;height:30px;background:rgba(255,140,0,.8);border:none;border-radius:15px;cursor:pointer;transition:all .3s ease;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:bold;position:relative;overflow:hidden}.ytomo-toggle.toggle-button.enabled{color:#fff}.ytomo-toggle.toggle-button.disabled{color:#ddd}.ytomo-toggle.toggle-figure{width:100%;height:100%;margin:0;padding:0;border:none;background:rgba(0,0,0,0);pointer-events:none}.ytomo-dialog.overlay{position:fixed;top:0;left:0;width:100%;height:100%;background-color:rgba(0,0,0,.5);z-index:10000;display:flex;justify-content:center;align-items:center}.ytomo-dialog.container{background:#fff;border-radius:8px;padding:20px;max-width:400px;width:90%;max-height:70vh;overflow-y:auto;box-shadow:0 4px 12px rgba(0,0,0,.3)}.ytomo-dialog.title{margin:0 0 16px 0;color:#333;font-size:18px;font-weight:bold}.ytomo-dialog.button-group{display:flex;justify-content:flex-end;gap:10px;margin-top:20px}.ytomo-dialog.primary-button{background:#006821;color:#fff;border:none;padding:10px 20px;border-radius:4px;cursor:pointer;font-size:14px}.ytomo-dialog.primary-button:hover{background:#02862b}.ytomo-dialog.primary-button:disabled{background:gray;cursor:not-allowed}.ytomo-dialog.secondary-button{background:rgba(0,0,0,0);color:#666;border:1px solid #ccc;padding:10px 20px;border-radius:4px;cursor:pointer;font-size:14px}.ytomo-dialog.secondary-button:hover{background:#f5f5f5}.ytomo-progress.counter{display:inline-block;margin-left:8px;padding:2px 6px;background:rgba(0,0,0,.3);border-radius:10px;font-size:10px;color:#fff;font-weight:bold}.ytomo-error-message{position:fixed;top:20px;right:20px;background:#f44;color:#fff;padding:15px;border-radius:5px;box-shadow:0 2px 10px rgba(0,0,0,.3);z-index:10001;max-width:300px;font-size:14px;line-height:1.4}.ytomo-error-message .error-title{font-weight:bold;margin-bottom:5px}.ytomo-error-message .error-close-btn{margin-top:10px;padding:5px 10px;background:hsla(0,0%,100%,.2);border:none;border-radius:3px;color:#fff;cursor:pointer;font-size:12px}.ytomo-error-message .error-close-btn:hover{background:hsla(0,0%,100%,.3)}.ytomo-flex-column-center{display:flex;flex-direction:column;align-items:center}.ytomo-brand-text{font-size:8px;font-weight:bold;margin-top:2px}.ytomo-processing-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.3);z-index:100000;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(1px);transition:all .3s ease;pointer-events:auto}.ytomo-processing-overlay.z-normal{z-index:100000}.ytomo-processing-overlay.z-below-fab{z-index:99999}.ytomo-processing-overlay.hidden{opacity:0;visibility:hidden;pointer-events:none}.ytomo-processing-overlay.visible{opacity:1;visibility:visible;pointer-events:auto}.ytomo-processing-overlay .processing-message-area{background:hsla(0,0%,100%,.95);border-radius:12px;padding:24px 32px;text-align:center;box-shadow:0 8px 32px rgba(0,0,0,.3);border:2px solid rgba(255,140,0,.3);max-width:400px;margin:20px}@media(max-width: 768px){.ytomo-processing-overlay .processing-message-area{padding:20px 24px;margin:16px;max-width:90vw}}.ytomo-processing-overlay .processing-message-text{font-size:20px;font-weight:bold;color:#333;margin-bottom:8px;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}@media(max-width: 768px){.ytomo-processing-overlay .processing-message-text{font-size:18px;margin-bottom:6px}}.ytomo-processing-overlay .processing-target-text{font-size:16px;font-weight:600;color:#333;margin-bottom:12px;white-space:pre-line;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;text-align:center}@media(max-width: 768px){.ytomo-processing-overlay .processing-target-text{font-size:14px;margin-bottom:10px}}.ytomo-processing-overlay .processing-countdown-text{font-size:18px;font-weight:bold;color:#e67e00;margin-bottom:12px;font-family:"SF Mono","Monaco","Consolas",monospace;text-align:center;text-shadow:0 1px 2px rgba(0,0,0,.1)}@media(max-width: 768px){.ytomo-processing-overlay .processing-countdown-text{font-size:16px;margin-bottom:10px}}.ytomo-processing-overlay .processing-countdown-text.countdown-warning{color:#dc3545;animation:countdownPulse 1s ease-in-out infinite;text-shadow:0 0 8px rgba(220,53,69,.4)}.ytomo-processing-overlay .processing-warning-text{font-size:14px;color:#666;margin-bottom:16px;line-height:1.4;transition:all .3s ease}@media(max-width: 768px){.ytomo-processing-overlay .processing-warning-text{font-size:13px;margin-bottom:14px}}.ytomo-processing-overlay .processing-warning-text.warning-flash{color:#dc3545;font-weight:bold;transform:scale(1.05);animation:flash .5s ease-in-out 2}.ytomo-processing-overlay .processing-cancel-area{font-size:12px;color:#888;font-style:italic}@media(max-width: 768px){.ytomo-processing-overlay .processing-cancel-area{font-size:11px}}@keyframes flash{0%,100%{opacity:1}50%{opacity:.7}}@keyframes countdownPulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.8;transform:scale(1.05)}}.ytomo-processing-overlay.efficiency-mode .processing-message-area{border-color:rgba(255,140,0,.5);background:linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(255, 248, 220, 0.95))}.ytomo-processing-overlay.efficiency-mode .processing-message-text{color:#e67e00}.ytomo-processing-overlay.monitoring-mode .processing-message-area{border-color:rgba(0,104,33,.5);background:linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(240, 255, 240, 0.95))}.ytomo-processing-overlay.monitoring-mode .processing-message-text{color:#004d1a}@media(prefers-reduced-motion: reduce){.ytomo-processing-overlay{transition:none}.ytomo-processing-overlay .processing-warning-text.warning-flash{animation:none;transform:none}}table[class*=style_main__timetable__] td[data-gray-out] div[role=button][data-disabled=true]{pointer-events:auto !important;cursor:pointer !important}`, ""]);
+___CSS_LOADER_EXPORT___.push([module.id, `#ytomo-status-badge.countdown-warning{background:rgba(255,0,0,.9)}.ytomo-efficiency-toggle{width:45px;height:32px;border-radius:16px;color:#fff;border:none;font-size:10px;font-weight:bold;cursor:pointer;transition:all .2s ease;box-shadow:0 2px 8px rgba(0,0,0,.3);display:flex;align-items:center;justify-content:center;pointer-events:auto;margin-bottom:8px}.ytomo-efficiency-toggle.efficiency-enabled{background:rgba(255,140,0,.9)}.ytomo-efficiency-toggle.efficiency-disabled{background:rgba(128,128,128,.9)}.ytomo-efficiency-toggle:hover{transform:scale(1.1);box-shadow:0 4px 12px rgba(0,0,0,.4)}.ytomo-efficiency-toggle:active{transform:scale(0.95)}button.ext-ytomo{height:40px;width:auto;min-width:60px;padding:0px 8px;background:#006821;color:#fff}button.ext-ytomo.no-after:after{background:rgba(0,0,0,0) none repeat 0 0/auto auto padding-box border-box scroll}button.ext-ytomo.btn-done{background:#4a4c4a}button.ext-ytomo:hover{background:#02862b}.pavilion-sub-btn{color:#fff;border:none;border-radius:20px;padding:8px 16px;font-size:12px;white-space:nowrap;transition:all .2s ease}.pavilion-sub-btn.btn-enabled{background:#006821;cursor:pointer;opacity:1}.pavilion-sub-btn.btn-enabled:hover{background:#02862b;transform:scale(1.05)}.pavilion-sub-btn.btn-disabled,.pavilion-sub-btn.btn-loading{background:gray;cursor:not-allowed;opacity:.6}.pavilion-sub-btn.btn-disabled:hover,.pavilion-sub-btn.btn-loading:hover{background:gray;transform:scale(1)}.pavilion-sub-btn:disabled{background:gray !important;cursor:not-allowed !important;opacity:.6 !important}.pavilion-sub-btn:disabled:hover{background:gray !important;transform:scale(1) !important}button.ext-ytomo.pavilion-sub-btn.btn-disabled,button.ext-ytomo.pavilion-sub-btn.btn-loading{background:gray;cursor:not-allowed;opacity:.6}button.ext-ytomo.pavilion-sub-btn.btn-disabled:hover,button.ext-ytomo.pavilion-sub-btn.btn-loading:hover{background:gray;transform:scale(1)}.safe-none,.ytomo-none,.filter-none{display:none}button.ext-ytomo.pavilion-sub-btn.ytomo-date-button.date-selected{border:2px solid #4caf50;box-shadow:0 0 8px rgba(76,175,80,.6)}div.div-flex{display:flex;justify-content:center;margin:5px}.js-show{display:block}.js-hide{display:none}.js-visible{visibility:visible}.js-invisible{visibility:hidden}.js-enabled{pointer-events:auto;opacity:1}.js-disabled{pointer-events:none;opacity:.6}.js-green{background:#228b22;color:#fff}.js-red{background:#dc3545;color:#fff}.js-gray{background:gray;color:#fff}.btn-success-highlight{background:#00c800;color:#fff}.status-bg-green{background:rgba(0,128,0,.9)}.status-bg-red{background:rgba(255,0,0,.9)}.status-bg-orange{background:rgba(255,140,0,.9)}.status-bg-blue{background:rgba(0,104,33,.9)}.status-bg-default{background:rgba(0,0,0,.8)}#ytomo-status-badge{background:linear-gradient(135deg, rgba(0, 0, 0, 0.9), rgba(40, 40, 40, 0.9));color:#fff;padding:8px 16px;border-radius:20px;font-size:12px;font-weight:bold;white-space:pre-line;box-shadow:0 4px 12px rgba(0,0,0,.3),0 2px 6px rgba(0,0,0,.2);border:2px solid hsla(0,0%,100%,.15);pointer-events:none}#ytomo-status-badge.ytomo-status-waiting{background:linear-gradient(135deg, rgba(0, 0, 0, 0.9), rgba(40, 40, 40, 0.9))}#ytomo-status-badge.ytomo-status-reservation{background:linear-gradient(135deg, rgba(255, 140, 0, 0.9), rgba(255, 165, 0, 0.9))}#ytomo-status-badge.ytomo-status-reservation.ytomo-status-countdown-warning{background:linear-gradient(135deg, rgba(255, 0, 0, 0.9), rgba(220, 53, 69, 0.9))}#ytomo-status-badge.ytomo-status-cooldown{background:linear-gradient(135deg, rgba(255, 107, 53, 0.9), rgba(255, 140, 0, 0.9))}.ytomo-header li.fab-toggle-li{display:inline-block;margin-right:8px}.ytomo-header li.fab-toggle-li button.fab-toggle-button{background:none;border:none;cursor:pointer;padding:0;color:#fff;transition:all .2s ease;display:flex;align-items:center;justify-content:center}.ytomo-header li.fab-toggle-li button.fab-toggle-button:hover{color:#ddd}.ytomo-header li.fab-toggle-li button.fab-toggle-button figure.fab-toggle-figure{width:auto;height:24px;display:flex;align-items:center;justify-content:center;padding:0 4px}.ytomo-pavilion-fab button.ytomo-fab{position:relative}.ytomo-pavilion-fab button.ytomo-fab:hover{transform:scale(1.15);box-shadow:0 8px 25px rgba(0,0,0,.5),0 4px 12px rgba(0,0,0,.3);border-width:4px}.ytomo-pavilion-fab .ytomo-fab-inner-content .pavilion-fab-expand-icon{font-size:8px;line-height:1;margin-bottom:1px;opacity:.8}.ytomo-pavilion-fab .ytomo-fab-inner-content .pavilion-fab-brand-text{font-size:7px;font-weight:normal;line-height:1;margin-bottom:2px;opacity:.7}.ytomo-pavilion-fab .ytomo-fab-inner-content .pavilion-fab-counts-text{font-size:12px;font-weight:bold;line-height:1}.ytomo-pavilion-fab .pavilion-sub-actions-container{display:none;flex-direction:column;gap:8px;align-items:flex-end;margin-bottom:8px}.ytomo-pavilion-fab .pavilion-sub-actions-container.expanded{display:flex}.ytomo-pavilion-fab .pavilion-sub-actions-container button.pavilion-sub-btn.base-style{color:#fff;border:none;border-radius:20px;padding:8px 16px;font-size:12px;white-space:nowrap;box-shadow:0 2px 8px rgba(0,0,0,.3);transition:all .2s ease}.ytomo-companion-dialog{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;z-index:99999;padding:20px;box-sizing:border-box}.ytomo-companion-dialog .dialog-content{background:#fff;border-radius:12px;padding:24px;width:100%;max-width:500px;max-height:90vh;overflow-y:auto;box-shadow:0 10px 40px rgba(0,0,0,.3)}@media(max-width: 768px){.ytomo-companion-dialog .dialog-content{max-width:95vw;max-height:85vh;padding:16px;border-radius:8px}}.ytomo-companion-dialog .dialog-content .input-row{display:flex;gap:8px;margin-bottom:12px}@media(max-width: 480px){.ytomo-companion-dialog .dialog-content .input-row{flex-direction:column;gap:12px}}.ytomo-companion-dialog .dialog-content .input-row input{padding:12px 8px;border:1px solid #ddd;border-radius:4px;font-size:16px}.ytomo-companion-dialog .dialog-content .input-row input:focus{outline:none;border-color:#4caf50;box-shadow:0 0 0 2px rgba(76,175,80,.2)}.ytomo-companion-dialog .dialog-content .input-row button{padding:12px 16px;background:#4caf50;color:#fff;border:none;border-radius:4px;cursor:pointer;font-size:14px;white-space:nowrap;min-width:60px}.ytomo-companion-dialog .dialog-content .input-row button:hover{background:#45a049}.ytomo-companion-dialog .dialog-content .input-row button:active{background:#3d8b40}.ytomo-abort-button{position:fixed;bottom:100px;right:24px;z-index:100001;background:#f44336;color:#fff;border:none;border-radius:50%;width:64px;height:64px;font-size:12px;font-weight:bold;cursor:pointer;box-shadow:0 4px 12px rgba(244,67,54,.4);transition:all .3s ease;display:flex;align-items:center;justify-content:center}.ytomo-abort-button:hover{transform:scale(1.1);box-shadow:0 6px 20px rgba(244,67,54,.6)}.ytomo-abort-button:active{transform:scale(0.95)}.copy-ticket-btn{margin-left:8px;padding:6px;background:#f0f0f0;border:1px solid #ddd;border-radius:4px;cursor:pointer;display:flex;align-items:center;justify-content:center;min-width:32px;height:32px;transition:all .3s ease}.copy-ticket-btn:hover{background:#e0e0e0;border-color:#ccc}.copy-ticket-btn:active{transform:scale(0.95)}.copy-ticket-btn svg{color:#666;transition:all .3s ease}.copy-ticket-btn.copy-success{background:rgba(76,175,80,.1);border-color:#4caf50}.copy-ticket-btn.copy-success svg{color:#4caf50}.dialog-btn{padding:8px 16px;border:none;border-radius:4px;cursor:pointer;font-size:14px;font-weight:bold;transition:all .2s ease}.dialog-btn.btn-cancel{background:#666;color:#fff}.dialog-btn.btn-cancel:hover{background:#555}.dialog-btn.btn-delete{background:#f44336;color:#fff}.dialog-btn.btn-delete:hover{background:#d32f2f}.dialog-btn.btn-execute{background:#2196f3;color:#fff}.dialog-btn.btn-execute:hover{background:#1976d2}.dialog-btn.btn-execute.btn-disabled{background:#ccc;color:#666;cursor:not-allowed}.dialog-btn.btn-execute.btn-disabled:hover{background:#ccc}.ticket-row{display:flex;align-items:center;padding:8px;border-bottom:1px solid #eee;transition:background-color .2s ease;cursor:pointer}.ticket-row:last-child{border-bottom:none}.ticket-row.already-added{position:relative;opacity:.6;background:repeating-linear-gradient(45deg, transparent, transparent 8px, rgba(255, 140, 0, 0.1) 8px, rgba(255, 140, 0, 0.1) 16px)}.ticket-row.already-added::after{content:"追加済み";position:absolute;top:4px;right:40px;background:rgba(255,140,0,.9);color:#fff;font-size:10px;font-weight:bold;padding:2px 6px;border-radius:3px;pointer-events:none}.ticket-row.already-added input[type=checkbox]{opacity:.5;cursor:not-allowed}.ticket-row.already-added .copy-ticket-btn{opacity:1;background:#f8f8f8;border-color:#bbb}.ticket-row.already-added .copy-ticket-btn:hover{background:#e8e8e8;border-color:#999}.ytomo-fab{width:56px;height:56px;border-radius:50%;color:#fff;border:none;box-shadow:0 6px 20px rgba(0,0,0,.4),0 2px 8px rgba(0,0,0,.2);border:3px solid hsla(0,0%,100%,.2);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:bold;transition:all .3s ease;position:relative;overflow:hidden;pointer-events:auto}.ytomo-fab-enabled{background:#ff8c00;opacity:.9;cursor:pointer;pointer-events:auto}.ytomo-fab-disabled{background:gray;opacity:.6;cursor:not-allowed;pointer-events:none}.ytomo-fab-running{background:#dc3545;opacity:.9;cursor:pointer;pointer-events:auto}.ytomo-fab.state-idle{background:gray;opacity:.6;cursor:not-allowed;pointer-events:none}.ytomo-fab.pointer-events-none{pointer-events:none}.ytomo-fab.pointer-events-auto{pointer-events:auto}.ytomo-fab.state-enabled{background:#ff8c00;opacity:.9;cursor:pointer;pointer-events:auto}.ytomo-fab.state-running{background:#dc3545;opacity:.9;cursor:pointer;pointer-events:auto}.ytomo-fab.state-reservation{background:#ff8c00;opacity:.9;cursor:pointer;pointer-events:auto}.ytomo-fab:hover{transform:scale(1.15);box-shadow:0 8px 25px rgba(0,0,0,.5),0 4px 12px rgba(0,0,0,.3)}.ytomo-fab.reservation-enabled{background:#006821;opacity:.9;cursor:pointer}.ytomo-fab.reservation-disabled{background:gray;opacity:.9;cursor:not-allowed}.ytomo-fab.cooldown-warning{background:#ff6b35}.ytomo-fab.cooldown-normal{background:#007bff}.ytomo-fab-container{position:fixed;bottom:100px;right:24px;z-index:10000;display:flex;flex-direction:column;align-items:flex-end;gap:12px;pointer-events:auto}.ytomo-fab-container.z-normal{z-index:10000}.ytomo-fab-container.z-above-overlay{z-index:100001}.ytomo-fab-container.visible{display:flex}.ytomo-fab-container.hidden{display:none}.ytomo-fab-content{position:relative;display:flex;flex-direction:column-reverse;align-items:center;gap:8px;opacity:0;transform:scale(0.8) translateY(10px);transition:all .3s cubic-bezier(0.175, 0.885, 0.32, 1.275);pointer-events:none}.ytomo-fab-content.expanded{opacity:1;transform:scale(1) translateY(0);pointer-events:auto}.ytomo-sub-fab{width:45px;height:32px;border-radius:16px;background:rgba(0,104,33,.9);color:#fff;border:none;font-size:11px;font-weight:bold;cursor:pointer;transition:all .2s ease;box-shadow:0 2px 8px rgba(0,0,0,.3);display:flex;align-items:center;justify-content:center;pointer-events:auto}.ytomo-sub-fab:hover{background:rgba(2,134,43,.9);transform:scale(1.1);box-shadow:0 4px 12px rgba(0,0,0,.4)}.ytomo-sub-fab:active{transform:scale(0.95)}.ytomo-pavilion-fab-container{position:fixed;bottom:100px;right:24px;z-index:10000;display:flex;flex-direction:column;gap:12px;align-items:flex-end;pointer-events:auto}.ytomo-ticket-selection-fab-container{position:fixed;bottom:100px;right:24px;z-index:10000;display:flex;flex-direction:column;gap:12px;align-items:flex-end;pointer-events:auto}.ytomo-ticket-selection-fab-container.z-normal{z-index:10000}.ytomo-ticket-selection-fab-container.z-above-overlay{z-index:100001}.ytomo-ticket-selection-fab-container #ytomo-companion-sub-buttons{display:flex;flex-direction:column;gap:8px;align-items:flex-end;transition:all .3s ease}.ytomo-fab-inner-content{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;pointer-events:none}.ytomo-reservation-target-display{background:linear-gradient(135deg, rgba(0, 123, 255, 0.95), rgba(0, 86, 179, 0.95));color:#fff;padding:8px 12px;border-radius:12px;font-size:12px;font-weight:bold;text-align:center;box-shadow:0 3px 10px rgba(0,0,0,.3);border:2px solid hsla(0,0%,100%,.3);min-width:80px;max-width:120px;white-space:pre-line;overflow:visible;text-overflow:clip;transition:all .3s ease;pointer-events:auto;cursor:pointer}.ytomo-reservation-target-display:hover{transform:scale(1.05);box-shadow:0 4px 14px rgba(0,0,0,.4)}.ytomo-reservation-target-display.hidden{display:none}.ytomo-reservation-target-display.visible{display:block}input.ext-tomo.search{height:50px;min-width:200px;max-width:min(300px,100%);font-family:quicksand;font-size:16px;-webkit-appearance:textfield;-moz-appearance:textfield;appearance:textfield;border:1px solid #222426;border-radius:25px;box-shadow:0 1px 0 0 #ccc;padding:0 0 0 10px;flex:1 1}.ytomo-icon.expand-icon{font-size:8px;line-height:1;color:#fff;font-weight:bold;text-align:center;pointer-events:none}.ytomo-icon.countdown-text{font-size:6px;line-height:1;color:#fff;font-weight:bold;text-align:center;margin-top:1px;pointer-events:none}.ytomo-toggle.toggle-li{position:fixed;bottom:10px;left:10px;z-index:1000;list-style:none;margin:0;padding:0}.ytomo-toggle.toggle-button{width:50px;height:30px;background:rgba(255,140,0,.8);border:none;border-radius:15px;cursor:pointer;transition:all .3s ease;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:bold;position:relative;overflow:hidden}.ytomo-toggle.toggle-button.enabled{color:#fff}.ytomo-toggle.toggle-button.disabled{color:#ddd}.ytomo-toggle.toggle-figure{width:100%;height:100%;margin:0;padding:0;border:none;background:rgba(0,0,0,0);pointer-events:none}.ytomo-dialog.overlay{position:fixed;top:0;left:0;width:100%;height:100%;background-color:rgba(0,0,0,.5);z-index:10000;display:flex;justify-content:center;align-items:center}.ytomo-dialog.container{background:#fff;border-radius:8px;padding:20px;max-width:400px;width:90%;max-height:70vh;overflow-y:auto;box-shadow:0 4px 12px rgba(0,0,0,.3)}.ytomo-dialog.title{margin:0 0 16px 0;color:#333;font-size:18px;font-weight:bold}.ytomo-dialog.button-group{display:flex;justify-content:flex-end;gap:10px;margin-top:20px}.ytomo-dialog.primary-button{background:#006821;color:#fff;border:none;padding:10px 20px;border-radius:4px;cursor:pointer;font-size:14px}.ytomo-dialog.primary-button:hover{background:#02862b}.ytomo-dialog.primary-button:disabled{background:gray;cursor:not-allowed}.ytomo-dialog.secondary-button{background:rgba(0,0,0,0);color:#666;border:1px solid #ccc;padding:10px 20px;border-radius:4px;cursor:pointer;font-size:14px}.ytomo-dialog.secondary-button:hover{background:#f5f5f5}.ytomo-progress.counter{display:inline-block;margin-left:8px;padding:2px 6px;background:rgba(0,0,0,.3);border-radius:10px;font-size:10px;color:#fff;font-weight:bold}.ytomo-error-message{position:fixed;top:20px;right:20px;background:#f44;color:#fff;padding:15px;border-radius:5px;box-shadow:0 2px 10px rgba(0,0,0,.3);z-index:10001;max-width:300px;font-size:14px;line-height:1.4}.ytomo-error-message .error-title{font-weight:bold;margin-bottom:5px}.ytomo-error-message .error-close-btn{margin-top:10px;padding:5px 10px;background:hsla(0,0%,100%,.2);border:none;border-radius:3px;color:#fff;cursor:pointer;font-size:12px}.ytomo-error-message .error-close-btn:hover{background:hsla(0,0%,100%,.3)}.ytomo-flex-column-center{display:flex;flex-direction:column;align-items:center}.ytomo-brand-text{font-size:8px;font-weight:bold;margin-top:2px}.ytomo-processing-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.3);z-index:100000;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(1px);transition:all .3s ease;pointer-events:auto}.ytomo-processing-overlay.z-normal{z-index:100000}.ytomo-processing-overlay.z-below-fab{z-index:99999}.ytomo-processing-overlay.hidden{opacity:0;visibility:hidden;pointer-events:none}.ytomo-processing-overlay.visible{opacity:1;visibility:visible;pointer-events:auto}.ytomo-processing-overlay .processing-message-area{background:hsla(0,0%,100%,.95);border-radius:12px;padding:24px 32px;text-align:center;box-shadow:0 8px 32px rgba(0,0,0,.3);border:2px solid rgba(255,140,0,.3);max-width:400px;margin:20px}@media(max-width: 768px){.ytomo-processing-overlay .processing-message-area{padding:20px 24px;margin:16px;max-width:90vw}}.ytomo-processing-overlay .processing-message-text{font-size:20px;font-weight:bold;color:#333;margin-bottom:8px;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}@media(max-width: 768px){.ytomo-processing-overlay .processing-message-text{font-size:18px;margin-bottom:6px}}.ytomo-processing-overlay .processing-target-text{font-size:16px;font-weight:600;color:#333;margin-bottom:12px;white-space:pre-line;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;text-align:center}@media(max-width: 768px){.ytomo-processing-overlay .processing-target-text{font-size:14px;margin-bottom:10px}}.ytomo-processing-overlay .processing-countdown-text{font-size:18px;font-weight:bold;color:#e67e00;margin-bottom:12px;font-family:"SF Mono","Monaco","Consolas",monospace;text-align:center;text-shadow:0 1px 2px rgba(0,0,0,.1)}@media(max-width: 768px){.ytomo-processing-overlay .processing-countdown-text{font-size:16px;margin-bottom:10px}}.ytomo-processing-overlay .processing-countdown-text.countdown-warning{color:#dc3545;animation:countdownPulse 1s ease-in-out infinite;text-shadow:0 0 8px rgba(220,53,69,.4)}.ytomo-processing-overlay .processing-warning-text{font-size:14px;color:#666;margin-bottom:16px;line-height:1.4;transition:all .3s ease}@media(max-width: 768px){.ytomo-processing-overlay .processing-warning-text{font-size:13px;margin-bottom:14px}}.ytomo-processing-overlay .processing-warning-text.warning-flash{color:#dc3545;font-weight:bold;transform:scale(1.05);animation:flash .5s ease-in-out 2}.ytomo-processing-overlay .notification-toggle-btn{display:flex;align-items:center;justify-content:center;width:40px;height:40px;border:none;border-radius:50%;cursor:pointer;transition:all .2s ease;margin-bottom:16px;box-shadow:0 2px 6px rgba(0,0,0,.15);font-size:20px;line-height:1}@media(max-width: 768px){.ytomo-processing-overlay .notification-toggle-btn{width:36px;height:36px;margin-bottom:14px;font-size:18px}}.ytomo-processing-overlay .notification-toggle-btn:hover{transform:scale(1.05);box-shadow:0 4px 10px rgba(0,0,0,.2)}.ytomo-processing-overlay .notification-toggle-btn:active{transform:scale(0.95)}.ytomo-processing-overlay .notification-toggle-btn.enabled{background:#4caf50;color:#fff}.ytomo-processing-overlay .notification-toggle-btn.enabled:hover{background:#45a049}.ytomo-processing-overlay .notification-toggle-btn.muted{background:#f44336;color:#fff}.ytomo-processing-overlay .notification-toggle-btn.muted:hover{background:#e53935}.ytomo-processing-overlay .processing-cancel-area{font-size:12px;color:#888;font-style:italic}@media(max-width: 768px){.ytomo-processing-overlay .processing-cancel-area{font-size:11px}}@keyframes flash{0%,100%{opacity:1}50%{opacity:.7}}@keyframes countdownPulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.8;transform:scale(1.05)}}.ytomo-processing-overlay.efficiency-mode .processing-message-area{border-color:rgba(255,140,0,.5);background:linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(255, 248, 220, 0.95))}.ytomo-processing-overlay.efficiency-mode .processing-message-text{color:#e67e00}.ytomo-processing-overlay.monitoring-mode .processing-message-area{border-color:rgba(0,104,33,.5);background:linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(240, 255, 240, 0.95))}.ytomo-processing-overlay.monitoring-mode .processing-message-text{color:#004d1a}@media(prefers-reduced-motion: reduce){.ytomo-processing-overlay{transition:none}.ytomo-processing-overlay .processing-warning-text.warning-flash{animation:none;transform:none}}table[class*=style_main__timetable__] td[data-gray-out] div[role=button][data-disabled=true]{pointer-events:auto !important;cursor:pointer !important}`, ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -3645,23 +3820,112 @@ module.exports = domAPI;
 
 /***/ }),
 
-/***/ 975:
+/***/ 851:
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   DT: () => (/* binding */ createEntranceReservationUI),
-/* harmony export */   FX: () => (/* binding */ entranceReservationHelper),
-/* harmony export */   TP: () => (/* binding */ setCacheManagerForSection7),
-/* harmony export */   il: () => (/* binding */ waitForTimeSlotTable),
-/* harmony export */   startCalendarWatcher: () => (/* binding */ startCalendarWatcher)
-/* harmony export */ });
-/* unused harmony exports getCurrentReservationTarget, checkVisitTimeButtonState, checkTimeSlotSelected, canStartReservation, checkInitialState, handleCalendarChange */
-/* harmony import */ var _processing_overlay__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(307);
-/* harmony import */ var _entrance_page_state__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(31);
-/* harmony import */ var _entrance_page_dom_utils__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(38);
-/* harmony import */ var _entrance_page_core__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(271);
-/* harmony import */ var _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(79);
+
+// EXPORTS
+__webpack_require__.d(__webpack_exports__, {
+  DT: () => (/* binding */ createEntranceReservationUI),
+  FX: () => (/* binding */ entranceReservationHelper),
+  TP: () => (/* binding */ setCacheManagerForSection7),
+  startCalendarWatcher: () => (/* binding */ startCalendarWatcher),
+  il: () => (/* binding */ waitForTimeSlotTable)
+});
+
+// UNUSED EXPORTS: canStartReservation, checkInitialState, checkTimeSlotSelected, checkVisitTimeButtonState, getCurrentReservationTarget, handleCalendarChange
+
+;// ./ts/modules/audio-player.ts
+/**
+ * 音声再生モジュール
+ * UserScript環境での音声通知機能を提供
+ */
+class AudioPlayer {
+    /**
+     * 8ビット風成功音を再生
+     * 自動予約成功時の通知音として使用
+     */
+    static playSuccessSound() {
+        try {
+            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            // 8ビット風のメロディ
+            const chiptune = [
+                { freq: 523, duration: 100 }, // C5
+                { freq: 659, duration: 100 }, // E5
+                { freq: 784, duration: 100 }, // G5
+                { freq: 1047, duration: 100 }, // C6
+                { freq: 1319, duration: 200 }, // E6
+                { freq: 1047, duration: 300 } // C6
+            ];
+            let currentTime = 0;
+            chiptune.forEach((note) => {
+                setTimeout(() => {
+                    const osc = audioContext.createOscillator();
+                    const gain = audioContext.createGain();
+                    osc.connect(gain);
+                    gain.connect(audioContext.destination);
+                    osc.type = 'square'; // 8ビット風の矩形波
+                    osc.frequency.value = note.freq;
+                    // 8ビット風の音量エンベロープ
+                    gain.gain.setValueAtTime(0.6, audioContext.currentTime);
+                    gain.gain.setValueAtTime(0.6, audioContext.currentTime + (note.duration / 1000) * 0.7);
+                    gain.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + (note.duration / 1000));
+                    osc.start(audioContext.currentTime);
+                    osc.stop(audioContext.currentTime + (note.duration / 1000));
+                }, currentTime);
+                currentTime += note.duration + 20;
+            });
+        }
+        catch (error) {
+            console.error('Success sound playback failed:', error);
+        }
+    }
+    /**
+     * 簡単なビープ音を再生
+     * @param frequency 周波数 (Hz)
+     * @param duration 持続時間 (ms)
+     */
+    static playBeep(frequency = 800, duration = 200) {
+        try {
+            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            oscillator.frequency.value = frequency;
+            oscillator.type = 'sine';
+            // 音量フェードアウト（クリック音を防ぐ）
+            gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + duration / 1000);
+            oscillator.start(audioContext.currentTime);
+            oscillator.stop(audioContext.currentTime + duration / 1000);
+        }
+        catch (error) {
+            console.error('Beep sound playback failed:', error);
+        }
+    }
+    /**
+     * Web Audio APIがサポートされているかチェック
+     */
+    static isAudioSupported() {
+        return !!(window.AudioContext || window.webkitAudioContext);
+    }
+}
+
+// EXTERNAL MODULE: ./ts/modules/processing-overlay.ts
+var processing_overlay = __webpack_require__(307);
+// EXTERNAL MODULE: ./ts/modules/entrance-page-state.ts
+var entrance_page_state = __webpack_require__(31);
+// EXTERNAL MODULE: ./ts/modules/entrance-page-dom-utils.ts
+var entrance_page_dom_utils = __webpack_require__(38);
+// EXTERNAL MODULE: ./ts/modules/entrance-page-core.ts
+var entrance_page_core = __webpack_require__(271);
+// EXTERNAL MODULE: ./ts/modules/entrance-reservation-state-manager.ts + 1 modules
+var entrance_reservation_state_manager = __webpack_require__(79);
+;// ./ts/modules/entrance-page-fab.ts
 // 統一処理移行により個別importは不要
+// 音声再生用import
+
 // entrance-page-stateからのimport
 
 
@@ -3701,8 +3965,8 @@ function showStatus(message, color = 'white') {
     if (color !== 'red' && color !== 'green' && color !== 'orange') {
         setTimeout(() => {
             // 状態管理システムによる更新に委譲
-            if (_entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_4__/* .entranceReservationStateManager */ .xx) {
-                _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_4__/* .entranceReservationStateManager */ .xx.updateFabDisplay();
+            if (entrance_reservation_state_manager/* entranceReservationStateManager */.xx) {
+                entrance_reservation_state_manager/* entranceReservationStateManager */.xx.updateFabDisplay();
             }
         }, 3000);
     }
@@ -3758,17 +4022,17 @@ function createEntranceReservationUI() {
             return false;
         }
         // 中断不可期間のチェック
-        if (!(0,_entrance_page_core__WEBPACK_IMPORTED_MODULE_3__/* .isInterruptionAllowed */ .Is)()) {
+        if (!(0,entrance_page_core/* isInterruptionAllowed */.Is)()) {
             // リロード直前のため中断不可
             showStatus('リロード直前のため中断できません', 'red');
             return;
         }
-        if (_entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_4__/* .entranceReservationStateManager */ .xx.isReservationRunning()) {
+        if (entrance_reservation_state_manager/* entranceReservationStateManager */.xx.isReservationRunning()) {
             stopReservationProcess();
             return;
         }
         // 入場予約状態管理システムを使用した開始判定
-        const preferredAction = _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_4__/* .entranceReservationStateManager */ .xx.getPreferredAction();
+        const preferredAction = entrance_reservation_state_manager/* entranceReservationStateManager */.xx.getPreferredAction();
         // FABクリック処理開始
         if (preferredAction === 'reservation') {
             await startReservationProcess();
@@ -3781,10 +4045,10 @@ function createEntranceReservationUI() {
     // 予約中断処理
     function stopReservationProcess() {
         console.log('⏹️ 予約を中断');
-        _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_4__/* .entranceReservationStateManager */ .xx.setShouldStop(true);
+        entrance_reservation_state_manager/* entranceReservationStateManager */.xx.setShouldStop(true);
         showStatus('予約処理を中断中...', 'orange');
         // 中断フラグ設定後、UIを即座に更新
-        _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_4__/* .entranceReservationStateManager */ .xx.updateFabDisplay();
+        entrance_reservation_state_manager/* entranceReservationStateManager */.xx.updateFabDisplay();
     }
     // 予約開始処理
     async function startReservationProcess() {
@@ -3792,19 +4056,19 @@ function createEntranceReservationUI() {
         // DOM状態から予約対象を同期（予約開始前に必須）
         syncReservationTargetFromDOM();
         // 統一予約開始処理
-        if (!_entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_4__/* .entranceReservationStateManager */ .xx.startReservation()) {
+        if (!entrance_reservation_state_manager/* entranceReservationStateManager */.xx.startReservation()) {
             console.error('❌ 予約開始に失敗しました');
             showStatus('予約開始失敗', 'red');
             return;
         }
         console.log('🔄 予約開始成功、FABボタン状態更新中...');
         // デバッグ: 実行状態を確認
-        const currentState = _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_4__/* .entranceReservationStateManager */ .xx.getExecutionState();
+        const currentState = entrance_reservation_state_manager/* entranceReservationStateManager */.xx.getExecutionState();
         console.log(`🔄 [予約開始後] 実行状態: ${currentState}`);
         // 予約に切り替わった場合にオーバーレイを更新
-        _processing_overlay__WEBPACK_IMPORTED_MODULE_0__/* .processingOverlay */ .O.show('reservation');
+        processing_overlay/* processingOverlay */.O.show('reservation');
         showStatus('予約処理実行中...', 'blue');
-        _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_4__/* .entranceReservationStateManager */ .xx.updateFabDisplay();
+        entrance_reservation_state_manager/* entranceReservationStateManager */.xx.updateFabDisplay();
         // デバッグ: FABボタンの現在の状態を確認
         const mainButton = document.getElementById('ytomo-main-fab');
         if (mainButton) {
@@ -3839,7 +4103,7 @@ function createEntranceReservationUI() {
             }
         };
         // 予約開始前に予約対象情報を保存（成功時のUI更新用）
-        const reservationTarget = _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_4__/* .entranceReservationStateManager */ .xx.getReservationTarget();
+        const reservationTarget = entrance_reservation_state_manager/* entranceReservationStateManager */.xx.getReservationTarget();
         console.log('🔍 予約開始前の対象情報:', reservationTarget);
         try {
             const result = await entranceReservationHelper(config);
@@ -3848,8 +4112,24 @@ function createEntranceReservationUI() {
                 showStatus(`🎉 予約成功！(${result.attempts}回試行)`, 'green');
                 // 予約開始前に保存した対象情報で成功情報を設定
                 if (reservationTarget) {
-                    _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_4__/* .entranceReservationStateManager */ .xx.setReservationSuccess(reservationTarget.timeSlot, reservationTarget.locationIndex);
-                    _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_4__/* .entranceReservationStateManager */ .xx.updateFabDisplay(); // FAB表示更新
+                    entrance_reservation_state_manager/* entranceReservationStateManager */.xx.setReservationSuccess(reservationTarget.timeSlot, reservationTarget.locationIndex);
+                    entrance_reservation_state_manager/* entranceReservationStateManager */.xx.updateFabDisplay(); // FAB表示更新
+                    // 通知音が有効な場合は成功音を再生
+                    const soundEnabled = entrance_reservation_state_manager/* entranceReservationStateManager */.xx.isNotificationSoundEnabled();
+                    console.log(`🔍 予約成功時の通知音設定チェック: ${soundEnabled ? '有効' : '無効'}`);
+                    if (soundEnabled) {
+                        console.log('🎵 予約成功 - 通知音を再生');
+                        try {
+                            AudioPlayer.playSuccessSound();
+                            console.log('✅ 通知音再生完了');
+                        }
+                        catch (error) {
+                            console.error('❌ 通知音再生エラー:', error);
+                        }
+                    }
+                    else {
+                        console.log('🔇 予約成功 - 通知音は無効のため再生なし');
+                    }
                     console.log('✅ 予約成功UI更新完了');
                 }
                 else {
@@ -3885,8 +4165,8 @@ function createEntranceReservationUI() {
         }
         finally {
             // 入場予約状態管理システムで予約実行終了
-            _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_4__/* .entranceReservationStateManager */ .xx.stop();
-            _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_4__/* .entranceReservationStateManager */ .xx.updateFabDisplay();
+            entrance_reservation_state_manager/* entranceReservationStateManager */.xx.stop();
+            entrance_reservation_state_manager/* entranceReservationStateManager */.xx.updateFabDisplay();
             // 予約終了時の表示更新は統一システムで管理
         }
     }
@@ -3915,7 +4195,7 @@ function createEntranceReservationUI() {
     efficiencyToggleButton.addEventListener('click', (e) => {
         e.preventDefault();
         e.stopPropagation();
-        _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_4__/* .entranceReservationStateManager */ .xx.toggleEfficiencyMode();
+        entrance_reservation_state_manager/* entranceReservationStateManager */.xx.toggleEfficiencyMode();
         updateEfficiencyToggleButton();
     });
     // ホバー効果はCSSで制御
@@ -3926,7 +4206,7 @@ function createEntranceReservationUI() {
     // DOMに追加（body直下）
     document.body.appendChild(fabContainer);
     // 効率モード設定を読み込み
-    _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_4__/* .entranceReservationStateManager */ .xx.loadEfficiencyModeSettings();
+    entrance_reservation_state_manager/* entranceReservationStateManager */.xx.loadEfficiencyModeSettings();
     updateEfficiencyToggleButton(); // ボタン表示を更新
     // 自動選択イベントリスナーを設定
     window.addEventListener('entrance-auto-select', async (event) => {
@@ -3939,7 +4219,7 @@ function createEntranceReservationUI() {
         try {
             // オーバーレイを確実に非表示にして状態をリセット
             console.log('🛡️ 予約移行: オーバーレイ状態をリセット');
-            _processing_overlay__WEBPACK_IMPORTED_MODULE_0__/* .processingOverlay */ .O.hide();
+            processing_overlay/* processingOverlay */.O.hide();
             // 1. 時間帯要素をクリックして選択状態にする
             console.log(`🖱️ 自動選択: 時間帯をクリック ${slot.targetInfo.timeSlot}`);
             const timeSlotElement = document.querySelector(slot.targetInfo.selector);
@@ -3952,7 +4232,7 @@ function createEntranceReservationUI() {
                     // 2. 選択後、少し待ってから内部的に自動予約を開始
                     setTimeout(async () => {
                         console.log('🚀 内部的に自動予約を開始');
-                        if (_entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_4__/* .entranceReservationStateManager */ .xx.canStartReservation()) {
+                        if (entrance_reservation_state_manager/* entranceReservationStateManager */.xx.canStartReservation()) {
                             await startReservationProcess();
                         }
                         else {
@@ -3973,8 +4253,8 @@ function createEntranceReservationUI() {
         }
     });
     // FAB表示状態を初期化・適用
-    (0,_entrance_page_state__WEBPACK_IMPORTED_MODULE_1__.loadFABVisibility)();
-    (0,_entrance_page_state__WEBPACK_IMPORTED_MODULE_1__.updateFABVisibility)();
+    (0,entrance_page_state.loadFABVisibility)();
+    (0,entrance_page_state.updateFABVisibility)();
     // 初期状態を判定してFABを更新
     waitForTimeSlotTable(() => {
         checkInitialState();
@@ -4045,9 +4325,9 @@ function canStartReservation() {
 function checkInitialState() {
     console.log('🔍 初期状態をチェック中...');
     // 【統一システム連動】統一システムが責任を持つ場合はスキップ
-    const currentState = _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_4__/* .entranceReservationStateManager */ .xx.getExecutionState();
-    const preferredAction = _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_4__/* .entranceReservationStateManager */ .xx.getPreferredAction();
-    if (currentState !== _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_4__/* .ExecutionState */ .si.IDLE) {
+    const currentState = entrance_reservation_state_manager/* entranceReservationStateManager */.xx.getExecutionState();
+    const preferredAction = entrance_reservation_state_manager/* entranceReservationStateManager */.xx.getPreferredAction();
+    if (currentState !== entrance_reservation_state_manager/* ExecutionState */.si.IDLE) {
         console.log(`🔄 統一システム実行中 (${currentState}) - 初期状態チェックをスキップ`);
         return;
     }
@@ -4058,22 +4338,22 @@ function checkInitialState() {
     // 【統一システム完全委譲】FABボタン状態は統一システムが一元管理
     console.log('🔄 FABボタン状態は統一システムに完全委譲');
     // 統一システムに状態更新を要求
-    _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_4__/* .entranceReservationStateManager */ .xx.updateFabDisplay();
+    entrance_reservation_state_manager/* entranceReservationStateManager */.xx.updateFabDisplay();
 }
 // カレンダー変更を検知してボタンを再設置
 function startCalendarWatcher() {
-    if (_entrance_page_state__WEBPACK_IMPORTED_MODULE_1__.calendarWatchState.isWatching)
+    if (entrance_page_state.calendarWatchState.isWatching)
         return;
-    _entrance_page_state__WEBPACK_IMPORTED_MODULE_1__.calendarWatchState.isWatching = true;
-    _entrance_page_state__WEBPACK_IMPORTED_MODULE_1__.calendarWatchState.currentSelectedDate = (0,_entrance_page_core__WEBPACK_IMPORTED_MODULE_3__/* .getCurrentSelectedCalendarDate */ .rY)();
+    entrance_page_state.calendarWatchState.isWatching = true;
+    entrance_page_state.calendarWatchState.currentSelectedDate = (0,entrance_page_core/* getCurrentSelectedCalendarDate */.rY)();
     // 初期化時に入場予約状態管理にも現在の選択日付を設定
-    if (_entrance_page_state__WEBPACK_IMPORTED_MODULE_1__.calendarWatchState.currentSelectedDate) {
-        _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_4__/* .entranceReservationStateManager */ .xx.setSelectedCalendarDate(_entrance_page_state__WEBPACK_IMPORTED_MODULE_1__.calendarWatchState.currentSelectedDate);
-        console.log(`📅 初期化時の選択日付を設定: ${_entrance_page_state__WEBPACK_IMPORTED_MODULE_1__.calendarWatchState.currentSelectedDate}`);
+    if (entrance_page_state.calendarWatchState.currentSelectedDate) {
+        entrance_reservation_state_manager/* entranceReservationStateManager */.xx.setSelectedCalendarDate(entrance_page_state.calendarWatchState.currentSelectedDate);
+        console.log(`📅 初期化時の選択日付を設定: ${entrance_page_state.calendarWatchState.currentSelectedDate}`);
     }
     console.log('📅 カレンダー変更検知を開始');
     // MutationObserverでカレンダー変更・時間帯選択・ボタン状態変更を検出
-    _entrance_page_state__WEBPACK_IMPORTED_MODULE_1__.calendarWatchState.observer = new MutationObserver((mutations) => {
+    entrance_page_state.calendarWatchState.observer = new MutationObserver((mutations) => {
         let shouldUpdate = false;
         mutations.forEach((mutation) => {
             // 1. カレンダーのaria-pressed属性の変更を検出
@@ -4094,12 +4374,12 @@ function startCalendarWatcher() {
                     const ariaPressed = element.getAttribute('aria-pressed');
                     console.log(`🔄 時間帯選択変更検出: ${ariaPressed}`);
                     // 入場予約状態管理システムの同期（初期化中は除外）
-                    if (ariaPressed === 'true' && !_entrance_page_state__WEBPACK_IMPORTED_MODULE_1__.calendarWatchState.isInitializing) {
+                    if (ariaPressed === 'true' && !entrance_page_state.calendarWatchState.isInitializing) {
                         // 選択状態変更を検出 - DOM状態から予約対象を同期
                         console.log(`🔄 時間帯選択状態を検出`);
                         setTimeout(() => {
                             syncReservationTargetFromDOM();
-                            _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_4__/* .entranceReservationStateManager */ .xx.updateFabDisplay();
+                            entrance_reservation_state_manager/* entranceReservationStateManager */.xx.updateFabDisplay();
                         }, 50);
                     }
                     shouldUpdate = true;
@@ -4124,7 +4404,7 @@ function startCalendarWatcher() {
     });
     // カレンダー要素全体を検知
     const observeTarget = document.body;
-    _entrance_page_state__WEBPACK_IMPORTED_MODULE_1__.calendarWatchState.observer.observe(observeTarget, {
+    entrance_page_state.calendarWatchState.observer.observe(observeTarget, {
         attributes: true,
         subtree: true,
         attributeFilter: ['aria-pressed', 'class', 'disabled']
@@ -4133,48 +4413,48 @@ function startCalendarWatcher() {
 // カレンダー変更・状態変更時の処理
 async function handleCalendarChange() {
     // 動的待機で日付を取得（遷移中の場合は適切に待機）
-    const newSelectedDate = await (0,_entrance_page_core__WEBPACK_IMPORTED_MODULE_3__/* .waitForValidCalendarDate */ .p4)(3000, 100);
-    const calendarDateChanged = newSelectedDate !== _entrance_page_state__WEBPACK_IMPORTED_MODULE_1__.calendarWatchState.currentSelectedDate;
+    const newSelectedDate = await (0,entrance_page_core/* waitForValidCalendarDate */.p4)(3000, 100);
+    const calendarDateChanged = newSelectedDate !== entrance_page_state.calendarWatchState.currentSelectedDate;
     // 入場予約状態管理の管理している日付とも比較
-    const stateManagerSelectedDate = _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_4__/* .entranceReservationStateManager */ .xx.getSelectedCalendarDate();
+    const stateManagerSelectedDate = entrance_reservation_state_manager/* entranceReservationStateManager */.xx.getSelectedCalendarDate();
     const actualDateChanged = newSelectedDate !== stateManagerSelectedDate;
     if (calendarDateChanged) {
-        console.log(`📅 カレンダー日付変更を検出: ${_entrance_page_state__WEBPACK_IMPORTED_MODULE_1__.calendarWatchState.currentSelectedDate} → ${newSelectedDate}`);
-        _entrance_page_state__WEBPACK_IMPORTED_MODULE_1__.calendarWatchState.currentSelectedDate = newSelectedDate;
+        console.log(`📅 カレンダー日付変更を検出: ${entrance_page_state.calendarWatchState.currentSelectedDate} → ${newSelectedDate}`);
+        entrance_page_state.calendarWatchState.currentSelectedDate = newSelectedDate;
         // 入場予約状態管理にも日付を設定
         if (newSelectedDate) {
-            _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_4__/* .entranceReservationStateManager */ .xx.setSelectedCalendarDate(newSelectedDate);
+            entrance_reservation_state_manager/* entranceReservationStateManager */.xx.setSelectedCalendarDate(newSelectedDate);
         }
         // 実際に日付が変更された場合のみ状態をクリア
         if (actualDateChanged) {
             console.log(`📅 実際の日付変更確認: ${stateManagerSelectedDate} → ${newSelectedDate}`);
-            const hasReservationTarget = _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_4__/* .entranceReservationStateManager */ .xx.hasReservationTarget();
+            const hasReservationTarget = entrance_reservation_state_manager/* entranceReservationStateManager */.xx.hasReservationTarget();
             if (hasReservationTarget) {
                 console.log('📅 日付変更により予約対象をクリア');
-                _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_4__/* .entranceReservationStateManager */ .xx.clearReservationTarget();
+                entrance_reservation_state_manager/* entranceReservationStateManager */.xx.clearReservationTarget();
             }
         }
         else {
             console.log('📅 同じ日付への再クリック');
         }
         // 予約対象がクリアされたため、即座にFAB表示を更新
-        _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_4__/* .entranceReservationStateManager */ .xx.updateFabDisplay();
+        entrance_reservation_state_manager/* entranceReservationStateManager */.xx.updateFabDisplay();
     }
     else {
         // 日付は変わっていない - FABボタンの状態のみ更新
         console.log('📅 日付変更なし - FABボタンの状態のみ更新');
         // 入場予約状態管理システムを取得して状態同期
         // 公式サイトによる選択解除があった場合の状態同期
-        const selectedSlot = document.querySelector(_entrance_page_dom_utils__WEBPACK_IMPORTED_MODULE_2__/* .timeSlotSelectors */ .eN.selectedSlot);
-        if (!selectedSlot && _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_4__/* .entranceReservationStateManager */ .xx.hasReservationTarget()) {
+        const selectedSlot = document.querySelector(entrance_page_dom_utils/* timeSlotSelectors */.eN.selectedSlot);
+        if (!selectedSlot && entrance_reservation_state_manager/* entranceReservationStateManager */.xx.hasReservationTarget()) {
             // DOM上に選択がないが入場予約状態管理に予約対象がある場合はクリア
             console.log('🔄 公式サイトによる選択解除を検出 - 入場予約状態管理を同期');
-            _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_4__/* .entranceReservationStateManager */ .xx.clearReservationTarget();
+            entrance_reservation_state_manager/* entranceReservationStateManager */.xx.clearReservationTarget();
             // UI更新を確実に実行
-            _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_4__/* .entranceReservationStateManager */ .xx.updateFabDisplay();
+            entrance_reservation_state_manager/* entranceReservationStateManager */.xx.updateFabDisplay();
         }
         // FABボタンの状態を更新
-        _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_4__/* .entranceReservationStateManager */ .xx.updateFabDisplay();
+        entrance_reservation_state_manager/* entranceReservationStateManager */.xx.updateFabDisplay();
     }
 }
 // DOM上の選択状態から予約対象を同期
@@ -4185,16 +4465,16 @@ function syncReservationTargetFromDOM() {
         const tdElement = selectedElement.closest('td[data-gray-out]');
         const timeText = selectedElement.querySelector('dt span')?.textContent?.trim();
         if (tdElement && timeText) {
-            const locationIndex = _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_4__/* .LocationHelper */ .Qs.getIndexFromElement(tdElement);
-            const selector = (0,_entrance_page_dom_utils__WEBPACK_IMPORTED_MODULE_2__/* .generateUniqueTdSelector */ .sN)(tdElement);
+            const locationIndex = entrance_reservation_state_manager/* LocationHelper */.Qs.getIndexFromElement(tdElement);
+            const selector = (0,entrance_page_dom_utils/* generateUniqueTdSelector */.sN)(tdElement);
             console.log(`🔄 DOM状態から予約対象を同期: ${timeText} (位置: ${locationIndex})`);
-            _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_4__/* .entranceReservationStateManager */ .xx.setReservationTarget(timeText, locationIndex, selector);
+            entrance_reservation_state_manager/* entranceReservationStateManager */.xx.setReservationTarget(timeText, locationIndex, selector);
         }
     }
     else {
         // 選択状態の要素がない場合は予約対象をクリア
         console.log(`🔄 選択状態なし - 予約対象をクリア`);
-        _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_4__/* .entranceReservationStateManager */ .xx.clearReservationTarget();
+        entrance_reservation_state_manager/* entranceReservationStateManager */.xx.clearReservationTarget();
     }
 }
 // 時間帯テーブルの準備を待つ
@@ -4258,9 +4538,9 @@ function setupTimeSlotClickHandlers() {
             return;
         }
         // 入場予約状態管理システムを取得
-        const locationIndex = _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_4__/* .LocationHelper */ .Qs.getIndexFromElement(tdElement);
+        const locationIndex = entrance_reservation_state_manager/* LocationHelper */.Qs.getIndexFromElement(tdElement);
         // 入場予約状態管理で現在の選択状態を確認
-        const isCurrentlyReservationTarget = _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_4__/* .entranceReservationStateManager */ .xx.isReservationTarget(timeText, locationIndex);
+        const isCurrentlyReservationTarget = entrance_reservation_state_manager/* entranceReservationStateManager */.xx.isReservationTarget(timeText, locationIndex);
         if (isCurrentlyReservationTarget) {
             // 既に予約対象として設定済みの場合は選択解除
             // イベントを停止（デフォルト動作を防ぐ）
@@ -4272,14 +4552,14 @@ function setupTimeSlotClickHandlers() {
                 currentSelectedCalendarButton.click();
                 // 入場予約状態管理からも予約対象を削除
                 setTimeout(() => {
-                    _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_4__/* .entranceReservationStateManager */ .xx.clearReservationTarget();
-                    _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_4__/* .entranceReservationStateManager */ .xx.updateFabDisplay();
+                    entrance_reservation_state_manager/* entranceReservationStateManager */.xx.clearReservationTarget();
+                    entrance_reservation_state_manager/* entranceReservationStateManager */.xx.updateFabDisplay();
                 }, 100);
             }
             else {
                 // フォールバック: 直接削除
-                _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_4__/* .entranceReservationStateManager */ .xx.clearReservationTarget();
-                _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_4__/* .entranceReservationStateManager */ .xx.updateFabDisplay();
+                entrance_reservation_state_manager/* entranceReservationStateManager */.xx.clearReservationTarget();
+                entrance_reservation_state_manager/* entranceReservationStateManager */.xx.updateFabDisplay();
             }
         }
         else {
@@ -4287,7 +4567,7 @@ function setupTimeSlotClickHandlers() {
             // DOM上の選択状態から予約対象を同期
             setTimeout(() => {
                 syncReservationTargetFromDOM();
-                _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_4__/* .entranceReservationStateManager */ .xx.updateFabDisplay();
+                entrance_reservation_state_manager/* entranceReservationStateManager */.xx.updateFabDisplay();
             }, 100);
         }
     };
@@ -4302,24 +4582,24 @@ async function entranceReservationHelper(config) {
     console.log('🚀 統一自動処理管理による入場予約補助機能を開始します...');
     try {
         // 統一自動処理管理による予約処理実行
-        const result = await _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_4__/* .entranceReservationStateManager */ .xx.executeUnifiedReservationProcess(config);
+        const result = await entrance_reservation_state_manager/* entranceReservationStateManager */.xx.executeUnifiedReservationProcess(config);
         if (result.success) {
             console.log('🎉 統一予約処理成功！');
         }
         else if (result.cancelled) {
             console.log('⏹️ 統一予約処理がキャンセルされました');
-            _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_4__/* .entranceReservationStateManager */ .xx.stop();
+            entrance_reservation_state_manager/* entranceReservationStateManager */.xx.stop();
         }
         else if (result.abnormalTermination) {
             console.error('🚨 統一予約処理異常終了');
-            _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_4__/* .entranceReservationStateManager */ .xx.setShouldStop(true);
+            entrance_reservation_state_manager/* entranceReservationStateManager */.xx.setShouldStop(true);
         }
         return result;
     }
     catch (error) {
         if (error.name === 'CancellationError') {
             console.log('⏹️ 統一予約処理が中断されました');
-            _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_4__/* .entranceReservationStateManager */ .xx.stop();
+            entrance_reservation_state_manager/* entranceReservationStateManager */.xx.stop();
             return { success: false, attempts: 0, cancelled: true };
         }
         else {
@@ -5099,8 +5379,8 @@ var entrance_page_state = __webpack_require__(31);
 var entrance_page_dom_utils = __webpack_require__(38);
 // EXTERNAL MODULE: ./ts/modules/entrance-page-core.ts
 var entrance_page_core = __webpack_require__(271);
-// EXTERNAL MODULE: ./ts/modules/entrance-page-fab.ts
-var entrance_page_fab = __webpack_require__(975);
+// EXTERNAL MODULE: ./ts/modules/entrance-page-fab.ts + 1 modules
+var entrance_page_fab = __webpack_require__(851);
 ;// ./ts/modules/entrance-page-init.ts
 // ============================================================================
 // 【入場予約画面初期化】
@@ -5158,7 +5438,7 @@ const init_entrance_page = (dependencies = {}) => {
         if (restoreFromCacheFn)
             await restoreFromCacheFn();
         // キャッシュ復元後にカレンダー変更を開始
-        const { startCalendarWatcher } = await Promise.resolve(/* import() */).then(__webpack_require__.bind(__webpack_require__, 975));
+        const { startCalendarWatcher } = await Promise.resolve(/* import() */).then(__webpack_require__.bind(__webpack_require__, 851));
         startCalendarWatcher();
         // 初期化完了時に読み込み状態を解除
         if (setPageLoadingStateFn)
@@ -7213,6 +7493,8 @@ function initCompanionTicketFeature() {
 
 // EXTERNAL MODULE: ./ts/modules/entrance-reservation-state-manager.ts + 1 modules
 var entrance_reservation_state_manager = __webpack_require__(79);
+// EXTERNAL MODULE: ./ts/modules/page-utils.ts
+var page_utils = __webpack_require__(214);
 ;// ./ts/modules/app-router.ts
 // 各モジュールからのimport
 
@@ -7304,32 +7586,11 @@ const initializeUnifiedStateManager = () => {
 // entrance-page-uiに必要な関数を注入
 (0,entrance_page_core/* setEntranceReservationHelper */.XP)(entrance_page_fab/* entranceReservationHelper */.FX);
 // 各モジュールで直接インポートを使用
-// URL判定とページタイプ識別
-const identify_page_type = (url) => {
-    try {
-        const urlObj = new URL(url);
-        const pathname = urlObj.pathname;
-        if (pathname === '/ticket_visiting_reservation/') {
-            return "entrance_reservation";
-        }
-        else if (pathname === '/event_search/') {
-            return "pavilion_reservation";
-        }
-        else if (pathname === '/ticket_selection/') {
-            return "ticket_selection";
-        }
-        else if (pathname === '/agent_ticket/') {
-            return "agent_ticket";
-        }
-    }
-    catch (error) {
-        console.error(`URL解析エラー: ${error}`);
-    }
-    return null;
-};
+// URL判定とページタイプ識別（共通utilityに移動）
+
 // ページ遷移時の初期化トリガー
 const trigger_init = (url_record) => {
-    const page_type = identify_page_type(url_record);
+    const page_type = (0,page_utils/* identify_page_type */.a)(url_record);
     // 同じページタイプで初期化中の場合はスキップ
     if (currentPageType === page_type && isPageInitializing) {
         return;

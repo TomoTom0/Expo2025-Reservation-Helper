@@ -121,6 +121,10 @@ export class EntranceReservationStateManager {
     constructor() {
         // 統一自動処理管理を初期化
         this.automationManager = new UnifiedAutomationManager(this);
+        
+        // 保存された設定を読み込み
+        this.loadNotificationSoundSettings();
+        
         console.log('📋 統一状態管理システム初期化完了');
     }
     
@@ -176,6 +180,11 @@ export class EntranceReservationStateManager {
     
     // デバッグフラグ（本番環境では詳細ログを抑制）
     private debugMode: boolean = true;
+    
+    // 通知音設定
+    private notificationSound = {
+        enabled: true // デフォルトで有効
+    };
     
     
     // ============================================================================
@@ -578,8 +587,7 @@ export class EntranceReservationStateManager {
         // 4. 来場日時ボタンの有効性確認
         const visitTimeButton = document.querySelector('button.basic-btn.type2.style_full__ptzZq') as HTMLButtonElement;
         if (!visitTimeButton || visitTimeButton.disabled) {
-            console.log(`⚠️ 来場日時ボタンが無効: exists=${!!visitTimeButton}, disabled=${visitTimeButton?.disabled}`);
-            console.log(`📵 すでに予約取得済みまたは予約不可能な状態のため予約開始を阻止`);
+            // 過剰ログ防止のため削除
             return false;
         }
         
@@ -1139,6 +1147,47 @@ export class EntranceReservationStateManager {
             }
         } catch (error) {
             console.error('効率モード設定読み込みエラー:', error);
+        }
+    }
+    
+    // ============================================================================
+    // 通知音設定管理
+    // ============================================================================
+    
+    // 通知音の有効/無効を切り替え
+    toggleNotificationSound(): boolean {
+        this.notificationSound.enabled = !this.notificationSound.enabled;
+        this.saveNotificationSoundSettings();
+        this.log(`🔊 通知音設定変更: ${this.notificationSound.enabled ? '有効' : '無効'}`);
+        return this.notificationSound.enabled;
+    }
+    
+    // 通知音が有効かどうか
+    isNotificationSoundEnabled(): boolean {
+        return this.notificationSound.enabled;
+    }
+    
+    // 通知音設定を保存
+    private saveNotificationSoundSettings(): void {
+        try {
+            localStorage.setItem('ytomo-notification-sound', JSON.stringify({
+                enabled: this.notificationSound.enabled
+            }));
+        } catch (error) {
+            console.error('通知音設定保存エラー:', error);
+        }
+    }
+    
+    // 通知音設定を読み込み
+    loadNotificationSoundSettings(): void {
+        try {
+            const saved = localStorage.getItem('ytomo-notification-sound');
+            if (saved) {
+                const settings = JSON.parse(saved);
+                this.notificationSound.enabled = settings.enabled !== false; // デフォルトは有効
+            }
+        } catch (error) {
+            console.error('通知音設定読み込みエラー:', error);
         }
     }
     
