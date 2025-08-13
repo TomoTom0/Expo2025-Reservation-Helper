@@ -239,6 +239,12 @@ class CompanionProcessManager {
 
             try {
                 const result = await this.waitForProcessingComplete();
+                
+                if (result) {
+                    // 成功した場合、チケット選択画面に戻る
+                    await this.returnToTicketSelection();
+                }
+                
                 return result;
             } catch (error) {
                 console.error('❌ 処理完了待機でタイムアウト:', error);
@@ -512,7 +518,63 @@ class CompanionProcessManager {
         });
     }
 
+    // 同行者追加成功後にチケット選択画面に戻る
+    private async returnToTicketSelection(): Promise<void> {
+        console.log('🔄 チケット選択画面への戻り処理開始');
+        
+        try {
+            // 「次へ」ボタンを探してクリック
+            const nextButton = await this.waitForElement<HTMLButtonElement>(
+                'button.basic-btn.type2:not(.style_main__register_btn__FHBxM)', 
+                5000
+            );
+            
+            if (nextButton) {
+                console.log('🔘 「次へ」ボタンをクリック');
+                nextButton.click();
+                
+                // チケット選択画面への戻りを待機
+                await this.waitForTicketSelectionPage();
+            } else {
+                console.warn('⚠️ 「次へ」ボタンが見つかりません');
+            }
+            
+        } catch (error) {
+            console.error('❌ チケット選択画面への戻りでエラー:', error);
+        }
+    }
 
+    // チケット選択画面への戻りを待機
+    private async waitForTicketSelectionPage(): Promise<void> {
+        const maxWaitTime = 10000; // 10秒
+        const checkInterval = 500;
+        let elapsed = 0;
+
+        return new Promise((resolve) => {
+            const checkReturn = () => {
+                // チケット選択画面の特徴的な要素をチェック
+                const ticketSelection = document.querySelector('.style_main__ticket_list__OD9dG') || 
+                                      document.querySelector('.style_main__content__2xq7k');
+                
+                if (ticketSelection) {
+                    console.log('✅ チケット選択画面への戻りを確認');
+                    resolve();
+                    return;
+                }
+
+                elapsed += checkInterval;
+                if (elapsed >= maxWaitTime) {
+                    console.warn('⚠️ チケット選択画面への戻りがタイムアウト');
+                    resolve();
+                    return;
+                }
+
+                setTimeout(checkReturn, checkInterval);
+            };
+
+            setTimeout(checkReturn, checkInterval);
+        });
+    }
 
     // 要素の動的待機（汎用）
     private async waitForElement<T extends Element>(selector: string, timeout: number = 10000): Promise<T | null> {
