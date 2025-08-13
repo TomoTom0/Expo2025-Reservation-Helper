@@ -9,7 +9,7 @@
 // @run-at       document-end
 // ==/UserScript==
 
-// Built: 2025/08/13 16:34:15
+// Built: 2025/08/13 16:50:42
 
 
 (function webpackUniversalModuleDefinition(root, factory) {
@@ -2018,7 +2018,7 @@ const identify_page_type = (url) => {
 /* harmony export */   p4: () => (/* binding */ waitForValidCalendarDate),
 /* harmony export */   rY: () => (/* binding */ getCurrentSelectedCalendarDate)
 /* harmony export */ });
-/* unused harmony exports startTimeSlotTableObserver, waitForTimeSlotTable, checkTimeSlotTableExistsSync, analyzeTimeSlots, extractTimeSlotInfo, generateSelectorForElement, clickCalendarDate, tryClickCalendarForTimeSlot, showErrorMessage, restoreSelectionAfterUpdate, getCurrentEntranceConfig, getCurrentFabState, getCurrentMode, updateStatusBadge, resetPreviousSelection, scheduleReload, startReloadCountdown, stopReloadCountdown */
+/* unused harmony exports checkTimeSlotTableExistsSync, getCurrentEntranceConfig, getCurrentFabState, getCurrentMode, updateStatusBadge, resetPreviousSelection, scheduleReload, startReloadCountdown, stopReloadCountdown */
 /* harmony import */ var _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(79);
 /* harmony import */ var _entrance_page_dom_utils__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(38);
 // entrance-page-stateからのimport（もう使用しません）
@@ -2032,97 +2032,6 @@ const identify_page_type = (url) => {
 const setCacheManager = (_cm) => {
     // 必要に応じて使用
 };
-// 時間帯テーブルの動的生成を検出（ループ防止版）
-function startTimeSlotTableObserver() {
-    console.log('時間帯テーブルの動的生成検出を開始');
-    let isProcessing = false; // 処理中フラグでループ防止
-    let lastTableContent = ''; // 前回のテーブル内容を記録
-    // MutationObserverで DOM変化を検知
-    const observer = new MutationObserver((mutations) => {
-        if (isProcessing) {
-            console.log('⏭️ 処理中のため変更を無視');
-            return;
-        }
-        let hasRelevantChange = false;
-        mutations.forEach((mutation) => {
-            // console.log(`📊 DOM変更検出: type=${mutation.type}, target=${mutation.target.tagName}`, mutation);
-            if (mutation.type === 'childList') {
-                const addedNodes = Array.from(mutation.addedNodes);
-                const removedNodes = Array.from(mutation.removedNodes);
-                // 時間帯テーブル関連の変更のみ検出
-                const hasTableChange = [...addedNodes, ...removedNodes].some(node => {
-                    if (node.nodeType === Node.ELEMENT_NODE) {
-                        const element = node;
-                        const isRelevant = element.tagName === 'TABLE' ||
-                            element.tagName === 'TD' ||
-                            element.tagName === 'IMG' || // アイコン変更も検出
-                            (element.querySelector && (element.querySelector('table') ||
-                                element.querySelector('td[data-gray-out]') ||
-                                element.querySelector('div[role="button"]') ||
-                                element.querySelector('img[src*="calendar_ng.svg"]') ||
-                                element.querySelector('img[src*="ico_scale"]')));
-                        if (isRelevant) {
-                            // console.log(`🔍 テーブル関連の変更を検出: ${element.tagName}`, element);
-                        }
-                        return isRelevant;
-                    }
-                    return false;
-                });
-                if (hasTableChange) {
-                    hasRelevantChange = true;
-                }
-            }
-            else if (mutation.type === 'attributes') {
-                // 属性変更も検知（data-disabled、src等）
-                const target = mutation.target;
-                const attrName = mutation.attributeName;
-                if (target.nodeType === Node.ELEMENT_NODE) {
-                    const isRelevantAttr = ((attrName === 'data-disabled' && target.tagName === 'DIV' && target.getAttribute('role') === 'button') ||
-                        (attrName === 'src' && target.tagName === 'IMG') ||
-                        (attrName === 'aria-pressed' && target.tagName === 'DIV' && target.getAttribute('role') === 'button'));
-                    if (isRelevantAttr) {
-                        // console.log(`🔄 属性変更を検出: ${attrName}=${target.getAttribute(attrName)}`, target);
-                        hasRelevantChange = true;
-                    }
-                }
-            }
-        });
-        if (hasRelevantChange) {
-            // デバウンス処理
-            clearTimeout(window.timeSlotCheckTimeout);
-            window.timeSlotCheckTimeout = window.setTimeout(() => {
-                // 現在のテーブル内容をチェック
-                const currentTableContent = getCurrentTableContent();
-                if (currentTableContent === lastTableContent) {
-                    console.log('📋 テーブル内容に変化なし、処理をスキップ');
-                    return;
-                }
-                // console.log('🔍 有効な時間帯テーブル変更を検出');
-                isProcessing = true;
-                // テーブル内容を記録
-                lastTableContent = getCurrentTableContent();
-                isProcessing = false;
-            }, 800);
-        }
-    });
-    // 検知範囲を限定（属性変更も検知）
-    observer.observe(document.body, {
-        childList: true,
-        subtree: true,
-        attributes: true,
-        attributeFilter: ['data-disabled', 'src', 'aria-pressed']
-    });
-    // 初回チェック
-    setTimeout(() => {
-        if (checkTimeSlotTableExistsSync()) {
-            // console.log('既存の時間帯テーブルを検出');
-            isProcessing = true;
-            lastTableContent = getCurrentTableContent();
-            isProcessing = false;
-        }
-    }, 1000);
-    console.log('継続的な時間帯テーブル検知を開始しました（ループ防止版）');
-}
 // 時間帯テーブルの動的待機
 async function waitForTimeSlotTable(timeout = 10000) {
     const startTime = Date.now();
@@ -2160,106 +2069,7 @@ function checkTimeSlotTableExistsSync() {
     // console.log('❌ 実際の時間帯要素が見つかりません（カレンダー日付のみ）');
     return false;
 }
-// 全時間帯の状態分析
-function analyzeTimeSlots() {
-    const available = [];
-    const full = [];
-    const selected = [];
-    // 全てのtd要素を取得（時間帯テーブル内）
-    const allTdElements = document.querySelectorAll(timeSlotSelectors.timeSlotContainer + ' td[data-gray-out]');
-    // console.log(`📊 時間帯分析開始: ${allTdElements.length}個のtd要素を確認`);
-    allTdElements.forEach(tdElement => {
-        const status = extractTdStatus(tdElement);
-        if (status && status.timeText) {
-            const isFull = status.isFull;
-            const isAvailable = status.isAvailable;
-            const isSelected = status.element.getAttribute('aria-pressed') === 'true';
-            let statusType = 'unknown';
-            if (isFull) {
-                statusType = 'full';
-            }
-            else if (isSelected) {
-                statusType = 'selected';
-            }
-            else if (isAvailable) {
-                statusType = 'available';
-            }
-            // console.log(`📊 ${status.timeText}: ${statusType} (満員:${isFull}, 利用可能:${isAvailable}, 選択:${isSelected})`);
-            const timeInfo = {
-                element: status.element,
-                tdElement: status.tdElement,
-                timeText: status.timeText,
-                isAvailable: isAvailable,
-                isFull: isFull,
-                tdSelector: generateUniqueTdSelector(status.tdElement)
-            };
-            if (statusType === 'full') {
-                full.push(timeInfo);
-            }
-            else if (statusType === 'selected') {
-                selected.push(timeInfo);
-            }
-            else if (statusType === 'available') {
-                available.push(timeInfo);
-            }
-        }
-    });
-    // console.log(`📊 分析結果: 利用可能=${available.length}, 満員=${full.length}, 選択=${selected.length}`);
-    return { available, full, selected };
-}
-// 時間帯要素から情報を抽出
-function extractTimeSlotInfo(buttonElement) {
-    const tdElement = buttonElement.closest('td');
-    if (!tdElement)
-        return null;
-    // 時間テキストを取得
-    const timeSpan = buttonElement.querySelector('dt span');
-    const timeText = timeSpan ? timeSpan.textContent?.trim() || '' : '';
-    // デバッグ用：要素の状態を詳細表示
-    const dataDisabled = buttonElement.getAttribute('data-disabled');
-    const ariaPressed = buttonElement.getAttribute('aria-pressed');
-    // アイコンによる満員判定（calendar_ng.svgが最も確実）
-    const fullIcon = buttonElement.querySelector('img[src*="calendar_ng.svg"]');
-    const lowIcon = buttonElement.querySelector('img[src*="ico_scale_low.svg"]');
-    const highIcon = buttonElement.querySelector('img[src*="ico_scale_high.svg"]');
-    let iconType = 'unknown';
-    let isAvailable = false;
-    let isFull = false;
-    // アイコンベースでの判定
-    if (fullIcon) {
-        iconType = 'full';
-        isFull = true;
-    }
-    else if (highIcon) {
-        iconType = 'high';
-        isAvailable = true;
-    }
-    else if (lowIcon) {
-        iconType = 'low';
-        isAvailable = true;
-    }
-    // data-disabled属性での追加確認
-    if (dataDisabled === 'true') {
-        isFull = true;
-        isAvailable = false;
-    }
-    // デバッグ情報
-    console.log(`時間帯解析: ${timeText} - isFull: ${isFull}, isAvailable: ${isAvailable}, iconType: ${iconType}, disabled: ${dataDisabled}, pressed: ${ariaPressed}, hasFullIcon: ${!!fullIcon}`);
-    return {
-        element: buttonElement,
-        tdElement: tdElement,
-        timeText: timeText,
-        isAvailable: isAvailable,
-        isFull: isFull,
-        tdSelector: generateSelectorForElement(buttonElement)
-    };
-}
-// 要素のセレクタを生成（フォールバック用）
-function generateSelectorForElement(element) {
-    const timeSpan = element.querySelector('dt span');
-    const timeText = timeSpan ? timeSpan.textContent?.trim() || '' : '';
-    return `td[data-gray-out] div[role='button'] dt span:contains('${timeText}')`;
-}
+// 時間帯分析とボタン追加のメイン処理
 // エクスポート
 
 // 【6. カレンダー・UI状態管理】（entrance-page-ui.tsから統合）
@@ -2648,122 +2458,6 @@ async function clickCalendarDate(targetDate) {
         console.error('❌ カレンダー日付クリックエラー:', error);
         return false;
     }
-}
-// 時間帯表示のためのカレンダー自動クリック機能
-async function tryClickCalendarForTimeSlot() {
-    console.log('📅 時間帯表示のためのカレンダークリックを試行中...');
-    // 1. カレンダー要素を検索
-    const calendarSelectors = [
-        '.style_main__calendar__HRSsz',
-        '[class*="calendar"]',
-        'button[role="button"]:has(.style_main__calendar__HRSsz)',
-        'div[class*="calendar"] button'
-    ];
-    let calendarElement = null;
-    for (const selector of calendarSelectors) {
-        calendarElement = document.querySelector(selector);
-        if (calendarElement) {
-            console.log(`📅 カレンダー要素を発見: ${selector}`);
-            break;
-        }
-    }
-    if (!calendarElement) {
-        console.log('❌ カレンダー要素が見つかりません');
-        return false;
-    }
-    // 2. 現在選択されている日付のみを検索
-    const dateSelectors = [
-        '.style_main__calendar__HRSsz button',
-        '.style_main__calendar__HRSsz [role="button"]',
-        '[class*="calendar"] button:not([disabled])',
-        '[class*="date"]:not([disabled])'
-    ];
-    let clickableDate = null;
-    // 現在選択されている日付を探す（これのみが対象）
-    for (const selector of dateSelectors) {
-        const dates = document.querySelectorAll(selector);
-        for (const date of dates) {
-            if (date.classList.contains('selected') ||
-                date.classList.contains('active') ||
-                date.getAttribute('aria-selected') === 'true') {
-                clickableDate = date;
-                console.log(`📅 現在選択中の日付を発見: ${date.textContent?.trim()}`);
-                break;
-            }
-        }
-        if (clickableDate)
-            break;
-    }
-    // ユーザーが選択した日付のみがクリック対象
-    if (!clickableDate) {
-        console.log('❌ ユーザーが選択した日付が見つかりません');
-        console.log('💡 現在選択中の日付のみクリック可能です');
-        return false;
-    }
-    // 3. 選択中の日付をクリック
-    try {
-        console.log(`🖱️ 日付をクリック: "${clickableDate.textContent?.trim()}"`);
-        // マウスイベントを発火
-        const clickEvent = new MouseEvent('click', {
-            view: window,
-            bubbles: true,
-            cancelable: true
-        });
-        clickableDate.dispatchEvent(clickEvent);
-        // 少し待機してクリック結果を確認（短縮）
-        await new Promise(resolve => setTimeout(resolve, 200));
-        console.log('✅ カレンダー日付のクリックを実行しました');
-        return true;
-    }
-    catch (error) {
-        console.error('❌ カレンダークリック中にエラー:', error);
-        return false;
-    }
-}
-// エラー表示機能
-function showErrorMessage(message) {
-    // 既存のエラーメッセージがあれば削除
-    const existingError = document.getElementById('ytomo-error-message');
-    if (existingError) {
-        existingError.remove();
-    }
-    // エラーメッセージ要素を作成
-    const errorDiv = document.createElement('div');
-    errorDiv.id = 'ytomo-error-message';
-    errorDiv.className = 'ytomo-error-message';
-    errorDiv.innerHTML = `
-        <div class="error-title">⚠️ 監視エラー</div>
-        <div>${message}</div>
-        <button class="error-close-btn" onclick="this.parentElement.remove()">閉じる</button>
-    `;
-    document.body.appendChild(errorDiv);
-    // 10秒後に自動削除
-    setTimeout(() => {
-        if (errorDiv && errorDiv.parentElement) {
-            errorDiv.remove();
-        }
-    }, 10000);
-}
-// 現在のテーブル内容を取得（変化検出用）
-function getCurrentTableContent() {
-    const tables = document.querySelectorAll('table');
-    let content = '';
-    tables.forEach(table => {
-        const timeSlots = table.querySelectorAll('td div[role="button"]');
-        timeSlots.forEach(slot => {
-            const timeText = slot.querySelector('dt span')?.textContent?.trim();
-            const disabled = slot.getAttribute('data-disabled');
-            const pressed = slot.getAttribute('aria-pressed');
-            if (timeText && (timeText.includes(':') || timeText.includes('時'))) {
-                content += `${timeText}-${disabled}-${pressed}|`;
-            }
-        });
-    });
-    return content;
-}
-// 日付変更後の選択状態復元
-function restoreSelectionAfterUpdate() {
-    entranceReservationStateManager.updateFabDisplay();
 }
 // 時間帯を自動選択して予約開始
 // 現在の設定を取得（ヘルパー関数）
