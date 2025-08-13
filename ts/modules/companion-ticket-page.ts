@@ -6,6 +6,8 @@
 // - FABダイアログによる一括操作
 // - 同行者追加画面での自動処理
 
+import { processingOverlay } from './processing-overlay';
+
 // URL検出と画面判定
 export function isTicketSelectionPage(): boolean {
     return window.location.href.includes('ticket_selection');
@@ -13,6 +15,29 @@ export function isTicketSelectionPage(): boolean {
 
 export function isAgentTicketPage(): boolean {
     return window.location.href.includes('agent_ticket');
+}
+
+// 画面で追加済みのチケットIDを検出
+function getAlreadyAddedTicketIds(): Set<string> {
+    const addedTicketIds = new Set<string>();
+    
+    try {
+        // 直接的で効率的なセレクタ: チケットIDを直接取得
+        const ticketIdElements = document.querySelectorAll('ul[data-list-type="myticket_send"] > li > div > dl > div:first-of-type > dd');
+        
+        ticketIdElements.forEach(dd => {
+            const ticketId = dd.textContent?.trim();
+            if (ticketId) {
+                addedTicketIds.add(ticketId);
+            }
+        });
+        
+        console.log(`🔍 画面で検出された追加済みチケットID: ${Array.from(addedTicketIds).join(', ')}`);
+    } catch (error) {
+        console.error('追加済みチケットID検出エラー:', error);
+    }
+    
+    return addedTicketIds;
 }
 
 // チケットID管理システム
@@ -141,6 +166,8 @@ class CompanionProcessManager {
         errorCount: 0,
         errors: []
     };
+    
+    private currentTimeoutId: number | null = null;
 
     // 処理開始
     startProcess(ticketIds: string[]): void {
@@ -158,11 +185,21 @@ class CompanionProcessManager {
         };
 
         console.log(`🚀 同行者追加処理開始: ${ticketIds.length}件のチケットID`);
+        
+        // 同行者処理用オーバーレイを表示
+        processingOverlay.show('companion');
+        
         this.processNext();
     }
 
     // 次のチケットID処理
     private async processNext(): Promise<void> {
+        // 中断チェック
+        if (!this.state.isRunning) {
+            console.log('🛑 処理が中断されたため、次の処理をスキップします');
+            return;
+        }
+        
         if (this.state.queuedTicketIds.length === 0) {
             this.completeProcess();
             return;
@@ -178,15 +215,27 @@ class CompanionProcessManager {
             if (success) {
                 this.state.successCount++;
                 companionTicketManager.markAsUsed(ticketId);
+                
+                // 次の処理（待機時間後）
+                this.currentTimeoutId = window.setTimeout(() => {
+                    if (this.state.isRunning) { // 中断されていないかチェック
+                        this.processNext();
+                    }
+                }, 1000 + Math.random() * 1000);
             } else {
                 this.handleError(ticketId, '処理に失敗しました');
+                // 失敗時は処理を中断
+                console.log('❌ 同行者追加処理に失敗したため処理を中断します');
+                this.completeProcess();
+                return;
             }
         } catch (error) {
             this.handleError(ticketId, error instanceof Error ? error.message : '不明なエラー');
+            // エラー時も処理を中断
+            console.log('❌ 同行者追加処理でエラーが発生したため処理を中断します');
+            this.completeProcess();
+            return;
         }
-
-        // 次の処理（待機時間後）
-        setTimeout(() => this.processNext(), 1000 + Math.random() * 1000);
     }
 
     // 個別チケットID処理（実際の同行者追加処理）
@@ -194,6 +243,12 @@ class CompanionProcessManager {
         console.log(`🎫 チケットID ${ticketId} の処理開始`);
 
         try {
+            // 中断チェック
+            if (!this.state.isRunning) {
+                console.log('🛑 処理が中断されたため、チケット処理を停止します');
+                return false;
+            }
+
             // Phase 1: チケット選択画面で同行者追加ボタンをクリック
             if (isTicketSelectionPage()) {
                 const success = await this.clickCompanionAddButton();
@@ -201,8 +256,20 @@ class CompanionProcessManager {
                     throw new Error('同行者追加ボタンのクリックに失敗');
                 }
 
+                // 中断チェック
+                if (!this.state.isRunning) {
+                    console.log('🛑 処理が中断されたため、画面遷移後の処理を停止します');
+                    return false;
+                }
+
                 // 画面遷移を待機
                 await this.waitForPageTransition();
+            }
+
+            // 中断チェック
+            if (!this.state.isRunning) {
+                console.log('🛑 処理が中断されたため、チケットID入力前に処理を停止します');
+                return false;
             }
 
             // Phase 2: 同行者追加画面でチケットIDを入力
@@ -216,9 +283,21 @@ class CompanionProcessManager {
                 throw new Error('チケットID入力に失敗');
             }
 
+            // 中断チェック
+            if (!this.state.isRunning) {
+                console.log('🛑 処理が中断されたため、入力後の処理を停止します');
+                return false;
+            }
+
             // 入力後の安定化待機（UI更新を確実に待つ）
             console.log('⏳ 入力後の安定化待機中...');
             await new Promise(resolve => setTimeout(resolve, 1000));
+
+            // 中断チェック
+            if (!this.state.isRunning) {
+                console.log('🛑 処理が中断されたため、安定化待機後の処理を停止します');
+                return false;
+            }
 
             // 再度値を確認（フォーム状態の最終検証）
             const inputField = document.getElementById('agent_ticket_id_register') as HTMLInputElement;
@@ -231,18 +310,42 @@ class CompanionProcessManager {
                 inputField.dispatchEvent(new Event('change', { bubbles: true }));
             }
 
+            // 中断チェック
+            if (!this.state.isRunning) {
+                console.log('🛑 処理が中断されたため、追加ボタンクリック前に処理を停止します');
+                return false;
+            }
+
             // 追加ボタンクリック
             const addSuccess = await this.clickAddButton();
             if (!addSuccess) {
                 throw new Error('追加ボタンのクリックに失敗');
             }
 
+            // 中断チェック
+            if (!this.state.isRunning) {
+                console.log('🛑 処理が中断されたため、処理完了待機前に停止します');
+                return false;
+            }
+
             try {
                 const result = await this.waitForProcessingComplete();
                 
-                if (result) {
-                    // 成功した場合、チケット選択画面に戻る
+                // 中断チェック
+                if (!this.state.isRunning) {
+                    console.log('🛑 処理が中断されたため、処理完了後の戻り処理を停止します');
+                    return false;
+                }
+                
+                if (result && this.state.queuedTicketIds.length === 0) {
+                    // 成功かつ残りのチケットがない場合（最後のチケット）のみチケット選択画面に戻る
+                    console.log('✅ 最後のチケット処理成功、チケット選択画面に戻ります');
                     await this.returnToTicketSelection();
+                } else if (result) {
+                    // 成功だが残りのチケットがある場合は戻らない
+                    console.log(`✅ 同行者追加成功、残り${this.state.queuedTicketIds.length}件のため画面戻りはスキップ`);
+                } else {
+                    console.log('❌ 同行者追加失敗、次の処理へ');
                 }
                 
                 return result;
@@ -552,12 +655,27 @@ class CompanionProcessManager {
 
         return new Promise((resolve) => {
             const checkReturn = () => {
-                // チケット選択画面の特徴的な要素をチェック
-                const ticketSelection = document.querySelector('.style_main__ticket_list__OD9dG') || 
-                                      document.querySelector('.style_main__content__2xq7k');
+                // URLでチケット選択画面を確認
+                if (isTicketSelectionPage()) {
+                    console.log('✅ チケット選択画面への戻りを確認（URL判定）');
+                    resolve();
+                    return;
+                }
+                
+                // 追加：チケット選択画面の特徴的な要素をチェック
+                const ticketSelectionElements = [
+                    '.style_main__ticket_list__OD9dG',
+                    '.style_main__content__2xq7k', 
+                    '.col3',  // チケット要素
+                    'input[type="checkbox"][id*="ticket_"]' // チケットチェックボックス
+                ];
+                
+                const ticketSelection = ticketSelectionElements.some(selector => 
+                    document.querySelector(selector) !== null
+                );
                 
                 if (ticketSelection) {
-                    console.log('✅ チケット選択画面への戻りを確認');
+                    console.log('✅ チケット選択画面への戻りを確認（DOM要素判定）');
                     resolve();
                     return;
                 }
@@ -624,6 +742,9 @@ class CompanionProcessManager {
         this.state.isRunning = false;
         this.state.currentTicketId = undefined;
         
+        // オーバーレイを非表示
+        processingOverlay.hide();
+        
         // チェック解除は initializeTicketSelectionPage でのみ実行する
         // （ユーザーの手動チェックを保護するため）
     }
@@ -635,6 +756,16 @@ class CompanionProcessManager {
             this.state.isRunning = false;
             this.state.currentTicketId = undefined;
             this.state.queuedTicketIds = [];
+            
+            // 実行中のタイマーをクリア
+            if (this.currentTimeoutId !== null) {
+                clearTimeout(this.currentTimeoutId);
+                this.currentTimeoutId = null;
+                console.log('⏰ 待機中のタイマーを中断しました');
+            }
+            
+            // オーバーレイを非表示
+            processingOverlay.hide();
         }
     }
 
@@ -646,6 +777,9 @@ class CompanionProcessManager {
 
 // グローバルプロセスマネージャーインスタンス
 export const companionProcessManager = new CompanionProcessManager();
+
+// グローバルアクセス用にwindowオブジェクトに登録
+(window as any).companionProcessManager = companionProcessManager;
 
 // ページタイプごとの初期化関数
 export function initializeTicketSelectionPage(): void {
@@ -763,32 +897,16 @@ function createTicketSelectionFAB(): void {
     // チケット選択画面用FABコンテナ作成（パビリオン検索画面と同様の構造）
     const fabContainer = document.createElement('div');
     fabContainer.id = 'ytomo-ticket-selection-fab-container';
-    fabContainer.classList.add('ytomo-companion-fab', 'ytomo-ticket-selection-page');
+    fabContainer.classList.add('ytomo-ticket-selection-fab-container');
+    // デフォルトで表示（js-hideクラスなし）
     
-    // FAB作成ログ
-    console.log('✨ チケット選択画面用同行者FABを作成しました:', fabContainer.id);
-    fabContainer.style.cssText = `
-        position: fixed !important;
-        bottom: 100px !important;
-        right: 24px !important;
-        z-index: 9999 !important;
-        display: flex !important;
-        flex-direction: column !important;
-        gap: 12px !important;
-        align-items: flex-end !important;
-        pointer-events: auto !important;
-    `;
+    // インラインスタイル完全削除 - 全てSCSSで管理
 
     // 子ボタンコンテナ（展開される部分）
     const subButtonsContainer = document.createElement('div');
     subButtonsContainer.id = 'ytomo-companion-sub-buttons';
-    subButtonsContainer.style.cssText = `
-        display: flex !important;
-        flex-direction: column !important;
-        gap: 8px !important;
-        align-items: flex-end !important;
-        transition: all 0.3s ease !important;
-    `;
+    // 初期状態は展開（js-hideクラスなし）
+    // インラインスタイル完全削除 - 全てSCSSで管理
 
     
     // 同行者ボタン
@@ -945,8 +1063,7 @@ function createTicketSelectionFAB(): void {
     mainFabButton.id = 'ytomo-ticket-selection-main-fab';
     mainFabButton.classList.add('ext-ytomo', 'ytomo-fab', 'ytomo-fab-enabled');
     
-    // FABボタンにrelative positionを設定
-    mainFabButton.style.position = 'relative';
+    // インラインスタイル完全削除 - 全てSCSSで管理
 
     // FABボタンの内容構造（パビリオンFABと同じ構造）
     const fabContent = document.createElement('div');
@@ -1001,23 +1118,16 @@ function createTicketSelectionFAB(): void {
     fabContent.appendChild(functionText);
     mainFabButton.appendChild(fabContent);
 
-    // ホバー効果（パビリオンFABと同じ）
-    mainFabButton.addEventListener('mouseenter', () => {
-        mainFabButton.style.transform = 'scale(1.15)';
-        mainFabButton.style.boxShadow = '0 8px 25px rgba(0, 0, 0, 0.5), 0 4px 12px rgba(0, 0, 0, 0.3)';
-        mainFabButton.style.borderWidth = '4px';
-    });
-
-    mainFabButton.addEventListener('mouseleave', () => {
-        mainFabButton.style.transform = 'scale(1.0)';
-        mainFabButton.style.boxShadow = '0 6px 20px rgba(0, 0, 0, 0.4), 0 2px 8px rgba(0, 0, 0, 0.2)';
-        mainFabButton.style.borderWidth = '3px';
-    });
+    // ホバー効果はSCSSで管理
 
     // メインボタンクリック（展開/縮小）
     mainFabButton.addEventListener('click', () => {
         isExpanded = !isExpanded;
-        subButtonsContainer.style.display = isExpanded ? 'flex' : 'none';
+        if (isExpanded) {
+            subButtonsContainer.classList.remove('js-hide');
+        } else {
+            subButtonsContainer.classList.add('js-hide');
+        }
         updateMainButtonIcon();
     });
 
@@ -1624,13 +1734,13 @@ function showCompanionTicketDialog(): void {
         </div>
 
         <div style="display: flex; gap: 12px; justify-content: flex-end;">
-            <button id="cancel-btn" style="padding: 8px 16px; background: #666; color: white; border: none; border-radius: 4px; cursor: pointer;">
+            <button id="cancel-btn" class="dialog-btn btn-cancel">
                 キャンセル
             </button>
-            <button id="delete-selected-btn" style="padding: 8px 16px; background: #f44336; color: white; border: none; border-radius: 4px; cursor: pointer;">
+            <button id="delete-selected-btn" class="dialog-btn btn-delete">
                 削除
             </button>
-            <button id="execute-btn" style="padding: 8px 16px; background: #2196F3; color: white; border: none; border-radius: 4px; cursor: pointer;">
+            <button id="execute-btn" class="dialog-btn btn-execute btn-disabled" disabled>
                 同行者追加
             </button>
         </div>
@@ -1819,12 +1929,22 @@ function setupDialogEvents(dialog: HTMLElement): void {
     dialog.querySelector('#execute-btn')?.addEventListener('click', () => {
         const selectedIds = getSelectedTicketIds();
         if (selectedIds.length > 0) {
+            console.log(`🚀 ${selectedIds.length}件のチケットで同行者追加処理を開始します`);
             companionProcessManager.startProcess(selectedIds);
             dialog.closest('#ytomo-companion-dialog')?.remove();
         } else {
-            showCustomAlert('チケットIDを選択してください');
+            // チェックされているが全て追加済みの場合と、何も選択していない場合を区別
+            const allCheckboxes = document.querySelectorAll('#ticket-list input[type="checkbox"]:checked') as NodeListOf<HTMLInputElement>;
+            if (allCheckboxes.length > 0) {
+                showCustomAlert('選択されたチケットIDは全て追加済みです');
+            } else {
+                showCustomAlert('チケットIDを選択してください');
+            }
         }
     });
+    
+    // ダイアログ開始時に実行ボタンの状態を初期化
+    updateExecuteButtonState();
 }
 
 // チケットリスト表示更新
@@ -1839,21 +1959,37 @@ function updateTicketList(): void {
         return;
     }
 
-    const listHTML = tickets.map(ticket => `
-        <div class="ticket-row" data-ticket-id="${ticket.id}" style="display: flex; align-items: center; padding: 8px; border-bottom: 1px solid #eee; last-child:border-bottom-none; transition: background-color 0.2s ease; cursor: pointer;">
-            <input type="checkbox" value="${ticket.id}" style="margin-right: 8px;">
-            <div style="flex: 1;">
-                <div style="font-weight: bold; color: #333;">${ticket.label}</div>
-                <div style="font-size: 12px; color: #999;">ID: ${ticket.id}</div>
-                ${ticket.lastUsed ? `<div style="font-size: 11px; color: #999;">最終使用: ${new Date(ticket.lastUsed).toLocaleString()}</div>` : ''}
+    // 画面で追加済みのチケットIDを取得
+    const alreadyAddedTicketIds = getAlreadyAddedTicketIds();
+
+    const listHTML = tickets.map(ticket => {
+        const isAlreadyAdded = alreadyAddedTicketIds.has(ticket.id);
+        const rowClass = isAlreadyAdded ? 'ticket-row already-added' : 'ticket-row';
+        
+        return `
+            <div class="${rowClass}" data-ticket-id="${ticket.id}">
+                <input type="checkbox" value="${ticket.id}" ${isAlreadyAdded ? 'disabled' : ''} style="margin-right: 8px;">
+                <div style="flex: 1;">
+                    <div style="font-weight: bold; color: #333;">${ticket.label}</div>
+                    <div style="font-size: 12px; color: #999;">ID: ${ticket.id}</div>
+                    ${ticket.lastUsed ? `<div style="font-size: 11px; color: #999;">最終使用: ${new Date(ticket.lastUsed).toLocaleString()}</div>` : ''}
+                </div>
+                <button class="copy-ticket-btn" data-ticket-id="${ticket.id}" title="チケットIDをコピー">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z" />
+                    </svg>
+                </button>
             </div>
-        </div>
-    `).join('');
+        `;
+    }).join('');
     
     listContainer.innerHTML = listHTML;
     
     // イベントリスナーを設定
     setupTicketRowEvents(listContainer as HTMLElement);
+    
+    // 実行ボタンの初期状態を設定
+    updateExecuteButtonState();
 }
 
 // チケット行のイベントリスナーを設定
@@ -1863,20 +1999,38 @@ function setupTicketRowEvents(container: HTMLElement): void {
     ticketRows.forEach(row => {
         const rowElement = row as HTMLElement;
         const checkbox = rowElement.querySelector('input[type="checkbox"]') as HTMLInputElement;
+        const copyButton = rowElement.querySelector('.copy-ticket-btn') as HTMLButtonElement;
+        
         if (!checkbox) return;
         
         // チェックボックスの変更イベント
         checkbox.addEventListener('change', () => {
             updateTicketRowSelection(checkbox);
+            updateExecuteButtonState();
         });
+        
+        // コピーボタンのクリックイベント
+        if (copyButton) {
+            copyButton.addEventListener('click', (e) => {
+                e.stopPropagation(); // 行クリックイベントを防ぐ
+                const ticketId = copyButton.getAttribute('data-ticket-id');
+                if (ticketId) {
+                    copyTicketIdToClipboard(ticketId, copyButton);
+                }
+            });
+        }
         
         // 行全体のクリックでチェックボックス切り替え
         rowElement.addEventListener('click', (e) => {
-            // チェックボックス自体をクリックした場合は重複処理を避ける
-            if (e.target === checkbox) return;
+            // チェックボックスやコピーボタンをクリックした場合は重複処理を避ける
+            if (e.target === checkbox || e.target === copyButton || copyButton?.contains(e.target as Node)) return;
+            
+            // 追加済みチケットの場合は操作を無効化
+            if (rowElement.classList.contains('already-added')) return;
             
             checkbox.checked = !checkbox.checked;
             updateTicketRowSelection(checkbox);
+            updateExecuteButtonState();
         });
     });
 }
@@ -1895,13 +2049,116 @@ function updateTicketRowSelection(checkbox: HTMLInputElement): void {
     }
 }
 
+// クリップボードにチケットIDをコピー
+function copyTicketIdToClipboard(ticketId: string, copyButton: HTMLButtonElement): void {
+    try {
+        // モダンブラウザのClipboard API
+        if (navigator.clipboard && window.isSecureContext) {
+            navigator.clipboard.writeText(ticketId).then(() => {
+                showCopySuccessAnimation(ticketId, copyButton);
+            }).catch((error) => {
+                console.error('クリップボードコピーエラー:', error);
+                fallbackCopyToClipboard(ticketId, copyButton);
+            });
+        } else {
+            // フォールバック: 古いブラウザ対応
+            fallbackCopyToClipboard(ticketId, copyButton);
+        }
+    } catch (error) {
+        console.error('チケットIDコピーエラー:', error);
+        showCustomAlert('コピーに失敗しました');
+    }
+}
+
+// フォールバック: document.execCommand使用
+function fallbackCopyToClipboard(ticketId: string, copyButton: HTMLButtonElement): void {
+    try {
+        const textArea = document.createElement('textarea');
+        textArea.value = ticketId;
+        textArea.style.position = 'fixed';
+        textArea.style.left = '-999999px';
+        textArea.style.top = '-999999px';
+        document.body.appendChild(textArea);
+        textArea.focus();
+        textArea.select();
+        
+        const successful = document.execCommand('copy');
+        document.body.removeChild(textArea);
+        
+        if (successful) {
+            showCopySuccessAnimation(ticketId, copyButton);
+        } else {
+            showCustomAlert('コピーに失敗しました');
+        }
+    } catch (error) {
+        console.error('フォールバックコピーエラー:', error);
+        showCustomAlert('コピーに失敗しました');
+    }
+}
+
+// コピー成功アニメーション表示
+function showCopySuccessAnimation(ticketId: string, copyButton: HTMLButtonElement): void {
+    console.log(`✅ チケットID "${ticketId}" をクリップボードにコピーしました`);
+    
+    // ボタンを成功状態に変更
+    copyButton.classList.add('copy-success');
+    
+    // アイコンをチェックマークに変更
+    const svgElement = copyButton.querySelector('svg');
+    if (svgElement) {
+        // 元のアイコンを保存
+        const originalSvg = svgElement.cloneNode(true);
+        
+        // チェックマークアイコンに変更
+        svgElement.innerHTML = '<path d="M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z" />';
+        
+        // 1.5秒後に元に戻す
+        setTimeout(() => {
+            copyButton.classList.remove('copy-success');
+            if (originalSvg && svgElement.parentNode) {
+                svgElement.parentNode.replaceChild(originalSvg, svgElement);
+            }
+        }, 1500);
+    }
+}
+
+// 実行ボタンの状態を更新
+function updateExecuteButtonState(): void {
+    const executeButton = document.querySelector('#execute-btn') as HTMLButtonElement;
+    if (!executeButton) return;
+
+    const selectedTicketIds = getSelectedTicketIds();
+    const hasValidSelection = selectedTicketIds.length > 0;
+
+    if (hasValidSelection) {
+        executeButton.disabled = false;
+        executeButton.classList.remove('btn-disabled');
+        executeButton.classList.add('btn-enabled');
+    } else {
+        executeButton.disabled = true;
+        executeButton.classList.remove('btn-enabled');
+        executeButton.classList.add('btn-disabled');
+    }
+}
+
 // グローバルスコープでアクセス可能にする
 (window as any).updateTicketRowSelection = updateTicketRowSelection;
 
 // 選択されたチケットID取得
 function getSelectedTicketIds(): string[] {
     const checkboxes = document.querySelectorAll('#ticket-list input[type="checkbox"]:checked') as NodeListOf<HTMLInputElement>;
-    return Array.from(checkboxes).map(cb => cb.value);
+    const selectedIds = Array.from(checkboxes).map(cb => cb.value);
+    
+    // 既に画面に表示されているチケットIDを除外
+    const alreadyAddedTicketIds = getAlreadyAddedTicketIds();
+    const filteredIds = selectedIds.filter(id => !alreadyAddedTicketIds.has(id));
+    
+    if (selectedIds.length !== filteredIds.length) {
+        const excludedCount = selectedIds.length - filteredIds.length;
+        console.log(`⚠️ 既に選択済みのチケット ${excludedCount}件を処理対象から除外しました`);
+    }
+    
+    return filteredIds;
 }
 
 // カスタムアラート・確認ダイアログ

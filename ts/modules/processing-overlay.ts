@@ -11,9 +11,12 @@ export class ProcessingOverlay {
     private overlayElement: HTMLElement | null = null;
     private isActive: boolean = false;
     private countdownTimer: number | null = null;
+    private currentProcessType: 'reservation' | 'companion' | null = null;
+    private urlObserver: MutationObserver | null = null;
     
     constructor() {
         this.initializeOverlay();
+        this.setupUrlWatcher();
     }
     
     /**
@@ -92,6 +95,72 @@ export class ProcessingOverlay {
     }
     
     /**
+     * URL変化監視の設定（SPA対応）
+     */
+    private setupUrlWatcher(): void {
+        let currentUrl = window.location.href;
+        
+        // MutationObserverでDOM変化を監視（SPA遷移検出）
+        this.urlObserver = new MutationObserver(() => {
+            if (window.location.href !== currentUrl) {
+                currentUrl = window.location.href;
+                this.onUrlChanged();
+            }
+        });
+        
+        // body全体の変更を監視
+        this.urlObserver.observe(document.body, {
+            childList: true,
+            subtree: true
+        });
+        
+        // popstateイベントでも監視（戻る・進むボタン対応）
+        window.addEventListener('popstate', () => {
+            this.onUrlChanged();
+        });
+        
+        console.log('🌐 URL変化監視を設定');
+    }
+    
+    /**
+     * URL変化時の処理
+     */
+    private onUrlChanged(): void {
+        if (this.isActive && this.currentProcessType) {
+            console.log('🌐 URL変化検出 - オーバーレイを迅速再設定');
+            
+            // 短い遅延後にオーバーレイを再初期化
+            setTimeout(() => {
+                this.reinitializeOverlay();
+            }, 100);
+        }
+    }
+    
+    /**
+     * オーバーレイの迅速再初期化
+     */
+    private reinitializeOverlay(): void {
+        if (!this.isActive || !this.currentProcessType) return;
+        
+        console.log('🔄 オーバーレイ迅速再初期化中...');
+        
+        // 既存のオーバーレイを削除
+        if (this.overlayElement) {
+            this.overlayElement.remove();
+        }
+        
+        // 新しいオーバーレイを初期化
+        this.initializeOverlay();
+        
+        // 現在のプロセスタイプで再表示
+        const processType = this.currentProcessType;
+        this.isActive = false; // showメソッドが実行されるようにリセット
+        this.show(processType);
+        
+        console.log('✅ オーバーレイ迅速再初期化完了');
+    }
+    
+    /**
      * キーボードイベントハンドラー
      */
     private handleKeyDown(e: KeyboardEvent): void {
@@ -123,7 +192,7 @@ export class ProcessingOverlay {
     /**
      * オーバーレイを表示（自動処理開始時）
      */
-    public show(processType: 'reservation' = 'reservation'): void {
+    public show(processType: 'reservation' | 'companion' = 'reservation'): void {
         if (!this.overlayElement || this.isActive) return;
         
         console.log(`🛡️ 誤動作防止オーバーレイ表示: ${processType}`);
@@ -132,8 +201,12 @@ export class ProcessingOverlay {
         const messageText = this.overlayElement.querySelector('.processing-message-text');
         const targetText = this.overlayElement.querySelector('.processing-target-text');
         
-        {
-            // 予約対象の情報を取得
+        if (processType === 'companion') {
+            // 同行者追加処理用のメッセージ
+            if (messageText) messageText.textContent = '同行者追加処理実行中...';
+            if (targetText) targetText.textContent = '自動処理を中断する場合は中断ボタンをクリック';
+        } else {
+            // 予約処理用のメッセージ（既存）
             let targetInfo = '対象なし';
             
             if (entranceReservationStateManager && entranceReservationStateManager.getFabTargetDisplayInfo) {
@@ -152,19 +225,18 @@ export class ProcessingOverlay {
         this.overlayElement.classList.add('visible');
         
         // FABボタンのz-indexを調整（オーバーレイより前面に）
-        const fabContainer = document.getElementById('ytomo-fab-container');
-        if (fabContainer) {
-            fabContainer.className = fabContainer.className.replace(/z-\w+/g, '').trim() + ' z-above-overlay';
-        }
+        this.adjustFabButtonsForOverlay();
         
-        // 【システム連動】オーバーレイ表示中は必ずFABボタンを有効化（中断可能にする）
-        const mainFabButton = document.getElementById('ytomo-main-fab') as HTMLButtonElement;
-        if (mainFabButton) {
-            mainFabButton.disabled = false;
-            console.log('🛡️ [システム連動] オーバーレイ表示につき中断ボタンを強制有効化');
+        if (processType === 'companion') {
+            // 同行者処理の場合は専用中断ボタンを作成
+            this.createAbortButton();
+        } else {
+            // 予約処理の場合は既存FABボタンを有効化
+            this.ensureFabButtonsVisible();
         }
         
         this.isActive = true;
+        this.currentProcessType = processType; // プロセスタイプを保存
         
         // カウントダウン監視開始
         this.startCountdownMonitoring();
@@ -183,12 +255,13 @@ export class ProcessingOverlay {
         this.overlayElement.classList.add('hidden');
         
         // FABボタンのz-indexを元に戻す
-        const fabContainer = document.getElementById('ytomo-fab-container');
-        if (fabContainer) {
-            fabContainer.className = fabContainer.className.replace(/z-\w+/g, '').trim() + ' z-normal';
-        }
+        this.restoreFabButtonsFromOverlay();
+        
+        // 中断ボタンを削除
+        this.removeAbortButton();
         
         this.isActive = false;
+        this.currentProcessType = null; // プロセスタイプをクリア
         
         // カウントダウン監視停止
         this.stopCountdownMonitoring();
@@ -318,6 +391,245 @@ export class ProcessingOverlay {
         }
     }
 
+    /**
+     * 中断ボタンを作成
+     */
+    private createAbortButton(): void {
+        // 既存の中断ボタンがあれば削除
+        const existingAbortButton = document.getElementById('ytomo-processing-abort-button');
+        if (existingAbortButton) {
+            existingAbortButton.remove();
+        }
+        
+        // 中断ボタン作成
+        const abortButton = document.createElement('button');
+        abortButton.id = 'ytomo-processing-abort-button';
+        abortButton.classList.add('ext-ytomo', 'ytomo-abort-button');
+        abortButton.textContent = '中断';
+        
+        // インラインスタイル完全削除 - 全てSCSSで管理
+        
+        // クリックイベント
+        abortButton.addEventListener('click', () => {
+            this.handleAbortClick();
+        });
+        
+        // bodyに追加
+        document.body.appendChild(abortButton);
+        
+        console.log('🛑 処理中断ボタンを作成しました');
+    }
+    
+    /**
+     * 中断ボタンクリック処理
+     */
+    private handleAbortClick(): void {
+        console.log('🛑 処理中断ボタンがクリックされました');
+        
+        // 処理タイプに応じて中断処理を実行
+        if (this.currentProcessType === 'companion') {
+            // 同行者処理の中断（確認なし）
+            this.abortCompanionProcess();
+            this.hide();
+        } else if (this.currentProcessType === 'reservation') {
+            // 予約処理の中断（確認ダイアログあり）
+            this.showCustomConfirm('処理を中断しますか？', () => {
+                this.abortReservationProcess();
+                this.hide();
+            });
+        }
+    }
+    
+    /**
+     * 同行者処理の中断
+     */
+    private abortCompanionProcess(): void {
+        console.log('🛑 同行者追加処理を中断中...');
+        
+        // companion-ticket-pageのプロセスマネージャーを停止
+        try {
+            // companionProcessManagerにアクセス（window経由でグローバルアクセス）
+            const companionProcessManager = (window as any).companionProcessManager;
+            if (companionProcessManager && typeof companionProcessManager.stopProcess === 'function') {
+                companionProcessManager.stopProcess();
+                console.log('✅ 同行者追加処理を正常に中断しました');
+            } else {
+                console.warn('⚠️ companionProcessManagerが見つかりません');
+            }
+        } catch (error) {
+            console.error('❌ 同行者処理中断でエラー:', error);
+        }
+    }
+    
+    /**
+     * 予約処理の中断
+     */
+    private abortReservationProcess(): void {
+        console.log('🛑 予約処理を中断中...');
+        
+        // 既存の予約中断処理と連携
+        try {
+            const fabButton = document.getElementById('ytomo-main-fab');
+            if (fabButton) {
+                fabButton.click();
+            }
+        } catch (error) {
+            console.error('❌ 予約処理中断でエラー:', error);
+        }
+    }
+    
+    /**
+     * 中断ボタンを削除
+     */
+    private removeAbortButton(): void {
+        const abortButton = document.getElementById('ytomo-processing-abort-button');
+        if (abortButton) {
+            abortButton.remove();
+            console.log('🛑 処理中断ボタンを削除しました');
+        }
+    }
+    
+    /**
+     * FABボタンをオーバーレイより前面に調整
+     */
+    private adjustFabButtonsForOverlay(): void {
+        // 複数のFABコンテナIDを試行
+        const fabContainerIds = [
+            'ytomo-fab-container',
+            'ytomo-ticket-selection-fab-container',
+            'ytomo-pavilion-fab-container'
+        ];
+        
+        fabContainerIds.forEach(id => {
+            const fabContainer = document.getElementById(id);
+            if (fabContainer) {
+                fabContainer.className = fabContainer.className.replace(/z-\w+/g, '').trim() + ' z-above-overlay';
+                console.log(`🛡️ FABコンテナ "${id}" をオーバーレイより前面に調整`);
+            }
+        });
+    }
+    
+    /**
+     * FABボタンを確実に表示・有効化
+     */
+    private ensureFabButtonsVisible(): void {
+        // 複数のFABボタンIDを試行
+        const fabButtonIds = [
+            'ytomo-main-fab',
+            'ytomo-ticket-selection-main-fab',
+            'ytomo-pavilion-main-fab'
+        ];
+        
+        let fabFound = false;
+        fabButtonIds.forEach(id => {
+            const fabButton = document.getElementById(id) as HTMLButtonElement;
+            if (fabButton) {
+                fabButton.disabled = false;
+                fabButton.style.display = 'flex';
+                fabButton.style.visibility = 'visible';
+                fabButton.style.opacity = '1';
+                fabFound = true;
+                console.log(`🛡️ [システム連動] FABボタン "${id}" を中断可能状態に設定`);
+            }
+        });
+        
+        if (!fabFound) {
+            console.warn('⚠️ 中断用FABボタンが見つかりません - 全画面検索実行');
+            // フォールバック：全画面でFABボタンを検索
+            const allFabs = document.querySelectorAll('[id*="fab"]') as NodeListOf<HTMLButtonElement>;
+            allFabs.forEach(fab => {
+                if (fab.id && (fab.id.includes('ytomo') || fab.id.includes('main'))) {
+                    fab.disabled = false;
+                    fab.style.display = 'flex';
+                    fab.style.visibility = 'visible';
+                    fab.style.opacity = '1';
+                    console.log(`🛡️ [フォールバック] FABボタン "${fab.id}" を発見・有効化`);
+                }
+            });
+        }
+    }
+    
+    /**
+     * FABボタンのz-indexを元に戻す
+     */
+    private restoreFabButtonsFromOverlay(): void {
+        const fabContainerIds = [
+            'ytomo-fab-container',
+            'ytomo-ticket-selection-fab-container',
+            'ytomo-pavilion-fab-container'
+        ];
+        
+        fabContainerIds.forEach(id => {
+            const fabContainer = document.getElementById(id);
+            if (fabContainer) {
+                fabContainer.className = fabContainer.className.replace(/z-\w+/g, '').trim() + ' z-normal';
+            }
+        });
+    }
+    
+    /**
+     * カスタム確認ダイアログ
+     */
+    private showCustomConfirm(message: string, onConfirm: () => void): void {
+        const overlay = document.createElement('div');
+        overlay.style.cssText = `
+            position: fixed !important;
+            top: 0 !important;
+            left: 0 !important;
+            width: 100% !important;
+            height: 100% !important;
+            background: rgba(0, 0, 0, 0.5) !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            z-index: 100010 !important;
+        `;
+
+        const dialog = document.createElement('div');
+        dialog.style.cssText = `
+            background: white !important;
+            border-radius: 8px !important;
+            padding: 24px !important;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+            max-width: 400px !important;
+            text-align: center !important;
+        `;
+
+        dialog.innerHTML = `
+            <p style="margin: 0 0 16px 0; font-size: 16px; color: #333;">${message}</p>
+            <div style="display: flex; gap: 12px; justify-content: center;">
+                <button id="custom-confirm-cancel" style="padding: 8px 16px; background: #666; color: white; border: none; border-radius: 4px; cursor: pointer;">
+                    キャンセル
+                </button>
+                <button id="custom-confirm-ok" style="padding: 8px 16px; background: #f44336; color: white; border: none; border-radius: 4px; cursor: pointer;">
+                    中断する
+                </button>
+            </div>
+        `;
+
+        const cancelBtn = dialog.querySelector('#custom-confirm-cancel') as HTMLButtonElement;
+        const okBtn = dialog.querySelector('#custom-confirm-ok') as HTMLButtonElement;
+
+        const closeDialog = () => {
+            document.body.removeChild(overlay);
+        };
+
+        cancelBtn.addEventListener('click', closeDialog);
+        okBtn.addEventListener('click', () => {
+            closeDialog();
+            onConfirm();
+        });
+
+        overlay.addEventListener('click', (e) => {
+            if (e.target === overlay) {
+                closeDialog();
+            }
+        });
+
+        overlay.appendChild(dialog);
+        document.body.appendChild(overlay);
+    }
+    
     /**
      * オーバーレイを破棄
      */
