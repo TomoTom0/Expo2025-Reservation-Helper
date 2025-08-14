@@ -1,6 +1,20 @@
 /**
- * 入場予約状態管理システム
- * 入場予約の状態と対象を管理
+ * 入場予約状態管理システム - Entrance Reservation State Manager
+ * 
+ * 【責務】
+ * - 入場予約の実行状態管理（IDLE/RESERVATION_RUNNING）
+ * - 予約対象の統一管理（時間帯・場所・DOM selector）
+ * - 効率モード（00秒/30秒タイミング）制御
+ * - 通知音設定・FAB UI状態の一元管理
+ * - changeダイアログ出現・タイミング調整管理
+ * - リロードカウントダウン・ページローディング状態
+ * 
+ * 【統一状態管理の中核】
+ * このクラスはアプリケーション全体の状態を統一管理し、
+ * FAB UI・オーバーレイ・自動処理システムとの整合性を保つ
+ * 
+ * @version v1.0.0
+ * @architecture Singleton pattern with unified state management
  */
 
 // 必要なimport
@@ -14,42 +28,60 @@ import type { ReservationConfig, ReservationResult } from '../types/index.js';
 // 型定義
 // ============================================================================
 
-// 実行状態（排他的）
+/**
+ * 実行状態（排他的）
+ * アプリケーション全体で同時に実行できる処理は1つのみ
+ */
 export enum ExecutionState {
-    IDLE = 'idle',
-    RESERVATION_RUNNING = 'reservation_running'
+    IDLE = 'idle',                          // 待機状態：何も実行していない
+    RESERVATION_RUNNING = 'reservation_running' // 予約実行状態：予約処理実行中
 }
 
-// 優先実行モード
+/**
+ * 優先実行モード
+ * 複数の実行可能アクションがある場合の優先度決定
+ */
 export enum PriorityMode {
     AUTO = 'auto',                          // 自動判定（予約優先）
-    FORCE_RESERVATION = 'force_reservation' // 予約強制実行
+    FORCE_RESERVATION = 'force_reservation' // 予約強制実行（満員でも試行）
 }
 
-// 位置管理の定数
+/**
+ * 位置管理の定数
+ * 万博入場予約画面の東西エリア選択テーブル構造に対応
+ * - テーブルの1列目（index=0）が東エリア
+ * - テーブルの2列目（index=1）が西エリア
+ */
 const LOCATION_MAP: Record<number, 'east' | 'west'> = {
-    0: 'east',  // 0番目のtd = 東
-    1: 'west'   // 1番目のtd = 西
+    0: 'east',  // 0番目のtd = 東エリア
+    1: 'west'   // 1番目のtd = 西エリア
 } as const;
 
+/** 東西からテーブル列インデックスへの逆引きマップ */
 const LOCATION_TO_INDEX: Record<'east' | 'west', number> = {
-    'east': 0,
-    'west': 1
+    'east': 0,  // 東エリア → 1列目
+    'west': 1   // 西エリア → 2列目
 } as const;
 
-// 予約対象（単一）
+/**
+ * 予約対象（単一）
+ * ユーザーが選択した入場予約の対象情報
+ */
 export interface ReservationTarget {
-    timeSlot: string;        // '11:00-'
-    locationIndex: number;   // 0 or 1
-    selector: string;        // DOM selector
-    isValid: boolean;
+    timeSlot: string;        // 時間帯表示文字列 例: '11:00-', '14:30-'
+    locationIndex: number;   // 位置インデックス: 0(東) or 1(西)
+    selector: string;        // DOMセレクタ文字列（ユニークなtd要素特定用）
+    isValid: boolean;        // 対象の有効性フラグ
 }
 
-// 予約成功情報
+/**
+ * 予約成功情報
+ * 予約が成功した際の詳細情報を保存
+ */
 export interface ReservationSuccess {
-    timeSlot: string;        // '11:00-'
-    locationIndex: number;   // 0 or 1
-    successTime: Date;       // 成功時刻
+    timeSlot: string;        // 成功した時間帯 例: '11:00-'
+    locationIndex: number;   // 成功した場所: 0(東) or 1(西)
+    successTime: Date;       // 予約成功時刻（ログ・通知用）
 }
 
 
@@ -58,29 +90,48 @@ export interface ReservationSuccess {
 // 位置管理ヘルパークラス
 // ============================================================================
 
+/**
+ * 位置管理ヘルパークラス
+ * 東西エリアとテーブルインデックスの相互変換ユーティリティ
+ * DOM操作や表示用文字列生成に使用
+ */
 export class LocationHelper {
-    // indexから東西を取得
+    /**
+     * テーブル列インデックスから東西エリアを取得
+     * @param index テーブル列インデックス (0 or 1)
+     * @returns 'east' | 'west'
+     */
     static getLocationFromIndex(index: number): 'east' | 'west' {
-        return LOCATION_MAP[index] || 'east';
+        return LOCATION_MAP[index] || 'east'; // 不正値はデフォルトで東
     }
     
-    // 東西からindexを取得
+    /**
+     * 東西エリアからテーブル列インデックスを取得
+     * @param location 'east' | 'west'
+     * @returns テーブル列インデックス (0 or 1)
+     */
     static getIndexFromLocation(location: 'east' | 'west'): number {
         return LOCATION_TO_INDEX[location];
     }
     
-    // tdSelectorからindexを抽出
+    /**
+     * DOMセレクタ文字列からテーブル列インデックスを抽出
+     * CSSセレクタの nth-child() 部分をパースしてインデックスを得る
+     * @param selector CSSセレクタ文字列 例: "tr:nth-child(2) > td:nth-child(1)"
+     * @returns テーブル列インデックス (0 or 1)
+     */
     static getIndexFromSelector(selector: string): number {
         if (!selector || typeof selector !== 'string') {
             console.warn('⚠️ LocationHelper.getIndexFromSelector: 無効なselector:', selector);
-            return 0; // デフォルトは東
+            return 0; // デフォルトは東エリア
         }
         
+        // "td:nth-child(N)" パターンを抽出
         const cellMatch = selector.match(/td:nth-child\((\d+)\)/);
         if (cellMatch && cellMatch[1]) {
-            return parseInt(cellMatch[1]) - 1; // nth-childは1ベース、indexは0ベース
+            return parseInt(cellMatch[1]) - 1; // nth-childは1ベース、配列indexは0ベース
         }
-        return 0; // デフォルトは東
+        return 0; // パース失敗時は東エリアデフォルト
     }
     
     // DOM要素からindexを取得
@@ -105,96 +156,126 @@ export class LocationHelper {
 // 入場予約状態管理クラス
 // ============================================================================
 
+/**
+ * 入場予約状態管理クラス
+ * アプリケーション全体の中核シングルトン状態管理システム
+ * 
+ * 【設計原則】
+ * - Single Source of Truth: すべての状態をこのクラスで一元管理
+ * - 原子性: 状態変更は原子的に実行、中途半端な状態を回避
+ * - 一貫性: FAB UI・overlay・自動処理との状態同期を保証
+ * - 中断可能: すべての長時間処理は中断可能に設計
+ */
 export class EntranceReservationStateManager {
-    // 実行状態
+    // ==================== 実行状態管理 ====================
+    /** 現在の実行状態（IDLE/RESERVATION_RUNNING） */
     private executionState: ExecutionState = ExecutionState.IDLE;
     
-    // 開始時対象キャッシュ（検証用）
+    /** 開始時対象キャッシュ（予約処理中の整合性検証用） */
     private initialTargetCache: {
         reservationTarget: ReservationTarget | null;
         timestamp: number;
     } | null = null;
     
-    // 統一自動処理管理（Phase 1で追加）
+    /** 統一自動処理管理システム（効率モード・予約処理・中断制御） */
     private automationManager: UnifiedAutomationManager;
     
+    /**
+     * コンストラクタ
+     * シングルトンインスタンスとして初期化される
+     */
     constructor() {
-        // 統一自動処理管理を初期化
+        // 統一自動処理管理を初期化（中断可能な非同期処理管理）
         this.automationManager = new UnifiedAutomationManager(this);
         
-        // 保存された設定を読み込み
+        // localStorageから保存された設定を復元
         this.loadNotificationSoundSettings();
         
         console.log('📋 統一状態管理システム初期化完了');
     }
     
-    // 対象管理
+    // ==================== 対象情報管理 ====================
+    /** 現在の予約対象（時間帯・位置・セレクタ） */
     private reservationTarget: ReservationTarget | null = null;
     
-    // 予約成功情報
+    /** 予約成功情報（成功後の表示・通知用） */
     private reservationSuccess: ReservationSuccess | null = null;
     
-    // 選択されたカレンダー日付
+    /** ユーザーが選択したカレンダー日付 (YYYY-MM-DD形式) */
     private selectedCalendarDate: string | null = null;
     
-    // 優先度設定
+    /** 優先度モード（現在は予約のみサポート） */
     private priorityMode: PriorityMode = PriorityMode.AUTO;
     
-    // 予約実行情報（旧entranceReservationStateから統合）
+    // ==================== 予約実行状態管理 ====================
+    /** 予約実行情報（旧entranceReservationStateから統合） */
     private reservationExecution = {
-        shouldStop: false,
-        startTime: null as number | null,
-        attempts: 0
+        shouldStop: false,              // 中断フラグ（ユーザーが中断ボタンを押した場合）
+        startTime: null as number | null, // 予約開始時刻（タイムアウト判定用）
+        attempts: 0                     // 予約試行回数（サイクルカウンタ）
     };
 
-    
-    
-    // 効率モード設定管理（常時有効）
+    // ==================== 効率モード管理 ====================
+    /** 効率モード設定管理（毎分00秒/30秒のsubmitタイミング制御） */
     private efficiencyMode = {
-        enabled: true, // 常時有効に設定
-        nextSubmitTarget: null as Date | null,
-        updateTimer: null as number | null // FABボタン更新タイマー
+        enabled: true, // 常時有効に設定（v1.0.0ではデフォルト有効）
+        nextSubmitTarget: null as Date | null,     // 次のsubmit目標時刻
+        updateTimer: null as number | null         // FABボタン更新タイマー
     };
     
-    // changeダイアログ検出・調整管理
+    /** changeダイアログ検出・調整管理（予約サイトの「change」ダイアログ対策） */
     private changeDialogState = {
-        hasAppeared: false,  // 一度でもchangeダイアログが表示されたか
-        needsTimingAdjustment: false  // タイミング調整が必要か
+        hasAppeared: false,             // 一度でもchangeダイアログが表示されたか
+        needsTimingAdjustment: false    // タイミング調整が必要か（00/30秒タイミング用）
     };
     
-    // リロードカウントダウン状態管理（旧reloadCountdownStateから統合）
+    // ==================== リロード・ページ状態管理 ====================
+    /** リロードカウントダウン状態管理（旧reloadCountdownStateから統合） */
     private reloadCountdown = {
-        totalSeconds: 30,
-        secondsRemaining: null as number | null,
-        startTime: null as number | null,
-        countdownInterval: null as number | null,
-        reloadTimer: null as number | null
+        totalSeconds: 30,                           // カウントダウン総秒数
+        secondsRemaining: null as number | null,    // 残り秒数（nullは停止中）
+        startTime: null as number | null,           // カウントダウン開始時刻
+        countdownInterval: null as number | null,   // カウントダウン表示更新用タイマー
+        reloadTimer: null as number | null          // リロード実行用タイマー
     };
     
-    // ページ読み込み状態管理（旧pageLoadingStateから統合）
+    /** ページ読み込み状態管理（旧pageLoadingStateから統合） */
     private pageLoading = {
-        isLoading: false,
-        startTime: null as number | null,
-        timeout: 10000
+        isLoading: false,                    // ページ読み込み中フラグ
+        startTime: null as number | null,    // 読み込み開始時刻
+        timeout: 10000                       // タイムアウト時間（10秒）
     };
     
-    // デバッグフラグ（本番環境では詳細ログを抑制）
+    // ==================== デバッグ・通知設定 ====================
+    /** デバッグログ出力フラグ（v1.0.0では開発用に有効） */
     private debugMode: boolean = true;
     
-    // 通知音設定
+    /** 予約成功時の8bitスタイル音声通知設定 */
     private notificationSound = {
-        enabled: true // デフォルトで有効
+        enabled: true // デフォルトで有効（ユーザーがoverlayで切り替え可能）
     };
-    
-    
     // ============================================================================
-    // 実行状態管理
+    // 実行状態管理 API
+    // 【主要メソッド】
+    // - getExecutionState() / setExecutionState(): 現在状態の取得・設定
+    // - startReservation(): 予約処理開始
+    // - stop(): すべての処理を停止
+    // - canStartReservation(): 予約開始可能性判定
     // ============================================================================
     
+    /**
+     * 現在の実行状態を取得
+     * @returns 現在の実行状態
+     */
     getExecutionState(): ExecutionState {
         return this.executionState;
     }
     
+    /**
+     * 実行状態を設定
+     * デバッグモード時は状態変更ログを出力
+     * @param state 設定する実行状態
+     */
     setExecutionState(state: ExecutionState): void {
         this.executionState = state;
         if (this.debugMode) {
@@ -202,6 +283,16 @@ export class EntranceReservationStateManager {
         }
     }
     
+    /**
+     * 予約処理を開始
+     * 
+     * 【機能】
+     * - 初回開始時: 予約開始条件チェック + ターゲットキャッシュ保存
+     * - 継続サイクル: 実行中でも継続可能（リロード後の再開始など）
+     * - 効率モード: 次の00/30秒ターゲット計算 + 更新タイマー開始
+     * 
+     * @returns 開始成功時true、失敗時false
+     */
     startReservation(): boolean {
         // 初回のみ条件チェック（2サイクル目以降は実行中でも継続）
         if (this.executionState !== ExecutionState.RESERVATION_RUNNING && 
@@ -252,6 +343,14 @@ export class EntranceReservationStateManager {
     
     
 
+    /**
+     * すべての処理を停止しIDLE状態に戻す
+     * 
+     * 【停止対象】
+     * - 予約実行情報のリセット
+     * - 初回開始時ターゲットキャッシュのクリア
+     * - 効率モード更新タイマーの停止
+     */
     stop(): void {
         const prevState = this.executionState;
         this.executionState = ExecutionState.IDLE;
@@ -279,19 +378,29 @@ export class EntranceReservationStateManager {
     
     // 削除: startReservationExecution()はstartReservation()に統合
     
-    // 予約中断フラグ設定
+    /**
+     * 予約中断フラグを設定
+     * ユーザーが中断ボタンを押した際に呼び出される
+     * 
+     * 【中断メカニズム】
+     * 1. shouldStopフラグを設定
+     * 2. UnifiedAutomationManagerで実行中の場合は即座中断
+     * 3. 状態変更は予約処理ループ完了後に実行
+     * 
+     * @param shouldStop true:中断、false:継続
+     */
     setShouldStop(shouldStop: boolean): void {
         this.reservationExecution.shouldStop = shouldStop;
         this.log(`🛑 予約中断フラグ: ${shouldStop}`);
         
-        // Phase 1: 統一自動処理管理での中断処理を追加
+        // 統一自動処理管理での即座中断処理
         if (shouldStop && this.automationManager.isRunning()) {
             this.log('🛑 統一自動処理管理での即座中断を実行');
             this.automationManager.abort();
         }
         
-        // 中断フラグのみ設定、状態変更は予約処理完了後に行う
-        // （予約処理ループが完了するまで RESERVATION_RUNNING 状態を維持）
+        // 注意: 状態変更はRESERVATION_RUNNINGのまま維持
+        // 予約処理ループが中断を検知して終了するまで待機
     }
 
     // ============================================================================
@@ -299,7 +408,8 @@ export class EntranceReservationStateManager {
     // ============================================================================
     
     /**
-     * 初回開始時の対象を保存
+     * 初回予約開始時の対象をキャッシュに保存
+     * 予約処理中にユーザーが別の時間帯を選択した場合の検知用
      */
     private saveInitialTargets(): void {
         this.initialTargetCache = {
@@ -312,8 +422,14 @@ export class EntranceReservationStateManager {
     }
     
     /**
-     * 現在の対象が初回開始時と一致するかを検証
-     * @returns true: 一致, false: 不一致（処理中断が必要）
+     * 予約対象の一貫性を検証
+     * 予約処理中にユーザーが別の時間帯を選択した場合の検出
+     * 
+     * 【検証項目】
+     * - 予約対象の時間帯一致性
+     * - 予約対象の位置一致性
+     * 
+     * @returns true:一貫性OK、false:不一致検知（処理中断が必要）
      */
     validateTargetConsistency(): boolean {
         if (!this.initialTargetCache) {
@@ -359,9 +475,11 @@ export class EntranceReservationStateManager {
     // ============================================================================
 
     /**
-     * 統一効率モード待機処理実行
-     * @param targetTime 目標時刻
-     * @returns Promise<void>
+     * 統一効率モード待機処理を実行
+     * UnifiedAutomationManager経由で中断可能な待機を実行
+     * 
+     * @param targetTime 目標時刻（00秒または30秒のタイミング）
+     * @returns Promise<void> 中断時はCancellationErrorをthrow
      */
     async executeUnifiedEfficiencyWait(targetTime: Date): Promise<void> {
         return await this.automationManager.executeEfficiencyWait(targetTime);
@@ -369,18 +487,22 @@ export class EntranceReservationStateManager {
 
     /**
      * 統一中断可能待機
+     * AbortSignalを使用して中断可能な待機を実行
+     * 
      * @param ms 待機時間（ミリ秒）
-     * @param signal 中断シグナル
-     * @returns Promise<void>
+     * @param signal 中断シグナル（AbortControllerから生成）
+     * @returns Promise<void> 中断時はCancellationErrorをthrow
      */
     async executeUnifiedWaitWithCancellation(ms: number, signal: AbortSignal): Promise<void> {
         return await this.automationManager.waitWithCancellation(ms, signal);
     }
 
     /**
-     * 統一予約処理実行
-     * @param config 予約設定
-     * @returns Promise<ReservationResult>
+     * 統一予約処理を実行
+     * UnifiedAutomationManager経由で予約処理を実行
+     * 
+     * @param config 予約設定オブジェクト（対象時間帯・位置など）
+     * @returns Promise<ReservationResult> 予約結果（成功/失敗/エラー）
      */
     async executeUnifiedReservationProcess(config: ReservationConfig): Promise<ReservationResult> {
         return await this.automationManager.executeReservationProcess(config);

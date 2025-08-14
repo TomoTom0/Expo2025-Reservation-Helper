@@ -50,3 +50,60 @@
 - [ ] 「すべて読み込み」ボタンのdisabled状態表示修正
 - [ ] CSS specificity強化
 
+### doc/ディレクトリの整理・再構成
+- [ ] **フォルダ構造の再構成**
+  - [ ] `doc/design/_archive/` 作成とdesign内の古い文書移動
+  - [ ] `doc/info/` 作成（DOM構造等の一次情報保存用）
+  - [ ] `doc/plan/_archive/` 作成（有用な完了済み計画保存用）
+  - [ ] `doc/dev/` の技術文書整理（開発者向け方針・仕様）
+  - [ ] `doc/usage/` 作成準備（利用者向け詳細使い方、後回し可）
+- [ ] **一次情報の整理（doc/info/配置対象）**
+  - [ ] calendar-html-structure.md → info/（DOM構造分析）
+  - [ ] その他の技術調査・分析結果があればinfo/に移動
+- [ ] **完了済み計画の整理**
+  - [ ] phase4-implementation-plan.md → plan/_archive/（有用な場合）
+  - [ ] 有用でない完了済み計画 → ./tmp/ に移動
+- [ ] **削除済み機能（時間帯監視）関連文書の整理**
+  - [ ] implementation-status.md の全面書き直し → doc/dev/v1.0.0-status.md
+  - [ ] design/time-slot-monitoring-design.md → design/_archive/ に移動
+  - [ ] test-plan-comprehensive.md から監視機能削除
+- [ ] **古い構造・パス参照の更新**  
+  - [ ] src-modules/ → ts/modules/ パス更新
+  - [ ] unit-test-analysis.md 全面書き直し → doc/dev/testing-strategy.md
+- [ ] **v1.0.0対応文書の作成**
+  - [ ] doc/dev/v1.0.0-architecture.md（技術アーキテクチャ）
+  - [ ] doc/dev/module-dependencies.md（モジュール依存関係）
+  - [ ] doc/dev/build-and-deployment.md（ビルド・デプロイ手順）
+
+### v1.0.0リリース前テスト強化
+- [ ] **v1.0.0主要機能のテスト作成・実行**
+  - [ ] 音声通知システムのテスト（8ビット音声生成、オン/オフ切替）
+  - [ ] 入場予約自動化の統合テスト（効率モード、通常モード）
+  - [ ] 同行者追加機能のE2Eテスト（入力、追加、成功フロー）
+  - [ ] TypeScriptモジュール構造の整合性テスト
+  - [ ] 状態管理システムのテスト（予約対象管理、実行状態）
+- [ ] **削除済み機能の残骸チェック**
+  - [ ] 時間帯監視関連コードの完全削除確認
+  - [ ] 未使用import/export の最終チェック
+  - [ ] window object 依存の動作テスト
+- [ ] **ブラウザ互換性テスト**
+  - [ ] Chrome (Windows) での全機能テスト
+  - [ ] Safari (iOS) での基本機能テスト
+  - [ ] 拡張機能権限の最小化確認
+- [ ] **パフォーマンス・安定性テスト**
+  - [ ] 大量予約リクエスト時の安定性確認
+  - [ ] メモリリーク検出テスト
+  - [ ] エラーハンドリング網羅性確認
+
+### v1.0.0リリース準備
+- [ ] バージョン番号の更新（package.json, manifest.json）
+- [ ] 最終ビルドの実行と動作確認
+- [ ] **リリースアセットの準備**
+  - [ ] src.zip の作成（srcディレクトリ圧縮）
+  - [ ] index.js の単体ファイル準備（Safari用）
+  - [ ] SHA256ハッシュ値の計算と記録
+  - [ ] リリースノートへのSHA256追記
+- [ ] GitHub Releaseの作成とリリースノート公開
+- [ ] READMEのインストール手順確認
+- [ ] Chrome Web Store申請準備（将来的）
+

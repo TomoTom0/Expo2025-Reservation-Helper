@@ -1,42 +1,85 @@
-// 各モジュールからのimport
+/**
+ * アプリケーションルーター - App Router
+ * 
+ * 【責務】
+ * - URLベースのページタイプ判定と適切なモジュール初期化
+ * - 統一キャッシュ管理システムの初期化・依存注入
+ * - FAB UIのライフサイクル管理（作成・クリーンアップ）
+ * - ページ遷移時の状態管理システム同期
+ * 
+ * 【アーキテクチャ】
+ * - シングルトンエントリーポイント: main.tsから呼び出される
+ * - 依存注入パターン: 各モジュールにキャッシュ管理を注入
+ * - ライフサイクル管理: URL変更検知でページ移行を追跡
+ * 
+ * @version v1.0.0 - 統一状態管理版
+ * @architecture Module Router with Dependency Injection
+ */
+
+// ==================== モジュールインポート ====================
+// パビリオン検索ページモジュール
 import { init_page, judge_init } from './pavilion-search-page';
+// 入場予約ページ初期化モジュール
 import { judge_entrance_init, init_entrance_page } from './entrance-page-init';
+// FAB状態管理
 import { createFABToggleButton } from './entrance-page-state';
+// キャッシュ管理システム
 import { createCacheManager } from './cache-manager';
 import { setCacheManager } from './entrance-page-core';
 import { 
-    setPageLoadingState,
-    restoreFromCache, setCacheManagerForSection6, setEntranceReservationHelper
+    setPageLoadingState,                   // ページ読み込み状態設定
+    restoreFromCache,                      // キャッシュからの状態復元
+    setCacheManagerForSection6,            // Section 6へのキャッシュ管理注入
+    setEntranceReservationHelper           // 予約ヘルパー設定
 } from './entrance-page-core';
-import { getCurrentSelectedCalendarDate } from './entrance-page-core';
+import { getCurrentSelectedCalendarDate } from './entrance-page-core'; // カレンダー日付取得
 import { 
-    createEntranceReservationUI, setCacheManagerForSection7,
-    entranceReservationHelper, waitForTimeSlotTable
+    createEntranceReservationUI,           // 入場予約FAB UI作成
+    setCacheManagerForSection7,            // Section 7へのキャッシュ管理注入
+    entranceReservationHelper,             // 予約ヘルパーメイン処理
+    waitForTimeSlotTable                   // 時間帯テーブル待機
 } from './entrance-page-fab';
-import { initCompanionTicketFeature, initializeTicketSelectionPage, initializeAgentTicketPage } from './companion-ticket-page'; // 同行者追加機能
+// 同行者チケット機能モジュール
+import { 
+    initCompanionTicketFeature,            // 同行者機能初期化
+    initializeTicketSelectionPage,         // チケット選択ページ初期化
+    initializeAgentTicketPage              // 代理チケットページ初期化
+} from './companion-ticket-page';
 
-// 入場予約状態管理システムのimport
+// 統一状態管理システム（アプリケーションの中核）
 import { entranceReservationStateManager } from './entrance-reservation-state-manager';
 
-
-// 型定義のインポート
+// TypeScript型定義
 import type { CacheManager } from '../types/index.js';
 
-// Window型の拡張（beforeunloadハンドラー削除により不要）
+// ==================== グローバル変数・型定義 ====================
 
-// 【8. ページ判定・初期化】
+// ============================================================================
+// メインアプリケーションルーターシステム - Section 8
+// 【機能】
+// - URLベースのページタイプ判定・モジュールルーティング
+// - 統一キャッシュ管理システムの初期化・依存注入
+// - ページ遷移時のFAB UIライフサイクル管理
+// - モバイル対応のクリーンアップ処理
 // ============================================================================
 
-// beforeunloadハンドラーは不要なので削除
-
-// 全FABをクリーンアップする統一関数
+/**
+ * 全FABをクリーンアップする統一関数
+ * ページ遷移時に既存FABを削除してUI競合を防止
+ * 
+ * 【削除対象】
+ * - ytomo-fab-container: 入場予約FAB
+ * - ytomo-pavilion-fab-container: パビリオン検索FAB  
+ * - ytomo-ticket-selection-fab-container: チケット選択FAB
+ */
 function cleanupAllFABs(): void {
-    console.log('🧹 全FABをクリーンアップ開始');
+    console.log('🧹 全FABクリーンアップ開始 - ページ遷移時のUI競合防止');
     
+    // クリーンアップ対象のFAB IDリスト
     const fabSelectors = [
-        'ytomo-fab-container',                    // 入場予約FAB
-        'ytomo-pavilion-fab-container',           // パビリオンFAB  
-        'ytomo-ticket-selection-fab-container'    // チケット選択FAB
+        'ytomo-fab-container',                    // 入場予約メインFAB
+        'ytomo-pavilion-fab-container',           // パビリオン検索FAB  
+        'ytomo-ticket-selection-fab-container'    // 同行者チケット選択FAB
     ];
     
     let removedCount = 0;
@@ -72,10 +115,19 @@ function cleanupAllFABs(): void {
     }
 }
 
-// モバイルデバイス判定（簡易版）
+/**
+ * モバイルデバイス判定（簡易版）
+ * UserAgentと画面幅の組み合わせでモバイル環境を検知
+ * 
+ * 【用途】
+ * - モバイル対応の遅延処理（DOM更新のタイミング調整）
+ * - UIレスポンシブ対応の切り替え
+ * 
+ * @returns true:モバイルデバイス、false:デスクトップ
+ */
 function isMobileDevice(): boolean {
     return /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
-           (window.innerWidth <= 768);
+           (window.innerWidth <= 768); // タブレットサイズ以下をモバイル扱い
 }
 
 // cacheManagerの初期化

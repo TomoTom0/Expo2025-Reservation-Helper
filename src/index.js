@@ -9,7 +9,7 @@
 // @run-at       document-end
 // ==/UserScript==
 
-// Built: 2025/08/13 16:50:42
+// Built: 2025/08/13 17:46:43
 
 
 (function webpackUniversalModuleDefinition(root, factory) {
@@ -933,8 +933,22 @@ class UnifiedAutomationManager {
 
 ;// ./ts/modules/entrance-reservation-state-manager.ts
 /**
- * 入場予約状態管理システム
- * 入場予約の状態と対象を管理
+ * 入場予約状態管理システム - Entrance Reservation State Manager
+ *
+ * 【責務】
+ * - 入場予約の実行状態管理（IDLE/RESERVATION_RUNNING）
+ * - 予約対象の統一管理（時間帯・場所・DOM selector）
+ * - 効率モード（00秒/30秒タイミング）制御
+ * - 通知音設定・FAB UI状態の一元管理
+ * - changeダイアログ出現・タイミング調整管理
+ * - リロードカウントダウン・ページローディング状態
+ *
+ * 【統一状態管理の中核】
+ * このクラスはアプリケーション全体の状態を統一管理し、
+ * FAB UI・オーバーレイ・自動処理システムとの整合性を保つ
+ *
+ * @version v1.0.0
+ * @architecture Singleton pattern with unified state management
  */
 // 必要なimport
 
@@ -943,50 +957,81 @@ class UnifiedAutomationManager {
 // ============================================================================
 // 型定義
 // ============================================================================
-// 実行状態（排他的）
+/**
+ * 実行状態（排他的）
+ * アプリケーション全体で同時に実行できる処理は1つのみ
+ */
 var ExecutionState;
 (function (ExecutionState) {
     ExecutionState["IDLE"] = "idle";
-    ExecutionState["RESERVATION_RUNNING"] = "reservation_running";
+    ExecutionState["RESERVATION_RUNNING"] = "reservation_running"; // 予約実行状態：予約処理実行中
 })(ExecutionState || (ExecutionState = {}));
-// 優先実行モード
+/**
+ * 優先実行モード
+ * 複数の実行可能アクションがある場合の優先度決定
+ */
 var PriorityMode;
 (function (PriorityMode) {
     PriorityMode["AUTO"] = "auto";
-    PriorityMode["FORCE_RESERVATION"] = "force_reservation"; // 予約強制実行
+    PriorityMode["FORCE_RESERVATION"] = "force_reservation"; // 予約強制実行（満員でも試行）
 })(PriorityMode || (PriorityMode = {}));
-// 位置管理の定数
+/**
+ * 位置管理の定数
+ * 万博入場予約画面の東西エリア選択テーブル構造に対応
+ * - テーブルの1列目（index=0）が東エリア
+ * - テーブルの2列目（index=1）が西エリア
+ */
 const LOCATION_MAP = {
-    0: 'east', // 0番目のtd = 東
-    1: 'west' // 1番目のtd = 西
+    0: 'east', // 0番目のtd = 東エリア
+    1: 'west' // 1番目のtd = 西エリア
 };
+/** 東西からテーブル列インデックスへの逆引きマップ */
 const LOCATION_TO_INDEX = {
-    'east': 0,
-    'west': 1
+    'east': 0, // 東エリア → 1列目
+    'west': 1 // 西エリア → 2列目
 };
 // ============================================================================
 // 位置管理ヘルパークラス
 // ============================================================================
+/**
+ * 位置管理ヘルパークラス
+ * 東西エリアとテーブルインデックスの相互変換ユーティリティ
+ * DOM操作や表示用文字列生成に使用
+ */
 class LocationHelper {
-    // indexから東西を取得
+    /**
+     * テーブル列インデックスから東西エリアを取得
+     * @param index テーブル列インデックス (0 or 1)
+     * @returns 'east' | 'west'
+     */
     static getLocationFromIndex(index) {
-        return LOCATION_MAP[index] || 'east';
+        return LOCATION_MAP[index] || 'east'; // 不正値はデフォルトで東
     }
-    // 東西からindexを取得
+    /**
+     * 東西エリアからテーブル列インデックスを取得
+     * @param location 'east' | 'west'
+     * @returns テーブル列インデックス (0 or 1)
+     */
     static getIndexFromLocation(location) {
         return LOCATION_TO_INDEX[location];
     }
-    // tdSelectorからindexを抽出
+    /**
+     * DOMセレクタ文字列からテーブル列インデックスを抽出
+     * CSSセレクタの nth-child() 部分をパースしてインデックスを得る
+     * @param selector CSSセレクタ文字列 例: "tr:nth-child(2) > td:nth-child(1)"
+     * @returns テーブル列インデックス (0 or 1)
+     */
     static getIndexFromSelector(selector) {
         if (!selector || typeof selector !== 'string') {
             console.warn('⚠️ LocationHelper.getIndexFromSelector: 無効なselector:', selector);
-            return 0; // デフォルトは東
+            return 0; // デフォルトは東エリア
         }
+        // "td:nth-child(N)" パターンを抽出
         const cellMatch = selector.match(/td:nth-child\((\d+)\)/);
         if (cellMatch && cellMatch[1]) {
-            return parseInt(cellMatch[1]) - 1; // nth-childは1ベース、indexは0ベース
+            return parseInt(cellMatch[1]) - 1; // nth-childは1ベース、配列indexは0ベース
         }
-        return 0; // デフォルトは東
+        return 0; // パース失敗時は東エリアデフォルト
     }
     // DOM要素からindexを取得
     static getIndexFromElement(tdElement) {
@@ -1006,75 +1051,119 @@ class LocationHelper {
 // ============================================================================
 // 入場予約状態管理クラス
 // ============================================================================
+/**
+ * 入場予約状態管理クラス
+ * アプリケーション全体の中核シングルトン状態管理システム
+ *
+ * 【設計原則】
+ * - Single Source of Truth: すべての状態をこのクラスで一元管理
+ * - 原子性: 状態変更は原子的に実行、中途半端な状態を回避
+ * - 一貫性: FAB UI・overlay・自動処理との状態同期を保証
+ * - 中断可能: すべての長時間処理は中断可能に設計
+ */
 class EntranceReservationStateManager {
+    /**
+     * コンストラクタ
+     * シングルトンインスタンスとして初期化される
+     */
     constructor() {
-        // 実行状態
+        // ==================== 実行状態管理 ====================
+        /** 現在の実行状態（IDLE/RESERVATION_RUNNING） */
         this.executionState = ExecutionState.IDLE;
-        // 開始時対象キャッシュ（検証用）
+        /** 開始時対象キャッシュ（予約処理中の整合性検証用） */
         this.initialTargetCache = null;
-        // 対象管理
+        // ==================== 対象情報管理 ====================
+        /** 現在の予約対象（時間帯・位置・セレクタ） */
         this.reservationTarget = null;
-        // 予約成功情報
+        /** 予約成功情報（成功後の表示・通知用） */
         this.reservationSuccess = null;
-        // 選択されたカレンダー日付
+        /** ユーザーが選択したカレンダー日付 (YYYY-MM-DD形式) */
         this.selectedCalendarDate = null;
-        // 優先度設定
+        /** 優先度モード（現在は予約のみサポート） */
         this.priorityMode = PriorityMode.AUTO;
-        // 予約実行情報（旧entranceReservationStateから統合）
+        // ==================== 予約実行状態管理 ====================
+        /** 予約実行情報（旧entranceReservationStateから統合） */
         this.reservationExecution = {
-            shouldStop: false,
-            startTime: null,
-            attempts: 0
+            shouldStop: false, // 中断フラグ（ユーザーが中断ボタンを押した場合）
+            startTime: null, // 予約開始時刻（タイムアウト判定用）
+            attempts: 0 // 予約試行回数（サイクルカウンタ）
         };
-        // 効率モード設定管理（常時有効）
+        // ==================== 効率モード管理 ====================
+        /** 効率モード設定管理（毎分00秒/30秒のsubmitタイミング制御） */
         this.efficiencyMode = {
-            enabled: true, // 常時有効に設定
-            nextSubmitTarget: null,
+            enabled: true, // 常時有効に設定（v1.0.0ではデフォルト有効）
+            nextSubmitTarget: null, // 次のsubmit目標時刻
             updateTimer: null // FABボタン更新タイマー
         };
-        // changeダイアログ検出・調整管理
+        /** changeダイアログ検出・調整管理（予約サイトの「change」ダイアログ対策） */
         this.changeDialogState = {
             hasAppeared: false, // 一度でもchangeダイアログが表示されたか
-            needsTimingAdjustment: false // タイミング調整が必要か
+            needsTimingAdjustment: false // タイミング調整が必要か（00/30秒タイミング用）
         };
-        // リロードカウントダウン状態管理（旧reloadCountdownStateから統合）
+        // ==================== リロード・ページ状態管理 ====================
+        /** リロードカウントダウン状態管理（旧reloadCountdownStateから統合） */
         this.reloadCountdown = {
-            totalSeconds: 30,
-            secondsRemaining: null,
-            startTime: null,
-            countdownInterval: null,
-            reloadTimer: null
+            totalSeconds: 30, // カウントダウン総秒数
+            secondsRemaining: null, // 残り秒数（nullは停止中）
+            startTime: null, // カウントダウン開始時刻
+            countdownInterval: null, // カウントダウン表示更新用タイマー
+            reloadTimer: null // リロード実行用タイマー
         };
-        // ページ読み込み状態管理（旧pageLoadingStateから統合）
+        /** ページ読み込み状態管理（旧pageLoadingStateから統合） */
         this.pageLoading = {
-            isLoading: false,
-            startTime: null,
-            timeout: 10000
+            isLoading: false, // ページ読み込み中フラグ
+            startTime: null, // 読み込み開始時刻
+            timeout: 10000 // タイムアウト時間（10秒）
         };
-        // デバッグフラグ（本番環境では詳細ログを抑制）
+        // ==================== デバッグ・通知設定 ====================
+        /** デバッグログ出力フラグ（v1.0.0では開発用に有効） */
         this.debugMode = true;
-        // 通知音設定
+        /** 予約成功時の8bitスタイル音声通知設定 */
         this.notificationSound = {
-            enabled: true // デフォルトで有効
+            enabled: true // デフォルトで有効（ユーザーがoverlayで切り替え可能）
         };
-        // 統一自動処理管理を初期化
+        // 統一自動処理管理を初期化（中断可能な非同期処理管理）
         this.automationManager = new UnifiedAutomationManager(this);
-        // 保存された設定を読み込み
+        // localStorageから保存された設定を復元
         this.loadNotificationSoundSettings();
         console.log('📋 統一状態管理システム初期化完了');
     }
     // ============================================================================
-    // 実行状態管理
+    // 実行状態管理 API
+    // 【主要メソッド】
+    // - getExecutionState() / setExecutionState(): 現在状態の取得・設定
+    // - startReservation(): 予約処理開始
+    // - stop(): すべての処理を停止
+    // - canStartReservation(): 予約開始可能性判定
     // ============================================================================
+    /**
+     * 現在の実行状態を取得
+     * @returns 現在の実行状態
+     */
     getExecutionState() {
         return this.executionState;
     }
+    /**
+     * 実行状態を設定
+     * デバッグモード時は状態変更ログを出力
+     * @param state 設定する実行状態
+     */
     setExecutionState(state) {
         this.executionState = state;
         if (this.debugMode) {
             console.log(`[UnifiedState] 実行状態変更: ${state}`);
         }
     }
+    /**
+     * 予約処理を開始
+     *
+     * 【機能】
+     * - 初回開始時: 予約開始条件チェック + ターゲットキャッシュ保存
+     * - 継続サイクル: 実行中でも継続可能（リロード後の再開始など）
+     * - 効率モード: 次の00/30秒ターゲット計算 + 更新タイマー開始
+     *
+     * @returns 開始成功時true、失敗時false
+     */
     startReservation() {
         // 初回のみ条件チェック（2サイクル目以降は実行中でも継続）
         if (this.executionState !== ExecutionState.RESERVATION_RUNNING &&
@@ -1114,6 +1203,14 @@ class EntranceReservationStateManager {
         this.log(`🚀 予約処理を開始 (${cycleType})`);
         return true;
     }
+    /**
+     * すべての処理を停止しIDLE状態に戻す
+     *
+     * 【停止対象】
+     * - 予約実行情報のリセット
+     * - 初回開始時ターゲットキャッシュのクリア
+     * - 効率モード更新タイマーの停止
+     */
     stop() {
         const prevState = this.executionState;
         this.executionState = ExecutionState.IDLE;
@@ -1135,23 +1232,34 @@ class EntranceReservationStateManager {
     // 予約実行情報管理（旧entranceReservationStateから統合）
     // ============================================================================
     // 削除: startReservationExecution()はstartReservation()に統合
-    // 予約中断フラグ設定
+    /**
+     * 予約中断フラグを設定
+     * ユーザーが中断ボタンを押した際に呼び出される
+     *
+     * 【中断メカニズム】
+     * 1. shouldStopフラグを設定
+     * 2. UnifiedAutomationManagerで実行中の場合は即座中断
+     * 3. 状態変更は予約処理ループ完了後に実行
+     *
+     * @param shouldStop true:中断、false:継続
+     */
     setShouldStop(shouldStop) {
         this.reservationExecution.shouldStop = shouldStop;
         this.log(`🛑 予約中断フラグ: ${shouldStop}`);
-        // Phase 1: 統一自動処理管理での中断処理を追加
+        // 統一自動処理管理での即座中断処理
         if (shouldStop && this.automationManager.isRunning()) {
             this.log('🛑 統一自動処理管理での即座中断を実行');
             this.automationManager.abort();
         }
-        // 中断フラグのみ設定、状態変更は予約処理完了後に行う
-        // （予約処理ループが完了するまで RESERVATION_RUNNING 状態を維持）
+        // 注意: 状態変更はRESERVATION_RUNNINGのまま維持
+        // 予約処理ループが中断を検知して終了するまで待機
     }
     // ============================================================================
     // 開始時対象キャッシュ管理（検証用）
     // ============================================================================
     /**
-     * 初回開始時の対象を保存
+     * 初回予約開始時の対象をキャッシュに保存
+     * 予約処理中にユーザーが別の時間帯を選択した場合の検知用
      */
     saveInitialTargets() {
         this.initialTargetCache = {
@@ -1162,8 +1270,14 @@ class EntranceReservationStateManager {
         console.log('💾 予約対象:', this.initialTargetCache.reservationTarget);
     }
     /**
-     * 現在の対象が初回開始時と一致するかを検証
-     * @returns true: 一致, false: 不一致（処理中断が必要）
+     * 予約対象の一貫性を検証
+     * 予約処理中にユーザーが別の時間帯を選択した場合の検出
+     *
+     * 【検証項目】
+     * - 予約対象の時間帯一致性
+     * - 予約対象の位置一致性
+     *
+     * @returns true:一貫性OK、false:不一致検知（処理中断が必要）
      */
     validateTargetConsistency() {
         if (!this.initialTargetCache) {
@@ -1203,26 +1317,32 @@ class EntranceReservationStateManager {
     // 統一自動処理管理へのアクセスメソッド（Phase 2で追加）
     // ============================================================================
     /**
-     * 統一効率モード待機処理実行
-     * @param targetTime 目標時刻
-     * @returns Promise<void>
+     * 統一効率モード待機処理を実行
+     * UnifiedAutomationManager経由で中断可能な待機を実行
+     *
+     * @param targetTime 目標時刻（00秒または30秒のタイミング）
+     * @returns Promise<void> 中断時はCancellationErrorをthrow
      */
     async executeUnifiedEfficiencyWait(targetTime) {
         return await this.automationManager.executeEfficiencyWait(targetTime);
     }
     /**
      * 統一中断可能待機
+     * AbortSignalを使用して中断可能な待機を実行
+     *
      * @param ms 待機時間（ミリ秒）
-     * @param signal 中断シグナル
-     * @returns Promise<void>
+     * @param signal 中断シグナル（AbortControllerから生成）
+     * @returns Promise<void> 中断時はCancellationErrorをthrow
      */
     async executeUnifiedWaitWithCancellation(ms, signal) {
         return await this.automationManager.waitWithCancellation(ms, signal);
     }
     /**
-     * 統一予約処理実行
-     * @param config 予約設定
-     * @returns Promise<ReservationResult>
+     * 統一予約処理を実行
+     * UnifiedAutomationManager経由で予約処理を実行
+     *
+     * @param config 予約設定オブジェクト（対象時間帯・位置など）
+     * @returns Promise<ReservationResult> 予約結果（成功/失敗/エラー）
      */
     async executeUnifiedReservationProcess(config) {
         return await this.automationManager.executeReservationProcess(config);
@@ -2018,35 +2138,77 @@ const identify_page_type = (url) => {
 /* harmony export */   p4: () => (/* binding */ waitForValidCalendarDate),
 /* harmony export */   rY: () => (/* binding */ getCurrentSelectedCalendarDate)
 /* harmony export */ });
-/* unused harmony exports checkTimeSlotTableExistsSync, getCurrentEntranceConfig, getCurrentFabState, getCurrentMode, updateStatusBadge, resetPreviousSelection, scheduleReload, startReloadCountdown, stopReloadCountdown */
+/* unused harmony exports checkTimeSlotTableExistsSync, getCurrentEntranceConfig, getCurrentMode, updateStatusBadge, scheduleReload, stopReloadCountdown */
 /* harmony import */ var _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(79);
 /* harmony import */ var _entrance_page_dom_utils__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(38);
-// entrance-page-stateからのimport（もう使用しません）
-// 入場予約状態管理システムからのimport
+/**
+ * 入場予約ページコア機能モジュール
+ *
+ * 【責務】
+ * - 時間帯テーブルの存在確認・待機処理
+ * - カレンダー日付管理（選択日付の取得・検証）
+ * - 中断可能性判定ユーティリティ
+ * - ページ状態管理・キャッシュ連携
+ *
+ * 【アーキテクチャ】
+ * - ユーティリティ関数群: DOM操作の基盤機能を提供
+ * - 状態管理連携: EntranceReservationStateManagerとの統合
+ * - 依存注入: CacheManagerのセッター関数を提供
+ *
+ * @version v1.0.0 - 統一状態管理版
+ * @dependencies EntranceReservationStateManager, DOM Utils
+ */
+// ==================== 依存モジュール import ====================
+// 統一状態管理システム
 
-// entrance-page-dom-utilsからのimport
+// DOM操作ユーティリティ
 
-// 【5. 時間帯分析システム】
 // ============================================================================
-// cacheManagerを設定するヘルパー関数（互換性のため保持）
+// 時間帯分析システム - Section 5
+// 【機能】
+// - 時間帯テーブルの存在確認・待機処理
+// - カレンダー日付管理・検証ユーティリティ
+// - 中断可能性判定・ページ状態管理
+// - キャッシュ管理システム連携
+// ============================================================================
+/**
+ * キャッシュ管理インスタンス設定関数
+ * 互換性維持のため保持されているが、現在は未使用
+ *
+ * @param _cm キャッシュ管理インスタンス（未使用）
+ */
 const setCacheManager = (_cm) => {
-    // 必要に応じて使用
+    // TODO: 必要に応じてキャッシュ連携機能を実装
 };
-// 時間帯テーブルの動的待機
+/**
+ * 時間帯テーブルの動的待機処理
+ * DOMが動的に読み込まれるまで高速ポーリングで待機
+ *
+ * 【特徴】
+ * - 50ms間隔の高速チェック（レスポンシブな検知）
+ * - ランダム待機時間でCPU負荷軽減
+ * - タイムアウト機能で無限ループ防止
+ *
+ * @param timeout タイムアウト時間（ミリ秒、デフォルト: 10秒）
+ * @returns テーブル検出成功時true、タイムアウト時false
+ */
 async function waitForTimeSlotTable(timeout = 10000) {
     const startTime = Date.now();
-    const checkInterval = 50; // 50msで高速チェック
-    console.log('時間帯テーブルの出現を待機中...');
+    const checkInterval = 50; // 50msで高速チェック（レスポンシブな検知）
+    console.log('🔍 時間帯テーブルの動的読み込みを待機中...');
+    // ポーリングループ: タイムアウトまで継続
     while (Date.now() - startTime < timeout) {
+        // 時間帯テーブルの存在確認
         if (checkTimeSlotTableExistsSync()) {
-            console.log('時間帯テーブルを検出しました');
+            console.log('✅ 時間帯テーブル検出成功 - DOM要素が利用可能です');
             return true;
         }
-        // ランダム待機時間で次のチェック
-        const waitTime = checkInterval + Math.floor(Math.random() * 200);
+        // CPU負荷軽減のためのランダム待機（ジッター防止）
+        const waitTime = checkInterval + Math.floor(Math.random() * 200); // 50-250msのランダム間隔
         await new Promise(resolve => setTimeout(resolve, waitTime));
     }
-    console.log(`時間帯テーブルの待機がタイムアウトしました (${timeout}ms)`);
+    // タイムアウト時のエラーログ
+    console.error(`⚠️ 時間帯テーブル待機タイムアウト (${timeout}ms) - DOM要素が読み込まれませんでした`);
     return false;
 }
 // 時間帯テーブルの存在確認（同期版）
@@ -2087,15 +2249,6 @@ const setEntranceReservationHelper = (helper) => {
 };
 // メインボタンの表示更新（FAB形式対応）
 // FAB更新の状態管理（統一状態管理システムで管理）
-// 現在のFAB状態を文字列として取得
-function getCurrentFabState() {
-    if (!entranceReservationStateManager)
-        return 'no-manager';
-    const mode = getCurrentMode();
-    const executionState = entranceReservationStateManager.getExecutionState();
-    const hasReservation = entranceReservationStateManager.hasReservationTarget();
-    return `${mode}-${executionState}-${hasReservation}`;
-}
 // FAB表示更新は統一状態管理システムで直接処理
 // 現在のモードを取得するヘルパー関数（予約優先ロジック組み込み）
 function getCurrentMode() {
@@ -2210,13 +2363,6 @@ function updateStatusBadge(mode) {
         entranceReservationStateManager.updateFabDisplay();
     }
 }
-// 前の選択をリセット
-function resetPreviousSelection() {
-    // すべての対象をクリア
-    if (entranceReservationStateManager) {
-        entranceReservationStateManager.clearAllTargets();
-    }
-}
 // 統一されたリロードスケジュール関数
 function scheduleReload(seconds = 30) {
     console.log(`🔄 統一リロードスケジュール開始: ${seconds}秒`);
@@ -2227,10 +2373,6 @@ function scheduleReload(seconds = 30) {
     }
     // 即座に一度UI更新
     entranceReservationStateManager.updateFabDisplay();
-}
-// 下位互換のためのstartReloadCountdown関数（scheduleReloadのエイリアス）
-function startReloadCountdown(seconds = 30) {
-    scheduleReload(seconds);
 }
 // カウントダウン停止関数
 function stopReloadCountdown() {
@@ -2901,7 +3043,8 @@ class ProcessingOverlay {
         console.log('🛑 同行者追加処理を中断中...');
         // companion-ticket-pageのプロセスマネージャーを停止
         try {
-            // companionProcessManagerにアクセス（window経由でグローバルアクセス）
+            // 適切なimportを使用するべきだが、現在はモジュール構造上の制約でwindow経由でアクセス
+            // TODO: 将来的にはcompanion-ticket-pageから直接importするようにリファクタリングが必要
             const companionProcessManager = window.companionProcessManager;
             if (companionProcessManager && typeof companionProcessManager.stopProcess === 'function') {
                 companionProcessManager.stopProcess();
@@ -4740,6 +4883,7 @@ const init_page = () => {
     insert_search_input();
     createPavilionFAB();
     // 状態更新関数をグローバルに公開
+    // TODO: 適切なmodule構造で置き換えるべき
     window.updateLoadAllButtonState = updateLoadAllButtonState;
     // ページ読み込み完了後に状態をチェック（複数回、より頻繁に）
     const checkIntervals = [500, 1000, 2000, 3000, 5000];
@@ -5761,6 +5905,7 @@ class CompanionProcessManager {
 // グローバルプロセスマネージャーインスタンス
 const companionProcessManager = new CompanionProcessManager();
 // グローバルアクセス用にwindowオブジェクトに登録
+// TODO: 適切なmodule export/import構造で置き換えるべき
 window.companionProcessManager = companionProcessManager;
 // ページタイプごとの初期化関数
 function initializeTicketSelectionPage() {
@@ -6952,6 +7097,7 @@ function updateExecuteButtonState() {
     }
 }
 // グローバルスコープでアクセス可能にする
+// TODO: 適切なmodule構造で置き換えるべき
 window.updateTicketRowSelection = updateTicketRowSelection;
 // 選択されたチケットID取得
 function getSelectedTicketIds() {
@@ -7073,29 +7219,65 @@ var entrance_reservation_state_manager = __webpack_require__(79);
 // EXTERNAL MODULE: ./ts/modules/page-utils.ts
 var page_utils = __webpack_require__(214);
 ;// ./ts/modules/app-router.ts
-// 各モジュールからのimport
+/**
+ * アプリケーションルーター - App Router
+ *
+ * 【責務】
+ * - URLベースのページタイプ判定と適切なモジュール初期化
+ * - 統一キャッシュ管理システムの初期化・依存注入
+ * - FAB UIのライフサイクル管理（作成・クリーンアップ）
+ * - ページ遷移時の状態管理システム同期
+ *
+ * 【アーキテクチャ】
+ * - シングルトンエントリーポイント: main.tsから呼び出される
+ * - 依存注入パターン: 各モジュールにキャッシュ管理を注入
+ * - ライフサイクル管理: URL変更検知でページ移行を追跡
+ *
+ * @version v1.0.0 - 統一状態管理版
+ * @architecture Module Router with Dependency Injection
+ */
+// ==================== モジュールインポート ====================
+// パビリオン検索ページモジュール
+
+// 入場予約ページ初期化モジュール
+
+// FAB状態管理
+
+// キャッシュ管理システム
 
 
 
+ // カレンダー日付取得
 
+// 同行者チケット機能モジュール
 
+// 統一状態管理システム（アプリケーションの中核）
 
-
-
- // 同行者追加機能
-// 入場予約状態管理システムのimport
-
-// Window型の拡張（beforeunloadハンドラー削除により不要）
-// 【8. ページ判定・初期化】
+// ==================== グローバル変数・型定義 ====================
 // ============================================================================
-// beforeunloadハンドラーは不要なので削除
-// 全FABをクリーンアップする統一関数
+// メインアプリケーションルーターシステム - Section 8
+// 【機能】
+// - URLベースのページタイプ判定・モジュールルーティング
+// - 統一キャッシュ管理システムの初期化・依存注入
+// - ページ遷移時のFAB UIライフサイクル管理
+// - モバイル対応のクリーンアップ処理
+// ============================================================================
+/**
+ * 全FABをクリーンアップする統一関数
+ * ページ遷移時に既存FABを削除してUI競合を防止
+ *
+ * 【削除対象】
+ * - ytomo-fab-container: 入場予約FAB
+ * - ytomo-pavilion-fab-container: パビリオン検索FAB
+ * - ytomo-ticket-selection-fab-container: チケット選択FAB
+ */
 function cleanupAllFABs() {
-    console.log('🧹 全FABをクリーンアップ開始');
+    console.log('🧹 全FABクリーンアップ開始 - ページ遷移時のUI競合防止');
+    // クリーンアップ対象のFAB IDリスト
     const fabSelectors = [
-        'ytomo-fab-container', // 入場予約FAB
-        'ytomo-pavilion-fab-container', // パビリオンFAB  
-        'ytomo-ticket-selection-fab-container' // チケット選択FAB
+        'ytomo-fab-container', // 入場予約メインFAB
+        'ytomo-pavilion-fab-container', // パビリオン検索FAB  
+        'ytomo-ticket-selection-fab-container' // 同行者チケット選択FAB
     ];
     let removedCount = 0;
     fabSelectors.forEach(id => {
@@ -7127,10 +7309,19 @@ function cleanupAllFABs() {
         }
     }
 }
-// モバイルデバイス判定（簡易版）
+/**
+ * モバイルデバイス判定（簡易版）
+ * UserAgentと画面幅の組み合わせでモバイル環境を検知
+ *
+ * 【用途】
+ * - モバイル対応の遅延処理（DOM更新のタイミング調整）
+ * - UIレスポンシブ対応の切り替え
+ *
+ * @returns true:モバイルデバイス、false:デスクトップ
+ */
 function isMobileDevice() {
     return /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
-        (window.innerWidth <= 768);
+        (window.innerWidth <= 768); // タブレットサイズ以下をモバイル扱い
 }
 // cacheManagerの初期化
 const cacheManager = createCacheManager({

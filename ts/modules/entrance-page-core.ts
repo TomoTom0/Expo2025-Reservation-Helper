@@ -1,52 +1,87 @@
-// entrance-page-stateからのimport（もう使用しません）
+/**
+ * 入場予約ページコア機能モジュール
+ * 
+ * 【責務】
+ * - 時間帯テーブルの存在確認・待機処理
+ * - カレンダー日付管理（選択日付の取得・検証）
+ * - 中断可能性判定ユーティリティ
+ * - ページ状態管理・キャッシュ連携
+ * 
+ * 【アーキテクチャ】
+ * - ユーティリティ関数群: DOM操作の基盤機能を提供
+ * - 状態管理連携: EntranceReservationStateManagerとの統合
+ * - 依存注入: CacheManagerのセッター関数を提供
+ * 
+ * @version v1.0.0 - 統一状態管理版
+ * @dependencies EntranceReservationStateManager, DOM Utils
+ */
 
-// 入場予約状態管理システムからのimport
+// ==================== 依存モジュール import ====================
+// 統一状態管理システム
 import { entranceReservationStateManager } from './entrance-reservation-state-manager';
 
-// entrance-page-dom-utilsからのimport
+// DOM操作ユーティリティ
 import {
-    timeSlotSelectors
+    timeSlotSelectors  // 時間帯関連のDOMセレクタ群
 } from './entrance-page-dom-utils';
 
-
-
-// UI更新ヘルパー関数は外部関数として設定される
-
-// 型定義のインポート
+// TypeScript型定義
 import type { 
-    CacheManager
+    CacheManager  // キャッシュ管理インターフェース
 } from '../types/index.js';
 
-// 【5. 時間帯分析システム】
+// ============================================================================
+// 時間帯分析システム - Section 5
+// 【機能】
+// - 時間帯テーブルの存在確認・待機処理
+// - カレンダー日付管理・検証ユーティリティ
+// - 中断可能性判定・ページ状態管理
+// - キャッシュ管理システム連携
 // ============================================================================
 
-// cacheManagerを設定するヘルパー関数（互換性のため保持）
+/**
+ * キャッシュ管理インスタンス設定関数
+ * 互換性維持のため保持されているが、現在は未使用
+ * 
+ * @param _cm キャッシュ管理インスタンス（未使用）
+ */
 export const setCacheManager = (_cm: CacheManager): void => {
-    // 必要に応じて使用
+    // TODO: 必要に応じてキャッシュ連携機能を実装
 };
 
-
-
-
-// 時間帯テーブルの動的待機
+/**
+ * 時間帯テーブルの動的待機処理
+ * DOMが動的に読み込まれるまで高速ポーリングで待機
+ * 
+ * 【特徴】
+ * - 50ms間隔の高速チェック（レスポンシブな検知）
+ * - ランダム待機時間でCPU負荷軽減
+ * - タイムアウト機能で無限ループ防止
+ * 
+ * @param timeout タイムアウト時間（ミリ秒、デフォルト: 10秒）
+ * @returns テーブル検出成功時true、タイムアウト時false
+ */
 async function waitForTimeSlotTable(timeout: number = 10000): Promise<boolean> {
     const startTime = Date.now();
-    const checkInterval = 50; // 50msで高速チェック
+    const checkInterval = 50; // 50msで高速チェック（レスポンシブな検知）
     
-    console.log('時間帯テーブルの出現を待機中...');
+    console.log('🔍 時間帯テーブルの動的読み込みを待機中...');
     
+    // ポーリングループ: タイムアウトまで継続
     while (Date.now() - startTime < timeout) {
+        // 時間帯テーブルの存在確認
         if (checkTimeSlotTableExistsSync()) {
-            console.log('時間帯テーブルを検出しました');
+            console.log('✅ 時間帯テーブル検出成功 - DOM要素が利用可能です');
             return true;
         }
         
-        // ランダム待機時間で次のチェック
-        const waitTime = checkInterval + Math.floor(Math.random() * 200);
+        // CPU負荷軽減のためのランダム待機（ジッター防止）
+        const waitTime = checkInterval + Math.floor(Math.random() * 200); // 50-250msのランダム間隔
         await new Promise(resolve => setTimeout(resolve, waitTime));
     }
     
-    console.log(`時間帯テーブルの待機がタイムアウトしました (${timeout}ms)`);
+    // タイムアウト時のエラーログ
+    console.error(`⚠️ 時間帯テーブル待機タイムアウト (${timeout}ms) - DOM要素が読み込まれませんでした`);
     return false;
 }
 
