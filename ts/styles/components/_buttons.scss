@@ -66,8 +66,8 @@ button.ext-ytomo {
   }
 }
 
-// パビリオンサブボタンの基本スタイルと状態管理
-.pavilion-sub-btn {
+// FABサブボタンの基本スタイルと状態管理
+.fab-sub-btn {
   // 基本スタイル（FABボタン共通）
   color: white;
   border: none;
@@ -86,6 +86,15 @@ button.ext-ytomo {
     &:hover {
       background: rgb(2, 134, 43);
       transform: scale(1.05);
+    }
+
+    // 完了状態（空きのみフィルター有効時）
+    &.btn-done {
+      background: rgb(74, 76, 74);
+
+      &:hover {
+        background: rgb(96, 98, 96);
+      }
     }
   }
 
@@ -137,6 +146,14 @@ button.ext-ytomo.pavilion-sub-btn {
   display: none;
 }
 
+
+// FABサブボタン内の数値表示用spanスタイル
+.fab-sub-btn span.button-count {
+  font-family: 'Courier New', 'Monaco', monospace;
+  font-weight: bold;
+  color: #ffeb3b;
+  vertical-align: baseline;
+}
 
 // 日付選択ボタンの選択状態管理
 button.ext-ytomo.pavilion-sub-btn.ytomo-date-button {

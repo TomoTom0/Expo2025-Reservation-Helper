@@ -203,8 +203,9 @@ const init_page = (): void => {
         filterSafeButtons.forEach((btn) => {
             const button = btn as HTMLButtonElement;
             const baseText = '空きのみ';
-            const newText = `${baseText}(${counts.available})`;
-            button.textContent = newText;
+            const countText = counts.available.toString();
+            // SCSSクラスで数字部分を装飾
+            button.innerHTML = `${baseText} <span class="button-count">${countText}</span>`;
         });
     };
 
@@ -322,7 +323,7 @@ const init_page = (): void => {
         // サブアクションボタンの作成
         const createSubButton = (text: string, className: string) => {
             const btn = document.createElement('button');
-            btn.classList.add('ext-ytomo', 'pavilion-sub-btn', 'base-style', className, 'btn-enabled');
+            btn.classList.add('ext-ytomo', 'fab-sub-btn', 'base-style', className, 'btn-enabled');
             btn.textContent = text;
             
             return btn;
@@ -583,11 +584,24 @@ const init_page = (): void => {
             else if (target && target.classList.contains("btn-filter-safe")) {
                 // 空きあり絞り込み
                 (target as HTMLButtonElement).disabled = true;
+                
+                // 現在のフィルター状態を判定（btn-doneクラスの有無で判定）
+                const isCurrentlyFiltering = target.classList.contains("btn-done");
+                
+                // ボタン状態を切り替え
                 target.classList.toggle("btn-done");
-                document.querySelectorAll("div.style_search_item_row__moqWC:has(img[src*=\"/asset/img/calendar_none.svg\"])"
-                ).forEach((div) => {
-                    div.classList.toggle("safe-none");
-                })
+                
+                // 全ての満員パビリオンに対して状態に応じて処理
+                document.querySelectorAll("div.style_search_item_row__moqWC:has(img[src*=\"/asset/img/calendar_none.svg\"])")
+                .forEach((div) => {
+                    if (isCurrentlyFiltering) {
+                        // 現在フィルター中 → フィルター解除（表示）
+                        div.classList.remove("safe-none");
+                    } else {
+                        // 現在フィルター無し → フィルター適用（非表示）
+                        div.classList.add("safe-none");
+                    }
+                });
 
                 setTimeout(() => {
                     if (target) {

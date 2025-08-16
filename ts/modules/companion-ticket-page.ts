@@ -862,7 +862,7 @@ function updateDateButtonsOnly(subButtonsContainer: HTMLElement): void {
         if (index === 0) button.style.fontWeight = 'bold !important';
         
         const displayText = (index === 2 && availableDates.length > 3) ? '他' : formatted;
-        button.innerHTML = `${buttonLabel} <span style="font-family: 'Courier New', 'Monaco', monospace; font-weight: bold; color: #ffeb3b; vertical-align: baseline;">${displayText}</span>`;
+        button.innerHTML = `${buttonLabel} <span class="button-count">${displayText}</span>`;
         
         // 同行者ボタンの前に挿入
         if (companionButton) {
@@ -943,7 +943,7 @@ function createTicketSelectionFAB(): void {
             button.classList.add('ytomo-date-button');
             button.style.fontWeight = 'bold !important';
             // 日付部分を強調表示で追加
-            button.innerHTML = `選択 <span style="font-family: 'Courier New', 'Monaco', monospace; font-weight: bold; color: #ffeb3b; vertical-align: baseline;">${formatted}</span>`;
+            button.innerHTML = `選択 <span class="button-count">${formatted}</span>`;
             subButtonsContainer.appendChild(button);
         } else if (availableDates.length === 2) {
             // 2種類の場合: 2個のボタン
@@ -955,7 +955,7 @@ function createTicketSelectionFAB(): void {
                 button.classList.add('ytomo-date-button');
                 if (index === 0) button.style.fontWeight = 'bold !important';
                 // 日付部分を強調表示で追加
-                button.innerHTML = `選択 <span style="font-family: 'Courier New', 'Monaco', monospace; font-weight: bold; color: #ffeb3b; vertical-align: baseline;">${formatted}</span>`;
+                button.innerHTML = `選択 <span class="button-count">${formatted}</span>`;
                 subButtonsContainer.appendChild(button);
             });
         } else {
@@ -969,7 +969,7 @@ function createTicketSelectionFAB(): void {
             firstButton.classList.add('ytomo-date-button');
             firstButton.style.fontWeight = 'bold !important';
             // 日付部分を強調表示で追加
-            firstButton.innerHTML = `選択 <span style="font-family: 'Courier New', 'Monaco', monospace; font-weight: bold; color: #ffeb3b; vertical-align: baseline;">${firstFormatted}</span>`;
+            firstButton.innerHTML = `選択 <span class="button-count">${firstFormatted}</span>`;
             subButtonsContainer.appendChild(firstButton);
 
             // ボタン2: 2番目の日付
@@ -980,7 +980,7 @@ function createTicketSelectionFAB(): void {
             });
             secondButton.classList.add('ytomo-date-button');
             // 日付部分を強調表示で追加
-            secondButton.innerHTML = `選択 <span style="font-family: 'Courier New', 'Monaco', monospace; font-weight: bold; color: #ffeb3b; vertical-align: baseline;">${secondFormatted}</span>`;
+            secondButton.innerHTML = `選択 <span class="button-count">${secondFormatted}</span>`;
             subButtonsContainer.appendChild(secondButton);
 
             // ボタン3: 3番目の日付（利用可能な場合）
@@ -1024,7 +1024,7 @@ function createTicketSelectionFAB(): void {
                     });
                     thirdButton.classList.add('ytomo-date-button');
                     // 日付部分を強調表示で追加
-                    thirdButton.innerHTML = `選択 <span style="font-family: 'Courier New', 'Monaco', monospace; font-weight: bold; color: #ffeb3b; vertical-align: baseline;">${thirdFormatted}</span>`;
+                    thirdButton.innerHTML = `選択 <span class="button-count">${thirdFormatted}</span>`;
                     subButtonsContainer.appendChild(thirdButton);
                 }
             }
@@ -1144,7 +1144,7 @@ function createTicketSelectionFAB(): void {
 // 子FABボタン作成ヘルパー関数（パビリオン検索画面と完全統一）
 function createSubFABButton(label: string, onClick: () => void): HTMLButtonElement {
     const button = document.createElement('button');
-    button.classList.add('ext-ytomo', 'pavilion-sub-btn', 'btn-enabled');
+    button.classList.add('ext-ytomo', 'fab-sub-btn', 'btn-enabled');
     button.textContent = label;
     // インラインスタイル完全削除 - 全てSCSSで管理
 

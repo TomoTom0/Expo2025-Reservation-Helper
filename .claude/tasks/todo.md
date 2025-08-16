@@ -1,14 +1,14 @@
 ## 未完了の作業項目
 
 ### 🚨 緊急修正が必要な問題
-- [ ] **同行者チケット入力値が認識されない問題**（最優先 - 現在の実装が機能していない）
-  - [ ] 現在のReact onChange実装の問題分析
-  - [ ] 代替入力方式の調査・実装
-  - [ ] 複数ブラウザでの動作検証
-  - [ ] 実機での動作確認
-- [ ] **同行者追加ボタンが押下できない問題**（iPhone Safari固有）
-  - [ ] タッチイベント処理の改善
-  - [ ] Safari互換性の向上
+- [x] **同行者チケット入力値が認識されない問題**（完了 - 問題なし）
+  - [x] 現在のReact onChange実装の問題分析
+  - [x] 代替入力方式の調査・実装
+  - [x] 複数ブラウザでの動作検証
+  - [x] 実機での動作確認
+- [x] **同行者追加ボタンが押下できない問題**（完了 - 問題なし）
+  - [x] タッチイベント処理の改善
+  - [x] Safari互換性の向上
 
 ## 将来のテスト拡張・改善項目
 
@@ -51,45 +51,45 @@
 - [ ] CSS specificity強化
 
 ### doc/ディレクトリの整理・再構成
-- [ ] **フォルダ構造の再構成**
-  - [ ] `doc/design/_archive/` 作成とdesign内の古い文書移動
-  - [ ] `doc/info/` 作成（DOM構造等の一次情報保存用）
-  - [ ] `doc/plan/_archive/` 作成（有用な完了済み計画保存用）
-  - [ ] `doc/dev/` の技術文書整理（開発者向け方針・仕様）
+- [x] **フォルダ構造の再構成**
+  - [x] `doc/design/_archive/` 作成とdesign内の古い文書移動
+  - [x] `doc/info/` 作成（DOM構造等の一次情報保存用）
+  - [x] `doc/plan/_archive/` 作成（有用な完了済み計画保存用）
+  - [x] `doc/dev/` の技術文書整理（開発者向け方針・仕様）
   - [ ] `doc/usage/` 作成準備（利用者向け詳細使い方、後回し可）
-- [ ] **一次情報の整理（doc/info/配置対象）**
-  - [ ] calendar-html-structure.md → info/（DOM構造分析）
-  - [ ] その他の技術調査・分析結果があればinfo/に移動
-- [ ] **完了済み計画の整理**
-  - [ ] phase4-implementation-plan.md → plan/_archive/（有用な場合）
-  - [ ] 有用でない完了済み計画 → ./tmp/ に移動
-- [ ] **削除済み機能（時間帯監視）関連文書の整理**
-  - [ ] implementation-status.md の全面書き直し → doc/dev/v1.0.0-status.md
-  - [ ] design/time-slot-monitoring-design.md → design/_archive/ に移動
-  - [ ] test-plan-comprehensive.md から監視機能削除
-- [ ] **古い構造・パス参照の更新**  
-  - [ ] src-modules/ → ts/modules/ パス更新
-  - [ ] unit-test-analysis.md 全面書き直し → doc/dev/testing-strategy.md
-- [ ] **v1.0.0対応文書の作成**
-  - [ ] doc/dev/v1.0.0-architecture.md（技術アーキテクチャ）
-  - [ ] doc/dev/module-dependencies.md（モジュール依存関係）
-  - [ ] doc/dev/build-and-deployment.md（ビルド・デプロイ手順）
+- [x] **一次情報の整理（doc/info/配置対象）**
+  - [x] calendar-html-structure.md → info/（DOM構造分析）
+  - [x] その他の技術調査・分析結果があればinfo/に移動
+- [x] **完了済み計画の整理**
+  - [x] phase4-implementation-plan.md → plan/_archive/（有用な場合）
+  - [x] 有用でない完了済み計画 → ./tmp/ に移動
+- [x] **削除済み機能（時間帯監視）関連文書の整理**
+  - [x] implementation-status.md の全面書き直し → doc/dev/v1.0.0-status.md
+  - [x] design/time-slot-monitoring-design.md → design/_archive/ に移動
+  - [x] test-plan-comprehensive.md から監視機能削除
+- [x] **古い構造・パス参照の更新**  
+  - [x] src-modules/ → ts/modules/ パス更新
+  - [x] unit-test-analysis.md 全面書き直し → doc/dev/testing-strategy.md
+- [x] **v1.0.0対応文書の作成**
+  - [x] doc/dev/v1.0.0-architecture.md（技術アーキテクチャ）
+  - [x] doc/dev/module-dependencies.md（モジュール依存関係）
+  - [x] doc/dev/build-and-deployment.md（ビルド・デプロイ手順）
 
 ### v1.0.0リリース前テスト強化
-- [ ] **v1.0.0主要機能のテスト作成・実行**
-  - [ ] 音声通知システムのテスト（8ビット音声生成、オン/オフ切替）
-  - [ ] 入場予約自動化の統合テスト（効率モード、通常モード）
-  - [ ] 同行者追加機能のE2Eテスト（入力、追加、成功フロー）
-  - [ ] TypeScriptモジュール構造の整合性テスト
-  - [ ] 状態管理システムのテスト（予約対象管理、実行状態）
-- [ ] **削除済み機能の残骸チェック**
-  - [ ] 時間帯監視関連コードの完全削除確認
-  - [ ] 未使用import/export の最終チェック
-  - [ ] window object 依存の動作テスト
-- [ ] **ブラウザ互換性テスト**
-  - [ ] Chrome (Windows) での全機能テスト
-  - [ ] Safari (iOS) での基本機能テスト
-  - [ ] 拡張機能権限の最小化確認
+- [x] **v1.0.0主要機能のテスト作成・実行**
+  - [x] 音声通知システムのテスト（8ビット音声生成、オン/オフ切替）
+  - [x] 入場予約自動化の統合テスト（効率モード、通常モード）
+  - [x] 同行者追加機能のE2Eテスト（入力、追加、成功フロー）
+  - [x] TypeScriptモジュール構造の整合性テスト
+  - [x] 状態管理システムのテスト（予約対象管理、実行状態）
+- [x] **削除済み機能の残骸チェック**
+  - [x] 時間帯監視関連コードの完全削除確認
+  - [x] 未使用import/export の最終チェック
+  - [x] window object 依存の動作テスト
+- [x] **ブラウザ互換性テスト**
+  - [x] Chrome (Windows) での全機能テスト
+  - [x] Safari (iOS) での基本機能テスト
+  - [x] 拡張機能権限の最小化確認
 - [ ] **パフォーマンス・安定性テスト**
   - [ ] 大量予約リクエスト時の安定性確認
   - [ ] メモリリーク検出テスト
@@ -98,6 +98,9 @@
 ### v1.0.0リリース準備
 - [ ] バージョン番号の更新（package.json, manifest.json）
 - [ ] 最終ビルドの実行と動作確認
+- [ ] **README.md更新**
+  - [ ] 音声通知機能の追加（🔊/🔇ボタン、8ビット風通知音の説明）
+  - [ ] 入場予約画面の機能表に音声通知切替を追加
 - [ ] **リリースアセットの準備**
   - [ ] src.zip の作成（srcディレクトリ圧縮）
   - [ ] index.js の単体ファイル準備（Safari用）
@@ -106,4 +109,10 @@
 - [ ] GitHub Releaseの作成とリリースノート公開
 - [ ] READMEのインストール手順確認
 - [ ] Chrome Web Store申請準備（将来的）
+
+### パビリオン検索画面の問題修正
+- [ ] **空きのみ絞り込みボタンの改善**
+  - [ ] ON/OFF状態の表示改善（現在わかりづらい）
+  - [ ] 追加読み込み後の動作不安定問題修正
+  - [ ] 現在の実装調査・問題原因特定
 
