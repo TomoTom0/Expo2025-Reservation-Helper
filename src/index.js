@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         yt-Expo2025-Reservation-Helper
 // @namespace    http://staybrowser.com/
-// @version      0.6.0
+// @version      0.6.2
 // @description  大阪万博2025予約支援ツール: パビリオン検索補助, 入場予約監視自動化, 同行者追加自動化
 // @author       TomoTom0 https://github.com/TomoTom0
 // @match        https://ticket.expo2025.or.jp/*
@@ -9,7 +9,7 @@
 // @run-at       document-end
 // ==/UserScript==
 
-// Built: 2025/08/16 17:52:34
+// Built: 2025/08/18 22:33:19
 
 
 (function webpackUniversalModuleDefinition(root, factory) {
@@ -3399,7 +3399,7 @@ module.exports = function (cssWithMappingToString) {
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1___default()((_node_modules_css_loader_dist_runtime_noSourceMaps_js__WEBPACK_IMPORTED_MODULE_0___default()));
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, `#ytomo-status-badge.countdown-warning{background:rgba(255,0,0,.9)}.ytomo-efficiency-toggle{width:45px;height:32px;border-radius:16px;color:#fff;border:none;font-size:10px;font-weight:bold;cursor:pointer;transition:all .2s ease;box-shadow:0 2px 8px rgba(0,0,0,.3);display:flex;align-items:center;justify-content:center;pointer-events:auto;margin-bottom:8px}.ytomo-efficiency-toggle.efficiency-enabled{background:rgba(255,140,0,.9)}.ytomo-efficiency-toggle.efficiency-disabled{background:rgba(128,128,128,.9)}.ytomo-efficiency-toggle:hover{transform:scale(1.1);box-shadow:0 4px 12px rgba(0,0,0,.4)}.ytomo-efficiency-toggle:active{transform:scale(0.95)}button.ext-ytomo{height:40px;width:auto;min-width:60px;padding:0px 8px;background:#006821;color:#fff}button.ext-ytomo.no-after:after{background:rgba(0,0,0,0) none repeat 0 0/auto auto padding-box border-box scroll}button.ext-ytomo.btn-done{background:#4a4c4a}button.ext-ytomo:hover{background:#02862b}.fab-sub-btn{color:#fff;border:none;border-radius:20px;padding:8px 16px;font-size:12px;white-space:nowrap;transition:all .2s ease}.fab-sub-btn.btn-enabled{background:#006821;cursor:pointer;opacity:1}.fab-sub-btn.btn-enabled:hover{background:#02862b;transform:scale(1.05)}.fab-sub-btn.btn-enabled.btn-done{background:#4a4c4a}.fab-sub-btn.btn-enabled.btn-done:hover{background:#606260}.fab-sub-btn.btn-disabled,.fab-sub-btn.btn-loading{background:gray;cursor:not-allowed;opacity:.6}.fab-sub-btn.btn-disabled:hover,.fab-sub-btn.btn-loading:hover{background:gray;transform:scale(1)}.fab-sub-btn:disabled{background:gray !important;cursor:not-allowed !important;opacity:.6 !important}.fab-sub-btn:disabled:hover{background:gray !important;transform:scale(1) !important}button.ext-ytomo.pavilion-sub-btn.btn-disabled,button.ext-ytomo.pavilion-sub-btn.btn-loading{background:gray;cursor:not-allowed;opacity:.6}button.ext-ytomo.pavilion-sub-btn.btn-disabled:hover,button.ext-ytomo.pavilion-sub-btn.btn-loading:hover{background:gray;transform:scale(1)}.safe-none,.ytomo-none,.filter-none{display:none}.fab-sub-btn span.button-count{font-family:"Courier New","Monaco",monospace;font-weight:bold;color:#ffeb3b;vertical-align:baseline}button.ext-ytomo.pavilion-sub-btn.ytomo-date-button.date-selected{border:2px solid #4caf50;box-shadow:0 0 8px rgba(76,175,80,.6)}div.div-flex{display:flex;justify-content:center;margin:5px}.js-show{display:block}.js-hide{display:none}.js-visible{visibility:visible}.js-invisible{visibility:hidden}.js-enabled{pointer-events:auto;opacity:1}.js-disabled{pointer-events:none;opacity:.6}.js-green{background:#228b22;color:#fff}.js-red{background:#dc3545;color:#fff}.js-gray{background:gray;color:#fff}.btn-success-highlight{background:#00c800;color:#fff}.status-bg-green{background:rgba(0,128,0,.9)}.status-bg-red{background:rgba(255,0,0,.9)}.status-bg-orange{background:rgba(255,140,0,.9)}.status-bg-blue{background:rgba(0,104,33,.9)}.status-bg-default{background:rgba(0,0,0,.8)}#ytomo-status-badge{background:linear-gradient(135deg, rgba(0, 0, 0, 0.9), rgba(40, 40, 40, 0.9));color:#fff;padding:8px 16px;border-radius:20px;font-size:12px;font-weight:bold;white-space:pre-line;box-shadow:0 4px 12px rgba(0,0,0,.3),0 2px 6px rgba(0,0,0,.2);border:2px solid hsla(0,0%,100%,.15);pointer-events:none}#ytomo-status-badge.ytomo-status-waiting{background:linear-gradient(135deg, rgba(0, 0, 0, 0.9), rgba(40, 40, 40, 0.9))}#ytomo-status-badge.ytomo-status-reservation{background:linear-gradient(135deg, rgba(255, 140, 0, 0.9), rgba(255, 165, 0, 0.9))}#ytomo-status-badge.ytomo-status-reservation.ytomo-status-countdown-warning{background:linear-gradient(135deg, rgba(255, 0, 0, 0.9), rgba(220, 53, 69, 0.9))}#ytomo-status-badge.ytomo-status-cooldown{background:linear-gradient(135deg, rgba(255, 107, 53, 0.9), rgba(255, 140, 0, 0.9))}.ytomo-header li.fab-toggle-li{display:inline-block;margin-right:8px}.ytomo-header li.fab-toggle-li button.fab-toggle-button{background:none;border:none;cursor:pointer;padding:0;color:#fff;transition:all .2s ease;display:flex;align-items:center;justify-content:center}.ytomo-header li.fab-toggle-li button.fab-toggle-button:hover{color:#ddd}.ytomo-header li.fab-toggle-li button.fab-toggle-button figure.fab-toggle-figure{width:auto;height:24px;display:flex;align-items:center;justify-content:center;padding:0 4px}.ytomo-pavilion-fab button.ytomo-fab{position:relative}.ytomo-pavilion-fab button.ytomo-fab:hover{transform:scale(1.15);box-shadow:0 8px 25px rgba(0,0,0,.5),0 4px 12px rgba(0,0,0,.3);border-width:4px}.ytomo-pavilion-fab .ytomo-fab-inner-content .pavilion-fab-expand-icon{font-size:8px;line-height:1;margin-bottom:1px;opacity:.8}.ytomo-pavilion-fab .ytomo-fab-inner-content .pavilion-fab-brand-text{font-size:7px;font-weight:normal;line-height:1;margin-bottom:2px;opacity:.7}.ytomo-pavilion-fab .ytomo-fab-inner-content .pavilion-fab-counts-text{font-size:12px;font-weight:bold;line-height:1}.ytomo-pavilion-fab .pavilion-sub-actions-container{display:none;flex-direction:column;gap:8px;align-items:flex-end;margin-bottom:8px}.ytomo-pavilion-fab .pavilion-sub-actions-container.expanded{display:flex}.ytomo-pavilion-fab .pavilion-sub-actions-container button.pavilion-sub-btn.base-style{color:#fff;border:none;border-radius:20px;padding:8px 16px;font-size:12px;white-space:nowrap;box-shadow:0 2px 8px rgba(0,0,0,.3);transition:all .2s ease}.ytomo-companion-dialog{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;z-index:99999;padding:20px;box-sizing:border-box}.ytomo-companion-dialog .dialog-content{background:#fff;border-radius:12px;padding:24px;width:100%;max-width:500px;max-height:90vh;overflow-y:auto;box-shadow:0 10px 40px rgba(0,0,0,.3)}@media(max-width: 768px){.ytomo-companion-dialog .dialog-content{max-width:95vw;max-height:85vh;padding:16px;border-radius:8px}}.ytomo-companion-dialog .dialog-content .input-row{display:flex;gap:8px;margin-bottom:12px}@media(max-width: 480px){.ytomo-companion-dialog .dialog-content .input-row{flex-direction:column;gap:12px}}.ytomo-companion-dialog .dialog-content .input-row input{padding:12px 8px;border:1px solid #ddd;border-radius:4px;font-size:16px}.ytomo-companion-dialog .dialog-content .input-row input:focus{outline:none;border-color:#4caf50;box-shadow:0 0 0 2px rgba(76,175,80,.2)}.ytomo-companion-dialog .dialog-content .input-row button{padding:12px 16px;background:#4caf50;color:#fff;border:none;border-radius:4px;cursor:pointer;font-size:14px;white-space:nowrap;min-width:60px}.ytomo-companion-dialog .dialog-content .input-row button:hover{background:#45a049}.ytomo-companion-dialog .dialog-content .input-row button:active{background:#3d8b40}.ytomo-abort-button{position:fixed;bottom:100px;right:24px;z-index:100001;background:#f44336;color:#fff;border:none;border-radius:50%;width:64px;height:64px;font-size:12px;font-weight:bold;cursor:pointer;box-shadow:0 4px 12px rgba(244,67,54,.4);transition:all .3s ease;display:flex;align-items:center;justify-content:center}.ytomo-abort-button:hover{transform:scale(1.1);box-shadow:0 6px 20px rgba(244,67,54,.6)}.ytomo-abort-button:active{transform:scale(0.95)}.copy-ticket-btn{margin-left:8px;padding:6px;background:#f0f0f0;border:1px solid #ddd;border-radius:4px;cursor:pointer;display:flex;align-items:center;justify-content:center;min-width:32px;height:32px;transition:all .3s ease}.copy-ticket-btn:hover{background:#e0e0e0;border-color:#ccc}.copy-ticket-btn:active{transform:scale(0.95)}.copy-ticket-btn svg{color:#666;transition:all .3s ease}.copy-ticket-btn.copy-success{background:rgba(76,175,80,.1);border-color:#4caf50}.copy-ticket-btn.copy-success svg{color:#4caf50}.dialog-btn{padding:8px 16px;border:none;border-radius:4px;cursor:pointer;font-size:14px;font-weight:bold;transition:all .2s ease}.dialog-btn.btn-cancel{background:#666;color:#fff}.dialog-btn.btn-cancel:hover{background:#555}.dialog-btn.btn-delete{background:#f44336;color:#fff}.dialog-btn.btn-delete:hover{background:#d32f2f}.dialog-btn.btn-execute{background:#2196f3;color:#fff}.dialog-btn.btn-execute:hover{background:#1976d2}.dialog-btn.btn-execute.btn-disabled{background:#ccc;color:#666;cursor:not-allowed}.dialog-btn.btn-execute.btn-disabled:hover{background:#ccc}.ticket-row{display:flex;align-items:center;padding:8px;border-bottom:1px solid #eee;transition:background-color .2s ease;cursor:pointer}.ticket-row:last-child{border-bottom:none}.ticket-row.already-added{position:relative;opacity:.6;background:repeating-linear-gradient(45deg, transparent, transparent 8px, rgba(255, 140, 0, 0.1) 8px, rgba(255, 140, 0, 0.1) 16px)}.ticket-row.already-added::after{content:"追加済み";position:absolute;top:4px;right:40px;background:rgba(255,140,0,.9);color:#fff;font-size:10px;font-weight:bold;padding:2px 6px;border-radius:3px;pointer-events:none}.ticket-row.already-added input[type=checkbox]{opacity:.5;cursor:not-allowed}.ticket-row.already-added .copy-ticket-btn{opacity:1;background:#f8f8f8;border-color:#bbb}.ticket-row.already-added .copy-ticket-btn:hover{background:#e8e8e8;border-color:#999}.ytomo-fab{width:56px;height:56px;border-radius:50%;color:#fff;border:none;box-shadow:0 6px 20px rgba(0,0,0,.4),0 2px 8px rgba(0,0,0,.2);border:3px solid hsla(0,0%,100%,.2);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:bold;transition:all .3s ease;position:relative;overflow:hidden;pointer-events:auto}.ytomo-fab-enabled{background:#ff8c00;opacity:.9;cursor:pointer;pointer-events:auto}.ytomo-fab-disabled{background:gray;opacity:.6;cursor:not-allowed;pointer-events:none}.ytomo-fab-running{background:#dc3545;opacity:.9;cursor:pointer;pointer-events:auto}.ytomo-fab.state-idle{background:gray;opacity:.6;cursor:not-allowed;pointer-events:none}.ytomo-fab.pointer-events-none{pointer-events:none}.ytomo-fab.pointer-events-auto{pointer-events:auto}.ytomo-fab.state-enabled{background:#ff8c00;opacity:.9;cursor:pointer;pointer-events:auto}.ytomo-fab.state-running{background:#dc3545;opacity:.9;cursor:pointer;pointer-events:auto}.ytomo-fab.state-reservation{background:#ff8c00;opacity:.9;cursor:pointer;pointer-events:auto}.ytomo-fab:hover{transform:scale(1.15);box-shadow:0 8px 25px rgba(0,0,0,.5),0 4px 12px rgba(0,0,0,.3)}.ytomo-fab.reservation-enabled{background:#006821;opacity:.9;cursor:pointer}.ytomo-fab.reservation-disabled{background:gray;opacity:.9;cursor:not-allowed}.ytomo-fab.cooldown-warning{background:#ff6b35}.ytomo-fab.cooldown-normal{background:#007bff}.ytomo-fab-container{position:fixed;bottom:100px;right:24px;z-index:10000;display:flex;flex-direction:column;align-items:flex-end;gap:12px;pointer-events:auto}.ytomo-fab-container.z-normal{z-index:10000}.ytomo-fab-container.z-above-overlay{z-index:100001}.ytomo-fab-container.visible{display:flex}.ytomo-fab-container.hidden{display:none}.ytomo-fab-content{position:relative;display:flex;flex-direction:column-reverse;align-items:center;gap:8px;opacity:0;transform:scale(0.8) translateY(10px);transition:all .3s cubic-bezier(0.175, 0.885, 0.32, 1.275);pointer-events:none}.ytomo-fab-content.expanded{opacity:1;transform:scale(1) translateY(0);pointer-events:auto}.ytomo-sub-fab{width:45px;height:32px;border-radius:16px;background:rgba(0,104,33,.9);color:#fff;border:none;font-size:11px;font-weight:bold;cursor:pointer;transition:all .2s ease;box-shadow:0 2px 8px rgba(0,0,0,.3);display:flex;align-items:center;justify-content:center;pointer-events:auto}.ytomo-sub-fab:hover{background:rgba(2,134,43,.9);transform:scale(1.1);box-shadow:0 4px 12px rgba(0,0,0,.4)}.ytomo-sub-fab:active{transform:scale(0.95)}.ytomo-pavilion-fab-container{position:fixed;bottom:100px;right:24px;z-index:10000;display:flex;flex-direction:column;gap:12px;align-items:flex-end;pointer-events:auto}.ytomo-ticket-selection-fab-container{position:fixed;bottom:100px;right:24px;z-index:10000;display:flex;flex-direction:column;gap:12px;align-items:flex-end;pointer-events:auto}.ytomo-ticket-selection-fab-container.z-normal{z-index:10000}.ytomo-ticket-selection-fab-container.z-above-overlay{z-index:100001}.ytomo-ticket-selection-fab-container #ytomo-companion-sub-buttons{display:flex;flex-direction:column;gap:8px;align-items:flex-end;transition:all .3s ease}.ytomo-fab-inner-content{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;pointer-events:none}.ytomo-reservation-target-display{background:linear-gradient(135deg, rgba(0, 123, 255, 0.95), rgba(0, 86, 179, 0.95));color:#fff;padding:8px 12px;border-radius:12px;font-size:12px;font-weight:bold;text-align:center;box-shadow:0 3px 10px rgba(0,0,0,.3);border:2px solid hsla(0,0%,100%,.3);min-width:80px;max-width:120px;white-space:pre-line;overflow:visible;text-overflow:clip;transition:all .3s ease;pointer-events:auto;cursor:pointer}.ytomo-reservation-target-display:hover{transform:scale(1.05);box-shadow:0 4px 14px rgba(0,0,0,.4)}.ytomo-reservation-target-display.hidden{display:none}.ytomo-reservation-target-display.visible{display:block}input.ext-tomo.search{height:50px;min-width:200px;max-width:min(300px,100%);font-family:quicksand;font-size:16px;-webkit-appearance:textfield;-moz-appearance:textfield;appearance:textfield;border:1px solid #222426;border-radius:25px;box-shadow:0 1px 0 0 #ccc;padding:0 0 0 10px;flex:1 1}.ytomo-icon.expand-icon{font-size:8px;line-height:1;color:#fff;font-weight:bold;text-align:center;pointer-events:none}.ytomo-icon.countdown-text{font-size:6px;line-height:1;color:#fff;font-weight:bold;text-align:center;margin-top:1px;pointer-events:none}.ytomo-toggle.toggle-li{position:fixed;bottom:10px;left:10px;z-index:1000;list-style:none;margin:0;padding:0}.ytomo-toggle.toggle-button{width:50px;height:30px;background:rgba(255,140,0,.8);border:none;border-radius:15px;cursor:pointer;transition:all .3s ease;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:bold;position:relative;overflow:hidden}.ytomo-toggle.toggle-button.enabled{color:#fff}.ytomo-toggle.toggle-button.disabled{color:#ddd}.ytomo-toggle.toggle-figure{width:100%;height:100%;margin:0;padding:0;border:none;background:rgba(0,0,0,0);pointer-events:none}.ytomo-dialog.overlay{position:fixed;top:0;left:0;width:100%;height:100%;background-color:rgba(0,0,0,.5);z-index:10000;display:flex;justify-content:center;align-items:center}.ytomo-dialog.container{background:#fff;border-radius:8px;padding:20px;max-width:400px;width:90%;max-height:70vh;overflow-y:auto;box-shadow:0 4px 12px rgba(0,0,0,.3)}.ytomo-dialog.title{margin:0 0 16px 0;color:#333;font-size:18px;font-weight:bold}.ytomo-dialog.button-group{display:flex;justify-content:flex-end;gap:10px;margin-top:20px}.ytomo-dialog.primary-button{background:#006821;color:#fff;border:none;padding:10px 20px;border-radius:4px;cursor:pointer;font-size:14px}.ytomo-dialog.primary-button:hover{background:#02862b}.ytomo-dialog.primary-button:disabled{background:gray;cursor:not-allowed}.ytomo-dialog.secondary-button{background:rgba(0,0,0,0);color:#666;border:1px solid #ccc;padding:10px 20px;border-radius:4px;cursor:pointer;font-size:14px}.ytomo-dialog.secondary-button:hover{background:#f5f5f5}.ytomo-progress.counter{display:inline-block;margin-left:8px;padding:2px 6px;background:rgba(0,0,0,.3);border-radius:10px;font-size:10px;color:#fff;font-weight:bold}.ytomo-error-message{position:fixed;top:20px;right:20px;background:#f44;color:#fff;padding:15px;border-radius:5px;box-shadow:0 2px 10px rgba(0,0,0,.3);z-index:10001;max-width:300px;font-size:14px;line-height:1.4}.ytomo-error-message .error-title{font-weight:bold;margin-bottom:5px}.ytomo-error-message .error-close-btn{margin-top:10px;padding:5px 10px;background:hsla(0,0%,100%,.2);border:none;border-radius:3px;color:#fff;cursor:pointer;font-size:12px}.ytomo-error-message .error-close-btn:hover{background:hsla(0,0%,100%,.3)}.ytomo-flex-column-center{display:flex;flex-direction:column;align-items:center}.ytomo-brand-text{font-size:8px;font-weight:bold;margin-top:2px}.ytomo-processing-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.3);z-index:100000;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(1px);transition:all .3s ease;pointer-events:auto}.ytomo-processing-overlay.z-normal{z-index:100000}.ytomo-processing-overlay.z-below-fab{z-index:99999}.ytomo-processing-overlay.hidden{opacity:0;visibility:hidden;pointer-events:none}.ytomo-processing-overlay.visible{opacity:1;visibility:visible;pointer-events:auto}.ytomo-processing-overlay .processing-message-area{background:hsla(0,0%,100%,.95);border-radius:12px;padding:24px 32px;text-align:center;box-shadow:0 8px 32px rgba(0,0,0,.3);border:2px solid rgba(255,140,0,.3);max-width:400px;margin:20px}@media(max-width: 768px){.ytomo-processing-overlay .processing-message-area{padding:20px 24px;margin:16px;max-width:90vw}}.ytomo-processing-overlay .processing-message-text{font-size:20px;font-weight:bold;color:#333;margin-bottom:8px;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}@media(max-width: 768px){.ytomo-processing-overlay .processing-message-text{font-size:18px;margin-bottom:6px}}.ytomo-processing-overlay .processing-target-text{font-size:16px;font-weight:600;color:#333;margin-bottom:12px;white-space:pre-line;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;text-align:center}@media(max-width: 768px){.ytomo-processing-overlay .processing-target-text{font-size:14px;margin-bottom:10px}}.ytomo-processing-overlay .processing-countdown-text{font-size:18px;font-weight:bold;color:#e67e00;margin-bottom:12px;font-family:"SF Mono","Monaco","Consolas",monospace;text-align:center;text-shadow:0 1px 2px rgba(0,0,0,.1)}@media(max-width: 768px){.ytomo-processing-overlay .processing-countdown-text{font-size:16px;margin-bottom:10px}}.ytomo-processing-overlay .processing-countdown-text.countdown-warning{color:#dc3545;animation:countdownPulse 1s ease-in-out infinite;text-shadow:0 0 8px rgba(220,53,69,.4)}.ytomo-processing-overlay .processing-warning-text{font-size:14px;color:#666;margin-bottom:16px;line-height:1.4;transition:all .3s ease}@media(max-width: 768px){.ytomo-processing-overlay .processing-warning-text{font-size:13px;margin-bottom:14px}}.ytomo-processing-overlay .processing-warning-text.warning-flash{color:#dc3545;font-weight:bold;transform:scale(1.05);animation:flash .5s ease-in-out 2}.ytomo-processing-overlay .notification-toggle-btn{display:flex;align-items:center;justify-content:center;width:40px;height:40px;border:none;border-radius:50%;cursor:pointer;transition:all .2s ease;margin-bottom:16px;box-shadow:0 2px 6px rgba(0,0,0,.15);font-size:20px;line-height:1}@media(max-width: 768px){.ytomo-processing-overlay .notification-toggle-btn{width:36px;height:36px;margin-bottom:14px;font-size:18px}}.ytomo-processing-overlay .notification-toggle-btn:hover{transform:scale(1.05);box-shadow:0 4px 10px rgba(0,0,0,.2)}.ytomo-processing-overlay .notification-toggle-btn:active{transform:scale(0.95)}.ytomo-processing-overlay .notification-toggle-btn.enabled{background:#4caf50;color:#fff}.ytomo-processing-overlay .notification-toggle-btn.enabled:hover{background:#45a049}.ytomo-processing-overlay .notification-toggle-btn.muted{background:#f44336;color:#fff}.ytomo-processing-overlay .notification-toggle-btn.muted:hover{background:#e53935}.ytomo-processing-overlay .processing-cancel-area{font-size:12px;color:#888;font-style:italic}@media(max-width: 768px){.ytomo-processing-overlay .processing-cancel-area{font-size:11px}}@keyframes flash{0%,100%{opacity:1}50%{opacity:.7}}@keyframes countdownPulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.8;transform:scale(1.05)}}.ytomo-processing-overlay.efficiency-mode .processing-message-area{border-color:rgba(255,140,0,.5);background:linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(255, 248, 220, 0.95))}.ytomo-processing-overlay.efficiency-mode .processing-message-text{color:#e67e00}.ytomo-processing-overlay.monitoring-mode .processing-message-area{border-color:rgba(0,104,33,.5);background:linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(240, 255, 240, 0.95))}.ytomo-processing-overlay.monitoring-mode .processing-message-text{color:#004d1a}@media(prefers-reduced-motion: reduce){.ytomo-processing-overlay{transition:none}.ytomo-processing-overlay .processing-warning-text.warning-flash{animation:none;transform:none}}table[class*=style_main__timetable__] td[data-gray-out] div[role=button][data-disabled=true]{pointer-events:auto !important;cursor:pointer !important}`, ""]);
+___CSS_LOADER_EXPORT___.push([module.id, `#ytomo-status-badge.countdown-warning{background:rgba(255,0,0,.9)}.ytomo-efficiency-toggle{width:45px;height:32px;border-radius:16px;color:#fff;border:none;font-size:10px;font-weight:bold;cursor:pointer;transition:all .2s ease;box-shadow:0 2px 8px rgba(0,0,0,.3);display:flex;align-items:center;justify-content:center;pointer-events:auto;margin-bottom:8px}.ytomo-efficiency-toggle.efficiency-enabled{background:rgba(255,140,0,.9)}.ytomo-efficiency-toggle.efficiency-disabled{background:rgba(128,128,128,.9)}.ytomo-efficiency-toggle:hover{transform:scale(1.1);box-shadow:0 4px 12px rgba(0,0,0,.4)}.ytomo-efficiency-toggle:active{transform:scale(0.95)}button.ext-ytomo{height:40px;width:auto;min-width:60px;padding:0px 8px;background:#006821;color:#fff}button.ext-ytomo.no-after:after{background:rgba(0,0,0,0) none repeat 0 0/auto auto padding-box border-box scroll}button.ext-ytomo.btn-done{background:#4a4c4a}button.ext-ytomo:hover{background:#02862b}.fab-sub-btn{color:#fff;border:none;border-radius:20px;padding:8px 16px;font-size:12px;white-space:nowrap;transition:all .2s ease}.fab-sub-btn.btn-enabled{background:#006821;cursor:pointer;opacity:1}.fab-sub-btn.btn-enabled:hover{background:#02862b;transform:scale(1.05)}.fab-sub-btn.btn-enabled.btn-done{background:#4a4c4a}.fab-sub-btn.btn-enabled.btn-done:hover{background:#606260}.fab-sub-btn.btn-disabled,.fab-sub-btn.btn-loading{background:gray;cursor:not-allowed;opacity:.6}.fab-sub-btn.btn-disabled:hover,.fab-sub-btn.btn-loading:hover{background:gray;transform:scale(1)}.fab-sub-btn:disabled{background:gray !important;cursor:not-allowed !important;opacity:.6 !important}.fab-sub-btn:disabled:hover{background:gray !important;transform:scale(1) !important}button.ext-ytomo.pavilion-sub-btn.btn-disabled,button.ext-ytomo.pavilion-sub-btn.btn-loading{background:gray;cursor:not-allowed;opacity:.6}button.ext-ytomo.pavilion-sub-btn.btn-disabled:hover,button.ext-ytomo.pavilion-sub-btn.btn-loading:hover{background:gray;transform:scale(1)}.safe-none,.ytomo-none,.filter-none{display:none}.fab-sub-btn span.button-count{font-family:"Courier New","Monaco",monospace;font-weight:bold;color:#ffeb3b;vertical-align:baseline}button.ext-ytomo.pavilion-sub-btn.ytomo-date-button.date-selected{border:2px solid #4caf50;box-shadow:0 0 8px rgba(76,175,80,.6)}div.div-flex{display:flex;justify-content:center;margin:5px}div.div-flex input.ext-tomo.search{flex:1;padding:8px 12px;border:1px solid #ddd;border-radius:4px;font-size:14px;margin-right:8px}div.div-flex input.ext-tomo.search:focus{outline:none;border-color:#006821;box-shadow:0 0 0 2px rgba(0,104,33,.2)}div.div-flex button.btn-filter-without-load{height:auto;min-height:40px;width:auto;min-width:60px;padding:0px 8px;color:#fff;margin:5px;background:#006821;border:none;border-radius:4px;cursor:pointer;font-size:14px}div.div-flex button.btn-filter-without-load:hover{background:#02862b}div.div-flex button.btn-filter-without-load:active{background:#005417}div.div-flex button.btn-filter-without-load:disabled{background:gray;cursor:not-allowed}.js-show{display:block}.js-hide{display:none}.js-visible{visibility:visible}.js-invisible{visibility:hidden}.js-enabled{pointer-events:auto;opacity:1}.js-disabled{pointer-events:none;opacity:.6}.js-green{background:#228b22;color:#fff}.js-red{background:#dc3545;color:#fff}.js-gray{background:gray;color:#fff}.btn-success-highlight{background:#00c800;color:#fff}.status-bg-green{background:rgba(0,128,0,.9)}.status-bg-red{background:rgba(255,0,0,.9)}.status-bg-orange{background:rgba(255,140,0,.9)}.status-bg-blue{background:rgba(0,104,33,.9)}.status-bg-default{background:rgba(0,0,0,.8)}#ytomo-status-badge{background:linear-gradient(135deg, rgba(0, 0, 0, 0.9), rgba(40, 40, 40, 0.9));color:#fff;padding:8px 16px;border-radius:20px;font-size:12px;font-weight:bold;white-space:pre-line;box-shadow:0 4px 12px rgba(0,0,0,.3),0 2px 6px rgba(0,0,0,.2);border:2px solid hsla(0,0%,100%,.15);pointer-events:none}#ytomo-status-badge.ytomo-status-waiting{background:linear-gradient(135deg, rgba(0, 0, 0, 0.9), rgba(40, 40, 40, 0.9))}#ytomo-status-badge.ytomo-status-reservation{background:linear-gradient(135deg, rgba(255, 140, 0, 0.9), rgba(255, 165, 0, 0.9))}#ytomo-status-badge.ytomo-status-reservation.ytomo-status-countdown-warning{background:linear-gradient(135deg, rgba(255, 0, 0, 0.9), rgba(220, 53, 69, 0.9))}#ytomo-status-badge.ytomo-status-cooldown{background:linear-gradient(135deg, rgba(255, 107, 53, 0.9), rgba(255, 140, 0, 0.9))}.ytomo-header li.fab-toggle-li{display:inline-block;margin-right:8px}.ytomo-header li.fab-toggle-li button.fab-toggle-button{background:none;border:none;cursor:pointer;padding:0;color:#fff;transition:all .2s ease;display:flex;align-items:center;justify-content:center}.ytomo-header li.fab-toggle-li button.fab-toggle-button:hover{color:#ddd}.ytomo-header li.fab-toggle-li button.fab-toggle-button figure.fab-toggle-figure{width:auto;height:24px;display:flex;align-items:center;justify-content:center;padding:0 4px}.ytomo-pavilion-fab button.ytomo-fab{position:relative}.ytomo-pavilion-fab button.ytomo-fab:hover{transform:scale(1.15);box-shadow:0 8px 25px rgba(0,0,0,.5),0 4px 12px rgba(0,0,0,.3);border-width:4px}.ytomo-pavilion-fab .ytomo-fab-inner-content .pavilion-fab-expand-icon{font-size:8px;line-height:1;margin-bottom:1px;opacity:.8}.ytomo-pavilion-fab .ytomo-fab-inner-content .pavilion-fab-brand-text{font-size:7px;font-weight:normal;line-height:1;margin-bottom:2px;opacity:.7}.ytomo-pavilion-fab .ytomo-fab-inner-content .pavilion-fab-counts-text{font-size:12px;font-weight:bold;line-height:1}.ytomo-pavilion-fab .pavilion-sub-actions-container{display:none;flex-direction:column;gap:8px;align-items:flex-end;margin-bottom:8px}.ytomo-pavilion-fab .pavilion-sub-actions-container.expanded{display:flex}.ytomo-pavilion-fab .pavilion-sub-actions-container button.pavilion-sub-btn.base-style{color:#fff;border:none;border-radius:20px;padding:8px 16px;font-size:12px;white-space:nowrap;box-shadow:0 2px 8px rgba(0,0,0,.3);transition:all .2s ease}.ytomo-companion-dialog{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;z-index:99999;padding:20px;box-sizing:border-box}.ytomo-companion-dialog .dialog-content{background:#fff;border-radius:12px;padding:24px;width:100%;max-width:500px;max-height:90vh;overflow-y:auto;box-shadow:0 10px 40px rgba(0,0,0,.3)}@media(max-width: 768px){.ytomo-companion-dialog .dialog-content{max-width:95vw;max-height:85vh;padding:16px;border-radius:8px}}.ytomo-companion-dialog .dialog-content .input-row{display:flex;gap:8px;margin-bottom:12px}@media(max-width: 480px){.ytomo-companion-dialog .dialog-content .input-row{flex-direction:column;gap:12px}}.ytomo-companion-dialog .dialog-content .input-row input{padding:12px 8px;border:1px solid #ddd;border-radius:4px;font-size:16px}.ytomo-companion-dialog .dialog-content .input-row input:focus{outline:none;border-color:#4caf50;box-shadow:0 0 0 2px rgba(76,175,80,.2)}.ytomo-companion-dialog .dialog-content .input-row button{padding:12px 16px;background:#4caf50;color:#fff;border:none;border-radius:4px;cursor:pointer;font-size:14px;white-space:nowrap;min-width:60px}.ytomo-companion-dialog .dialog-content .input-row button:hover{background:#45a049}.ytomo-companion-dialog .dialog-content .input-row button:active{background:#3d8b40}.ytomo-abort-button{position:fixed;bottom:100px;right:24px;z-index:100001;background:#f44336;color:#fff;border:none;border-radius:50%;width:64px;height:64px;font-size:12px;font-weight:bold;cursor:pointer;box-shadow:0 4px 12px rgba(244,67,54,.4);transition:all .3s ease;display:flex;align-items:center;justify-content:center}.ytomo-abort-button:hover{transform:scale(1.1);box-shadow:0 6px 20px rgba(244,67,54,.6)}.ytomo-abort-button:active{transform:scale(0.95)}.copy-ticket-btn{margin-left:8px;padding:6px;background:#f0f0f0;border:1px solid #ddd;border-radius:4px;cursor:pointer;display:flex;align-items:center;justify-content:center;min-width:32px;height:32px;transition:all .3s ease}.copy-ticket-btn:hover{background:#e0e0e0;border-color:#ccc}.copy-ticket-btn:active{transform:scale(0.95)}.copy-ticket-btn svg{color:#666;transition:all .3s ease}.copy-ticket-btn.copy-success{background:rgba(76,175,80,.1);border-color:#4caf50}.copy-ticket-btn.copy-success svg{color:#4caf50}.dialog-btn{padding:8px 16px;border:none;border-radius:4px;cursor:pointer;font-size:14px;font-weight:bold;transition:all .2s ease}.dialog-btn.btn-cancel{background:#666;color:#fff}.dialog-btn.btn-cancel:hover{background:#555}.dialog-btn.btn-delete{background:#f44336;color:#fff}.dialog-btn.btn-delete:hover{background:#d32f2f}.dialog-btn.btn-execute{background:#2196f3;color:#fff}.dialog-btn.btn-execute:hover{background:#1976d2}.dialog-btn.btn-execute.btn-disabled{background:#ccc;color:#666;cursor:not-allowed}.dialog-btn.btn-execute.btn-disabled:hover{background:#ccc}.ticket-row{display:flex;align-items:center;padding:8px;border-bottom:1px solid #eee;transition:background-color .2s ease;cursor:pointer}.ticket-row:last-child{border-bottom:none}.ticket-row.already-added{position:relative;opacity:.6;background:repeating-linear-gradient(45deg, transparent, transparent 8px, rgba(255, 140, 0, 0.1) 8px, rgba(255, 140, 0, 0.1) 16px)}.ticket-row.already-added::after{content:"追加済み";position:absolute;top:4px;right:40px;background:rgba(255,140,0,.9);color:#fff;font-size:10px;font-weight:bold;padding:2px 6px;border-radius:3px;pointer-events:none}.ticket-row.already-added input[type=checkbox]{opacity:.5;cursor:not-allowed}.ticket-row.already-added .copy-ticket-btn{opacity:1;background:#f8f8f8;border-color:#bbb}.ticket-row.already-added .copy-ticket-btn:hover{background:#e8e8e8;border-color:#999}.ytomo-fab{width:56px;height:56px;border-radius:50%;color:#fff;border:none;box-shadow:0 6px 20px rgba(0,0,0,.4),0 2px 8px rgba(0,0,0,.2);border:3px solid hsla(0,0%,100%,.2);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:bold;transition:all .3s ease;position:relative;overflow:hidden;pointer-events:auto}.ytomo-fab-enabled{background:#ff8c00;opacity:.9;cursor:pointer;pointer-events:auto}.ytomo-fab-disabled{background:gray;opacity:.6;cursor:not-allowed;pointer-events:none}.ytomo-fab-running{background:#dc3545;opacity:.9;cursor:pointer;pointer-events:auto}.ytomo-fab.state-idle{background:gray;opacity:.6;cursor:not-allowed;pointer-events:none}.ytomo-fab.pointer-events-none{pointer-events:none}.ytomo-fab.pointer-events-auto{pointer-events:auto}.ytomo-fab.state-enabled{background:#ff8c00;opacity:.9;cursor:pointer;pointer-events:auto}.ytomo-fab.state-running{background:#dc3545;opacity:.9;cursor:pointer;pointer-events:auto}.ytomo-fab.state-reservation{background:#ff8c00;opacity:.9;cursor:pointer;pointer-events:auto}.ytomo-fab:hover{transform:scale(1.15);box-shadow:0 8px 25px rgba(0,0,0,.5),0 4px 12px rgba(0,0,0,.3)}.ytomo-fab.reservation-enabled{background:#006821;opacity:.9;cursor:pointer}.ytomo-fab.reservation-disabled{background:gray;opacity:.9;cursor:not-allowed}.ytomo-fab.cooldown-warning{background:#ff6b35}.ytomo-fab.cooldown-normal{background:#007bff}.ytomo-fab-container{position:fixed;bottom:100px;right:24px;z-index:10000;display:flex;flex-direction:column;align-items:flex-end;gap:12px;pointer-events:auto}.ytomo-fab-container.z-normal{z-index:10000}.ytomo-fab-container.z-above-overlay{z-index:100001}.ytomo-fab-container.visible{display:flex}.ytomo-fab-container.hidden{display:none}.ytomo-fab-content{position:relative;display:flex;flex-direction:column-reverse;align-items:center;gap:8px;opacity:0;transform:scale(0.8) translateY(10px);transition:all .3s cubic-bezier(0.175, 0.885, 0.32, 1.275);pointer-events:none}.ytomo-fab-content.expanded{opacity:1;transform:scale(1) translateY(0);pointer-events:auto}.ytomo-sub-fab{width:45px;height:32px;border-radius:16px;background:rgba(0,104,33,.9);color:#fff;border:none;font-size:11px;font-weight:bold;cursor:pointer;transition:all .2s ease;box-shadow:0 2px 8px rgba(0,0,0,.3);display:flex;align-items:center;justify-content:center;pointer-events:auto}.ytomo-sub-fab:hover{background:rgba(2,134,43,.9);transform:scale(1.1);box-shadow:0 4px 12px rgba(0,0,0,.4)}.ytomo-sub-fab:active{transform:scale(0.95)}.ytomo-pavilion-fab-container{position:fixed;bottom:100px;right:24px;z-index:10000;display:flex;flex-direction:column;gap:12px;align-items:flex-end;pointer-events:auto}.ytomo-ticket-selection-fab-container{position:fixed;bottom:100px;right:24px;z-index:10000;display:flex;flex-direction:column;gap:12px;align-items:flex-end;pointer-events:auto}.ytomo-ticket-selection-fab-container.z-normal{z-index:10000}.ytomo-ticket-selection-fab-container.z-above-overlay{z-index:100001}.ytomo-ticket-selection-fab-container #ytomo-companion-sub-buttons{display:flex;flex-direction:column;gap:8px;align-items:flex-end;transition:all .3s ease}.ytomo-fab-inner-content{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;pointer-events:none}.ytomo-reservation-target-display{background:linear-gradient(135deg, rgba(0, 123, 255, 0.95), rgba(0, 86, 179, 0.95));color:#fff;padding:8px 12px;border-radius:12px;font-size:12px;font-weight:bold;text-align:center;box-shadow:0 3px 10px rgba(0,0,0,.3);border:2px solid hsla(0,0%,100%,.3);min-width:80px;max-width:120px;white-space:pre-line;overflow:visible;text-overflow:clip;transition:all .3s ease;pointer-events:auto;cursor:pointer}.ytomo-reservation-target-display:hover{transform:scale(1.05);box-shadow:0 4px 14px rgba(0,0,0,.4)}.ytomo-reservation-target-display.hidden{display:none}.ytomo-reservation-target-display.visible{display:block}input.ext-tomo.search{height:50px;min-width:200px;max-width:min(300px,100%);font-family:quicksand;font-size:16px;-webkit-appearance:textfield;-moz-appearance:textfield;appearance:textfield;border:1px solid #222426;border-radius:25px;box-shadow:0 1px 0 0 #ccc;padding:0 0 0 10px;flex:1 1}.ytomo-icon.expand-icon{font-size:8px;line-height:1;color:#fff;font-weight:bold;text-align:center;pointer-events:none}.ytomo-icon.countdown-text{font-size:6px;line-height:1;color:#fff;font-weight:bold;text-align:center;margin-top:1px;pointer-events:none}.ytomo-toggle.toggle-li{position:fixed;bottom:10px;left:10px;z-index:1000;list-style:none;margin:0;padding:0}.ytomo-toggle.toggle-button{width:50px;height:30px;background:rgba(255,140,0,.8);border:none;border-radius:15px;cursor:pointer;transition:all .3s ease;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:bold;position:relative;overflow:hidden}.ytomo-toggle.toggle-button.enabled{color:#fff}.ytomo-toggle.toggle-button.disabled{color:#ddd}.ytomo-toggle.toggle-figure{width:100%;height:100%;margin:0;padding:0;border:none;background:rgba(0,0,0,0);pointer-events:none}.ytomo-dialog.overlay{position:fixed;top:0;left:0;width:100%;height:100%;background-color:rgba(0,0,0,.5);z-index:10000;display:flex;justify-content:center;align-items:center}.ytomo-dialog.container{background:#fff;border-radius:8px;padding:20px;max-width:400px;width:90%;max-height:70vh;overflow-y:auto;box-shadow:0 4px 12px rgba(0,0,0,.3)}.ytomo-dialog.container.day-reservation{max-width:600px;max-height:80vh}.ytomo-dialog.title{margin:0 0 16px 0;color:#333;font-size:18px;font-weight:bold}.ytomo-dialog.button-group{display:flex;justify-content:flex-end;gap:10px;margin-top:20px}.ytomo-dialog.primary-button{background:#006821;color:#fff;border:none;padding:10px 20px;border-radius:4px;cursor:pointer;font-size:14px}.ytomo-dialog.primary-button:hover{background:#02862b}.ytomo-dialog.primary-button:disabled{background:gray;cursor:not-allowed}.ytomo-dialog.secondary-button{background:rgba(0,0,0,0);color:#666;border:1px solid #ccc;padding:10px 20px;border-radius:4px;cursor:pointer;font-size:14px}.ytomo-dialog.secondary-button:hover{background:#f5f5f5}.ytomo-progress.counter{display:inline-block;margin-left:8px;padding:2px 6px;background:rgba(0,0,0,.3);border-radius:10px;font-size:10px;color:#fff;font-weight:bold}.ytomo-error-message{position:fixed;top:20px;right:20px;background:#f44;color:#fff;padding:15px;border-radius:5px;box-shadow:0 2px 10px rgba(0,0,0,.3);z-index:10001;max-width:300px;font-size:14px;line-height:1.4}.ytomo-error-message .error-title{font-weight:bold;margin-bottom:5px}.ytomo-error-message .error-close-btn{margin-top:10px;padding:5px 10px;background:hsla(0,0%,100%,.2);border:none;border-radius:3px;color:#fff;cursor:pointer;font-size:12px}.ytomo-error-message .error-close-btn:hover{background:hsla(0,0%,100%,.3)}.ytomo-flex-column-center{display:flex;flex-direction:column;align-items:center}.ytomo-brand-text{font-size:8px;font-weight:bold;margin-top:2px}.ytomo-dialog.overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;z-index:10000;padding:20px;box-sizing:border-box}.ytomo-dialog.container{background:#fff;border-radius:12px;padding:24px;max-width:800px;max-height:80vh;overflow-y:auto;box-shadow:0 10px 40px rgba(0,0,0,.3);width:100%}.ytomo-dialog.header{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}.ytomo-dialog.title{margin:0;color:#333;font-size:24px;font-weight:bold}.ytomo-dialog.refresh-button{background:#006821;color:#fff;border:none;border-radius:50%;width:40px;height:40px;font-size:16px;cursor:pointer;transition:all .2s ease;display:flex;align-items:center;justify-content:center}.ytomo-dialog.refresh-button:hover{background:#02862b;transform:scale(1.1)}.ytomo-dialog.refresh-button:disabled{background:#ccc;cursor:not-allowed;transform:none}.ytomo-dialog.right-button-group{display:flex;gap:12px;align-items:center}.ytomo-dialog.available-only-toggle{background:#6c757d;color:#fff;border:none;border-radius:20px;padding:8px 16px;font-size:14px;font-weight:bold;cursor:pointer;transition:all .2s ease;white-space:nowrap}.ytomo-dialog.available-only-toggle.active{background:#006821;box-shadow:0 0 0 2px rgba(0,104,33,.3)}.ytomo-dialog.available-only-toggle:hover{transform:translateY(-1px);box-shadow:0 4px 8px rgba(0,0,0,.2)}.ytomo-dialog.available-only-toggle:disabled{background:#ccc;cursor:not-allowed;transform:none;box-shadow:none}.ytomo-dialog.button-group{display:flex;gap:12px;justify-content:space-between;margin-top:24px}.ytomo-dialog.secondary-button{background:#6c757d;color:#fff;border:none;border-radius:20px;padding:8px 16px;font-size:14px;font-weight:bold;cursor:pointer;transition:all .2s ease;white-space:nowrap}.ytomo-dialog.secondary-button:hover{transform:translateY(-1px);box-shadow:0 4px 8px rgba(0,0,0,.2)}.ytomo-dialog.monitor-button{background:#fd7e14;color:#fff;border:none;border-radius:20px;padding:8px 16px;font-size:14px;font-weight:bold;cursor:pointer;transition:all .2s ease;white-space:nowrap}.ytomo-dialog.monitor-button:hover{transform:translateY(-1px);box-shadow:0 4px 8px rgba(0,0,0,.2)}.day-reservation-description{color:#666;line-height:1.6;margin:0 0 20px 0}.pavilion-list{max-height:400px;overflow-y:auto;border:1px solid #ddd;border-radius:4px;margin-bottom:16px}.pavilion-list-empty{padding:20px;text-align:center;color:#666}.pavilion-item{display:flex;justify-content:space-between;align-items:center;padding:12px;border-bottom:1px solid #eee;transition:background-color .2s;cursor:pointer}.pavilion-item:hover{background-color:#f5f5f5}.pavilion-item:last-child{border-bottom:none}.pavilion-item.monitored{background-color:rgba(253,126,20,.1);border-left:4px solid #fd7e14}.pavilion-item.monitored:hover{background-color:rgba(253,126,20,.15)}.pavilion-info{flex:1}.pavilion-info .pavilion-name{font-weight:bold;margin-bottom:4px}.pavilion-info .pavilion-time-slots{font-size:12px;color:#666;display:flex;flex-wrap:wrap;gap:8px;margin-top:8px;max-width:100%}@media(max-width: 600px){.pavilion-info .pavilion-time-slots{gap:6px;margin-top:6px}}.pavilion-button-area{display:flex;gap:8px;align-items:center}.pavilion-button-area .pavilion-reserve-button{padding:8px 16px;background-color:#006821;color:#fff;border:none;border-radius:4px;cursor:pointer;font-size:12px;transition:background-color .2s;white-space:nowrap}.pavilion-button-area .pavilion-reserve-button:hover:not(:disabled){background-color:#02862b}.pavilion-button-area .pavilion-reserve-button:disabled{background:#ccc;color:#666;cursor:not-allowed}.pavilion-button-area .pavilion-monitor-checkbox{margin-right:12px;transform:scale(1.2);accent-color:#fd7e14;flex-shrink:0}.pavilion-button-area .pavilion-no-slots{font-size:12px;color:#999}.pavilion-button-area .pavilion-time-slot{font-size:12px;padding:4px 8px;border-radius:6px;border:1px solid rgba(0,0,0,0);min-width:60px;text-align:center;white-space:nowrap}@media(max-width: 600px){.pavilion-button-area .pavilion-time-slot{font-size:11px;padding:3px 6px;min-width:55px}}@media(max-width: 400px){.pavilion-button-area .pavilion-time-slot{font-size:10px;padding:2px 4px;min-width:50px}}.pavilion-button-area .pavilion-time-slot.clickable{background:rgba(0,0,0,0);border-color:#dee2e6;cursor:pointer;transition:all .2s ease}.pavilion-button-area .pavilion-time-slot.clickable:hover:not(.selected){background:#f8f9fa;border-color:#adb5bd;transform:translateY(-1px);box-shadow:0 2px 4px rgba(0,0,0,.1)}.pavilion-button-area .pavilion-time-slot.clickable:active{transform:translateY(0);box-shadow:0 1px 2px rgba(0,0,0,.1)}.pavilion-button-area .pavilion-time-slot.clickable.selected{background:rgba(0,104,33,.15);border-color:#006821;box-shadow:0 0 0 2px rgba(0,104,33,.3);color:#006821;font-weight:bold}.pavilion-button-area .pavilion-time-slot.clickable.selected:hover{background:rgba(0,104,33,.2);transform:translateY(-1px)}.pavilion-button-area .pavilion-time-slot.clickable.unavailable{background:rgba(0,0,0,0);border-color:#ffc107;color:#dc6c00}.pavilion-button-area .pavilion-time-slot.clickable.unavailable:hover:not(.selected){background:#fff3cd;border-color:#ffb300;transform:translateY(-1px);box-shadow:0 2px 4px rgba(255,193,7,.2)}.pavilion-button-area .pavilion-time-slot.clickable.unavailable.selected{background:rgba(255,193,7,.25);border-color:#ffc107;box-shadow:0 0 0 2px rgba(255,193,7,.4);color:#dc6c00;font-weight:bold}.pavilion-button-area .pavilion-time-slot.clickable.unavailable.selected:hover{background:rgba(255,193,7,.3);transform:translateY(-1px)}.ytomo-processing-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.3);z-index:100000;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(1px);transition:all .3s ease;pointer-events:auto}.ytomo-processing-overlay.z-normal{z-index:100000}.ytomo-processing-overlay.z-below-fab{z-index:99999}.ytomo-processing-overlay.hidden{opacity:0;visibility:hidden;pointer-events:none}.ytomo-processing-overlay.visible{opacity:1;visibility:visible;pointer-events:auto}.ytomo-processing-overlay .processing-message-area{background:hsla(0,0%,100%,.95);border-radius:12px;padding:24px 32px;text-align:center;box-shadow:0 8px 32px rgba(0,0,0,.3);border:2px solid rgba(255,140,0,.3);max-width:400px;margin:20px}@media(max-width: 768px){.ytomo-processing-overlay .processing-message-area{padding:20px 24px;margin:16px;max-width:90vw}}.ytomo-processing-overlay .processing-message-text{font-size:20px;font-weight:bold;color:#333;margin-bottom:8px;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}@media(max-width: 768px){.ytomo-processing-overlay .processing-message-text{font-size:18px;margin-bottom:6px}}.ytomo-processing-overlay .processing-target-text{font-size:16px;font-weight:600;color:#333;margin-bottom:12px;white-space:pre-line;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;text-align:center}@media(max-width: 768px){.ytomo-processing-overlay .processing-target-text{font-size:14px;margin-bottom:10px}}.ytomo-processing-overlay .processing-countdown-text{font-size:18px;font-weight:bold;color:#e67e00;margin-bottom:12px;font-family:"SF Mono","Monaco","Consolas",monospace;text-align:center;text-shadow:0 1px 2px rgba(0,0,0,.1)}@media(max-width: 768px){.ytomo-processing-overlay .processing-countdown-text{font-size:16px;margin-bottom:10px}}.ytomo-processing-overlay .processing-countdown-text.countdown-warning{color:#dc3545;animation:countdownPulse 1s ease-in-out infinite;text-shadow:0 0 8px rgba(220,53,69,.4)}.ytomo-processing-overlay .processing-warning-text{font-size:14px;color:#666;margin-bottom:16px;line-height:1.4;transition:all .3s ease}@media(max-width: 768px){.ytomo-processing-overlay .processing-warning-text{font-size:13px;margin-bottom:14px}}.ytomo-processing-overlay .processing-warning-text.warning-flash{color:#dc3545;font-weight:bold;transform:scale(1.05);animation:flash .5s ease-in-out 2}.ytomo-processing-overlay .notification-toggle-btn{display:flex;align-items:center;justify-content:center;width:40px;height:40px;border:none;border-radius:50%;cursor:pointer;transition:all .2s ease;margin-bottom:16px;box-shadow:0 2px 6px rgba(0,0,0,.15);font-size:20px;line-height:1}@media(max-width: 768px){.ytomo-processing-overlay .notification-toggle-btn{width:36px;height:36px;margin-bottom:14px;font-size:18px}}.ytomo-processing-overlay .notification-toggle-btn:hover{transform:scale(1.05);box-shadow:0 4px 10px rgba(0,0,0,.2)}.ytomo-processing-overlay .notification-toggle-btn:active{transform:scale(0.95)}.ytomo-processing-overlay .notification-toggle-btn.enabled{background:#4caf50;color:#fff}.ytomo-processing-overlay .notification-toggle-btn.enabled:hover{background:#45a049}.ytomo-processing-overlay .notification-toggle-btn.muted{background:#f44336;color:#fff}.ytomo-processing-overlay .notification-toggle-btn.muted:hover{background:#e53935}.ytomo-processing-overlay .processing-cancel-area{font-size:12px;color:#888;font-style:italic}@media(max-width: 768px){.ytomo-processing-overlay .processing-cancel-area{font-size:11px}}@keyframes flash{0%,100%{opacity:1}50%{opacity:.7}}@keyframes countdownPulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.8;transform:scale(1.05)}}.ytomo-processing-overlay.efficiency-mode .processing-message-area{border-color:rgba(255,140,0,.5);background:linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(255, 248, 220, 0.95))}.ytomo-processing-overlay.efficiency-mode .processing-message-text{color:#e67e00}.ytomo-processing-overlay.monitoring-mode .processing-message-area{border-color:rgba(0,104,33,.5);background:linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(240, 255, 240, 0.95))}.ytomo-processing-overlay.monitoring-mode .processing-message-text{color:#004d1a}@media(prefers-reduced-motion: reduce){.ytomo-processing-overlay{transition:none}.ytomo-processing-overlay .processing-warning-text.warning-flash{animation:none;transform:none}}table[class*=style_main__timetable__] td[data-gray-out] div[role=button][data-disabled=true]{pointer-events:auto !important;cursor:pointer !important}`, ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -3430,6 +3430,356 @@ module.exports = insertStyleElement;
 module.exports = function (i) {
   return i[1];
 };
+
+/***/ }),
+
+/***/ 619:
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+// ESM COMPAT FLAG
+__webpack_require__.r(__webpack_exports__);
+
+// EXPORTS
+__webpack_require__.d(__webpack_exports__, {
+  PavilionReservationCache: () => (/* binding */ PavilionReservationCache)
+});
+
+;// ./ts/modules/reservation-data.ts
+/**
+ * 予約データ管理モジュール
+ * 万博パビリオン予約の自動化で使用するデータ構造定義
+ */
+// キャッシュキーの定数
+const CACHE_KEYS = {
+    RESERVATION_DATA: 'expo2025_reservation_data',
+    AUTOMATION_STATE: 'expo2025_automation_state',
+    USER_PREFERENCES: 'expo2025_user_preferences'
+};
+// 予約データの一意キー生成
+const generateReservationKey = (pavilionCode, timeSlot) => {
+    return `${pavilionCode}_${timeSlot}`;
+};
+// デフォルト設定
+const DEFAULT_USER_PREFERENCES = {
+    autoCloseDialog: true,
+    showDebugLogs: false,
+    retryCount: 3,
+    waitTimeout: 5000
+};
+// ユーティリティ関数
+class ReservationDataUtils {
+    /**
+     * 時間文字列を表示用に変換
+     * @param timeSlot "1000" -> "10:00"
+     */
+    static formatTimeSlot(timeSlot) {
+        if (timeSlot.length !== 4)
+            return timeSlot;
+        return `${timeSlot.slice(0, 2)}:${timeSlot.slice(2)}`;
+    }
+    /**
+     * 予約データの有効性チェック
+     */
+    static isValidReservationData(data) {
+        return (typeof data === 'object' &&
+            typeof data.pavilionCode === 'string' &&
+            typeof data.pavilionName === 'string' &&
+            typeof data.selectedTimeSlot === 'string' &&
+            typeof data.selectedTimeDisplay === 'string' &&
+            typeof data.isAvailable === 'boolean' &&
+            typeof data.timestamp === 'number' &&
+            typeof data.status === 'string');
+    }
+    /**
+     * データの期限チェック（セッション内での有効性）
+     */
+    static isDataExpired(timestamp, maxAge = 24 * 60 * 60 * 1000) {
+        return Date.now() - timestamp > maxAge;
+    }
+    /**
+     * 予約データを作成
+     */
+    static createReservationData(pavilionCode, pavilionName, selectedTimeSlot, isAvailable) {
+        return {
+            pavilionCode,
+            pavilionName,
+            selectedTimeSlot,
+            selectedTimeDisplay: this.formatTimeSlot(selectedTimeSlot),
+            isAvailable,
+            timestamp: Date.now(),
+            status: 'pending'
+        };
+    }
+}
+
+;// ./ts/modules/pavilion-reservation-cache.ts
+/**
+ * パビリオン予約キャッシュ管理モジュール
+ * sessionStorageを使用した予約データの保存・取得
+ */
+
+class PavilionReservationCache {
+    /**
+     * sessionStorageへの安全な保存
+     */
+    static setItem(key, value) {
+        try {
+            const serialized = JSON.stringify(value);
+            sessionStorage.setItem(key, serialized);
+            return true;
+        }
+        catch (error) {
+            console.error('❌ Cache save error:', error);
+            return false;
+        }
+    }
+    /**
+     * sessionStorageからの安全な取得
+     */
+    static getItem(key) {
+        try {
+            const item = sessionStorage.getItem(key);
+            if (!item)
+                return null;
+            return JSON.parse(item);
+        }
+        catch (error) {
+            console.error('❌ Cache load error:', error);
+            return null;
+        }
+    }
+    /**
+     * sessionStorageからの削除
+     */
+    static removeItem(key) {
+        try {
+            sessionStorage.removeItem(key);
+        }
+        catch (error) {
+            console.error('❌ Cache remove error:', error);
+        }
+    }
+    // ============ 予約データ管理 ============
+    /**
+     * 予約データを保存（パビリオンコード+時間スロットで一意キー生成）
+     */
+    static saveReservationData(pavilionCode, data) {
+        const allData = this.getAllReservationData();
+        const key = generateReservationKey(pavilionCode, data.selectedTimeSlot);
+        allData[key] = data;
+        const success = this.setItem(CACHE_KEYS.RESERVATION_DATA, allData);
+        if (success) {
+            console.log(`💾 予約データ保存: ${key} - ${data.selectedTimeDisplay}`);
+        }
+        return success;
+    }
+    /**
+     * 特定パビリオン+時間スロットの予約データを取得
+     */
+    static getReservationData(pavilionCode, timeSlot) {
+        const allData = this.getAllReservationData();
+        const key = generateReservationKey(pavilionCode, timeSlot);
+        const data = allData[key];
+        if (!data)
+            return null;
+        // データ有効性チェック
+        if (!ReservationDataUtils.isValidReservationData(data)) {
+            console.warn(`⚠️ 無効な予約データ: ${key}`);
+            this.removeReservationData(pavilionCode, timeSlot);
+            return null;
+        }
+        // 期限チェック
+        if (ReservationDataUtils.isDataExpired(data.timestamp)) {
+            console.warn(`⏰ 期限切れデータ: ${key}`);
+            this.removeReservationData(pavilionCode, timeSlot);
+            return null;
+        }
+        return data;
+    }
+    /**
+     * 特定パビリオンの全時間スロット予約データを取得
+     */
+    static getReservationDataByPavilion(pavilionCode) {
+        const allData = this.getAllReservationData();
+        const results = [];
+        for (const [key, data] of Object.entries(allData)) {
+            if (data.pavilionCode === pavilionCode) {
+                // データ有効性・期限チェック
+                if (ReservationDataUtils.isValidReservationData(data) &&
+                    !ReservationDataUtils.isDataExpired(data.timestamp)) {
+                    results.push(data);
+                }
+                else {
+                    // 無効なデータは削除
+                    delete allData[key];
+                }
+            }
+        }
+        // 無効データがあった場合は更新
+        if (Object.keys(allData).length !== Object.keys(this.getAllReservationData()).length) {
+            this.setItem(CACHE_KEYS.RESERVATION_DATA, allData);
+        }
+        return results;
+    }
+    /**
+     * 全ての予約データを取得
+     */
+    static getAllReservationData() {
+        return this.getItem(CACHE_KEYS.RESERVATION_DATA) || {};
+    }
+    /**
+     * 特定の予約データを削除
+     */
+    static removeReservationData(pavilionCode, timeSlot) {
+        const allData = this.getAllReservationData();
+        const key = generateReservationKey(pavilionCode, timeSlot);
+        delete allData[key];
+        this.setItem(CACHE_KEYS.RESERVATION_DATA, allData);
+        console.log(`🗑️ 予約データ削除: ${key}`);
+    }
+    /**
+     * 特定パビリオンの全予約データを削除
+     */
+    static removeReservationDataByPavilion(pavilionCode) {
+        const allData = this.getAllReservationData();
+        let deletedCount = 0;
+        for (const key of Object.keys(allData)) {
+            if (allData[key].pavilionCode === pavilionCode) {
+                delete allData[key];
+                deletedCount++;
+            }
+        }
+        if (deletedCount > 0) {
+            this.setItem(CACHE_KEYS.RESERVATION_DATA, allData);
+            console.log(`🗑️ パビリオン予約データ削除: ${pavilionCode} (${deletedCount}件)`);
+        }
+    }
+    /**
+     * 全ての予約データをクリア
+     */
+    static clearAllReservationData() {
+        this.removeItem(CACHE_KEYS.RESERVATION_DATA);
+        console.log('🧹 全予約データクリア');
+    }
+    /**
+     * 予約データの状態を更新
+     */
+    static updateReservationStatus(pavilionCode, timeSlot, status) {
+        const data = this.getReservationData(pavilionCode, timeSlot);
+        if (!data)
+            return false;
+        data.status = status;
+        data.timestamp = Date.now(); // タイムスタンプ更新
+        return this.saveReservationData(pavilionCode, data);
+    }
+    // ============ 自動操作状態管理 ============
+    /**
+     * 自動操作状態を保存
+     */
+    static saveAutomationState(state) {
+        const success = this.setItem(CACHE_KEYS.AUTOMATION_STATE, state);
+        if (success) {
+            console.log(`🤖 自動操作状態保存: ${state.currentStep}`);
+        }
+        return success;
+    }
+    /**
+     * 自動操作状態を取得
+     */
+    static getAutomationState() {
+        return this.getItem(CACHE_KEYS.AUTOMATION_STATE);
+    }
+    /**
+     * 自動操作状態をクリア
+     */
+    static clearAutomationState() {
+        this.removeItem(CACHE_KEYS.AUTOMATION_STATE);
+        console.log('🧹 自動操作状態クリア');
+    }
+    // ============ ユーザー設定管理 ============
+    /**
+     * ユーザー設定を保存
+     */
+    static saveUserPreferences(preferences) {
+        return this.setItem(CACHE_KEYS.USER_PREFERENCES, preferences);
+    }
+    /**
+     * ユーザー設定を取得
+     */
+    static getUserPreferences() {
+        const saved = this.getItem(CACHE_KEYS.USER_PREFERENCES);
+        return { ...DEFAULT_USER_PREFERENCES, ...saved };
+    }
+    // ============ ユーティリティ ============
+    /**
+     * キャッシュサイズを取得（概算）
+     */
+    static getCacheSize() {
+        try {
+            let total = 0;
+            for (const key of Object.values(CACHE_KEYS)) {
+                const item = sessionStorage.getItem(key);
+                if (item) {
+                    total += item.length;
+                }
+            }
+            return total;
+        }
+        catch {
+            return 0;
+        }
+    }
+    /**
+     * 期限切れデータを一括削除
+     */
+    static cleanupExpiredData() {
+        const allData = this.getAllReservationData();
+        let cleanedCount = 0;
+        for (const [pavilionCode, data] of Object.entries(allData)) {
+            if (ReservationDataUtils.isDataExpired(data.timestamp)) {
+                delete allData[pavilionCode];
+                cleanedCount++;
+            }
+        }
+        if (cleanedCount > 0) {
+            this.setItem(CACHE_KEYS.RESERVATION_DATA, allData);
+            console.log(`🧹 期限切れデータ削除: ${cleanedCount}件`);
+        }
+    }
+    /**
+     * デバッグ用: 全キャッシュ内容を表示
+     */
+    static debugLogAllCache() {
+        console.group('📋 パビリオン予約キャッシュ内容');
+        console.log('予約データ:', this.getAllReservationData());
+        console.log('自動操作状態:', this.getAutomationState());
+        console.log('ユーザー設定:', this.getUserPreferences());
+        console.log('キャッシュサイズ:', `${this.getCacheSize()} bytes`);
+        console.groupEnd();
+    }
+    /**
+     * 時間選択UIとの連携用: 選択データをキャッシュに保存
+     */
+    static saveSelectedTimeFromUI(pavilionCode, pavilionName, timeSlot, isAvailable) {
+        const reservationData = ReservationDataUtils.createReservationData(pavilionCode, pavilionName, timeSlot, isAvailable);
+        return this.saveReservationData(pavilionCode, reservationData);
+    }
+    /**
+     * 選択された予約データ一覧を取得（処理待ち状態のもの）
+     */
+    static getPendingReservations() {
+        const allData = this.getAllReservationData();
+        return Object.values(allData).filter(data => data.status === 'pending');
+    }
+    /**
+     * 現在処理中の予約データを取得
+     */
+    static getProcessingReservation() {
+        const allData = this.getAllReservationData();
+        return Object.values(allData).find(data => data.status === 'processing') || null;
+    }
+}
+
 
 /***/ }),
 
@@ -4719,8 +5069,7 @@ const init_page = () => {
         fabContent.appendChild(brandText);
         fabContent.appendChild(countsText);
         fabButton.appendChild(fabContent);
-        // FABボタンにrelative positionを設定
-        fabButton.style.position = 'relative';
+        // FABボタンの位置設定はCSSで行う
         // 件数表示を更新する関数（FABボタン内に表示）
         const updateCountsDisplay = () => {
             const counts = getItemCounts();
@@ -4743,10 +5092,12 @@ const init_page = () => {
         const btnLoadAll = createSubButton('すべて読み込み', 'btn-load-all');
         const btnFilterSafe = createSubButton('空きのみ', 'btn-filter-safe');
         const btnAlertToCopy = createSubButton('一覧コピー', 'btn-alert-to-copy');
+        const btnDayReservation = createSubButton('当日予約', 'btn-day-reservation');
         // DOM構築
         subActionsContainer.appendChild(btnLoadAll);
         subActionsContainer.appendChild(btnFilterSafe);
         subActionsContainer.appendChild(btnAlertToCopy);
+        subActionsContainer.appendChild(btnDayReservation);
         fabContainer.appendChild(subActionsContainer);
         fabContainer.appendChild(fabButton);
         // FABの開閉制御（デフォルトで展開）
@@ -4861,16 +5212,6 @@ const init_page = () => {
         input_another_search.setAttribute("placeholder", "読み込みなし絞込");
         const btn_filter_without_load = document.createElement("button");
         btn_filter_without_load.classList.add("basic-btn", "type2", "no-after", "ext-ytomo", "btn-filter-without-load");
-        btn_filter_without_load.style.cssText = `
-            height: auto;
-            min-height: 40px;
-            width: auto;
-            min-width: 60px;
-            padding: 0px 8px;
-            color: white;
-            margin: 5px;
-            background: rgb(0, 104, 33) !important;
-        `;
         const span_filter_without_load = document.createElement("span");
         span_filter_without_load.classList.add("ext-ytomo");
         span_filter_without_load.innerText = "絞込";
@@ -4929,10 +5270,6 @@ const init_page = () => {
                 console.log(`🔧 実行開始時の状態設定完了: disabled=${button.disabled}, classes=${button.className}`);
                 console.log(`🔧 実際のHTML disabled属性:`, button.hasAttribute('disabled'));
                 console.log(`🔧 computedStyle background:`, window.getComputedStyle(button).backgroundColor);
-                // 強制的にCSS再適用
-                button.style.background = 'rgb(128, 128, 128)';
-                button.style.cursor = 'not-allowed';
-                console.log(`🔧 強制スタイル適用後:`, button.style.cssText);
                 // 他の「すべて読み込み」ボタンも同時に無効化
                 document.querySelectorAll("button.btn-load-all").forEach((btn) => {
                     if (btn !== button) {
@@ -5026,17 +5363,494 @@ const init_page = () => {
                     navigator.clipboard.writeText(text);
                 }
                 catch (e) {
-                    alert(text);
+                    showErrorMessage('クリップボードエラー', 'クリップボードへのコピーに失敗しました。以下のテキストを手動でコピーしてください:\n\n' + text);
                     // console.error("ytomo extension error", e);
-                    // alert(e);
                 }
                 setTimeout(() => {
                     target.disabled = false;
                 }, 500);
             }
+            else if (target && target.classList.contains("btn-day-reservation")) {
+                // 当日予約
+                console.log('🎫 当日予約ボタンがクリックされました');
+                showDayReservationDialog();
+            }
         }
     });
 };
+// エラーメッセージ表示関数
+const showErrorMessage = (title, message) => {
+    // 既存のエラーメッセージがある場合は削除
+    const existingError = document.getElementById('ytomo-error-message');
+    if (existingError) {
+        existingError.remove();
+    }
+    const errorDiv = document.createElement('div');
+    errorDiv.id = 'ytomo-error-message';
+    errorDiv.className = 'ytomo-error-message';
+    const titleDiv = document.createElement('div');
+    titleDiv.className = 'error-title';
+    titleDiv.textContent = title;
+    const messageDiv = document.createElement('div');
+    messageDiv.textContent = message;
+    const closeButton = document.createElement('button');
+    closeButton.className = 'error-close-btn';
+    closeButton.textContent = '閉じる';
+    closeButton.addEventListener('click', () => {
+        errorDiv.remove();
+    });
+    errorDiv.appendChild(titleDiv);
+    errorDiv.appendChild(messageDiv);
+    errorDiv.appendChild(closeButton);
+    document.body.appendChild(errorDiv);
+    // 10秒後に自動で消去
+    setTimeout(() => {
+        if (errorDiv.parentNode) {
+            errorDiv.remove();
+        }
+    }, 10000);
+};
+// 当日予約ダイアログ表示関数
+const showDayReservationDialog = async () => {
+    console.log('🎫 当日予約ダイアログを表示します');
+    try {
+        // 万博API データを取得
+        const expoData = await fetchExpoReservationData();
+        createDayReservationDialog(expoData);
+    }
+    catch (error) {
+        console.error('❌ 万博API データの取得に失敗:', error);
+        showErrorMessage('データ取得エラー', 'パビリオン情報の取得に失敗しました。しばらく時間をおいて再試行してください。');
+    }
+};
+// 万博API 全体データ取得関数（空きなしも含む）
+const fetchAllExpoReservationData = async () => {
+    console.log('🌐 万博API から全体データを取得中...');
+    try {
+        let data;
+        // Chrome拡張機能環境かUserScript環境かを判定
+        if (typeof chrome !== 'undefined' && chrome.runtime) {
+            // Chrome拡張機能環境: background scriptを経由
+            const response = await new Promise((resolve) => {
+                chrome.runtime.sendMessage({ action: 'fetchExpoData' }, (response) => resolve(response));
+            });
+            if (!response.success || !response.data) {
+                throw new Error(response.error || 'Unknown error');
+            }
+            data = response.data;
+        }
+        else if (typeof GM_xmlhttpRequest !== 'undefined' || (typeof GM !== 'undefined' && GM?.xmlHttpRequest)) {
+            // UserScript環境: GM_xmlhttpRequestを使用
+            data = await new Promise((resolve, reject) => {
+                const request = GM_xmlhttpRequest || GM?.xmlHttpRequest;
+                if (!request) {
+                    reject(new Error('GM_xmlhttpRequest not available'));
+                    return;
+                }
+                request({
+                    method: 'GET',
+                    url: 'https://expo.ebii.net/api/data',
+                    onload: (response) => {
+                        try {
+                            const jsonData = JSON.parse(response.responseText);
+                            resolve(jsonData);
+                        }
+                        catch (e) {
+                            reject(new Error('Failed to parse JSON response'));
+                        }
+                    },
+                    onerror: (error) => {
+                        reject(new Error(`Request failed: ${error}`));
+                    }
+                });
+            });
+        }
+        else {
+            // サポートされていない環境
+            throw new Error('この機能はChrome拡張機能またはUserScript環境でのみ利用可能です');
+        }
+        console.log('✅ 万博API 全体データ取得成功:', data.length, '件のパビリオン');
+        // 全てのパビリオンを返す（フィルタリングなし）
+        return data;
+    }
+    catch (error) {
+        console.error('❌ 万博API 全体データ取得エラー:', error);
+        throw error;
+    }
+};
+// 万博API データ取得関数（空きありのみ）
+const fetchExpoReservationData = async () => {
+    console.log('🌐 万博API からデータを取得中...');
+    try {
+        let data;
+        // Chrome拡張機能環境かUserScript環境かを判定
+        if (typeof chrome !== 'undefined' && chrome.runtime) {
+            // Chrome拡張機能環境: background scriptを経由
+            const response = await new Promise((resolve) => {
+                chrome.runtime.sendMessage({ action: 'fetchExpoData' }, (response) => resolve(response));
+            });
+            if (!response.success || !response.data) {
+                throw new Error(response.error || 'Unknown error');
+            }
+            data = response.data;
+        }
+        else if (typeof GM_xmlhttpRequest !== 'undefined' || (typeof GM !== 'undefined' && GM?.xmlHttpRequest)) {
+            // UserScript環境: GM_xmlhttpRequestを使用
+            data = await new Promise((resolve, reject) => {
+                const request = GM_xmlhttpRequest || GM?.xmlHttpRequest;
+                if (!request) {
+                    reject(new Error('GM_xmlhttpRequest not available'));
+                    return;
+                }
+                request({
+                    method: 'GET',
+                    url: 'https://expo.ebii.net/api/data',
+                    onload: (response) => {
+                        try {
+                            const jsonData = JSON.parse(response.responseText);
+                            resolve(jsonData);
+                        }
+                        catch (e) {
+                            reject(new Error('Failed to parse JSON response'));
+                        }
+                    },
+                    onerror: (error) => {
+                        reject(new Error(`Request failed: ${error}`));
+                    }
+                });
+            });
+        }
+        else {
+            // サポートされていない環境
+            throw new Error('この機能はChrome拡張機能またはUserScript環境でのみ利用可能です');
+        }
+        console.log('✅ 万博API データ取得成功:', data.length, '件のパビリオン');
+        // 空きがあるパビリオンのみフィルタリング
+        const availablePavilions = data.filter(pavilion => {
+            return pavilion.s && pavilion.s.some(slot => slot.s === 0 || slot.s === 1);
+        });
+        console.log('🎯 予約可能なパビリオン:', availablePavilions.length, '件');
+        return availablePavilions;
+    }
+    catch (error) {
+        console.error('❌ 万博API データ取得エラー:', error);
+        throw error;
+    }
+};
+// 当日予約ダイアログ作成関数
+const createDayReservationDialog = (pavilionData, showAll = false) => {
+    console.log('🏗️ 当日予約ダイアログを作成中...', pavilionData.length, '件のパビリオン');
+    // 既存のダイアログがある場合は削除
+    const existingDialog = document.getElementById('day-reservation-dialog');
+    if (existingDialog) {
+        existingDialog.remove();
+    }
+    // ダイアログ全体のコンテナ
+    const dialogOverlay = document.createElement('div');
+    dialogOverlay.id = 'day-reservation-dialog';
+    dialogOverlay.className = 'ytomo-dialog overlay';
+    // ダイアログコンテンツ
+    const dialogContent = document.createElement('div');
+    dialogContent.className = 'ytomo-dialog container day-reservation';
+    // ヘッダー
+    const header = document.createElement('div');
+    header.className = 'ytomo-dialog header';
+    // タイトル
+    const title = document.createElement('h2');
+    title.className = 'ytomo-dialog title';
+    title.textContent = '🎫 当日パビリオン予約';
+    // 更新ボタン（右上）
+    const refreshButton = document.createElement('button');
+    refreshButton.className = 'ytomo-dialog refresh-button';
+    refreshButton.textContent = '🔄';
+    refreshButton.title = '更新';
+    refreshButton.addEventListener('click', async () => {
+        refreshButton.disabled = true;
+        refreshButton.textContent = '⏳';
+        // 選択状態をクリア
+        selectedTimes.clear();
+        // キャッシュもクリア
+        Promise.resolve(/* import() */).then(__webpack_require__.bind(__webpack_require__, 619)).then(({ PavilionReservationCache }) => {
+            PavilionReservationCache.clearAllReservationData();
+        }).catch(error => {
+            console.error('❌ キャッシュクリアエラー:', error);
+        });
+        try {
+            // 現在の状態（空きのみモードかどうか）を保持
+            const newData = showAll ? await fetchAllExpoReservationData() : await fetchExpoReservationData();
+            dialogOverlay.remove();
+            createDayReservationDialog(newData, showAll);
+        }
+        catch (error) {
+            console.error('❌ データ更新エラー:', error);
+            showErrorMessage('更新エラー', 'データの更新に失敗しました');
+        }
+        finally {
+            refreshButton.disabled = false;
+            refreshButton.textContent = '🔄';
+        }
+    });
+    header.appendChild(title);
+    header.appendChild(refreshButton);
+    // 説明文
+    const description = document.createElement('p');
+    description.className = 'day-reservation-description';
+    description.innerHTML = `
+        🟢 空きあり　🟡 残りわずか　⚪ 空きなし<br>
+        ボタンをクリックして予約画面に移動できます。
+    `;
+    // パビリオンリスト
+    const pavilionList = document.createElement('div');
+    pavilionList.className = 'pavilion-list';
+    // パビリオンデータが空の場合
+    if (pavilionData.length === 0) {
+        const noDataMessage = document.createElement('div');
+        noDataMessage.className = 'pavilion-list-empty';
+        noDataMessage.textContent = '現在予約可能なパビリオンはありません';
+        pavilionList.appendChild(noDataMessage);
+    }
+    else {
+        // パビリオンリストを作成
+        pavilionData.forEach(pavilion => {
+            const pavilionItem = createPavilionListItem(pavilion, showAll);
+            pavilionList.appendChild(pavilionItem);
+        });
+    }
+    // ボタングループ
+    const buttonGroup = document.createElement('div');
+    buttonGroup.className = 'ytomo-dialog button-group';
+    // 閉じるボタン
+    const closeButton = document.createElement('button');
+    closeButton.className = 'ytomo-dialog secondary-button';
+    closeButton.textContent = '閉じる';
+    closeButton.addEventListener('click', () => {
+        dialogOverlay.remove();
+    });
+    // 右側ボタングループ
+    const rightButtonGroup = document.createElement('div');
+    rightButtonGroup.className = 'ytomo-dialog right-button-group';
+    // 空きのみトグルボタン
+    const availableOnlyToggle = document.createElement('button');
+    availableOnlyToggle.className = `ytomo-dialog available-only-toggle ${!showAll ? 'active' : ''}`;
+    availableOnlyToggle.textContent = '空きのみ';
+    availableOnlyToggle.title = '空きのあるパビリオンのみ表示';
+    // 空きのみトグルイベント
+    availableOnlyToggle.addEventListener('click', async () => {
+        const isCurrentlyActive = availableOnlyToggle.classList.contains('active');
+        availableOnlyToggle.disabled = true;
+        availableOnlyToggle.textContent = '取得中...';
+        // 選択状態をクリア
+        selectedTimes.clear();
+        // キャッシュもクリア
+        Promise.resolve(/* import() */).then(__webpack_require__.bind(__webpack_require__, 619)).then(({ PavilionReservationCache }) => {
+            PavilionReservationCache.clearAllReservationData();
+        }).catch(error => {
+            console.error('❌ キャッシュクリアエラー:', error);
+        });
+        try {
+            const newData = isCurrentlyActive ? await fetchAllExpoReservationData() : await fetchExpoReservationData();
+            dialogOverlay.remove();
+            createDayReservationDialog(newData, isCurrentlyActive);
+        }
+        catch (error) {
+            console.error('❌ データ取得エラー:', error);
+            showErrorMessage('データ取得エラー', 'データの取得に失敗しました');
+        }
+        finally {
+            availableOnlyToggle.disabled = false;
+            availableOnlyToggle.textContent = '空きのみ';
+        }
+    });
+    // 監視ボタン（右下）
+    const monitorButton = document.createElement('button');
+    monitorButton.className = 'ytomo-dialog monitor-button';
+    monitorButton.innerHTML = '監視';
+    monitorButton.title = 'パビリオン監視を開始';
+    monitorButton.addEventListener('click', () => {
+        // TODO: 監視機能の実装（後ほど指示される）
+        console.log('🔍 監視ボタンがクリックされました（実装待ち）');
+    });
+    rightButtonGroup.appendChild(availableOnlyToggle);
+    rightButtonGroup.appendChild(monitorButton);
+    buttonGroup.appendChild(closeButton);
+    buttonGroup.appendChild(rightButtonGroup);
+    // DOM構築
+    dialogContent.appendChild(header);
+    dialogContent.appendChild(description);
+    dialogContent.appendChild(pavilionList);
+    dialogContent.appendChild(buttonGroup);
+    dialogOverlay.appendChild(dialogContent);
+    // ダイアログを表示
+    document.body.appendChild(dialogOverlay);
+    // 背景クリックで閉じる
+    dialogOverlay.addEventListener('click', (e) => {
+        if (e.target === dialogOverlay) {
+            dialogOverlay.remove();
+        }
+    });
+    console.log('✅ 当日予約ダイアログ表示完了');
+};
+// パビリオンリストアイテム作成関数
+const createPavilionListItem = (pavilion, showAll = false) => {
+    const item = document.createElement('div');
+    item.className = 'pavilion-item';
+    // パビリオン情報エリア
+    const infoArea = document.createElement('div');
+    infoArea.className = 'pavilion-info';
+    // パビリオン名
+    const name = document.createElement('div');
+    name.className = 'pavilion-name';
+    name.textContent = pavilion.n;
+    // 時間枠情報
+    const timeSlots = document.createElement('div');
+    timeSlots.className = 'pavilion-time-slots';
+    // 時間枠を個別のbutton要素で表示
+    const allSlots = pavilion.s || [];
+    if (allSlots.length > 0) {
+        allSlots.forEach(slot => {
+            const timeElement = createTimeSlotElement(slot, pavilion, showAll);
+            if (timeElement) {
+                timeSlots.appendChild(timeElement);
+            }
+        });
+    }
+    else {
+        timeSlots.textContent = '時間枠情報なし';
+    }
+    infoArea.appendChild(name);
+    infoArea.appendChild(timeSlots);
+    item.appendChild(infoArea);
+    return item;
+};
+// ステータスアイコン取得関数
+const getStatusIcon = (status) => {
+    return status === 0 ? '🟢' : status === 1 ? '🟡' : '🔴';
+};
+// 選択状態管理（複数時間選択対応）
+const selectedTimes = new Map(); // Map<pavilionCode, Set<timeSlot>>
+// デバッグ用: 選択状況を確認
+const getSelectedTimes = () => {
+    const result = {};
+    selectedTimes.forEach((timeSlots, pavilionCode) => {
+        result[pavilionCode] = Array.from(timeSlots);
+    });
+    return result;
+};
+// デバッグ用: 選択状況をフォーマットして表示
+const logSelectedTimes = () => {
+    const selections = getSelectedTimes();
+    if (Object.keys(selections).length === 0) {
+        console.log('📋 時間選択状況: 選択なし');
+        return;
+    }
+    console.log('📋 時間選択状況:');
+    Object.entries(selections).forEach(([pavilionCode, timeSlots]) => {
+        const times = timeSlots.map(slot => `${slot.slice(0, 2)}:${slot.slice(2)}`).join(', ');
+        console.log(`  ${pavilionCode}: ${times} (${timeSlots.length}件)`);
+    });
+};
+// キャッシュデバッグ機能
+const debugCache = () => {
+    Promise.resolve(/* import() */).then(__webpack_require__.bind(__webpack_require__, 619)).then(({ PavilionReservationCache }) => {
+        PavilionReservationCache.debugLogAllCache();
+    }).catch(error => {
+        console.error('❌ キャッシュデバッグエラー:', error);
+    });
+};
+// キャッシュクリア機能
+const clearCache = () => {
+    Promise.resolve(/* import() */).then(__webpack_require__.bind(__webpack_require__, 619)).then(({ PavilionReservationCache }) => {
+        PavilionReservationCache.clearAllReservationData();
+        console.log('🧹 パビリオン予約キャッシュをクリアしました');
+    }).catch(error => {
+        console.error('❌ キャッシュクリアエラー:', error);
+    });
+};
+// グローバルに公開（デバッグ用）
+window.getSelectedTimes = getSelectedTimes;
+window.logSelectedTimes = logSelectedTimes;
+window.debugCache = debugCache;
+window.clearCache = clearCache;
+// 時間枠クリック処理（複数選択対応）
+const handleTimeSlotClick = (pavilionCode, timeSlot, buttonElement) => {
+    // 1. 現在の選択状態を取得または初期化
+    if (!selectedTimes.has(pavilionCode)) {
+        selectedTimes.set(pavilionCode, new Set());
+    }
+    const pavilionSlots = selectedTimes.get(pavilionCode);
+    // 2. 選択状態をトグル
+    const isCurrentlySelected = buttonElement.classList.contains('selected');
+    if (isCurrentlySelected) {
+        // 選択解除
+        pavilionSlots.delete(timeSlot);
+        buttonElement.classList.remove('selected');
+        // キャッシュからも削除
+        Promise.resolve(/* import() */).then(__webpack_require__.bind(__webpack_require__, 619)).then(({ PavilionReservationCache }) => {
+            PavilionReservationCache.removeReservationData(pavilionCode, timeSlot);
+            console.log(`🗑️ 時間選択解除: ${pavilionCode} - ${timeSlot}`);
+        }).catch(error => {
+            console.error('❌ キャッシュ削除エラー:', error);
+        });
+    }
+    else {
+        // 新規選択
+        pavilionSlots.add(timeSlot);
+        buttonElement.classList.add('selected');
+        // キャッシュに保存
+        Promise.resolve(/* import() */).then(__webpack_require__.bind(__webpack_require__, 619)).then(({ PavilionReservationCache }) => {
+            const pavilionName = buttonElement.dataset['pavilionName'] || pavilionCode;
+            const isAvailable = buttonElement.dataset['available'] === 'true';
+            const success = PavilionReservationCache.saveSelectedTimeFromUI(pavilionCode, pavilionName, timeSlot, isAvailable);
+            if (success) {
+                console.log(`💾 時間選択をキャッシュに保存: ${pavilionCode} - ${timeSlot}`);
+            }
+        }).catch(error => {
+            console.error('❌ キャッシュ保存エラー:', error);
+        });
+    }
+    // 3. パビリオンの選択が空になった場合はMapから削除
+    if (pavilionSlots.size === 0) {
+        selectedTimes.delete(pavilionCode);
+    }
+    console.log(`時間選択${isCurrentlySelected ? '解除' : '追加'}: ${pavilionCode} - ${timeSlot}`);
+};
+// 時間枠要素作成関数
+const createTimeSlotElement = (slot, pavilion, showAll) => {
+    const time = `${slot.t.slice(0, 2)}:${slot.t.slice(2)}`;
+    const isAvailable = slot.s === 0 || slot.s === 1;
+    // 空きのみON かつ 予約不可 → 表示しない
+    if (!showAll && !isAvailable) {
+        return null;
+    }
+    // 表示される時間枠はすべて選択可能（button要素）
+    const button = document.createElement('button');
+    button.className = `pavilion-time-slot clickable ${!isAvailable ? 'unavailable' : ''}`;
+    button.innerHTML = `${getStatusIcon(slot.s)}${time}`;
+    button.dataset['timeSlot'] = slot.t;
+    button.dataset['pavilionCode'] = pavilion.c;
+    button.dataset['pavilionName'] = pavilion.n;
+    button.dataset['available'] = isAvailable.toString();
+    // クリックイベント追加
+    button.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        handleTimeSlotClick(pavilion.c, slot.t, button);
+    });
+    return button;
+};
+// 予約画面への遷移関数（Phase 3で使用予定）
+const navigateToReservation = (pavilion) => {
+    console.log('🎯 予約画面への遷移:', pavilion.n);
+    // ダイアログを閉じる
+    const dialog = document.getElementById('day-reservation-dialog');
+    if (dialog) {
+        dialog.remove();
+    }
+    // パビリオンコードを使って予約画面に遷移
+    // 実際の予約画面のURLパターンを使用
+};
+// TypeScript unused警告回避のため一時的に使用
+void navigateToReservation;
 // ページ初期化可能か判定
 const judge_init = () => {
     const cand_btn = document.querySelector("button.style_search_btn__ZuOpx");
@@ -7576,6 +8390,1580 @@ else {
 // TypeScript環境では module.exports は使用しない
 // 必要に応じてES6のexportを使用する
 
+;// ./ts/modules/page-detector.ts
+/**
+ * ページ検知・判定モジュール
+ * 万博予約サイトの各ページを識別し、適切な処理を決定
+ */
+// URL パターンの定義
+const URL_PATTERNS = {
+    RESERVATION_TIME: /\/event_time\/\?.*event_id=([^&]+)/,
+    CONFIRMATION: /\/confirm\//,
+    PAVILION_SEARCH: /\/pavilion\/search/
+};
+// DOM セレクター定義
+const SELECTORS = {
+    RESERVATION_TIME: {
+        timeRadios: 'input[type="radio"][name="date_picker"]',
+        submitButton: '.basic-btn.type2',
+        titleElement: '.style_title__44y_b'
+    },
+    CONFIRMATION: {
+        confirmButton: '.confirm-button',
+        backButton: '.back-button'
+    },
+    PAVILION_SEARCH: {
+        searchForm: '.search-form',
+        pavilionList: '.pavilion-list'
+    }
+};
+class PageDetector {
+    constructor() {
+        this.currentUrl = window.location.href;
+        this.currentTitle = document.title;
+    }
+    /**
+     * 現在のページタイプを検知
+     */
+    detectPageType() {
+        const url = this.currentUrl;
+        if (URL_PATTERNS.RESERVATION_TIME.test(url)) {
+            return 'reservation_time';
+        }
+        if (URL_PATTERNS.CONFIRMATION.test(url)) {
+            return 'confirmation';
+        }
+        if (URL_PATTERNS.PAVILION_SEARCH.test(url)) {
+            return 'pavilion_search';
+        }
+        return 'unknown';
+    }
+    /**
+     * 予約時間選択ページかどうか判定
+     */
+    isReservationPage() {
+        return this.detectPageType() === 'reservation_time';
+    }
+    /**
+     * 確認ページかどうか判定
+     */
+    isConfirmationPage() {
+        return this.detectPageType() === 'confirmation';
+    }
+    /**
+     * パビリオン検索ページかどうか判定
+     */
+    isPavilionSearchPage() {
+        return this.detectPageType() === 'pavilion_search';
+    }
+    /**
+     * ページ情報を抽出
+     */
+    extractPageInfo() {
+        const pageType = this.detectPageType();
+        const baseInfo = {
+            type: pageType,
+            url: this.currentUrl,
+            isReady: false,
+            title: this.currentTitle
+        };
+        switch (pageType) {
+            case 'reservation_time':
+                return {
+                    ...baseInfo,
+                    ...this.extractReservationPageInfo(),
+                    isReady: this.checkReservationPageReady()
+                };
+            case 'confirmation':
+                return {
+                    ...baseInfo,
+                    isReady: this.checkConfirmationPageReady()
+                };
+            case 'pavilion_search':
+                return {
+                    ...baseInfo,
+                    isReady: this.checkPavilionSearchPageReady()
+                };
+            default:
+                return baseInfo;
+        }
+    }
+    /**
+     * 予約ページから情報抽出
+     */
+    extractReservationPageInfo() {
+        const urlMatch = this.currentUrl.match(URL_PATTERNS.RESERVATION_TIME);
+        const pavilionCode = urlMatch ? urlMatch[1] : undefined;
+        // URLパラメータからticket IDを抽出
+        const urlParams = new URLSearchParams(window.location.search);
+        const ticketId = urlParams.get('id') || undefined;
+        return {
+            pavilionCode,
+            ticketId
+        };
+    }
+    /**
+     * 予約ページの準備状態をチェック
+     */
+    checkReservationPageReady() {
+        const selectors = SELECTORS.RESERVATION_TIME;
+        // 必要な要素が存在するかチェック
+        const timeRadios = document.querySelectorAll(selectors.timeRadios);
+        const submitButton = document.querySelector(selectors.submitButton);
+        return timeRadios.length > 0 && submitButton !== null;
+    }
+    /**
+     * 確認ページの準備状態をチェック
+     */
+    checkConfirmationPageReady() {
+        const selectors = SELECTORS.CONFIRMATION;
+        return document.querySelector(selectors.confirmButton) !== null;
+    }
+    /**
+     * パビリオン検索ページの準備状態をチェック
+     */
+    checkPavilionSearchPageReady() {
+        const selectors = SELECTORS.PAVILION_SEARCH;
+        return document.querySelector(selectors.searchForm) !== null;
+    }
+    /**
+     * ページが変更されたかチェック
+     */
+    hasPageChanged() {
+        const currentUrl = window.location.href;
+        const currentTitle = document.title;
+        if (currentUrl !== this.currentUrl || currentTitle !== this.currentTitle) {
+            this.currentUrl = currentUrl;
+            this.currentTitle = currentTitle;
+            return true;
+        }
+        return false;
+    }
+    /**
+     * 指定されたページタイプになるまで待機
+     */
+    async waitForPageType(expectedType, timeout = 10000) {
+        const startTime = Date.now();
+        while (Date.now() - startTime < timeout) {
+            if (this.detectPageType() === expectedType) {
+                return true;
+            }
+            await new Promise(resolve => setTimeout(resolve, 500));
+        }
+        return false;
+    }
+    /**
+     * ページの準備完了まで待機
+     */
+    async waitForPageReady(timeout = 10000) {
+        const startTime = Date.now();
+        while (Date.now() - startTime < timeout) {
+            const pageInfo = this.extractPageInfo();
+            if (pageInfo.isReady) {
+                return true;
+            }
+            await new Promise(resolve => setTimeout(resolve, 500));
+        }
+        return false;
+    }
+    /**
+     * デバッグ用: 現在のページ情報をログ出力
+     */
+    logPageInfo() {
+        const pageInfo = this.extractPageInfo();
+        console.group('📍 ページ情報');
+        console.log('タイプ:', pageInfo.type);
+        console.log('URL:', pageInfo.url);
+        console.log('準備状態:', pageInfo.isReady);
+        console.log('タイトル:', pageInfo.title);
+        if (pageInfo.pavilionCode) {
+            console.log('パビリオンコード:', pageInfo.pavilionCode);
+        }
+        if (pageInfo.ticketId) {
+            console.log('チケットID:', pageInfo.ticketId);
+        }
+        console.groupEnd();
+    }
+}
+// シングルトンインスタンス
+let pageDetectorInstance = null;
+/**
+ * PageDetectorのシングルトンインスタンスを取得
+ */
+function getPageDetector() {
+    if (!pageDetectorInstance) {
+        pageDetectorInstance = new PageDetector();
+    }
+    return pageDetectorInstance;
+}
+/**
+ * PageDetectorインスタンスをリセット（ページ変更時用）
+ */
+function resetPageDetector() {
+    pageDetectorInstance = null;
+}
+
+;// ./ts/modules/dom-utils.ts
+/**
+ * DOM操作ユーティリティモジュール
+ * 万博予約ページでの自動操作に必要なDOM操作を提供
+ */
+class DOMUtils {
+    /**
+     * 要素が表示されるまで待機
+     */
+    async waitForElement(selector, timeout = 10000, checkVisibility = true) {
+        const startTime = Date.now();
+        while (Date.now() - startTime < timeout) {
+            const element = document.querySelector(selector);
+            if (element) {
+                // 可視性チェック
+                if (!checkVisibility || this.isElementVisible(element)) {
+                    return {
+                        success: true,
+                        element
+                    };
+                }
+            }
+            await new Promise(resolve => setTimeout(resolve, 200));
+        }
+        return {
+            success: false,
+            error: `要素が見つかりません: ${selector} (${timeout}ms)`
+        };
+    }
+    /**
+     * 複数要素が表示されるまで待機
+     */
+    async waitForElements(selectors, timeout = 10000) {
+        const startTime = Date.now();
+        while (Date.now() - startTime < timeout) {
+            const results = selectors.map(selector => {
+                const element = document.querySelector(selector);
+                return element && this.isElementVisible(element);
+            });
+            if (results.every(result => result)) {
+                return { success: true };
+            }
+            await new Promise(resolve => setTimeout(resolve, 200));
+        }
+        return {
+            success: false,
+            error: `一部の要素が見つかりません: ${selectors.join(', ')}`
+        };
+    }
+    /**
+     * 要素の可視性をチェック
+     */
+    isElementVisible(element) {
+        const style = window.getComputedStyle(element);
+        return style.display !== 'none' &&
+            style.visibility !== 'hidden' &&
+            style.opacity !== '0' &&
+            element.offsetWidth > 0 &&
+            element.offsetHeight > 0;
+    }
+    /**
+     * 指定時間の時間枠を選択
+     */
+    async selectTimeSlot(timeSlot) {
+        try {
+            // 時間ラジオボタンを取得
+            const radioButtons = document.querySelectorAll('input[type="radio"][name="date_picker"]');
+            if (radioButtons.length === 0) {
+                return {
+                    success: false,
+                    error: '時間選択ラジオボタンが見つかりません'
+                };
+            }
+            // 利用可能な時間オプションを収集
+            const availableOptions = [];
+            let targetRadio = null;
+            for (const radio of radioButtons) {
+                const value = radio.value;
+                availableOptions.push(value);
+                // 指定時間と一致するかチェック
+                if (value === timeSlot) {
+                    targetRadio = radio;
+                }
+            }
+            if (!targetRadio) {
+                return {
+                    success: false,
+                    error: `指定時間が見つかりません: ${timeSlot}`,
+                    availableOptions
+                };
+            }
+            // ラジオボタンが無効でないかチェック
+            if (targetRadio.disabled) {
+                return {
+                    success: false,
+                    error: `指定時間は選択できません: ${timeSlot}`,
+                    availableOptions
+                };
+            }
+            // ラジオボタンを選択
+            targetRadio.checked = true;
+            // changeイベントを発火
+            const changeEvent = new Event('change', { bubbles: true });
+            targetRadio.dispatchEvent(changeEvent);
+            // clickイベントも発火（一部サイトで必要）
+            const clickEvent = new Event('click', { bubbles: true });
+            targetRadio.dispatchEvent(clickEvent);
+            console.log(`⏰ 時間選択完了: ${timeSlot}`);
+            return {
+                success: true,
+                selectedTime: timeSlot,
+                availableOptions
+            };
+        }
+        catch (error) {
+            return {
+                success: false,
+                error: `時間選択エラー: ${error instanceof Error ? error.message : String(error)}`
+            };
+        }
+    }
+    /**
+     * 申込ボタンをクリック
+     */
+    async clickSubmitButton() {
+        try {
+            // 複数の可能なセレクタを試行
+            const selectors = [
+                '.basic-btn.type2',
+                'button[class*="reservation_next_link"]',
+                '.style_reservation_next_link__7gOxy',
+                'button:contains("申込")',
+                'button:contains("次へ")'
+            ];
+            for (const selector of selectors) {
+                const button = document.querySelector(selector);
+                if (button && this.isElementVisible(button) && !button.disabled) {
+                    // スクロールして表示
+                    button.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    // 少し待機してからクリック
+                    await new Promise(resolve => setTimeout(resolve, 500));
+                    button.click();
+                    console.log(`🔘 申込ボタンクリック: ${selector}`);
+                    return {
+                        success: true,
+                        element: button
+                    };
+                }
+            }
+            return {
+                success: false,
+                error: '申込ボタンが見つからないか、クリックできません'
+            };
+        }
+        catch (error) {
+            return {
+                success: false,
+                error: `申込ボタンクリックエラー: ${error instanceof Error ? error.message : String(error)}`
+            };
+        }
+    }
+    /**
+     * ページの読み込み完了をチェック
+     */
+    async checkPageReady(expectedSelectors = [], timeout = 10000) {
+        // document.readyStateチェック
+        if (document.readyState !== 'complete') {
+            await new Promise(resolve => {
+                if (document.readyState === 'complete') {
+                    resolve(void 0);
+                }
+                else {
+                    window.addEventListener('load', () => resolve(void 0), { once: true });
+                }
+            });
+        }
+        // 特定の要素が存在するかチェック
+        if (expectedSelectors.length > 0) {
+            const result = await this.waitForElements(expectedSelectors, timeout);
+            return result.success;
+        }
+        return true;
+    }
+    /**
+     * ページタイトルの変更を待機
+     */
+    async waitForTitleChange(expectedTitle, timeout = 10000) {
+        const startTime = Date.now();
+        while (Date.now() - startTime < timeout) {
+            const currentTitle = document.title;
+            if (typeof expectedTitle === 'string') {
+                if (currentTitle.includes(expectedTitle)) {
+                    return true;
+                }
+            }
+            else {
+                if (expectedTitle.test(currentTitle)) {
+                    return true;
+                }
+            }
+            await new Promise(resolve => setTimeout(resolve, 200));
+        }
+        return false;
+    }
+    /**
+     * URLの変更を待機
+     */
+    async waitForUrlChange(expectedUrl, timeout = 10000) {
+        const startTime = Date.now();
+        while (Date.now() - startTime < timeout) {
+            const currentUrl = window.location.href;
+            if (typeof expectedUrl === 'string') {
+                if (currentUrl.includes(expectedUrl)) {
+                    return true;
+                }
+            }
+            else {
+                if (expectedUrl.test(currentUrl)) {
+                    return true;
+                }
+            }
+            await new Promise(resolve => setTimeout(resolve, 200));
+        }
+        return false;
+    }
+    /**
+     * 要素にテキストが含まれているかチェック
+     */
+    checkElementContainsText(element, text) {
+        return element.textContent?.includes(text) ?? false;
+    }
+    /**
+     * フォームの入力状態をチェック
+     */
+    checkFormValid(formSelector) {
+        const form = document.querySelector(formSelector);
+        return form ? form.checkValidity() : false;
+    }
+    /**
+     * エラーメッセージの存在をチェック
+     */
+    checkForErrorMessages() {
+        const errorSelectors = [
+            '.error-message',
+            '.alert-danger',
+            '.validation-error',
+            '[class*="error"]',
+            '[class*="invalid"]'
+        ];
+        const errors = [];
+        errorSelectors.forEach(selector => {
+            const elements = document.querySelectorAll(selector);
+            elements.forEach(element => {
+                const text = element.textContent?.trim();
+                if (text) {
+                    errors.push(text);
+                }
+            });
+        });
+        return errors;
+    }
+    /**
+     * ページのスクリーンショット情報を取得（デバッグ用）
+     */
+    getPageDebugInfo() {
+        return {
+            url: window.location.href,
+            title: document.title,
+            readyState: document.readyState,
+            timeRadios: document.querySelectorAll('input[type="radio"][name="date_picker"]').length,
+            submitButtons: document.querySelectorAll('.basic-btn, button').length,
+            errors: this.checkForErrorMessages(),
+            timestamp: new Date().toISOString()
+        };
+    }
+}
+// シングルトンインスタンス
+let domUtilsInstance = null;
+/**
+ * DOMUtilsのシングルトンインスタンスを取得
+ */
+function getDOMUtils() {
+    if (!domUtilsInstance) {
+        domUtilsInstance = new DOMUtils();
+    }
+    return domUtilsInstance;
+}
+
+// EXTERNAL MODULE: ./ts/modules/pavilion-reservation-cache.ts + 1 modules
+var pavilion_reservation_cache = __webpack_require__(619);
+;// ./ts/modules/automation-overlay.ts
+/**
+ * 自動操作オーバーレイUI
+ * 自動操作中のユーザーフィードバックとコントロール
+ */
+class AutomationOverlay {
+    constructor() {
+        this.overlay = null;
+        this.eventHandler = null;
+        this.animationId = null;
+        /**
+         * キーボードイベント処理
+         */
+        this.handleKeyDown = (e) => {
+            if (e.key === 'Escape' && this.state.visible && this.state.canCancel) {
+                if (this.eventHandler) {
+                    this.eventHandler('cancel');
+                }
+            }
+        };
+        this.state = {
+            visible: false,
+            status: 'idle',
+            message: '',
+            progress: 0,
+            canCancel: true,
+            details: []
+        };
+    }
+    /**
+     * オーバーレイを表示
+     */
+    show(initialMessage = '自動操作を開始しています...') {
+        if (this.overlay) {
+            this.hide();
+        }
+        this.createOverlay();
+        this.updateState({
+            visible: true,
+            status: 'running',
+            message: initialMessage,
+            progress: 0,
+            canCancel: true,
+            details: []
+        });
+        // フェードインアニメーション
+        this.overlay.style.opacity = '0';
+        document.body.appendChild(this.overlay);
+        requestAnimationFrame(() => {
+            this.overlay.style.opacity = '1';
+        });
+        // 誤操作防止
+        this.preventPageInteraction();
+    }
+    /**
+     * オーバーレイを非表示
+     */
+    hide() {
+        if (!this.overlay)
+            return;
+        // フェードアウトアニメーション
+        this.overlay.style.opacity = '0';
+        setTimeout(() => {
+            if (this.overlay && this.overlay.parentNode) {
+                this.overlay.parentNode.removeChild(this.overlay);
+            }
+            this.overlay = null;
+            this.state.visible = false;
+            this.restorePageInteraction();
+        }, 300);
+    }
+    /**
+     * 状態を更新
+     */
+    updateState(newState) {
+        this.state = { ...this.state, ...newState };
+        this.render();
+    }
+    /**
+     * メッセージを更新
+     */
+    updateMessage(message, addToDetails = true) {
+        if (addToDetails) {
+            const timestamp = new Date().toLocaleTimeString();
+            this.state.details.push(`[${timestamp}] ${message}`);
+            // 詳細ログは最新10件まで保持
+            if (this.state.details.length > 10) {
+                this.state.details = this.state.details.slice(-10);
+            }
+        }
+        this.updateState({ message });
+    }
+    /**
+     * 進行状況を更新
+     */
+    updateProgress(progress) {
+        this.updateState({ progress: Math.max(0, Math.min(100, progress)) });
+    }
+    /**
+     * 実行結果を表示
+     */
+    showResult(result) {
+        const isSuccess = result.status === 'completed';
+        const message = isSuccess
+            ? `✅ 自動操作完了 (${result.successCount}件成功)`
+            : `❌ 自動操作失敗 (${result.failedCount}件失敗)`;
+        this.updateState({
+            status: result.status,
+            message,
+            progress: 100,
+            canCancel: false
+        });
+        // 結果詳細を追加
+        if (result.errors.length > 0) {
+            result.errors.forEach(error => {
+                this.updateMessage(`エラー: ${error}`, true);
+            });
+        }
+        // 成功時は3秒後に自動で閉じる
+        if (isSuccess) {
+            setTimeout(() => this.hide(), 3000);
+        }
+    }
+    /**
+     * エラーを表示
+     */
+    showError(error, canRetry = true) {
+        this.updateState({
+            status: 'failed',
+            message: `❌ エラー: ${error}`,
+            progress: 0,
+            canCancel: !canRetry
+        });
+        this.updateMessage(error, true);
+    }
+    /**
+     * イベントハンドラーを設定
+     */
+    setEventHandler(handler) {
+        this.eventHandler = handler;
+    }
+    /**
+     * オーバーレイDOMを作成
+     */
+    createOverlay() {
+        this.overlay = document.createElement('div');
+        this.overlay.className = 'automation-overlay';
+        this.overlay.innerHTML = this.getOverlayHTML();
+        // スタイルを適用
+        this.applyStyles();
+        // イベントリスナーを設定
+        this.setupEventListeners();
+    }
+    /**
+     * オーバーレイHTMLを取得
+     */
+    getOverlayHTML() {
+        return `
+            <div class="automation-overlay-backdrop">
+                <div class="automation-overlay-content">
+                    <div class="automation-overlay-header">
+                        <h3 class="automation-overlay-title">
+                            <span class="automation-icon">🤖</span>
+                            パビリオン予約自動操作
+                        </h3>
+                        <button class="automation-overlay-close" data-action="close">×</button>
+                    </div>
+                    
+                    <div class="automation-overlay-body">
+                        <div class="automation-status">
+                            <div class="automation-status-icon"></div>
+                            <div class="automation-status-message"></div>
+                        </div>
+                        
+                        <div class="automation-progress">
+                            <div class="automation-progress-bar">
+                                <div class="automation-progress-fill"></div>
+                            </div>
+                            <div class="automation-progress-text">0%</div>
+                        </div>
+                        
+                        <div class="automation-details">
+                            <div class="automation-details-title">処理詳細:</div>
+                            <div class="automation-details-content"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="automation-overlay-footer">
+                        <button class="automation-btn automation-btn-cancel" data-action="cancel">
+                            キャンセル
+                        </button>
+                        <button class="automation-btn automation-btn-retry" data-action="retry" style="display: none;">
+                            再試行
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+    /**
+     * スタイルを適用
+     */
+    applyStyles() {
+        if (!this.overlay)
+            return;
+        const styles = `
+            .automation-overlay {
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                z-index: 999999;
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+                transition: opacity 0.3s ease;
+            }
+            
+            .automation-overlay-backdrop {
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: rgba(0, 0, 0, 0.7);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                padding: 20px;
+            }
+            
+            .automation-overlay-content {
+                background: white;
+                border-radius: 12px;
+                box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+                max-width: 500px;
+                width: 100%;
+                max-height: 80vh;
+                overflow: hidden;
+                animation: automation-scale-in 0.3s ease;
+            }
+            
+            @keyframes automation-scale-in {
+                from { transform: scale(0.9); opacity: 0; }
+                to { transform: scale(1); opacity: 1; }
+            }
+            
+            .automation-overlay-header {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                padding: 20px 24px 16px;
+                border-bottom: 1px solid #eee;
+            }
+            
+            .automation-overlay-title {
+                margin: 0;
+                font-size: 18px;
+                font-weight: 600;
+                color: #333;
+                display: flex;
+                align-items: center;
+                gap: 8px;
+            }
+            
+            .automation-icon {
+                font-size: 20px;
+            }
+            
+            .automation-overlay-close {
+                background: none;
+                border: none;
+                font-size: 24px;
+                cursor: pointer;
+                color: #666;
+                width: 30px;
+                height: 30px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                border-radius: 50%;
+                transition: background-color 0.2s;
+            }
+            
+            .automation-overlay-close:hover {
+                background: #f5f5f5;
+            }
+            
+            .automation-overlay-body {
+                padding: 20px 24px;
+            }
+            
+            .automation-status {
+                display: flex;
+                align-items: center;
+                gap: 12px;
+                margin-bottom: 20px;
+            }
+            
+            .automation-status-icon {
+                width: 20px;
+                height: 20px;
+                border-radius: 50%;
+                position: relative;
+            }
+            
+            .automation-status-icon.running {
+                background: #2196F3;
+                animation: automation-pulse 2s infinite;
+            }
+            
+            .automation-status-icon.completed {
+                background: #4CAF50;
+            }
+            
+            .automation-status-icon.failed {
+                background: #F44336;
+            }
+            
+            @keyframes automation-pulse {
+                0%, 100% { opacity: 1; }
+                50% { opacity: 0.5; }
+            }
+            
+            .automation-status-message {
+                font-size: 16px;
+                color: #333;
+                flex: 1;
+            }
+            
+            .automation-progress {
+                margin-bottom: 20px;
+            }
+            
+            .automation-progress-bar {
+                height: 8px;
+                background: #eee;
+                border-radius: 4px;
+                overflow: hidden;
+                margin-bottom: 8px;
+            }
+            
+            .automation-progress-fill {
+                height: 100%;
+                background: linear-gradient(90deg, #2196F3, #21CBF3);
+                border-radius: 4px;
+                transition: width 0.3s ease;
+                width: 0%;
+            }
+            
+            .automation-progress-text {
+                text-align: right;
+                font-size: 12px;
+                color: #666;
+            }
+            
+            .automation-details {
+                background: #f8f9fa;
+                border-radius: 6px;
+                padding: 12px;
+                max-height: 150px;
+                overflow-y: auto;
+            }
+            
+            .automation-details-title {
+                font-size: 12px;
+                font-weight: 600;
+                color: #666;
+                margin-bottom: 8px;
+            }
+            
+            .automation-details-content {
+                font-size: 12px;
+                color: #333;
+                line-height: 1.4;
+            }
+            
+            .automation-details-content div {
+                margin-bottom: 2px;
+            }
+            
+            .automation-overlay-footer {
+                padding: 16px 24px 20px;
+                border-top: 1px solid #eee;
+                display: flex;
+                gap: 12px;
+                justify-content: flex-end;
+            }
+            
+            .automation-btn {
+                padding: 8px 16px;
+                border-radius: 6px;
+                border: 1px solid #ddd;
+                background: white;
+                cursor: pointer;
+                font-size: 14px;
+                transition: all 0.2s;
+            }
+            
+            .automation-btn:hover {
+                background: #f5f5f5;
+            }
+            
+            .automation-btn-cancel {
+                color: #666;
+            }
+            
+            .automation-btn-retry {
+                background: #2196F3;
+                color: white;
+                border-color: #2196F3;
+            }
+            
+            .automation-btn-retry:hover {
+                background: #1976D2;
+            }
+        `;
+        // スタイルシートを追加
+        const styleSheet = document.createElement('style');
+        styleSheet.textContent = styles;
+        document.head.appendChild(styleSheet);
+    }
+    /**
+     * イベントリスナーを設定
+     */
+    setupEventListeners() {
+        if (!this.overlay)
+            return;
+        this.overlay.addEventListener('click', (e) => {
+            const target = e.target;
+            const action = target.dataset['action'];
+            if (action && this.eventHandler) {
+                this.eventHandler(action);
+            }
+        });
+        // ESCキーでキャンセル
+        document.addEventListener('keydown', this.handleKeyDown);
+    }
+    /**
+     * レンダリング
+     */
+    render() {
+        if (!this.overlay)
+            return;
+        // ステータスアイコン
+        const statusIcon = this.overlay.querySelector('.automation-status-icon');
+        if (statusIcon) {
+            statusIcon.className = `automation-status-icon ${this.state.status}`;
+        }
+        // ステータスメッセージ
+        const statusMessage = this.overlay.querySelector('.automation-status-message');
+        if (statusMessage) {
+            statusMessage.textContent = this.state.message;
+        }
+        // 進行状況
+        const progressFill = this.overlay.querySelector('.automation-progress-fill');
+        const progressText = this.overlay.querySelector('.automation-progress-text');
+        if (progressFill && progressText) {
+            progressFill.style.width = `${this.state.progress}%`;
+            progressText.textContent = `${Math.round(this.state.progress)}%`;
+        }
+        // 詳細ログ
+        const detailsContent = this.overlay.querySelector('.automation-details-content');
+        if (detailsContent) {
+            detailsContent.innerHTML = this.state.details
+                .map(detail => `<div>${this.escapeHtml(detail)}</div>`)
+                .join('');
+            // 自動スクロール
+            detailsContent.scrollTop = detailsContent.scrollHeight;
+        }
+        // ボタン状態
+        const cancelBtn = this.overlay.querySelector('.automation-btn-cancel');
+        const retryBtn = this.overlay.querySelector('.automation-btn-retry');
+        if (cancelBtn) {
+            cancelBtn.style.display = this.state.canCancel ? 'inline-block' : 'none';
+        }
+        if (retryBtn) {
+            retryBtn.style.display = this.state.status === 'failed' ? 'inline-block' : 'none';
+        }
+    }
+    /**
+     * HTMLエスケープ
+     */
+    escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+    /**
+     * ページとの相互作用を防ぐ
+     */
+    preventPageInteraction() {
+        document.body.style.overflow = 'hidden';
+        document.body.style.pointerEvents = 'none';
+        if (this.overlay) {
+            this.overlay.style.pointerEvents = 'auto';
+        }
+    }
+    /**
+     * ページとの相互作用を復元
+     */
+    restorePageInteraction() {
+        document.body.style.overflow = '';
+        document.body.style.pointerEvents = '';
+        // ESCキーリスナーを削除
+        document.removeEventListener('keydown', this.handleKeyDown);
+    }
+    /**
+     * デストラクタ
+     */
+    destroy() {
+        this.hide();
+        this.eventHandler = null;
+        if (this.animationId) {
+            cancelAnimationFrame(this.animationId);
+        }
+    }
+}
+// シングルトンインスタンス
+let overlayInstance = null;
+/**
+ * オーバーレイのシングルトンインスタンスを取得
+ */
+function getAutomationOverlay() {
+    if (!overlayInstance) {
+        overlayInstance = new AutomationOverlay();
+    }
+    return overlayInstance;
+}
+/**
+ * オーバーレイインスタンスを破棄
+ */
+function destroyAutomationOverlay() {
+    if (overlayInstance) {
+        overlayInstance.destroy();
+        overlayInstance = null;
+    }
+}
+
+;// ./ts/modules/automation-engine.ts
+/**
+ * 自動操作エンジン
+ * 万博予約ページでの自動化処理を統括管理
+ */
+
+
+// test-exports用にexport
+
+
+
+
+// デフォルト設定
+const DEFAULT_CONFIG = {
+    maxRetries: 3,
+    stepDelay: 1000,
+    pageTimeout: 15000,
+    continueOnError: true,
+    enableLogging: true
+};
+class AutomationEngine {
+    constructor(config = {}) {
+        this.status = 'idle';
+        this.pageDetector = getPageDetector();
+        this.domUtils = getDOMUtils();
+        this.overlay = getAutomationOverlay();
+        this.startTime = 0;
+        this.processedCount = 0;
+        this.successCount = 0;
+        this.failedCount = 0;
+        this.errors = [];
+        this.currentReservation = null;
+        this.config = { ...DEFAULT_CONFIG, ...config };
+        // オーバーレイイベントハンドラーを設定
+        this.overlay.setEventHandler((type) => {
+            switch (type) {
+                case 'cancel':
+                    this.stop();
+                    break;
+                case 'retry':
+                    this.start();
+                    break;
+                case 'close':
+                    this.overlay.hide();
+                    break;
+            }
+        });
+    }
+    /**
+     * 自動操作を開始
+     */
+    async start() {
+        if (this.status === 'running') {
+            throw new Error('自動操作は既に実行中です');
+        }
+        this.log('🚀 自動操作エンジン開始');
+        this.resetCounters();
+        this.status = 'running';
+        this.startTime = Date.now();
+        // オーバーレイを表示
+        this.overlay.show('自動操作を開始しています...');
+        this.updateOverlayProgress(10, 'ページ情報を解析中...');
+        try {
+            // ページタイプを判定
+            const pageInfo = this.pageDetector.extractPageInfo();
+            this.log(`📍 現在のページ: ${pageInfo.type}`);
+            this.updateOverlayProgress(20, `${pageInfo.type} ページを検知`);
+            switch (pageInfo.type) {
+                case 'reservation_time':
+                    await this.handleReservationPage(pageInfo);
+                    break;
+                case 'confirmation':
+                    await this.handleConfirmationPage(pageInfo);
+                    break;
+                case 'pavilion_search':
+                    this.log('⚠️ パビリオン検索ページでは自動操作は不要です');
+                    this.updateOverlayProgress(100, 'パビリオン検索ページでは自動操作不要');
+                    break;
+                default:
+                    throw new Error(`未対応のページタイプ: ${pageInfo.type}`);
+            }
+            this.status = 'completed';
+            this.log('✅ 自動操作完了');
+            this.updateOverlayProgress(100, '自動操作が正常に完了しました');
+        }
+        catch (error) {
+            this.status = 'failed';
+            const errorMessage = error instanceof Error ? error.message : String(error);
+            this.errors.push(errorMessage);
+            this.log(`❌ 自動操作失敗: ${errorMessage}`);
+            this.overlay.showError(errorMessage, true);
+        }
+        const result = this.getResult();
+        // 成功時はオーバーレイに結果を表示、失敗時は既に表示済み
+        if (this.status === 'completed') {
+            this.overlay.showResult(result);
+        }
+        return result;
+    }
+    /**
+     * 予約時間選択ページの処理
+     */
+    async handleReservationPage(pageInfo) {
+        this.log('🎯 予約ページ処理開始');
+        // パビリオンコードが取得できない場合はエラー
+        if (!pageInfo.pavilionCode) {
+            throw new Error('パビリオンコードが取得できません');
+        }
+        // キャッシュからこのパビリオンの予約データを取得
+        const reservationData = await this.findMatchingReservation(pageInfo.pavilionCode);
+        if (!reservationData) {
+            throw new Error(`パビリオン ${pageInfo.pavilionCode} の予約データが見つかりません`);
+        }
+        this.currentReservation = reservationData;
+        this.log(`📋 予約データ発見: ${reservationData.pavilionName} - ${reservationData.selectedTimeDisplay}`);
+        this.updateOverlayProgress(25, `予約データ発見: ${reservationData.pavilionName}`);
+        // ページの準備完了を待機
+        await this.waitForPageReady();
+        // 時間選択を実行
+        await this.executeTimeSelection(reservationData);
+        // 申込ボタンをクリック
+        await this.executeSubmission();
+        // 状態を更新
+        pavilion_reservation_cache.PavilionReservationCache.updateReservationStatus(reservationData.pavilionCode, reservationData.selectedTimeSlot, 'processing');
+        this.processedCount++;
+        this.successCount++;
+    }
+    /**
+     * 確認ページの処理
+     */
+    async handleConfirmationPage(_pageInfo) {
+        this.log('📋 確認ページ処理開始');
+        // 現在処理中の予約データを取得
+        const processingReservation = pavilion_reservation_cache.PavilionReservationCache.getProcessingReservation();
+        if (!processingReservation) {
+            this.log('⚠️ 処理中の予約データがありません。手動操作の可能性があります。');
+            return;
+        }
+        this.currentReservation = processingReservation;
+        this.log(`📋 処理中の予約: ${processingReservation.pavilionName} - ${processingReservation.selectedTimeDisplay}`);
+        this.updateOverlayProgress(25, `処理中の予約: ${processingReservation.pavilionName}`);
+        // 確認ページの準備完了を待機
+        await this.waitForPageReady();
+        // 最終確認ボタンクリック
+        await this.executeConfirmation();
+        // 状態を完了に更新
+        pavilion_reservation_cache.PavilionReservationCache.updateReservationStatus(processingReservation.pavilionCode, processingReservation.selectedTimeSlot, 'completed');
+        this.processedCount++;
+        this.successCount++;
+    }
+    /**
+     * マッチする予約データを検索
+     */
+    async findMatchingReservation(pavilionCode) {
+        // 該当パビリオンのpending状態の予約データを取得
+        const pavilionReservations = pavilion_reservation_cache.PavilionReservationCache.getReservationDataByPavilion(pavilionCode);
+        const pendingReservations = pavilionReservations.filter(data => data.status === 'pending');
+        if (pendingReservations.length === 0) {
+            return null;
+        }
+        // 複数ある場合は最初の1つを選択
+        // TODO: 将来的にはユーザー選択や優先度設定を実装
+        return pendingReservations[0];
+    }
+    /**
+     * ページ準備完了まで待機
+     */
+    async waitForPageReady() {
+        this.log('⏳ ページ準備完了を待機中...');
+        this.updateOverlayProgress(30, 'ページ準備完了を待機中...');
+        const isReady = await this.pageDetector.waitForPageReady(this.config.pageTimeout);
+        if (!isReady) {
+            throw new Error(`ページ準備がタイムアウトしました (${this.config.pageTimeout}ms)`);
+        }
+        this.log('✅ ページ準備完了');
+        this.updateOverlayProgress(40, 'ページ準備完了');
+    }
+    /**
+     * 時間選択を実行
+     */
+    async executeTimeSelection(reservationData) {
+        this.log(`⏰ 時間選択実行: ${reservationData.selectedTimeDisplay}`);
+        this.updateOverlayProgress(50, `時間選択中: ${reservationData.selectedTimeDisplay}`);
+        const result = await this.domUtils.selectTimeSlot(reservationData.selectedTimeSlot);
+        if (!result.success) {
+            // 利用可能な時間オプションをログ出力
+            if (result.availableOptions) {
+                this.log(`📋 利用可能な時間: ${result.availableOptions.join(', ')}`);
+            }
+            throw new Error(result.error || '時間選択に失敗しました');
+        }
+        this.log(`✅ 時間選択完了: ${result.selectedTime}`);
+        this.updateOverlayProgress(70, `時間選択完了: ${result.selectedTime}`);
+        // 少し待機
+        await this.delay(this.config.stepDelay);
+    }
+    /**
+     * 申込ボタンクリック実行
+     */
+    async executeSubmission() {
+        this.log('🔘 申込ボタンクリック実行');
+        this.updateOverlayProgress(80, '申込ボタンをクリック中...');
+        const result = await this.domUtils.clickSubmitButton();
+        if (!result.success) {
+            throw new Error(result.error || '申込ボタンクリックに失敗しました');
+        }
+        this.log('✅ 申込ボタンクリック完了');
+        this.updateOverlayProgress(90, '申込ボタンクリック完了');
+        // ページ遷移を待機
+        await this.waitForPageTransition();
+    }
+    /**
+     * 確認ボタンクリック実行
+     */
+    async executeConfirmation() {
+        this.log('📋 最終確認ボタンクリック実行');
+        this.updateOverlayProgress(95, '最終確認ボタンをクリック中...');
+        // 確認ボタンを検索してクリック
+        const confirmResult = await this.domUtils.waitForElement('.confirm-button, .final-submit', this.config.pageTimeout);
+        if (!confirmResult.success || !confirmResult.element) {
+            throw new Error('確認ボタンが見つかりません');
+        }
+        confirmResult.element.click();
+        this.log('✅ 最終確認ボタンクリック完了');
+        this.updateOverlayProgress(100, '予約処理完了');
+        // 完了ページへの遷移を待機
+        await this.delay(this.config.stepDelay * 2);
+    }
+    /**
+     * ページ遷移を待機
+     */
+    async waitForPageTransition() {
+        this.log('🔄 ページ遷移を待機中...');
+        this.updateOverlayProgress(95, 'ページ遷移を待機中...');
+        // URLまたはタイトルの変更を待機
+        const urlChanged = await this.domUtils.waitForUrlChange(/confirm|complete/, this.config.pageTimeout);
+        if (!urlChanged) {
+            // エラーメッセージをチェック
+            const errors = this.domUtils.checkForErrorMessages();
+            if (errors.length > 0) {
+                throw new Error(`予約エラー: ${errors.join(', ')}`);
+            }
+            this.log('⚠️ ページ遷移が検知されませんでしたが、処理を継続します');
+        }
+        else {
+            this.log('✅ ページ遷移完了');
+        }
+    }
+    /**
+     * 自動操作を停止
+     */
+    stop() {
+        if (this.status === 'running') {
+            this.status = 'cancelled';
+            this.log('🛑 自動操作をキャンセルしました');
+        }
+    }
+    /**
+     * 現在の状態を取得
+     */
+    getStatus() {
+        return this.status;
+    }
+    /**
+     * 実行結果を取得
+     */
+    getResult() {
+        const executionTime = this.startTime ? Date.now() - this.startTime : 0;
+        return {
+            status: this.status,
+            processedCount: this.processedCount,
+            successCount: this.successCount,
+            failedCount: this.failedCount,
+            errors: [...this.errors],
+            executionTime
+        };
+    }
+    /**
+     * カウンターをリセット
+     */
+    resetCounters() {
+        this.processedCount = 0;
+        this.successCount = 0;
+        this.failedCount = 0;
+        this.errors = [];
+        this.currentReservation = null;
+    }
+    /**
+     * 指定時間待機
+     */
+    async delay(ms) {
+        await new Promise(resolve => setTimeout(resolve, ms));
+    }
+    /**
+     * オーバーレイの進行状況を更新
+     */
+    updateOverlayProgress(progress, message) {
+        this.overlay.updateProgress(progress);
+        this.overlay.updateMessage(message);
+    }
+    /**
+     * ログ出力
+     */
+    log(message) {
+        if (this.config.enableLogging) {
+            const timestamp = new Date().toLocaleTimeString();
+            console.log(`[${timestamp}] 🤖 ${message}`);
+        }
+    }
+    /**
+     * デバッグ情報を出力
+     */
+    debugInfo() {
+        console.group('🔧 自動操作エンジン - デバッグ情報');
+        console.log('状態:', this.status);
+        console.log('設定:', this.config);
+        console.log('実行結果:', this.getResult());
+        console.log('現在の予約:', this.currentReservation);
+        console.log('ページ情報:', this.pageDetector.extractPageInfo());
+        console.log('DOM情報:', this.domUtils.getPageDebugInfo());
+        console.groupEnd();
+    }
+}
+// グローバルインスタンス
+let automationEngineInstance = null;
+/**
+ * 自動操作エンジンのインスタンスを取得
+ */
+function getAutomationEngine(config) {
+    if (!automationEngineInstance || config) {
+        automationEngineInstance = new AutomationEngine(config);
+    }
+    return automationEngineInstance;
+}
+/**
+ * 自動操作を開始（ショートカット関数）
+ */
+async function startAutomation(config) {
+    const engine = getAutomationEngine(config);
+    return await engine.start();
+}
+/**
+ * 自動操作を停止（ショートカット関数）
+ */
+function stopAutomation() {
+    if (automationEngineInstance) {
+        automationEngineInstance.stop();
+    }
+}
+
+;// ./ts/modules/automation-init.ts
+/**
+ * 自動操作エンジンの初期化・自動起動モジュール
+ * ページ読み込み時に自動操作が必要かチェックし、必要に応じて実行
+ */
+
+
+
+// 初期化状態の管理
+let isInitialized = false;
+let isAutomationRunning = false;
+/**
+ * 自動操作エンジンを初期化
+ */
+function initializeAutomation() {
+    if (isInitialized)
+        return;
+    console.log('🤖 自動操作エンジン初期化開始');
+    // ページロード完了後に実行
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', checkAndStartAutomation);
+    }
+    else {
+        // すでにロード完了している場合は即座に実行
+        setTimeout(checkAndStartAutomation, 100);
+    }
+    // ページ変更時の監視（SPA対応）
+    setupPageChangeListener();
+    isInitialized = true;
+    console.log('✅ 自動操作エンジン初期化完了');
+}
+/**
+ * 自動操作が必要かチェックして開始
+ */
+async function checkAndStartAutomation() {
+    if (isAutomationRunning) {
+        console.log('⏳ 自動操作は既に実行中です');
+        return;
+    }
+    try {
+        // ページタイプを検知
+        const pageDetector = getPageDetector();
+        const pageInfo = pageDetector.extractPageInfo();
+        console.log(`📍 ページ検知: ${pageInfo.type} - ${pageInfo.url}`);
+        // 自動操作対象ページかチェック
+        if (!shouldStartAutomation(pageInfo.type)) {
+            console.log(`ℹ️ ${pageInfo.type} ページでは自動操作不要`);
+            return;
+        }
+        // キャッシュにデータがあるかチェック
+        const hasReservationData = checkReservationDataAvailable(pageInfo);
+        if (!hasReservationData) {
+            console.log('📋 キャッシュに予約データがありません');
+            return;
+        }
+        // 自動操作を開始
+        await startAutomationSafely();
+    }
+    catch (error) {
+        console.error('❌ 自動操作チェックエラー:', error);
+    }
+}
+/**
+ * 自動操作を安全に開始
+ */
+async function startAutomationSafely() {
+    if (isAutomationRunning)
+        return;
+    isAutomationRunning = true;
+    console.log('🚀 自動操作開始');
+    try {
+        const engine = getAutomationEngine({
+            enableLogging: true,
+            continueOnError: true,
+            maxRetries: 3
+        });
+        const result = await engine.start();
+        console.log('📊 自動操作結果:', result);
+        if (result.status === 'completed') {
+            console.log('✅ 自動操作正常完了');
+        }
+        else if (result.status === 'failed') {
+            console.warn('⚠️ 自動操作失敗:', result.errors);
+        }
+    }
+    catch (error) {
+        console.error('❌ 自動操作実行エラー:', error);
+    }
+    finally {
+        isAutomationRunning = false;
+    }
+}
+/**
+ * 自動操作を開始すべきかチェック
+ */
+function shouldStartAutomation(pageType) {
+    // 予約時間選択ページでのみ自動操作を実行
+    return pageType === 'reservation_time';
+}
+/**
+ * 予約データが利用可能かチェック
+ */
+function checkReservationDataAvailable(pageInfo) {
+    // パビリオン検索ページは除外
+    if (pageInfo.type === 'pavilion_search') {
+        return false;
+    }
+    // 予約時間選択ページの場合、該当パビリオンのデータをチェック
+    if (pageInfo.type === 'reservation_time' && pageInfo.pavilionCode) {
+        const pavilionData = pavilion_reservation_cache.PavilionReservationCache.getReservationDataByPavilion(pageInfo.pavilionCode);
+        const pendingData = pavilionData.filter(data => data.status === 'pending');
+        return pendingData.length > 0;
+    }
+    // 確認ページの場合、処理中のデータをチェック
+    if (pageInfo.type === 'confirmation') {
+        const processingData = pavilion_reservation_cache.PavilionReservationCache.getProcessingReservation();
+        return processingData !== null;
+    }
+    return false;
+}
+/**
+ * ページ変更監視を設定（SPA対応）
+ */
+function setupPageChangeListener() {
+    let currentUrl = window.location.href;
+    // URL変更の監視
+    const checkUrlChange = () => {
+        const newUrl = window.location.href;
+        if (newUrl !== currentUrl) {
+            currentUrl = newUrl;
+            console.log('🔄 ページ変更検知:', newUrl);
+            // ページデテクターをリセット
+            resetPageDetector();
+            // 少し待ってから自動操作チェック
+            setTimeout(checkAndStartAutomation, 1000);
+        }
+    };
+    // pushState/replaceStateの監視
+    const originalPushState = history.pushState;
+    const originalReplaceState = history.replaceState;
+    history.pushState = function (...args) {
+        originalPushState.apply(history, args);
+        setTimeout(checkUrlChange, 100);
+    };
+    history.replaceState = function (...args) {
+        originalReplaceState.apply(history, args);
+        setTimeout(checkUrlChange, 100);
+    };
+    // popstateイベントの監視
+    window.addEventListener('popstate', () => {
+        setTimeout(checkUrlChange, 100);
+    });
+    // 定期的なURLチェック（フォールバック）
+    setInterval(checkUrlChange, 2000);
+}
+/**
+ * デバッグ用: 手動で自動操作を実行
+ */
+function debugStartAutomation() {
+    console.log('🔧 デバッグ: 手動自動操作開始');
+    startAutomationSafely();
+}
+/**
+ * デバッグ用: 現在の状態を確認
+ */
+function debugAutomationStatus() {
+    console.group('🔧 自動操作エンジン状態');
+    console.log('初期化済み:', isInitialized);
+    console.log('実行中:', isAutomationRunning);
+    const pageDetector = getPageDetector();
+    console.log('ページ情報:', pageDetector.extractPageInfo());
+    const pendingReservations = pavilion_reservation_cache.PavilionReservationCache.getPendingReservations();
+    console.log('待機中予約:', pendingReservations.length, pendingReservations);
+    const processingReservation = pavilion_reservation_cache.PavilionReservationCache.getProcessingReservation();
+    console.log('処理中予約:', processingReservation);
+    console.groupEnd();
+}
+// グローバルに公開（デバッグ用）
+window.debugStartAutomation = debugStartAutomation;
+window.debugAutomationStatus = debugAutomationStatus;
+// 自動初期化
+initializeAutomation();
+
 ;// ./ts/modules/main.ts
 /**
  * メインエントリーポイント
@@ -7591,6 +9979,7 @@ else {
 
 
  // 同行者追加機能
+ // 自動操作エンジン初期化
 // テスト環境・開発環境でのみtest-exportsをimport
 // 本番環境では webpack の tree shaking で除外される
 if (false) // removed by dead control flow

@@ -1,6 +1,6 @@
 {
   "name": "expo2025-extension",
-  "version": "0.7.0",
+  "version": "0.6.2",
   "description": "大阪万博Expo2025の予約を補助します",
   "main": "src/index.js",
   "scripts": {

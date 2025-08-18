@@ -1,7 +1,7 @@
 {
   "name": "Expo2025予約補助",
   "author": "TomoTomo",
-  "version": "0.7.0",
+  "version": "0.6.2",
   "manifest_version": 3,
   "icons": {
   },
@@ -21,8 +21,12 @@
     "storage",
     "activeTab"
   ],
+  "background": {
+    "service_worker": "background.js"
+  },
   "host_permissions": [
-    "https://ticket.expo2025.or.jp/*"
+    "https://ticket.expo2025.or.jp/*",
+    "https://expo.ebii.net/*"
   ],
   "description": "大阪万博2025予約支援ツール: パビリオン検索補助, 入場予約自動化, 同行者追加自動化"
 }

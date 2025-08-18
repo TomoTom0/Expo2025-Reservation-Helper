@@ -8,3 +8,5 @@
 ## build
 
 - buildは`mise run build-rsync`で行う。これで拡張機能のwindowsへの同期も行われる
+
+- styleはscssとクラス名やタグ名およびそれらを用いた階層構造で指定する

@@ -26,36 +26,40 @@
 
 ## 現在の作業
 
-### 予約自動化機能の設計
-パビリオン予約の自動化について以下の設計を検討中：
+### 予約自動化機能の詳細設計 🔄
+パビリオン予約の自動化について詳細設計を進行中：
 
-#### フロー設計
-1. **予約開始**: パビリオン検索ページで時間指定 + 予約ボタン押下
-2. **情報保存**: 予約情報をキャッシュ（localStorage/sessionStorage）に保存
-3. **ページ遷移**: 予約ページに自動遷移
-4. **操作復元**: キャッシュから情報を復元し、必要な操作を自動実行
-5. **完了処理**: 予約完了またはエラー処理
+#### 確認済み仕様
+- **遷移先URL**: `https://ticket.expo2025.or.jp/event_time/?id=${ticketIds}&event_id=${pavilionCode}&screen_id=108&lottery=5&entrance_date=${formatDateToYMD()}`
+- **必要データ**: ticketIds（usp値）、pavilionCode、selectedTimeSlot、entranceDate
+- **自動操作フロー**: 動的待機 → ページタイトル確認 → 時間選択確認・実行 → submit押下 → 結果確認
 
-#### 保存データ構造（案）
-```javascript
-{
-  pavilionId: string,
-  pavilionName: string,
-  selectedTimeSlot: string,
-  operationSteps: string[],
-  timestamp: number
-}
-```
+#### 詳細設計中の項目
+1. **アーキテクチャ設計** ✅
+   - コンポーネント構成の明確化
+   - データフローの設計
 
-#### 技術課題
-- 時間指定UI の実装方法
-- DOM要素の特定方法（予約ページの構造解析必要）
-- エラーハンドリング（DOM構造変化、ネットワークエラー等）
-- 操作の信頼性確保
+2. **データ構造設計** ✅
+   ```typescript
+   interface ReservationCache {
+     pavilionCode: string;      // event_id用
+     pavilionName: string;      // 表示用
+     ticketIds: string;         // usp値（id用）
+     selectedTimeSlot: string;  // 選択時間枠
+     entranceDate: string;      // 入場日（YYYY-MM-DD）
+     targetUrl: string;         // 遷移先URL
+     status: 'pending' | 'processing' | 'completed' | 'failed';
+     timestamp: number;
+   }
+   ```
+
+3. **設計検討事項** 📋
+   - 詳細質問事項を `./tmp/reservation-automation-questions.md` に整理
+   - UI配置、データ取得方法、自動操作の具体的仕様について要確認
 
 ## 次のステップ
-1. 時間指定UI の設計・実装
-2. 予約ページのDOM構造調査
-3. キャッシュ機能の実装
-4. 自動操作ロジックの実装
-5. エラーハンドリングの強化
+1. 🔍 **設計質問の回答** - UI仕様、データ取得方法の確定
+2. 🎨 **時間選択UI の実装**
+3. 💾 **キャッシュ管理システムの実装**
+4. 🤖 **自動操作エンジンの実装**
+5. 🛡️ **エラーハンドリングの実装**

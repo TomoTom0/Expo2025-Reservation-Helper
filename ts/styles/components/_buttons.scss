@@ -44,6 +44,7 @@
   }
 }
 
+
 // ボタン共通スタイル
 button.ext-ytomo {
   height: 40px;
@@ -166,11 +167,56 @@ button.ext-ytomo.pavilion-sub-btn.ytomo-date-button {
   }
 }
 
-// フレックスレイアウト
+// フレックスレイアウト（検索エリア）
 div.div-flex {
   display: flex;
   justify-content: center;
   margin: 5px;
+  
+  // 検索入力フィールド
+  input.ext-tomo.search {
+    flex: 1;
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+    margin-right: 8px;
+    
+    &:focus {
+      outline: none;
+      border-color: rgb(0, 104, 33);
+      box-shadow: 0 0 0 2px rgba(0, 104, 33, 0.2);
+    }
+  }
+  
+  // 絞り込みボタン
+  button.btn-filter-without-load {
+    height: auto;
+    min-height: 40px;
+    width: auto;
+    min-width: 60px;
+    padding: 0px 8px;
+    color: white;
+    margin: 5px;
+    background: rgb(0, 104, 33);
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    
+    &:hover {
+      background: rgb(2, 134, 43);
+    }
+    
+    &:active {
+      background: rgb(0, 84, 23);
+    }
+    
+    &:disabled {
+      background: rgb(128, 128, 128);
+      cursor: not-allowed;
+    }
+  }
 }
 
 // JavaScript制御用の表示・非表示クラス
