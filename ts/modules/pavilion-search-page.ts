@@ -302,8 +302,7 @@ const init_page = (): void => {
         fabContent.appendChild(countsText);
         fabButton.appendChild(fabContent);
         
-        // FABボタンにrelative positionを設定
-        fabButton.style.position = 'relative';
+        // FABボタンの位置設定はCSSで行う
 
         // 件数表示を更新する関数（FABボタン内に表示）
         const updateCountsDisplay = () => {
@@ -332,11 +331,13 @@ const init_page = (): void => {
         const btnLoadAll = createSubButton('すべて読み込み', 'btn-load-all');
         const btnFilterSafe = createSubButton('空きのみ', 'btn-filter-safe');
         const btnAlertToCopy = createSubButton('一覧コピー', 'btn-alert-to-copy');
+        const btnDayReservation = createSubButton('当日予約', 'btn-day-reservation');
 
         // DOM構築
         subActionsContainer.appendChild(btnLoadAll);
         subActionsContainer.appendChild(btnFilterSafe);
         subActionsContainer.appendChild(btnAlertToCopy);
+        subActionsContainer.appendChild(btnDayReservation);
         
         fabContainer.appendChild(subActionsContainer);
         fabContainer.appendChild(fabButton);
@@ -474,16 +475,6 @@ const init_page = (): void => {
 
         const btn_filter_without_load = document.createElement("button");
         btn_filter_without_load.classList.add("basic-btn", "type2", "no-after", "ext-ytomo", "btn-filter-without-load");
-        btn_filter_without_load.style.cssText = `
-            height: auto;
-            min-height: 40px;
-            width: auto;
-            min-width: 60px;
-            padding: 0px 8px;
-            color: white;
-            margin: 5px;
-            background: rgb(0, 104, 33) !important;
-        `;
         const span_filter_without_load = document.createElement("span");
         span_filter_without_load.classList.add("ext-ytomo");
         span_filter_without_load.innerText = "絞込";
@@ -550,11 +541,6 @@ const init_page = (): void => {
                 console.log(`🔧 実行開始時の状態設定完了: disabled=${button.disabled}, classes=${button.className}`);
                 console.log(`🔧 実際のHTML disabled属性:`, button.hasAttribute('disabled'));
                 console.log(`🔧 computedStyle background:`, window.getComputedStyle(button).backgroundColor);
-                
-                // 強制的にCSS再適用
-                button.style.background = 'rgb(128, 128, 128)';
-                button.style.cursor = 'not-allowed';
-                console.log(`🔧 強制スタイル適用後:`, button.style.cssText);
                 
                 // 他の「すべて読み込み」ボタンも同時に無効化
                 document.querySelectorAll("button.btn-load-all").forEach((btn) => {
@@ -658,18 +644,590 @@ const init_page = (): void => {
                 try {
                     navigator.clipboard.writeText(text);
                 } catch (e) {
-                    alert(text);
+                    showErrorMessage('クリップボードエラー', 'クリップボードへのコピーに失敗しました。以下のテキストを手動でコピーしてください:\n\n' + text);
                     // console.error("ytomo extension error", e);
-                    // alert(e);
                 }
                 setTimeout(() => {
                     (target as HTMLButtonElement).disabled = false;
                 }, 500)
             }
-
+            else if (target && target.classList.contains("btn-day-reservation")) {
+                // 当日予約
+                console.log('🎫 当日予約ボタンがクリックされました');
+                showDayReservationDialog();
+            }
         }
     })
 }
+
+// エラーメッセージ表示関数
+const showErrorMessage = (title: string, message: string): void => {
+    // 既存のエラーメッセージがある場合は削除
+    const existingError = document.getElementById('ytomo-error-message');
+    if (existingError) {
+        existingError.remove();
+    }
+    
+    const errorDiv = document.createElement('div');
+    errorDiv.id = 'ytomo-error-message';
+    errorDiv.className = 'ytomo-error-message';
+    
+    const titleDiv = document.createElement('div');
+    titleDiv.className = 'error-title';
+    titleDiv.textContent = title;
+    
+    const messageDiv = document.createElement('div');
+    messageDiv.textContent = message;
+    
+    const closeButton = document.createElement('button');
+    closeButton.className = 'error-close-btn';
+    closeButton.textContent = '閉じる';
+    closeButton.addEventListener('click', () => {
+        errorDiv.remove();
+    });
+    
+    errorDiv.appendChild(titleDiv);
+    errorDiv.appendChild(messageDiv);
+    errorDiv.appendChild(closeButton);
+    
+    document.body.appendChild(errorDiv);
+    
+    // 10秒後に自動で消去
+    setTimeout(() => {
+        if (errorDiv.parentNode) {
+            errorDiv.remove();
+        }
+    }, 10000);
+};
+
+// 当日予約機能
+interface PavilionData {
+    c: string; // パビリオンコード
+    n: string; // パビリオン名
+    u?: string; // URL
+    s: Array<{
+        t: string; // 時間 (HHMM)
+        s: number; // ステータス (0: 空きあり, 1: 残りわずか, 2: 満席)
+    }>;
+}
+
+// 当日予約ダイアログ表示関数
+const showDayReservationDialog = async (): Promise<void> => {
+    console.log('🎫 当日予約ダイアログを表示します');
+    
+    try {
+        // 万博API データを取得
+        const expoData = await fetchExpoReservationData();
+        createDayReservationDialog(expoData);
+    } catch (error) {
+        console.error('❌ 万博API データの取得に失敗:', error);
+        showErrorMessage('データ取得エラー', 'パビリオン情報の取得に失敗しました。しばらく時間をおいて再試行してください。');
+    }
+};
+
+// 万博API 全体データ取得関数（空きなしも含む）
+const fetchAllExpoReservationData = async (): Promise<PavilionData[]> => {
+    console.log('🌐 万博API から全体データを取得中...');
+    
+    try {
+        let data: PavilionData[];
+        
+        // Chrome拡張機能環境かUserScript環境かを判定
+        if (typeof chrome !== 'undefined' && chrome.runtime) {
+            // Chrome拡張機能環境: background scriptを経由
+            const response = await new Promise<{success: boolean, data?: PavilionData[], error?: string}>((resolve) => {
+                chrome.runtime.sendMessage(
+                    { action: 'fetchExpoData' },
+                    (response) => resolve(response)
+                );
+            });
+            
+            if (!response.success || !response.data) {
+                throw new Error(response.error || 'Unknown error');
+            }
+            data = response.data;
+        } else if (typeof GM_xmlhttpRequest !== 'undefined' || (typeof GM !== 'undefined' && GM?.xmlHttpRequest)) {
+            // UserScript環境: GM_xmlhttpRequestを使用
+            data = await new Promise<PavilionData[]>((resolve, reject) => {
+                const request = GM_xmlhttpRequest || GM?.xmlHttpRequest;
+                if (!request) {
+                    reject(new Error('GM_xmlhttpRequest not available'));
+                    return;
+                }
+                
+                request({
+                    method: 'GET',
+                    url: 'https://expo.ebii.net/api/data',
+                    onload: (response) => {
+                        try {
+                            const jsonData = JSON.parse(response.responseText);
+                            resolve(jsonData);
+                        } catch (e) {
+                            reject(new Error('Failed to parse JSON response'));
+                        }
+                    },
+                    onerror: (error) => {
+                        reject(new Error(`Request failed: ${error}`));
+                    }
+                });
+            });
+        } else {
+            // サポートされていない環境
+            throw new Error('この機能はChrome拡張機能またはUserScript環境でのみ利用可能です');
+        }
+        
+        console.log('✅ 万博API 全体データ取得成功:', data.length, '件のパビリオン');
+        
+        // 全てのパビリオンを返す（フィルタリングなし）
+        return data;
+        
+    } catch (error) {
+        console.error('❌ 万博API 全体データ取得エラー:', error);
+        throw error;
+    }
+};
+
+// 万博API データ取得関数（空きありのみ）
+const fetchExpoReservationData = async (): Promise<PavilionData[]> => {
+    console.log('🌐 万博API からデータを取得中...');
+    
+    try {
+        let data: PavilionData[];
+        
+        // Chrome拡張機能環境かUserScript環境かを判定
+        if (typeof chrome !== 'undefined' && chrome.runtime) {
+            // Chrome拡張機能環境: background scriptを経由
+            const response = await new Promise<{success: boolean, data?: PavilionData[], error?: string}>((resolve) => {
+                chrome.runtime.sendMessage(
+                    { action: 'fetchExpoData' },
+                    (response) => resolve(response)
+                );
+            });
+            
+            if (!response.success || !response.data) {
+                throw new Error(response.error || 'Unknown error');
+            }
+            data = response.data;
+        } else if (typeof GM_xmlhttpRequest !== 'undefined' || (typeof GM !== 'undefined' && GM?.xmlHttpRequest)) {
+            // UserScript環境: GM_xmlhttpRequestを使用
+            data = await new Promise<PavilionData[]>((resolve, reject) => {
+                const request = GM_xmlhttpRequest || GM?.xmlHttpRequest;
+                if (!request) {
+                    reject(new Error('GM_xmlhttpRequest not available'));
+                    return;
+                }
+                
+                request({
+                    method: 'GET',
+                    url: 'https://expo.ebii.net/api/data',
+                    onload: (response) => {
+                        try {
+                            const jsonData = JSON.parse(response.responseText);
+                            resolve(jsonData);
+                        } catch (e) {
+                            reject(new Error('Failed to parse JSON response'));
+                        }
+                    },
+                    onerror: (error) => {
+                        reject(new Error(`Request failed: ${error}`));
+                    }
+                });
+            });
+        } else {
+            // サポートされていない環境
+            throw new Error('この機能はChrome拡張機能またはUserScript環境でのみ利用可能です');
+        }
+        
+        console.log('✅ 万博API データ取得成功:', data.length, '件のパビリオン');
+        
+        // 空きがあるパビリオンのみフィルタリング
+        const availablePavilions = data.filter(pavilion => {
+            return pavilion.s && pavilion.s.some(slot => slot.s === 0 || slot.s === 1);
+        });
+        
+        console.log('🎯 予約可能なパビリオン:', availablePavilions.length, '件');
+        return availablePavilions;
+        
+    } catch (error) {
+        console.error('❌ 万博API データ取得エラー:', error);
+        throw error;
+    }
+};
+
+// 当日予約ダイアログ作成関数
+const createDayReservationDialog = (pavilionData: PavilionData[], showAll: boolean = false): void => {
+    console.log('🏗️ 当日予約ダイアログを作成中...', pavilionData.length, '件のパビリオン');
+    
+    // 既存のダイアログがある場合は削除
+    const existingDialog = document.getElementById('day-reservation-dialog');
+    if (existingDialog) {
+        existingDialog.remove();
+    }
+    
+    // ダイアログ全体のコンテナ
+    const dialogOverlay = document.createElement('div');
+    dialogOverlay.id = 'day-reservation-dialog';
+    dialogOverlay.className = 'ytomo-dialog overlay';
+    
+    // ダイアログコンテンツ
+    const dialogContent = document.createElement('div');
+    dialogContent.className = 'ytomo-dialog container day-reservation';
+    
+    // ヘッダー
+    const header = document.createElement('div');
+    header.className = 'ytomo-dialog header';
+    
+    // タイトル
+    const title = document.createElement('h2');
+    title.className = 'ytomo-dialog title';
+    title.textContent = '🎫 当日パビリオン予約';
+    
+    // 更新ボタン（右上）
+    const refreshButton = document.createElement('button');
+    refreshButton.className = 'ytomo-dialog refresh-button';
+    refreshButton.textContent = '🔄';
+    refreshButton.title = '更新';
+    refreshButton.addEventListener('click', async () => {
+        refreshButton.disabled = true;
+        refreshButton.textContent = '⏳';
+        
+        // 選択状態をクリア
+        selectedTimes.clear();
+        
+        // キャッシュもクリア
+        import('./pavilion-reservation-cache').then(({ PavilionReservationCache }) => {
+            PavilionReservationCache.clearAllReservationData();
+        }).catch(error => {
+            console.error('❌ キャッシュクリアエラー:', error);
+        });
+        
+        try {
+            // 現在の状態（空きのみモードかどうか）を保持
+            const newData = showAll ? await fetchAllExpoReservationData() : await fetchExpoReservationData();
+            dialogOverlay.remove();
+            createDayReservationDialog(newData, showAll);
+        } catch (error) {
+            console.error('❌ データ更新エラー:', error);
+            showErrorMessage('更新エラー', 'データの更新に失敗しました');
+        } finally {
+            refreshButton.disabled = false;
+            refreshButton.textContent = '🔄';
+        }
+    });
+    
+    header.appendChild(title);
+    header.appendChild(refreshButton);
+    
+    // 説明文
+    const description = document.createElement('p');
+    description.className = 'day-reservation-description';
+    description.innerHTML = `
+        🟢 空きあり　🟡 残りわずか　⚪ 空きなし<br>
+        ボタンをクリックして予約画面に移動できます。
+    `;
+    
+    // パビリオンリスト
+    const pavilionList = document.createElement('div');
+    pavilionList.className = 'pavilion-list';
+    
+    // パビリオンデータが空の場合
+    if (pavilionData.length === 0) {
+        const noDataMessage = document.createElement('div');
+        noDataMessage.className = 'pavilion-list-empty';
+        noDataMessage.textContent = '現在予約可能なパビリオンはありません';
+        pavilionList.appendChild(noDataMessage);
+    } else {
+        // パビリオンリストを作成
+        pavilionData.forEach(pavilion => {
+            const pavilionItem = createPavilionListItem(pavilion, showAll);
+            pavilionList.appendChild(pavilionItem);
+        });
+    }
+    
+    // ボタングループ
+    const buttonGroup = document.createElement('div');
+    buttonGroup.className = 'ytomo-dialog button-group';
+    
+    // 閉じるボタン
+    const closeButton = document.createElement('button');
+    closeButton.className = 'ytomo-dialog secondary-button';
+    closeButton.textContent = '閉じる';
+    closeButton.addEventListener('click', () => {
+        dialogOverlay.remove();
+    });
+    
+    // 右側ボタングループ
+    const rightButtonGroup = document.createElement('div');
+    rightButtonGroup.className = 'ytomo-dialog right-button-group';
+    
+    // 空きのみトグルボタン
+    const availableOnlyToggle = document.createElement('button');
+    availableOnlyToggle.className = `ytomo-dialog available-only-toggle ${!showAll ? 'active' : ''}`;
+    availableOnlyToggle.textContent = '空きのみ';
+    availableOnlyToggle.title = '空きのあるパビリオンのみ表示';
+    
+    // 空きのみトグルイベント
+    availableOnlyToggle.addEventListener('click', async () => {
+        const isCurrentlyActive = availableOnlyToggle.classList.contains('active');
+        availableOnlyToggle.disabled = true;
+        availableOnlyToggle.textContent = '取得中...';
+        
+        // 選択状態をクリア
+        selectedTimes.clear();
+        
+        // キャッシュもクリア
+        import('./pavilion-reservation-cache').then(({ PavilionReservationCache }) => {
+            PavilionReservationCache.clearAllReservationData();
+        }).catch(error => {
+            console.error('❌ キャッシュクリアエラー:', error);
+        });
+        
+        try {
+            const newData = isCurrentlyActive ? await fetchAllExpoReservationData() : await fetchExpoReservationData();
+            dialogOverlay.remove();
+            createDayReservationDialog(newData, isCurrentlyActive);
+        } catch (error) {
+            console.error('❌ データ取得エラー:', error);
+            showErrorMessage('データ取得エラー', 'データの取得に失敗しました');
+        } finally {
+            availableOnlyToggle.disabled = false;
+            availableOnlyToggle.textContent = '空きのみ';
+        }
+    });
+    
+    // 監視ボタン（右下）
+    const monitorButton = document.createElement('button');
+    monitorButton.className = 'ytomo-dialog monitor-button';
+    monitorButton.innerHTML = '監視';
+    monitorButton.title = 'パビリオン監視を開始';
+    monitorButton.addEventListener('click', () => {
+        // TODO: 監視機能の実装（後ほど指示される）
+        console.log('🔍 監視ボタンがクリックされました（実装待ち）');
+    });
+    
+    rightButtonGroup.appendChild(availableOnlyToggle);
+    rightButtonGroup.appendChild(monitorButton);
+    
+    buttonGroup.appendChild(closeButton);
+    buttonGroup.appendChild(rightButtonGroup);
+    
+    // DOM構築
+    dialogContent.appendChild(header);
+    dialogContent.appendChild(description);
+    dialogContent.appendChild(pavilionList);
+    dialogContent.appendChild(buttonGroup);
+    dialogOverlay.appendChild(dialogContent);
+    
+    // ダイアログを表示
+    document.body.appendChild(dialogOverlay);
+    
+    // 背景クリックで閉じる
+    dialogOverlay.addEventListener('click', (e) => {
+        if (e.target === dialogOverlay) {
+            dialogOverlay.remove();
+        }
+    });
+    
+    console.log('✅ 当日予約ダイアログ表示完了');
+};
+
+// パビリオンリストアイテム作成関数
+const createPavilionListItem = (pavilion: PavilionData, showAll: boolean = false): HTMLDivElement => {
+    const item = document.createElement('div');
+    item.className = 'pavilion-item';
+    
+    // パビリオン情報エリア
+    const infoArea = document.createElement('div');
+    infoArea.className = 'pavilion-info';
+    
+    // パビリオン名
+    const name = document.createElement('div');
+    name.className = 'pavilion-name';
+    name.textContent = pavilion.n;
+    
+    // 時間枠情報
+    const timeSlots = document.createElement('div');
+    timeSlots.className = 'pavilion-time-slots';
+    
+    // 時間枠を個別のbutton要素で表示
+    const allSlots = pavilion.s || [];
+    if (allSlots.length > 0) {
+        allSlots.forEach(slot => {
+            const timeElement = createTimeSlotElement(slot, pavilion, showAll);
+            if (timeElement) {
+                timeSlots.appendChild(timeElement);
+            }
+        });
+    } else {
+        timeSlots.textContent = '時間枠情報なし';
+    }
+    
+    infoArea.appendChild(name);
+    infoArea.appendChild(timeSlots);
+    
+    item.appendChild(infoArea);
+    
+    return item;
+};
+
+// ステータスアイコン取得関数
+const getStatusIcon = (status: number): string => {
+    return status === 0 ? '🟢' : status === 1 ? '🟡' : '🔴';
+};
+
+// 選択状態管理（複数時間選択対応）
+const selectedTimes = new Map<string, Set<string>>(); // Map<pavilionCode, Set<timeSlot>>
+
+// デバッグ用: 選択状況を確認
+const getSelectedTimes = (): Record<string, string[]> => {
+    const result: Record<string, string[]> = {};
+    selectedTimes.forEach((timeSlots, pavilionCode) => {
+        result[pavilionCode] = Array.from(timeSlots);
+    });
+    return result;
+};
+
+// デバッグ用: 選択状況をフォーマットして表示
+const logSelectedTimes = (): void => {
+    const selections = getSelectedTimes();
+    if (Object.keys(selections).length === 0) {
+        console.log('📋 時間選択状況: 選択なし');
+        return;
+    }
+    
+    console.log('📋 時間選択状況:');
+    Object.entries(selections).forEach(([pavilionCode, timeSlots]) => {
+        const times = timeSlots.map(slot => `${slot.slice(0, 2)}:${slot.slice(2)}`).join(', ');
+        console.log(`  ${pavilionCode}: ${times} (${timeSlots.length}件)`);
+    });
+};
+
+// キャッシュデバッグ機能
+const debugCache = (): void => {
+    import('./pavilion-reservation-cache').then(({ PavilionReservationCache }) => {
+        PavilionReservationCache.debugLogAllCache();
+    }).catch(error => {
+        console.error('❌ キャッシュデバッグエラー:', error);
+    });
+};
+
+// キャッシュクリア機能
+const clearCache = (): void => {
+    import('./pavilion-reservation-cache').then(({ PavilionReservationCache }) => {
+        PavilionReservationCache.clearAllReservationData();
+        console.log('🧹 パビリオン予約キャッシュをクリアしました');
+    }).catch(error => {
+        console.error('❌ キャッシュクリアエラー:', error);
+    });
+};
+
+// グローバルに公開（デバッグ用）
+(window as any).getSelectedTimes = getSelectedTimes;
+(window as any).logSelectedTimes = logSelectedTimes;
+(window as any).debugCache = debugCache;
+(window as any).clearCache = clearCache;
+
+// 時間枠クリック処理（複数選択対応）
+const handleTimeSlotClick = (pavilionCode: string, timeSlot: string, buttonElement: HTMLElement): void => {
+    // 1. 現在の選択状態を取得または初期化
+    if (!selectedTimes.has(pavilionCode)) {
+        selectedTimes.set(pavilionCode, new Set());
+    }
+    const pavilionSlots = selectedTimes.get(pavilionCode)!;
+    
+    // 2. 選択状態をトグル
+    const isCurrentlySelected = buttonElement.classList.contains('selected');
+    
+    if (isCurrentlySelected) {
+        // 選択解除
+        pavilionSlots.delete(timeSlot);
+        buttonElement.classList.remove('selected');
+        
+        // キャッシュからも削除
+        import('./pavilion-reservation-cache').then(({ PavilionReservationCache }) => {
+            PavilionReservationCache.removeReservationData(pavilionCode, timeSlot);
+            console.log(`🗑️ 時間選択解除: ${pavilionCode} - ${timeSlot}`);
+        }).catch(error => {
+            console.error('❌ キャッシュ削除エラー:', error);
+        });
+    } else {
+        // 新規選択
+        pavilionSlots.add(timeSlot);
+        buttonElement.classList.add('selected');
+        
+        // キャッシュに保存
+        import('./pavilion-reservation-cache').then(({ PavilionReservationCache }) => {
+            const pavilionName = buttonElement.dataset['pavilionName'] || pavilionCode;
+            const isAvailable = buttonElement.dataset['available'] === 'true';
+            
+            const success = PavilionReservationCache.saveSelectedTimeFromUI(
+                pavilionCode,
+                pavilionName,
+                timeSlot,
+                isAvailable
+            );
+            
+            if (success) {
+                console.log(`💾 時間選択をキャッシュに保存: ${pavilionCode} - ${timeSlot}`);
+            }
+        }).catch(error => {
+            console.error('❌ キャッシュ保存エラー:', error);
+        });
+    }
+    
+    // 3. パビリオンの選択が空になった場合はMapから削除
+    if (pavilionSlots.size === 0) {
+        selectedTimes.delete(pavilionCode);
+    }
+    
+    console.log(`時間選択${isCurrentlySelected ? '解除' : '追加'}: ${pavilionCode} - ${timeSlot}`);
+};
+
+// 時間枠要素作成関数
+const createTimeSlotElement = (slot: any, pavilion: PavilionData, showAll: boolean): HTMLElement | null => {
+    const time = `${slot.t.slice(0, 2)}:${slot.t.slice(2)}`;
+    const isAvailable = slot.s === 0 || slot.s === 1;
+    
+    // 空きのみON かつ 予約不可 → 表示しない
+    if (!showAll && !isAvailable) {
+        return null;
+    }
+    
+    // 表示される時間枠はすべて選択可能（button要素）
+    const button = document.createElement('button');
+    button.className = `pavilion-time-slot clickable ${!isAvailable ? 'unavailable' : ''}`;
+    button.innerHTML = `${getStatusIcon(slot.s)}${time}`;
+    button.dataset['timeSlot'] = slot.t;
+    button.dataset['pavilionCode'] = pavilion.c;
+    button.dataset['pavilionName'] = pavilion.n;
+    button.dataset['available'] = isAvailable.toString();
+    
+    // クリックイベント追加
+    button.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        handleTimeSlotClick(pavilion.c, slot.t, button);
+    });
+    
+    return button;
+};
+
+// 予約画面への遷移関数（Phase 3で使用予定）
+const navigateToReservation = (pavilion: PavilionData): void => {
+    console.log('🎯 予約画面への遷移:', pavilion.n);
+    
+    // ダイアログを閉じる
+    const dialog = document.getElementById('day-reservation-dialog');
+    if (dialog) {
+        dialog.remove();
+    }
+    
+    // パビリオンコードを使って予約画面に遷移
+    // 実際の予約画面のURLパターンを使用
+};
+
+// TypeScript unused警告回避のため一時的に使用
+void navigateToReservation;
 
 // ページ初期化可能か判定
 const judge_init = (): boolean => {
