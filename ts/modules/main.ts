@@ -13,6 +13,7 @@ import './entrance-page-core';
 import './entrance-page-fab';
 import './app-router';
 import './companion-ticket-page'; // 同行者追加機能
+import './automation-init'; // 自動操作エンジン初期化
 
 // テスト環境・開発環境でのみtest-exportsをimport
 // 本番環境では webpack の tree shaking で除外される

@@ -24,6 +24,11 @@ import {
 import { createCacheManager } from './cache-manager';
 import type { CacheManager } from '../types/index.js';
 
+// 自動操作エンジン関連のimport
+import { getAutomationEngine, getPageDetector, getDOMUtils } from './automation-engine';
+import { getAutomationOverlay } from './automation-overlay';
+import { PavilionReservationCache } from './pavilion-reservation-cache';
+
 /**
  * テスト用のインスタンス・DOM工場クラス
  * テストで必要なオブジェクトとDOM構造を生成
@@ -154,6 +159,167 @@ export class TestFactory {
 }
 
 /**
+ * 統合テスト実行関数
+ */
+export function runIntegrationTest(): Promise<void> {
+    return new Promise(async (resolve, reject) => {
+        console.group('🧪 自動操作エンジン統合テスト開始');
+        
+        try {
+            // 1. テストデータ準備
+            setupTestData();
+            
+            // 2. ページ検知テスト
+            const pageDetector = getPageDetector();
+            const pageInfo = pageDetector.extractPageInfo();
+            console.log('✅ ページ検知テスト:', pageInfo);
+            
+            // 3. 自動操作エンジンテスト
+            const engine = getAutomationEngine();
+            console.log('✅ 自動操作エンジン取得:', engine.getStatus());
+            
+            // 4. オーバーレイテスト
+            const overlay = getAutomationOverlay();
+            overlay.show('統合テスト実行中...');
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            overlay.hide();
+            console.log('✅ オーバーレイテスト完了');
+            
+            // 5. キャッシュテスト
+            const cacheData = PavilionReservationCache.getAllReservationData();
+            console.log('✅ キャッシュテスト:', Object.keys(cacheData).length, '件');
+            
+            console.log('🎉 統合テスト正常完了');
+            resolve();
+            
+        } catch (error) {
+            console.error('❌ 統合テスト失敗:', error);
+            reject(error);
+        } finally {
+            console.groupEnd();
+        }
+    });
+}
+
+/**
+ * エンドツーエンドフローテスト
+ */
+export function testEndToEndFlow(): Promise<boolean> {
+    return new Promise(async (resolve) => {
+        console.group('🚀 エンドツーエンドフローテスト');
+        
+        try {
+            // テストデータがあることを確認
+            const hasData = Object.keys(PavilionReservationCache.getAllReservationData()).length > 0;
+            
+            if (!hasData) {
+                console.warn('⚠️ テストデータがありません。setupTestData()を実行してください');
+                resolve(false);
+                return;
+            }
+            
+            // 自動操作エンジンを実行
+            const engine = getAutomationEngine({ enableLogging: true });
+            const result = await engine.start();
+            
+            console.log('📊 実行結果:', result);
+            
+            const success = result.status === 'completed' || result.status === 'failed';
+            console.log(success ? '✅ E2Eテスト完了' : '❌ E2Eテスト失敗');
+            
+            resolve(success);
+            
+        } catch (error) {
+            console.error('❌ E2Eテスト例外:', error);
+            resolve(false);
+        } finally {
+            console.groupEnd();
+        }
+    });
+}
+
+/**
+ * 自動操作結果検証
+ */
+export function validateAutomationResult(): boolean {
+    const engine = getAutomationEngine();
+    const result = engine.getResult();
+    
+    console.group('🔍 自動操作結果検証');
+    console.log('ステータス:', result.status);
+    console.log('処理件数:', result.processedCount);
+    console.log('成功件数:', result.successCount);
+    console.log('失敗件数:', result.failedCount);
+    console.log('エラー:', result.errors);
+    console.log('実行時間:', result.executionTime, 'ms');
+    
+    const isValid = result.processedCount >= 0 && 
+                   result.successCount >= 0 && 
+                   result.failedCount >= 0 &&
+                   (result.status === 'completed' || result.status === 'failed' || result.status === 'cancelled');
+    
+    console.log(isValid ? '✅ 結果検証OK' : '❌ 結果検証NG');
+    console.groupEnd();
+    
+    return isValid;
+}
+
+/**
+ * テストデータセットアップ
+ */
+export function setupTestData(): void {
+    const testData = {
+        pavilionCode: 'TEST001',
+        pavilionName: 'テストパビリオン',
+        selectedTimeSlot: '10:00-11:00',
+        selectedTimeDisplay: '10:00-11:00',
+        isAvailable: true,
+        timestamp: Date.now(),
+        status: 'pending' as const
+    };
+    
+    PavilionReservationCache.saveReservationData(testData.pavilionCode, testData);
+    console.log('🔧 テストデータ投入完了:', testData);
+}
+
+/**
+ * 全キャッシュクリア
+ */
+export function clearAllCaches(): void {
+    sessionStorage.clear();
+    localStorage.clear();
+    console.log('🗑️ 全キャッシュクリア完了');
+}
+
+/**
+ * テスト結果ログ出力
+ */
+export function logTestResults(): void {
+    console.group('📋 テスト結果サマリー');
+    
+    // ページ情報
+    const pageInfo = getPageDetector().extractPageInfo();
+    console.log('ページ情報:', pageInfo);
+    
+    // 自動操作エンジン状態
+    const engine = getAutomationEngine();
+    console.log('エンジン状態:', engine.getStatus());
+    console.log('実行結果:', engine.getResult());
+    
+    // キャッシュ状態
+    const cacheData = PavilionReservationCache.getAllReservationData();
+    console.log('キャッシュデータ:', Object.keys(cacheData).length, '件');
+    
+    // 待機中・処理中の予約
+    const pending = PavilionReservationCache.getPendingReservations();
+    const processing = PavilionReservationCache.getProcessingReservation();
+    console.log('待機中予約:', pending.length, '件');
+    console.log('処理中予約:', processing ? 1 : 0, '件');
+    
+    console.groupEnd();
+}
+
+/**
  * テストで使用する主要クラス・関数のexport
  * 実際のアプリケーションコードにアクセスするためのインターフェース
  */
@@ -184,7 +350,22 @@ export const TestExports = {
     TestFactory,
     
     // === Cache Management ===
-    createCacheManager
+    createCacheManager,
+    
+    // === Automation Engine ===
+    getAutomationEngine,
+    getPageDetector,
+    getDOMUtils,
+    getAutomationOverlay,
+    PavilionReservationCache,
+    
+    // === Integration Tests ===
+    runIntegrationTest,
+    testEndToEndFlow,
+    validateAutomationResult,
+    setupTestData,
+    clearAllCaches,
+    logTestResults
 };
 
 /**
