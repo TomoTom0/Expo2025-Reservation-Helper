@@ -663,11 +663,169 @@ const init_page = (): void => {
             else if (target && target.classList.contains("btn-day-reservation")) {
                 // 当日予約
                 console.log('🎫 当日予約ボタンがクリックされました');
-                showDayReservationDialog();
+                showDayReservationDialog().catch(error => {
+                    console.error('❌ 当日予約ダイアログエラー:', error);
+                    showMobileErrorDialog('当日予約エラー', error);
+                });
             }
         }
     })
 }
+
+// スマホエラー調査用ダイアログ（詳細情報表示）
+const showMobileErrorDialog = (title: string, error: any): void => {
+    // 既存のエラーダイアログがある場合は削除
+    const existingError = document.getElementById('mobile-error-dialog');
+    if (existingError) {
+        existingError.remove();
+    }
+
+    // エラー情報を詳細に収集
+    const errorInfo = {
+        message: error?.message || String(error),
+        stack: error?.stack || 'スタックトレースなし',
+        name: error?.name || 'Unknown',
+        userAgent: navigator.userAgent,
+        timestamp: new Date().toISOString(),
+        url: window.location.href,
+        isMobile: /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent),
+        screen: `${screen.width}x${screen.height}`,
+        viewport: `${window.innerWidth}x${window.innerHeight}`
+    };
+
+    // ダイアログコンテナ
+    const dialogOverlay = document.createElement('div');
+    dialogOverlay.id = 'mobile-error-dialog';
+    dialogOverlay.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.8);
+        z-index: 10000;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+        box-sizing: border-box;
+    `;
+
+    // ダイアログ本体
+    const dialog = document.createElement('div');
+    dialog.style.cssText = `
+        background: white;
+        border-radius: 8px;
+        padding: 20px;
+        max-width: 90%;
+        max-height: 80%;
+        overflow-y: auto;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    `;
+
+    // タイトル
+    const titleElement = document.createElement('h3');
+    titleElement.textContent = `🚨 ${title}`;
+    titleElement.style.cssText = `
+        margin: 0 0 15px 0;
+        color: #d32f2f;
+        font-size: 18px;
+    `;
+
+    // エラー詳細
+    const detailsElement = document.createElement('pre');
+    detailsElement.textContent = JSON.stringify(errorInfo, null, 2);
+    detailsElement.style.cssText = `
+        background: #f5f5f5;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        padding: 10px;
+        font-size: 12px;
+        white-space: pre-wrap;
+        word-wrap: break-word;
+        max-height: 300px;
+        overflow-y: auto;
+        margin: 10px 0;
+    `;
+
+    // ボタン群
+    const buttonGroup = document.createElement('div');
+    buttonGroup.style.cssText = `
+        display: flex;
+        gap: 10px;
+        margin-top: 15px;
+        flex-wrap: wrap;
+    `;
+
+    // コピーボタン
+    const copyButton = document.createElement('button');
+    copyButton.textContent = '📋 エラー情報をコピー';
+    copyButton.style.cssText = `
+        flex: 1;
+        min-width: 120px;
+        padding: 10px;
+        background: #2196f3;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 14px;
+    `;
+    copyButton.addEventListener('click', async () => {
+        try {
+            await navigator.clipboard.writeText(JSON.stringify(errorInfo, null, 2));
+            copyButton.textContent = '✅ コピー完了';
+            setTimeout(() => {
+                copyButton.textContent = '📋 エラー情報をコピー';
+            }, 2000);
+        } catch {
+            // クリップボードAPIが使えない場合
+            const textArea = document.createElement('textarea');
+            textArea.value = JSON.stringify(errorInfo, null, 2);
+            document.body.appendChild(textArea);
+            textArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textArea);
+            copyButton.textContent = '✅ コピー完了';
+        }
+    });
+
+    // 閉じるボタン
+    const closeButton = document.createElement('button');
+    closeButton.textContent = '❌ 閉じる';
+    closeButton.style.cssText = `
+        flex: 1;
+        min-width: 120px;
+        padding: 10px;
+        background: #f44336;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 14px;
+    `;
+    closeButton.addEventListener('click', () => {
+        dialogOverlay.remove();
+    });
+
+    // DOM構築
+    buttonGroup.appendChild(copyButton);
+    buttonGroup.appendChild(closeButton);
+    dialog.appendChild(titleElement);
+    dialog.appendChild(detailsElement);
+    dialog.appendChild(buttonGroup);
+    dialogOverlay.appendChild(dialog);
+    document.body.appendChild(dialogOverlay);
+
+    // タップで閉じる
+    dialogOverlay.addEventListener('click', (e) => {
+        if (e.target === dialogOverlay) {
+            dialogOverlay.remove();
+        }
+    });
+
+    console.log('📱 スマホエラーダイアログ表示:', errorInfo);
+};
 
 // エラーメッセージ表示関数
 const showErrorMessage = (title: string, message: string): void => {
@@ -725,12 +883,12 @@ const showDayReservationDialog = async (): Promise<void> => {
     console.log('🎫 当日予約ダイアログを表示します');
     
     try {
-        // 万博API データを取得
-        const expoData = await fetchExpoReservationData();
-        createDayReservationDialog(expoData);
+        // 万博API 全体データを取得（フィルターは表示側で制御）
+        const expoData = await fetchAllExpoReservationData();
+        createDayReservationDialog(expoData, false); // デフォルトは空きのみモード
     } catch (error) {
         console.error('❌ 万博API データの取得に失敗:', error);
-        showErrorMessage('データ取得エラー', 'パビリオン情報の取得に失敗しました。しばらく時間をおいて再試行してください。');
+        showMobileErrorDialog('データ取得エラー', error);
     }
 };
 
@@ -796,72 +954,6 @@ const fetchAllExpoReservationData = async (): Promise<PavilionData[]> => {
     }
 };
 
-// 万博API データ取得関数（空きありのみ）
-const fetchExpoReservationData = async (): Promise<PavilionData[]> => {
-    console.log('🌐 万博API からデータを取得中...');
-    
-    try {
-        let data: PavilionData[];
-        
-        // Chrome拡張機能環境かUserScript環境かを判定
-        if (typeof chrome !== 'undefined' && chrome.runtime) {
-            // Chrome拡張機能環境: background scriptを経由
-            const response = await new Promise<{success: boolean, data?: PavilionData[], error?: string}>((resolve) => {
-                chrome.runtime.sendMessage(
-                    { action: 'fetchExpoData' },
-                    (response) => resolve(response)
-                );
-            });
-            
-            if (!response.success || !response.data) {
-                throw new Error(response.error || 'Unknown error');
-            }
-            data = response.data;
-        } else if (typeof GM_xmlhttpRequest !== 'undefined' || (typeof GM !== 'undefined' && GM?.xmlHttpRequest)) {
-            // UserScript環境: GM_xmlhttpRequestを使用
-            data = await new Promise<PavilionData[]>((resolve, reject) => {
-                const request = GM_xmlhttpRequest || GM?.xmlHttpRequest;
-                if (!request) {
-                    reject(new Error('GM_xmlhttpRequest not available'));
-                    return;
-                }
-                
-                request({
-                    method: 'GET',
-                    url: 'https://expo.ebii.net/api/data',
-                    onload: (response) => {
-                        try {
-                            const jsonData = JSON.parse(response.responseText);
-                            resolve(jsonData);
-                        } catch (e) {
-                            reject(new Error('Failed to parse JSON response'));
-                        }
-                    },
-                    onerror: (error) => {
-                        reject(new Error(`Request failed: ${error}`));
-                    }
-                });
-            });
-        } else {
-            // サポートされていない環境
-            throw new Error('この機能はChrome拡張機能またはUserScript環境でのみ利用可能です');
-        }
-        
-        console.log('✅ 万博API データ取得成功:', data.length, '件のパビリオン');
-        
-        // 空きがあるパビリオンのみフィルタリング
-        const availablePavilions = data.filter(pavilion => {
-            return pavilion.s && pavilion.s.some(slot => slot.s === 0 || slot.s === 1);
-        });
-        
-        console.log('🎯 予約可能なパビリオン:', availablePavilions.length, '件');
-        return availablePavilions;
-        
-    } catch (error) {
-        console.error('❌ 万博API データ取得エラー:', error);
-        throw error;
-    }
-};
 
 // 当日予約ダイアログ作成関数
 const createDayReservationDialog = (pavilionData: PavilionData[], showAll: boolean = false): void => {
@@ -911,13 +1003,13 @@ const createDayReservationDialog = (pavilionData: PavilionData[], showAll: boole
         });
         
         try {
-            // 現在の状態（空きのみモードかどうか）を保持
-            const newData = showAll ? await fetchAllExpoReservationData() : await fetchExpoReservationData();
+            // 常に全体データを取得してフィルターで制御
+            const newData = await fetchAllExpoReservationData();
             dialogOverlay.remove();
             createDayReservationDialog(newData, showAll);
         } catch (error) {
             console.error('❌ データ更新エラー:', error);
-            showErrorMessage('更新エラー', 'データの更新に失敗しました');
+            showMobileErrorDialog('更新エラー', error);
         } finally {
             refreshButton.disabled = false;
             refreshButton.textContent = '🔄';
@@ -957,11 +1049,23 @@ const createDayReservationDialog = (pavilionData: PavilionData[], showAll: boole
         noDataMessage.textContent = '現在予約可能なパビリオンはありません';
         pavilionList.appendChild(noDataMessage);
     } else {
-        // パビリオンリストを作成
-        pavilionData.forEach(pavilion => {
-            const pavilionItem = createPavilionListItem(pavilion, showAll);
-            pavilionList.appendChild(pavilionItem);
+        // パビリオンリストを作成（フィルター適用）
+        const filteredData = showAll ? pavilionData : pavilionData.filter(pavilion => {
+            // 空きのみモード: 空きありまたは残りわずかのパビリオンのみ表示
+            return pavilion.s.some(slot => slot.s === 0 || slot.s === 1);
         });
+        
+        if (filteredData.length === 0) {
+            const noDataMessage = document.createElement('div');
+            noDataMessage.className = 'pavilion-list-empty';
+            noDataMessage.textContent = showAll ? 'パビリオンデータがありません' : '現在予約可能なパビリオンはありません';
+            pavilionList.appendChild(noDataMessage);
+        } else {
+            filteredData.forEach(pavilion => {
+                const pavilionItem = createPavilionListItem(pavilion, showAll);
+                pavilionList.appendChild(pavilionItem);
+            });
+        }
     }
     
     // ボタングループ
@@ -986,11 +1090,10 @@ const createDayReservationDialog = (pavilionData: PavilionData[], showAll: boole
     availableOnlyToggle.textContent = '空きのみ';
     availableOnlyToggle.title = '空きのあるパビリオンのみ表示';
     
-    // 空きのみトグルイベント
-    availableOnlyToggle.addEventListener('click', async () => {
+    // 空きのみトグルイベント（フィルター切り替えのみ、データ再取得なし）
+    availableOnlyToggle.addEventListener('click', () => {
         const isCurrentlyActive = availableOnlyToggle.classList.contains('active');
-        availableOnlyToggle.disabled = true;
-        availableOnlyToggle.textContent = '取得中...';
+        const newShowAll = isCurrentlyActive; // activeの場合は全表示に切り替え
         
         // 選択状態をクリア
         selectedTimes.clear();
@@ -1002,17 +1105,9 @@ const createDayReservationDialog = (pavilionData: PavilionData[], showAll: boole
             console.error('❌ キャッシュクリアエラー:', error);
         });
         
-        try {
-            const newData = isCurrentlyActive ? await fetchAllExpoReservationData() : await fetchExpoReservationData();
-            dialogOverlay.remove();
-            createDayReservationDialog(newData, isCurrentlyActive);
-        } catch (error) {
-            console.error('❌ データ取得エラー:', error);
-            showErrorMessage('データ取得エラー', 'データの取得に失敗しました');
-        } finally {
-            availableOnlyToggle.disabled = false;
-            availableOnlyToggle.textContent = '空きのみ';
-        }
+        // 既存データでダイアログを再作成（フィルター適用）
+        dialogOverlay.remove();
+        createDayReservationDialog(pavilionData, newShowAll);
     });
     
     
