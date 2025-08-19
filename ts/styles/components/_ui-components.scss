@@ -1,5 +1,113 @@
 // UI共通コンポーネント
 
+// 予約結果通知システム
+.day-reservation-info-area {
+  position: relative;
+  min-height: 50px; // 最小高さを固定してレイアウト変動を防ぐ
+}
+
+.day-reservation-description {
+  margin: 10px 0;
+  color: #666;
+  font-size: 14px;
+  line-height: 1.5;
+  text-align: center;
+  
+  &.hidden {
+    display: none;
+  }
+}
+
+.day-reservation-notification {
+  margin: 10px 0;
+  
+  &.hidden {
+    display: none;
+  }
+  
+  .notification-content {
+    padding: 12px 16px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-height: 24px;
+    position: relative;
+    
+    .notification-message {
+      flex: 1;
+      margin-left: 8px;
+      margin-right: 8px;
+    }
+    
+    .notification-close {
+      background: none;
+      border: none;
+      font-size: 18px;
+      font-weight: bold;
+      cursor: pointer;
+      padding: 0;
+      width: 20px;
+      height: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0.7;
+      transition: opacity 0.2s ease;
+      
+      &:hover {
+        opacity: 1;
+      }
+    }
+    
+    // 成功通知
+    &.success {
+      background-color: #d4edda;
+      color: #155724;
+      border: 1px solid #c3e6cb;
+      
+      .notification-close {
+        color: #155724;
+      }
+    }
+    
+    // エラー通知
+    &.error {
+      background-color: #f8d7da;
+      color: #721c24;
+      border: 1px solid #f5c6cb;
+      
+      .notification-close {
+        color: #721c24;
+      }
+    }
+    
+    // 警告通知
+    &.warning {
+      background-color: #fff3cd;
+      color: #856404;
+      border: 1px solid #ffeaa7;
+      
+      .notification-close {
+        color: #856404;
+      }
+    }
+    
+    // 情報通知
+    &.info {
+      background-color: #d1ecf1;
+      color: #0c5460;
+      border: 1px solid #bee5eb;
+      
+      .notification-close {
+        color: #0c5460;
+      }
+    }
+  }
+}
+
 // アイコン系
 .ytomo-icon {
   &.expand-icon {
@@ -165,6 +273,84 @@
   }
 }
 
+
+// ダイアログボタンスタイル
+.ytomo-dialog {
+  &.clear-selection-button {
+    padding: 8px 16px;
+    background: #dc3545;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.2s ease;
+    
+    &:hover {
+      background: #c82333;
+      transform: translateY(-1px);
+    }
+    
+    &:active {
+      transform: translateY(0);
+    }
+  }
+  
+  &.monitor-button {
+    padding: 8px 16px;
+    background: #006821;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.2s ease;
+    
+    &:hover {
+      background: #02862b;
+      transform: translateY(-1px);
+    }
+    
+    &:active {
+      transform: translateY(0);
+    }
+  }
+}
+
+// パビリオン名行
+.pavilion-name-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+  
+  .pavilion-name {
+    flex: 1;
+    font-weight: bold;
+    color: #333;
+  }
+}
+
+// パビリオン選択ボタン
+.pavilion-select-all-btn {
+  padding: 2px 8px;
+  font-size: 11px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  
+  &:hover {
+    background-color: #0056b3;
+    transform: scale(1.05);
+  }
+  
+  &:active {
+    transform: scale(0.95);
+  }
+}
 
 // エラーメッセージ表示
 .ytomo-error-message {

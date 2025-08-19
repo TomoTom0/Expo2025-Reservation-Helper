@@ -100,6 +100,9 @@ export class AutomationEngine {
         this.updateOverlayProgress(10, 'ページ情報を解析中...');
 
         try {
+            // リダイレクト異常検知
+            await this.checkRedirectAbnormality();
+            
             // ページタイプを判定
             const pageInfo = this.pageDetector.extractPageInfo();
             this.log(`📍 現在のページ: ${pageInfo.type}`);
@@ -134,6 +137,13 @@ export class AutomationEngine {
             this.errors.push(errorMessage);
             this.log(`❌ 自動操作失敗: ${errorMessage}`);
             this.overlay.showError(errorMessage, true);
+            
+            // エラー通知を送信
+            if (errorMessage.includes('リダイレクト異常')) {
+                this.sendNotificationToDialog('warning', errorMessage);
+            } else {
+                this.sendNotificationToDialog('error', `予約処理失敗: ${errorMessage}`);
+            }
         }
 
         const result = this.getResult();
@@ -221,6 +231,9 @@ export class AutomationEngine {
 
         this.processedCount++;
         this.successCount++;
+        
+        // 成功通知を送信
+        this.sendNotificationToDialog('success', `予約完了: ${processingReservation.pavilionName} ${processingReservation.selectedTimeDisplay}～`);
     }
 
     /**
@@ -427,6 +440,95 @@ export class AutomationEngine {
         console.log('ページ情報:', this.pageDetector.extractPageInfo());
         console.log('DOM情報:', this.domUtils.getPageDebugInfo());
         console.groupEnd();
+    }
+
+    /**
+     * リダイレクト異常検知
+     */
+    private async checkRedirectAbnormality(): Promise<void> {
+        // sessionStorageから元ページURLを確認（予約が実行されたかの判定）
+        const originalUrl = sessionStorage.getItem('expo_original_page_url');
+        
+        if (!originalUrl) {
+            this.log('⚠️ 元ページURL情報がないため、リダイレクト検知をスキップ');
+            return;
+        }
+
+        // 最新の予約データを取得（pending/processing状態を統一的に扱う）
+        const reservationData = this.findLatestReservationData();
+
+        if (!reservationData) {
+            this.log('⚠️ 予約データが見つからないため、リダイレクト検知をスキップ');
+            return;
+        }
+
+        // 期待タイトルを予約データから生成
+        const expectedTitle = `${reservationData.pavilionName} ${reservationData.selectedTimeDisplay}～`;
+        
+        // 現在のページタイトルと比較
+        const currentTitle = document.title;
+        this.log(`🔍 タイトル検証: 期待="${expectedTitle}", 実際="${currentTitle}"`);
+
+        if (currentTitle !== expectedTitle) {
+            this.log('❌ リダイレクト異常を検知: タイトルが一致しません');
+            this.log(`🔙 元のページに戻ります: ${originalUrl}`);
+            
+            // sessionStorageをクリア
+            sessionStorage.removeItem('expo_original_page_url');
+            
+            // 元のページに戻る
+            window.location.href = originalUrl;
+            
+            // 処理を中断（ページ遷移するため）
+            throw new Error('リダイレクト異常により元のページに復旧しました');
+        }
+
+        this.log('✅ リダイレクト検証OK: 正常なページです');
+        
+        // 検証完了後、元ページURLをクリア
+        sessionStorage.removeItem('expo_original_page_url');
+    }
+
+    /**
+     * ダイアログに通知を送信
+     */
+    private sendNotificationToDialog(type: 'success' | 'error' | 'warning' | 'info', message: string): void {
+        try {
+            // グローバル関数が利用可能な場合に通知を送信
+            if (typeof (window as any).showReservationNotification === 'function') {
+                (window as any).showReservationNotification(type, message);
+                this.log(`📢 通知送信: [${type}] ${message}`);
+            } else {
+                this.log('⚠️ 通知関数が利用できません');
+            }
+        } catch (error) {
+            this.log(`❌ 通知送信エラー: ${error}`);
+        }
+    }
+
+    /**
+     * 最新の予約データを取得（pending/processing状態を統一的に扱う）
+     */
+    private findLatestReservationData(): ReservationCacheData | null {
+        // 1. まずprocessing状態を確認（処理中の予約が最優先）
+        const processingReservation = PavilionReservationCache.getProcessingReservation();
+        if (processingReservation) {
+            this.log(`📋 処理中の予約データを使用: ${processingReservation.pavilionName}`);
+            return processingReservation;
+        }
+
+        // 2. processing状態がない場合は、pending状態から最新のものを取得
+        const allData = PavilionReservationCache.getAllReservationData();
+        const activeData = Object.values(allData)
+            .filter(data => data.status === 'pending' || data.status === 'processing')
+            .sort((a, b) => b.timestamp - a.timestamp); // 最新順
+
+        if (activeData.length > 0) {
+            this.log(`📋 最新の予約データを使用: ${activeData[0].pavilionName} (${activeData[0].status})`);
+            return activeData[0];
+        }
+
+        return null;
     }
 }
 

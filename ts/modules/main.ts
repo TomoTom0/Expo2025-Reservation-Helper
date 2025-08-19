@@ -15,6 +15,12 @@ import './app-router';
 import './companion-ticket-page'; // 同行者追加機能
 import './automation-init'; // 自動操作エンジン初期化
 
+// 新しい監視・即時予約機能
+import './monitoring-scheduler';
+import './monitoring-cache';
+import './monitoring-service';
+import './immediate-reservation';
+
 // テスト環境・開発環境でのみtest-exportsをimport
 // 本番環境では webpack の tree shaking で除外される
 if (process.env['NODE_ENV'] === 'development' || process.env['NODE_ENV'] === 'test') {
