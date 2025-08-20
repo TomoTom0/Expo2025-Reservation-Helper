@@ -10,7 +10,7 @@
 // @run-at       document-end
 // ==/UserScript==
 
-// Built: 2025/08/19 23:08:36
+// Built: 2025/08/20 10:15:25
 
 
 (function webpackUniversalModuleDefinition(root, factory) {
@@ -2231,9 +2231,17 @@ class EntranceReservationStateManager {
     // changeダイアログが表示されたことを記録
     markChangeDialogAppeared() {
         console.log(`🔄 [markChangeDialogAppeared] 現在の状態: hasAppeared=${this.changeDialogState.hasAppeared}, needsTimingAdjustment=${this.changeDialogState.needsTimingAdjustment}`);
-        this.changeDialogState.hasAppeared = true;
-        this.changeDialogState.needsTimingAdjustment = true;
-        console.log('🔄 changeダイアログ出現を検出 - 毎回タイミング調整が必要');
+        if (this.changeDialogState.hasAppeared) {
+            // 2回目以降の出現：タイミング調整が必要
+            this.changeDialogState.needsTimingAdjustment = true;
+            console.log('🔄 changeダイアログ2回目以降の出現を検出 - タイミング調整が必要');
+        }
+        else {
+            // 最初の出現：タイミング調整は不要
+            this.changeDialogState.hasAppeared = true;
+            this.changeDialogState.needsTimingAdjustment = false;
+            console.log('🔄 changeダイアログ初回出現を検出 - タイミング調整はスキップ');
+        }
     }
     // changeダイアログが出現したかどうか
     hasChangeDialogAppeared() {
@@ -6272,7 +6280,24 @@ const showMobileErrorDialog = (title, error) => {
         url: window.location.href,
         isMobile: /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent),
         screen: `${screen.width}x${screen.height}`,
-        viewport: `${window.innerWidth}x${window.innerHeight}`
+        viewport: `${window.innerWidth}x${window.innerHeight}`,
+        // Chrome拡張環境情報
+        chromeAvailable: typeof chrome !== 'undefined',
+        chromeRuntimeAvailable: typeof chrome !== 'undefined' && !!chrome.runtime,
+        // UserScript環境情報
+        gmInfoAvailable: typeof window.GM_info !== 'undefined',
+        gmAvailable: typeof GM !== 'undefined',
+        gmXmlHttpRequestAvailable: typeof GM_xmlhttpRequest !== 'undefined' || (typeof GM !== 'undefined' && !!GM?.xmlHttpRequest),
+        // パフォーマンス情報
+        performanceNow: performance.now(),
+        // 接続情報
+        connectionType: navigator.connection?.effectiveType || 'unknown',
+        // メモリ情報（Chrome限定）
+        memoryInfo: performance.memory ? {
+            used: performance.memory.usedJSHeapSize,
+            total: performance.memory.totalJSHeapSize,
+            limit: performance.memory.jsHeapSizeLimit
+        } : null
     };
     // ダイアログコンテナ
     const dialogOverlay = document.createElement('div');
@@ -6449,18 +6474,8 @@ const fetchAllExpoReservationData = async () => {
     console.log('🌐 万博API から全体データを取得中...');
     try {
         let data;
-        // Chrome拡張機能環境かUserScript環境かを判定
-        if (typeof chrome !== 'undefined' && chrome.runtime) {
-            // Chrome拡張機能環境: background scriptを経由
-            const response = await new Promise((resolve) => {
-                chrome.runtime.sendMessage({ action: 'fetchExpoData' }, (response) => resolve(response));
-            });
-            if (!response.success || !response.data) {
-                throw new Error(response.error || 'Unknown error');
-            }
-            data = response.data;
-        }
-        else if (typeof GM_xmlhttpRequest !== 'undefined' || (typeof GM !== 'undefined' && GM?.xmlHttpRequest)) {
+        // UserScript環境を最優先で判定（GM_infoやGMオブジェクトで確実に識別）
+        if (typeof window.GM_info !== 'undefined' || typeof GM !== 'undefined') {
             // UserScript環境: GM_xmlhttpRequestを使用
             data = await new Promise((resolve, reject) => {
                 const request = GM_xmlhttpRequest || GM?.xmlHttpRequest;
@@ -6485,6 +6500,55 @@ const fetchAllExpoReservationData = async () => {
                     }
                 });
             });
+        }
+        else if (typeof chrome !== 'undefined' && chrome.runtime) {
+            // Chrome拡張機能環境: background scriptを経由
+            const response = await new Promise((resolve, reject) => {
+                let isResolved = false;
+                // 10秒タイムアウト
+                const timeout = setTimeout(() => {
+                    if (!isResolved) {
+                        isResolved = true;
+                        reject(new Error('Chrome拡張API応答タイムアウト（10秒）- スマホ環境ではUserScript推奨'));
+                    }
+                }, 10000);
+                try {
+                    chrome.runtime.sendMessage({ action: 'fetchExpoData' }, (response) => {
+                        if (isResolved)
+                            return; // タイムアウト後は無視
+                        clearTimeout(timeout);
+                        isResolved = true;
+                        // Chrome拡張APIエラーをチェック
+                        if (chrome.runtime.lastError) {
+                            reject(new Error(`Chrome拡張APIエラー: ${chrome.runtime.lastError.message}`));
+                            return;
+                        }
+                        // 応答がundefinedの場合の処理
+                        if (!response) {
+                            reject(new Error('Chrome拡張APIから応答がありません（スマホ環境の可能性）'));
+                            return;
+                        }
+                        resolve(response);
+                    });
+                }
+                catch (error) {
+                    if (!isResolved) {
+                        clearTimeout(timeout);
+                        isResolved = true;
+                        reject(new Error(`Chrome拡張API呼び出しエラー: ${error}`));
+                    }
+                }
+            });
+            if (!response.success || !response.data) {
+                const error = new Error(response.error || 'Chrome拡張API呼び出し失敗');
+                error.context = {
+                    environment: 'chrome-extension',
+                    chromeRuntime: !!chrome?.runtime,
+                    response: response
+                };
+                throw error;
+            }
+            data = response.data;
         }
         else {
             // サポートされていない環境

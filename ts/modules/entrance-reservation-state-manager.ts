@@ -1320,9 +1320,17 @@ export class EntranceReservationStateManager {
     // changeダイアログが表示されたことを記録
     markChangeDialogAppeared(): void {
         console.log(`🔄 [markChangeDialogAppeared] 現在の状態: hasAppeared=${this.changeDialogState.hasAppeared}, needsTimingAdjustment=${this.changeDialogState.needsTimingAdjustment}`);
-        this.changeDialogState.hasAppeared = true;
-        this.changeDialogState.needsTimingAdjustment = true;
-        console.log('🔄 changeダイアログ出現を検出 - 毎回タイミング調整が必要');
+        
+        if (this.changeDialogState.hasAppeared) {
+            // 2回目以降の出現：タイミング調整が必要
+            this.changeDialogState.needsTimingAdjustment = true;
+            console.log('🔄 changeダイアログ2回目以降の出現を検出 - タイミング調整が必要');
+        } else {
+            // 最初の出現：タイミング調整は不要
+            this.changeDialogState.hasAppeared = true;
+            this.changeDialogState.needsTimingAdjustment = false;
+            console.log('🔄 changeダイアログ初回出現を検出 - タイミング調整はスキップ');
+        }
     }
     
     // changeダイアログが出現したかどうか

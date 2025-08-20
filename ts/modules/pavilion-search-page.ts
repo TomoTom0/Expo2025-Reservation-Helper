@@ -690,7 +690,24 @@ const showMobileErrorDialog = (title: string, error: any): void => {
         url: window.location.href,
         isMobile: /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent),
         screen: `${screen.width}x${screen.height}`,
-        viewport: `${window.innerWidth}x${window.innerHeight}`
+        viewport: `${window.innerWidth}x${window.innerHeight}`,
+        // Chrome拡張環境情報
+        chromeAvailable: typeof chrome !== 'undefined',
+        chromeRuntimeAvailable: typeof chrome !== 'undefined' && !!chrome.runtime,
+        // UserScript環境情報
+        gmInfoAvailable: typeof (window as any).GM_info !== 'undefined',
+        gmAvailable: typeof GM !== 'undefined',
+        gmXmlHttpRequestAvailable: typeof GM_xmlhttpRequest !== 'undefined' || (typeof GM !== 'undefined' && !!GM?.xmlHttpRequest),
+        // パフォーマンス情報
+        performanceNow: performance.now(),
+        // 接続情報
+        connectionType: (navigator as any).connection?.effectiveType || 'unknown',
+        // メモリ情報（Chrome限定）
+        memoryInfo: (performance as any).memory ? {
+            used: (performance as any).memory.usedJSHeapSize,
+            total: (performance as any).memory.totalJSHeapSize,
+            limit: (performance as any).memory.jsHeapSizeLimit
+        } : null
     };
 
     // ダイアログコンテナ
@@ -899,21 +916,8 @@ const fetchAllExpoReservationData = async (): Promise<PavilionData[]> => {
     try {
         let data: PavilionData[];
         
-        // Chrome拡張機能環境かUserScript環境かを判定
-        if (typeof chrome !== 'undefined' && chrome.runtime) {
-            // Chrome拡張機能環境: background scriptを経由
-            const response = await new Promise<{success: boolean, data?: PavilionData[], error?: string}>((resolve) => {
-                chrome.runtime.sendMessage(
-                    { action: 'fetchExpoData' },
-                    (response) => resolve(response)
-                );
-            });
-            
-            if (!response.success || !response.data) {
-                throw new Error(response.error || 'Unknown error');
-            }
-            data = response.data;
-        } else if (typeof GM_xmlhttpRequest !== 'undefined' || (typeof GM !== 'undefined' && GM?.xmlHttpRequest)) {
+        // UserScript環境を最優先で判定（GM_infoやGMオブジェクトで確実に識別）
+        if (typeof (window as any).GM_info !== 'undefined' || typeof GM !== 'undefined') {
             // UserScript環境: GM_xmlhttpRequestを使用
             data = await new Promise<PavilionData[]>((resolve, reject) => {
                 const request = GM_xmlhttpRequest || GM?.xmlHttpRequest;
@@ -938,6 +942,62 @@ const fetchAllExpoReservationData = async (): Promise<PavilionData[]> => {
                     }
                 });
             });
+        } else if (typeof chrome !== 'undefined' && chrome.runtime) {
+            // Chrome拡張機能環境: background scriptを経由
+            const response = await new Promise<{success: boolean, data?: PavilionData[], error?: string}>((resolve, reject) => {
+                let isResolved = false;
+                
+                // 10秒タイムアウト
+                const timeout = setTimeout(() => {
+                    if (!isResolved) {
+                        isResolved = true;
+                        reject(new Error('Chrome拡張API応答タイムアウト（10秒）- スマホ環境ではUserScript推奨'));
+                    }
+                }, 10000);
+                
+                try {
+                    chrome.runtime.sendMessage(
+                        { action: 'fetchExpoData' },
+                        (response) => {
+                            if (isResolved) return; // タイムアウト後は無視
+                            
+                            clearTimeout(timeout);
+                            isResolved = true;
+                            
+                            // Chrome拡張APIエラーをチェック
+                            if (chrome.runtime.lastError) {
+                                reject(new Error(`Chrome拡張APIエラー: ${chrome.runtime.lastError.message}`));
+                                return;
+                            }
+                            
+                            // 応答がundefinedの場合の処理
+                            if (!response) {
+                                reject(new Error('Chrome拡張APIから応答がありません（スマホ環境の可能性）'));
+                                return;
+                            }
+                            
+                            resolve(response);
+                        }
+                    );
+                } catch (error) {
+                    if (!isResolved) {
+                        clearTimeout(timeout);
+                        isResolved = true;
+                        reject(new Error(`Chrome拡張API呼び出しエラー: ${error}`));
+                    }
+                }
+            });
+            
+            if (!response.success || !response.data) {
+                const error = new Error(response.error || 'Chrome拡張API呼び出し失敗');
+                (error as any).context = {
+                    environment: 'chrome-extension',
+                    chromeRuntime: !!chrome?.runtime,
+                    response: response
+                };
+                throw error;
+            }
+            data = response.data;
         } else {
             // サポートされていない環境
             throw new Error('この機能はChrome拡張機能またはUserScript環境でのみ利用可能です');
