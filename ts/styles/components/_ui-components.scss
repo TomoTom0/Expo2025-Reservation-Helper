@@ -277,18 +277,20 @@
 // ダイアログボタンスタイル
 .ytomo-dialog {
   &.clear-selection-button {
-    padding: 8px 16px;
     background: #dc3545;
     color: white;
     border: none;
-    border-radius: 4px;
-    cursor: pointer;
+    border-radius: 20px;
+    padding: 8px 16px;
     font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
     transition: all 0.2s ease;
+    white-space: nowrap;
     
     &:hover {
-      background: #c82333;
       transform: translateY(-1px);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     }
     
     &:active {
@@ -297,18 +299,20 @@
   }
   
   &.monitor-button {
-    padding: 8px 16px;
-    background: #006821;
+    background: #fd7e14;
     color: white;
     border: none;
-    border-radius: 4px;
-    cursor: pointer;
+    border-radius: 20px;
+    padding: 8px 16px;
     font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
     transition: all 0.2s ease;
+    white-space: nowrap;
     
     &:hover {
-      background: #02862b;
       transform: translateY(-1px);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     }
     
     &:active {
@@ -427,6 +431,12 @@
     overflow-y: auto;
     box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
     width: 100%;
+    
+    // モバイル対応：下部ボタンが見切れる問題を修正
+    @media (max-width: 600px) {
+      padding-bottom: 60px; // ボタン分の追加余白
+      max-height: 85vh; // モバイルでは高さを少し増やす
+    }
   }
   
   &.header {
@@ -700,15 +710,39 @@
       }
       
       &.selected {
-        background: rgba(0, 104, 33, 0.15);
+        background: rgba(0, 104, 33, 0.25);
         border-color: rgb(0, 104, 33);
-        box-shadow: 0 0 0 2px rgba(0, 104, 33, 0.3);
+        border-width: 2px;
+        box-shadow: 0 0 0 3px rgba(0, 104, 33, 0.4);
         color: rgb(0, 104, 33);
         font-weight: bold;
         
+        // モバイル対応：より目立つ視覚フィードバック
+        @media (max-width: 600px) {
+          background: rgba(0, 104, 33, 0.35);
+          border-width: 3px;
+          box-shadow: 0 0 0 4px rgba(0, 104, 33, 0.5);
+          transform: scale(1.05);
+        }
+        
         &:hover {
-          background: rgba(0, 104, 33, 0.2);
+          background: rgba(0, 104, 33, 0.3);
           transform: translateY(-1px);
+          
+          @media (max-width: 600px) {
+            background: rgba(0, 104, 33, 0.4);
+            transform: scale(1.05) translateY(-1px);
+          }
+        }
+        
+        &:active {
+          background: rgba(0, 104, 33, 0.35);
+          transform: translateY(0);
+          
+          @media (max-width: 600px) {
+            background: rgba(0, 104, 33, 0.45);
+            transform: scale(1.05);
+          }
         }
       }
       
@@ -726,18 +760,157 @@
         }
         
         &.selected {
-          background: rgba(255, 193, 7, 0.25);
+          background: rgba(255, 193, 7, 0.35);
           border-color: #ffc107;
-          box-shadow: 0 0 0 2px rgba(255, 193, 7, 0.4);
+          border-width: 2px;
+          box-shadow: 0 0 0 3px rgba(255, 193, 7, 0.5);
           color: #dc6c00;
           font-weight: bold;
           
+          // モバイル対応：より目立つ視覚フィードバック
+          @media (max-width: 600px) {
+            background: rgba(255, 193, 7, 0.45);
+            border-width: 3px;
+            box-shadow: 0 0 0 4px rgba(255, 193, 7, 0.6);
+            transform: scale(1.05);
+          }
+          
           &:hover {
-            background: rgba(255, 193, 7, 0.3);
+            background: rgba(255, 193, 7, 0.4);
             transform: translateY(-1px);
+            
+            @media (max-width: 600px) {
+              background: rgba(255, 193, 7, 0.5);
+              transform: scale(1.05) translateY(-1px);
+            }
+          }
+          
+          &:active {
+            background: rgba(255, 193, 7, 0.45);
+            transform: translateY(0);
+            
+            @media (max-width: 600px) {
+              background: rgba(255, 193, 7, 0.55);
+              transform: scale(1.05);
+            }
           }
         }
       }
+    }
+  }
+}
+
+// グローバル通知システム
+.ytomo-global-notification-container {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 20000; // ダイアログより上に表示
+  max-width: 400px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  
+  @media (max-width: 600px) {
+    top: 10px;
+    right: 10px;
+    left: 10px;
+    max-width: none;
+  }
+}
+
+.ytomo-global-notification {
+  background: white;
+  border-radius: 8px;
+  padding: 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  border-left: 4px solid #ccc;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 14px;
+  font-weight: 500;
+  transform: translateX(100%);
+  opacity: 0;
+  transition: all 0.3s ease;
+  
+  &.show {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  
+  &.hide {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  
+  .notification-message {
+    flex: 1;
+    line-height: 1.4;
+  }
+  
+  .notification-close {
+    background: none;
+    border: none;
+    font-size: 18px;
+    font-weight: bold;
+    cursor: pointer;
+    padding: 0;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0.7;
+    transition: opacity 0.2s ease;
+    
+    &:hover {
+      opacity: 1;
+    }
+  }
+  
+  // 成功通知
+  &.success {
+    background-color: #d4edda;
+    color: #155724;
+    border-left-color: #28a745;
+    
+    .notification-close {
+      color: #155724;
+    }
+  }
+  
+  // エラー通知
+  &.error {
+    background-color: #f8d7da;
+    color: #721c24;
+    border-left-color: #dc3545;
+    
+    .notification-close {
+      color: #721c24;
+    }
+  }
+  
+  // 警告通知
+  &.warning {
+    background-color: #fff3cd;
+    color: #856404;
+    border-left-color: #ffc107;
+    
+    .notification-close {
+      color: #856404;
+    }
+  }
+  
+  // 情報通知
+  &.info {
+    background-color: #d1ecf1;
+    color: #0c5460;
+    border-left-color: #17a2b8;
+    
+    .notification-close {
+      color: #0c5460;
     }
   }
 }

@@ -1041,7 +1041,7 @@ const createDayReservationDialog = (pavilionData: PavilionData[], showAll: boole
     // タイトル
     const title = document.createElement('h2');
     title.className = 'ytomo-dialog title';
-    title.textContent = '🎫 当日パビリオン予約';
+    title.textContent = '当日予約';
     
     // 更新ボタン（右上）
     const refreshButton = document.createElement('button');
@@ -1086,10 +1086,7 @@ const createDayReservationDialog = (pavilionData: PavilionData[], showAll: boole
     // デフォルトの説明文
     const description = document.createElement('p');
     description.className = 'day-reservation-description';
-    description.innerHTML = `
-        🟢 空きあり　🟡 残りわずか　⚪ 空きなし<br>
-        ボタンをクリックして予約画面に移動できます。
-    `;
+    description.innerHTML = ``;
     
     // 通知エリア（初期は非表示）
     const notificationArea = document.createElement('div');

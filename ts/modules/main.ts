@@ -20,6 +20,7 @@ import './monitoring-scheduler';
 import './monitoring-cache';
 import './monitoring-service';
 import './immediate-reservation';
+import './notification-system'; // グローバル通知システム
 
 // テスト環境・開発環境でのみtest-exportsをimport
 // 本番環境では webpack の tree shaking で除外される
