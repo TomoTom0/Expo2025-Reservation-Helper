@@ -1517,10 +1517,13 @@ const handleMonitoringSelection = async (pavilionCode: string, pavilionName: str
                 // 選択解除
                 buttonElement.classList.remove('selected');
                 console.log(`🗑️ 監視対象解除: ${pavilionName} - ${timeSlot}`);
+                console.log(`🔍 選択解除後のクラス: ${buttonElement.className}`);
             } else {
                 // 選択追加
                 buttonElement.classList.add('selected');
                 console.log(`✅ 監視対象追加: ${pavilionName} - ${timeSlot}`);
+                console.log(`🔍 選択後のクラス: ${buttonElement.className}`);
+                console.log(`🔍 選択後のスタイル: background=${getComputedStyle(buttonElement).backgroundColor}, border=${getComputedStyle(buttonElement).borderColor}`);
             }
             
             // 監視対象数を更新
