@@ -1,0 +1,250 @@
+// デバッグダイアログのスタイル
+.ytomo-dialog.overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    z-index: 10000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+.ytomo-dialog.container.debug-dialog {
+    background: white;
+    border-radius: 12px;
+    padding: 0;
+    max-width: 90%;
+    max-height: 85%;
+    min-width: 600px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    
+    @media (max-width: 768px) {
+        min-width: auto;
+        max-width: 95%;
+        max-height: 90%;
+    }
+}
+
+.ytomo-dialog.header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 24px;
+    border-bottom: 1px solid #e0e0e0;
+    background: #f8f9fa;
+    border-radius: 12px 12px 0 0;
+}
+
+.ytomo-dialog.title {
+    margin: 0;
+    font-size: 20px;
+    color: #333;
+    font-weight: 600;
+}
+
+.ytomo-dialog.close-button {
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    color: #666;
+    padding: 5px;
+    border-radius: 4px;
+    
+    &:hover {
+        background: rgba(0, 0, 0, 0.1);
+    }
+}
+
+.debug-content {
+    padding: 24px;
+    overflow-y: auto;
+    flex: 1;
+}
+
+.debug-section {
+    margin-bottom: 32px;
+    
+    &:last-child {
+        margin-bottom: 0;
+    }
+    
+    h3 {
+        margin: 0 0 12px 0;
+        font-size: 18px;
+        color: #333;
+        font-weight: 600;
+    }
+    
+    p {
+        margin: 0 0 16px 0;
+        color: #666;
+        line-height: 1.5;
+    }
+}
+
+.debug-input-group {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+    
+    label {
+        font-weight: 500;
+        color: #333;
+        min-width: 120px;
+    }
+    
+    input {
+        flex: 1;
+        min-width: 200px;
+        padding: 10px 12px;
+        border: 2px solid #e0e0e0;
+        border-radius: 6px;
+        font-size: 14px;
+        transition: border-color 0.2s ease;
+        
+        &:focus {
+            outline: none;
+            border-color: #007bff;
+        }
+        
+        &::placeholder {
+            color: #999;
+        }
+    }
+    
+    button {
+        background: #007bff;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 6px;
+        font-size: 14px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: background-color 0.2s ease;
+        white-space: nowrap;
+        
+        &:hover:not(:disabled) {
+            background: #0056b3;
+        }
+        
+        &:disabled {
+            background: #6c757d;
+            cursor: not-allowed;
+        }
+    }
+}
+
+.debug-results-area {
+    h4 {
+        margin: 0 0 12px 0;
+        font-size: 16px;
+        color: #333;
+        font-weight: 600;
+    }
+}
+
+.debug-results-display {
+    background: #f8f9fa;
+    border: 1px solid #e0e0e0;
+    border-radius: 6px;
+    padding: 16px;
+    font-family: 'Courier New', Monaco, monospace;
+    font-size: 12px;
+    line-height: 1.4;
+    max-height: 300px;
+    overflow-y: auto;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    color: #333;
+    
+    // JSON構文ハイライト風の色分け（簡易版）
+    .json-key {
+        color: #d73a49;
+        font-weight: bold;
+    }
+    
+    .json-string {
+        color: #032f62;
+    }
+    
+    .json-number {
+        color: #005cc5;
+    }
+    
+    .json-boolean {
+        color: #e36209;
+    }
+    
+    .json-null {
+        color: #6f42c1;
+    }
+}
+
+// レスポンシブ対応
+@media (max-width: 768px) {
+    .debug-input-group {
+        flex-direction: column;
+        align-items: stretch;
+        
+        label {
+            min-width: auto;
+        }
+        
+        input {
+            min-width: auto;
+        }
+        
+        button {
+            align-self: flex-start;
+        }
+    }
+    
+    .ytomo-dialog.container.debug-dialog {
+        min-width: auto;
+    }
+    
+    .debug-content {
+        padding: 16px;
+    }
+}
+
+// デバッグダイアログ特有のアニメーション
+.ytomo-dialog.overlay {
+    animation: fadeIn 0.2s ease-out;
+}
+
+.ytomo-dialog.container.debug-dialog {
+    animation: slideIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-20px) scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
