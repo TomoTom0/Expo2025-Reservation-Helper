@@ -6,6 +6,7 @@
 @use './components/processing-overlay';
 @use './components/debug-dialog';
 @use './components/main-dialog';
+@use './components/ticket-tab';
 
 // 時間帯テーブル内の満員時間帯を常にクリック可能にする
 table[class*='style_main__timetable__'] {

@@ -1,4 +1,5 @@
 import { PageChecker } from './page-utils';
+import { getTicketManager, TicketManager } from './ticket-manager';
 
 /**
  * メインダイアログ用FAB「yt」ボタン実装
@@ -21,6 +22,7 @@ export interface MainDialogFab {
 export class MainDialogFabImpl implements MainDialogFab {
     private ytFabButton: HTMLElement | null = null;
     private mainDialogContainer: HTMLElement | null = null;
+    private ticketManager!: TicketManager;
 
     /**
      * メインダイアログFABシステムを初期化
@@ -33,6 +35,9 @@ export class MainDialogFabImpl implements MainDialogFab {
             console.log('⚠️ チケットサイト以外では初期化をスキップ');
             return;
         }
+
+        // チケットマネージャーを初期化
+        this.ticketManager = getTicketManager();
 
         // 既存のFABコンテナを確認
         let fabContainer = document.getElementById('ytomo-fab-container');
@@ -288,22 +293,330 @@ export class MainDialogFabImpl implements MainDialogFab {
         const ticketTab = this.mainDialogContainer?.querySelector('#ticket-tab');
         if (!ticketTab) return;
 
-        // 一旦プレースホルダーを表示
+        console.log('🎫 チケットタブ初期化開始');
+
+        // ローディング表示
         ticketTab.innerHTML = `
-            <div class="ytomo-tab-placeholder">
-                <h3>🎫 チケット管理</h3>
-                <p>チケット統合管理システムは次のフェーズで実装予定です</p>
-                <div class="ytomo-feature-preview">
-                    <h4>実装予定機能:</h4>
-                    <ul>
-                        <li>自分のチケット一覧表示</li>
-                        <li>他人のチケットID追加</li>
-                        <li>日付別チケット選択</li>
-                        <li>入場予約状況表示</li>
-                    </ul>
+            <div class="ytomo-loading">
+                <p>チケット情報を読み込み中...</p>
+            </div>
+        `;
+
+        try {
+            // チケット情報を取得
+            const tickets = await this.ticketManager.loadAllTickets();
+            const availableDates = this.ticketManager.getAvailableDates();
+
+            // チケットタブUIを構築
+            this.buildTicketTabUI(ticketTab as HTMLElement, tickets, availableDates);
+
+            // タブカウント更新
+            this.updateTicketTabCount();
+
+            console.log('✅ チケットタブ初期化完了');
+
+        } catch (error) {
+            console.error('❌ チケットタブ初期化エラー:', error);
+            
+            // エラー表示
+            ticketTab.innerHTML = `
+                <div class="ytomo-error">
+                    <h3>⚠️ チケット情報の取得に失敗しました</h3>
+                    <p>ログインしているか確認してください</p>
+                    <button class="ytomo-button retry-button">再試行</button>
+                </div>
+            `;
+
+            // 再試行ボタンのイベント
+            const retryButton = ticketTab.querySelector('.retry-button');
+            if (retryButton) {
+                retryButton.addEventListener('click', () => {
+                    this.initializeTicketTab();
+                });
+            }
+        }
+    }
+
+    /**
+     * チケットタブUIを構築
+     */
+    private buildTicketTabUI(container: HTMLElement, tickets: any[], availableDates: string[]): void {
+        container.innerHTML = `
+            <div class="ytomo-ticket-tab">
+                <!-- チケット簡易選択エリア -->
+                <div class="ytomo-quick-select">
+                    <div class="ytomo-quick-select-header">
+                        <label class="ytomo-toggle-container">
+                            <input type="checkbox" id="own-only-toggle" class="ytomo-toggle-input">
+                            <span class="ytomo-toggle-slider"></span>
+                            <span class="ytomo-toggle-label">自分のチケットのみ</span>
+                        </label>
+                    </div>
+                    <div class="ytomo-date-buttons" id="date-buttons-container">
+                        ${this.buildDateButtons(availableDates)}
+                    </div>
+                </div>
+
+                <!-- チケット一覧エリア -->
+                <div class="ytomo-ticket-list" id="ticket-list-container">
+                    ${this.buildTicketList(tickets)}
+                </div>
+
+                <!-- チケット追加エリア -->
+                <div class="ytomo-add-ticket">
+                    <h4>🎫 チケットID追加</h4>
+                    <div class="ytomo-add-ticket-form">
+                        <input type="text" id="ticket-id-input" placeholder="チケットIDを入力" class="ytomo-input">
+                        <input type="text" id="ticket-label-input" placeholder="ラベル（任意）" class="ytomo-input">
+                        <button id="add-ticket-button" class="ytomo-button primary">追加</button>
+                    </div>
                 </div>
             </div>
         `;
+
+        // イベントリスナーを設定
+        this.setupTicketTabEventListeners(container);
+    }
+
+    /**
+     * 日付ボタンを構築
+     */
+    private buildDateButtons(dates: string[]): string {
+        return dates.map(date => {
+            const formattedDate = this.formatDate(date);
+            return `
+                <button class="ytomo-date-button" data-date="${date}">
+                    ${formattedDate}
+                </button>
+            `;
+        }).join('');
+    }
+
+    /**
+     * チケット一覧を構築
+     */
+    private buildTicketList(tickets: any[]): string {
+        if (tickets.length === 0) {
+            return `
+                <div class="ytomo-empty-state">
+                    <p>チケットが見つかりませんでした</p>
+                </div>
+            `;
+        }
+
+        return tickets.map(ticket => `
+            <div class="ytomo-ticket-item" data-ticket-id="${ticket.id}">
+                <div class="ytomo-ticket-header">
+                    <span class="ytomo-ticket-id">${ticket.id}</span>
+                    ${ticket.isOwn ? 
+                        '<span class="ytomo-me-tip">Me</span>' : 
+                        `<span class="ytomo-label-tag">${ticket.label || '外部'}</span>`
+                    }
+                </div>
+                <div class="ytomo-ticket-body">
+                    <div class="ytomo-entrance-dates">
+                        ${this.buildEntranceDateButtons(ticket.entranceDates)}
+                    </div>
+                    <div class="ytomo-reservation-types">
+                        ${this.buildReservationTypes(ticket.reservationTypes)}
+                    </div>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    /**
+     * 入場日時ボタンを構築
+     */
+    private buildEntranceDateButtons(dates: string[]): string {
+        return dates.map(date => `
+            <button class="ytomo-entrance-date-button" data-date="${date}">
+                ${this.formatDate(date)}
+            </button>
+        `).join('');
+    }
+
+    /**
+     * 予約種類表示を構築
+     */
+    private buildReservationTypes(types: any[]): string {
+        if (types.length === 0) {
+            return '<span class="ytomo-no-reservation-types">予約種類不明</span>';
+        }
+
+        return types.map(type => `
+            <span class="ytomo-reservation-type ${type.isActive ? 'active' : 'inactive'}">
+                ${type.type}
+            </span>
+        `).join('');
+    }
+
+    /**
+     * 日付フォーマット
+     */
+    private formatDate(dateStr: string): string {
+        try {
+            const date = new Date(dateStr);
+            return `${date.getMonth() + 1}/${date.getDate()}`;
+        } catch {
+            return dateStr;
+        }
+    }
+
+    /**
+     * チケットタブのイベントリスナーを設定
+     */
+    private setupTicketTabEventListeners(container: HTMLElement): void {
+        // 自分のみトグル
+        const ownOnlyToggle = container.querySelector('#own-only-toggle') as HTMLInputElement;
+        if (ownOnlyToggle) {
+            ownOnlyToggle.addEventListener('change', () => {
+                this.handleOwnOnlyToggle(ownOnlyToggle.checked);
+            });
+        }
+
+        // 日付ボタン
+        const dateButtons = container.querySelectorAll('.ytomo-date-button');
+        dateButtons.forEach(button => {
+            button.addEventListener('click', (e) => {
+                const target = e.target as HTMLElement;
+                const date = target.dataset['date'];
+                if (date) {
+                    this.handleDateSelection(date, ownOnlyToggle?.checked || false);
+                }
+            });
+        });
+
+        // チケット追加
+        const addButton = container.querySelector('#add-ticket-button');
+        if (addButton) {
+            addButton.addEventListener('click', () => {
+                this.handleAddTicket();
+            });
+        }
+
+        // Enter キーでチケット追加
+        const ticketIdInput = container.querySelector('#ticket-id-input') as HTMLInputElement;
+        const labelInput = container.querySelector('#ticket-label-input') as HTMLInputElement;
+        
+        [ticketIdInput, labelInput].forEach(input => {
+            if (input) {
+                input.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter') {
+                        this.handleAddTicket();
+                    }
+                });
+            }
+        });
+    }
+
+    /**
+     * 自分のみトグル処理
+     */
+    private handleOwnOnlyToggle(ownOnly: boolean): void {
+        console.log(`🔄 自分のみトグル: ${ownOnly}`);
+        // 表示フィルター処理
+        this.filterTicketDisplay(ownOnly);
+    }
+
+    /**
+     * 日付選択処理
+     */
+    private handleDateSelection(date: string, ownOnly: boolean): void {
+        console.log(`📅 日付選択: ${date} (自分のみ: ${ownOnly})`);
+        
+        // チケットマネージャーで日付別選択
+        this.ticketManager.selectTicketsByDate(date, ownOnly);
+        
+        // UI更新
+        this.updateTicketSelection();
+        this.updateTicketTabCount();
+    }
+
+    /**
+     * チケット追加処理
+     */
+    private async handleAddTicket(): Promise<void> {
+        const ticketIdInput = this.mainDialogContainer?.querySelector('#ticket-id-input') as HTMLInputElement;
+        const labelInput = this.mainDialogContainer?.querySelector('#ticket-label-input') as HTMLInputElement;
+        
+        if (!ticketIdInput) return;
+
+        const ticketId = ticketIdInput.value.trim();
+        const label = labelInput?.value.trim() || '外部チケット';
+
+        if (!ticketId) {
+            alert('チケットIDを入力してください');
+            return;
+        }
+
+        try {
+            await this.ticketManager.addExternalTicket(ticketId, label);
+            
+            // 成功時はタブを再初期化
+            await this.initializeTicketTab();
+            
+            // 入力をクリア
+            ticketIdInput.value = '';
+            if (labelInput) labelInput.value = '';
+
+            console.log(`✅ チケット追加成功: ${ticketId}`);
+
+        } catch (error) {
+            console.error('❌ チケット追加エラー:', error);
+            alert(`チケット追加に失敗しました: ${error}`);
+        }
+    }
+
+    /**
+     * チケット表示フィルター
+     */
+    private filterTicketDisplay(ownOnly: boolean): void {
+        const ticketItems = this.mainDialogContainer?.querySelectorAll('.ytomo-ticket-item');
+        
+        ticketItems?.forEach(item => {
+            const ticketId = (item as HTMLElement).dataset['ticketId'];
+            const ticket = this.ticketManager.getAllTickets().find(t => t.id === ticketId);
+            
+            if (ticket) {
+                if (ownOnly && !ticket.isOwn) {
+                    (item as HTMLElement).style.display = 'none';
+                } else {
+                    (item as HTMLElement).style.display = '';
+                }
+            }
+        });
+    }
+
+    /**
+     * チケット選択状態をUI更新
+     */
+    private updateTicketSelection(): void {
+        const selectedTickets = this.ticketManager.getSelectedTickets();
+        const selectedIds = new Set(selectedTickets.map(t => t.id));
+
+        // チケット項目の選択状態を更新
+        const ticketItems = this.mainDialogContainer?.querySelectorAll('.ytomo-ticket-item');
+        ticketItems?.forEach(item => {
+            const ticketId = (item as HTMLElement).dataset['ticketId'];
+            if (ticketId && selectedIds.has(ticketId)) {
+                item.classList.add('selected');
+            } else {
+                item.classList.remove('selected');
+            }
+        });
+    }
+
+    /**
+     * チケットタブカウントを更新
+     */
+    private updateTicketTabCount(): void {
+        const count = this.ticketManager.getSelectedTicketCount();
+        const tabCount = this.mainDialogContainer?.querySelector('#ticket-count');
+        
+        if (tabCount) {
+            tabCount.textContent = count > 0 ? ` (${count})` : '';
+        }
     }
 
     /**

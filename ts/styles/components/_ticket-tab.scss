@@ -1,0 +1,520 @@
+/**
+ * チケットタブのスタイル定義
+ */
+
+.ytomo-ticket-tab {
+    padding: 0;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+/* 簡易選択エリア */
+.ytomo-quick-select {
+    background: white;
+    border-radius: 8px;
+    padding: 16px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    border: 1px solid #e2e8f0;
+    flex-shrink: 0;
+}
+
+.ytomo-quick-select-header {
+    margin-bottom: 12px;
+}
+
+/* トグルスイッチ */
+.ytomo-toggle-container {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    user-select: none;
+}
+
+.ytomo-toggle-input {
+    display: none;
+}
+
+.ytomo-toggle-slider {
+    position: relative;
+    width: 44px;
+    height: 24px;
+    background: #cbd5e1;
+    border-radius: 12px;
+    transition: background-color 0.2s;
+    margin-right: 8px;
+
+    &::before {
+        content: "";
+        position: absolute;
+        top: 2px;
+        left: 2px;
+        width: 20px;
+        height: 20px;
+        background: white;
+        border-radius: 50%;
+        transition: transform 0.2s;
+    }
+}
+
+.ytomo-toggle-input:checked + .ytomo-toggle-slider {
+    background: #2c5aa0;
+
+    &::before {
+        transform: translateX(20px);
+    }
+}
+
+.ytomo-toggle-label {
+    font-size: 14px;
+    font-weight: 500;
+    color: #374151;
+}
+
+/* 日付ボタン */
+.ytomo-date-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.ytomo-date-button {
+    background: #f1f5f9;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    padding: 8px 12px;
+    font-size: 13px;
+    font-weight: 500;
+    color: #475569;
+    cursor: pointer;
+    transition: all 0.2s;
+
+    &:hover {
+        background: #e2e8f0;
+        border-color: #cbd5e1;
+    }
+
+    &.selected {
+        background: #2c5aa0;
+        border-color: #2c5aa0;
+        color: white;
+    }
+
+    &:focus {
+        outline: 2px solid #2c5aa0;
+        outline-offset: 2px;
+    }
+}
+
+/* チケット一覧 */
+.ytomo-ticket-list {
+    flex: 1;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    min-height: 0;
+}
+
+.ytomo-ticket-item {
+    background: white;
+    border-radius: 8px;
+    border: 2px solid #e2e8f0;
+    padding: 16px;
+    transition: all 0.2s;
+
+    &:hover {
+        border-color: #cbd5e1;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    &.selected {
+        border-color: #2c5aa0;
+        background: #f8fafc;
+    }
+}
+
+.ytomo-ticket-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 12px;
+}
+
+.ytomo-ticket-id {
+    font-family: 'Courier New', monospace;
+    font-size: 14px;
+    font-weight: 600;
+    color: #374151;
+    background: #f3f4f6;
+    padding: 4px 8px;
+    border-radius: 4px;
+}
+
+.ytomo-me-tip {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    color: white;
+    padding: 3px 8px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.ytomo-label-tag {
+    background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+    color: white;
+    padding: 3px 8px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.ytomo-ticket-body {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+/* 入場日時ボタン */
+.ytomo-entrance-dates {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.ytomo-entrance-date-button {
+    background: #e0f2fe;
+    border: 1px solid #0891b2;
+    border-radius: 4px;
+    padding: 4px 8px;
+    font-size: 12px;
+    color: #0c4a6e;
+    cursor: pointer;
+    transition: all 0.2s;
+
+    &:hover {
+        background: #0891b2;
+        color: white;
+    }
+
+    &.selected {
+        background: #0891b2;
+        color: white;
+    }
+}
+
+/* 予約種類 */
+.ytomo-reservation-types {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    align-items: center;
+}
+
+.ytomo-reservation-type {
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 500;
+
+    &.active {
+        background: #dcfce7;
+        color: #166534;
+        border: 1px solid #22c55e;
+    }
+
+    &.inactive {
+        background: #fef2f2;
+        color: #991b1b;
+        border: 1px solid #ef4444;
+    }
+}
+
+.ytomo-no-reservation-types {
+    color: #6b7280;
+    font-size: 12px;
+    font-style: italic;
+}
+
+/* チケット追加エリア */
+.ytomo-add-ticket {
+    background: white;
+    border-radius: 8px;
+    padding: 16px;
+    border: 2px dashed #cbd5e1;
+    flex-shrink: 0;
+
+    h4 {
+        margin: 0 0 12px 0;
+        color: #374151;
+        font-size: 14px;
+        font-weight: 600;
+    }
+}
+
+.ytomo-add-ticket-form {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+
+    @media (max-width: 600px) {
+        flex-direction: column;
+        align-items: stretch;
+    }
+}
+
+/* 入力フィールド */
+.ytomo-input {
+    flex: 1;
+    padding: 8px 12px;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    font-size: 14px;
+    transition: border-color 0.2s;
+
+    &:focus {
+        outline: none;
+        border-color: #2c5aa0;
+        box-shadow: 0 0 0 3px rgba(44, 90, 160, 0.1);
+    }
+
+    &::placeholder {
+        color: #9ca3af;
+    }
+}
+
+/* ボタンスタイル */
+.ytomo-button {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    white-space: nowrap;
+
+    &.primary {
+        background: linear-gradient(135deg, #2c5aa0 0%, #1a365d 100%);
+        color: white;
+
+        &:hover {
+            background: linear-gradient(135deg, #1a365d 0%, #2c5aa0 100%);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(44, 90, 160, 0.3);
+        }
+
+        &:active {
+            transform: translateY(0);
+        }
+    }
+
+    &.retry-button {
+        background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+        color: white;
+        margin-top: 12px;
+
+        &:hover {
+            background: linear-gradient(135deg, #d97706 0%, #f59e0b 100%);
+        }
+    }
+
+    &:focus {
+        outline: 2px solid #2c5aa0;
+        outline-offset: 2px;
+    }
+
+    &:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+        transform: none !important;
+    }
+}
+
+/* 空の状態 */
+.ytomo-empty-state {
+    text-align: center;
+    padding: 40px 20px;
+    color: #6b7280;
+    font-style: italic;
+
+    p {
+        margin: 0;
+        font-size: 14px;
+    }
+}
+
+/* エラー表示 */
+.ytomo-error {
+    text-align: center;
+    padding: 40px 20px;
+    color: #dc2626;
+
+    h3 {
+        margin: 0 0 8px 0;
+        font-size: 16px;
+        color: #dc2626;
+    }
+
+    p {
+        margin: 0;
+        font-size: 14px;
+        color: #6b7280;
+    }
+}
+
+/* ローディング表示の調整（ベースから継承） */
+.ytomo-ticket-tab .ytomo-loading {
+    height: 150px;
+}
+
+/* スクロールバーのスタイル */
+.ytomo-ticket-list::-webkit-scrollbar {
+    width: 6px;
+}
+
+.ytomo-ticket-list::-webkit-scrollbar-track {
+    background: #f1f5f9;
+    border-radius: 3px;
+}
+
+.ytomo-ticket-list::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 3px;
+
+    &:hover {
+        background: #94a3b8;
+    }
+}
+
+/* アニメーション */
+.ytomo-ticket-item {
+    animation: slideIn 0.2s ease-out;
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* アクセシビリティ対応 */
+@media (prefers-reduced-motion: reduce) {
+    .ytomo-ticket-item,
+    .ytomo-button,
+    .ytomo-date-button,
+    .ytomo-entrance-date-button,
+    .ytomo-toggle-slider,
+    .ytomo-input {
+        animation: none;
+        transition: none;
+    }
+}
+
+/* ハイコントラストモード対応 */
+@media (prefers-contrast: high) {
+    .ytomo-ticket-item {
+        border-width: 3px;
+    }
+
+    .ytomo-ticket-item.selected {
+        border-width: 4px;
+    }
+
+    .ytomo-button:focus,
+    .ytomo-input:focus,
+    .ytomo-date-button:focus {
+        outline: 3px solid #000;
+    }
+}
+
+/* ダークモード対応（将来実装時用） */
+@media (prefers-color-scheme: dark) {
+    .ytomo-quick-select,
+    .ytomo-ticket-item,
+    .ytomo-add-ticket {
+        background: #374151;
+        border-color: #4b5563;
+    }
+
+    .ytomo-ticket-item.selected {
+        background: #1f2937;
+        border-color: #60a5fa;
+    }
+
+    .ytomo-ticket-id {
+        background: #4b5563;
+        color: #f3f4f6;
+    }
+
+    .ytomo-input {
+        background: #4b5563;
+        border-color: #6b7280;
+        color: #f3f4f6;
+
+        &::placeholder {
+            color: #9ca3af;
+        }
+
+        &:focus {
+            border-color: #60a5fa;
+            box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.1);
+        }
+    }
+
+    .ytomo-date-button {
+        background: #4b5563;
+        border-color: #6b7280;
+        color: #d1d5db;
+
+        &:hover {
+            background: #6b7280;
+        }
+
+        &.selected {
+            background: #60a5fa;
+            border-color: #60a5fa;
+            color: #1f2937;
+        }
+    }
+
+    .ytomo-toggle-slider {
+        background: #6b7280;
+    }
+
+    .ytomo-toggle-input:checked + .ytomo-toggle-slider {
+        background: #60a5fa;
+    }
+
+    .ytomo-empty-state,
+    .ytomo-no-reservation-types {
+        color: #9ca3af;
+    }
+
+    .ytomo-error h3 {
+        color: #f87171;
+    }
+
+    .ytomo-ticket-list::-webkit-scrollbar-track {
+        background: #374151;
+    }
+
+    .ytomo-ticket-list::-webkit-scrollbar-thumb {
+        background: #6b7280;
+
+        &:hover {
+            background: #9ca3af;
+        }
+    }
+}
