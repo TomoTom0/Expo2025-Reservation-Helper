@@ -14,7 +14,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    z-index: 999999;
+    z-index: 2147483647;
     opacity: 0;
     animation: fadeIn 0.2s ease-out forwards;
 }

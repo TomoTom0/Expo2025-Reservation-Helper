@@ -329,7 +329,7 @@
     transition: all 0.3s;
     pointer-events: none;
     max-width: 300px;
-    z-index: 10;
+    z-index: 2147483648;
 
     &.show {
         opacity: 1;
