@@ -444,6 +444,11 @@
     justify-content: space-between;
     align-items: center;
     margin-bottom: 16px;
+    gap: 8px; // ボタン間のスペース
+    
+    .ytomo-dialog.title {
+      flex-grow: 1; // タイトルが残りのスペースを占有
+    }
   }
   
   &.title {
@@ -673,7 +678,6 @@
         background: rgba(0, 104, 33, 0.25);
         border-color: rgb(0, 104, 33);
         border-width: 2px;
-        box-shadow: 0 0 0 3px rgba(0, 104, 33, 0.4);
         color: rgb(0, 104, 33);
         font-weight: bold;
         
@@ -681,27 +685,21 @@
         @media (max-width: 600px) {
           background: rgba(0, 104, 33, 0.35);
           border-width: 3px;
-          box-shadow: 0 0 0 4px rgba(0, 104, 33, 0.5);
-          transform: scale(1.05);
         }
         
         &:hover {
           background: rgba(0, 104, 33, 0.3);
-          transform: translateY(-1px);
           
           @media (max-width: 600px) {
             background: rgba(0, 104, 33, 0.4);
-            transform: scale(1.05) translateY(-1px);
           }
         }
         
         &:active {
           background: rgba(0, 104, 33, 0.35);
-          transform: translateY(0);
           
           @media (max-width: 600px) {
             background: rgba(0, 104, 33, 0.45);
-            transform: scale(1.05);
           }
         }
       }
@@ -723,7 +721,6 @@
           background: rgba(255, 193, 7, 0.35);
           border-color: #ffc107;
           border-width: 2px;
-          box-shadow: 0 0 0 3px rgba(255, 193, 7, 0.5);
           color: #dc6c00;
           font-weight: bold;
           
@@ -731,27 +728,21 @@
           @media (max-width: 600px) {
             background: rgba(255, 193, 7, 0.45);
             border-width: 3px;
-            box-shadow: 0 0 0 4px rgba(255, 193, 7, 0.6);
-            transform: scale(1.05);
           }
           
           &:hover {
             background: rgba(255, 193, 7, 0.4);
-            transform: translateY(-1px);
             
             @media (max-width: 600px) {
               background: rgba(255, 193, 7, 0.5);
-              transform: scale(1.05) translateY(-1px);
             }
           }
           
           &:active {
             background: rgba(255, 193, 7, 0.45);
-            transform: translateY(0);
             
             @media (max-width: 600px) {
               background: rgba(255, 193, 7, 0.55);
-              transform: scale(1.05);
             }
           }
         }

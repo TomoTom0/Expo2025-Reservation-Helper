@@ -130,6 +130,9 @@ export class AutomationEngine {
             this.status = 'completed';
             this.log('✅ 自動操作完了');
             this.updateOverlayProgress(100, '自動操作が正常に完了しました');
+            
+            // 成功通知をグローバル表示
+            this.showGlobalNotification('success', '予約処理が正常に完了しました');
 
         } catch (error) {
             this.status = 'failed';
@@ -138,11 +141,18 @@ export class AutomationEngine {
             this.log(`❌ 自動操作失敗: ${errorMessage}`);
             this.overlay.showError(errorMessage, true);
             
-            // エラー通知を送信
-            if (errorMessage.includes('リダイレクト異常')) {
-                this.sendNotificationToDialog('warning', errorMessage);
+            // 失敗通知をグローバル表示
+            if (errorMessage.includes('タイムアウト')) {
+                this.showGlobalNotification('error', 'ページ準備がタイムアウトしました。サイトが混雑している可能性があります。');
+            } else if (errorMessage.includes('選択に失敗')) {
+                this.showGlobalNotification('error', '指定された時間帯の選択に失敗しました。時間帯が変更された可能性があります。');
+            } else if (errorMessage.includes('異常リダイレクト')) {
+                this.showGlobalNotification('error', `予約処理失敗: ${errorMessage}`);
+                // 異常リダイレクトの場合は即座にオーバーレイを非表示
+                this.overlay.hide();
+                this.log('🚀 異常リダイレクト検知: オーバーレイを即座に非表示');
             } else {
-                this.sendNotificationToDialog('error', `予約処理失敗: ${errorMessage}`);
+                this.showGlobalNotification('error', `予約処理失敗: ${errorMessage}`);
             }
         }
 
@@ -152,6 +162,16 @@ export class AutomationEngine {
         if (this.status === 'completed') {
             this.overlay.showResult(result);
         }
+        
+        // オーバーレイを即座に非表示（異常リダイレクトの場合は既に非表示済み）
+        if (!this.errors.some(error => error.includes('異常リダイレクト'))) {
+            this.overlay.hide();
+            this.log('🚀 処理完了: オーバーレイを即座に非表示');
+        }
+
+        // 自動予約処理完了時にリダイレクト判定フラグをクリア
+        sessionStorage.removeItem('expo_redirect_validated');
+        this.log('🧹 リダイレクト判定完了フラグをクリア');
 
         return result;
     }
@@ -232,8 +252,8 @@ export class AutomationEngine {
         this.processedCount++;
         this.successCount++;
         
-        // 成功通知を送信
-        this.sendNotificationToDialog('success', `予約完了: ${processingReservation.pavilionName} ${processingReservation.selectedTimeDisplay}～`);
+        // 成功通知をグローバル表示
+        this.showGlobalNotification('success', `予約完了: ${processingReservation.pavilionName} ${processingReservation.selectedTimeDisplay}～`);
     }
 
     /**
@@ -442,15 +462,39 @@ export class AutomationEngine {
         console.groupEnd();
     }
 
+
     /**
-     * リダイレクト異常検知
+     * グローバル通知を表示
+     */
+    private showGlobalNotification(type: 'success' | 'error' | 'warning' | 'info', message: string): void {
+        try {
+            // グローバル通知システムを使用
+            if (typeof (window as any).showReservationNotification === 'function') {
+                (window as any).showReservationNotification(type, message, false); // 自動非表示しない
+                this.log(`📢 グローバル通知表示: [${type}] ${message}`);
+            } else {
+                this.log('⚠️ グローバル通知システムが利用できません');
+                // フォールバック: sessionStorageに保存
+                const notificationData = {
+                    type,
+                    message,
+                    timestamp: Date.now()
+                };
+                sessionStorage.setItem('expo_reservation_result', JSON.stringify(notificationData));
+            }
+        } catch (error) {
+            this.log(`❌ グローバル通知エラー: ${error}`);
+        }
+    }
+
+    /**
+     * リダイレクト異常検知（500ms間隔x4回で安定化を確認）
      */
     private async checkRedirectAbnormality(): Promise<void> {
-        // sessionStorageから元ページURLを確認（予約が実行されたかの判定）
-        const originalUrl = sessionStorage.getItem('expo_original_page_url');
-        
-        if (!originalUrl) {
-            this.log('⚠️ 元ページURL情報がないため、リダイレクト検知をスキップ');
+        // 既にリダイレクト判定済みかチェック
+        const isValidated = sessionStorage.getItem('expo_redirect_validated');
+        if (isValidated === 'true') {
+            this.log('✅ リダイレクト判定済みのためスキップ');
             return;
         }
 
@@ -465,45 +509,65 @@ export class AutomationEngine {
         // 期待タイトルを予約データから生成
         const expectedTitle = `${reservationData.pavilionName} ${reservationData.selectedTimeDisplay}～`;
         
-        // 現在のページタイトルと比較
-        const currentTitle = document.title;
-        this.log(`🔍 タイトル検証: 期待="${expectedTitle}", 実際="${currentTitle}"`);
+        this.log('🔍 リダイレクト安定化チェック開始（500ms間隔、最大30回、4回連続安定まで）');
+        
+        // 500ms間隔で最大30回チェックして4回連続の安定化を確認
+        let previousTitle = '';
+        let previousUrl = '';
+        let consecutiveStableCount = 0;
+        let totalChecks = 0;
+        const maxChecks = 30;
+        
+        while (consecutiveStableCount < 4 && totalChecks < maxChecks) {
+            await this.delay(500);
+            totalChecks++;
+            
+            const currentTitle = document.title;
+            const currentUrl = window.location.href;
+            
+            this.log(`🔍 チェック${totalChecks}/${maxChecks}: タイトル="${currentTitle}", URL="${currentUrl}"`);
+            
+            if (totalChecks > 1 && currentTitle === previousTitle && currentUrl === previousUrl) {
+                consecutiveStableCount++;
+                this.log(`✅ 安定継続: ${consecutiveStableCount}/4回`);
+            } else if (totalChecks > 1) {
+                consecutiveStableCount = 0; // 変化があったらリセット
+                this.log(`🔄 変化検出: 安定カウントをリセット`);
+            }
+            
+            previousTitle = currentTitle;
+            previousUrl = currentUrl;
+        }
+        
+        this.log(`🔍 安定化チェック完了: 連続安定回数=${consecutiveStableCount}/4, 総チェック回数=${totalChecks}/${maxChecks}`);
+        
+        // 最終的なタイトル比較
+        const finalTitle = document.title;
+        this.log(`🔍 最終タイトル検証: 期待="${expectedTitle}", 実際="${finalTitle}"`);
 
-        if (currentTitle !== expectedTitle) {
-            this.log('❌ リダイレクト異常を検知: タイトルが一致しません');
-            this.log(`🔙 元のページに戻ります: ${originalUrl}`);
+        if (finalTitle !== expectedTitle && consecutiveStableCount >= 4) {
+            this.log('❌ リダイレクト異常を検知: タイトルが一致せず、ページが安定している');
             
-            // sessionStorageをクリア
-            sessionStorage.removeItem('expo_original_page_url');
+            // 予約データを失敗状態に更新
+            const { PavilionReservationCache } = await import('./pavilion-reservation-cache');
+            PavilionReservationCache.updateReservationStatus(
+                reservationData.pavilionCode,
+                reservationData.selectedTimeSlot,
+                'failed'
+            );
             
-            // 元のページに戻る
-            window.location.href = originalUrl;
+            // 異常リダイレクト通知をポップアップ表示
+            this.showGlobalNotification('warning', `異常リダイレクト検知: ${reservationData.pavilionName} ${reservationData.selectedTimeDisplay}～`);
             
-            // 処理を中断（ページ遷移するため）
-            throw new Error('リダイレクト異常により元のページに復旧しました');
+            // 処理を中断
+            throw new Error('異常リダイレクトを検知しました');
         }
 
         this.log('✅ リダイレクト検証OK: 正常なページです');
         
-        // 検証完了後、元ページURLをクリア
-        sessionStorage.removeItem('expo_original_page_url');
-    }
-
-    /**
-     * ダイアログに通知を送信
-     */
-    private sendNotificationToDialog(type: 'success' | 'error' | 'warning' | 'info', message: string): void {
-        try {
-            // グローバル関数が利用可能な場合に通知を送信
-            if (typeof (window as any).showReservationNotification === 'function') {
-                (window as any).showReservationNotification(type, message);
-                this.log(`📢 通知送信: [${type}] ${message}`);
-            } else {
-                this.log('⚠️ 通知関数が利用できません');
-            }
-        } catch (error) {
-            this.log(`❌ 通知送信エラー: ${error}`);
-        }
+        // リダイレクト判定完了をsessionStorageに保存
+        sessionStorage.setItem('expo_redirect_validated', 'true');
+        this.log('💾 リダイレクト判定完了フラグを保存');
     }
 
     /**
@@ -530,6 +594,8 @@ export class AutomationEngine {
 
         return null;
     }
+
+
 }
 
 // グローバルインスタンス

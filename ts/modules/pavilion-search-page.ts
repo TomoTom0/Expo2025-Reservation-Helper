@@ -522,8 +522,17 @@ const init_page = (): void => {
             console.log('📋 DOMContentLoaded後の状態チェック');
             setTimeout(() => {
                 updateLoadAllButtonState();
+                // 失敗した予約の通知をチェック（ページ読み込み時）
+                checkAndShowFailedReservationNotification();
             }, 100);
         });
+    } else {
+        // DOMが既に読み込まれている場合は即座に実行
+        setTimeout(() => {
+            updateLoadAllButtonState();
+            // 失敗した予約の通知をチェック（ページ読み込み時）
+            checkAndShowFailedReservationNotification();
+        }, 100);
     }
 
     // 独自ボタンのクリックイベントハンドラ
@@ -903,6 +912,9 @@ const showDayReservationDialog = async (): Promise<void> => {
         // 万博API 全体データを取得（フィルターは表示側で制御）
         const expoData = await fetchAllExpoReservationData();
         createDayReservationDialog(expoData, false); // デフォルトは空きのみモード
+        
+        // 失敗した予約の通知をチェック
+        await checkAndShowFailedReservationNotification();
     } catch (error) {
         console.error('❌ 万博API データの取得に失敗:', error);
         showMobileErrorDialog('データ取得エラー', error);
@@ -1076,7 +1088,34 @@ const createDayReservationDialog = (pavilionData: PavilionData[], showAll: boole
         }
     });
     
+    // 空きのみトグルボタン（更新ボタンの左に配置）
+    const availableOnlyToggle = document.createElement('button');
+    availableOnlyToggle.className = `ytomo-dialog available-only-toggle ${!showAll ? 'active' : ''}`;
+    availableOnlyToggle.textContent = '空きのみ';
+    availableOnlyToggle.title = '空きのあるパビリオンのみ表示';
+    
+    // 空きのみトグルイベント（フィルター切り替えのみ、データ再取得なし）
+    availableOnlyToggle.addEventListener('click', () => {
+        const isCurrentlyActive = availableOnlyToggle.classList.contains('active');
+        const newShowAll = isCurrentlyActive; // activeの場合は全表示に切り替え
+        
+        // 選択状態をクリア
+        selectedTimes.clear();
+        
+        // キャッシュもクリア
+        import('./pavilion-reservation-cache').then(({ PavilionReservationCache }) => {
+            PavilionReservationCache.clearAllReservationData();
+        }).catch(error => {
+            console.error('❌ キャッシュクリアエラー:', error);
+        });
+        
+        // 既存データでダイアログを再作成（フィルター適用）
+        dialogOverlay.remove();
+        createDayReservationDialog(pavilionData, newShowAll);
+    });
+
     header.appendChild(title);
+    header.appendChild(availableOnlyToggle);
     header.appendChild(refreshButton);
     
     // 説明文・通知エリア（同じ位置に配置）
@@ -1141,32 +1180,6 @@ const createDayReservationDialog = (pavilionData: PavilionData[], showAll: boole
     const rightButtonGroup = document.createElement('div');
     rightButtonGroup.className = 'ytomo-dialog right-button-group';
     
-    // 空きのみトグルボタン
-    const availableOnlyToggle = document.createElement('button');
-    availableOnlyToggle.className = `ytomo-dialog available-only-toggle ${!showAll ? 'active' : ''}`;
-    availableOnlyToggle.textContent = '空きのみ';
-    availableOnlyToggle.title = '空きのあるパビリオンのみ表示';
-    
-    // 空きのみトグルイベント（フィルター切り替えのみ、データ再取得なし）
-    availableOnlyToggle.addEventListener('click', () => {
-        const isCurrentlyActive = availableOnlyToggle.classList.contains('active');
-        const newShowAll = isCurrentlyActive; // activeの場合は全表示に切り替え
-        
-        // 選択状態をクリア
-        selectedTimes.clear();
-        
-        // キャッシュもクリア
-        import('./pavilion-reservation-cache').then(({ PavilionReservationCache }) => {
-            PavilionReservationCache.clearAllReservationData();
-        }).catch(error => {
-            console.error('❌ キャッシュクリアエラー:', error);
-        });
-        
-        // 既存データでダイアログを再作成（フィルター適用）
-        dialogOverlay.remove();
-        createDayReservationDialog(pavilionData, newShowAll);
-    });
-    
     
     // 選択解除ボタン（監視開始の左）- 空きのみOFFの時のみ表示
     const clearSelectionButton = document.createElement('button');
@@ -1227,7 +1240,6 @@ const createDayReservationDialog = (pavilionData: PavilionData[], showAll: boole
         }
     });
     
-    rightButtonGroup.appendChild(availableOnlyToggle);
     // 空きのみOFFの時のみ監視関連ボタンを表示
     if (showAll) {
         rightButtonGroup.appendChild(clearSelectionButton);
@@ -1672,6 +1684,58 @@ async function waitForElement(selector: string, timeout: number = 5000, config: 
         checkElement();
     });
 }
+
+// 失敗した予約の通知をチェックして表示
+const checkAndShowFailedReservationNotification = async (): Promise<void> => {
+    try {
+        // sessionStorageから失敗情報をチェック（異常リダイレクト用）
+        const failureInfoStr = sessionStorage.getItem('expo_reservation_failure');
+        if (failureInfoStr) {
+            const failureInfo = JSON.parse(failureInfoStr);
+            
+            // グローバル通知システムで表示
+            if (typeof (window as any).showReservationNotification === 'function') {
+                (window as any).showReservationNotification(
+                    'error',
+                    `予約に失敗しました: ${failureInfo.pavilionName} ${failureInfo.timeDisplay}～（${failureInfo.reason}）`,
+                    false // 自動非表示しない
+                );
+                console.log('📢 異常リダイレクトによる失敗通知を表示しました');
+            }
+            
+            // 表示完了後、sessionStorageをクリア
+            sessionStorage.removeItem('expo_reservation_failure');
+            return;
+        }
+        
+        // 従来の失敗予約チェック（その他のエラー用）
+        const { PavilionReservationCache } = await import('./pavilion-reservation-cache');
+        const allData = PavilionReservationCache.getAllReservationData();
+        
+        // 失敗状態の予約を検索
+        const failedReservations = Object.values(allData).filter(data => data.status === 'failed');
+        
+        if (failedReservations.length > 0) {
+            // 最新の失敗予約を表示
+            const latestFailed = failedReservations.sort((a, b) => b.timestamp - a.timestamp)[0];
+            
+            // グローバル通知システムで表示
+            if (typeof (window as any).showReservationNotification === 'function') {
+                (window as any).showReservationNotification(
+                    'error',
+                    `予約に失敗しました: ${latestFailed.pavilionName} ${latestFailed.selectedTimeDisplay}～`,
+                    false // 自動非表示しない
+                );
+                console.log('📢 失敗した予約の通知を表示しました');
+            }
+            
+            // 通知を表示した予約データを削除（重複表示を防ぐ）
+            PavilionReservationCache.removeReservationData(latestFailed.pavilionCode, latestFailed.selectedTimeSlot);
+        }
+    } catch (error) {
+        console.error('❌ 失敗予約通知チェックエラー:', error);
+    }
+};
 
 async function waitForAnyElement(selectors: Record<string, string>, timeout: number = 10000, selectorTexts: Record<string, string> = {}, config: ReservationConfig): Promise<ElementSearchResult> {
     return new Promise((resolve, reject) => {

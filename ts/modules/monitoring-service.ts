@@ -269,10 +269,6 @@ export class MonitoringService {
             // キャッシュに保存
             PavilionReservationCache.saveReservationData(target.pavilionCode, reservationData);
 
-            // 元ページURLをsessionStorageに保存（リダイレクト異常復旧用）
-            sessionStorage.setItem('expo_original_page_url', window.location.href);
-            console.log(`💾 元ページURL保存（監視）: ${window.location.href}`);
-
             // 予約ページを開く
             // expoTable.jsを参照した正しいURL実装
             const ticketIds = new URLSearchParams(window.location.search).get('id') || '';
@@ -285,9 +281,9 @@ export class MonitoringService {
             };
             
             const reservationUrl = `https://ticket.expo2025.or.jp/event_time/?id=${ticketIds}&event_id=${target.pavilionCode}&screen_id=108&lottery=5&entrance_date=${formatDateToYMD()}`;
-            window.open(reservationUrl, '_blank');
+            window.location.href = reservationUrl;
 
-            console.log('✅ 予約ページオープン:', reservationUrl);
+            console.log('✅ 予約ページに遷移:', reservationUrl);
             
             // 監視成功通知を送信
             this.sendNotificationToDialog('info', `監視成功: ${target.pavilionName} ${target.timeSlot} の空きを検知し予約開始`);

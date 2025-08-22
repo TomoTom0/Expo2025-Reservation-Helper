@@ -1616,10 +1616,108 @@ function toggleNearestDateSelection(targetDate: Date): void {
 
         const dateStr = formatDateForLabel(targetDate);
         console.log(`✅ 対象日付(${dateStr})のチケット${targetDateTickets.length}件を選択しました`);
+        
+        // チケット選択後、submitボタンの自動押下を実行
+        setTimeout(() => autoSubmitTicketSelection(), 500);
     }
     
     // 選択状態変更後、日付ボタンの視覚状態を更新
     setTimeout(() => updateDateButtonStates(), 100);
+}
+
+/**
+ * チケット選択後のsubmitボタン自動押下
+ */
+function autoSubmitTicketSelection(): void {
+    console.log('🚀 submitボタン自動押下を実行');
+    
+    try {
+        // submitボタンを検索（複数の可能なセレクタで）
+        const submitSelectors = [
+            'a.style_ticket_selection__submit__U0a_C.basic-btn.to-send.type2:not(.disabled)',
+            'a.basic-btn.to-send.type2:not(.disabled)',
+            'a[class*="submit"]:not(.disabled)',
+            'a.basic-btn:not(.disabled)'
+        ];
+        
+        let submitButton: HTMLElement | null = null;
+        
+        for (const selector of submitSelectors) {
+            submitButton = document.querySelector(selector) as HTMLElement;
+            if (submitButton) {
+                console.log(`✅ submitボタンを発見: ${selector}`);
+                break;
+            }
+        }
+        
+        if (!submitButton) {
+            console.warn('⚠️ submitボタンが見つかりません');
+            // フォールバック: disabled状態のボタンも含めて検索
+            const fallbackSelectors = [
+                'a.style_ticket_selection__submit__U0a_C.basic-btn.to-send.type2',
+                'a.basic-btn.to-send.type2',
+                'a[class*="submit"]'
+            ];
+            
+            for (const selector of fallbackSelectors) {
+                submitButton = document.querySelector(selector) as HTMLElement;
+                if (submitButton) {
+                    console.log(`⚠️ disabled状態のsubmitボタンを発見: ${selector}`);
+                    break;
+                }
+            }
+        }
+        
+        if (submitButton) {
+            // ボタンがdisabled状態かチェック
+            const isDisabled = submitButton.classList.contains('disabled') || 
+                             submitButton.getAttribute('tabindex') === '-1' ||
+                             (submitButton as HTMLButtonElement).disabled;
+            
+            if (isDisabled) {
+                console.log('⏳ submitボタンがdisabled状態です。有効化を待機...');
+                // disabled状態の場合、短時間待機してから再試行
+                setTimeout(() => {
+                    autoSubmitTicketSelection();
+                }, 1000);
+                return;
+            }
+            
+            console.log('🎯 submitボタンをクリックします');
+            
+            // 誤動作防止オーバーレイを表示
+            processingOverlay.show('companion');
+            processingOverlay.updateCountdown('申込み処理中...', true);
+            
+            // クリック実行
+            if (submitButton.tagName.toLowerCase() === 'a') {
+                // aタグの場合はhref処理またはclick
+                if (submitButton.getAttribute('href') && submitButton.getAttribute('href') !== '#') {
+                    window.location.href = submitButton.getAttribute('href')!;
+                } else {
+                    submitButton.click();
+                }
+            } else {
+                submitButton.click();
+            }
+            
+            console.log('✅ submitボタンクリック完了');
+            
+            // 処理完了後オーバーレイを非表示（少し遅延）
+            setTimeout(() => {
+                processingOverlay.hide();
+            }, 2000);
+            
+        } else {
+            console.error('❌ submitボタンが全く見つかりません');
+            showCustomAlert('申込みボタンが見つかりません');
+        }
+        
+    } catch (error) {
+        console.error('❌ submitボタン自動押下エラー:', error);
+        processingOverlay.hide();
+        showCustomAlert('申込み処理でエラーが発生しました');
+    }
 }
 
 // チケット選択変更の監視を開始

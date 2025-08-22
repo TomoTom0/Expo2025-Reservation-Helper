@@ -129,12 +129,18 @@ export class ProcessingOverlay {
      */
     private onUrlChanged(): void {
         if (this.isActive && this.currentProcessType) {
-            console.log('🌐 URL変化検出 - オーバーレイを迅速再設定');
+            console.log('🌐 URL変化検出 - オーバーレイ状態確認中');
             
-            // 短い遅延後にオーバーレイを再初期化
+            // より長い遅延を設けて、意図的な画面遷移と区別
             setTimeout(() => {
-                this.reinitializeOverlay();
-            }, 100);
+                // 依然としてアクティブな場合のみ再初期化
+                if (this.isActive && this.currentProcessType) {
+                    console.log('🔄 オーバーレイを迅速再設定');
+                    this.reinitializeOverlay();
+                } else {
+                    console.log('🚫 処理完了により再初期化をスキップ');
+                }
+            }, 500);
         }
     }
     

@@ -44,11 +44,9 @@ export class ImmediateReservationService {
             
             PavilionReservationCache.saveReservationData(pavilionCode, cacheData);
             
-            // 元ページURLをsessionStorageに保存（リダイレクト異常復旧用）
-            sessionStorage.setItem('expo_original_page_url', window.location.href);
-            console.log(`💾 元ページURL保存: ${window.location.href}`);
+            // ページ復帰システムは無効化
             
-            // 3. 予約ページを新しいタブで開く
+            // 3. 予約ページに遷移
             // expoTable.jsを参照した正しいURL実装
             const ticketIds = new URLSearchParams(window.location.search).get('id') || '';
             const formatDateToYMD = () => {
@@ -60,14 +58,10 @@ export class ImmediateReservationService {
             };
             
             const reservationUrl = `https://ticket.expo2025.or.jp/event_time/?id=${ticketIds}&event_id=${pavilionCode}&screen_id=108&lottery=5&entrance_date=${formatDateToYMD()}`;
-            const newWindow = window.open(reservationUrl, '_blank');
+            window.location.href = reservationUrl;
             
-            if (!newWindow) {
-                throw new Error('ポップアップがブロックされました');
-            }
-            
-            console.log('✅ 予約ページオープン:', reservationUrl);
-            console.log('🤖 新しいタブで自動操作が開始されます');
+            console.log('✅ 予約ページに遷移:', reservationUrl);
+            console.log('🤖 自動操作が開始されます');
             
             return true;
             
