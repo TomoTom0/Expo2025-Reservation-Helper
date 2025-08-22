@@ -87,6 +87,23 @@ export class PavilionManager {
     }
 
     /**
+     * 現在のページパラメータを取得（調査結果に基づく）
+     */
+    private getCurrentPageParams() {
+        const urlParams = new URLSearchParams(window.location.search);
+        return {
+            ticketIds: urlParams.get('id')?.split(',') || [],
+            lottery: urlParams.get('lottery') || '1',
+            entranceDate: urlParams.get('entrance_date') || '',
+            eventType: urlParams.get('event_type') || '0',
+            screenId: urlParams.get('screen_id') || '108',
+            priority: urlParams.get('priority'),
+            keyword: urlParams.get('keyword') || '',
+            reserveId: urlParams.get('reserve_id') || ''
+        };
+    }
+
+    /**
      * パビリオン検索・取得
      */
     async searchPavilions(
@@ -97,22 +114,25 @@ export class PavilionManager {
         console.log(`🏛️ パビリオン検索: "${query}" (チケット: ${ticketIds.length}個)`);
         
         try {
-            // 既存のパビリオン検索APIを活用
-            const searchParams = this.buildSearchParams(query, ticketIds, entranceDate);
-            const response = await fetch('/api/d/events', {
-                method: 'POST',
+            // 調査結果に基づくパビリオン検索API実装
+            const params = this.getCurrentPageParams();
+            const ticketIdsParam = ticketIds.map(id => `ticket_ids[]=${id}`).join('&');
+            const eventNameParam = query ? `&event_name=${encodeURIComponent(query)}` : '';
+            const entranceDateParam = `&entrance_date=${entranceDate || params.entranceDate}`;
+            const paginationParam = `&count=1&limit=999&event_type=0&next_token=`;
+            const apiUrl = `/api/d/events?${ticketIdsParam}${eventNameParam}${entranceDateParam}${paginationParam}&channel=${params.lottery}`;
+
+            const response = await fetch(apiUrl, {
+                method: 'GET',
                 headers: {
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json',
-                    'X-Api-Lang': 'ja',
-                    'Accept-Language': 'ja'
+                    'Accept-Language': 'ja,en-US;q=0.9,en;q=0.8,zh-TW;q=0.7,zh;q=0.6',
+                    'X-Api-Lang': 'ja'
                 },
-                credentials: 'include',
-                body: JSON.stringify(searchParams)
+                credentials: 'same-origin'
             });
 
             if (!response.ok) {
-                throw new Error(`パビリオン検索APIエラー: ${response.status}`);
+                throw new Error(`API Error: ${response.status} ${response.statusText}`);
             }
 
             const data = await response.json();
@@ -132,21 +152,6 @@ export class PavilionManager {
             console.error('❌ パビリオン検索エラー:', error);
             throw error;
         }
-    }
-
-    /**
-     * 検索パラメータを構築
-     */
-    private buildSearchParams(query: string, ticketIds: string[], entranceDate?: string): any {
-        return {
-            ticket_id_list: ticketIds,
-            search_text: query,
-            entrance_date: entranceDate || '',
-            category: '',
-            sort_type: 'name', // 名前順
-            page: 1,
-            per_page: 50
-        };
     }
 
     /**
@@ -482,26 +487,45 @@ export class PavilionManager {
      */
     private async executeReservationAPI(request: ReservationRequest): Promise<ReservationResult> {
         try {
+            // 調査結果に基づく予約API実装
+            const params = this.getCurrentPageParams();
+            const reservationData = {
+                ticket_ids: request.ticketIds,
+                entrance_date: params.entranceDate,
+                start_time: request.timeSlotId, // 時間帯ID（例：1000）
+                event_code: request.pavilionId,
+                registered_channel: params.lottery
+            };
+
+            // CSRFトークン取得
+            const csrfToken = this.getCsrfToken();
+            const headers: Record<string, string> = {
+                'Accept': 'application/json, text/plain, */*',
+                'Accept-Language': 'ja,en-US;q=0.9,en;q=0.8,zh-TW;q=0.7,zh;q=0.6',
+                'X-Api-Lang': 'ja',
+                'Content-Type': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest'
+            };
+
+            if (csrfToken) {
+                headers['X-CSRF-TOKEN'] = csrfToken;
+            }
+
             const response = await fetch('/api/d/user_event_reservations', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json',
-                    'X-Api-Lang': 'ja',
-                    'Accept-Language': 'ja'
-                },
-                credentials: 'include',
-                body: JSON.stringify({
-                    event_code: request.pavilionId,
-                    time_slot_id: request.timeSlotId,
-                    ticket_ids: request.ticketIds,
-                    companion_count: request.companions || 0
-                })
+                headers,
+                credentials: 'same-origin',
+                body: JSON.stringify(reservationData)
             });
 
             if (!response.ok) {
-                const errorData = await response.json().catch(() => ({}));
-                throw new Error(errorData.message || `API Error: ${response.status}`);
+                let errorBody = '';
+                try {
+                    errorBody = await response.text();
+                } catch (e) {
+                    // エラーレスポンス読み取り失敗は無視
+                }
+                throw new Error(`API Error: ${response.status} ${response.statusText}\n${errorBody}`);
             }
 
             const data = await response.json();
@@ -509,16 +533,42 @@ export class PavilionManager {
             return {
                 success: true,
                 message: '予約が完了しました',
-                reservationId: data.reservation_id || data.id
+                reservationId: data.reservation_id || data.id,
+                details: {
+                    pavilionName: request.pavilionId,
+                    timeSlot: request.timeSlotId,
+                    ticketCount: request.ticketIds.length
+                }
             };
 
         } catch (error) {
             return {
                 success: false,
-                message: `予約APIエラー: ${error}`,
+                message: `予約に失敗しました: ${error}`,
                 error: String(error)
             };
         }
+    }
+
+    /**
+     * CSRFトークンを取得（調査結果に基づく）
+     */
+    private getCsrfToken(): string | null {
+        // metaタグから取得
+        const csrfMeta = document.querySelector('meta[name="csrf-token"]');
+        if (csrfMeta) {
+            return csrfMeta.getAttribute('content');
+        }
+        
+        // クッキーから取得
+        const cookies = document.cookie.split(';');
+        for (let cookie of cookies) {
+            const [name, value] = cookie.trim().split('=');
+            if (name === 'csrftoken' || name === '_token' || name === 'XSRF-TOKEN') {
+                return decodeURIComponent(value);
+            }
+        }
+        return null;
     }
 
     /**

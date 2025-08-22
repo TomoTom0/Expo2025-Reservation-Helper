@@ -103,19 +103,19 @@ export class TicketManager {
         console.log('🔍 自分のチケット情報取得中...');
         
         try {
-            // 既存のAPI機能を活用（パビリオン検索画面のデバッグダイアログから）
+            // デバッグダイアログ調査結果に基づくAPI実装
             const response = await fetch('/api/d/my/tickets/?count=1', {
                 method: 'GET',
                 headers: {
                     'Accept': 'application/json',
-                    'X-Api-Lang': 'ja',
-                    'Accept-Language': 'ja'
+                    'Accept-Language': 'ja,en-US;q=0.9,en;q=0.8,zh-TW;q=0.7,zh;q=0.6',
+                    'X-Api-Lang': 'ja'
                 },
-                credentials: 'include'
+                credentials: 'same-origin'
             });
 
             if (!response.ok) {
-                throw new Error(`API応答エラー: ${response.status}`);
+                throw new Error(`API Error: ${response.status} ${response.statusText}`);
             }
 
             const data = await response.json();
@@ -123,20 +123,19 @@ export class TicketManager {
 
             const tickets: TicketData[] = [];
 
-            if (data.results && Array.isArray(data.results)) {
-                for (const ticketGroup of data.results) {
-                    if (ticketGroup.tickets && Array.isArray(ticketGroup.tickets)) {
-                        for (const ticket of ticketGroup.tickets) {
-                            const ticketData: TicketData = {
-                                id: ticket.id,
-                                isOwn: true,
-                                entranceDates: this.extractEntranceDates(ticket),
-                                reservationTypes: this.extractReservationTypes(ticket),
-                                entranceReservations: this.extractEntranceReservations(ticket)
-                            };
-                            tickets.push(ticketData);
-                        }
-                    }
+            // 調査結果: data.list配列にチケット情報が格納される
+            if (data.list && Array.isArray(data.list)) {
+                for (const ticket of data.list) {
+                    const ticketData: TicketData = {
+                        id: ticket.ticket_id || ticket.simple_ticket_id || '',
+                        label: ticket.item_name || 'チケット',
+                        isOwn: true,
+                        entranceDates: this.extractEntranceDates(ticket),
+                        reservationTypes: this.extractReservationTypes(ticket),
+                        entranceReservations: this.extractEntranceReservations(ticket),
+                        reservationStatus: this.extractReservationStatus(ticket)
+                    };
+                    tickets.push(ticketData);
                 }
             }
 
@@ -273,17 +272,18 @@ export class TicketManager {
     }
 
     /**
-     * チケットから入場可能日付を抽出
+     * チケットから入場可能日付を抽出（調査結果に基づく）
      */
     private extractEntranceDates(ticket: any): string[] {
         const dates: string[] = [];
         
         try {
-            // チケット情報から入場可能日付を抽出
-            if (ticket.entrance_dates && Array.isArray(ticket.entrance_dates)) {
-                for (const dateInfo of ticket.entrance_dates) {
-                    if (dateInfo.date) {
-                        dates.push(dateInfo.date);
+            // 調査結果: ticket.schedules配列から入場日付を取得
+            if (ticket.schedules && Array.isArray(ticket.schedules)) {
+                for (const schedule of ticket.schedules) {
+                    if (schedule.entrance_date) {
+                        // YYYYMMDD形式の日付
+                        dates.push(schedule.entrance_date);
                     }
                 }
             }
@@ -317,19 +317,21 @@ export class TicketManager {
     }
 
     /**
-     * チケットから入場予約情報を抽出
+     * チケットから入場予約情報を抽出（調査結果に基づく）
      */
     private extractEntranceReservations(ticket: any): EntranceReservation[] {
         const reservations: EntranceReservation[] = [];
         
         try {
-            if (ticket.entrance_reservations && Array.isArray(ticket.entrance_reservations)) {
-                for (const reservation of ticket.entrance_reservations) {
+            // 調査結果: ticket.schedules配列から入場予約情報を取得
+            if (ticket.schedules && Array.isArray(ticket.schedules)) {
+                for (const schedule of ticket.schedules) {
                     const reservationData: EntranceReservation = {
-                        date: reservation.date || '',
-                        time: reservation.time || '',
-                        location: reservation.location === 'east' ? 'east' : 'west',
-                        status: this.mapReservationStatus(reservation.status)
+                        date: schedule.entrance_date || '',
+                        time: schedule.schedule_name || '', // 時間帯名
+                        location: 'east', // デフォルト値（実際の位置情報は不明）
+                        status: schedule.use_state === 0 ? 'confirmed' : 
+                               schedule.use_state === 1 ? 'cancelled' : 'pending'
                     };
                     reservations.push(reservationData);
                 }
@@ -353,26 +355,34 @@ export class TicketManager {
         };
     }
 
+
     /**
-     * 予約状況をマッピング
+     * チケットから予約状況を抽出（調査結果に基づく）
      */
-    private mapReservationStatus(status: any): 'confirmed' | 'pending' | 'cancelled' {
-        if (typeof status === 'string') {
-            switch (status.toLowerCase()) {
-                case 'confirmed':
-                case '確定':
-                    return 'confirmed';
-                case 'pending':
-                case '保留':
-                    return 'pending';
-                case 'cancelled':
-                case 'キャンセル':
-                    return 'cancelled';
-                default:
-                    return 'pending';
+    private extractReservationStatus(ticket: any): ReservationStatus[] {
+        const statuses: ReservationStatus[] = [];
+        
+        try {
+            // 調査結果: ticket.event_schedules配列からパビリオン予約状況を取得
+            if (ticket.event_schedules && Array.isArray(ticket.event_schedules)) {
+                for (const event of ticket.event_schedules) {
+                    const status: ReservationStatus = {
+                        pavilionId: event.event_code || '',
+                        pavilionName: event.event_name || '',
+                        date: event.entrance_date || '',
+                        time: `${event.start_time}-${event.end_time}`,
+                        status: event.use_state === 0 ? 'confirmed' : 
+                               event.use_state === 1 ? 'cancelled' : 'pending',
+                        reservationType: event.registered_channel || '1日券'
+                    };
+                    statuses.push(status);
+                }
             }
+        } catch (error) {
+            console.warn('⚠️ 予約状況抽出エラー:', error);
         }
-        return 'pending';
+
+        return statuses;
     }
 
     /**
