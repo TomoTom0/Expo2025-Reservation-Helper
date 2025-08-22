@@ -46,6 +46,9 @@ import {
     initializeAgentTicketPage              // 代理チケットページ初期化
 } from './companion-ticket-page';
 
+// メインダイアログFABモジュール
+import { initializeMainDialogFab } from './main-dialog-fab';
+
 // 統一状態管理システム（アプリケーションの中核）
 import { entranceReservationStateManager } from './entrance-reservation-state-manager';
 
@@ -293,6 +296,9 @@ function initializeExtension() {
         
         const url = window.location.href;
         trigger_init(url);
+
+        // メインダイアログFAB初期化（全ページ共通）
+        initializeMainDialogFab();
 
     let url_record = url;
     

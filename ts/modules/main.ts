@@ -14,6 +14,7 @@ import './entrance-page-fab';
 import './app-router';
 import './companion-ticket-page'; // 同行者追加機能
 import './automation-init'; // 自動操作エンジン初期化
+import './main-dialog-fab'; // メインダイアログFAB
 
 // 新しい監視・即時予約機能
 import './monitoring-scheduler';
