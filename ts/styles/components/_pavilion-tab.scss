@@ -1,0 +1,565 @@
+/**
+ * パビリオンタブのスタイル定義
+ */
+
+.ytomo-pavilion-tab {
+    padding: 0;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+/* 検索コントロールエリア */
+.ytomo-search-controls {
+    background: white;
+    border-radius: 8px;
+    padding: 16px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    border: 1px solid #e2e8f0;
+    flex-shrink: 0;
+    display: flex;
+    gap: 12px;
+    align-items: center;
+
+    @media (max-width: 600px) {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 12px;
+    }
+}
+
+.ytomo-search-input-container {
+    flex: 1;
+}
+
+.ytomo-search-input {
+    width: 100%;
+    padding: 10px 16px;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    font-size: 14px;
+    transition: all 0.2s;
+
+    &:focus {
+        outline: none;
+        border-color: #2c5aa0;
+        box-shadow: 0 0 0 3px rgba(44, 90, 160, 0.1);
+    }
+
+    &::placeholder {
+        color: #9ca3af;
+    }
+}
+
+.ytomo-control-buttons {
+    display: flex;
+    gap: 8px;
+    flex-shrink: 0;
+
+    @media (max-width: 600px) {
+        justify-content: center;
+    }
+}
+
+.ytomo-icon-button {
+    width: 40px;
+    height: 40px;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    background: white;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    font-size: 16px;
+
+    &:hover {
+        background: #f3f4f6;
+        border-color: #9ca3af;
+        transform: translateY(-1px);
+    }
+
+    &:active {
+        transform: translateY(0);
+    }
+
+    &.active {
+        background: #2c5aa0;
+        border-color: #2c5aa0;
+        color: white;
+
+        &:hover {
+            background: #1a365d;
+        }
+    }
+
+    &:focus {
+        outline: 2px solid #2c5aa0;
+        outline-offset: 2px;
+    }
+
+    span {
+        display: block;
+        line-height: 1;
+    }
+}
+
+/* パビリオン一覧エリア */
+.ytomo-pavilion-list {
+    flex: 1;
+    overflow-y: auto;
+    background: white;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+    min-height: 0;
+}
+
+.ytomo-pavilion-item {
+    border-bottom: 1px solid #f1f5f9;
+    transition: all 0.2s;
+
+    &:last-child {
+        border-bottom: none;
+    }
+
+    &:hover {
+        background: #f8fafc;
+    }
+}
+
+.ytomo-pavilion-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px;
+    cursor: pointer;
+}
+
+.ytomo-star-button {
+    background: none;
+    border: none;
+    font-size: 18px;
+    cursor: pointer;
+    transition: all 0.2s;
+    padding: 4px;
+    border-radius: 4px;
+
+    &:hover {
+        background: rgba(255, 193, 7, 0.1);
+        transform: scale(1.1);
+    }
+
+    &.favorite {
+        color: #ffc107;
+    }
+
+    &:focus {
+        outline: 2px solid #2c5aa0;
+        outline-offset: 2px;
+    }
+}
+
+.ytomo-pavilion-checkbox-container {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+}
+
+.ytomo-pavilion-checkbox {
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
+}
+
+.ytomo-pavilion-name {
+    flex: 1;
+    font-size: 15px;
+    font-weight: 500;
+    color: #374151;
+    line-height: 1.4;
+}
+
+.ytomo-expand-button {
+    background: none;
+    border: none;
+    font-size: 12px;
+    color: #6b7280;
+    cursor: pointer;
+    padding: 4px 8px;
+    border-radius: 4px;
+    transition: all 0.2s;
+
+    &:hover {
+        background: #f3f4f6;
+        color: #374151;
+    }
+
+    &.expanded {
+        background: #e2e8f0;
+        color: #374151;
+    }
+
+    &:focus {
+        outline: 2px solid #2c5aa0;
+        outline-offset: 2px;
+    }
+}
+
+/* 時間帯エリア */
+.ytomo-time-slots {
+    padding: 0 16px 16px 16px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    transition: all 0.3s ease;
+
+    &.hidden {
+        display: none;
+    }
+}
+
+.ytomo-time-slot-button {
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    border: 1px solid;
+    min-width: 80px;
+    text-align: center;
+
+    &.available {
+        background: #dcfce7;
+        border-color: #22c55e;
+        color: #166534;
+
+        &:hover {
+            background: #22c55e;
+            color: white;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(34, 197, 94, 0.3);
+        }
+
+        &.selected {
+            background: #22c55e;
+            color: white;
+            box-shadow: 0 2px 8px rgba(34, 197, 94, 0.3);
+        }
+    }
+
+    &.unavailable {
+        background: #fef2f2;
+        border-color: #ef4444;
+        color: #991b1b;
+        cursor: not-allowed;
+        opacity: 0.6;
+
+        &:hover {
+            transform: none;
+            box-shadow: none;
+        }
+    }
+
+    &:focus {
+        outline: 2px solid #2c5aa0;
+        outline-offset: 2px;
+    }
+
+    &:disabled {
+        pointer-events: none;
+    }
+}
+
+/* 予約コントロールエリア */
+.ytomo-reservation-controls {
+    background: white;
+    border-radius: 8px;
+    padding: 16px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    border: 1px solid #e2e8f0;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    position: relative;
+
+    @media (max-width: 600px) {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 12px;
+    }
+}
+
+.ytomo-selected-info {
+    flex: 1;
+    font-size: 14px;
+    color: #374151;
+    font-weight: 500;
+
+    @media (max-width: 600px) {
+        text-align: center;
+    }
+}
+
+.ytomo-reservation-controls .ytomo-button {
+    padding: 10px 20px;
+    font-weight: 600;
+    white-space: nowrap;
+
+    @media (max-width: 600px) {
+        width: 100%;
+    }
+}
+
+/* 予約結果表示 */
+.ytomo-result-display {
+    position: absolute;
+    bottom: 100%;
+    right: 16px;
+    margin-bottom: 8px;
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 500;
+    opacity: 0;
+    transform: translateY(10px);
+    transition: all 0.3s;
+    pointer-events: none;
+    max-width: 300px;
+    z-index: 10;
+
+    &.show {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    &.success {
+        background: #22c55e;
+        color: white;
+    }
+
+    &.error {
+        background: #ef4444;
+        color: white;
+    }
+
+    &.info {
+        background: #3b82f6;
+        color: white;
+    }
+
+    @media (max-width: 600px) {
+        position: static;
+        transform: none;
+        margin: 8px 0 0 0;
+        text-align: center;
+    }
+}
+
+/* 空の状態・エラー表示 */
+.ytomo-pavilion-tab .ytomo-empty-state,
+.ytomo-pavilion-tab .ytomo-error {
+    padding: 40px 20px;
+    text-align: center;
+}
+
+.ytomo-pavilion-tab .ytomo-empty-state p {
+    margin: 0;
+    color: #6b7280;
+    font-size: 14px;
+}
+
+.ytomo-pavilion-tab .ytomo-error p {
+    margin: 0;
+    color: #dc2626;
+    font-size: 14px;
+}
+
+/* ローディング表示の調整 */
+.ytomo-pavilion-tab .ytomo-loading {
+    height: 150px;
+}
+
+/* スクロールバーのスタイル */
+.ytomo-pavilion-list::-webkit-scrollbar {
+    width: 6px;
+}
+
+.ytomo-pavilion-list::-webkit-scrollbar-track {
+    background: #f1f5f9;
+    border-radius: 3px;
+}
+
+.ytomo-pavilion-list::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 3px;
+
+    &:hover {
+        background: #94a3b8;
+    }
+}
+
+/* アニメーション */
+.ytomo-pavilion-item {
+    animation: slideIn 0.2s ease-out;
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ホバー効果の強化 */
+.ytomo-time-slot-button.available:hover {
+    animation: pulse 0.6s ease-in-out;
+}
+
+@keyframes pulse {
+    0% { transform: scale(1) translateY(-1px); }
+    50% { transform: scale(1.05) translateY(-2px); }
+    100% { transform: scale(1) translateY(-1px); }
+}
+
+/* フォーカス状態の統一 */
+.ytomo-pavilion-tab input:focus,
+.ytomo-pavilion-tab button:focus {
+    outline: 2px solid #2c5aa0;
+    outline-offset: 2px;
+}
+
+/* アクセシビリティ対応 */
+@media (prefers-reduced-motion: reduce) {
+    .ytomo-pavilion-item,
+    .ytomo-time-slot-button,
+    .ytomo-icon-button,
+    .ytomo-result-display,
+    .ytomo-time-slots {
+        animation: none;
+        transition: none;
+    }
+
+    .ytomo-time-slot-button.available:hover {
+        animation: none;
+        transform: none;
+    }
+}
+
+/* ハイコントラストモード対応 */
+@media (prefers-contrast: high) {
+    .ytomo-pavilion-item {
+        border-bottom-width: 2px;
+    }
+
+    .ytomo-time-slot-button {
+        border-width: 2px;
+    }
+
+    .ytomo-icon-button.active {
+        border-width: 3px;
+    }
+
+    .ytomo-pavilion-tab input:focus,
+    .ytomo-pavilion-tab button:focus {
+        outline: 3px solid #000;
+    }
+}
+
+/* ダークモード対応（将来実装時用） */
+@media (prefers-color-scheme: dark) {
+    .ytomo-search-controls,
+    .ytomo-pavilion-list,
+    .ytomo-reservation-controls {
+        background: #374151;
+        border-color: #4b5563;
+    }
+
+    .ytomo-pavilion-item:hover {
+        background: #4b5563;
+    }
+
+    .ytomo-pavilion-name {
+        color: #f3f4f6;
+    }
+
+    .ytomo-search-input {
+        background: #4b5563;
+        border-color: #6b7280;
+        color: #f3f4f6;
+
+        &::placeholder {
+            color: #9ca3af;
+        }
+
+        &:focus {
+            border-color: #60a5fa;
+            box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.1);
+        }
+    }
+
+    .ytomo-icon-button {
+        background: #4b5563;
+        border-color: #6b7280;
+        color: #f3f4f6;
+
+        &:hover {
+            background: #6b7280;
+        }
+
+        &.active {
+            background: #60a5fa;
+            border-color: #60a5fa;
+            color: #1f2937;
+        }
+    }
+
+    .ytomo-time-slot-button.available {
+        background: #065f46;
+        border-color: #10b981;
+        color: #d1fae5;
+
+        &:hover,
+        &.selected {
+            background: #10b981;
+            color: #064e3b;
+        }
+    }
+
+    .ytomo-time-slot-button.unavailable {
+        background: #7f1d1d;
+        border-color: #ef4444;
+        color: #fecaca;
+    }
+
+    .ytomo-selected-info {
+        color: #f3f4f6;
+    }
+
+    .ytomo-pavilion-tab .ytomo-empty-state p {
+        color: #9ca3af;
+    }
+
+    .ytomo-pavilion-tab .ytomo-error p {
+        color: #f87171;
+    }
+
+    .ytomo-pavilion-list::-webkit-scrollbar-track {
+        background: #374151;
+    }
+
+    .ytomo-pavilion-list::-webkit-scrollbar-thumb {
+        background: #6b7280;
+
+        &:hover {
+            background: #9ca3af;
+        }
+    }
+}
