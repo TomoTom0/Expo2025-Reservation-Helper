@@ -308,9 +308,26 @@ export class MainDialogFabImpl implements MainDialogFab {
         `;
 
         try {
-            // チケット情報を取得
-            const tickets = await this.ticketManager.loadAllTickets();
-            const availableDates = this.ticketManager.getAvailableDates();
+            // 直接APIからチケット情報を取得
+            const response = await fetch('/api/d/my/tickets/?count=1', {
+                method: 'GET',
+                headers: {
+                    'Accept': 'application/json',
+                    'Accept-Language': 'ja,en-US;q=0.9,en;q=0.8,zh-TW;q=0.7,zh;q=0.6',
+                    'X-Api-Lang': 'ja'
+                },
+                credentials: 'same-origin'
+            });
+
+            if (!response.ok) {
+                throw new Error(`API Error: ${response.status} ${response.statusText}`);
+            }
+
+            const data = await response.json();
+            console.log('🔍 チケットAPI応答:', data);
+            
+            const tickets = data.list || [];
+            const availableDates = this.extractAvailableDates(tickets);
 
             // チケットタブUIを構築
             this.buildTicketTabUI(ticketTab as HTMLElement, tickets, availableDates);
@@ -398,7 +415,7 @@ export class MainDialogFabImpl implements MainDialogFab {
     }
 
     /**
-     * チケット一覧を構築
+     * チケット一覧を構築（調査結果に基づく）
      */
     private buildTicketList(tickets: any[]): string {
         if (tickets.length === 0) {
@@ -412,18 +429,15 @@ export class MainDialogFabImpl implements MainDialogFab {
         return tickets.map(ticket => `
             <div class="ytomo-ticket-item" data-ticket-id="${ticket.id}">
                 <div class="ytomo-ticket-header">
-                    <span class="ytomo-ticket-id">${ticket.id}</span>
-                    ${ticket.isOwn ? 
-                        '<span class="ytomo-me-tip">Me</span>' : 
-                        `<span class="ytomo-label-tag">${ticket.label || '外部'}</span>`
-                    }
+                    <span class="ytomo-ticket-id">${ticket.simple_ticket_id || ticket.ticket_id || ticket.id}</span>
+                    <span class="ytomo-me-tip">Me</span>
                 </div>
                 <div class="ytomo-ticket-body">
                     <div class="ytomo-entrance-dates">
-                        ${this.buildEntranceDateButtons(ticket.entranceDates)}
+                        ${this.buildEntranceDateButtons(ticket.schedules || [])}
                     </div>
                     <div class="ytomo-reservation-types">
-                        ${this.buildReservationTypes(ticket.reservationTypes)}
+                        ${this.buildReservationTypes(ticket)}
                     </div>
                 </div>
             </div>
@@ -431,38 +445,87 @@ export class MainDialogFabImpl implements MainDialogFab {
     }
 
     /**
-     * 入場日時ボタンを構築
+     * 入場日時ボタンを構築（調査結果に基づく）
      */
-    private buildEntranceDateButtons(dates: string[]): string {
-        return dates.map(date => `
-            <button class="ytomo-entrance-date-button" data-date="${date}">
-                ${this.formatDate(date)}
+    private buildEntranceDateButtons(schedules: any[]): string {
+        if (!Array.isArray(schedules) || schedules.length === 0) {
+            return '<span class="ytomo-no-entrance-dates">入場予約なし</span>';
+        }
+
+        return schedules.map(schedule => `
+            <button class="ytomo-entrance-date-button" data-date="${schedule.entrance_date}" data-use-state="${schedule.use_state}">
+                ${this.formatDate(schedule.entrance_date)} ${schedule.schedule_name || ''}
+                ${schedule.use_state === 1 ? '(使用済み)' : ''}
             </button>
         `).join('');
     }
 
     /**
-     * 予約種類表示を構築
+     * 予約種類表示を構築（調査結果に基づく）
      */
-    private buildReservationTypes(types: any[]): string {
-        if (types.length === 0) {
-            return '<span class="ytomo-no-reservation-types">予約種類不明</span>';
+    private buildReservationTypes(ticket: any): string {
+        // チケットのitem_nameから予約種類を推測、または既定値を使用
+        const ticketName = ticket.item_name || '';
+        let reservationType = '1日券'; // デフォルト
+        
+        if (ticketName.includes('3日')) {
+            reservationType = '3日券';
+        } else if (ticketName.includes('週末')) {
+            reservationType = '週末券';
+        } else if (ticketName.includes('月間')) {
+            reservationType = '月間券';
         }
 
-        return types.map(type => `
-            <span class="ytomo-reservation-type ${type.isActive ? 'active' : 'inactive'}">
-                ${type.type}
+        // 入場予約があるかチェックして有効性を判定
+        const hasValidReservations = ticket.schedules && 
+            Array.isArray(ticket.schedules) && 
+            ticket.schedules.some((s: any) => s.use_state === 0);
+
+        return `
+            <span class="ytomo-reservation-type ${hasValidReservations ? 'active' : 'inactive'}">
+                ${reservationType}
             </span>
-        `).join('');
+        `;
     }
 
     /**
-     * 日付フォーマット
+     * 利用可能日付を抽出（調査結果に基づく）
+     */
+    private extractAvailableDates(tickets: any[]): string[] {
+        const dates = new Set<string>();
+        
+        for (const ticket of tickets) {
+            if (ticket.schedules && Array.isArray(ticket.schedules)) {
+                for (const schedule of ticket.schedules) {
+                    if (schedule.entrance_date && schedule.use_state === 0) {
+                        dates.add(schedule.entrance_date);
+                    }
+                }
+            }
+        }
+
+        return Array.from(dates).sort();
+    }
+
+    /**
+     * 日付フォーマット（YYYYMMDD → M/D）
      */
     private formatDate(dateStr: string): string {
         try {
+            // YYYYMMDD形式（例：20250826）をパース
+            if (dateStr && dateStr.length === 8) {
+                const year = dateStr.slice(0, 4);
+                const month = dateStr.slice(4, 6);
+                const day = dateStr.slice(6, 8);
+                const date = new Date(`${year}-${month}-${day}`);
+                return `${date.getMonth() + 1}/${date.getDate()}`;
+            }
+            // それ以外の形式も試す
             const date = new Date(dateStr);
-            return `${date.getMonth() + 1}/${date.getDate()}`;
+            if (!isNaN(date.getTime())) {
+                return `${date.getMonth() + 1}/${date.getDate()}`;
+            }
+            return dateStr;
         } catch {
             return dateStr;
         }

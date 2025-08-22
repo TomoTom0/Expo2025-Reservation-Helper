@@ -370,8 +370,19 @@
     }
 }
 
-/* ダークモード対応（将来実装時用） */
-@media (prefers-color-scheme: dark) {
+/* ダークモード対応を無効化（明示的にライトテーマを強制） */
+.ytomo-dialog-overlay {
+    color-scheme: light;
+}
+
+.ytomo-main-dialog {
+    color-scheme: light;
+    background: white !important;
+    color: #1f2937 !important;
+}
+
+/* 将来のダークモード対応（現在は無効） */
+@media (prefers-color-scheme: dark) and (max-width: 0px) {
     .ytomo-main-dialog {
         background: #1f2937;
         color: #f9fafb;

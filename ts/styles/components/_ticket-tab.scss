@@ -239,13 +239,18 @@
     font-style: italic;
 }
 
-/* チケット追加エリア */
+/* チケット追加エリア（下部固定） */
 .ytomo-add-ticket {
     background: white;
-    border-radius: 8px;
+    border-radius: 8px 8px 0 0;
     padding: 16px;
     border: 2px dashed #cbd5e1;
+    border-bottom: none;
     flex-shrink: 0;
+    position: sticky;
+    bottom: 0;
+    z-index: 10;
+    box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.1);
 
     h4 {
         margin: 0 0 12px 0;
