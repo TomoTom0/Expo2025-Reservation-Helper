@@ -457,9 +457,14 @@ export class MainDialogFabImpl implements MainDialogFab {
             `;
         }
 
-        // 状態0の入場予約があるチケットのみ表示
+        // 状態0の入場予約があるチケット または 外部チケット(isOwnがfalse)を表示
         const validTickets = tickets.filter(ticket => {
             const schedules = ticket.schedules || [];
+            // 外部チケット（自分のものでない）は常に表示
+            if (ticket.isOwn === false) {
+                return true;
+            }
+            // 自分のチケットは状態0の入場予約があるもののみ表示
             return schedules.some((schedule: any) => schedule.use_state === 0);
         });
 
@@ -1071,6 +1076,12 @@ export class MainDialogFabImpl implements MainDialogFab {
 
         try {
             await this.reactiveTicketManager.addExternalTicket(ticketId, label);
+            
+            // デバッグ: チケット追加後の状態確認
+            const allTickets = this.ticketManager.getAllTickets();
+            console.log(`🎫 チケット追加後の全チケット数: ${allTickets.length}`);
+            console.log(`🎫 追加されたチケットID: ${ticketId} が含まれているか:`, 
+                allTickets.some(t => t.ticket_id === ticketId));
             
             // 成功時はタブを再初期化
             await this.initializeTicketTab();
