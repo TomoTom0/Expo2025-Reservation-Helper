@@ -633,13 +633,34 @@ export class MainDialogFabImpl implements MainDialogFab {
         // 表示順序: 1,3,週,月
 
         // 当日予約 - 左から1番目
-        const onTheDayStatus = schedule.on_the_day ? 'あり' : 'なし';
-        console.log('1️⃣ 当日予約:', { on_the_day: schedule.on_the_day, status: onTheDayStatus });
+        // 実際の予約を確認（registered_channel === '5' かつ entrance_date が一致、かつ未使用）
+        const hasOnTheDayReservation = ticket?.event_schedules?.some((eventSchedule: any) => 
+            eventSchedule.entrance_date === schedule.entrance_date && 
+            eventSchedule.registered_channel === '5' && // 当日予約のチャンネル
+            eventSchedule.use_state === 0 // 未使用のみ
+        );
+        const onTheDayStatus = hasOnTheDayReservation ? 'あり' : 'なし';
+        console.log('1️⃣ 当日予約:', { 
+            on_the_day_field: schedule.on_the_day, 
+            hasActualReservation: hasOnTheDayReservation,
+            status: onTheDayStatus,
+            eventSchedules: ticket?.event_schedules?.filter((es: any) => es.entrance_date === schedule.entrance_date)
+        });
         processReservationType('1', onTheDayStatus, checkPeriod(lotteryData.on_the_day_reservation));
 
         // 空き枠予約 - 左から2番目
-        const emptyFrameStatus = schedule.empty_frame ? 'あり' : 'なし';
-        console.log('3️⃣ 空き枠予約:', { empty_frame: schedule.empty_frame, status: emptyFrameStatus });
+        // 実際の予約を確認（registered_channel === '4' かつ entrance_date が一致）
+        const hasEmptyFrameReservation = ticket?.event_schedules?.some((eventSchedule: any) => 
+            eventSchedule.entrance_date === schedule.entrance_date && 
+            eventSchedule.registered_channel === '4' // 空き枠予約のチャンネル
+        );
+        const emptyFrameStatus = hasEmptyFrameReservation ? 'あり' : 'なし';
+        console.log('3️⃣ 空き枠予約:', { 
+            empty_frame_field: schedule.empty_frame, 
+            hasActualReservation: hasEmptyFrameReservation,
+            status: emptyFrameStatus,
+            eventSchedules: ticket?.event_schedules?.filter((es: any) => es.entrance_date === schedule.entrance_date)
+        });
         processReservationType('3', emptyFrameStatus, checkPeriod(lotteryData.empty_frame_reservation));
 
         // 7日前抽選 - 左から3番目
@@ -658,6 +679,12 @@ export class MainDialogFabImpl implements MainDialogFab {
         };
         
         console.log('✅ 予約種類判定結果:', result);
+        
+        // スマホ環境での初期化完了アラート
+        if (/Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+            alert(`スマホ環境: 予約種類判定完了\n結果: ${result.statusText}\n利用可能: ${result.availableTypes.join(', ')}`);
+        }
+        
         return result;
     }
 
