@@ -88,8 +88,8 @@ export class ReactiveTicketManager {
         return this.getReactiveManager().loadAllTickets();
     }
 
-    async addExternalTicket(ticketId: string, label: string): Promise<void> {
-        return this.getReactiveManager().addExternalTicket(ticketId, label);
+    async addExternalTicket(ticketId: string, label: string, channel?: string): Promise<void> {
+        return this.getReactiveManager().addExternalTicket(ticketId, label, channel);
     }
 
     selectTicketsByDate(date: string, ownOnly?: boolean): void {

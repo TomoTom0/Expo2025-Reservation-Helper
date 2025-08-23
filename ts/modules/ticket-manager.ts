@@ -192,20 +192,21 @@ export class TicketManager {
     /**
      * 外部チケットの詳細データを取得
      */
-    private async loadExternalTicketData(ticketId: string, label: string): Promise<TicketData | null> {
+    private async loadExternalTicketData(ticketId: string, label: string, channel?: string): Promise<TicketData | null> {
         try {
             // 外部チケット取得API（agent-ticket.jsより）
-            // 当日予約channel='5', 3日前予約channel='4' を試行
-            const channels = ['5', '4']; // 5:当日予約, 4:3日前予約
+            const channels = channel ? [channel] : ['5', '4', '3', '2']; // 指定されたchannelまたは全チャネル試行
             
-            for (const channel of channels) {
+            for (const testChannel of channels) {
                 try {
-                    const response = await fetch(`/api/d/proxy_tickets/${ticketId}/add_check?registered_channel=${channel}`, {
+                    const response = await fetch(`/api/d/proxy_tickets/${ticketId}/add_check?registered_channel=${testChannel}`, {
                         credentials: 'include'
                     });
                     
                     if (response.ok) {
                         const data = await response.json();
+                        
+                        console.log(`✅ 外部チケット取得成功 (channel: ${testChannel}):`, data);
                         
                         // 公式サイトのデータ構造に合わせてTicketDataに変換
                         const ticketData: TicketData = {
@@ -247,8 +248,9 @@ export class TicketManager {
     /**
      * 外部チケットIDを追加
      */
-    async addExternalTicket(ticketId: string, label: string): Promise<void> {
-        console.log(`🎫 外部チケット追加: ${ticketId} (${label})`);
+    async addExternalTicket(ticketId: string, label: string, channel?: string): Promise<void> {
+        const registeredChannel = channel || '5'; // デフォルトは当日(1)
+        console.log(`🎫 外部チケット追加: ${ticketId} (${label}) channel: ${registeredChannel}`);
         
         try {
             // 重複チェック
@@ -257,19 +259,19 @@ export class TicketManager {
             }
 
             // チケットIDの妥当性を検証
-            await this.validateTicketId(ticketId);
+            await this.validateTicketId(ticketId, registeredChannel);
 
             // チケットデータを作成
-            const ticketData = await this.loadExternalTicketData(ticketId, label);
+            const ticketData = await this.loadExternalTicketData(ticketId, label, registeredChannel);
             if (!ticketData) {
                 throw new Error('チケットデータの取得に失敗しました');
             }
 
             // メモリとキャッシュに保存
             this.tickets.set(ticketId, ticketData);
-            await this.saveExternalTicketToCache(ticketId, label);
+            await this.saveExternalTicketToCache(ticketId, label, registeredChannel);
 
-            console.log(`✅ 外部チケット追加完了: ${ticketId}`);
+            console.log(`✅ 外部チケット追加完了: ${ticketId} (channel: ${registeredChannel})`);
 
         } catch (error) {
             console.error('❌ 外部チケット追加エラー:', error);
@@ -280,7 +282,7 @@ export class TicketManager {
     /**
      * チケットIDの妥当性を検証
      */
-    private async validateTicketId(ticketId: string): Promise<void> {
+    private async validateTicketId(ticketId: string, channel?: string): Promise<void> {
         // チケットIDの形式チェック
         if (!ticketId || ticketId.trim().length === 0) {
             throw new Error('チケットIDが空です');
@@ -288,16 +290,18 @@ export class TicketManager {
 
         // 必要に応じてAPIでチケットIDの存在確認
         // 現在は基本的な形式チェックのみ
+        console.log(`🔍 チケットID検証: ${ticketId} (channel: ${channel || 'auto'})`);
     }
 
     /**
      * 外部チケットをキャッシュに保存
      */
-    private async saveExternalTicketToCache(ticketId: string, label: string): Promise<void> {
+    private async saveExternalTicketToCache(ticketId: string, label: string, channel?: string): Promise<void> {
         try {
             // 監視キャッシュに保存
             const monitoringCache = localStorage.getItem('expo_monitoring_cache') || '{}';
             const monitoringData = JSON.parse(monitoringCache);
+            console.log(`💾 外部チケットキャッシュ保存: ${ticketId} (channel: ${channel || 'auto'})`);
             
             if (!monitoringData.externalTickets) {
                 monitoringData.externalTickets = {};

@@ -421,6 +421,12 @@ export class MainDialogFabImpl implements MainDialogFab {
                     <div class="ytomo-ticket-upper">
                         <input type="text" id="ticket-id-input" placeholder="チケットID" class="ytomo-input-inline ytomo-input-ticket-id">
                         <input type="text" id="ticket-label-input" placeholder="Label" class="ytomo-input-inline ytomo-input-label">
+                        <select id="channel-select" class="ytomo-select-inline">
+                            <option value="5">1</option>
+                            <option value="4">3</option>
+                            <option value="3">週</option>
+                            <option value="2">月</option>
+                        </select>
                         <button id="add-ticket-button" class="ytomo-button primary">Add</button>
                     </div>
                 </div>
@@ -539,198 +545,13 @@ export class MainDialogFabImpl implements MainDialogFab {
      * 入場予約の詳細な予約状況を取得
      */
     private getReservationStatus(schedule: any, lotteryData?: any, ticket?: any): { statusText: string, availableTypes: string[] } {
-        const statuses: string[] = [];
-        const availableTypes: string[] = [];
-
-        console.log('🔍 予約種類判定開始:', { schedule, lotteryData, ticket });
-
-        if (!lotteryData) {
-            const debugInfo = {
-                userAgent: navigator.userAgent,
-                schedule: JSON.stringify(schedule),
-                ticketId: ticket?.ticket_id,
-                entranceDate: schedule?.entrance_date,
-                fetchUrl: schedule?.entrance_date ? `/api/d/lottery_calendars?entrance_date=${schedule.entrance_date}` : 'undefined'
-            };
-            alert(`スマホ環境デバッグ: lotteryData取得失敗\n${JSON.stringify(debugInfo, null, 2)}`);
-            return { statusText: '確認中...', availableTypes: [] };
-        }
-
-        // lotteryDataの構造をログ出力
-        console.log('📊 lotteryData構造:', {
-            on_the_day_reservation: lotteryData.on_the_day_reservation,
-            empty_frame_reservation: lotteryData.empty_frame_reservation,
-            seven_days_ago_lottery: lotteryData.seven_days_ago_lottery,
-            two_months_ago_lottery: lotteryData.two_months_ago_lottery
-        });
-
-        const now = new Date();
+        // すべての入場予約をable（選択可能）にする
+        console.log('🔍 予約種類判定（すべてable）:', { schedule, lotteryData, ticket });
         
-        // 当日から3日後までの日付範囲チェック
-        const isWithinAlwaysEnabledRange = (entranceDate: string): boolean => {
-            try {
-                const entrance = new Date(entranceDate.substring(0, 4) + '-' + 
-                                         entranceDate.substring(4, 6) + '-' + 
-                                         entranceDate.substring(6, 8));
-                const today = new Date();
-                today.setHours(0, 0, 0, 0);
-                const threeDaysLater = new Date(today);
-                threeDaysLater.setDate(today.getDate() + 3);
-                
-                return entrance >= today && entrance <= threeDaysLater;
-            } catch (error) {
-                return false;
-            }
+        return { 
+            statusText: 'able', 
+            availableTypes: ['able'] 
         };
-        
-        const alwaysEnabled = isWithinAlwaysEnabledRange(schedule.entrance_date);
-        console.log('🔄 Always Enable チェック:', { date: schedule.entrance_date, enabled: alwaysEnabled });
-        
-        const checkPeriod = (period: any) => {
-            if (!period || !period.request_start || !period.request_end) {
-                console.log('⚠️ 期間データなし:', period);
-                // Always Enabled範囲の場合は強制的にopenにする
-                return alwaysEnabled ? 
-                    { isOpen: true, isExpired: false, notStarted: false } :
-                    { isOpen: false, isExpired: false, notStarted: false };
-            }
-            const start = new Date(period.request_start);
-            const end = new Date(period.request_end);
-            const result = { 
-                isOpen: now >= start && now <= end,
-                isExpired: now > end,
-                notStarted: now < start
-            };
-            
-            // Always Enabled範囲の場合は強制的にopenにする
-            if (alwaysEnabled && !result.isOpen) {
-                result.isOpen = true;
-                result.isExpired = false;
-                result.notStarted = false;
-                console.log('🔄 Always Enable適用: 期間外だが強制的にopen');
-            }
-            
-            console.log('📅 期間チェック:', { period, start, end, now, result });
-            return result;
-        };
-
-        const getStatusFromLottery = (lotteryArray: any[], lotteryType: '7day' | '2month', ticket: any) => {
-            // 抽選データがある場合のみ処理
-            if (lotteryArray?.length > 0) {
-                const lottery = lotteryArray[0];
-                
-                // 申し込み状態を確認
-                if (lottery.state === 0) {
-                    return '提出';
-                }
-                
-                // 当選判定: event_schedulesから実際の予約を確認
-                if (lottery.state === 1 && ticket?.event_schedules?.length > 0) {
-                    // registered_channelで予約種類を照合
-                    const lotteryChannelMap = {
-                        '7day': '2',   // 7日前抽選
-                        '2month': '1'  // 2ヶ月前抽選
-                    };
-                    const expectedChannel = lotteryChannelMap[lotteryType];
-                    
-                    const hasActualReservation = ticket.event_schedules.some((eventSchedule: any) => 
-                        eventSchedule.entrance_date === schedule.entrance_date && 
-                        eventSchedule.registered_channel === expectedChannel
-                    );
-                    
-                    return hasActualReservation ? 'あり' : '落選';
-                } else if (lottery.state === 1) {
-                    // event_schedulesがない場合は申し込み済みとして扱う
-                    return '提出';
-                } else {
-                    // その他の状態は落選
-                    return '落選';
-                }
-            }
-            return 'なし';
-        };
-
-        const processReservationType = (
-            label: string,
-            reservationStatus: string,
-            period: any
-        ) => {
-            if (period.isExpired) {
-                // 期限後は「あり」のみ表示（落選・提出は表示しない）
-                if (reservationStatus === 'あり') {
-                    statuses.push(`${label}:あり`);
-                }
-            } else if (period.isOpen) {
-                // 期限中は全状態表示
-                if (reservationStatus === 'あり') {
-                    statuses.push(`${label}:あり`);
-                } else if (reservationStatus === '提出') {
-                    statuses.push(`${label}:提出`);
-                } else if (reservationStatus === '落選') {
-                    statuses.push(`${label}:落選`);
-                } else {
-                    // 未申込で期限中
-                    statuses.push(`${label}:なし`);
-                    availableTypes.push(label);
-                }
-            }
-            // 期限前（notStarted）は表示しない
-        };
-
-        // 表示順序: 1,3,週,月
-
-        // 当日予約 - 左から1番目
-        // 実際の予約を確認（registered_channel === '5' かつ entrance_date が一致、かつ未使用）
-        const hasOnTheDayReservation = ticket?.event_schedules?.some((eventSchedule: any) => 
-            eventSchedule.entrance_date === schedule.entrance_date && 
-            eventSchedule.registered_channel === '5' && // 当日予約のチャンネル
-            eventSchedule.use_state === 0 // 未使用のみ
-        );
-        const onTheDayStatus = hasOnTheDayReservation ? 'あり' : 'なし';
-        console.log('1️⃣ 当日予約:', { 
-            on_the_day_field: schedule.on_the_day, 
-            hasActualReservation: hasOnTheDayReservation,
-            alwaysEnabled: alwaysEnabled,
-            status: onTheDayStatus,
-            eventSchedules: ticket?.event_schedules?.filter((es: any) => es.entrance_date === schedule.entrance_date)
-        });
-        processReservationType('1', onTheDayStatus, checkPeriod(lotteryData.on_the_day_reservation));
-
-        // 空き枠予約 - 左から2番目
-        // 実際の予約を確認（registered_channel === '4' かつ entrance_date が一致）
-        const hasEmptyFrameReservation = ticket?.event_schedules?.some((eventSchedule: any) => 
-            eventSchedule.entrance_date === schedule.entrance_date && 
-            eventSchedule.registered_channel === '4' // 空き枠予約のチャンネル
-        );
-        const emptyFrameStatus = hasEmptyFrameReservation ? 'あり' : 'なし';
-        console.log('3️⃣ 空き枠予約:', { 
-            empty_frame_field: schedule.empty_frame, 
-            hasActualReservation: hasEmptyFrameReservation,
-            alwaysEnabled: alwaysEnabled,
-            status: emptyFrameStatus,
-            eventSchedules: ticket?.event_schedules?.filter((es: any) => es.entrance_date === schedule.entrance_date)
-        });
-        processReservationType('3', emptyFrameStatus, checkPeriod(lotteryData.empty_frame_reservation));
-
-        // 7日前抽選 - 左から3番目
-        const dayStatus = getStatusFromLottery(schedule.lotteries?.day, '7day', ticket);
-        console.log('📅 7日前抽選:', { lotteries_day: schedule.lotteries?.day, status: dayStatus });
-        processReservationType('週', dayStatus, checkPeriod(lotteryData.seven_days_ago_lottery));
-
-        // 2ヶ月前抽選 - 左から4番目
-        const monthStatus = getStatusFromLottery(schedule.lotteries?.month, '2month', ticket);
-        console.log('🗓️ 2ヶ月前抽選:', { lotteries_month: schedule.lotteries?.month, status: monthStatus });
-        processReservationType('月', monthStatus, checkPeriod(lotteryData.two_months_ago_lottery));
-
-        const result = {
-            statusText: statuses.join(' '),
-            availableTypes
-        };
-        
-        console.log('✅ 予約種類判定結果:', result);
-        
-        
-        return result;
     }
 
     /**
@@ -1063,11 +884,13 @@ export class MainDialogFabImpl implements MainDialogFab {
     private async handleAddTicket(): Promise<void> {
         const ticketIdInput = this.mainDialogContainer?.querySelector('#ticket-id-input') as HTMLInputElement;
         const labelInput = this.mainDialogContainer?.querySelector('#ticket-label-input') as HTMLInputElement;
+        const channelSelect = this.mainDialogContainer?.querySelector('#channel-select') as HTMLSelectElement;
         
         if (!ticketIdInput) return;
 
         const ticketId = ticketIdInput.value.trim();
         const label = labelInput?.value.trim() || '外部チケット';
+        const channel = channelSelect?.value || '5'; // デフォルトは当日(1)
 
         if (!ticketId) {
             alert('チケットIDを入力してください');
@@ -1075,12 +898,12 @@ export class MainDialogFabImpl implements MainDialogFab {
         }
 
         try {
-            await this.reactiveTicketManager.addExternalTicket(ticketId, label);
+            await this.reactiveTicketManager.addExternalTicket(ticketId, label, channel);
             
             // デバッグ: チケット追加後の状態確認
             const allTickets = this.ticketManager.getAllTickets();
             console.log(`🎫 チケット追加後の全チケット数: ${allTickets.length}`);
-            console.log(`🎫 追加されたチケットID: ${ticketId} が含まれているか:`, 
+            console.log(`🎫 追加されたチケットID: ${ticketId} (channel: ${channel}) が含まれているか:`, 
                 allTickets.some(t => t.ticket_id === ticketId));
             
             // 成功時はタブを再初期化
@@ -1089,8 +912,9 @@ export class MainDialogFabImpl implements MainDialogFab {
             // 入力をクリア
             ticketIdInput.value = '';
             if (labelInput) labelInput.value = '';
+            channelSelect.selectedIndex = 0; // チャンネルもリセット
 
-            console.log(`✅ チケット追加成功: ${ticketId}`);
+            console.log(`✅ チケット追加成功: ${ticketId} (channel: ${channel})`);
 
         } catch (error) {
             console.error('❌ チケット追加エラー:', error);

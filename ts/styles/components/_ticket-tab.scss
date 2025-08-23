@@ -425,6 +425,23 @@
     }
 }
 
+/* セレクトボックスのスタイル */
+.ytomo-select-inline {
+    padding: 4px 8px;
+    border: 1px solid #d1d5db;
+    border-radius: 4px;
+    font-size: 12px;
+    background: white;
+    cursor: pointer;
+    width: 50px;
+    
+    &:focus {
+        outline: none;
+        border-color: #2c5aa0;
+        box-shadow: 0 0 0 2px rgba(44, 90, 160, 0.1);
+    }
+}
+
 /* ボタンスタイル */
 .ytomo-button {
     padding: 8px 16px;
