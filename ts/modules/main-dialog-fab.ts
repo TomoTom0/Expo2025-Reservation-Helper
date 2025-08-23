@@ -528,20 +528,43 @@ export class MainDialogFabImpl implements MainDialogFab {
         const statuses: string[] = [];
         const availableTypes: string[] = [];
 
+        console.log('🔍 予約種類判定開始:', { schedule, lotteryData, ticket });
+
         if (!lotteryData) {
+            const debugInfo = {
+                userAgent: navigator.userAgent,
+                schedule: JSON.stringify(schedule),
+                ticketId: ticket?.ticket_id,
+                entranceDate: schedule?.entrance_date,
+                fetchUrl: schedule?.entrance_date ? `/api/d/lottery_calendars?entrance_date=${schedule.entrance_date}` : 'undefined'
+            };
+            alert(`スマホ環境デバッグ: lotteryData取得失敗\n${JSON.stringify(debugInfo, null, 2)}`);
             return { statusText: '確認中...', availableTypes: [] };
         }
 
+        // lotteryDataの構造をログ出力
+        console.log('📊 lotteryData構造:', {
+            on_the_day_reservation: lotteryData.on_the_day_reservation,
+            empty_frame_reservation: lotteryData.empty_frame_reservation,
+            seven_days_ago_lottery: lotteryData.seven_days_ago_lottery,
+            two_months_ago_lottery: lotteryData.two_months_ago_lottery
+        });
+
         const now = new Date();
         const checkPeriod = (period: any) => {
-            if (!period || !period.request_start || !period.request_end) return { isOpen: false, isExpired: false, notStarted: false };
+            if (!period || !period.request_start || !period.request_end) {
+                console.log('⚠️ 期間データなし:', period);
+                return { isOpen: false, isExpired: false, notStarted: false };
+            }
             const start = new Date(period.request_start);
             const end = new Date(period.request_end);
-            return { 
+            const result = { 
                 isOpen: now >= start && now <= end,
                 isExpired: now > end,
                 notStarted: now < start
             };
+            console.log('📅 期間チェック:', { period, start, end, now, result });
+            return result;
         };
 
         const getStatusFromLottery = (lotteryArray: any[], lotteryType: '7day' | '2month', ticket: any) => {
@@ -611,24 +634,31 @@ export class MainDialogFabImpl implements MainDialogFab {
 
         // 当日予約 - 左から1番目
         const onTheDayStatus = schedule.on_the_day ? 'あり' : 'なし';
+        console.log('1️⃣ 当日予約:', { on_the_day: schedule.on_the_day, status: onTheDayStatus });
         processReservationType('1', onTheDayStatus, checkPeriod(lotteryData.on_the_day_reservation));
 
         // 空き枠予約 - 左から2番目
         const emptyFrameStatus = schedule.empty_frame ? 'あり' : 'なし';
+        console.log('3️⃣ 空き枠予約:', { empty_frame: schedule.empty_frame, status: emptyFrameStatus });
         processReservationType('3', emptyFrameStatus, checkPeriod(lotteryData.empty_frame_reservation));
 
         // 7日前抽選 - 左から3番目
         const dayStatus = getStatusFromLottery(schedule.lotteries?.day, '7day', ticket);
+        console.log('📅 7日前抽選:', { lotteries_day: schedule.lotteries?.day, status: dayStatus });
         processReservationType('週', dayStatus, checkPeriod(lotteryData.seven_days_ago_lottery));
 
         // 2ヶ月前抽選 - 左から4番目
         const monthStatus = getStatusFromLottery(schedule.lotteries?.month, '2month', ticket);
+        console.log('🗓️ 2ヶ月前抽選:', { lotteries_month: schedule.lotteries?.month, status: monthStatus });
         processReservationType('月', monthStatus, checkPeriod(lotteryData.two_months_ago_lottery));
 
-        return {
+        const result = {
             statusText: statuses.join(' '),
             availableTypes
         };
+        
+        console.log('✅ 予約種類判定結果:', result);
+        return result;
     }
 
     /**
@@ -785,8 +815,8 @@ export class MainDialogFabImpl implements MainDialogFab {
                             this.reactiveTicketManager.toggleTicketSelection(ticketId);
                         }
                     } else {
-                        // その他の領域のクリック → 通常のトグル
-                        this.reactiveTicketManager.toggleTicketSelection(ticketId);
+                        // チケット個別選択は無効化（入場予約選択で連動するため）
+                        console.log('🔒 チケット個別選択は無効化されています');
                     }
                     // UI更新はリアクティブシステムで自動実行される
                 }

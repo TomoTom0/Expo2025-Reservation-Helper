@@ -350,9 +350,20 @@ export class TicketManager {
     /**
      * チケット種別から予約種類を判定
      */
-    private determineReservationType(_ticketType: any): ReservationType | null {
-        // 実装は既存のビジネスロジックに基づく
-        // 現在は1日券として扱う（今後拡張）
+    private determineReservationType(ticketType: any): ReservationType | null {
+        // スマホでの表示問題修正：チケットが存在する場合は常にアクティブとして扱う
+        console.log('🔍 チケット種別判定:', ticketType);
+        
+        if (!ticketType) {
+            // チケット種別が不明でも、チケットが存在する限りアクティブとして扱う
+            console.log('⚠️ チケット種別不明、デフォルト1日券として処理');
+            return {
+                type: '1日券',
+                isActive: true
+            };
+        }
+        
+        // チケット種別に応じて判定（今後拡張可能）
         return {
             type: '1日券',
             isActive: true
