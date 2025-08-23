@@ -10,7 +10,7 @@
 // @run-at       document-end
 // ==/UserScript==
 
-// Built: 2025/08/24 04:03:25
+// Built: 2025/08/24 04:13:07
 
 
 (function webpackUniversalModuleDefinition(root, factory) {
@@ -11200,46 +11200,6 @@ class MainDialogFabImpl {
             // パビリオンタブの初期化
             await this.initializePavilionTab();
             console.log('✅ ダイアログ内容初期化完了');
-            // スマホ環境での診断情報表示（特定日付のみ、1回のみ）
-            if (/Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) &&
-                !window.ytomoMobileDiagShown) {
-                window.ytomoMobileDiagShown = true;
-                const tickets = this.ticketManager.getAllTickets();
-                const targetDates = ['20250511', '20250824', '20250826', '20250925'];
-                let filteredInfo = '';
-                // 対象日付のスケジュールのみ抽出
-                const targetSchedules = [];
-                for (const ticket of tickets) {
-                    if (ticket.schedules) {
-                        for (const schedule of ticket.schedules) {
-                            if (targetDates.includes(schedule.entrance_date)) {
-                                targetSchedules.push({
-                                    ticketId: ticket.ticket_id,
-                                    date: schedule.entrance_date,
-                                    on_the_day: schedule.on_the_day,
-                                    empty_frame: schedule.empty_frame,
-                                    lotteries_day: schedule.lotteries?.day?.length || 0,
-                                    lotteries_month: schedule.lotteries?.month?.length || 0
-                                });
-                            }
-                        }
-                    }
-                }
-                if (targetSchedules.length > 0) {
-                    filteredInfo = '\n対象日付スケジュール:';
-                    targetSchedules.forEach((sched, index) => {
-                        filteredInfo += `\n${index + 1}. ${sched.date}
-  チケット: ${sched.ticketId}
-  当日: ${sched.on_the_day}, 空枠: ${sched.empty_frame}
-  抽選(週): ${sched.lotteries_day}, (月): ${sched.lotteries_month}`;
-                    });
-                }
-                else {
-                    filteredInfo = '\n対象日付(5/11,8/24,8/26,9/25)のスケジュールなし';
-                }
-                alert(`スマホ診断:
-チケット: ${tickets.length}個${filteredInfo}`);
-            }
         }
         catch (error) {
             console.error('❌ ダイアログ内容初期化エラー:', error);
@@ -11445,10 +11405,31 @@ class MainDialogFabImpl {
             two_months_ago_lottery: lotteryData.two_months_ago_lottery
         });
         const now = new Date();
+        // 当日から3日後までの日付範囲チェック
+        const isWithinAlwaysEnabledRange = (entranceDate) => {
+            try {
+                const entrance = new Date(entranceDate.substring(0, 4) + '-' +
+                    entranceDate.substring(4, 6) + '-' +
+                    entranceDate.substring(6, 8));
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+                const threeDaysLater = new Date(today);
+                threeDaysLater.setDate(today.getDate() + 3);
+                return entrance >= today && entrance <= threeDaysLater;
+            }
+            catch (error) {
+                return false;
+            }
+        };
+        const alwaysEnabled = isWithinAlwaysEnabledRange(schedule.entrance_date);
+        console.log('🔄 Always Enable チェック:', { date: schedule.entrance_date, enabled: alwaysEnabled });
         const checkPeriod = (period) => {
             if (!period || !period.request_start || !period.request_end) {
                 console.log('⚠️ 期間データなし:', period);
-                return { isOpen: false, isExpired: false, notStarted: false };
+                // Always Enabled範囲の場合は強制的にopenにする
+                return alwaysEnabled ?
+                    { isOpen: true, isExpired: false, notStarted: false } :
+                    { isOpen: false, isExpired: false, notStarted: false };
             }
             const start = new Date(period.request_start);
             const end = new Date(period.request_end);
@@ -11457,6 +11438,13 @@ class MainDialogFabImpl {
                 isExpired: now > end,
                 notStarted: now < start
             };
+            // Always Enabled範囲の場合は強制的にopenにする
+            if (alwaysEnabled && !result.isOpen) {
+                result.isOpen = true;
+                result.isExpired = false;
+                result.notStarted = false;
+                console.log('🔄 Always Enable適用: 期間外だが強制的にopen');
+            }
             console.log('📅 期間チェック:', { period, start, end, now, result });
             return result;
         };
@@ -11528,6 +11516,7 @@ class MainDialogFabImpl {
         console.log('1️⃣ 当日予約:', {
             on_the_day_field: schedule.on_the_day,
             hasActualReservation: hasOnTheDayReservation,
+            alwaysEnabled: alwaysEnabled,
             status: onTheDayStatus,
             eventSchedules: ticket?.event_schedules?.filter((es) => es.entrance_date === schedule.entrance_date)
         });
@@ -11541,6 +11530,7 @@ class MainDialogFabImpl {
         console.log('3️⃣ 空き枠予約:', {
             empty_frame_field: schedule.empty_frame,
             hasActualReservation: hasEmptyFrameReservation,
+            alwaysEnabled: alwaysEnabled,
             status: emptyFrameStatus,
             eventSchedules: ticket?.event_schedules?.filter((es) => es.entrance_date === schedule.entrance_date)
         });
@@ -11558,53 +11548,6 @@ class MainDialogFabImpl {
             availableTypes
         };
         console.log('✅ 予約種類判定結果:', result);
-        // スマホ環境での詳細診断（表示決定時の情報）
-        if (/Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) &&
-            !window.ytomoDetailDiagShown) {
-            window.ytomoDetailDiagShown = true;
-            const targetDates = ['20250511', '20250824', '20250826', '20250925'];
-            if (targetDates.includes(schedule?.entrance_date)) {
-                const diagnosticInfo = {
-                    date: schedule.entrance_date,
-                    finalStatusText: result.statusText || '空白',
-                    availableTypes: result.availableTypes,
-                    // 当日予約判定詳細
-                    onTheDay: {
-                        scheduleField: schedule.on_the_day,
-                        actualReservation: ticket?.event_schedules?.some((es) => es.entrance_date === schedule.entrance_date &&
-                            es.registered_channel === '5' &&
-                            es.use_state === 0),
-                        status: (ticket?.event_schedules?.some((es) => es.entrance_date === schedule.entrance_date &&
-                            es.registered_channel === '5' &&
-                            es.use_state === 0)) ? 'あり' : 'なし'
-                    },
-                    // 空き枠予約判定詳細
-                    emptyFrame: {
-                        scheduleField: schedule.empty_frame,
-                        actualReservation: ticket?.event_schedules?.some((es) => es.entrance_date === schedule.entrance_date &&
-                            es.registered_channel === '4'),
-                        status: (ticket?.event_schedules?.some((es) => es.entrance_date === schedule.entrance_date &&
-                            es.registered_channel === '4')) ? 'あり' : 'なし'
-                    },
-                    // 期間チェック結果
-                    periods: {
-                        onTheDay: lotteryData?.on_the_day_reservation ? checkPeriod(lotteryData.on_the_day_reservation) : null,
-                        emptyFrame: lotteryData?.empty_frame_reservation ? checkPeriod(lotteryData.empty_frame_reservation) : null
-                    }
-                };
-                alert(`スマホ診断詳細:
-日付: ${diagnosticInfo.date}
-最終表示: "${diagnosticInfo.finalStatusText}"
-利用可能: [${diagnosticInfo.availableTypes.join(',')}]
-
-当日予約(1): ${diagnosticInfo.onTheDay.status}
-空き枠(3): ${diagnosticInfo.emptyFrame.status}
-
-期間状況:
-- 当日予約: ${JSON.stringify(diagnosticInfo.periods.onTheDay)}
-- 空き枠: ${JSON.stringify(diagnosticInfo.periods.emptyFrame)}`);
-            }
-        }
         return result;
     }
     /**
