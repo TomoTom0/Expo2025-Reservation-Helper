@@ -1196,50 +1196,13 @@ export class MainDialogFabImpl implements MainDialogFab {
         }
 
         try {
-            // 最初の選択時間帯で予約実行
-            const { pavilionId, timeSlot } = selectedTimeSlots[0];
-            
-            // 誤操作防止オーバーレイを表示
-            this.showProcessingOverlay('予約を実行中...');
-            
-            // 予約実行中はFABボタンを無効化
-            const reservationButton = this.mainDialogContainer?.querySelector('#reservation-button') as HTMLButtonElement;
-            if (reservationButton) {
-                reservationButton.disabled = true;
-            }
-            
-            this.showReservationResult('予約処理中...', 'info');
-
-            // メインダイアログの状態から入場日とregistered_channelを取得
-            const { entranceDate } = this.getSearchParameters();
-            
-            if (!entranceDate) {
-                this.showReservationResult('❌ 入場日が選択されていません', 'error');
-                return;
-            }
-            
-            const registeredChannel = this.getRegisteredChannelFromSelection();
-            
-            const result = await this.pavilionManager.makeReservation(
-                pavilionId,
-                timeSlot,
-                selectedTickets,
-                entranceDate,
-                registeredChannel
-            );
-
-            if (result.success) {
-                this.showReservationResult('予約成功', 'success');
-                
-                // UI更新
-                this.updateSelectedInfo();
-                
+            // 複数選択時は順次予約、単一選択時は単一予約
+            if (selectedTimeSlots.length === 1) {
+                await this.executeSingleReservation(selectedTimeSlots[0], selectedTickets);
             } else {
-                // result.messageから重複部分を除去
-                const cleanMessage = result.message.replace('予約に失敗しました: Error: ', '').replace('予約に失敗しました: ', '');
-                this.showReservationResult(`予約失敗: ${cleanMessage}`, 'error');
-                console.log('🔍 予約失敗詳細:', result);
+                await this.executeSequentialReservations(selectedTimeSlots, selectedTickets);
             }
+
 
         } catch (error) {
             console.error('❌ 予約実行エラー:', error);
@@ -1252,6 +1215,541 @@ export class MainDialogFabImpl implements MainDialogFab {
             
             // オーバーレイを非表示
             this.hideProcessingOverlay();
+        }
+    }
+
+    /**
+     * 単一予約実行
+     */
+    private async executeSingleReservation(selectedTimeSlot: any, selectedTickets: any[]): Promise<void> {
+        const { pavilionId, timeSlot } = selectedTimeSlot;
+        
+        // 誤操作防止オーバーレイを表示
+        this.showProcessingOverlay('予約を実行中...');
+        
+        // 予約実行中はFABボタンを無効化
+        const reservationButton = this.mainDialogContainer?.querySelector('#reservation-button') as HTMLButtonElement;
+        if (reservationButton) {
+            reservationButton.disabled = true;
+        }
+        
+        // 登録チャンネルを取得
+        const registeredChannel = this.getRegisteredChannelFromSelection();
+        const entranceDate = this.getSearchParameters().entranceDate;
+        
+        if (!entranceDate) {
+            this.showReservationResult('❗ 入場日が選択されていません', 'error');
+            return;
+        }
+        
+        // 予約を実行
+        const result = await this.pavilionManager.makeReservation(
+            pavilionId,
+            timeSlot,
+            selectedTickets,
+            entranceDate,
+            registeredChannel
+        );
+        
+        if (result.success) {
+            this.showReservationResult('予約成功', 'success');
+            
+            // パビリオン情報を再取得して表示を更新
+            const pavilionName = this.lastSearchResults.find(p => p.id === pavilionId)?.name || pavilionId;
+            const entranceDate = this.getSearchParameters().entranceDate;
+            if (entranceDate) {
+                const dateTimeInfo = `${this.formatDate(entranceDate)} ${this.formatTime(timeSlot.time)}`;
+                
+                // 3行のステータスFAB表示
+                const statusFab = this.mainDialogContainer?.querySelector('.ytomo-status-fab');
+                if (statusFab) {
+                    statusFab.className = 'ytomo-status-fab success';
+                    statusFab.innerHTML = `
+                        <div>予約成功</div>
+                        <div>${pavilionName}</div>
+                        <div>${dateTimeInfo}</div>
+                    `;
+                }
+            }
+            
+            console.log(`✅ 予約成功: ${pavilionId} ${timeSlot.time}`);
+        } else {
+            this.showReservationResult(`予約失敗: ${result.message}`, 'error');
+        }
+    }
+
+    // 180回制限カウンター
+    private attemptCount = 0;
+    private readonly FAST_INTERVAL_LIMIT = 180;
+
+    /**
+     * 順次予約実行（複数選択時）
+     */
+    private async executeSequentialReservations(selectedTimeSlots: any[], selectedTickets: any[]): Promise<void> {
+        // タイムスタンプ順でソート（選択順序を保持）
+        const sortedTimeSlots = this.sortTimeSlotsByTimestamp(selectedTimeSlots);
+        
+        // 拡張オーバーレイを表示
+        this.showSequentialReservationOverlay(sortedTimeSlots.length);
+        
+        // 予約実行中はFABボタンを無効化
+        const reservationButton = this.mainDialogContainer?.querySelector('#reservation-button') as HTMLButtonElement;
+        if (reservationButton) {
+            reservationButton.disabled = true;
+        }
+
+        let successCount = 0;
+        let failureCount = 0;
+        const results: Array<{success: boolean, pavilionId: string, timeSlot: string, message?: string}> = [];
+
+        // オーバーレイ表示後に初期モード取得（UI構築完了後）
+        await new Promise(resolve => setTimeout(resolve, 100)); // DOM構築待機
+        console.log(`🎯 順次実行開始`);
+        
+        // 実行処理（循環対応）
+        let cycleCount = 0;
+        while (successCount === 0) {
+            cycleCount++;
+            console.log(`🔄 循環 ${cycleCount} 回目開始`);
+            
+            for (let i = 0; i < sortedTimeSlots.length; i++) {
+            const currentSlot = sortedTimeSlots[i];
+            const { pavilionId, timeSlot } = currentSlot;
+            
+            try {
+                // オーバーレイの進行状況を更新
+                this.updateSequentialOverlay(i + 1, sortedTimeSlots.length, pavilionId, timeSlot.time, cycleCount);
+                
+                // 各予約実行前にモードを確認（リアルタイム切り替え）
+                const currentMode = this.getCurrentMode();
+                let result;
+                
+                if (currentMode === 'monitoring') {
+                    // 監視モード：全対象を並列チェック
+                    const availableSlot = await this.checkAllSlotsAvailability(sortedTimeSlots, selectedTickets);
+                    
+                    if (availableSlot) {
+                        console.log(`✅ 空きを検出！予約実行: ${availableSlot.pavilionId} ${availableSlot.timeSlot.time}`);
+                        const registeredChannel = this.getRegisteredChannelFromSelection();
+                        const entranceDate = this.getSearchParameters().entranceDate;
+                        
+                        if (!entranceDate) {
+                            throw new Error('入場日が選択されていません');
+                        }
+                        
+                        result = await this.pavilionManager.makeReservation(
+                            availableSlot.pavilionId,
+                            availableSlot.timeSlot,
+                            selectedTickets,
+                            entranceDate,
+                            registeredChannel
+                        );
+                        
+                        // 監視モードでは最初に見つかった空きで予約実行後、結果に関わらず終了
+                        results.push({
+                            success: result.success,
+                            pavilionId: availableSlot.pavilionId,
+                            timeSlot: availableSlot.timeSlot.time,
+                            message: result.message
+                        });
+
+                        if (result.success) {
+                            successCount++;
+                        } else {
+                            failureCount++;
+                        }
+                        break; // forループを抜けて次の循環へ
+                    } else {
+                        console.log(`⏳ 監視継続: 全対象で空きなし`);
+                        break; // forループを抜けて次の循環へ
+                    }
+                } else {
+                    // 予約モード：直接予約実行
+                    const registeredChannel = this.getRegisteredChannelFromSelection();
+                    const entranceDate = this.getSearchParameters().entranceDate;
+                    
+                    if (!entranceDate) {
+                        throw new Error('入場日が選択されていません');
+                    }
+                    
+                    result = await this.pavilionManager.makeReservation(
+                        pavilionId,
+                        timeSlot,
+                        selectedTickets,
+                        entranceDate,
+                        registeredChannel
+                    );
+                }
+
+                results.push({
+                    success: result.success,
+                    pavilionId,
+                    timeSlot: timeSlot.time,
+                    message: result.message
+                });
+
+                if (result.success) {
+                    successCount++;
+                    console.log(`✅ 予約成功 ${i + 1}/${sortedTimeSlots.length}: ${pavilionId} ${timeSlot.time}`);
+                    
+                    // 成功時は即座に終了（最初に成功した予約を取る）
+                    this.showSequentialReservationResult(results, successCount, failureCount);
+                    return;
+                } else {
+                    failureCount++;
+                    console.log(`❌ 予約失敗 ${i + 1}/${sortedTimeSlots.length}: ${pavilionId} ${timeSlot.time} - ${result.message}`);
+                }
+
+                // 間隔調整（動的取得・180回制限チェック）
+                if (i < sortedTimeSlots.length - 1) {
+                    let currentInterval = this.getCurrentInterval();
+                    
+                    // 高速間隔の180回制限チェック（モード別・リアルタイム判定）
+                    const currentIntervalMode = this.getCurrentMode();
+                    if (currentIntervalMode === 'monitoring') {
+                        // 監視モード：5,15秒間隔の制限
+                        if ((currentInterval === 5 || currentInterval === 15) && this.attemptCount >= this.FAST_INTERVAL_LIMIT) {
+                            console.log(`⚠️ 監視モード ${currentInterval}秒間隔の180回制限に達しました。30秒間隔に自動変更します。`);
+                            currentInterval = 30;
+                            this.updateIntervalDropdown(30);
+                        }
+                    } else {
+                        // 予約モード：1,5秒間隔の制限
+                        if ((currentInterval === 1 || currentInterval === 5) && this.attemptCount >= this.FAST_INTERVAL_LIMIT) {
+                            console.log(`⚠️ 予約モード ${currentInterval}秒間隔の180回制限に達しました。15秒間隔に自動変更します。`);
+                            currentInterval = 15;
+                            this.updateIntervalDropdown(15);
+                        }
+                    }
+                    
+                    this.attemptCount++;
+                    await this.waitWithCountdown(currentInterval);
+                }
+
+            } catch (error) {
+                failureCount++;
+                results.push({
+                    success: false,
+                    pavilionId,
+                    timeSlot: timeSlot.time,
+                    message: String(error)
+                });
+                console.error(`❌ 予約エラー ${i + 1}/${sortedTimeSlots.length}: ${pavilionId} ${timeSlot.time}`, error);
+            }
+            }
+        }
+
+        // 全て失敗した場合の結果表示
+        this.showSequentialReservationResult(results, successCount, failureCount);
+    }
+
+    /**
+     * タイムスタンプ順でソート（選択順序を保持）
+     */
+    private sortTimeSlotsByTimestamp(timeSlots: any[]): any[] {
+        return timeSlots.map(slot => {
+            // DOM要素からタイムスタンプを取得
+            const button = this.mainDialogContainer?.querySelector(
+                `.ytomo-time-slot-button[data-pavilion-id="${slot.pavilionId}"][data-time="${slot.timeSlot.time}"]`
+            ) as HTMLElement;
+            const timestamp = button?.getAttribute('data-time-selected');
+            
+            return {
+                ...slot,
+                timestamp: timestamp ? parseInt(timestamp) : 0
+            };
+        }).sort((a, b) => a.timestamp - b.timestamp);
+    }
+
+    /**
+     * 現在の間隔設定を取得
+     */
+    private getCurrentInterval(): number {
+        const dropdown = document.getElementById('ytomo-interval-select') as HTMLSelectElement;
+        return dropdown ? parseInt(dropdown.value) : 15;
+    }
+
+    /**
+     * 間隔ドロップダウンを更新
+     */
+    private updateIntervalDropdown(seconds: number): void {
+        const dropdown = document.getElementById('ytomo-interval-select') as HTMLSelectElement;
+        if (dropdown) {
+            dropdown.value = seconds.toString();
+        }
+    }
+
+    /**
+     * 待機処理（カウントダウン付き）
+     */
+    private async waitWithCountdown(seconds: number): Promise<void> {
+        for (let i = seconds; i > 0; i--) {
+            this.updateSequentialOverlayCountdown(i);
+            await new Promise(resolve => setTimeout(resolve, 1000));
+        }
+    }
+
+    /**
+     * 順次予約オーバーレイを表示
+     */
+    private showSequentialReservationOverlay(totalCount: number): void {
+        this.hideProcessingOverlay();
+        
+        const overlay = document.createElement('div');
+        overlay.id = 'ytomo-sequential-overlay';
+        overlay.className = 'ytomo-sequential-overlay';
+        overlay.innerHTML = `
+            <div class="ytomo-sequential-content">
+                <h3>順次予約実行中</h3>
+                <div class="ytomo-sequential-settings">
+                    <div class="ytomo-mode-selection">
+                        <label>実行モード:</label>
+                        <div class="ytomo-mode-buttons">
+                            <button id="ytomo-reservation-mode" class="ytomo-mode-button active">予約モード</button>
+                            <button id="ytomo-monitoring-mode" class="ytomo-mode-button">監視モード</button>
+                        </div>
+                    </div>
+                    <div class="ytomo-interval-setting">
+                        <label for="ytomo-interval-select">実行間隔:</label>
+                        <select id="ytomo-interval-select" class="ytomo-interval-dropdown">
+                            <option value="1">1秒</option>
+                            <option value="5">5秒</option>
+                            <option value="15" selected>15秒</option>
+                            <option value="30">30秒</option>
+                            <option value="60">60秒</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="ytomo-sequential-progress">
+                    <div class="ytomo-sequential-current">1/${totalCount}</div>
+                    <div class="ytomo-sequential-target">準備中...</div>
+                    <div class="ytomo-sequential-countdown"></div>
+                </div>
+                <div class="ytomo-sequential-controls">
+                    <button id="ytomo-cancel-sequential" class="ytomo-cancel-button">キャンセル</button>
+                </div>
+            </div>
+        `;
+        
+        overlay.style.zIndex = '10002';
+        
+        // イベントリスナー設定
+        overlay.addEventListener('click', (e) => {
+            const target = e.target as HTMLElement;
+            
+            if (target.id === 'ytomo-cancel-sequential') {
+                this.cancelSequentialReservation();
+            } else if (target.id === 'ytomo-reservation-mode' || target.id === 'ytomo-monitoring-mode') {
+                this.handleModeSwitch(target);
+            }
+            
+            e.preventDefault();
+            e.stopPropagation();
+        });
+        
+        document.body.appendChild(overlay);
+    }
+
+    /**
+     * 実行モード切り替え
+     */
+    private handleModeSwitch(targetButton: HTMLElement): void {
+        const overlay = document.getElementById('ytomo-sequential-overlay');
+        if (!overlay) return;
+
+        const allModeButtons = overlay.querySelectorAll('.ytomo-mode-button');
+        allModeButtons.forEach(btn => btn.classList.remove('active'));
+        targetButton.classList.add('active');
+
+        // モードに応じて間隔選択肢を更新
+        this.updateIntervalOptionsForMode(targetButton.id === 'ytomo-monitoring-mode');
+        
+        // ヘッダーテキストを更新
+        const header = overlay.querySelector('h3');
+        if (header) {
+            header.textContent = targetButton.id === 'ytomo-monitoring-mode' ? '監視モード実行中' : '順次予約実行中';
+        }
+    }
+
+    /**
+     * 現在の実行モードを取得
+     */
+    private getCurrentMode(): 'reservation' | 'monitoring' {
+        const monitoringButton = document.getElementById('ytomo-monitoring-mode');
+        const reservationButton = document.getElementById('ytomo-reservation-mode');
+        
+        console.log('🔍 モード判定デバッグ:');
+        console.log('  - 監視ボタン存在:', !!monitoringButton);
+        console.log('  - 監視ボタンactive:', monitoringButton?.classList.contains('active'));
+        console.log('  - 予約ボタン存在:', !!reservationButton);
+        console.log('  - 予約ボタンactive:', reservationButton?.classList.contains('active'));
+        
+        const mode = monitoringButton?.classList.contains('active') ? 'monitoring' : 'reservation';
+        console.log('  - 判定結果:', mode);
+        
+        return mode;
+    }
+
+    /**
+     * モードに応じて間隔選択肢を更新
+     */
+    private updateIntervalOptionsForMode(isMonitoring: boolean): void {
+        const dropdown = document.getElementById('ytomo-interval-select') as HTMLSelectElement;
+        if (!dropdown) return;
+
+        const currentValue = dropdown.value;
+        dropdown.innerHTML = '';
+
+        if (isMonitoring) {
+            // 監視モード：5,15,30,60秒
+            dropdown.innerHTML = `
+                <option value="5">5秒</option>
+                <option value="15">15秒</option>
+                <option value="30">30秒</option>
+                <option value="60">60秒</option>
+            `;
+            // 現在の値が利用可能なら維持、なければデフォルト15秒
+            dropdown.value = ['5', '15', '30', '60'].includes(currentValue) ? currentValue : '15';
+        } else {
+            // 予約モード：1,5,15,30,60秒
+            dropdown.innerHTML = `
+                <option value="1">1秒</option>
+                <option value="5">5秒</option>
+                <option value="15">15秒</option>
+                <option value="30">30秒</option>
+                <option value="60">60秒</option>
+            `;
+            dropdown.value = currentValue || '15';
+        }
+    }
+
+    /**
+     * 全監視対象の空き状況を並列チェック（監視モード用）
+     */
+    private async checkAllSlotsAvailability(timeSlots: any[], selectedTickets: any[]): Promise<{pavilionId: string, timeSlot: any} | null> {
+        try {
+            const entranceDate = this.getSearchParameters().entranceDate;
+            if (!entranceDate) {
+                console.warn('入場日が選択されていません');
+                return null;
+            }
+
+            const ticketIds = selectedTickets.map(t => t.ticket_id);
+            
+            // 監視対象のパビリオンIDsを抽出
+            const pavilionIds = [...new Set(timeSlots.map(slot => slot.pavilionId))];
+            console.log(`🔍 並列監視チェック開始: ${pavilionIds.length}件のパビリオン`);
+            
+            // 並列で全パビリオンの時間帯情報を取得
+            const pavilionChecks = pavilionIds.map(async (pavilionId) => {
+                try {
+                    const apiTimeSlots = await this.pavilionManager.getPavilionTimeSlots(pavilionId, ticketIds, entranceDate);
+                    return { pavilionId, apiTimeSlots };
+                } catch (error) {
+                    console.warn(`⚠️ パビリオン${pavilionId}の取得エラー:`, error);
+                    return { pavilionId, apiTimeSlots: [] };
+                }
+            });
+            
+            const results = await Promise.all(pavilionChecks);
+            
+            // 監視対象の時間帯で空きがあるかチェック
+            for (const monitoringSlot of timeSlots) {
+                const pavilionResult = results.find(r => r.pavilionId === monitoringSlot.pavilionId);
+                if (!pavilionResult) continue;
+                
+                const targetSlot = pavilionResult.apiTimeSlots.find(slot => slot.time === monitoringSlot.timeSlot.time);
+                if (targetSlot?.available) {
+                    console.log(`✅ 空き発見: ${monitoringSlot.pavilionId} ${monitoringSlot.timeSlot.time}`);
+                    return { pavilionId: monitoringSlot.pavilionId, timeSlot: monitoringSlot.timeSlot };
+                }
+            }
+            
+            console.log(`⏳ 全対象で空きなし`);
+            return null;
+            
+        } catch (error) {
+            console.warn('⚠️ 並列監視チェックエラー:', error);
+            return null;
+        }
+    }
+
+
+    /**
+     * 順次予約をキャンセル
+     */
+    private cancelSequentialReservation(): void {
+        this.hideSequentialOverlay();
+        this.showReservationResult('順次予約をキャンセルしました', 'info');
+    }
+
+
+    /**
+     * 順次予約オーバーレイのカウントダウン更新
+     */
+    private updateSequentialOverlayCountdown(seconds: number): void {
+        const overlay = document.getElementById('ytomo-sequential-overlay');
+        if (!overlay) return;
+
+        const countdownDiv = overlay.querySelector('.ytomo-sequential-countdown');
+        if (countdownDiv) {
+            countdownDiv.textContent = `次まで ${seconds} 秒`;
+        }
+    }
+
+    /**
+     * 順次予約オーバーレイの進捗更新（旧名：updateSequentialOverlay）
+     */
+    private updateSequentialOverlay(current: number, total: number, pavilionId: string, timeSlot: string, cycleCount: number = 1): void {
+        const overlay = document.getElementById('ytomo-sequential-overlay');
+        if (!overlay) return;
+        
+        const currentDiv = overlay.querySelector('.ytomo-sequential-current');
+        const targetDiv = overlay.querySelector('.ytomo-sequential-target');
+        
+        if (currentDiv) currentDiv.textContent = `循環${cycleCount}回目: ${current}/${total}`;
+        if (targetDiv) {
+            const pavilionName = this.lastSearchResults.find(p => p.id === pavilionId)?.name || pavilionId;
+            targetDiv.textContent = `${pavilionName} ${this.formatTime(timeSlot)}`;
+        }
+    }
+
+    /**
+     * 順次予約結果表示
+     */
+    private showSequentialReservationResult(results: any[], successCount: number, failureCount: number): void {
+        this.hideSequentialOverlay();
+        
+        if (successCount > 0) {
+            const successResult = results.find(r => r.success);
+            this.showReservationResult('予約成功', 'success');
+            
+            // ステータスFAB更新
+            const pavilionName = this.lastSearchResults.find(p => p.id === successResult.pavilionId)?.name || successResult.pavilionId;
+            const entranceDate = this.getSearchParameters().entranceDate;
+            const dateTimeInfo = entranceDate ? `${this.formatDate(entranceDate)} ${this.formatTime(successResult.timeSlot)}` : '日時不明';
+            
+            const statusFab = this.mainDialogContainer?.querySelector('.ytomo-status-fab');
+            if (statusFab) {
+                statusFab.className = 'ytomo-status-fab success';
+                statusFab.innerHTML = `
+                    <div>予約成功</div>
+                    <div>${pavilionName}</div>
+                    <div>${dateTimeInfo}</div>
+                `;
+            }
+        } else {
+            this.showReservationResult(`全て失敗 (${failureCount}件)`, 'error');
+        }
+    }
+
+    /**
+     * 順次予約オーバーレイを非表示
+     */
+    private hideSequentialOverlay(): void {
+        const overlay = document.getElementById('ytomo-sequential-overlay');
+        if (overlay) {
+            overlay.remove();
         }
     }
 
@@ -1379,6 +1877,19 @@ export class MainDialogFabImpl implements MainDialogFab {
             });
         });
 
+        // パビリオンチェックボックス
+        const pavilionCheckboxes = container.querySelectorAll('.ytomo-pavilion-checkbox');
+        pavilionCheckboxes.forEach(checkbox => {
+            checkbox.addEventListener('change', (e) => {
+                const target = e.target as HTMLInputElement;
+                const pavilionId = target.dataset['pavilionId'];
+                
+                if (pavilionId) {
+                    this.handlePavilionCheckboxChange(pavilionId, target.checked);
+                }
+            });
+        });
+
         // 時間帯ボタン
         const timeSlotButtons = container.querySelectorAll('.ytomo-time-slot-button');
         timeSlotButtons.forEach(button => {
@@ -1441,11 +1952,83 @@ export class MainDialogFabImpl implements MainDialogFab {
         // パビリオンマネージャーで選択状態を更新
         this.pavilionManager.selectTimeSlot(pavilionId, timeSlot);
 
-        // UI更新
+        // UI更新とタイムスタンプ記録
         if (isSelected) {
+            // 選択解除：クラスとタイムスタンプ属性を削除
             button.classList.remove('selected');
+            button.removeAttribute('data-time-selected');
         } else {
+            // 選択：クラス追加とタイムスタンプ記録
             button.classList.add('selected');
+            const currentTimestamp = Math.floor(Date.now() / 1000);
+            button.setAttribute('data-time-selected', currentTimestamp.toString());
+        }
+
+        // 選択情報とボタン状態を更新
+        this.updateSelectedInfo();
+        this.updateReservationButton();
+    }
+
+    /**
+     * パビリオンチェックボックス変更時の処理
+     */
+    private handlePavilionCheckboxChange(pavilionId: string, isChecked: boolean): void {
+        const timeSlotContainer = this.mainDialogContainer?.querySelector(`#time-slots-${pavilionId}`);
+        if (!timeSlotContainer) return;
+
+        const timeSlotButtons = timeSlotContainer.querySelectorAll('.ytomo-time-slot-button') as NodeListOf<HTMLElement>;
+        
+        if (isChecked) {
+            // チェック時：全ての時間帯を昇順で選択し、昇順タイムスタンプを付与
+            let baseTimestamp = Math.floor(Date.now() / 1000);
+            
+            // 時間帯ボタンを時間順にソート
+            const sortedButtons = Array.from(timeSlotButtons).sort((a, b) => {
+                const timeA = parseInt(a.dataset['time'] || '0');
+                const timeB = parseInt(b.dataset['time'] || '0');
+                return timeA - timeB;
+            });
+
+            sortedButtons.forEach((button, index) => {
+                if (!(button as HTMLButtonElement).disabled) { // rate-limitedでない場合のみ選択
+                    const time = button.dataset['time'];
+                    if (time) {
+                        // UI更新
+                        button.classList.add('selected');
+                        // 昇順タイムスタンプ（1秒刻み）
+                        const timestamp = baseTimestamp + index;
+                        button.setAttribute('data-time-selected', timestamp.toString());
+
+                        // パビリオンマネージャーに通知
+                        const timeSlot = {
+                            time: time,
+                            available: !button.classList.contains('unavailable'),
+                            selected: true,
+                            reservationType: ''
+                        };
+                        this.pavilionManager.selectTimeSlot(pavilionId, timeSlot);
+                    }
+                }
+            });
+        } else {
+            // チェック解除時：全ての時間帯を解除
+            timeSlotButtons.forEach(button => {
+                const time = button.dataset['time'];
+                if (time) {
+                    // UI更新
+                    button.classList.remove('selected');
+                    button.removeAttribute('data-time-selected');
+
+                    // パビリオンマネージャーに通知
+                    const timeSlot = {
+                        time: time,
+                        available: !button.classList.contains('unavailable'),
+                        selected: false,
+                        reservationType: ''
+                    };
+                    this.pavilionManager.selectTimeSlot(pavilionId, timeSlot);
+                }
+            });
         }
 
         // 選択情報とボタン状態を更新

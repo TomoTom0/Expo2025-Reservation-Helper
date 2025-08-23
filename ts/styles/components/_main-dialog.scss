@@ -17,6 +17,7 @@
     z-index: 10000;
     opacity: 0;
     animation: fadeIn 0.2s ease-out forwards;
+    overflow-y: auto;
 }
 
 @keyframes fadeIn {
@@ -396,20 +397,25 @@
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.7);
+    background-color: rgba(0, 0, 0, 0.3);
     display: flex;
     align-items: center;
-    justify-content: center;
+    justify-content: flex-end;
     z-index: 10001;
+    padding-right: 40px;
+    pointer-events: auto;
+    overflow-y: auto;
 }
 
 .ytomo-processing-content {
-    background: white;
+    background: rgba(255, 255, 255, 0.7);
     border-radius: 12px;
     padding: 30px;
     text-align: center;
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
     min-width: 200px;
+    pointer-events: auto;
+    backdrop-filter: blur(1px);
 }
 
 .ytomo-processing-spinner {
@@ -426,6 +432,159 @@
     color: #374151;
     font-size: 14px;
     font-weight: 500;
+}
+
+/* 順次予約オーバーレイ */
+.ytomo-sequential-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.3);
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    z-index: 10002;
+    padding-right: 40px;
+    pointer-events: auto;
+    overflow-y: auto;
+}
+
+.ytomo-sequential-content {
+    background: rgba(255, 255, 255, 0.7);
+    border-radius: 12px;
+    padding: 30px;
+    text-align: center;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+    min-width: 300px;
+    max-width: 400px;
+    pointer-events: auto;
+    backdrop-filter: blur(1px);
+}
+
+.ytomo-sequential-content h3 {
+    margin: 0 0 20px 0;
+    color: #374151;
+    font-size: 18px;
+    font-weight: 600;
+}
+
+.ytomo-sequential-settings {
+    margin-bottom: 20px;
+    text-align: left;
+}
+
+.ytomo-sequential-settings label {
+    display: block;
+    margin-bottom: 8px;
+    color: #374151;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.ytomo-mode-selection {
+    margin-bottom: 16px;
+}
+
+.ytomo-mode-buttons {
+    display: flex;
+    gap: 8px;
+    margin-top: 8px;
+}
+
+.ytomo-mode-button {
+    flex: 1;
+    padding: 8px 16px;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    background: white;
+    color: #374151;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    
+    &:hover {
+        background: #f3f4f6;
+        border-color: #9ca3af;
+    }
+    
+    &.active {
+        background: #2c5aa0;
+        border-color: #2c5aa0;
+        color: white;
+    }
+    
+    &:focus {
+        outline: 2px solid #2c5aa0;
+        outline-offset: 2px;
+    }
+}
+
+.ytomo-interval-setting {
+    margin-top: 12px;
+}
+
+.ytomo-interval-dropdown {
+    width: 100%;
+    padding: 8px 12px;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    background: white;
+    font-size: 14px;
+    color: #374151;
+    cursor: pointer;
+    
+    &:focus {
+        outline: 2px solid #2c5aa0;
+        outline-offset: 2px;
+        border-color: #2c5aa0;
+    }
+}
+
+.ytomo-sequential-progress {
+    margin-bottom: 20px;
+}
+
+.ytomo-sequential-current {
+    font-size: 24px;
+    font-weight: bold;
+    color: #2c5aa0;
+    margin-bottom: 8px;
+}
+
+.ytomo-sequential-target {
+    font-size: 16px;
+    color: #374151;
+    margin-bottom: 8px;
+    font-weight: 500;
+}
+
+.ytomo-sequential-countdown {
+    font-size: 14px;
+    color: #6b7280;
+    min-height: 20px;
+}
+
+.ytomo-sequential-controls {
+    margin-top: 20px;
+}
+
+.ytomo-cancel-button {
+    background: #dc3545;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    padding: 10px 20px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.ytomo-cancel-button:hover {
+    background: #c82333;
 }
 
 /* ダークモード対応を無効化（明示的にライトテーマを強制） */
