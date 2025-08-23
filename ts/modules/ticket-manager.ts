@@ -32,30 +32,35 @@ export class TicketManager {
     async loadAllTickets(): Promise<TicketData[]> {
         console.log('🎫 チケット統合管理: 全チケット情報取得開始');
         
+        // 自分のチケットを最優先で読み込み
+        let ownTickets: TicketData[] = [];
         try {
-            // 並列実行で効率化
-            const [ownTickets, cachedTickets] = await Promise.all([
-                this.loadOwnTickets(),
-                this.loadCachedExternalTickets()
-            ]);
-
+            ownTickets = await this.loadOwnTickets();
+            console.log(`✅ 自分のチケット: ${ownTickets.length}個取得完了`);
+            
             // 自分のチケットを追加
             for (const ticket of ownTickets) {
                 this.tickets.set(ticket.ticket_id, ticket);
             }
+        } catch (error) {
+            console.error('❌ 自分のチケット取得エラー:', error);
+        }
 
+        // 外部チケットを取得（エラーがあっても自分のチケットには影響しない）
+        try {
+            const cachedTickets = await this.loadCachedExternalTickets();
+            console.log(`✅ 外部チケット: ${cachedTickets.length}個取得完了`);
+            
             // キャッシュされた外部チケットを追加
             for (const ticket of cachedTickets) {
                 this.tickets.set(ticket.ticket_id, ticket);
             }
-
-            console.log(`✅ チケット統合管理: ${this.tickets.size}個のチケットを読み込み完了`);
-            return Array.from(this.tickets.values());
-
         } catch (error) {
-            console.error('❌ チケット情報取得エラー:', error);
-            return [];
+            console.error('❌ 外部チケット取得エラー（自分のチケットは正常）:', error);
         }
+
+        console.log(`✅ チケット統合管理: ${this.tickets.size}個のチケットを読み込み完了`);
+        return Array.from(this.tickets.values());
     }
 
     /**
@@ -127,9 +132,13 @@ export class TicketManager {
                     const ticketData = await this.loadExternalTicketData(ticketId, label);
                     if (ticketData) {
                         tickets.push(ticketData);
+                        console.log(`✅ 外部チケット ${ticketId} (${label}) を正常追加`);
+                    } else {
+                        console.warn(`⚠️ 外部チケット ${ticketId} のデータ取得失敗（null返却）`);
                     }
                 } catch (error) {
                     console.warn(`⚠️ 外部チケット${ticketId}の取得に失敗:`, error);
+                    // 外部チケット取得失敗は他のチケットに影響させない
                 }
             }
 
@@ -221,11 +230,11 @@ export class TicketManager {
                             console.warn(`⚠️ 外部チケット${ticketId}の入場予約取得失敗:`, error);
                         }
 
-                        console.log(`✅ 外部チケット${ticketId}をchannel=${channel}で取得成功`);
+                        console.log(`✅ 外部チケット${ticketId}をchannel=${testChannel}で取得成功`);
                         return ticketData;
                     }
                 } catch (error) {
-                    console.warn(`⚠️ 外部チケット${ticketId}のchannel=${channel}取得失敗:`, error);
+                    console.warn(`⚠️ 外部チケット${ticketId}のchannel=${testChannel}取得失敗:`, error);
                 }
             }
             
