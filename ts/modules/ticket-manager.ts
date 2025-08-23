@@ -516,6 +516,30 @@ export class TicketManager {
     }
 
     /**
+     * 選択されたチケットの入場予約から最も遅い入場時間を取得（律速時間）
+     */
+    getLatestEntranceTime(targetDate: string): string | null {
+        const selectedTickets = this.getSelectedTickets();
+        let latestTime: string | null = null;
+
+        for (const ticket of selectedTickets) {
+            const entranceReservations = ticket.entranceReservations || [];
+            
+            for (const reservation of entranceReservations) {
+                // 対象日付の入場予約のみを対象
+                if (reservation.date === targetDate && reservation.status === 'confirmed') {
+                    // 時間の比較（HH:MM形式）
+                    if (!latestTime || reservation.time > latestTime) {
+                        latestTime = reservation.time;
+                    }
+                }
+            }
+        }
+
+        return latestTime;
+    }
+
+    /**
      * 全チケット一覧を取得
      */
     getAllTickets(): TicketData[] {

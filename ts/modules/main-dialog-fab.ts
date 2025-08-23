@@ -1139,9 +1139,19 @@ export class MainDialogFabImpl implements MainDialogFab {
             const allPavilionIds = pavilions.map(p => p.id);
             const timeSlotsMap = await this.fetchTimeSlotsForPavilionIds(allPavilionIds, ticketIds, entranceDate);
             
-            // 全パビリオンに時間帯情報を設定
+            // 全パビリオンに時間帯情報を設定し、dateStatusを更新
             for (const pavilion of pavilions) {
                 pavilion.timeSlots = timeSlotsMap.get(pavilion.id) || [];
+                
+                // 時間帯情報から満員状態を判定してdateStatusを設定
+                const hasAvailableSlots = pavilion.timeSlots.some(slot => slot.available);
+                if (!hasAvailableSlots && pavilion.timeSlots.length > 0) {
+                    pavilion.dateStatus = 2; // 全て満員
+                } else if (pavilion.timeSlots.length === 0) {
+                    pavilion.dateStatus = 2; // 時間帯なし（満員扱い）
+                } else {
+                    pavilion.dateStatus = 1; // 空きあり
+                }
             }
 
             // 検索結果を保存
@@ -1188,6 +1198,9 @@ export class MainDialogFabImpl implements MainDialogFab {
         try {
             // 最初の選択時間帯で予約実行
             const { pavilionId, timeSlot } = selectedTimeSlots[0];
+            
+            // 誤操作防止オーバーレイを表示
+            this.showProcessingOverlay('予約を実行中...');
             
             // 予約実行中はFABボタンを無効化
             const reservationButton = this.mainDialogContainer?.querySelector('#reservation-button') as HTMLButtonElement;
@@ -1236,6 +1249,9 @@ export class MainDialogFabImpl implements MainDialogFab {
         } finally {
             // 予約完了後にFABボタンを再有効化
             this.updateReservationButton();
+            
+            // オーバーレイを非表示
+            this.hideProcessingOverlay();
         }
     }
 
@@ -1255,6 +1271,9 @@ export class MainDialogFabImpl implements MainDialogFab {
             return;
         }
 
+        // オーバーレイを非表示
+        this.hideProcessingOverlay();
+        
         container.innerHTML = pavilions.map(pavilion => `
             <div class="ytomo-pavilion-item ${pavilion.dateStatus === 2 ? 'full-pavilion' : ''}" data-pavilion-id="${pavilion.id}">
                 <div class="ytomo-pavilion-header">
@@ -1291,15 +1310,34 @@ export class MainDialogFabImpl implements MainDialogFab {
             return timeA - timeB;
         });
         
+        // 選択されている入場日の律速時間を取得
+        const selectedDates = this.getSelectedEntranceDates();
+        let latestEntranceTime: string | null = null;
+        
+        if (selectedDates.length === 1) {
+            latestEntranceTime = this.ticketManager.getLatestEntranceTime(selectedDates[0]);
+        }
+        
         return sortedTimeSlots.map(slot => {
             const startTime = this.formatTime(slot.time);
             const endTime = slot.endTime ? this.formatTime(slot.endTime) : '';
             const timeDisplay = endTime ? `${startTime} - ${endTime}` : startTime;
             
+            // 律速時間チェック：開始時間が律速時間以前の場合はdisabled
+            let isDisabledByEntranceTime = false;
+            if (latestEntranceTime) {
+                const slotStartTime = this.formatTime(slot.time); // HH:MM形式
+                isDisabledByEntranceTime = slotStartTime <= latestEntranceTime;
+            }
+            
+            const disabledClass = isDisabledByEntranceTime ? 'rate-limited' : '';
+            const disabledAttr = isDisabledByEntranceTime ? 'disabled' : '';
+            
             return `
-                <button class="ytomo-time-slot-button ${slot.available ? 'available' : 'unavailable'} ${slot.selected ? 'selected' : ''}"
+                <button class="ytomo-time-slot-button ${slot.available ? 'available' : 'unavailable'} ${slot.selected ? 'selected' : ''} ${disabledClass}"
                         data-pavilion-id="${pavilionId}"
-                        data-time="${slot.time}">
+                        data-time="${slot.time}"
+                        ${disabledAttr}>
                     ${timeDisplay}
                 </button>
             `;
@@ -1477,12 +1515,55 @@ export class MainDialogFabImpl implements MainDialogFab {
      */
     private showPavilionLoading(message: string): void {
         const container = this.mainDialogContainer?.querySelector('#pavilion-list-container');
+        console.log('🔄 showPavilionLoading:', message, 'container found:', !!container);
         if (container) {
             container.innerHTML = `
                 <div class="ytomo-loading">
                     <p>${message}</p>
                 </div>
             `;
+        }
+        
+        // 誤操作防止オーバーレイも表示
+        this.showProcessingOverlay(message);
+    }
+
+    /**
+     * 誤操作防止オーバーレイを表示
+     */
+    private showProcessingOverlay(message: string): void {
+        // 既存のオーバーレイを削除
+        this.hideProcessingOverlay();
+        
+        const overlay = document.createElement('div');
+        overlay.id = 'ytomo-main-dialog-overlay';
+        overlay.className = 'ytomo-processing-overlay';
+        overlay.innerHTML = `
+            <div class="ytomo-processing-content">
+                <div class="ytomo-processing-spinner"></div>
+                <div class="ytomo-processing-message">${message}</div>
+            </div>
+        `;
+        
+        // ダイアログより上のz-indexで表示
+        overlay.style.zIndex = '10001';
+        
+        // クリックをブロック
+        overlay.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+        });
+        
+        document.body.appendChild(overlay);
+    }
+
+    /**
+     * 誤操作防止オーバーレイを非表示
+     */
+    private hideProcessingOverlay(): void {
+        const existingOverlay = document.getElementById('ytomo-main-dialog-overlay');
+        if (existingOverlay) {
+            existingOverlay.remove();
         }
     }
 
@@ -1498,6 +1579,9 @@ export class MainDialogFabImpl implements MainDialogFab {
                 </div>
             `;
         }
+        
+        // オーバーレイを非表示
+        this.hideProcessingOverlay();
     }
 
     /**
@@ -1588,12 +1672,53 @@ export class MainDialogFabImpl implements MainDialogFab {
         const dateStr = selectedDates.size > 0 ? 
             Array.from(selectedDates).map(date => this.formatDate(date)).join(', ') : '';
         
-        // タブボタン下半分の表示
+        // 律速時間（最も遅い入場時間）を取得
+        let rateTimeStr = '';
+        if (selectedDates.size === 1) {
+            const targetDate = Array.from(selectedDates)[0];
+            const latestTime = this.ticketManager.getLatestEntranceTime(targetDate);
+            if (latestTime) {
+                rateTimeStr = ` ${latestTime}`;
+            }
+        }
+        
+        // タブボタン下半分の表示（日付 + 律速時間）
         if (tabDates) {
-            tabDates.textContent = dateStr;
+            tabDates.textContent = dateStr + rateTimeStr;
         }
         
         console.log(`🗓️ パビリオンタブ日付更新: ${dateStr}`);
+    }
+
+    /**
+     * 選択されている入場日付を取得
+     */
+    private getSelectedEntranceDates(): string[] {
+        const selectedDates: string[] = [];
+        
+        // 複数のセレクタでチェック
+        const selectors = [
+            '.ytomo-entrance-date-btn.selected',
+            '.ytomo-entrance-date-button.selected',
+            '[data-date].selected'
+        ];
+        
+        let selectedEntranceButtons: NodeListOf<Element> | undefined;
+        for (const selector of selectors) {
+            selectedEntranceButtons = this.mainDialogContainer?.querySelectorAll(selector);
+            if (selectedEntranceButtons && selectedEntranceButtons.length > 0) {
+                break;
+            }
+        }
+        
+        selectedEntranceButtons?.forEach(button => {
+            const date = (button as HTMLElement).dataset['date'];
+            if (date) {
+                selectedDates.push(date);
+            }
+        });
+        
+        return selectedDates;
     }
 
     /**
@@ -1774,6 +1899,8 @@ export class MainDialogFabImpl implements MainDialogFab {
             const pavilions = await this.searchPavilionList(query, ticketIds, entranceDate);
             
             // 各パビリオンの時間帯情報を取得
+            console.log('⏳ 時間帯情報取得開始...');
+            this.showPavilionLoading(`時間帯情報を取得中... (${pavilions.length}件)`);
             await this.fetchPavilionTimeSlots(pavilions, ticketIds, entranceDate);
             
             console.log(`🔍 パビリオン検索完了: ${pavilions.length}件（時間帯情報付き）`);
@@ -1781,7 +1908,8 @@ export class MainDialogFabImpl implements MainDialogFab {
             // 検索結果を保存（全パビリオン - フィルタで制御）
             this.lastSearchResults = [...pavilions];
             
-            // 全パビリオンを表示
+            // 全パビリオンを表示（ローディング表示を置き換える）
+            console.log('📄 パビリオン表示開始...');
             this.displayPavilions(pavilions);
             
             // 空きパビリオン数を更新
@@ -1801,6 +1929,7 @@ export class MainDialogFabImpl implements MainDialogFab {
             
         } catch (error) {
             console.error('❌ パビリオン検索エラー:', error);
+            this.showPavilionError(`検索に失敗しました: ${error}`);
             this.showReservationResult(`❌ 検索に失敗しました: ${error}`, 'error');
         }
     }
@@ -1838,6 +1967,7 @@ export class MainDialogFabImpl implements MainDialogFab {
             
         } catch (error) {
             console.error('❌ パビリオン更新エラー:', error);
+            this.showPavilionError(`更新に失敗しました: ${error}`);
             this.showReservationResult(`❌ 更新に失敗しました: ${error}`, 'error');
         }
     }

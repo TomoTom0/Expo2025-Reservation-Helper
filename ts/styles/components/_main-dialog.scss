@@ -384,6 +384,50 @@
     }
 }
 
+/* ダイアログ内の全要素でfocus囲みを無効化 */
+.ytomo-main-dialog *:focus {
+    outline: none !important;
+}
+
+/* メインダイアログ用誤操作防止オーバーレイ */
+.ytomo-processing-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10001;
+}
+
+.ytomo-processing-content {
+    background: white;
+    border-radius: 12px;
+    padding: 30px;
+    text-align: center;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+    min-width: 200px;
+}
+
+.ytomo-processing-spinner {
+    width: 40px;
+    height: 40px;
+    border: 3px solid #e2e8f0;
+    border-top-color: #2c5aa0;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 0 auto 16px;
+}
+
+.ytomo-processing-message {
+    color: #374151;
+    font-size: 14px;
+    font-weight: 500;
+}
+
 /* ダークモード対応を無効化（明示的にライトテーマを強制） */
 .ytomo-dialog-overlay {
     color-scheme: light;
