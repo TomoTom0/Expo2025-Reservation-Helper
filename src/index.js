@@ -10,7 +10,7 @@
 // @run-at       document-end
 // ==/UserScript==
 
-// Built: 2025/08/24 03:29:46
+// Built: 2025/08/24 03:34:49
 
 
 (function webpackUniversalModuleDefinition(root, factory) {
@@ -11200,9 +11200,37 @@ class MainDialogFabImpl {
             // パビリオンタブの初期化
             await this.initializePavilionTab();
             console.log('✅ ダイアログ内容初期化完了');
+            // スマホ環境での診断情報表示
+            if (/Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+                const tickets = this.ticketManager.getAllTickets();
+                const selectedTickets = this.ticketManager.getSelectedTickets();
+                const availableDates = this.ticketManager.getAvailableDates();
+                // 最初の入場予約の予約種類判定結果をサンプル取得
+                let sampleReservationStatus = '取得できず';
+                if (tickets.length > 0 && tickets[0]?.schedules?.length && tickets[0].schedules.length > 0) {
+                    try {
+                        const schedule = tickets[0].schedules[0];
+                        const lotteryData = await this.fetchLotteryCalendar(schedule?.entrance_date);
+                        const status = this.getReservationStatus(schedule, lotteryData, tickets[0]);
+                        sampleReservationStatus = status.statusText || '空白';
+                    }
+                    catch (error) {
+                        sampleReservationStatus = `エラー: ${error}`;
+                    }
+                }
+                alert(`スマホ診断情報:
+チケット数: ${tickets.length}
+選択中: ${selectedTickets.length}  
+利用可能日: ${availableDates.length}
+サンプル予約種類: "${sampleReservationStatus}"`);
+            }
         }
         catch (error) {
             console.error('❌ ダイアログ内容初期化エラー:', error);
+            // スマホ環境でのエラーアラート
+            if (/Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+                alert(`スマホ環境: 初期化エラー\n${error}`);
+            }
         }
     }
     /**
@@ -11512,10 +11540,6 @@ class MainDialogFabImpl {
             availableTypes
         };
         console.log('✅ 予約種類判定結果:', result);
-        // スマホ環境での初期化完了アラート
-        if (/Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
-            alert(`スマホ環境: 予約種類判定完了\n結果: ${result.statusText}\n利用可能: ${result.availableTypes.join(', ')}`);
-        }
         return result;
     }
     /**
