@@ -416,12 +416,13 @@ export class MainDialogFabImpl implements MainDialogFab {
                     ${await this.buildTicketList(tickets)}
                 </div>
 
-                <!-- チケットID追加（同様のレイアウト） -->
-                <div class="ytomo-ticket-item ytomo-add-ticket-item">
-                    <div class="ytomo-ticket-upper">
+                <!-- チケットID追加 -->
+                <div class="ytomo-add-ticket">
+                    <h4>チケット追加</h4>
+                    <div class="ytomo-add-ticket-form">
                         <input type="text" id="ticket-id-input" placeholder="チケットID" class="ytomo-input-inline">
-                        <input type="text" id="ticket-label-input" placeholder="Label" class="ytomo-input-inline">
-                        <button id="add-ticket-button" class="ytomo-button primary">Add</button>
+                        <input type="text" id="ticket-label-input" placeholder="ラベル" class="ytomo-input-inline">
+                        <button id="add-ticket-button" class="ytomo-button primary">追加</button>
                     </div>
                 </div>
             </div>
