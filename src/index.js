@@ -10,7 +10,7 @@
 // @run-at       document-end
 // ==/UserScript==
 
-// Built: 2025/08/24 04:47:21
+// Built: 2025/08/24 05:38:41
 
 
 (function webpackUniversalModuleDefinition(root, factory) {
@@ -450,221 +450,6 @@ module.exports = function (list, options) {
     lastIdentifiers = newLastIdentifiers;
   };
 };
-
-/***/ }),
-
-/***/ 76:
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   MonitoringCacheManager: () => (/* binding */ MonitoringCacheManager)
-/* harmony export */ });
-/**
- * 監視対象キャッシュ管理
- * 順序ベースの監視対象データ管理
- */
-// キャッシュキー
-const CACHE_KEYS = {
-    MONITORING_TARGETS: 'pavilion_monitoring_targets',
-    MONITORING_STATE: 'pavilion_monitoring_state'
-};
-class MonitoringCacheManager {
-    /**
-     * 監視対象を追加
-     */
-    static addTarget(pavilionCode, timeSlot, pavilionName) {
-        try {
-            const targets = this.getTargets();
-            // 既に存在するかチェック
-            const exists = targets.some(t => t.pavilionCode === pavilionCode && t.timeSlot === timeSlot);
-            if (exists) {
-                console.log('⚠️ 既に監視対象に追加済み:', pavilionCode, timeSlot);
-                return false;
-            }
-            // 新しい順序番号を決定
-            const maxOrder = targets.length > 0 ? Math.max(...targets.map(t => t.order)) : 0;
-            const newTarget = {
-                pavilionCode,
-                timeSlot,
-                pavilionName,
-                order: maxOrder + 1,
-                addedAt: Date.now()
-            };
-            targets.push(newTarget);
-            this.saveTargets(targets);
-            console.log('✅ 監視対象追加:', newTarget);
-            return true;
-        }
-        catch (error) {
-            console.error('❌ 監視対象追加エラー:', error);
-            return false;
-        }
-    }
-    /**
-     * 監視対象を削除
-     */
-    static removeTarget(pavilionCode, timeSlot) {
-        try {
-            const targets = this.getTargets();
-            const initialLength = targets.length;
-            const filteredTargets = targets.filter(t => !(t.pavilionCode === pavilionCode && t.timeSlot === timeSlot));
-            if (filteredTargets.length === initialLength) {
-                console.log('⚠️ 削除対象が見つかりません:', pavilionCode, timeSlot);
-                return false;
-            }
-            // 順序を再調整
-            const reorderedTargets = filteredTargets
-                .sort((a, b) => a.order - b.order)
-                .map((target, index) => ({
-                ...target,
-                order: index + 1
-            }));
-            this.saveTargets(reorderedTargets);
-            console.log('🗑️ 監視対象削除:', pavilionCode, timeSlot);
-            return true;
-        }
-        catch (error) {
-            console.error('❌ 監視対象削除エラー:', error);
-            return false;
-        }
-    }
-    /**
-     * 監視対象を切り替え（追加/削除）
-     */
-    static toggleTarget(pavilionCode, timeSlot, pavilionName) {
-        const exists = this.hasTarget(pavilionCode, timeSlot);
-        if (exists) {
-            return this.removeTarget(pavilionCode, timeSlot);
-        }
-        else {
-            return this.addTarget(pavilionCode, timeSlot, pavilionName);
-        }
-    }
-    /**
-     * 監視対象が存在するかチェック
-     */
-    static hasTarget(pavilionCode, timeSlot) {
-        const targets = this.getTargets();
-        return targets.some(t => t.pavilionCode === pavilionCode && t.timeSlot === timeSlot);
-    }
-    /**
-     * 全監視対象を取得（順序順）
-     */
-    static getTargets() {
-        try {
-            const data = sessionStorage.getItem(CACHE_KEYS.MONITORING_TARGETS);
-            if (!data)
-                return [];
-            const targets = JSON.parse(data);
-            return targets.sort((a, b) => a.order - b.order);
-        }
-        catch (error) {
-            console.error('❌ 監視対象取得エラー:', error);
-            return [];
-        }
-    }
-    /**
-     * 優先順位最上位の監視対象を取得
-     */
-    static getTopPriorityTarget() {
-        const targets = this.getTargets();
-        return targets.length > 0 ? targets[0] : null;
-    }
-    /**
-     * 特定パビリオンの監視対象を取得
-     */
-    static getTargetsByPavilion(pavilionCode) {
-        const targets = this.getTargets();
-        return targets.filter(t => t.pavilionCode === pavilionCode);
-    }
-    /**
-     * 監視対象をクリア
-     */
-    static clearTargets() {
-        sessionStorage.removeItem(CACHE_KEYS.MONITORING_TARGETS);
-        console.log('🗑️ 全監視対象クリア');
-    }
-    /**
-     * 監視状態を取得
-     */
-    static getMonitoringState() {
-        try {
-            const data = sessionStorage.getItem(CACHE_KEYS.MONITORING_STATE);
-            if (!data) {
-                return {
-                    targets: [],
-                    isActive: false,
-                    lastCheck: 0,
-                    nextCheck: 0,
-                    checkCount: 0
-                };
-            }
-            return JSON.parse(data);
-        }
-        catch (error) {
-            console.error('❌ 監視状態取得エラー:', error);
-            return {
-                targets: [],
-                isActive: false,
-                lastCheck: 0,
-                nextCheck: 0,
-                checkCount: 0
-            };
-        }
-    }
-    /**
-     * 監視状態を更新
-     */
-    static updateMonitoringState(updates) {
-        try {
-            const currentState = this.getMonitoringState();
-            const newState = { ...currentState, ...updates };
-            sessionStorage.setItem(CACHE_KEYS.MONITORING_STATE, JSON.stringify(newState));
-        }
-        catch (error) {
-            console.error('❌ 監視状態更新エラー:', error);
-        }
-    }
-    /**
-     * 監視統計を取得
-     */
-    static getMonitoringStats() {
-        const targets = this.getTargets();
-        const state = this.getMonitoringState();
-        return {
-            totalTargets: targets.length,
-            activeMonitoring: state.isActive,
-            lastCheckTime: state.lastCheck > 0 ?
-                new Date(state.lastCheck).toLocaleTimeString() : '未実行',
-            checkCount: state.checkCount
-        };
-    }
-    /**
-     * 監視対象を保存（内部用）
-     */
-    static saveTargets(targets) {
-        sessionStorage.setItem(CACHE_KEYS.MONITORING_TARGETS, JSON.stringify(targets));
-    }
-    /**
-     * デバッグ情報を出力
-     */
-    static debugInfo() {
-        console.group('🔍 監視キャッシュ デバッグ情報');
-        const targets = this.getTargets();
-        const state = this.getMonitoringState();
-        const stats = this.getMonitoringStats();
-        console.log('監視対象:', targets);
-        console.log('監視状態:', state);
-        console.log('統計情報:', stats);
-        console.groupEnd();
-    }
-}
-// デバッグ用グローバル公開
-if (typeof window !== 'undefined') {
-    window.debugMonitoringCache = () => MonitoringCacheManager.debugInfo();
-    window.clearMonitoringTargets = () => MonitoringCacheManager.clearTargets();
-}
-
 
 /***/ }),
 
@@ -2312,341 +2097,6 @@ module.exports = styleTagTransform;
 
 /***/ }),
 
-/***/ 141:
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   getMonitoringStatus: () => (/* binding */ getMonitoringStatus),
-/* harmony export */   startPavilionMonitoring: () => (/* binding */ startPavilionMonitoring),
-/* harmony export */   stopPavilionMonitoring: () => (/* binding */ stopPavilionMonitoring)
-/* harmony export */ });
-/* unused harmony exports MonitoringService, getMonitoringService */
-/* harmony import */ var _monitoring_scheduler__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(723);
-/* harmony import */ var _monitoring_cache__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(76);
-/* harmony import */ var _pavilion_reservation_cache__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(619);
-/**
- * 監視サービス
- * API呼び出し・空き検知・自動予約実行
- */
-
-
-
-class MonitoringService {
-    constructor() {
-        this.scheduler = (0,_monitoring_scheduler__WEBPACK_IMPORTED_MODULE_0__/* .getMonitoringScheduler */ .Yq)();
-        this.isRunning = false;
-    }
-    /**
-     * 監視を開始
-     */
-    async startMonitoring() {
-        if (this.isRunning) {
-            console.log('⚠️ 監視は既に実行中です');
-            return false;
-        }
-        const targets = _monitoring_cache__WEBPACK_IMPORTED_MODULE_1__.MonitoringCacheManager.getTargets();
-        if (targets.length === 0) {
-            console.log('⚠️ 監視対象がありません');
-            return false;
-        }
-        this.isRunning = true;
-        // 監視状態を更新
-        _monitoring_cache__WEBPACK_IMPORTED_MODULE_1__.MonitoringCacheManager.updateMonitoringState({
-            isActive: true,
-            targets,
-            nextCheck: this.scheduler.getNextExecutionTime().getTime()
-        });
-        // スケジューラーを開始
-        this.scheduler.start(async () => {
-            await this.performMonitoringCheck();
-        });
-        console.log('🚀 パビリオン監視開始:', targets.length, '件');
-        return true;
-    }
-    /**
-     * 監視を停止
-     */
-    stopMonitoring() {
-        if (!this.isRunning) {
-            console.log('⚠️ 監視は実行されていません');
-            return;
-        }
-        this.scheduler.stop();
-        this.isRunning = false;
-        // 監視状態を更新
-        _monitoring_cache__WEBPACK_IMPORTED_MODULE_1__.MonitoringCacheManager.updateMonitoringState({
-            isActive: false,
-            nextCheck: 0
-        });
-        console.log('⏹️ パビリオン監視停止');
-    }
-    /**
-     * 監視チェックを実行
-     */
-    async performMonitoringCheck() {
-        try {
-            const targets = _monitoring_cache__WEBPACK_IMPORTED_MODULE_1__.MonitoringCacheManager.getTargets();
-            if (targets.length === 0) {
-                console.log('📋 監視対象がないため監視を停止します');
-                this.stopMonitoring();
-                return {
-                    success: false,
-                    checkedTargets: 0,
-                    foundAvailable: null,
-                    error: '監視対象なし'
-                };
-            }
-            console.log(`🔍 監視チェック開始 (${targets.length}件)`);
-            // 各監視対象をチェック
-            for (const target of targets) {
-                const isAvailable = await this.checkTargetAvailability(target);
-                if (isAvailable) {
-                    console.log('🎯 空きを発見:', target);
-                    // 自動予約を実行
-                    await this.executeReservation(target);
-                    // 監視対象から削除
-                    _monitoring_cache__WEBPACK_IMPORTED_MODULE_1__.MonitoringCacheManager.removeTarget(target.pavilionCode, target.timeSlot);
-                    // 監視状態を更新
-                    const currentState = _monitoring_cache__WEBPACK_IMPORTED_MODULE_1__.MonitoringCacheManager.getMonitoringState();
-                    _monitoring_cache__WEBPACK_IMPORTED_MODULE_1__.MonitoringCacheManager.updateMonitoringState({
-                        lastCheck: Date.now(),
-                        checkCount: currentState.checkCount + 1,
-                        nextCheck: this.scheduler.getNextExecutionTime().getTime()
-                    });
-                    return {
-                        success: true,
-                        checkedTargets: targets.length,
-                        foundAvailable: target
-                    };
-                }
-            }
-            // 空きなしの場合
-            console.log('📋 空きなし、監視継続');
-            // 監視状態を更新
-            const currentState = _monitoring_cache__WEBPACK_IMPORTED_MODULE_1__.MonitoringCacheManager.getMonitoringState();
-            _monitoring_cache__WEBPACK_IMPORTED_MODULE_1__.MonitoringCacheManager.updateMonitoringState({
-                lastCheck: Date.now(),
-                checkCount: currentState.checkCount + 1,
-                nextCheck: this.scheduler.getNextExecutionTime().getTime()
-            });
-            return {
-                success: true,
-                checkedTargets: targets.length,
-                foundAvailable: null
-            };
-        }
-        catch (error) {
-            const errorMessage = error instanceof Error ? error.message : String(error);
-            console.error('❌ 監視チェックエラー:', errorMessage);
-            // エラー時も状態更新
-            const currentState = _monitoring_cache__WEBPACK_IMPORTED_MODULE_1__.MonitoringCacheManager.getMonitoringState();
-            _monitoring_cache__WEBPACK_IMPORTED_MODULE_1__.MonitoringCacheManager.updateMonitoringState({
-                lastCheck: Date.now(),
-                checkCount: currentState.checkCount + 1,
-                nextCheck: this.scheduler.getNextExecutionTime().getTime()
-            });
-            return {
-                success: false,
-                checkedTargets: 0,
-                foundAvailable: null,
-                error: errorMessage
-            };
-        }
-    }
-    /**
-     * 特定対象の空き状況をチェック
-     */
-    async checkTargetAvailability(target) {
-        try {
-            const availability = await this.fetchPavilionAvailability(target.pavilionCode);
-            if (!availability) {
-                console.warn('⚠️ API応答なし:', target.pavilionCode);
-                return false;
-            }
-            // 該当時間帯の空き状況をチェック
-            const targetSlot = availability.timeSlots.find(slot => slot.time === target.timeSlot);
-            if (!targetSlot) {
-                console.warn('⚠️ 該当時間帯なし:', target.timeSlot);
-                return false;
-            }
-            console.log(`📊 ${target.pavilionName} ${target.timeSlot}: ${targetSlot.available ? '空きあり' : '満員'}`);
-            return targetSlot.available;
-        }
-        catch (error) {
-            console.error('❌ 空き状況チェックエラー:', target.pavilionCode, error);
-            return false;
-        }
-    }
-    /**
-     * パビリオン空き情報をAPI取得
-     */
-    async fetchPavilionAvailability(pavilionCode) {
-        try {
-            const url = `https://expo.ebii.net/data?pavilion=${pavilionCode}`;
-            console.log('🌐 API呼び出し:', url);
-            const response = await fetch(url, {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                }
-            });
-            if (!response.ok) {
-                throw new Error(`API応答エラー: ${response.status}`);
-            }
-            const data = await response.json();
-            // API応答をPavilionAvailability形式に変換
-            return this.transformApiResponse(data, pavilionCode);
-        }
-        catch (error) {
-            console.error('❌ API呼び出しエラー:', error);
-            return null;
-        }
-    }
-    /**
-     * API応答を内部形式に変換
-     */
-    transformApiResponse(apiData, pavilionCode) {
-        // TODO: 実際のAPI応答形式に合わせて実装
-        // 現在は仮実装
-        return {
-            pavilionCode,
-            pavilionName: apiData.pavilionName || `パビリオン${pavilionCode}`,
-            timeSlots: apiData.timeSlots || []
-        };
-    }
-    /**
-     * 自動予約を実行
-     */
-    async executeReservation(target) {
-        console.log('🤖 自動予約実行開始:', target);
-        try {
-            // 予約データを作成
-            const reservationData = {
-                pavilionCode: target.pavilionCode,
-                pavilionName: target.pavilionName,
-                selectedTimeSlot: target.timeSlot,
-                selectedTimeDisplay: target.timeSlot,
-                isAvailable: true,
-                timestamp: Date.now(),
-                status: 'pending'
-            };
-            // キャッシュに保存
-            _pavilion_reservation_cache__WEBPACK_IMPORTED_MODULE_2__.PavilionReservationCache.saveReservationData(target.pavilionCode, reservationData);
-            // 予約ページを開く
-            // expoTable.jsを参照した正しいURL実装
-            const ticketIds = new URLSearchParams(window.location.search).get('id') || '';
-            const formatDateToYMD = () => {
-                const date = new Date();
-                const y = date.getFullYear();
-                const m = String(date.getMonth() + 1).padStart(2, '0');
-                const d = String(date.getDate()).padStart(2, '0');
-                return `${y}${m}${d}`;
-            };
-            const reservationUrl = `https://ticket.expo2025.or.jp/event_time/?id=${ticketIds}&event_id=${target.pavilionCode}&screen_id=108&lottery=5&entrance_date=${formatDateToYMD()}`;
-            window.location.href = reservationUrl;
-            console.log('✅ 予約ページに遷移:', reservationUrl);
-            // 監視成功通知を送信
-            this.sendNotificationToDialog('info', `監視成功: ${target.pavilionName} ${target.timeSlot} の空きを検知し予約開始`);
-        }
-        catch (error) {
-            console.error('❌ 自動予約実行エラー:', error);
-            throw error;
-        }
-    }
-    /**
-     * 監視状態を取得
-     */
-    getMonitoringStatus() {
-        const stats = _monitoring_cache__WEBPACK_IMPORTED_MODULE_1__.MonitoringCacheManager.getMonitoringStats();
-        const nextCheck = this.scheduler.isActive() ?
-            this.scheduler.getNextExecutionTime().toLocaleTimeString() : '停止中';
-        return {
-            isRunning: this.isRunning,
-            targetCount: stats.totalTargets,
-            stats,
-            nextCheck
-        };
-    }
-    /**
-     * スケジュール設定を更新
-     */
-    updateSchedule(config) {
-        this.scheduler.updateConfig(config);
-    }
-    /**
-     * 手動チェック実行
-     */
-    async triggerManualCheck() {
-        console.log('🔄 手動チェック実行');
-        return await this.performMonitoringCheck();
-    }
-    /**
-     * ダイアログに通知を送信
-     */
-    sendNotificationToDialog(type, message) {
-        try {
-            // グローバル関数が利用可能な場合に通知を送信
-            if (typeof window.showReservationNotification === 'function') {
-                window.showReservationNotification(type, message);
-                console.log(`📢 監視通知送信: [${type}] ${message}`);
-            }
-            else {
-                console.log('⚠️ 通知関数が利用できません');
-            }
-        }
-        catch (error) {
-            console.log(`❌ 通知送信エラー: ${error}`);
-        }
-    }
-}
-// グローバルインスタンス
-let monitoringServiceInstance = null;
-/**
- * 監視サービスのシングルトンインスタンスを取得
- */
-function getMonitoringService() {
-    if (!monitoringServiceInstance) {
-        monitoringServiceInstance = new MonitoringService();
-    }
-    return monitoringServiceInstance;
-}
-/**
- * 監視開始（ショートカット関数）
- */
-async function startPavilionMonitoring() {
-    const service = getMonitoringService();
-    return await service.startMonitoring();
-}
-/**
- * 監視停止（ショートカット関数）
- */
-function stopPavilionMonitoring() {
-    const service = getMonitoringService();
-    service.stopMonitoring();
-}
-/**
- * 監視状況確認（ショートカット関数）
- */
-function getMonitoringStatus() {
-    const service = getMonitoringService();
-    return service.getMonitoringStatus();
-}
-// デバッグ用グローバル公開
-if (typeof window !== 'undefined') {
-    window.startPavilionMonitoring = startPavilionMonitoring;
-    window.stopPavilionMonitoring = stopPavilionMonitoring;
-    window.getMonitoringStatus = getMonitoringStatus;
-    window.debugMonitoringStatus = () => {
-        console.group('🔍 監視サービス状況');
-        console.log(getMonitoringStatus());
-        _monitoring_cache__WEBPACK_IMPORTED_MODULE_1__.MonitoringCacheManager.debugInfo();
-        console.groupEnd();
-    };
-}
-
-
-/***/ }),
-
 /***/ 214:
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
@@ -4001,7 +3451,7 @@ module.exports = function (cssWithMappingToString) {
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1___default()((_node_modules_css_loader_dist_runtime_noSourceMaps_js__WEBPACK_IMPORTED_MODULE_0___default()));
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, `#ytomo-status-badge.countdown-warning{background:rgba(255,0,0,.9)}.ytomo-efficiency-toggle{width:45px;height:32px;border-radius:16px;color:#fff;border:none;font-size:10px;font-weight:bold;cursor:pointer;transition:all .2s ease;box-shadow:0 2px 8px rgba(0,0,0,.3);display:flex;align-items:center;justify-content:center;pointer-events:auto;margin-bottom:8px}.ytomo-efficiency-toggle.efficiency-enabled{background:rgba(255,140,0,.9)}.ytomo-efficiency-toggle.efficiency-disabled{background:rgba(128,128,128,.9)}.ytomo-efficiency-toggle:hover{transform:scale(1.1);box-shadow:0 4px 12px rgba(0,0,0,.4)}.ytomo-efficiency-toggle:active{transform:scale(0.95)}button.ext-ytomo{height:40px;width:auto;min-width:60px;padding:0px 8px;background:#006821;color:#fff}button.ext-ytomo.no-after:after{background:rgba(0,0,0,0) none repeat 0 0/auto auto padding-box border-box scroll}button.ext-ytomo.btn-done{background:#4a4c4a}button.ext-ytomo:hover{background:#02862b}.fab-sub-btn{color:#fff;border:none;border-radius:20px;padding:8px 16px;font-size:12px;white-space:nowrap;transition:all .2s ease}.fab-sub-btn.btn-enabled{background:#006821;cursor:pointer;opacity:1}.fab-sub-btn.btn-enabled:hover{background:#02862b;transform:scale(1.05)}.fab-sub-btn.btn-enabled.btn-done{background:#4a4c4a}.fab-sub-btn.btn-enabled.btn-done:hover{background:#606260}.fab-sub-btn.btn-disabled,.fab-sub-btn.btn-loading{background:gray;cursor:not-allowed;opacity:.6}.fab-sub-btn.btn-disabled:hover,.fab-sub-btn.btn-loading:hover{background:gray;transform:scale(1)}.fab-sub-btn:disabled{background:gray !important;cursor:not-allowed !important;opacity:.6 !important}.fab-sub-btn:disabled:hover{background:gray !important;transform:scale(1) !important}button.ext-ytomo.pavilion-sub-btn.btn-disabled,button.ext-ytomo.pavilion-sub-btn.btn-loading{background:gray;cursor:not-allowed;opacity:.6}button.ext-ytomo.pavilion-sub-btn.btn-disabled:hover,button.ext-ytomo.pavilion-sub-btn.btn-loading:hover{background:gray;transform:scale(1)}.safe-none,.ytomo-none,.filter-none{display:none}.fab-sub-btn span.button-count{font-family:"Courier New","Monaco",monospace;font-weight:bold;color:#ffeb3b;vertical-align:baseline}button.ext-ytomo.pavilion-sub-btn.ytomo-date-button.date-selected{border:2px solid #4caf50;box-shadow:0 0 8px rgba(76,175,80,.6)}div.div-flex{display:flex;justify-content:center;margin:5px}div.div-flex input.ext-tomo.search{flex:1;padding:8px 12px;border:1px solid #ddd;border-radius:4px;font-size:14px;margin-right:8px}div.div-flex input.ext-tomo.search:focus{outline:none;border-color:#006821;box-shadow:0 0 0 2px rgba(0,104,33,.2)}div.div-flex button.btn-filter-without-load{height:auto;min-height:40px;width:auto;min-width:60px;padding:0px 8px;color:#fff;margin:5px;background:#006821;border:none;border-radius:4px;cursor:pointer;font-size:14px}div.div-flex button.btn-filter-without-load:hover{background:#02862b}div.div-flex button.btn-filter-without-load:active{background:#005417}div.div-flex button.btn-filter-without-load:disabled{background:gray;cursor:not-allowed}.js-show{display:block}.js-hide{display:none}.js-visible{visibility:visible}.js-invisible{visibility:hidden}.js-enabled{pointer-events:auto;opacity:1}.js-disabled{pointer-events:none;opacity:.6}.js-green{background:#228b22;color:#fff}.js-red{background:#dc3545;color:#fff}.js-gray{background:gray;color:#fff}.btn-success-highlight{background:#00c800;color:#fff}.status-bg-green{background:rgba(0,128,0,.9)}.status-bg-red{background:rgba(255,0,0,.9)}.status-bg-orange{background:rgba(255,140,0,.9)}.status-bg-blue{background:rgba(0,104,33,.9)}.status-bg-default{background:rgba(0,0,0,.8)}#ytomo-status-badge{background:linear-gradient(135deg, rgba(0, 0, 0, 0.9), rgba(40, 40, 40, 0.9));color:#fff;padding:8px 16px;border-radius:20px;font-size:12px;font-weight:bold;white-space:pre-line;box-shadow:0 4px 12px rgba(0,0,0,.3),0 2px 6px rgba(0,0,0,.2);border:2px solid hsla(0,0%,100%,.15);pointer-events:none}#ytomo-status-badge.ytomo-status-waiting{background:linear-gradient(135deg, rgba(0, 0, 0, 0.9), rgba(40, 40, 40, 0.9))}#ytomo-status-badge.ytomo-status-reservation{background:linear-gradient(135deg, rgba(255, 140, 0, 0.9), rgba(255, 165, 0, 0.9))}#ytomo-status-badge.ytomo-status-reservation.ytomo-status-countdown-warning{background:linear-gradient(135deg, rgba(255, 0, 0, 0.9), rgba(220, 53, 69, 0.9))}#ytomo-status-badge.ytomo-status-cooldown{background:linear-gradient(135deg, rgba(255, 107, 53, 0.9), rgba(255, 140, 0, 0.9))}.ytomo-header li.fab-toggle-li{display:inline-block;margin-right:8px}.ytomo-header li.fab-toggle-li button.fab-toggle-button{background:none;border:none;cursor:pointer;padding:0;color:#fff;transition:all .2s ease;display:flex;align-items:center;justify-content:center}.ytomo-header li.fab-toggle-li button.fab-toggle-button:hover{color:#ddd}.ytomo-header li.fab-toggle-li button.fab-toggle-button figure.fab-toggle-figure{width:auto;height:24px;display:flex;align-items:center;justify-content:center;padding:0 4px}.ytomo-pavilion-fab button.ytomo-fab{position:relative}.ytomo-pavilion-fab button.ytomo-fab:hover{transform:scale(1.15);box-shadow:0 8px 25px rgba(0,0,0,.5),0 4px 12px rgba(0,0,0,.3);border-width:4px}.ytomo-pavilion-fab .ytomo-fab-inner-content .pavilion-fab-expand-icon{font-size:8px;line-height:1;margin-bottom:1px;opacity:.8}.ytomo-pavilion-fab .ytomo-fab-inner-content .pavilion-fab-brand-text{font-size:7px;font-weight:normal;line-height:1;margin-bottom:2px;opacity:.7}.ytomo-pavilion-fab .ytomo-fab-inner-content .pavilion-fab-counts-text{font-size:12px;font-weight:bold;line-height:1}.ytomo-pavilion-fab .pavilion-sub-actions-container{display:none;flex-direction:column;gap:8px;align-items:flex-end;margin-bottom:8px}.ytomo-pavilion-fab .pavilion-sub-actions-container.expanded{display:flex}.ytomo-pavilion-fab .pavilion-sub-actions-container button.pavilion-sub-btn.base-style{color:#fff;border:none;border-radius:20px;padding:8px 16px;font-size:12px;white-space:nowrap;box-shadow:0 2px 8px rgba(0,0,0,.3);transition:all .2s ease}.ytomo-companion-dialog{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;z-index:99999;padding:20px;box-sizing:border-box}.ytomo-companion-dialog .dialog-content{background:#fff;border-radius:12px;padding:24px;width:100%;max-width:500px;max-height:90vh;overflow-y:auto;box-shadow:0 10px 40px rgba(0,0,0,.3)}@media(max-width: 768px){.ytomo-companion-dialog .dialog-content{max-width:95vw;max-height:85vh;padding:16px;border-radius:8px}}.ytomo-companion-dialog .dialog-content .input-row{display:flex;gap:8px;margin-bottom:12px}@media(max-width: 480px){.ytomo-companion-dialog .dialog-content .input-row{flex-direction:column;gap:12px}}.ytomo-companion-dialog .dialog-content .input-row input{padding:12px 8px;border:1px solid #ddd;border-radius:4px;font-size:16px}.ytomo-companion-dialog .dialog-content .input-row input:focus{outline:none;border-color:#4caf50;box-shadow:0 0 0 2px rgba(76,175,80,.2)}.ytomo-companion-dialog .dialog-content .input-row button{padding:12px 16px;background:#4caf50;color:#fff;border:none;border-radius:4px;cursor:pointer;font-size:14px;white-space:nowrap;min-width:60px}.ytomo-companion-dialog .dialog-content .input-row button:hover{background:#45a049}.ytomo-companion-dialog .dialog-content .input-row button:active{background:#3d8b40}.ytomo-abort-button{position:fixed;bottom:100px;right:24px;z-index:100001;background:#f44336;color:#fff;border:none;border-radius:50%;width:64px;height:64px;font-size:12px;font-weight:bold;cursor:pointer;box-shadow:0 4px 12px rgba(244,67,54,.4);transition:all .3s ease;display:flex;align-items:center;justify-content:center}.ytomo-abort-button:hover{transform:scale(1.1);box-shadow:0 6px 20px rgba(244,67,54,.6)}.ytomo-abort-button:active{transform:scale(0.95)}.copy-ticket-btn{margin-left:8px;padding:6px;background:#f0f0f0;border:1px solid #ddd;border-radius:4px;cursor:pointer;display:flex;align-items:center;justify-content:center;min-width:32px;height:32px;transition:all .3s ease}.copy-ticket-btn:hover{background:#e0e0e0;border-color:#ccc}.copy-ticket-btn:active{transform:scale(0.95)}.copy-ticket-btn svg{color:#666;transition:all .3s ease}.copy-ticket-btn.copy-success{background:rgba(76,175,80,.1);border-color:#4caf50}.copy-ticket-btn.copy-success svg{color:#4caf50}.dialog-btn{padding:8px 16px;border:none;border-radius:4px;cursor:pointer;font-size:14px;font-weight:bold;transition:all .2s ease}.dialog-btn.btn-cancel{background:#666;color:#fff}.dialog-btn.btn-cancel:hover{background:#555}.dialog-btn.btn-delete{background:#f44336;color:#fff}.dialog-btn.btn-delete:hover{background:#d32f2f}.dialog-btn.btn-execute{background:#2196f3;color:#fff}.dialog-btn.btn-execute:hover{background:#1976d2}.dialog-btn.btn-execute.btn-disabled{background:#ccc;color:#666;cursor:not-allowed}.dialog-btn.btn-execute.btn-disabled:hover{background:#ccc}.ticket-row{display:flex;align-items:center;padding:8px;border-bottom:1px solid #eee;transition:background-color .2s ease;cursor:pointer}.ticket-row:last-child{border-bottom:none}.ticket-row.already-added{position:relative;opacity:.6;background:repeating-linear-gradient(45deg, transparent, transparent 8px, rgba(255, 140, 0, 0.1) 8px, rgba(255, 140, 0, 0.1) 16px)}.ticket-row.already-added::after{content:"追加済み";position:absolute;top:4px;right:40px;background:rgba(255,140,0,.9);color:#fff;font-size:10px;font-weight:bold;padding:2px 6px;border-radius:3px;pointer-events:none}.ticket-row.already-added input[type=checkbox]{opacity:.5;cursor:not-allowed}.ticket-row.already-added .copy-ticket-btn{opacity:1;background:#f8f8f8;border-color:#bbb}.ticket-row.already-added .copy-ticket-btn:hover{background:#e8e8e8;border-color:#999}.ytomo-fab{width:56px;height:56px;border-radius:50%;color:#fff;border:none;box-shadow:0 6px 20px rgba(0,0,0,.4),0 2px 8px rgba(0,0,0,.2);border:3px solid hsla(0,0%,100%,.2);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:bold;transition:all .3s ease;position:relative;overflow:hidden;pointer-events:auto}.ytomo-fab-enabled{background:#ff8c00;opacity:.9;cursor:pointer;pointer-events:auto}.ytomo-fab-disabled{background:gray;opacity:.6;cursor:not-allowed;pointer-events:none}.ytomo-fab-running{background:#dc3545;opacity:.9;cursor:pointer;pointer-events:auto}.ytomo-fab.state-idle{background:gray;opacity:.6;cursor:not-allowed;pointer-events:none}.ytomo-fab.pointer-events-none{pointer-events:none}.ytomo-fab.pointer-events-auto{pointer-events:auto}.ytomo-fab.state-enabled{background:#ff8c00;opacity:.9;cursor:pointer;pointer-events:auto}.ytomo-fab.state-running{background:#dc3545;opacity:.9;cursor:pointer;pointer-events:auto}.ytomo-fab.state-reservation{background:#ff8c00;opacity:.9;cursor:pointer;pointer-events:auto}.ytomo-fab:hover{transform:scale(1.15);box-shadow:0 8px 25px rgba(0,0,0,.5),0 4px 12px rgba(0,0,0,.3)}.ytomo-fab.reservation-enabled{background:#006821;opacity:.9;cursor:pointer}.ytomo-fab.reservation-disabled{background:gray;opacity:.9;cursor:not-allowed}.ytomo-fab.cooldown-warning{background:#ff6b35}.ytomo-fab.cooldown-normal{background:#007bff}.ytomo-fab-container{position:fixed;bottom:100px;right:24px;z-index:10000;display:flex;flex-direction:column;align-items:flex-end;gap:12px;pointer-events:auto}.ytomo-fab-container.z-normal{z-index:10000}.ytomo-fab-container.z-above-overlay{z-index:100001}.ytomo-fab-container.visible{display:flex}.ytomo-fab-container.hidden{display:none}.ytomo-fab-content{position:relative;display:flex;flex-direction:column-reverse;align-items:center;gap:8px;opacity:0;transform:scale(0.8) translateY(10px);transition:all .3s cubic-bezier(0.175, 0.885, 0.32, 1.275);pointer-events:none}.ytomo-fab-content.expanded{opacity:1;transform:scale(1) translateY(0);pointer-events:auto}.ytomo-sub-fab{width:45px;height:32px;border-radius:16px;background:rgba(0,104,33,.9);color:#fff;border:none;font-size:11px;font-weight:bold;cursor:pointer;transition:all .2s ease;box-shadow:0 2px 8px rgba(0,0,0,.3);display:flex;align-items:center;justify-content:center;pointer-events:auto}.ytomo-sub-fab:hover{background:rgba(2,134,43,.9);transform:scale(1.1);box-shadow:0 4px 12px rgba(0,0,0,.4)}.ytomo-sub-fab:active{transform:scale(0.95)}.ytomo-pavilion-fab-container{position:fixed;bottom:100px;right:24px;z-index:10000;display:flex;flex-direction:column;gap:12px;align-items:flex-end;pointer-events:auto}.ytomo-ticket-selection-fab-container{position:fixed;bottom:100px;right:24px;z-index:10000;display:flex;flex-direction:column;gap:12px;align-items:flex-end;pointer-events:auto}.ytomo-ticket-selection-fab-container.z-normal{z-index:10000}.ytomo-ticket-selection-fab-container.z-above-overlay{z-index:100001}.ytomo-ticket-selection-fab-container #ytomo-companion-sub-buttons{display:flex;flex-direction:column;gap:8px;align-items:flex-end;transition:all .3s ease}.ytomo-fab-inner-content{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;pointer-events:none}.ytomo-reservation-target-display{background:linear-gradient(135deg, rgba(0, 123, 255, 0.95), rgba(0, 86, 179, 0.95));color:#fff;padding:8px 12px;border-radius:12px;font-size:12px;font-weight:bold;text-align:center;box-shadow:0 3px 10px rgba(0,0,0,.3);border:2px solid hsla(0,0%,100%,.3);min-width:80px;max-width:120px;white-space:pre-line;overflow:visible;text-overflow:clip;transition:all .3s ease;pointer-events:auto;cursor:pointer}.ytomo-reservation-target-display:hover{transform:scale(1.05);box-shadow:0 4px 14px rgba(0,0,0,.4)}.ytomo-reservation-target-display.hidden{display:none}.ytomo-reservation-target-display.visible{display:block}input.ext-tomo.search{height:50px;min-width:200px;max-width:min(300px,100%);font-family:quicksand;font-size:16px;-webkit-appearance:textfield;-moz-appearance:textfield;appearance:textfield;border:1px solid #222426;border-radius:25px;box-shadow:0 1px 0 0 #ccc;padding:0 0 0 10px;flex:1 1}.day-reservation-info-area{position:relative;min-height:50px}.day-reservation-description{margin:10px 0;color:#666;font-size:14px;line-height:1.5;text-align:center}.day-reservation-description.hidden{display:none}.day-reservation-notification{margin:10px 0}.day-reservation-notification.hidden{display:none}.day-reservation-notification .notification-content{padding:12px 16px;border-radius:8px;font-size:14px;font-weight:500;display:flex;align-items:center;justify-content:space-between;min-height:24px;position:relative}.day-reservation-notification .notification-content .notification-message{flex:1;margin-left:8px;margin-right:8px}.day-reservation-notification .notification-content .notification-close{background:none;border:none;font-size:18px;font-weight:bold;cursor:pointer;padding:0;width:20px;height:20px;display:flex;align-items:center;justify-content:center;opacity:.7;transition:opacity .2s ease}.day-reservation-notification .notification-content .notification-close:hover{opacity:1}.day-reservation-notification .notification-content.success{background-color:#d4edda;color:#155724;border:1px solid #c3e6cb}.day-reservation-notification .notification-content.success .notification-close{color:#155724}.day-reservation-notification .notification-content.error{background-color:#f8d7da;color:#721c24;border:1px solid #f5c6cb}.day-reservation-notification .notification-content.error .notification-close{color:#721c24}.day-reservation-notification .notification-content.warning{background-color:#fff3cd;color:#856404;border:1px solid #ffeaa7}.day-reservation-notification .notification-content.warning .notification-close{color:#856404}.day-reservation-notification .notification-content.info{background-color:#d1ecf1;color:#0c5460;border:1px solid #bee5eb}.day-reservation-notification .notification-content.info .notification-close{color:#0c5460}.ytomo-icon.expand-icon{font-size:8px;line-height:1;color:#fff;font-weight:bold;text-align:center;pointer-events:none}.ytomo-icon.countdown-text{font-size:6px;line-height:1;color:#fff;font-weight:bold;text-align:center;margin-top:1px;pointer-events:none}.ytomo-toggle.toggle-li{position:fixed;bottom:10px;left:10px;z-index:1000;list-style:none;margin:0;padding:0}.ytomo-toggle.toggle-button{width:50px;height:30px;background:rgba(255,140,0,.8);border:none;border-radius:15px;cursor:pointer;transition:all .3s ease;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:bold;position:relative;overflow:hidden}.ytomo-toggle.toggle-button.enabled{color:#fff}.ytomo-toggle.toggle-button.disabled{color:#ddd}.ytomo-toggle.toggle-figure{width:100%;height:100%;margin:0;padding:0;border:none;background:rgba(0,0,0,0);pointer-events:none}.ytomo-dialog.overlay{position:fixed;top:0;left:0;width:100%;height:100%;background-color:rgba(0,0,0,.5);z-index:10000;display:flex;justify-content:center;align-items:center}.ytomo-dialog.container{background:#fff;border-radius:8px;padding:20px;max-width:400px;width:90%;max-height:70vh;overflow-y:auto;box-shadow:0 4px 12px rgba(0,0,0,.3)}.ytomo-dialog.container.day-reservation{max-width:600px;max-height:80vh}.ytomo-dialog.title{margin:0 0 16px 0;color:#333;font-size:18px;font-weight:bold}.ytomo-dialog.button-group{display:flex;justify-content:flex-end;gap:10px;margin-top:20px}.ytomo-dialog.primary-button{background:#006821;color:#fff;border:none;padding:10px 20px;border-radius:4px;cursor:pointer;font-size:14px}.ytomo-dialog.primary-button:hover{background:#02862b}.ytomo-dialog.primary-button:disabled{background:gray;cursor:not-allowed}.ytomo-dialog.secondary-button{background:rgba(0,0,0,0);color:#666;border:1px solid #ccc;padding:10px 20px;border-radius:4px;cursor:pointer;font-size:14px}.ytomo-dialog.secondary-button:hover{background:#f5f5f5}.ytomo-progress.counter{display:inline-block;margin-left:8px;padding:2px 6px;background:rgba(0,0,0,.3);border-radius:10px;font-size:10px;color:#fff;font-weight:bold}.ytomo-dialog.clear-selection-button{background:#dc3545;color:#fff;border:none;border-radius:20px;padding:8px 16px;font-size:14px;font-weight:bold;cursor:pointer;transition:all .2s ease;white-space:nowrap}.ytomo-dialog.clear-selection-button:hover{transform:translateY(-1px);box-shadow:0 4px 8px rgba(0,0,0,.2)}.ytomo-dialog.clear-selection-button:active{transform:translateY(0)}.ytomo-dialog.monitor-button{background:#fd7e14;color:#fff;border:none;border-radius:20px;padding:8px 16px;font-size:14px;font-weight:bold;cursor:pointer;transition:all .2s ease;white-space:nowrap}.ytomo-dialog.monitor-button:hover{transform:translateY(-1px);box-shadow:0 4px 8px rgba(0,0,0,.2)}.ytomo-dialog.monitor-button:active{transform:translateY(0)}.pavilion-name-row{display:flex;align-items:center;gap:8px;margin-bottom:8px}.pavilion-name-row .pavilion-name{flex:1;font-weight:bold;color:#333}.pavilion-select-all-btn{padding:2px 8px;font-size:11px;background-color:#007bff;color:#fff;border:none;border-radius:4px;cursor:pointer;transition:all .2s ease}.pavilion-select-all-btn:hover{background-color:#0056b3;transform:scale(1.05)}.pavilion-select-all-btn:active{transform:scale(0.95)}.ytomo-error-message{position:fixed;top:20px;right:20px;background:#f44;color:#fff;padding:15px;border-radius:5px;box-shadow:0 2px 10px rgba(0,0,0,.3);z-index:10001;max-width:300px;font-size:14px;line-height:1.4}.ytomo-error-message .error-title{font-weight:bold;margin-bottom:5px}.ytomo-error-message .error-close-btn{margin-top:10px;padding:5px 10px;background:hsla(0,0%,100%,.2);border:none;border-radius:3px;color:#fff;cursor:pointer;font-size:12px}.ytomo-error-message .error-close-btn:hover{background:hsla(0,0%,100%,.3)}.ytomo-flex-column-center{display:flex;flex-direction:column;align-items:center}.ytomo-brand-text{font-size:8px;font-weight:bold;margin-top:2px}.ytomo-dialog.overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;z-index:10000;padding:20px;box-sizing:border-box}.ytomo-dialog.container{background:#fff;border-radius:12px;padding:24px;max-width:800px;max-height:80vh;overflow-y:auto;box-shadow:0 10px 40px rgba(0,0,0,.3);width:100%}@media(max-width: 600px){.ytomo-dialog.container{padding-bottom:60px;max-height:85vh}}.ytomo-dialog.header{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;gap:8px}.ytomo-dialog.header .ytomo-dialog.title{flex-grow:1}.ytomo-dialog.title{margin:0;color:#333;font-size:24px;font-weight:bold}.ytomo-dialog.refresh-button{background:#006821;color:#fff;border:none;border-radius:50%;width:40px;height:40px;font-size:16px;cursor:pointer;transition:all .2s ease;display:flex;align-items:center;justify-content:center}.ytomo-dialog.refresh-button:hover{background:#02862b;transform:scale(1.1)}.ytomo-dialog.refresh-button:disabled{background:#ccc;cursor:not-allowed;transform:none}.ytomo-dialog.right-button-group{display:flex;gap:12px;align-items:center}.ytomo-dialog.available-only-toggle{background:#6c757d;color:#fff;border:none;border-radius:20px;padding:8px 16px;font-size:14px;font-weight:bold;cursor:pointer;transition:all .2s ease;white-space:nowrap}.ytomo-dialog.available-only-toggle.active{background:#006821;box-shadow:0 0 0 2px rgba(0,104,33,.3)}.ytomo-dialog.available-only-toggle:hover{transform:translateY(-1px);box-shadow:0 4px 8px rgba(0,0,0,.2)}.ytomo-dialog.available-only-toggle:disabled{background:#ccc;cursor:not-allowed;transform:none;box-shadow:none}.ytomo-dialog.button-group{display:flex;gap:12px;justify-content:space-between;margin-top:24px}.ytomo-dialog.secondary-button{background:#6c757d;color:#fff;border:none;border-radius:20px;padding:8px 16px;font-size:14px;font-weight:bold;cursor:pointer;transition:all .2s ease;white-space:nowrap}.ytomo-dialog.secondary-button:hover{transform:translateY(-1px);box-shadow:0 4px 8px rgba(0,0,0,.2)}.ytomo-dialog.monitor-button{background:#fd7e14;color:#fff;border:none;border-radius:20px;padding:8px 16px;font-size:14px;font-weight:bold;cursor:pointer;transition:all .2s ease;white-space:nowrap}.ytomo-dialog.monitor-button:hover{transform:translateY(-1px);box-shadow:0 4px 8px rgba(0,0,0,.2)}.day-reservation-description{color:#666;line-height:1.6;margin:0 0 20px 0}.pavilion-list{max-height:400px;overflow-y:auto;border:1px solid #ddd;border-radius:4px;margin-bottom:16px}.pavilion-list-empty{padding:20px;text-align:center;color:#666}.pavilion-item{display:flex;justify-content:space-between;align-items:center;padding:12px;border-bottom:1px solid #eee;transition:background-color .2s;cursor:pointer}.pavilion-item:hover{background-color:#f5f5f5}.pavilion-item:last-child{border-bottom:none}.pavilion-item.monitored{background-color:rgba(253,126,20,.1);border-left:4px solid #fd7e14}.pavilion-item.monitored:hover{background-color:rgba(253,126,20,.15)}.pavilion-info{flex:1}.pavilion-info .pavilion-name{font-weight:bold;margin-bottom:4px}.pavilion-info .pavilion-time-slots{font-size:12px;color:#666;display:flex;flex-wrap:wrap;gap:8px;margin-top:8px;max-width:100%}@media(max-width: 600px){.pavilion-info .pavilion-time-slots{gap:6px;margin-top:6px}}.pavilion-info .pavilion-time-slots .pavilion-time-slot{font-size:12px;padding:4px 8px;border-radius:6px;border:1px solid rgba(0,0,0,0);min-width:60px;text-align:center;white-space:nowrap}@media(max-width: 600px){.pavilion-info .pavilion-time-slots .pavilion-time-slot{font-size:11px;padding:3px 6px;min-width:55px}}@media(max-width: 400px){.pavilion-info .pavilion-time-slots .pavilion-time-slot{font-size:10px;padding:2px 4px;min-width:50px}}.pavilion-info .pavilion-time-slots .pavilion-time-slot.clickable{background:rgba(0,0,0,0);border-color:#dee2e6;cursor:pointer;transition:all .2s ease}.pavilion-info .pavilion-time-slots .pavilion-time-slot.clickable:hover:not(.selected){background:#f8f9fa;border-color:#adb5bd;transform:translateY(-1px);box-shadow:0 2px 4px rgba(0,0,0,.1)}.pavilion-info .pavilion-time-slots .pavilion-time-slot.clickable:active{transform:translateY(0);box-shadow:0 1px 2px rgba(0,0,0,.1)}.pavilion-info .pavilion-time-slots .pavilion-time-slot.clickable.selected{background:rgba(0,104,33,.25);border-color:#006821;border-width:2px;color:#006821;font-weight:bold}@media(max-width: 600px){.pavilion-info .pavilion-time-slots .pavilion-time-slot.clickable.selected{background:rgba(0,104,33,.35);border-width:3px}}.pavilion-info .pavilion-time-slots .pavilion-time-slot.clickable.selected:hover{background:rgba(0,104,33,.3)}@media(max-width: 600px){.pavilion-info .pavilion-time-slots .pavilion-time-slot.clickable.selected:hover{background:rgba(0,104,33,.4)}}.pavilion-info .pavilion-time-slots .pavilion-time-slot.clickable.selected:active{background:rgba(0,104,33,.35)}@media(max-width: 600px){.pavilion-info .pavilion-time-slots .pavilion-time-slot.clickable.selected:active{background:rgba(0,104,33,.45)}}.pavilion-info .pavilion-time-slots .pavilion-time-slot.clickable.unavailable{background:rgba(0,0,0,0);border-color:#ffc107;color:#dc6c00}.pavilion-info .pavilion-time-slots .pavilion-time-slot.clickable.unavailable:hover:not(.selected){background:#fff3cd;border-color:#ffb300;transform:translateY(-1px);box-shadow:0 2px 4px rgba(255,193,7,.2)}.pavilion-info .pavilion-time-slots .pavilion-time-slot.clickable.unavailable.selected{background:rgba(255,193,7,.35);border-color:#ffc107;border-width:2px;color:#dc6c00;font-weight:bold}@media(max-width: 600px){.pavilion-info .pavilion-time-slots .pavilion-time-slot.clickable.unavailable.selected{background:rgba(255,193,7,.45);border-width:3px}}.pavilion-info .pavilion-time-slots .pavilion-time-slot.clickable.unavailable.selected:hover{background:rgba(255,193,7,.4)}@media(max-width: 600px){.pavilion-info .pavilion-time-slots .pavilion-time-slot.clickable.unavailable.selected:hover{background:rgba(255,193,7,.5)}}.pavilion-info .pavilion-time-slots .pavilion-time-slot.clickable.unavailable.selected:active{background:rgba(255,193,7,.45)}@media(max-width: 600px){.pavilion-info .pavilion-time-slots .pavilion-time-slot.clickable.unavailable.selected:active{background:rgba(255,193,7,.55)}}.pavilion-button-area{display:flex;gap:8px;align-items:center}.pavilion-button-area .pavilion-reserve-button{padding:8px 16px;background-color:#006821;color:#fff;border:none;border-radius:4px;cursor:pointer;font-size:12px;transition:background-color .2s;white-space:nowrap}.pavilion-button-area .pavilion-reserve-button:hover:not(:disabled){background-color:#02862b}.pavilion-button-area .pavilion-reserve-button:disabled{background:#ccc;color:#666;cursor:not-allowed}.pavilion-button-area .pavilion-monitor-checkbox{margin-right:12px;transform:scale(1.2);accent-color:#fd7e14;flex-shrink:0}.pavilion-button-area .pavilion-no-slots{font-size:12px;color:#999}.ytomo-global-notification-container{position:fixed;top:20px;right:20px;z-index:20000;max-width:400px;width:100%;display:flex;flex-direction:column;gap:10px}@media(max-width: 600px){.ytomo-global-notification-container{top:10px;right:10px;left:10px;max-width:none}}.ytomo-global-notification{background:#fff;border-radius:8px;padding:16px;box-shadow:0 4px 12px rgba(0,0,0,.15);border-left:4px solid #ccc;display:flex;align-items:center;gap:12px;font-size:14px;font-weight:500;transform:translateX(100%);opacity:0;transition:all .3s ease}.ytomo-global-notification.show{transform:translateX(0);opacity:1}.ytomo-global-notification.hide{transform:translateX(100%);opacity:0}.ytomo-global-notification .notification-message{flex:1;line-height:1.4}.ytomo-global-notification .notification-close{background:none;border:none;font-size:18px;font-weight:bold;cursor:pointer;padding:0;width:20px;height:20px;display:flex;align-items:center;justify-content:center;opacity:.7;transition:opacity .2s ease}.ytomo-global-notification .notification-close:hover{opacity:1}.ytomo-global-notification.success{background-color:#d4edda;color:#155724;border-left-color:#28a745}.ytomo-global-notification.success .notification-close{color:#155724}.ytomo-global-notification.error{background-color:#f8d7da;color:#721c24;border-left-color:#dc3545}.ytomo-global-notification.error .notification-close{color:#721c24}.ytomo-global-notification.warning{background-color:#fff3cd;color:#856404;border-left-color:#ffc107}.ytomo-global-notification.warning .notification-close{color:#856404}.ytomo-global-notification.info{background-color:#d1ecf1;color:#0c5460;border-left-color:#17a2b8}.ytomo-global-notification.info .notification-close{color:#0c5460}.ytomo-processing-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.3);z-index:100000;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(1px);transition:all .3s ease;pointer-events:auto}.ytomo-processing-overlay.z-normal{z-index:100000}.ytomo-processing-overlay.z-below-fab{z-index:99999}.ytomo-processing-overlay.hidden{opacity:0;visibility:hidden;pointer-events:none}.ytomo-processing-overlay.visible{opacity:1;visibility:visible;pointer-events:auto}.ytomo-processing-overlay .processing-message-area{background:hsla(0,0%,100%,.95);border-radius:12px;padding:24px 32px;text-align:center;box-shadow:0 8px 32px rgba(0,0,0,.3);border:2px solid rgba(255,140,0,.3);max-width:400px;margin:20px}@media(max-width: 768px){.ytomo-processing-overlay .processing-message-area{padding:20px 24px;margin:16px;max-width:90vw}}.ytomo-processing-overlay .processing-message-text{font-size:20px;font-weight:bold;color:#333;margin-bottom:8px;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}@media(max-width: 768px){.ytomo-processing-overlay .processing-message-text{font-size:18px;margin-bottom:6px}}.ytomo-processing-overlay .processing-target-text{font-size:16px;font-weight:600;color:#333;margin-bottom:12px;white-space:pre-line;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;text-align:center}@media(max-width: 768px){.ytomo-processing-overlay .processing-target-text{font-size:14px;margin-bottom:10px}}.ytomo-processing-overlay .processing-countdown-text{font-size:18px;font-weight:bold;color:#e67e00;margin-bottom:12px;font-family:"SF Mono","Monaco","Consolas",monospace;text-align:center;text-shadow:0 1px 2px rgba(0,0,0,.1)}@media(max-width: 768px){.ytomo-processing-overlay .processing-countdown-text{font-size:16px;margin-bottom:10px}}.ytomo-processing-overlay .processing-countdown-text.countdown-warning{color:#dc3545;animation:countdownPulse 1s ease-in-out infinite;text-shadow:0 0 8px rgba(220,53,69,.4)}.ytomo-processing-overlay .processing-warning-text{font-size:14px;color:#666;margin-bottom:16px;line-height:1.4;transition:all .3s ease}@media(max-width: 768px){.ytomo-processing-overlay .processing-warning-text{font-size:13px;margin-bottom:14px}}.ytomo-processing-overlay .processing-warning-text.warning-flash{color:#dc3545;font-weight:bold;transform:scale(1.05);animation:flash .5s ease-in-out 2}.ytomo-processing-overlay .notification-toggle-btn{display:flex;align-items:center;justify-content:center;width:40px;height:40px;border:none;border-radius:50%;cursor:pointer;transition:all .2s ease;margin-bottom:16px;box-shadow:0 2px 6px rgba(0,0,0,.15);font-size:20px;line-height:1}@media(max-width: 768px){.ytomo-processing-overlay .notification-toggle-btn{width:36px;height:36px;margin-bottom:14px;font-size:18px}}.ytomo-processing-overlay .notification-toggle-btn:hover{transform:scale(1.05);box-shadow:0 4px 10px rgba(0,0,0,.2)}.ytomo-processing-overlay .notification-toggle-btn:active{transform:scale(0.95)}.ytomo-processing-overlay .notification-toggle-btn.enabled{background:#4caf50;color:#fff}.ytomo-processing-overlay .notification-toggle-btn.enabled:hover{background:#45a049}.ytomo-processing-overlay .notification-toggle-btn.muted{background:#f44336;color:#fff}.ytomo-processing-overlay .notification-toggle-btn.muted:hover{background:#e53935}.ytomo-processing-overlay .processing-cancel-area{font-size:12px;color:#888;font-style:italic}@media(max-width: 768px){.ytomo-processing-overlay .processing-cancel-area{font-size:11px}}@keyframes flash{0%,100%{opacity:1}50%{opacity:.7}}@keyframes countdownPulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.8;transform:scale(1.05)}}.ytomo-processing-overlay.efficiency-mode .processing-message-area{border-color:rgba(255,140,0,.5);background:linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(255, 248, 220, 0.95))}.ytomo-processing-overlay.efficiency-mode .processing-message-text{color:#e67e00}.ytomo-processing-overlay.monitoring-mode .processing-message-area{border-color:rgba(0,104,33,.5);background:linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(240, 255, 240, 0.95))}.ytomo-processing-overlay.monitoring-mode .processing-message-text{color:#004d1a}@media(prefers-reduced-motion: reduce){.ytomo-processing-overlay{transition:none}.ytomo-processing-overlay .processing-warning-text.warning-flash{animation:none;transform:none}}.ytomo-dialog.overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.7);z-index:10000;display:flex;align-items:center;justify-content:center;padding:20px;box-sizing:border-box}.ytomo-dialog.container.debug-dialog{background:#fff;border-radius:12px;padding:0;max-width:90%;max-height:85%;min-width:600px;box-shadow:0 8px 32px rgba(0,0,0,.3);display:flex;flex-direction:column;overflow:hidden}@media(max-width: 768px){.ytomo-dialog.container.debug-dialog{min-width:auto;max-width:95%;max-height:90%}}.ytomo-dialog.header{display:flex;align-items:center;justify-content:space-between;padding:20px 24px;border-bottom:1px solid #e0e0e0;background:#f8f9fa;border-radius:12px 12px 0 0}.ytomo-dialog.title{margin:0;font-size:20px;color:#333;font-weight:600}.ytomo-dialog.close-button{background:none;border:none;font-size:24px;cursor:pointer;color:#666;padding:5px;border-radius:4px}.ytomo-dialog.close-button:hover{background:rgba(0,0,0,.1)}.debug-content{padding:24px;overflow-y:auto;flex:1}.debug-section{margin-bottom:32px}.debug-section:last-child{margin-bottom:0}.debug-section h3{margin:0 0 12px 0;font-size:18px;color:#333;font-weight:600}.debug-section p{margin:0 0 16px 0;color:#666;line-height:1.5}.debug-input-group{display:flex;align-items:center;gap:12px;margin-bottom:20px;flex-wrap:wrap}.debug-input-group label{font-weight:500;color:#333;min-width:120px}.debug-input-group input{flex:1;min-width:200px;padding:10px 12px;border:2px solid #e0e0e0;border-radius:6px;font-size:14px;transition:border-color .2s ease}.debug-input-group input:focus{outline:none;border-color:#007bff}.debug-input-group input::placeholder{color:#999}.debug-input-group button{background:#007bff;color:#fff;border:none;padding:10px 20px;border-radius:6px;font-size:14px;font-weight:500;cursor:pointer;transition:background-color .2s ease;white-space:nowrap}.debug-input-group button:hover:not(:disabled){background:#0056b3}.debug-input-group button:disabled{background:#6c757d;cursor:not-allowed}.debug-results-area h4{margin:0 0 12px 0;font-size:16px;color:#333;font-weight:600}.debug-results-display{background:#f8f9fa;border:1px solid #e0e0e0;border-radius:6px;padding:16px;font-family:"Courier New",Monaco,monospace;font-size:12px;line-height:1.4;max-height:300px;overflow-y:auto;white-space:pre-wrap;word-wrap:break-word;color:#333}.debug-results-display .json-key{color:#d73a49;font-weight:bold}.debug-results-display .json-string{color:#032f62}.debug-results-display .json-number{color:#005cc5}.debug-results-display .json-boolean{color:#e36209}.debug-results-display .json-null{color:#6f42c1}@media(max-width: 768px){.debug-input-group{flex-direction:column;align-items:stretch}.debug-input-group label{min-width:auto}.debug-input-group input{min-width:auto}.debug-input-group button{align-self:flex-start}.ytomo-dialog.container.debug-dialog{min-width:auto}.debug-content{padding:16px}}.ytomo-dialog.overlay{animation:fadeIn .2s ease-out}.ytomo-dialog.container.debug-dialog{animation:slideIn .3s ease-out}@keyframes fadeIn{from{opacity:0}to{opacity:1}}@keyframes slideIn{from{opacity:0;transform:translateY(-20px) scale(0.95)}to{opacity:1;transform:translateY(0) scale(1)}}.ytomo-dialog-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background-color:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;z-index:10000;opacity:0;animation:fadeIn .2s ease-out forwards;overflow-y:auto}@keyframes fadeIn{to{opacity:1}}.ytomo-main-dialog{background:#fff;border-radius:12px;box-shadow:0 20px 60px rgba(0,0,0,.3);width:90vw;max-width:800px;min-width:600px;height:80vh;max-height:700px;min-height:500px;display:flex;flex-direction:column;overflow:hidden;transform:scale(0.9);animation:dialogAppear .2s ease-out forwards}@media(max-width: 768px){.ytomo-main-dialog{width:95vw;height:90vh;min-width:320px;min-height:400px}}@keyframes dialogAppear{to{transform:scale(1)}}.ytomo-dialog-header{background:linear-gradient(135deg, #2c5aa0 0%, #1a365d 100%);color:#fff;padding:16px 20px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid hsla(0,0%,100%,.1);flex-shrink:0}.ytomo-dialog-title{margin:0;font-size:18px;font-weight:600;display:flex;align-items:center;gap:8px}.ytomo-dialog-close{background:none;border:none;color:#000;font-size:24px;width:32px;height:32px;border-radius:6px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background-color .2s}.ytomo-dialog-close:hover{background-color:rgba(0,0,0,.1)}.ytomo-dialog-close:focus{outline:2px solid rgba(0,0,0,.5);outline-offset:2px}.ytomo-dialog-body{flex:1;display:flex;flex-direction:column;overflow:hidden;background:#f8fafc}.ytomo-tab-navigation{display:flex;background:#fff;border-bottom:1px solid #e2e8f0;flex-shrink:0}.ytomo-tab-button{flex:1;background:none;border:none;padding:16px 12px;font-size:14px;font-weight:500;color:#64748b;cursor:pointer;position:relative;transition:all .2s;border-bottom:3px solid rgba(0,0,0,0)}.ytomo-tab-button:hover{background-color:#f1f5f9;color:#475569}.ytomo-tab-button.active{color:#2c5aa0;background-color:#f8fafc;border-bottom-color:#2c5aa0}.ytomo-tab-button:focus{outline:2px solid #2c5aa0;outline-offset:-2px}.ytomo-tab-content{display:flex;flex-direction:column;gap:2px;align-items:center}.ytomo-tab-title{font-size:14px;font-weight:500}.ytomo-tab-dates{font-size:12px;color:#6b7280;line-height:1;min-height:14px}.ytomo-tab-count,.ytomo-tab-type{display:inline-block;margin-left:4px;font-size:12px;background:#e2e8f0;color:#475569;padding:2px 6px;border-radius:10px;min-width:18px;text-align:center;transition:all .2s}.ytomo-tab-button.active .ytomo-tab-count,.ytomo-tab-button.active .ytomo-tab-type{background:#2c5aa0;color:#fff}.ytomo-tab-content{flex:1;overflow:hidden;position:relative}.ytomo-tab-pane{position:absolute;top:0;left:0;width:100%;height:100%;opacity:0;transform:translateX(20px);transition:all .2s ease-out;overflow-y:auto;padding:20px;display:none}.ytomo-tab-pane.active{opacity:1;transform:translateX(0);display:block}.ytomo-loading{display:flex;flex-direction:column;align-items:center;justify-content:center;height:200px;text-align:center}.ytomo-loading::before{content:"";width:40px;height:40px;border:3px solid #e2e8f0;border-top-color:#2c5aa0;border-radius:50%;animation:spin 1s linear infinite;margin-bottom:16px}.ytomo-loading p{margin:0;color:#64748b;font-size:14px}@keyframes spin{to{transform:rotate(360deg)}}.ytomo-tab-placeholder{text-align:center;padding:40px 20px}.ytomo-tab-placeholder h3{margin:0 0 16px 0;color:#2c5aa0;font-size:20px}.ytomo-tab-placeholder p{margin:0 0 24px 0;color:#64748b;font-size:14px}.ytomo-feature-preview{background:#fff;border-radius:8px;padding:20px;text-align:left;box-shadow:0 1px 3px rgba(0,0,0,.1);margin-top:20px}.ytomo-feature-preview h4{margin:0 0 12px 0;color:#374151;font-size:14px;font-weight:600}.ytomo-feature-preview ul{margin:0;padding-left:20px;color:#6b7280;font-size:13px;line-height:1.6}.ytomo-feature-preview li{margin-bottom:4px}.ytomo-yt-button{background:linear-gradient(135deg, #10b981 0%, #059669 100%);border:none;width:48px;height:48px;border-radius:50%;box-shadow:0 4px 12px rgba(16,185,129,.4);cursor:pointer;margin-bottom:12px;position:relative;transition:all .3s cubic-bezier(0.4, 0, 0.2, 1);overflow:hidden}.ytomo-yt-button:hover{transform:scale(1.1);box-shadow:0 6px 20px rgba(16,185,129,.5)}.ytomo-yt-button:active{transform:scale(0.95)}.ytomo-yt-button:focus{outline:3px solid rgba(16,185,129,.3);outline-offset:2px}.ytomo-yt-button .ytomo-fab-icon{color:#fff;font-size:14px;font-weight:700;letter-spacing:.5px;display:block;line-height:1}.ytomo-yt-button::before{content:"";position:absolute;top:50%;left:50%;width:0;height:0;background:hsla(0,0%,100%,.3);border-radius:50%;transform:translate(-50%, -50%);transition:width .6s,height .6s}.ytomo-yt-button:hover::before{width:100px;height:100px}@media(prefers-reduced-motion: reduce){.ytomo-dialog-overlay,.ytomo-main-dialog,.ytomo-tab-pane,.ytomo-tab-button,.ytomo-yt-button,.ytomo-loading::before{animation:none;transition:none}.ytomo-yt-button::before{transition:none}}@media(prefers-contrast: high){.ytomo-main-dialog{border:2px solid #000}.ytomo-tab-button.active{border-bottom-width:4px}.ytomo-dialog-close:focus,.ytomo-tab-button:focus,.ytomo-yt-button:focus{outline:3px solid #000}}.ytomo-main-dialog *:focus{outline:none !important}.ytomo-processing-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background-color:rgba(0,0,0,.3);display:flex;align-items:center;justify-content:flex-end;z-index:10001;padding-right:40px;pointer-events:auto;overflow-y:auto}.ytomo-processing-content{background:hsla(0,0%,100%,.7);border-radius:12px;padding:30px;text-align:center;box-shadow:0 10px 40px rgba(0,0,0,.2);min-width:200px;pointer-events:auto;backdrop-filter:blur(1px)}.ytomo-processing-spinner{width:40px;height:40px;border:3px solid #e2e8f0;border-top-color:#2c5aa0;border-radius:50%;animation:spin 1s linear infinite;margin:0 auto 16px}.ytomo-processing-message{color:#374151;font-size:14px;font-weight:500}.ytomo-sequential-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background-color:rgba(0,0,0,.3);display:flex;align-items:center;justify-content:flex-end;z-index:10002;padding-right:40px;pointer-events:auto;overflow-y:auto}.ytomo-sequential-content{background:hsla(0,0%,100%,.7);border-radius:12px;padding:30px;text-align:center;box-shadow:0 10px 40px rgba(0,0,0,.2);min-width:300px;max-width:400px;pointer-events:auto;backdrop-filter:blur(1px)}.ytomo-sequential-content h3{margin:0 0 20px 0;color:#374151;font-size:18px;font-weight:600}.ytomo-sequential-settings{margin-bottom:20px;text-align:left}.ytomo-sequential-settings label{display:block;margin-bottom:8px;color:#374151;font-size:14px;font-weight:500}.ytomo-mode-selection{margin-bottom:16px}.ytomo-mode-buttons{display:flex;gap:8px;margin-top:8px}.ytomo-mode-button{flex:1;padding:8px 16px;border:1px solid #d1d5db;border-radius:6px;background:#fff;color:#374151;font-size:14px;font-weight:500;cursor:pointer;transition:all .2s}.ytomo-mode-button:hover{background:#f3f4f6;border-color:#9ca3af}.ytomo-mode-button.active{background:#2c5aa0;border-color:#2c5aa0;color:#fff}.ytomo-mode-button:focus{outline:2px solid #2c5aa0;outline-offset:2px}.ytomo-interval-setting{margin-top:12px}.ytomo-interval-dropdown{width:100%;padding:8px 12px;border:1px solid #d1d5db;border-radius:6px;background:#fff;font-size:14px;color:#374151;cursor:pointer}.ytomo-interval-dropdown:focus{outline:2px solid #2c5aa0;outline-offset:2px;border-color:#2c5aa0}.ytomo-sequential-progress{margin-bottom:20px}.ytomo-sequential-current{font-size:24px;font-weight:bold;color:#2c5aa0;margin-bottom:8px}.ytomo-sequential-target{font-size:16px;color:#374151;margin-bottom:8px;font-weight:500}.ytomo-sequential-countdown{font-size:14px;color:#6b7280;min-height:20px}.ytomo-sequential-controls{margin-top:20px}.ytomo-cancel-button{background:#dc3545;color:#fff;border:none;border-radius:6px;padding:10px 20px;font-size:14px;font-weight:500;cursor:pointer;transition:background-color .2s}.ytomo-cancel-button:hover{background:#c82333}.ytomo-dialog-overlay{color-scheme:light}.ytomo-main-dialog{color-scheme:light;background:#fff !important;color:#1f2937 !important}@media(prefers-color-scheme: dark)and (max-width: 0px){.ytomo-main-dialog{background:#1f2937;color:#f9fafb}.ytomo-dialog-body{background:#111827}.ytomo-tab-navigation{background:#374151;border-bottom-color:#4b5563}.ytomo-tab-button{color:#d1d5db}.ytomo-tab-button:hover{background-color:#4b5563;color:#f3f4f6}.ytomo-tab-button.active{background-color:#1f2937;color:#60a5fa;border-bottom-color:#60a5fa}.ytomo-tab-count,.ytomo-tab-type{background:#4b5563;color:#d1d5db}.ytomo-tab-button.active .ytomo-tab-count,.ytomo-tab-button.active .ytomo-tab-type{background:#60a5fa;color:#1f2937}.ytomo-feature-preview{background:#374151;border:1px solid #4b5563}.ytomo-loading::before{border-color:#4b5563;border-top-color:#60a5fa}}.ytomo-ticket-tab{padding:0 12px 20px 12px;height:100%;overflow-y:auto;color-scheme:light}@media(max-width: 768px){.ytomo-ticket-tab{padding:0 8px 16px 8px}}.ytomo-quick-select{background:#fff;border-radius:8px;padding:12px;box-shadow:0 1px 3px rgba(0,0,0,.1);border:1px solid #e2e8f0;flex-shrink:0;display:flex;align-items:center;gap:10px;flex-wrap:wrap}.ytomo-toggle-container{display:flex;align-items:center;cursor:pointer;user-select:none}.ytomo-toggle-input{display:none}.ytomo-toggle-slider{position:relative;width:44px;height:24px;background:#cbd5e1;border-radius:12px;transition:background-color .2s;margin-right:8px}.ytomo-toggle-slider::before{content:"";position:absolute;top:2px;left:2px;width:20px;height:20px;background:#fff;border-radius:50%;transition:transform .2s}.ytomo-toggle-input:checked+.ytomo-toggle-slider{background:#2c5aa0}.ytomo-toggle-input:checked+.ytomo-toggle-slider::before{transform:translateX(20px)}.ytomo-toggle-label{font-size:14px;font-weight:500;color:#374151}.ytomo-date-buttons{display:flex;flex-wrap:wrap;gap:8px;flex:1}.ytomo-date-button{background:#e0f2fe;border:1px solid #0891b2;border-radius:4px;padding:4px 8px;font-size:12px;color:#0c4a6e;cursor:pointer;transition:all .2s;display:flex;flex-direction:column;gap:2px;align-items:center}.ytomo-date-button *{pointer-events:none}.ytomo-date-button:focus{outline:none;box-shadow:none}.ytomo-date-button:hover{background:#0ea5e9;color:#fff;transform:translateY(-1px);box-shadow:0 2px 4px rgba(14,165,233,.3)}.ytomo-date-button.selected{background:#0891b2;color:#fff;border-color:#164e63;outline:2px solid #164e63;outline-offset:-1px}.ytomo-date-button:active{transform:translateY(0);box-shadow:none}.ytomo-ticket-list{display:flex;flex-direction:column;gap:8px;margin-bottom:20px}.ytomo-ticket-item{background:#fff;border-radius:6px;border:1px solid #e2e8f0;overflow:hidden;transition:all .2s}.ytomo-ticket-item.hidden{display:none}.ytomo-ticket-item:hover{border-color:#cbd5e1;box-shadow:0 2px 4px rgba(0,0,0,.1)}.ytomo-ticket-item.selected{border-color:#2c5aa0;box-shadow:0 0 0 2px rgba(44,90,160,.2)}.ytomo-ticket-upper{background:#e2e8f0;padding:8px 12px;display:flex;align-items:center;gap:8px;border-bottom:1px solid #cbd5e1}.ytomo-ticket-id{font-family:"Courier New",monospace;font-size:13px;font-weight:600;color:#374151;background:#e2e8f0;padding:2px 6px;border-radius:3px}.ytomo-me-tip{background:linear-gradient(135deg, #10b981 0%, #059669 100%);color:#fff;padding:2px 6px;border-radius:10px;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.3px}.ytomo-label-tag{background:linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);color:#fff;padding:2px 6px;border-radius:10px;font-size:10px;font-weight:600}.ytomo-ticket-lower{padding:8px 12px;display:flex;flex-direction:column;gap:8px}.ytomo-entrance-dates{display:flex;flex-wrap:wrap;gap:6px}.ytomo-entrance-date-button{background:#e0f2fe;border:1px solid #0891b2;border-radius:4px;padding:4px 8px;font-size:12px;color:#0c4a6e;cursor:pointer;transition:all .2s;display:flex;flex-direction:column;gap:2px;align-items:center}.ytomo-entrance-date-button *{pointer-events:none}.ytomo-entrance-date-button:focus{outline:none;box-shadow:none}.ytomo-entrance-date-button:hover{background:#0284c7;color:#fff}.ytomo-entrance-date-button.selected{background:#0ea5e9;color:#fff;border-color:#164e63;outline:2px solid #164e63;outline-offset:-1px}.ytomo-entrance-date-button:active{transform:translateY(0);box-shadow:none}.ytomo-entrance-date-button.disabled,.ytomo-entrance-date-button:disabled{background:#e2e8f0;border-color:#94a3b8;color:#475569;cursor:not-allowed}.ytomo-entrance-date-button.disabled:hover,.ytomo-entrance-date-button:disabled:hover{background:#e2e8f0;color:#475569;transform:none;box-shadow:none}.ytomo-entrance-date-button .ytomo-reservation-status{background:hsla(0,0%,100%,.9);color:#0891b2;padding:2px 4px;border-radius:3px;font-size:9px;font-weight:500;line-height:1.1;text-align:center}.ytomo-entrance-date-button .ytomo-reservation-status:empty{background:rgba(0,0,0,0);padding:0}.ytomo-entrance-date-button:hover .ytomo-reservation-status{background:hsla(0,0%,100%,.95);color:#0ea5e9}.ytomo-entrance-date-button:hover .ytomo-reservation-status:empty{background:rgba(0,0,0,0)}.ytomo-entrance-date-button.selected .ytomo-reservation-status{background:hsla(0,0%,100%,.95);color:#0891b2}.ytomo-entrance-date-button.selected .ytomo-reservation-status:empty{background:rgba(0,0,0,0)}.ytomo-entrance-date-button.disabled .ytomo-reservation-status{background:hsla(0,0%,100%,.9);color:#475569}.ytomo-entrance-date-button.disabled .ytomo-reservation-status:empty{background:rgba(0,0,0,0)}.ytomo-reservation-types{display:flex;flex-wrap:wrap;gap:6px;align-items:center}.ytomo-reservation-type{padding:4px 8px;border-radius:4px;font-size:12px;font-weight:500}.ytomo-reservation-type.active{background:#dcfce7;color:#166534;border:1px solid #22c55e}.ytomo-reservation-type.inactive{background:#fef2f2;color:#991b1b;border:1px solid #ef4444}.ytomo-no-reservation-types{color:#6b7280;font-size:12px;font-style:italic}.ytomo-add-ticket{background:#fff;border-radius:8px;padding:16px;border:2px dashed #cbd5e1;margin-top:20px}.ytomo-add-ticket h4{margin:0 0 12px 0;color:#374151;font-size:14px;font-weight:600}.ytomo-add-ticket-form{display:flex;gap:8px;align-items:center;flex-wrap:wrap}@media(max-width: 768px){.ytomo-add-ticket-form{flex-direction:column;align-items:stretch;gap:12px}}.ytomo-input{flex:1;padding:8px 12px;border:1px solid #d1d5db;border-radius:6px;font-size:14px;transition:border-color .2s}.ytomo-input:focus{outline:none;border-color:#2c5aa0;box-shadow:0 0 0 3px rgba(44,90,160,.1)}.ytomo-input::placeholder{color:#9ca3af}.ytomo-input-inline{padding:4px 8px;border:1px solid #d1d5db;border-radius:4px;font-size:12px;transition:border-color .2s;background:#fff}.ytomo-input-inline:focus{outline:none;border-color:#2c5aa0;box-shadow:0 0 0 2px rgba(44,90,160,.1)}.ytomo-input-inline::placeholder{color:#9ca3af}.ytomo-input-inline.ytomo-input-ticket-id{width:120px}.ytomo-input-inline.ytomo-input-label{width:60px}.ytomo-button{padding:8px 16px;border:none;border-radius:6px;font-size:14px;font-weight:500;cursor:pointer;transition:all .2s;display:inline-flex;align-items:center;justify-content:center;white-space:nowrap}.ytomo-button.primary{background:linear-gradient(135deg, #2c5aa0 0%, #1a365d 100%);color:#fff}.ytomo-button.primary:hover{background:linear-gradient(135deg, #1a365d 0%, #2c5aa0 100%);transform:translateY(-1px);box-shadow:0 4px 12px rgba(44,90,160,.3)}.ytomo-button.primary:active{transform:translateY(0)}.ytomo-button.retry-button{background:linear-gradient(135deg, #f59e0b 0%, #d97706 100%);color:#fff;margin-top:12px}.ytomo-button.retry-button:hover{background:linear-gradient(135deg, #d97706 0%, #f59e0b 100%)}.ytomo-button:focus{outline:2px solid #2c5aa0;outline-offset:2px}.ytomo-button:disabled{opacity:.5;cursor:not-allowed;transform:none !important}.ytomo-empty-state{text-align:center;padding:40px 20px;color:#6b7280;font-style:italic}.ytomo-empty-state p{margin:0;font-size:14px}.ytomo-error{text-align:center;padding:40px 20px;color:#dc2626}.ytomo-error h3{margin:0 0 8px 0;font-size:16px;color:#dc2626}.ytomo-error p{margin:0;font-size:14px;color:#6b7280}.ytomo-ticket-tab .ytomo-loading{height:150px}.ytomo-ticket-list::-webkit-scrollbar{width:6px}.ytomo-ticket-list::-webkit-scrollbar-track{background:#f1f5f9;border-radius:3px}.ytomo-ticket-list::-webkit-scrollbar-thumb{background:#cbd5e1;border-radius:3px}.ytomo-ticket-list::-webkit-scrollbar-thumb:hover{background:#94a3b8}.ytomo-ticket-item{animation:slideIn .2s ease-out}@keyframes slideIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}@media(prefers-reduced-motion: reduce){.ytomo-ticket-item,.ytomo-button,.ytomo-date-button,.ytomo-entrance-date-button,.ytomo-toggle-slider,.ytomo-input{animation:none;transition:none}}@media(prefers-contrast: high){.ytomo-ticket-item{border-width:3px}.ytomo-ticket-item.selected{border-width:4px}.ytomo-button:focus,.ytomo-input:focus,.ytomo-date-button:focus{outline:3px solid #000}}.ytomo-pavilion-tab{padding:0 20px 20px 20px;height:100%;display:flex;flex-direction:column;gap:16px;overflow-y:auto;color-scheme:light}.ytomo-search-controls{background:#fff;border-radius:8px;padding:16px;box-shadow:0 1px 3px rgba(0,0,0,.1);border:1px solid #e2e8f0;flex-shrink:0;display:flex;gap:12px;align-items:center}@media(max-width: 600px){.ytomo-search-controls{flex-direction:column;align-items:stretch;gap:12px}}.ytomo-search-input-container{flex:1}.ytomo-search-input{width:100%;padding:10px 16px;border:1px solid #d1d5db;border-radius:8px;font-size:14px;transition:all .2s}.ytomo-search-input:focus{outline:none;border-color:#2c5aa0}.ytomo-search-input::placeholder{color:#9ca3af}.ytomo-control-buttons{display:flex;gap:8px;flex-shrink:0}@media(max-width: 600px){.ytomo-control-buttons{justify-content:center}}.ytomo-icon-button{width:40px;height:40px;border:1px solid #d1d5db;border-radius:8px;background:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s;font-size:16px;position:relative}.ytomo-icon-button:hover{background:#f3f4f6;border-color:#9ca3af;transform:translateY(-1px)}.ytomo-icon-button:active{transform:translateY(0)}.ytomo-icon-button.active{background:#2c5aa0;border-color:#2c5aa0;color:#fff}.ytomo-icon-button.active:hover{background:#1a365d}.ytomo-icon-button .ytomo-count-badge{position:absolute;top:-8px;right:-8px;background:#f44;color:#fff;border-radius:10px;padding:2px 6px;font-size:10px;font-weight:bold;min-width:16px;text-align:center;line-height:1.2;pointer-events:none;z-index:10}.ytomo-icon-button:focus{outline:none}.ytomo-icon-button span{display:block;line-height:1}.ytomo-pavilion-list{flex:1;background:#fff;border-radius:8px;border:1px solid #e2e8f0}.ytomo-pavilion-item{background:#fff;border-bottom:1px solid #f1f5f9;transition:all .2s;color:#374151}.ytomo-pavilion-item:last-child{border-bottom:none}.ytomo-pavilion-item:hover{background:#f8fafc}.ytomo-pavilion-item.hidden{display:none}.ytomo-pavilion-header{display:flex;align-items:center;gap:12px;padding:16px;cursor:pointer}.ytomo-star-button{background:none;border:none;font-size:18px;cursor:pointer;transition:all .2s;padding:4px;border-radius:4px}.ytomo-star-button:hover{background:rgba(255,193,7,.1)}.ytomo-star-button.favorite{color:#ffc107}.ytomo-star-button:focus{outline:none}.ytomo-pavilion-checkbox-container{display:flex;align-items:center;cursor:pointer}.ytomo-pavilion-checkbox{width:16px;height:16px;cursor:pointer}.ytomo-pavilion-name{flex:1;font-size:15px;font-weight:500;color:#374151;line-height:1.4}.ytomo-expand-button{background:none;border:none;font-size:12px;color:#6b7280;cursor:pointer;padding:4px 8px;border-radius:4px;transition:all .2s}.ytomo-expand-button:hover{background:#f3f4f6;color:#374151}.ytomo-expand-button.expanded{background:#e2e8f0;color:#374151}.ytomo-expand-button:focus{outline:none}.ytomo-time-slots{padding:0 16px 16px 16px;display:flex;flex-wrap:wrap;gap:8px;transition:all .3s ease}.ytomo-time-slots.hidden{display:none}.ytomo-time-slot-button{padding:8px 12px;border-radius:6px;font-size:13px;font-weight:500;cursor:pointer;transition:all .2s;border:1px solid;min-width:80px;text-align:center;display:inline-block}.ytomo-time-slot-button *{pointer-events:none}.ytomo-time-slot-button.available{background:#dcfce7;border-color:#22c55e;color:#166534}.ytomo-time-slot-button.available:hover{background:#bbf7d0;color:#166534;transform:translateY(-1px);box-shadow:0 2px 8px rgba(34,197,94,.3)}.ytomo-time-slot-button.available.selected{background:#22c55e;color:#fff;box-shadow:0 2px 8px rgba(34,197,94,.3)}.ytomo-time-slot-button.unavailable{background:#fef2f2;border-color:#ef4444;color:#991b1b;cursor:pointer;opacity:1}.ytomo-time-slot-button.unavailable:hover{background:#fecaca;color:#991b1b;transform:translateY(-1px);box-shadow:0 2px 8px rgba(239,68,68,.3)}.ytomo-time-slot-button.unavailable.selected{background:#ef4444;color:#fff;box-shadow:0 2px 8px rgba(239,68,68,.3)}.ytomo-time-slot-button.rate-limited{background:#f3f4f6;border-color:#9ca3af;color:#6b7280;cursor:not-allowed;opacity:.6}.ytomo-time-slot-button.rate-limited:hover{background:#f3f4f6;color:#6b7280;transform:none;box-shadow:none}.ytomo-time-slot-button.rate-limited:disabled{cursor:not-allowed;pointer-events:none}.ytomo-time-slot-button:focus{outline:none}.ytomo-time-slot-button.hidden{display:none}.ytomo-reservation-controls{background:#fff;border-radius:8px;padding:16px;box-shadow:0 1px 3px rgba(0,0,0,.1);border:1px solid #e2e8f0;flex-shrink:0;display:flex;align-items:center;gap:16px;position:relative}@media(max-width: 600px){.ytomo-reservation-controls{flex-direction:column;align-items:stretch;gap:12px}}.ytomo-selected-info{flex:1;font-size:14px;color:#374151;font-weight:500}@media(max-width: 600px){.ytomo-selected-info{text-align:center}}.ytomo-reservation-controls .ytomo-button{padding:10px 20px;font-weight:600;white-space:nowrap}@media(max-width: 600px){.ytomo-reservation-controls .ytomo-button{width:100%}}#ot-sdk-btn-floating{display:none !important}.ytomo-result-display{position:fixed;top:20px;right:20px;padding:8px 12px;border-radius:6px;font-size:13px;font-weight:500;opacity:0;transform:translateY(-10px);transition:all .3s;pointer-events:none;max-width:300px;z-index:10001}.ytomo-result-display.show{opacity:1;transform:translateY(0)}.ytomo-result-display.success{background:#22c55e;color:#fff}.ytomo-result-display.error{background:#ef4444;color:#fff}.ytomo-result-display.info{background:#3b82f6;color:#fff}@media(max-width: 600px){.ytomo-result-display{position:static;transform:none;margin:8px 0 0 0;text-align:center}}.ytomo-pavilion-tab .ytomo-empty-state,.ytomo-pavilion-tab .ytomo-error{padding:40px 20px;text-align:center}.ytomo-pavilion-tab .ytomo-empty-state p{margin:0;color:#6b7280;font-size:14px}.ytomo-pavilion-tab .ytomo-error p{margin:0;color:#dc2626;font-size:14px}.ytomo-pavilion-tab .ytomo-loading{height:150px}.ytomo-pavilion-list::-webkit-scrollbar{width:6px}.ytomo-pavilion-list::-webkit-scrollbar-track{background:#f1f5f9;border-radius:3px}.ytomo-pavilion-list::-webkit-scrollbar-thumb{background:#cbd5e1;border-radius:3px}.ytomo-pavilion-list::-webkit-scrollbar-thumb:hover{background:#94a3b8}.ytomo-selected-dates-display{background:#fff;border-radius:8px;padding:12px 16px;box-shadow:0 1px 3px rgba(0,0,0,.1);border:1px solid #e2e8f0;flex-shrink:0;min-height:44px;display:flex;align-items:center}.ytomo-selected-dates-content{display:flex;align-items:center;gap:8px;width:100%}.ytomo-dates-label{font-size:14px;font-weight:600;color:#374151;flex-shrink:0}.ytomo-dates-text{font-size:14px;color:#2c5aa0;font-weight:500}.ytomo-dates-text:empty::before{content:"なし";color:#9ca3af;font-style:italic}.ytomo-status-fab{position:fixed;bottom:86px;right:20px;min-width:120px;min-height:50px;border:none;border-radius:6px;color:#fff;font-size:11px;font-weight:500;cursor:pointer;box-shadow:0 4px 12px rgba(0,0,0,.3);transition:all .3s ease;z-index:1001;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:8px 12px;line-height:1.2}.ytomo-status-fab.success{background:linear-gradient(135deg, #22c55e 0%, #16a34a 100%);box-shadow:0 4px 12px rgba(34,197,94,.4)}.ytomo-status-fab.error{background:linear-gradient(135deg, #ef4444 0%, #dc2626 100%);box-shadow:0 4px 12px rgba(239,68,68,.4)}.ytomo-status-fab.info{background:linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);box-shadow:0 4px 12px rgba(59,130,246,.4)}.ytomo-status-fab:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 6px 16px rgba(0,0,0,.4)}.ytomo-status-fab:active:not(:disabled){transform:translateY(0)}.ytomo-status-fab:focus{outline:none}.ytomo-reservation-fab{position:fixed;bottom:20px;right:20px;width:56px;height:56px;background:linear-gradient(135deg, #2c5aa0 0%, #1a365d 100%);border:none;border-radius:28px;color:#fff;font-size:24px;cursor:pointer;box-shadow:0 4px 16px rgba(44,90,160,.3);transition:all .3s ease;z-index:1000;display:flex;align-items:center;justify-content:center}.ytomo-reservation-fab:hover:not(:disabled){background:linear-gradient(135deg, #1a365d 0%, #2c5aa0 100%);transform:translateY(-2px);box-shadow:0 6px 20px rgba(44,90,160,.4)}.ytomo-reservation-fab:active:not(:disabled){transform:translateY(0);box-shadow:0 2px 8px rgba(44,90,160,.3)}.ytomo-reservation-fab:disabled{background:#94a3b8;cursor:not-allowed;box-shadow:0 2px 8px rgba(148,163,184,.3);opacity:.6}.ytomo-reservation-fab:focus{outline:none}.ytomo-pavilion-item{animation:slideIn .2s ease-out}@keyframes slideIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}.ytomo-time-slot-button.available:hover{animation:pulse .6s ease-in-out}@keyframes pulse{0%{transform:translateY(-1px)}50%{transform:translateY(-2px)}100%{transform:translateY(-1px)}}.ytomo-pavilion-tab input:focus,.ytomo-pavilion-tab button:focus{outline:none}@media(prefers-reduced-motion: reduce){.ytomo-pavilion-item,.ytomo-time-slot-button,.ytomo-icon-button,.ytomo-result-display,.ytomo-time-slots{animation:none;transition:none}.ytomo-time-slot-button.available:hover{animation:none;transform:none}}@media(prefers-contrast: high){.ytomo-pavilion-item{border-bottom-width:2px}.ytomo-time-slot-button{border-width:2px}.ytomo-icon-button.active{border-width:3px}.ytomo-pavilion-tab input:focus,.ytomo-pavilion-tab button:focus{outline:3px solid #000}}table[class*=style_main__timetable__] td[data-gray-out] div[role=button][data-disabled=true]{pointer-events:auto !important;cursor:pointer !important}`, ""]);
+___CSS_LOADER_EXPORT___.push([module.id, `#ytomo-status-badge.countdown-warning{background:rgba(255,0,0,.9)}.ytomo-efficiency-toggle{width:45px;height:32px;border-radius:16px;color:#fff;border:none;font-size:10px;font-weight:bold;cursor:pointer;transition:all .2s ease;box-shadow:0 2px 8px rgba(0,0,0,.3);display:flex;align-items:center;justify-content:center;pointer-events:auto;margin-bottom:8px}.ytomo-efficiency-toggle.efficiency-enabled{background:rgba(255,140,0,.9)}.ytomo-efficiency-toggle.efficiency-disabled{background:rgba(128,128,128,.9)}.ytomo-efficiency-toggle:hover{transform:scale(1.1);box-shadow:0 4px 12px rgba(0,0,0,.4)}.ytomo-efficiency-toggle:active{transform:scale(0.95)}button.ext-ytomo{height:40px;width:auto;min-width:60px;padding:0px 8px;background:#006821;color:#fff}button.ext-ytomo.no-after:after{background:rgba(0,0,0,0) none repeat 0 0/auto auto padding-box border-box scroll}button.ext-ytomo.btn-done{background:#4a4c4a}button.ext-ytomo:hover{background:#02862b}.fab-sub-btn{color:#fff;border:none;border-radius:20px;padding:8px 16px;font-size:12px;white-space:nowrap;transition:all .2s ease}.fab-sub-btn.btn-enabled{background:#006821;cursor:pointer;opacity:1}.fab-sub-btn.btn-enabled:hover{background:#02862b;transform:scale(1.05)}.fab-sub-btn.btn-enabled.btn-done{background:#4a4c4a}.fab-sub-btn.btn-enabled.btn-done:hover{background:#606260}.fab-sub-btn.btn-disabled,.fab-sub-btn.btn-loading{background:gray;cursor:not-allowed;opacity:.6}.fab-sub-btn.btn-disabled:hover,.fab-sub-btn.btn-loading:hover{background:gray;transform:scale(1)}.fab-sub-btn:disabled{background:gray !important;cursor:not-allowed !important;opacity:.6 !important}.fab-sub-btn:disabled:hover{background:gray !important;transform:scale(1) !important}button.ext-ytomo.pavilion-sub-btn.btn-disabled,button.ext-ytomo.pavilion-sub-btn.btn-loading{background:gray;cursor:not-allowed;opacity:.6}button.ext-ytomo.pavilion-sub-btn.btn-disabled:hover,button.ext-ytomo.pavilion-sub-btn.btn-loading:hover{background:gray;transform:scale(1)}.safe-none,.ytomo-none,.filter-none{display:none}.fab-sub-btn span.button-count{font-family:"Courier New","Monaco",monospace;font-weight:bold;color:#ffeb3b;vertical-align:baseline}button.ext-ytomo.pavilion-sub-btn.ytomo-date-button.date-selected{border:2px solid #4caf50;box-shadow:0 0 8px rgba(76,175,80,.6)}div.div-flex{display:flex;justify-content:center;margin:5px}div.div-flex input.ext-tomo.search{flex:1;padding:8px 12px;border:1px solid #ddd;border-radius:4px;font-size:14px;margin-right:8px}div.div-flex input.ext-tomo.search:focus{outline:none;border-color:#006821;box-shadow:0 0 0 2px rgba(0,104,33,.2)}div.div-flex button.btn-filter-without-load{height:auto;min-height:40px;width:auto;min-width:60px;padding:0px 8px;color:#fff;margin:5px;background:#006821;border:none;border-radius:4px;cursor:pointer;font-size:14px}div.div-flex button.btn-filter-without-load:hover{background:#02862b}div.div-flex button.btn-filter-without-load:active{background:#005417}div.div-flex button.btn-filter-without-load:disabled{background:gray;cursor:not-allowed}.js-show{display:block}.js-hide{display:none}.js-visible{visibility:visible}.js-invisible{visibility:hidden}.js-enabled{pointer-events:auto;opacity:1}.js-disabled{pointer-events:none;opacity:.6}.js-green{background:#228b22;color:#fff}.js-red{background:#dc3545;color:#fff}.js-gray{background:gray;color:#fff}.btn-success-highlight{background:#00c800;color:#fff}.status-bg-green{background:rgba(0,128,0,.9)}.status-bg-red{background:rgba(255,0,0,.9)}.status-bg-orange{background:rgba(255,140,0,.9)}.status-bg-blue{background:rgba(0,104,33,.9)}.status-bg-default{background:rgba(0,0,0,.8)}#ytomo-status-badge{background:linear-gradient(135deg, rgba(0, 0, 0, 0.9), rgba(40, 40, 40, 0.9));color:#fff;padding:8px 16px;border-radius:20px;font-size:12px;font-weight:bold;white-space:pre-line;box-shadow:0 4px 12px rgba(0,0,0,.3),0 2px 6px rgba(0,0,0,.2);border:2px solid hsla(0,0%,100%,.15);pointer-events:none}#ytomo-status-badge.ytomo-status-waiting{background:linear-gradient(135deg, rgba(0, 0, 0, 0.9), rgba(40, 40, 40, 0.9))}#ytomo-status-badge.ytomo-status-reservation{background:linear-gradient(135deg, rgba(255, 140, 0, 0.9), rgba(255, 165, 0, 0.9))}#ytomo-status-badge.ytomo-status-reservation.ytomo-status-countdown-warning{background:linear-gradient(135deg, rgba(255, 0, 0, 0.9), rgba(220, 53, 69, 0.9))}#ytomo-status-badge.ytomo-status-cooldown{background:linear-gradient(135deg, rgba(255, 107, 53, 0.9), rgba(255, 140, 0, 0.9))}.ytomo-header li.fab-toggle-li{display:inline-block;margin-right:8px}.ytomo-header li.fab-toggle-li button.fab-toggle-button{background:none;border:none;cursor:pointer;padding:0;color:#fff;transition:all .2s ease;display:flex;align-items:center;justify-content:center}.ytomo-header li.fab-toggle-li button.fab-toggle-button:hover{color:#ddd}.ytomo-header li.fab-toggle-li button.fab-toggle-button figure.fab-toggle-figure{width:auto;height:24px;display:flex;align-items:center;justify-content:center;padding:0 4px}.ytomo-pavilion-fab button.ytomo-fab{position:relative}.ytomo-pavilion-fab button.ytomo-fab:hover{transform:scale(1.15);box-shadow:0 8px 25px rgba(0,0,0,.5),0 4px 12px rgba(0,0,0,.3);border-width:4px}.ytomo-pavilion-fab .ytomo-fab-inner-content .pavilion-fab-expand-icon{font-size:8px;line-height:1;margin-bottom:1px;opacity:.8}.ytomo-pavilion-fab .ytomo-fab-inner-content .pavilion-fab-brand-text{font-size:7px;font-weight:normal;line-height:1;margin-bottom:2px;opacity:.7}.ytomo-pavilion-fab .ytomo-fab-inner-content .pavilion-fab-counts-text{font-size:12px;font-weight:bold;line-height:1}.ytomo-pavilion-fab .pavilion-sub-actions-container{display:none;flex-direction:column;gap:8px;align-items:flex-end;margin-bottom:8px}.ytomo-pavilion-fab .pavilion-sub-actions-container.expanded{display:flex}.ytomo-pavilion-fab .pavilion-sub-actions-container button.pavilion-sub-btn.base-style{color:#fff;border:none;border-radius:20px;padding:8px 16px;font-size:12px;white-space:nowrap;box-shadow:0 2px 8px rgba(0,0,0,.3);transition:all .2s ease}.ytomo-companion-dialog{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;z-index:99999;padding:20px;box-sizing:border-box}.ytomo-companion-dialog .dialog-content{background:#fff;border-radius:12px;padding:24px;width:100%;max-width:500px;max-height:90vh;overflow-y:auto;box-shadow:0 10px 40px rgba(0,0,0,.3)}@media(max-width: 768px){.ytomo-companion-dialog .dialog-content{max-width:95vw;max-height:85vh;padding:16px;border-radius:8px}}.ytomo-companion-dialog .dialog-content .input-row{display:flex;gap:8px;margin-bottom:12px}@media(max-width: 480px){.ytomo-companion-dialog .dialog-content .input-row{flex-direction:column;gap:12px}}.ytomo-companion-dialog .dialog-content .input-row input{padding:12px 8px;border:1px solid #ddd;border-radius:4px;font-size:16px}.ytomo-companion-dialog .dialog-content .input-row input:focus{outline:none;border-color:#4caf50;box-shadow:0 0 0 2px rgba(76,175,80,.2)}.ytomo-companion-dialog .dialog-content .input-row button{padding:12px 16px;background:#4caf50;color:#fff;border:none;border-radius:4px;cursor:pointer;font-size:14px;white-space:nowrap;min-width:60px}.ytomo-companion-dialog .dialog-content .input-row button:hover{background:#45a049}.ytomo-companion-dialog .dialog-content .input-row button:active{background:#3d8b40}.ytomo-abort-button{position:fixed;bottom:100px;right:24px;z-index:100001;background:#f44336;color:#fff;border:none;border-radius:50%;width:64px;height:64px;font-size:12px;font-weight:bold;cursor:pointer;box-shadow:0 4px 12px rgba(244,67,54,.4);transition:all .3s ease;display:flex;align-items:center;justify-content:center}.ytomo-abort-button:hover{transform:scale(1.1);box-shadow:0 6px 20px rgba(244,67,54,.6)}.ytomo-abort-button:active{transform:scale(0.95)}.copy-ticket-btn{margin-left:8px;padding:6px;background:#f0f0f0;border:1px solid #ddd;border-radius:4px;cursor:pointer;display:flex;align-items:center;justify-content:center;min-width:32px;height:32px;transition:all .3s ease}.copy-ticket-btn:hover{background:#e0e0e0;border-color:#ccc}.copy-ticket-btn:active{transform:scale(0.95)}.copy-ticket-btn svg{color:#666;transition:all .3s ease}.copy-ticket-btn.copy-success{background:rgba(76,175,80,.1);border-color:#4caf50}.copy-ticket-btn.copy-success svg{color:#4caf50}.dialog-btn{padding:8px 16px;border:none;border-radius:4px;cursor:pointer;font-size:14px;font-weight:bold;transition:all .2s ease}.dialog-btn.btn-cancel{background:#666;color:#fff}.dialog-btn.btn-cancel:hover{background:#555}.dialog-btn.btn-delete{background:#f44336;color:#fff}.dialog-btn.btn-delete:hover{background:#d32f2f}.dialog-btn.btn-execute{background:#2196f3;color:#fff}.dialog-btn.btn-execute:hover{background:#1976d2}.dialog-btn.btn-execute.btn-disabled{background:#ccc;color:#666;cursor:not-allowed}.dialog-btn.btn-execute.btn-disabled:hover{background:#ccc}.ticket-row{display:flex;align-items:center;padding:8px;border-bottom:1px solid #eee;transition:background-color .2s ease;cursor:pointer}.ticket-row:last-child{border-bottom:none}.ticket-row.already-added{position:relative;opacity:.6;background:repeating-linear-gradient(45deg, transparent, transparent 8px, rgba(255, 140, 0, 0.1) 8px, rgba(255, 140, 0, 0.1) 16px)}.ticket-row.already-added::after{content:"追加済み";position:absolute;top:4px;right:40px;background:rgba(255,140,0,.9);color:#fff;font-size:10px;font-weight:bold;padding:2px 6px;border-radius:3px;pointer-events:none}.ticket-row.already-added input[type=checkbox]{opacity:.5;cursor:not-allowed}.ticket-row.already-added .copy-ticket-btn{opacity:1;background:#f8f8f8;border-color:#bbb}.ticket-row.already-added .copy-ticket-btn:hover{background:#e8e8e8;border-color:#999}.ytomo-fab{width:56px;height:56px;border-radius:50%;color:#fff;border:none;box-shadow:0 6px 20px rgba(0,0,0,.4),0 2px 8px rgba(0,0,0,.2);border:3px solid hsla(0,0%,100%,.2);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:bold;transition:all .3s ease;position:relative;overflow:hidden;pointer-events:auto}.ytomo-fab-enabled{background:#ff8c00;opacity:.9;cursor:pointer;pointer-events:auto}.ytomo-fab-disabled{background:gray;opacity:.6;cursor:not-allowed;pointer-events:none}.ytomo-fab-running{background:#dc3545;opacity:.9;cursor:pointer;pointer-events:auto}.ytomo-fab.state-idle{background:gray;opacity:.6;cursor:not-allowed;pointer-events:none}.ytomo-fab.pointer-events-none{pointer-events:none}.ytomo-fab.pointer-events-auto{pointer-events:auto}.ytomo-fab.state-enabled{background:#ff8c00;opacity:.9;cursor:pointer;pointer-events:auto}.ytomo-fab.state-running{background:#dc3545;opacity:.9;cursor:pointer;pointer-events:auto}.ytomo-fab.state-reservation{background:#ff8c00;opacity:.9;cursor:pointer;pointer-events:auto}.ytomo-fab:hover{transform:scale(1.15);box-shadow:0 8px 25px rgba(0,0,0,.5),0 4px 12px rgba(0,0,0,.3)}.ytomo-fab.reservation-enabled{background:#006821;opacity:.9;cursor:pointer}.ytomo-fab.reservation-disabled{background:gray;opacity:.9;cursor:not-allowed}.ytomo-fab.cooldown-warning{background:#ff6b35}.ytomo-fab.cooldown-normal{background:#007bff}.ytomo-fab-container{position:fixed;bottom:100px;right:24px;z-index:10000;display:flex;flex-direction:column;align-items:flex-end;gap:12px;pointer-events:auto}.ytomo-fab-container.z-normal{z-index:10000}.ytomo-fab-container.z-above-overlay{z-index:100001}.ytomo-fab-container.visible{display:flex}.ytomo-fab-container.hidden{display:none}.ytomo-fab-content{position:relative;display:flex;flex-direction:column-reverse;align-items:center;gap:8px;opacity:0;transform:scale(0.8) translateY(10px);transition:all .3s cubic-bezier(0.175, 0.885, 0.32, 1.275);pointer-events:none}.ytomo-fab-content.expanded{opacity:1;transform:scale(1) translateY(0);pointer-events:auto}.ytomo-sub-fab{width:45px;height:32px;border-radius:16px;background:rgba(0,104,33,.9);color:#fff;border:none;font-size:11px;font-weight:bold;cursor:pointer;transition:all .2s ease;box-shadow:0 2px 8px rgba(0,0,0,.3);display:flex;align-items:center;justify-content:center;pointer-events:auto}.ytomo-sub-fab:hover{background:rgba(2,134,43,.9);transform:scale(1.1);box-shadow:0 4px 12px rgba(0,0,0,.4)}.ytomo-sub-fab:active{transform:scale(0.95)}.ytomo-pavilion-fab-container{position:fixed;bottom:100px;right:24px;z-index:10000;display:flex;flex-direction:column;gap:12px;align-items:flex-end;pointer-events:auto}.ytomo-ticket-selection-fab-container{position:fixed;bottom:100px;right:24px;z-index:10000;display:flex;flex-direction:column;gap:12px;align-items:flex-end;pointer-events:auto}.ytomo-ticket-selection-fab-container.z-normal{z-index:10000}.ytomo-ticket-selection-fab-container.z-above-overlay{z-index:100001}.ytomo-ticket-selection-fab-container #ytomo-companion-sub-buttons{display:flex;flex-direction:column;gap:8px;align-items:flex-end;transition:all .3s ease}.ytomo-fab-inner-content{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;pointer-events:none}.ytomo-reservation-target-display{background:linear-gradient(135deg, rgba(0, 123, 255, 0.95), rgba(0, 86, 179, 0.95));color:#fff;padding:8px 12px;border-radius:12px;font-size:12px;font-weight:bold;text-align:center;box-shadow:0 3px 10px rgba(0,0,0,.3);border:2px solid hsla(0,0%,100%,.3);min-width:80px;max-width:120px;white-space:pre-line;overflow:visible;text-overflow:clip;transition:all .3s ease;pointer-events:auto;cursor:pointer}.ytomo-reservation-target-display:hover{transform:scale(1.05);box-shadow:0 4px 14px rgba(0,0,0,.4)}.ytomo-reservation-target-display.hidden{display:none}.ytomo-reservation-target-display.visible{display:block}input.ext-tomo.search{height:50px;min-width:200px;max-width:min(300px,100%);font-family:quicksand;font-size:16px;-webkit-appearance:textfield;-moz-appearance:textfield;appearance:textfield;border:1px solid #222426;border-radius:25px;box-shadow:0 1px 0 0 #ccc;padding:0 0 0 10px;flex:1 1}.day-reservation-info-area{position:relative;min-height:50px}.day-reservation-description{margin:10px 0;color:#666;font-size:14px;line-height:1.5;text-align:center}.day-reservation-description.hidden{display:none}.day-reservation-notification{margin:10px 0}.day-reservation-notification.hidden{display:none}.day-reservation-notification .notification-content{padding:12px 16px;border-radius:8px;font-size:14px;font-weight:500;display:flex;align-items:center;justify-content:space-between;min-height:24px;position:relative}.day-reservation-notification .notification-content .notification-message{flex:1;margin-left:8px;margin-right:8px}.day-reservation-notification .notification-content .notification-close{background:none;border:none;font-size:18px;font-weight:bold;cursor:pointer;padding:0;width:20px;height:20px;display:flex;align-items:center;justify-content:center;opacity:.7;transition:opacity .2s ease}.day-reservation-notification .notification-content .notification-close:hover{opacity:1}.day-reservation-notification .notification-content.success{background-color:#d4edda;color:#155724;border:1px solid #c3e6cb}.day-reservation-notification .notification-content.success .notification-close{color:#155724}.day-reservation-notification .notification-content.error{background-color:#f8d7da;color:#721c24;border:1px solid #f5c6cb}.day-reservation-notification .notification-content.error .notification-close{color:#721c24}.day-reservation-notification .notification-content.warning{background-color:#fff3cd;color:#856404;border:1px solid #ffeaa7}.day-reservation-notification .notification-content.warning .notification-close{color:#856404}.day-reservation-notification .notification-content.info{background-color:#d1ecf1;color:#0c5460;border:1px solid #bee5eb}.day-reservation-notification .notification-content.info .notification-close{color:#0c5460}.ytomo-icon.expand-icon{font-size:8px;line-height:1;color:#fff;font-weight:bold;text-align:center;pointer-events:none}.ytomo-icon.countdown-text{font-size:6px;line-height:1;color:#fff;font-weight:bold;text-align:center;margin-top:1px;pointer-events:none}.ytomo-toggle.toggle-li{position:fixed;bottom:10px;left:10px;z-index:1000;list-style:none;margin:0;padding:0}.ytomo-toggle.toggle-button{width:50px;height:30px;background:rgba(255,140,0,.8);border:none;border-radius:15px;cursor:pointer;transition:all .3s ease;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:bold;position:relative;overflow:hidden}.ytomo-toggle.toggle-button.enabled{color:#fff}.ytomo-toggle.toggle-button.disabled{color:#ddd}.ytomo-toggle.toggle-figure{width:100%;height:100%;margin:0;padding:0;border:none;background:rgba(0,0,0,0);pointer-events:none}.ytomo-dialog.overlay{position:fixed;top:0;left:0;width:100%;height:100%;background-color:rgba(0,0,0,.5);z-index:10000;display:flex;justify-content:center;align-items:center}.ytomo-dialog.container{background:#fff;border-radius:8px;padding:20px;max-width:400px;width:90%;max-height:70vh;overflow-y:auto;box-shadow:0 4px 12px rgba(0,0,0,.3)}.ytomo-dialog.container.day-reservation{max-width:600px;max-height:80vh}.ytomo-dialog.title{margin:0 0 16px 0;color:#333;font-size:18px;font-weight:bold}.ytomo-dialog.button-group{display:flex;justify-content:flex-end;gap:10px;margin-top:20px}.ytomo-dialog.primary-button{background:#006821;color:#fff;border:none;padding:10px 20px;border-radius:4px;cursor:pointer;font-size:14px}.ytomo-dialog.primary-button:hover{background:#02862b}.ytomo-dialog.primary-button:disabled{background:gray;cursor:not-allowed}.ytomo-dialog.secondary-button{background:rgba(0,0,0,0);color:#666;border:1px solid #ccc;padding:10px 20px;border-radius:4px;cursor:pointer;font-size:14px}.ytomo-dialog.secondary-button:hover{background:#f5f5f5}.ytomo-progress.counter{display:inline-block;margin-left:8px;padding:2px 6px;background:rgba(0,0,0,.3);border-radius:10px;font-size:10px;color:#fff;font-weight:bold}.ytomo-dialog.clear-selection-button{background:#dc3545;color:#fff;border:none;border-radius:20px;padding:8px 16px;font-size:14px;font-weight:bold;cursor:pointer;transition:all .2s ease;white-space:nowrap}.ytomo-dialog.clear-selection-button:hover{transform:translateY(-1px);box-shadow:0 4px 8px rgba(0,0,0,.2)}.ytomo-dialog.clear-selection-button:active{transform:translateY(0)}.ytomo-dialog.monitor-button{background:#fd7e14;color:#fff;border:none;border-radius:20px;padding:8px 16px;font-size:14px;font-weight:bold;cursor:pointer;transition:all .2s ease;white-space:nowrap}.ytomo-dialog.monitor-button:hover{transform:translateY(-1px);box-shadow:0 4px 8px rgba(0,0,0,.2)}.ytomo-dialog.monitor-button:active{transform:translateY(0)}.pavilion-name-row{display:flex;align-items:center;gap:8px;margin-bottom:8px}.pavilion-name-row .pavilion-name{flex:1;font-weight:bold;color:#333}.pavilion-select-all-btn{padding:2px 8px;font-size:11px;background-color:#007bff;color:#fff;border:none;border-radius:4px;cursor:pointer;transition:all .2s ease}.pavilion-select-all-btn:hover{background-color:#0056b3;transform:scale(1.05)}.pavilion-select-all-btn:active{transform:scale(0.95)}.ytomo-error-message{position:fixed;top:20px;right:20px;background:#f44;color:#fff;padding:15px;border-radius:5px;box-shadow:0 2px 10px rgba(0,0,0,.3);z-index:10001;max-width:300px;font-size:14px;line-height:1.4}.ytomo-error-message .error-title{font-weight:bold;margin-bottom:5px}.ytomo-error-message .error-close-btn{margin-top:10px;padding:5px 10px;background:hsla(0,0%,100%,.2);border:none;border-radius:3px;color:#fff;cursor:pointer;font-size:12px}.ytomo-error-message .error-close-btn:hover{background:hsla(0,0%,100%,.3)}.ytomo-flex-column-center{display:flex;flex-direction:column;align-items:center}.ytomo-brand-text{font-size:8px;font-weight:bold;margin-top:2px}.ytomo-dialog.overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;z-index:10000;padding:20px;box-sizing:border-box}.ytomo-dialog.container{background:#fff;border-radius:12px;padding:24px;max-width:800px;max-height:80vh;overflow-y:auto;box-shadow:0 10px 40px rgba(0,0,0,.3);width:100%}@media(max-width: 600px){.ytomo-dialog.container{padding-bottom:60px;max-height:85vh}}.ytomo-dialog.header{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;gap:8px}.ytomo-dialog.header .ytomo-dialog.title{flex-grow:1}.ytomo-dialog.title{margin:0;color:#333;font-size:24px;font-weight:bold}.ytomo-dialog.refresh-button{background:#006821;color:#fff;border:none;border-radius:50%;width:40px;height:40px;font-size:16px;cursor:pointer;transition:all .2s ease;display:flex;align-items:center;justify-content:center}.ytomo-dialog.refresh-button:hover{background:#02862b;transform:scale(1.1)}.ytomo-dialog.refresh-button:disabled{background:#ccc;cursor:not-allowed;transform:none}.ytomo-dialog.right-button-group{display:flex;gap:12px;align-items:center}.ytomo-dialog.available-only-toggle{background:#6c757d;color:#fff;border:none;border-radius:20px;padding:8px 16px;font-size:14px;font-weight:bold;cursor:pointer;transition:all .2s ease;white-space:nowrap}.ytomo-dialog.available-only-toggle.active{background:#006821;box-shadow:0 0 0 2px rgba(0,104,33,.3)}.ytomo-dialog.available-only-toggle:hover{transform:translateY(-1px);box-shadow:0 4px 8px rgba(0,0,0,.2)}.ytomo-dialog.available-only-toggle:disabled{background:#ccc;cursor:not-allowed;transform:none;box-shadow:none}.ytomo-dialog.button-group{display:flex;gap:12px;justify-content:space-between;margin-top:24px}.ytomo-dialog.secondary-button{background:#6c757d;color:#fff;border:none;border-radius:20px;padding:8px 16px;font-size:14px;font-weight:bold;cursor:pointer;transition:all .2s ease;white-space:nowrap}.ytomo-dialog.secondary-button:hover{transform:translateY(-1px);box-shadow:0 4px 8px rgba(0,0,0,.2)}.ytomo-dialog.monitor-button{background:#fd7e14;color:#fff;border:none;border-radius:20px;padding:8px 16px;font-size:14px;font-weight:bold;cursor:pointer;transition:all .2s ease;white-space:nowrap}.ytomo-dialog.monitor-button:hover{transform:translateY(-1px);box-shadow:0 4px 8px rgba(0,0,0,.2)}.day-reservation-description{color:#666;line-height:1.6;margin:0 0 20px 0}.pavilion-list{max-height:400px;overflow-y:auto;border:1px solid #ddd;border-radius:4px;margin-bottom:16px}.pavilion-list-empty{padding:20px;text-align:center;color:#666}.pavilion-item{display:flex;justify-content:space-between;align-items:center;padding:12px;border-bottom:1px solid #eee;transition:background-color .2s;cursor:pointer}.pavilion-item:hover{background-color:#f5f5f5}.pavilion-item:last-child{border-bottom:none}.pavilion-item.monitored{background-color:rgba(253,126,20,.1);border-left:4px solid #fd7e14}.pavilion-item.monitored:hover{background-color:rgba(253,126,20,.15)}.pavilion-info{flex:1}.pavilion-info .pavilion-name{font-weight:bold;margin-bottom:4px}.pavilion-info .pavilion-time-slots{font-size:12px;color:#666;display:flex;flex-wrap:wrap;gap:8px;margin-top:8px;max-width:100%}@media(max-width: 600px){.pavilion-info .pavilion-time-slots{gap:6px;margin-top:6px}}.pavilion-info .pavilion-time-slots .pavilion-time-slot{font-size:12px;padding:4px 8px;border-radius:6px;border:1px solid rgba(0,0,0,0);min-width:60px;text-align:center;white-space:nowrap}@media(max-width: 600px){.pavilion-info .pavilion-time-slots .pavilion-time-slot{font-size:11px;padding:3px 6px;min-width:55px}}@media(max-width: 400px){.pavilion-info .pavilion-time-slots .pavilion-time-slot{font-size:10px;padding:2px 4px;min-width:50px}}.pavilion-info .pavilion-time-slots .pavilion-time-slot.clickable{background:rgba(0,0,0,0);border-color:#dee2e6;cursor:pointer;transition:all .2s ease}.pavilion-info .pavilion-time-slots .pavilion-time-slot.clickable:hover:not(.selected){background:#f8f9fa;border-color:#adb5bd;transform:translateY(-1px);box-shadow:0 2px 4px rgba(0,0,0,.1)}.pavilion-info .pavilion-time-slots .pavilion-time-slot.clickable:active{transform:translateY(0);box-shadow:0 1px 2px rgba(0,0,0,.1)}.pavilion-info .pavilion-time-slots .pavilion-time-slot.clickable.selected{background:rgba(0,104,33,.25);border-color:#006821;border-width:2px;color:#006821;font-weight:bold}@media(max-width: 600px){.pavilion-info .pavilion-time-slots .pavilion-time-slot.clickable.selected{background:rgba(0,104,33,.35);border-width:3px}}.pavilion-info .pavilion-time-slots .pavilion-time-slot.clickable.selected:hover{background:rgba(0,104,33,.3)}@media(max-width: 600px){.pavilion-info .pavilion-time-slots .pavilion-time-slot.clickable.selected:hover{background:rgba(0,104,33,.4)}}.pavilion-info .pavilion-time-slots .pavilion-time-slot.clickable.selected:active{background:rgba(0,104,33,.35)}@media(max-width: 600px){.pavilion-info .pavilion-time-slots .pavilion-time-slot.clickable.selected:active{background:rgba(0,104,33,.45)}}.pavilion-info .pavilion-time-slots .pavilion-time-slot.clickable.unavailable{background:rgba(0,0,0,0);border-color:#ffc107;color:#dc6c00}.pavilion-info .pavilion-time-slots .pavilion-time-slot.clickable.unavailable:hover:not(.selected){background:#fff3cd;border-color:#ffb300;transform:translateY(-1px);box-shadow:0 2px 4px rgba(255,193,7,.2)}.pavilion-info .pavilion-time-slots .pavilion-time-slot.clickable.unavailable.selected{background:rgba(255,193,7,.35);border-color:#ffc107;border-width:2px;color:#dc6c00;font-weight:bold}@media(max-width: 600px){.pavilion-info .pavilion-time-slots .pavilion-time-slot.clickable.unavailable.selected{background:rgba(255,193,7,.45);border-width:3px}}.pavilion-info .pavilion-time-slots .pavilion-time-slot.clickable.unavailable.selected:hover{background:rgba(255,193,7,.4)}@media(max-width: 600px){.pavilion-info .pavilion-time-slots .pavilion-time-slot.clickable.unavailable.selected:hover{background:rgba(255,193,7,.5)}}.pavilion-info .pavilion-time-slots .pavilion-time-slot.clickable.unavailable.selected:active{background:rgba(255,193,7,.45)}@media(max-width: 600px){.pavilion-info .pavilion-time-slots .pavilion-time-slot.clickable.unavailable.selected:active{background:rgba(255,193,7,.55)}}.pavilion-button-area{display:flex;gap:8px;align-items:center}.pavilion-button-area .pavilion-reserve-button{padding:8px 16px;background-color:#006821;color:#fff;border:none;border-radius:4px;cursor:pointer;font-size:12px;transition:background-color .2s;white-space:nowrap}.pavilion-button-area .pavilion-reserve-button:hover:not(:disabled){background-color:#02862b}.pavilion-button-area .pavilion-reserve-button:disabled{background:#ccc;color:#666;cursor:not-allowed}.pavilion-button-area .pavilion-monitor-checkbox{margin-right:12px;transform:scale(1.2);accent-color:#fd7e14;flex-shrink:0}.pavilion-button-area .pavilion-no-slots{font-size:12px;color:#999}.ytomo-global-notification-container{position:fixed;top:20px;right:20px;z-index:20000;max-width:400px;width:100%;display:flex;flex-direction:column;gap:10px}@media(max-width: 600px){.ytomo-global-notification-container{top:10px;right:10px;left:10px;max-width:none}}.ytomo-global-notification{background:#fff;border-radius:8px;padding:16px;box-shadow:0 4px 12px rgba(0,0,0,.15);border-left:4px solid #ccc;display:flex;align-items:center;gap:12px;font-size:14px;font-weight:500;transform:translateX(100%);opacity:0;transition:all .3s ease}.ytomo-global-notification.show{transform:translateX(0);opacity:1}.ytomo-global-notification.hide{transform:translateX(100%);opacity:0}.ytomo-global-notification .notification-message{flex:1;line-height:1.4}.ytomo-global-notification .notification-close{background:none;border:none;font-size:18px;font-weight:bold;cursor:pointer;padding:0;width:20px;height:20px;display:flex;align-items:center;justify-content:center;opacity:.7;transition:opacity .2s ease}.ytomo-global-notification .notification-close:hover{opacity:1}.ytomo-global-notification.success{background-color:#d4edda;color:#155724;border-left-color:#28a745}.ytomo-global-notification.success .notification-close{color:#155724}.ytomo-global-notification.error{background-color:#f8d7da;color:#721c24;border-left-color:#dc3545}.ytomo-global-notification.error .notification-close{color:#721c24}.ytomo-global-notification.warning{background-color:#fff3cd;color:#856404;border-left-color:#ffc107}.ytomo-global-notification.warning .notification-close{color:#856404}.ytomo-global-notification.info{background-color:#d1ecf1;color:#0c5460;border-left-color:#17a2b8}.ytomo-global-notification.info .notification-close{color:#0c5460}.ytomo-processing-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.3);z-index:100000;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(1px);transition:all .3s ease;pointer-events:auto}.ytomo-processing-overlay.z-normal{z-index:100000}.ytomo-processing-overlay.z-below-fab{z-index:99999}.ytomo-processing-overlay.hidden{opacity:0;visibility:hidden;pointer-events:none}.ytomo-processing-overlay.visible{opacity:1;visibility:visible;pointer-events:auto}.ytomo-processing-overlay .processing-message-area{background:hsla(0,0%,100%,.95);border-radius:12px;padding:24px 32px;text-align:center;box-shadow:0 8px 32px rgba(0,0,0,.3);border:2px solid rgba(255,140,0,.3);max-width:400px;margin:20px}@media(max-width: 768px){.ytomo-processing-overlay .processing-message-area{padding:20px 24px;margin:16px;max-width:90vw}}.ytomo-processing-overlay .processing-message-text{font-size:20px;font-weight:bold;color:#333;margin-bottom:8px;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}@media(max-width: 768px){.ytomo-processing-overlay .processing-message-text{font-size:18px;margin-bottom:6px}}.ytomo-processing-overlay .processing-target-text{font-size:16px;font-weight:600;color:#333;margin-bottom:12px;white-space:pre-line;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;text-align:center}@media(max-width: 768px){.ytomo-processing-overlay .processing-target-text{font-size:14px;margin-bottom:10px}}.ytomo-processing-overlay .processing-countdown-text{font-size:18px;font-weight:bold;color:#e67e00;margin-bottom:12px;font-family:"SF Mono","Monaco","Consolas",monospace;text-align:center;text-shadow:0 1px 2px rgba(0,0,0,.1)}@media(max-width: 768px){.ytomo-processing-overlay .processing-countdown-text{font-size:16px;margin-bottom:10px}}.ytomo-processing-overlay .processing-countdown-text.countdown-warning{color:#dc3545;animation:countdownPulse 1s ease-in-out infinite;text-shadow:0 0 8px rgba(220,53,69,.4)}.ytomo-processing-overlay .processing-warning-text{font-size:14px;color:#666;margin-bottom:16px;line-height:1.4;transition:all .3s ease}@media(max-width: 768px){.ytomo-processing-overlay .processing-warning-text{font-size:13px;margin-bottom:14px}}.ytomo-processing-overlay .processing-warning-text.warning-flash{color:#dc3545;font-weight:bold;transform:scale(1.05);animation:flash .5s ease-in-out 2}.ytomo-processing-overlay .notification-toggle-btn{display:flex;align-items:center;justify-content:center;width:40px;height:40px;border:none;border-radius:50%;cursor:pointer;transition:all .2s ease;margin-bottom:16px;box-shadow:0 2px 6px rgba(0,0,0,.15);font-size:20px;line-height:1}@media(max-width: 768px){.ytomo-processing-overlay .notification-toggle-btn{width:36px;height:36px;margin-bottom:14px;font-size:18px}}.ytomo-processing-overlay .notification-toggle-btn:hover{transform:scale(1.05);box-shadow:0 4px 10px rgba(0,0,0,.2)}.ytomo-processing-overlay .notification-toggle-btn:active{transform:scale(0.95)}.ytomo-processing-overlay .notification-toggle-btn.enabled{background:#4caf50;color:#fff}.ytomo-processing-overlay .notification-toggle-btn.enabled:hover{background:#45a049}.ytomo-processing-overlay .notification-toggle-btn.muted{background:#f44336;color:#fff}.ytomo-processing-overlay .notification-toggle-btn.muted:hover{background:#e53935}.ytomo-processing-overlay .processing-cancel-area{font-size:12px;color:#888;font-style:italic}@media(max-width: 768px){.ytomo-processing-overlay .processing-cancel-area{font-size:11px}}@keyframes flash{0%,100%{opacity:1}50%{opacity:.7}}@keyframes countdownPulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.8;transform:scale(1.05)}}.ytomo-processing-overlay.efficiency-mode .processing-message-area{border-color:rgba(255,140,0,.5);background:linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(255, 248, 220, 0.95))}.ytomo-processing-overlay.efficiency-mode .processing-message-text{color:#e67e00}.ytomo-processing-overlay.monitoring-mode .processing-message-area{border-color:rgba(0,104,33,.5);background:linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(240, 255, 240, 0.95))}.ytomo-processing-overlay.monitoring-mode .processing-message-text{color:#004d1a}@media(prefers-reduced-motion: reduce){.ytomo-processing-overlay{transition:none}.ytomo-processing-overlay .processing-warning-text.warning-flash{animation:none;transform:none}}.ytomo-dialog.overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.7);z-index:10000;display:flex;align-items:center;justify-content:center;padding:20px;box-sizing:border-box}.ytomo-dialog.container.debug-dialog{background:#fff;border-radius:12px;padding:0;max-width:90%;max-height:85%;min-width:600px;box-shadow:0 8px 32px rgba(0,0,0,.3);display:flex;flex-direction:column;overflow:hidden}@media(max-width: 768px){.ytomo-dialog.container.debug-dialog{min-width:auto;max-width:95%;max-height:90%}}.ytomo-dialog.header{display:flex;align-items:center;justify-content:space-between;padding:20px 24px;border-bottom:1px solid #e0e0e0;background:#f8f9fa;border-radius:12px 12px 0 0}.ytomo-dialog.title{margin:0;font-size:20px;color:#333;font-weight:600}.ytomo-dialog.close-button{background:none;border:none;font-size:24px;cursor:pointer;color:#666;padding:5px;border-radius:4px}.ytomo-dialog.close-button:hover{background:rgba(0,0,0,.1)}.debug-content{padding:24px;overflow-y:auto;flex:1}.debug-section{margin-bottom:32px}.debug-section:last-child{margin-bottom:0}.debug-section h3{margin:0 0 12px 0;font-size:18px;color:#333;font-weight:600}.debug-section p{margin:0 0 16px 0;color:#666;line-height:1.5}.debug-input-group{display:flex;align-items:center;gap:12px;margin-bottom:20px;flex-wrap:wrap}.debug-input-group label{font-weight:500;color:#333;min-width:120px}.debug-input-group input{flex:1;min-width:200px;padding:10px 12px;border:2px solid #e0e0e0;border-radius:6px;font-size:14px;transition:border-color .2s ease}.debug-input-group input:focus{outline:none;border-color:#007bff}.debug-input-group input::placeholder{color:#999}.debug-input-group button{background:#007bff;color:#fff;border:none;padding:10px 20px;border-radius:6px;font-size:14px;font-weight:500;cursor:pointer;transition:background-color .2s ease;white-space:nowrap}.debug-input-group button:hover:not(:disabled){background:#0056b3}.debug-input-group button:disabled{background:#6c757d;cursor:not-allowed}.debug-results-area h4{margin:0 0 12px 0;font-size:16px;color:#333;font-weight:600}.debug-results-display{background:#f8f9fa;border:1px solid #e0e0e0;border-radius:6px;padding:16px;font-family:"Courier New",Monaco,monospace;font-size:12px;line-height:1.4;max-height:300px;overflow-y:auto;white-space:pre-wrap;word-wrap:break-word;color:#333}.debug-results-display .json-key{color:#d73a49;font-weight:bold}.debug-results-display .json-string{color:#032f62}.debug-results-display .json-number{color:#005cc5}.debug-results-display .json-boolean{color:#e36209}.debug-results-display .json-null{color:#6f42c1}@media(max-width: 768px){.debug-input-group{flex-direction:column;align-items:stretch}.debug-input-group label{min-width:auto}.debug-input-group input{min-width:auto}.debug-input-group button{align-self:flex-start}.ytomo-dialog.container.debug-dialog{min-width:auto}.debug-content{padding:16px}}.ytomo-dialog.overlay{animation:fadeIn .2s ease-out}.ytomo-dialog.container.debug-dialog{animation:slideIn .3s ease-out}@keyframes fadeIn{from{opacity:0}to{opacity:1}}@keyframes slideIn{from{opacity:0;transform:translateY(-20px) scale(0.95)}to{opacity:1;transform:translateY(0) scale(1)}}.ytomo-dialog-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background-color:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;z-index:10000;opacity:0;animation:fadeIn .2s ease-out forwards;overflow-y:auto}@keyframes fadeIn{to{opacity:1}}.ytomo-main-dialog{background:#fff;border-radius:12px;box-shadow:0 20px 60px rgba(0,0,0,.3);width:90vw;max-width:800px;min-width:600px;height:80vh;max-height:700px;min-height:500px;display:flex;flex-direction:column;overflow:hidden;transform:scale(0.9);animation:dialogAppear .2s ease-out forwards}@media(max-width: 768px){.ytomo-main-dialog{width:95vw;height:90vh;min-width:320px;min-height:400px}}@keyframes dialogAppear{to{transform:scale(1)}}.ytomo-dialog-header{background:linear-gradient(135deg, #2c5aa0 0%, #1a365d 100%);color:#fff;padding:16px 20px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid hsla(0,0%,100%,.1);flex-shrink:0}.ytomo-dialog-title{margin:0;font-size:18px;font-weight:600;display:flex;align-items:center;gap:8px}.ytomo-dialog-close{background:none;border:none;color:#000;font-size:24px;width:32px;height:32px;border-radius:6px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background-color .2s}.ytomo-dialog-close:hover{background-color:rgba(0,0,0,.1)}.ytomo-dialog-close:focus{outline:2px solid rgba(0,0,0,.5);outline-offset:2px}.ytomo-dialog-body{flex:1;display:flex;flex-direction:column;overflow:hidden;background:#f8fafc}.ytomo-tab-navigation{display:flex;background:#fff;border-bottom:1px solid #e2e8f0;flex-shrink:0}.ytomo-tab-button{flex:1;background:none;border:none;padding:16px 12px;font-size:14px;font-weight:500;color:#64748b;cursor:pointer;position:relative;transition:all .2s;border-bottom:3px solid rgba(0,0,0,0)}.ytomo-tab-button:hover{background-color:#f1f5f9;color:#475569}.ytomo-tab-button.active{color:#2c5aa0;background-color:#f8fafc;border-bottom-color:#2c5aa0}.ytomo-tab-button:focus{outline:2px solid #2c5aa0;outline-offset:-2px}.ytomo-tab-content{display:flex;flex-direction:column;gap:2px;align-items:center}.ytomo-tab-title{font-size:14px;font-weight:500}.ytomo-tab-dates{font-size:12px;color:#6b7280;line-height:1;min-height:14px}.ytomo-tab-count,.ytomo-tab-type{display:inline-block;margin-left:4px;font-size:12px;background:#e2e8f0;color:#475569;padding:2px 6px;border-radius:10px;min-width:18px;text-align:center;transition:all .2s}.ytomo-tab-button.active .ytomo-tab-count,.ytomo-tab-button.active .ytomo-tab-type{background:#2c5aa0;color:#fff}.ytomo-tab-content{flex:1;overflow:hidden;position:relative}.ytomo-tab-pane{position:absolute;top:0;left:0;width:100%;height:100%;opacity:0;transform:translateX(20px);transition:all .2s ease-out;overflow-y:auto;padding:20px;display:none}.ytomo-tab-pane.active{opacity:1;transform:translateX(0);display:block}.ytomo-loading{display:flex;flex-direction:column;align-items:center;justify-content:center;height:200px;text-align:center}.ytomo-loading::before{content:"";width:40px;height:40px;border:3px solid #e2e8f0;border-top-color:#2c5aa0;border-radius:50%;animation:spin 1s linear infinite;margin-bottom:16px}.ytomo-loading p{margin:0;color:#64748b;font-size:14px}@keyframes spin{to{transform:rotate(360deg)}}.ytomo-tab-placeholder{text-align:center;padding:40px 20px}.ytomo-tab-placeholder h3{margin:0 0 16px 0;color:#2c5aa0;font-size:20px}.ytomo-tab-placeholder p{margin:0 0 24px 0;color:#64748b;font-size:14px}.ytomo-feature-preview{background:#fff;border-radius:8px;padding:20px;text-align:left;box-shadow:0 1px 3px rgba(0,0,0,.1);margin-top:20px}.ytomo-feature-preview h4{margin:0 0 12px 0;color:#374151;font-size:14px;font-weight:600}.ytomo-feature-preview ul{margin:0;padding-left:20px;color:#6b7280;font-size:13px;line-height:1.6}.ytomo-feature-preview li{margin-bottom:4px}.ytomo-yt-button{background:linear-gradient(135deg, #10b981 0%, #059669 100%);border:none;width:48px;height:48px;border-radius:50%;box-shadow:0 4px 12px rgba(16,185,129,.4);cursor:pointer;margin-bottom:12px;position:relative;transition:all .3s cubic-bezier(0.4, 0, 0.2, 1);overflow:hidden}.ytomo-yt-button:hover{transform:scale(1.1);box-shadow:0 6px 20px rgba(16,185,129,.5)}.ytomo-yt-button:active{transform:scale(0.95)}.ytomo-yt-button:focus{outline:3px solid rgba(16,185,129,.3);outline-offset:2px}.ytomo-yt-button .ytomo-fab-icon{color:#fff;font-size:14px;font-weight:700;letter-spacing:.5px;display:block;line-height:1}.ytomo-yt-button::before{content:"";position:absolute;top:50%;left:50%;width:0;height:0;background:hsla(0,0%,100%,.3);border-radius:50%;transform:translate(-50%, -50%);transition:width .6s,height .6s}.ytomo-yt-button:hover::before{width:100px;height:100px}@media(prefers-reduced-motion: reduce){.ytomo-dialog-overlay,.ytomo-main-dialog,.ytomo-tab-pane,.ytomo-tab-button,.ytomo-yt-button,.ytomo-loading::before{animation:none;transition:none}.ytomo-yt-button::before{transition:none}}@media(prefers-contrast: high){.ytomo-main-dialog{border:2px solid #000}.ytomo-tab-button.active{border-bottom-width:4px}.ytomo-dialog-close:focus,.ytomo-tab-button:focus,.ytomo-yt-button:focus{outline:3px solid #000}}.ytomo-main-dialog *:focus{outline:none !important}.ytomo-processing-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background-color:rgba(0,0,0,.3);display:flex;align-items:center;justify-content:flex-end;z-index:10001;padding-right:40px;pointer-events:auto;overflow-y:auto}.ytomo-processing-content{background:hsla(0,0%,100%,.7);border-radius:12px;padding:30px;text-align:center;box-shadow:0 10px 40px rgba(0,0,0,.2);min-width:200px;pointer-events:auto;backdrop-filter:blur(1px)}.ytomo-processing-spinner{width:40px;height:40px;border:3px solid #e2e8f0;border-top-color:#2c5aa0;border-radius:50%;animation:spin 1s linear infinite;margin:0 auto 16px}.ytomo-processing-message{color:#374151;font-size:14px;font-weight:500}.ytomo-sequential-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background-color:rgba(0,0,0,.3);display:flex;align-items:center;justify-content:flex-end;z-index:10002;padding-right:40px;pointer-events:auto;overflow-y:auto}.ytomo-sequential-content{background:hsla(0,0%,100%,.7);border-radius:12px;padding:30px;text-align:center;box-shadow:0 10px 40px rgba(0,0,0,.2);min-width:300px;max-width:400px;pointer-events:auto;backdrop-filter:blur(1px)}.ytomo-sequential-content h3{margin:0 0 20px 0;color:#374151;font-size:18px;font-weight:600}.ytomo-sequential-settings{margin-bottom:20px;text-align:left}.ytomo-sequential-settings label{display:block;margin-bottom:8px;color:#374151;font-size:14px;font-weight:500}.ytomo-mode-selection{margin-bottom:16px}.ytomo-mode-buttons{display:flex;gap:8px;margin-top:8px}.ytomo-mode-button{flex:1;padding:8px 16px;border:1px solid #d1d5db;border-radius:6px;background:#fff;color:#374151;font-size:14px;font-weight:500;cursor:pointer;transition:all .2s}.ytomo-mode-button:hover{background:#f3f4f6;border-color:#9ca3af}.ytomo-mode-button.active{background:#2c5aa0;border-color:#2c5aa0;color:#fff}.ytomo-mode-button:focus{outline:2px solid #2c5aa0;outline-offset:2px}.ytomo-interval-setting{margin-top:12px}.ytomo-interval-dropdown{width:100%;padding:8px 12px;border:1px solid #d1d5db;border-radius:6px;background:#fff;font-size:14px;color:#374151;cursor:pointer}.ytomo-interval-dropdown:focus{outline:2px solid #2c5aa0;outline-offset:2px;border-color:#2c5aa0}.ytomo-sequential-progress{margin-bottom:20px}.ytomo-sequential-current{font-size:24px;font-weight:bold;color:#2c5aa0;margin-bottom:8px}.ytomo-sequential-target{font-size:16px;color:#374151;margin-bottom:8px;font-weight:500}.ytomo-sequential-countdown{font-size:14px;color:#6b7280;min-height:20px}.ytomo-sequential-controls{margin-top:20px}.ytomo-cancel-button{background:#dc3545;color:#fff;border:none;border-radius:6px;padding:10px 20px;font-size:14px;font-weight:500;cursor:pointer;transition:background-color .2s}.ytomo-cancel-button:hover{background:#c82333}.ytomo-dialog-overlay{color-scheme:light}.ytomo-main-dialog{color-scheme:light;background:#fff !important;color:#1f2937 !important}@media(prefers-color-scheme: dark)and (max-width: 0px){.ytomo-main-dialog{background:#1f2937;color:#f9fafb}.ytomo-dialog-body{background:#111827}.ytomo-tab-navigation{background:#374151;border-bottom-color:#4b5563}.ytomo-tab-button{color:#d1d5db}.ytomo-tab-button:hover{background-color:#4b5563;color:#f3f4f6}.ytomo-tab-button.active{background-color:#1f2937;color:#60a5fa;border-bottom-color:#60a5fa}.ytomo-tab-count,.ytomo-tab-type{background:#4b5563;color:#d1d5db}.ytomo-tab-button.active .ytomo-tab-count,.ytomo-tab-button.active .ytomo-tab-type{background:#60a5fa;color:#1f2937}.ytomo-feature-preview{background:#374151;border:1px solid #4b5563}.ytomo-loading::before{border-color:#4b5563;border-top-color:#60a5fa}}.ytomo-ticket-tab{padding:0 12px 20px 12px;height:100%;overflow-y:auto;color-scheme:light}@media(max-width: 768px){.ytomo-ticket-tab{padding:0 8px 16px 8px}}.ytomo-quick-select{background:#fff;border-radius:8px;padding:12px;box-shadow:0 1px 3px rgba(0,0,0,.1);border:1px solid #e2e8f0;flex-shrink:0;display:flex;align-items:center;gap:10px;flex-wrap:wrap}.ytomo-toggle-container{display:flex;align-items:center;cursor:pointer;user-select:none}.ytomo-toggle-input{display:none}.ytomo-toggle-slider{position:relative;width:44px;height:24px;background:#cbd5e1;border-radius:12px;transition:background-color .2s;margin-right:8px}.ytomo-toggle-slider::before{content:"";position:absolute;top:2px;left:2px;width:20px;height:20px;background:#fff;border-radius:50%;transition:transform .2s}.ytomo-toggle-input:checked+.ytomo-toggle-slider{background:#2c5aa0}.ytomo-toggle-input:checked+.ytomo-toggle-slider::before{transform:translateX(20px)}.ytomo-toggle-label{font-size:14px;font-weight:500;color:#374151}.ytomo-date-buttons{display:flex;flex-wrap:wrap;gap:8px;flex:1}.ytomo-date-button{background:#e0f2fe;border:1px solid #0891b2;border-radius:4px;padding:4px 8px;font-size:12px;color:#0c4a6e;cursor:pointer;transition:all .2s;display:flex;flex-direction:column;gap:2px;align-items:center}.ytomo-date-button *{pointer-events:none}.ytomo-date-button:focus{outline:none;box-shadow:none}.ytomo-date-button:hover{background:#0ea5e9;color:#fff;transform:translateY(-1px);box-shadow:0 2px 4px rgba(14,165,233,.3)}.ytomo-date-button.selected{background:#0891b2;color:#fff;border-color:#164e63;outline:2px solid #164e63;outline-offset:-1px}.ytomo-date-button:active{transform:translateY(0);box-shadow:none}.ytomo-ticket-list{display:flex;flex-direction:column;gap:8px;margin-bottom:20px}.ytomo-ticket-item{background:#fff;border-radius:6px;border:1px solid #e2e8f0;overflow:hidden;transition:all .2s}.ytomo-ticket-item.hidden{display:none}.ytomo-ticket-item:hover{border-color:#cbd5e1;box-shadow:0 2px 4px rgba(0,0,0,.1)}.ytomo-ticket-item.selected{border-color:#2c5aa0;box-shadow:0 0 0 2px rgba(44,90,160,.2)}.ytomo-ticket-upper{background:#e2e8f0;padding:8px 12px;display:flex;align-items:center;gap:8px;border-bottom:1px solid #cbd5e1}.ytomo-ticket-id{font-family:"Courier New",monospace;font-size:13px;font-weight:600;color:#374151;background:#e2e8f0;padding:2px 6px;border-radius:3px}.ytomo-me-tip{background:linear-gradient(135deg, #10b981 0%, #059669 100%);color:#fff;padding:2px 6px;border-radius:10px;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.3px}.ytomo-label-tag{background:linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);color:#fff;padding:2px 6px;border-radius:10px;font-size:10px;font-weight:600}.ytomo-ticket-lower{padding:8px 12px;display:flex;flex-direction:column;gap:8px}.ytomo-entrance-dates{display:flex;flex-wrap:wrap;gap:6px}.ytomo-entrance-date-button{background:#e0f2fe;border:1px solid #0891b2;border-radius:4px;padding:4px 8px;font-size:12px;color:#0c4a6e;cursor:pointer;transition:all .2s;display:flex;flex-direction:column;gap:2px;align-items:center}.ytomo-entrance-date-button *{pointer-events:none}.ytomo-entrance-date-button:focus{outline:none;box-shadow:none}.ytomo-entrance-date-button:hover{background:#0284c7;color:#fff}.ytomo-entrance-date-button.selected{background:#0ea5e9;color:#fff;border-color:#164e63;outline:2px solid #164e63;outline-offset:-1px}.ytomo-entrance-date-button:active{transform:translateY(0);box-shadow:none}.ytomo-entrance-date-button.disabled,.ytomo-entrance-date-button:disabled{background:#e2e8f0;border-color:#94a3b8;color:#475569;cursor:not-allowed}.ytomo-entrance-date-button.disabled:hover,.ytomo-entrance-date-button:disabled:hover{background:#e2e8f0;color:#475569;transform:none;box-shadow:none}.ytomo-entrance-date-button .ytomo-reservation-status{background:hsla(0,0%,100%,.9);color:#0891b2;padding:2px 4px;border-radius:3px;font-size:9px;font-weight:500;line-height:1.1;text-align:center}.ytomo-entrance-date-button .ytomo-reservation-status:empty{background:rgba(0,0,0,0);padding:0}.ytomo-entrance-date-button:hover .ytomo-reservation-status{background:hsla(0,0%,100%,.95);color:#0ea5e9}.ytomo-entrance-date-button:hover .ytomo-reservation-status:empty{background:rgba(0,0,0,0)}.ytomo-entrance-date-button.selected .ytomo-reservation-status{background:hsla(0,0%,100%,.95);color:#0891b2}.ytomo-entrance-date-button.selected .ytomo-reservation-status:empty{background:rgba(0,0,0,0)}.ytomo-entrance-date-button.disabled .ytomo-reservation-status{background:hsla(0,0%,100%,.9);color:#475569}.ytomo-entrance-date-button.disabled .ytomo-reservation-status:empty{background:rgba(0,0,0,0)}.ytomo-reservation-types{display:flex;flex-wrap:wrap;gap:6px;align-items:center}.ytomo-reservation-type{padding:4px 8px;border-radius:4px;font-size:12px;font-weight:500}.ytomo-reservation-type.active{background:#dcfce7;color:#166534;border:1px solid #22c55e}.ytomo-reservation-type.inactive{background:#fef2f2;color:#991b1b;border:1px solid #ef4444}.ytomo-no-reservation-types{color:#6b7280;font-size:12px;font-style:italic}.ytomo-add-ticket{background:#fff;border-radius:8px;padding:16px;border:2px dashed #cbd5e1;margin-top:20px}.ytomo-add-ticket h4{margin:0 0 12px 0;color:#374151;font-size:14px;font-weight:600}.ytomo-add-ticket-form{display:flex;gap:8px;align-items:center;flex-wrap:wrap}@media(max-width: 768px){.ytomo-add-ticket-form{flex-direction:column;align-items:stretch;gap:12px}}.ytomo-input{flex:1;padding:8px 12px;border:1px solid #d1d5db;border-radius:6px;font-size:14px;transition:border-color .2s}.ytomo-input:focus{outline:none;border-color:#2c5aa0;box-shadow:0 0 0 3px rgba(44,90,160,.1)}.ytomo-input::placeholder{color:#9ca3af}.ytomo-input-inline{padding:4px 8px;border:1px solid #d1d5db;border-radius:4px;font-size:12px;transition:border-color .2s;background:#fff}.ytomo-input-inline:focus{outline:none;border-color:#2c5aa0;box-shadow:0 0 0 2px rgba(44,90,160,.1)}.ytomo-input-inline::placeholder{color:#9ca3af}.ytomo-input-inline.ytomo-input-ticket-id{width:120px}.ytomo-input-inline.ytomo-input-label{width:60px}.ytomo-button{padding:8px 16px;border:none;border-radius:6px;font-size:14px;font-weight:500;cursor:pointer;transition:all .2s;display:inline-flex;align-items:center;justify-content:center;white-space:nowrap}.ytomo-button.primary{background:linear-gradient(135deg, #2c5aa0 0%, #1a365d 100%);color:#fff}.ytomo-button.primary:hover{background:linear-gradient(135deg, #1a365d 0%, #2c5aa0 100%);transform:translateY(-1px);box-shadow:0 4px 12px rgba(44,90,160,.3)}.ytomo-button.primary:active{transform:translateY(0)}.ytomo-button.retry-button{background:linear-gradient(135deg, #f59e0b 0%, #d97706 100%);color:#fff;margin-top:12px}.ytomo-button.retry-button:hover{background:linear-gradient(135deg, #d97706 0%, #f59e0b 100%)}.ytomo-button:focus{outline:2px solid #2c5aa0;outline-offset:2px}.ytomo-button:disabled{opacity:.5;cursor:not-allowed;transform:none !important}.ytomo-empty-state{text-align:center;padding:40px 20px;color:#6b7280;font-style:italic}.ytomo-empty-state p{margin:0;font-size:14px}.ytomo-error{text-align:center;padding:40px 20px;color:#dc2626}.ytomo-error h3{margin:0 0 8px 0;font-size:16px;color:#dc2626}.ytomo-error p{margin:0;font-size:14px;color:#6b7280}.ytomo-ticket-tab .ytomo-loading{height:150px}.ytomo-ticket-list::-webkit-scrollbar{width:6px}.ytomo-ticket-list::-webkit-scrollbar-track{background:#f1f5f9;border-radius:3px}.ytomo-ticket-list::-webkit-scrollbar-thumb{background:#cbd5e1;border-radius:3px}.ytomo-ticket-list::-webkit-scrollbar-thumb:hover{background:#94a3b8}.ytomo-ticket-item{animation:slideIn .2s ease-out}@keyframes slideIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}@media(prefers-reduced-motion: reduce){.ytomo-ticket-item,.ytomo-button,.ytomo-date-button,.ytomo-entrance-date-button,.ytomo-toggle-slider,.ytomo-input{animation:none;transition:none}}@media(prefers-contrast: high){.ytomo-ticket-item{border-width:3px}.ytomo-ticket-item.selected{border-width:4px}.ytomo-button:focus,.ytomo-input:focus,.ytomo-date-button:focus{outline:3px solid #000}}.ytomo-pavilion-tab{padding:0 8px 20px 8px;height:100%;display:flex;flex-direction:column;gap:16px;overflow-y:auto;color-scheme:light}.ytomo-search-controls{background:#fff;border-radius:8px;padding:16px;box-shadow:0 1px 3px rgba(0,0,0,.1);border:1px solid #e2e8f0;flex-shrink:0;display:flex;gap:12px;align-items:center}@media(max-width: 600px){.ytomo-search-controls{flex-direction:column;align-items:stretch;gap:12px}}.ytomo-search-input-container{flex:1}.ytomo-search-input{width:100%;padding:10px 16px;border:1px solid #d1d5db;border-radius:8px;font-size:14px;transition:all .2s}.ytomo-search-input:focus{outline:none;border-color:#2c5aa0}.ytomo-search-input::placeholder{color:#9ca3af}.ytomo-control-buttons{display:flex;gap:8px;flex-shrink:0}@media(max-width: 600px){.ytomo-control-buttons{justify-content:center}}.ytomo-icon-button{width:40px;height:40px;border:1px solid #d1d5db;border-radius:8px;background:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s;font-size:16px;position:relative}.ytomo-icon-button:hover{background:#f3f4f6;border-color:#9ca3af;transform:translateY(-1px)}.ytomo-icon-button:active{transform:translateY(0)}.ytomo-icon-button.active{background:#2c5aa0;border-color:#2c5aa0;color:#fff}.ytomo-icon-button.active:hover{background:#1a365d}.ytomo-icon-button .ytomo-count-badge{position:absolute;top:-8px;right:-8px;background:#f44;color:#fff;border-radius:10px;padding:2px 6px;font-size:10px;font-weight:bold;min-width:16px;text-align:center;line-height:1.2;pointer-events:none;z-index:10}.ytomo-icon-button:focus{outline:none}.ytomo-icon-button span{display:block;line-height:1}.ytomo-pavilion-list{flex:1;background:#fff;border-radius:8px;border:1px solid #e2e8f0}.ytomo-pavilion-item{background:#fff;border-bottom:1px solid #f1f5f9;transition:all .2s;color:#374151}.ytomo-pavilion-item:last-child{border-bottom:none}.ytomo-pavilion-item:hover{background:#f8fafc}.ytomo-pavilion-item.hidden{display:none}.ytomo-pavilion-header{display:flex;align-items:center;gap:12px;padding:16px;cursor:pointer}.ytomo-star-button{background:none;border:none;font-size:18px;cursor:pointer;transition:all .2s;padding:4px;border-radius:4px}.ytomo-star-button:hover{background:rgba(255,193,7,.1)}.ytomo-star-button.favorite{color:#ffc107}.ytomo-star-button:focus{outline:none}.ytomo-pavilion-checkbox-container{display:flex;align-items:center;cursor:pointer}.ytomo-pavilion-checkbox{width:16px;height:16px;cursor:pointer}.ytomo-pavilion-name{flex:1;font-size:15px;font-weight:500;color:#374151;line-height:1.4}.ytomo-expand-button{background:none;border:none;font-size:12px;color:#6b7280;cursor:pointer;padding:4px 8px;border-radius:4px;transition:all .2s}.ytomo-expand-button:hover{background:#f3f4f6;color:#374151}.ytomo-expand-button.expanded{background:#e2e8f0;color:#374151}.ytomo-expand-button:focus{outline:none}.ytomo-time-slots{padding:0 16px 16px 16px;display:flex;flex-wrap:wrap;gap:8px;transition:all .3s ease}.ytomo-time-slots.hidden{display:none}.ytomo-time-slot-button{padding:8px 12px;border-radius:6px;font-size:13px;font-weight:500;cursor:pointer;transition:all .2s;border:1px solid;min-width:80px;text-align:center;display:inline-block}.ytomo-time-slot-button *{pointer-events:none}.ytomo-time-slot-button.available{background:#dcfce7;border-color:#22c55e;color:#166534}.ytomo-time-slot-button.available:hover{background:#bbf7d0;color:#166534;transform:translateY(-1px);box-shadow:0 2px 8px rgba(34,197,94,.3)}.ytomo-time-slot-button.available.selected{background:#22c55e;color:#fff;box-shadow:0 2px 8px rgba(34,197,94,.3)}.ytomo-time-slot-button.unavailable{background:#fef2f2;border-color:#ef4444;color:#991b1b;cursor:pointer;opacity:1}.ytomo-time-slot-button.unavailable:hover{background:#fecaca;color:#991b1b;transform:translateY(-1px);box-shadow:0 2px 8px rgba(239,68,68,.3)}.ytomo-time-slot-button.unavailable.selected{background:#ef4444;color:#fff;box-shadow:0 2px 8px rgba(239,68,68,.3)}.ytomo-time-slot-button.rate-limited{background:#f3f4f6;border-color:#9ca3af;color:#6b7280;cursor:not-allowed;opacity:.6}.ytomo-time-slot-button.rate-limited:hover{background:#f3f4f6;color:#6b7280;transform:none;box-shadow:none}.ytomo-time-slot-button.rate-limited:disabled{cursor:not-allowed;pointer-events:none}.ytomo-time-slot-button:focus{outline:none}.ytomo-time-slot-button.hidden{display:none}.ytomo-reservation-controls{background:#fff;border-radius:8px;padding:16px;box-shadow:0 1px 3px rgba(0,0,0,.1);border:1px solid #e2e8f0;flex-shrink:0;display:flex;align-items:center;gap:16px;position:relative}@media(max-width: 600px){.ytomo-reservation-controls{flex-direction:column;align-items:stretch;gap:12px}}.ytomo-selected-info{flex:1;font-size:14px;color:#374151;font-weight:500}@media(max-width: 600px){.ytomo-selected-info{text-align:center}}.ytomo-reservation-controls .ytomo-button{padding:10px 20px;font-weight:600;white-space:nowrap}@media(max-width: 600px){.ytomo-reservation-controls .ytomo-button{width:100%}}#ot-sdk-btn-floating{display:none !important}.ytomo-result-display{position:fixed;top:20px;right:20px;padding:8px 12px;border-radius:6px;font-size:13px;font-weight:500;opacity:0;transform:translateY(-10px);transition:all .3s;pointer-events:none;max-width:300px;z-index:10001}.ytomo-result-display.show{opacity:1;transform:translateY(0)}.ytomo-result-display.success{background:#22c55e;color:#fff}.ytomo-result-display.error{background:#ef4444;color:#fff}.ytomo-result-display.info{background:#3b82f6;color:#fff}@media(max-width: 600px){.ytomo-result-display{position:static;transform:none;margin:8px 0 0 0;text-align:center}}.ytomo-pavilion-tab .ytomo-empty-state,.ytomo-pavilion-tab .ytomo-error{padding:40px 20px;text-align:center}.ytomo-pavilion-tab .ytomo-empty-state p{margin:0;color:#6b7280;font-size:14px}.ytomo-pavilion-tab .ytomo-error p{margin:0;color:#dc2626;font-size:14px}.ytomo-pavilion-tab .ytomo-loading{height:150px}.ytomo-pavilion-list::-webkit-scrollbar{width:6px}.ytomo-pavilion-list::-webkit-scrollbar-track{background:#f1f5f9;border-radius:3px}.ytomo-pavilion-list::-webkit-scrollbar-thumb{background:#cbd5e1;border-radius:3px}.ytomo-pavilion-list::-webkit-scrollbar-thumb:hover{background:#94a3b8}.ytomo-selected-dates-display{background:#fff;border-radius:8px;padding:12px 16px;box-shadow:0 1px 3px rgba(0,0,0,.1);border:1px solid #e2e8f0;flex-shrink:0;min-height:44px;display:flex;align-items:center}.ytomo-selected-dates-content{display:flex;align-items:center;gap:8px;width:100%}.ytomo-dates-label{font-size:14px;font-weight:600;color:#374151;flex-shrink:0}.ytomo-dates-text{font-size:14px;color:#2c5aa0;font-weight:500}.ytomo-dates-text:empty::before{content:"なし";color:#9ca3af;font-style:italic}.ytomo-status-fab{position:fixed;bottom:86px;right:20px;min-width:120px;min-height:50px;border:none;border-radius:6px;color:#fff;font-size:11px;font-weight:500;cursor:pointer;box-shadow:0 4px 12px rgba(0,0,0,.3);transition:all .3s ease;z-index:1001;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:8px 12px;line-height:1.2}.ytomo-status-fab.success{background:linear-gradient(135deg, #22c55e 0%, #16a34a 100%);box-shadow:0 4px 12px rgba(34,197,94,.4)}.ytomo-status-fab.error{background:linear-gradient(135deg, #ef4444 0%, #dc2626 100%);box-shadow:0 4px 12px rgba(239,68,68,.4)}.ytomo-status-fab.info{background:linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);box-shadow:0 4px 12px rgba(59,130,246,.4)}.ytomo-status-fab:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 6px 16px rgba(0,0,0,.4)}.ytomo-status-fab:active:not(:disabled){transform:translateY(0)}.ytomo-status-fab:focus{outline:none}.ytomo-reservation-fab{position:fixed;bottom:20px;right:20px;width:56px;height:56px;background:linear-gradient(135deg, #2c5aa0 0%, #1a365d 100%);border:none;border-radius:28px;color:#fff;font-size:24px;cursor:pointer;box-shadow:0 4px 16px rgba(44,90,160,.3);transition:all .3s ease;z-index:1000;display:flex;align-items:center;justify-content:center}.ytomo-reservation-fab:hover:not(:disabled){background:linear-gradient(135deg, #1a365d 0%, #2c5aa0 100%);transform:translateY(-2px);box-shadow:0 6px 20px rgba(44,90,160,.4)}.ytomo-reservation-fab:active:not(:disabled){transform:translateY(0);box-shadow:0 2px 8px rgba(44,90,160,.3)}.ytomo-reservation-fab:disabled{background:#94a3b8;cursor:not-allowed;box-shadow:0 2px 8px rgba(148,163,184,.3);opacity:.6}.ytomo-reservation-fab:focus{outline:none}.ytomo-pavilion-item{animation:slideIn .2s ease-out}@keyframes slideIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}.ytomo-time-slot-button.available:hover{animation:pulse .6s ease-in-out}@keyframes pulse{0%{transform:translateY(-1px)}50%{transform:translateY(-2px)}100%{transform:translateY(-1px)}}.ytomo-pavilion-tab input:focus,.ytomo-pavilion-tab button:focus{outline:none}@media(prefers-reduced-motion: reduce){.ytomo-pavilion-item,.ytomo-time-slot-button,.ytomo-icon-button,.ytomo-result-display,.ytomo-time-slots{animation:none;transition:none}.ytomo-time-slot-button.available:hover{animation:none;transform:none}}@media(prefers-contrast: high){.ytomo-pavilion-item{border-bottom-width:2px}.ytomo-time-slot-button{border-width:2px}.ytomo-icon-button.active{border-width:3px}.ytomo-pavilion-tab input:focus,.ytomo-pavilion-tab button:focus{outline:3px solid #000}}table[class*=style_main__timetable__] td[data-gray-out] div[role=button][data-disabled=true]{pointer-events:auto !important;cursor:pointer !important}`, ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -4021,96 +3471,6 @@ function insertStyleElement(options) {
   return element;
 }
 module.exports = insertStyleElement;
-
-/***/ }),
-
-/***/ 599:
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   executeImmediateReservation: () => (/* binding */ executeImmediateReservation)
-/* harmony export */ });
-/* unused harmony exports ImmediateReservationService, canExecuteImmediateReservation */
-/* harmony import */ var _pavilion_reservation_cache__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(619);
-/**
- * 即時予約機能
- * 空き時間帯での即座予約実行
- */
-
-class ImmediateReservationService {
-    /**
-     * 即時予約を実行
-     */
-    static async executeReservation(pavilionCode, pavilionName, timeSlot, timeDisplay) {
-        console.log('🚀 即時予約実行開始:', pavilionName, timeDisplay);
-        try {
-            // 1. 通常の予約キャッシュ形式に変換して保存
-            const cacheData = {
-                pavilionCode,
-                pavilionName,
-                selectedTimeSlot: timeSlot,
-                selectedTimeDisplay: timeDisplay,
-                isAvailable: true,
-                timestamp: Date.now(),
-                status: 'pending'
-            };
-            _pavilion_reservation_cache__WEBPACK_IMPORTED_MODULE_0__.PavilionReservationCache.saveReservationData(pavilionCode, cacheData);
-            // ページ復帰システムは無効化
-            // 3. 予約ページに遷移
-            // expoTable.jsを参照した正しいURL実装
-            const ticketIds = new URLSearchParams(window.location.search).get('id') || '';
-            const formatDateToYMD = () => {
-                const date = new Date();
-                const y = date.getFullYear();
-                const m = String(date.getMonth() + 1).padStart(2, '0');
-                const d = String(date.getDate()).padStart(2, '0');
-                return `${y}${m}${d}`;
-            };
-            const reservationUrl = `https://ticket.expo2025.or.jp/event_time/?id=${ticketIds}&event_id=${pavilionCode}&screen_id=108&lottery=5&entrance_date=${formatDateToYMD()}`;
-            window.location.href = reservationUrl;
-            console.log('✅ 予約ページに遷移:', reservationUrl);
-            console.log('🤖 自動操作が開始されます');
-            return true;
-        }
-        catch (error) {
-            console.error('❌ 即時予約実行エラー:', error);
-            return false;
-        }
-    }
-    /**
-     * 即時予約可能性をチェック
-     */
-    static canExecuteImmediate(isAvailable) {
-        return isAvailable === true;
-    }
-    /**
-     * 即時予約の説明メッセージ
-     */
-    static getExecutionMessage(pavilionName, timeDisplay) {
-        return `${pavilionName} ${timeDisplay} の予約ページを開き、自動で時間選択・申込を実行します。`;
-    }
-}
-/**
- * 即時予約実行（ショートカット関数）
- */
-async function executeImmediateReservation(pavilionCode, pavilionName, timeSlot, timeDisplay) {
-    return await ImmediateReservationService.executeReservation(pavilionCode, pavilionName, timeSlot, timeDisplay);
-}
-/**
- * 即時予約可能判定（ショートカット関数）
- */
-function canExecuteImmediateReservation(isAvailable) {
-    return ImmediateReservationService.canExecuteImmediate(isAvailable);
-}
-// デバッグ用グローバル公開
-if (typeof window !== 'undefined') {
-    window.executeImmediateReservation = executeImmediateReservation;
-    window.debugImmediateReservation = (pavilionCode, timeSlot) => {
-        console.log('🔧 即時予約デバッグ実行');
-        return executeImmediateReservation(pavilionCode, `テストパビリオン${pavilionCode}`, timeSlot, timeSlot);
-    };
-}
-
 
 /***/ }),
 
@@ -4512,223 +3872,6 @@ function insertBySelector(insert, style) {
   target.appendChild(style);
 }
 module.exports = insertBySelector;
-
-/***/ }),
-
-/***/ 723:
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   Yq: () => (/* binding */ getMonitoringScheduler)
-/* harmony export */ });
-/* unused harmony exports MonitoringScheduler, updateMonitoringSchedule, triggerManualCheck */
-/**
- * 監視スケジューラー
- * 変更容易な監視タイミング制御
- */
-// デフォルト設定（毎分00,15,30,45秒）
-const DEFAULT_CONFIG = {
-    intervalType: 'fixed-seconds',
-    fixedSeconds: [0, 15, 30, 45]
-};
-class MonitoringScheduler {
-    constructor(config = DEFAULT_CONFIG) {
-        this.callback = null;
-        this.timeoutId = null;
-        this.isRunning = false;
-        this.config = { ...config };
-    }
-    /**
-     * スケジューラーを開始
-     */
-    start(callback) {
-        if (this.isRunning) {
-            this.stop();
-        }
-        this.callback = callback;
-        this.isRunning = true;
-        this.scheduleNext();
-        console.log('🕐 監視スケジューラー開始:', this.getConfigDescription());
-    }
-    /**
-     * スケジューラーを停止
-     */
-    stop() {
-        if (this.timeoutId) {
-            clearTimeout(this.timeoutId);
-            this.timeoutId = null;
-        }
-        this.isRunning = false;
-        this.callback = null;
-        console.log('⏹️ 監視スケジューラー停止');
-    }
-    /**
-     * スケジュール設定を更新
-     */
-    updateConfig(newConfig) {
-        const wasRunning = this.isRunning;
-        const oldCallback = this.callback;
-        if (wasRunning) {
-            this.stop();
-        }
-        this.config = { ...this.config, ...newConfig };
-        console.log('⚙️ スケジューラー設定更新:', this.getConfigDescription());
-        if (wasRunning && oldCallback) {
-            this.start(oldCallback);
-        }
-    }
-    /**
-     * 次回実行時刻を取得
-     */
-    getNextExecutionTime() {
-        const delay = this.calculateNextDelay();
-        return new Date(Date.now() + delay);
-    }
-    /**
-     * 現在の設定説明を取得
-     */
-    getConfigDescription() {
-        switch (this.config.intervalType) {
-            case 'fixed-seconds':
-                return `毎分${this.config.fixedSeconds?.join(',')}秒`;
-            case 'cron-like':
-                return `Cron: ${this.config.cronExpression}`;
-            case 'custom':
-                return 'カスタム関数';
-            default:
-                return '不明な設定';
-        }
-    }
-    /**
-     * 実行中かどうか
-     */
-    isActive() {
-        return this.isRunning;
-    }
-    /**
-     * 手動実行トリガー
-     */
-    triggerManual() {
-        if (this.callback) {
-            console.log('🔄 手動実行トリガー');
-            this.executeCallback();
-        }
-    }
-    /**
-     * 次回実行をスケジュール
-     */
-    scheduleNext() {
-        if (!this.isRunning)
-            return;
-        const delay = this.calculateNextDelay();
-        this.timeoutId = setTimeout(() => {
-            this.executeCallback();
-            this.scheduleNext(); // 次回をスケジュール
-        }, delay);
-        const nextTime = new Date(Date.now() + delay);
-        console.log(`⏰ 次回実行予定: ${nextTime.toLocaleTimeString()}`);
-    }
-    /**
-     * 次回実行までの遅延時間を計算
-     */
-    calculateNextDelay() {
-        const now = new Date();
-        switch (this.config.intervalType) {
-            case 'fixed-seconds':
-                return this.calculateFixedSecondsDelay(now);
-            case 'cron-like':
-                return this.calculateCronDelay(now);
-            case 'custom':
-                if (this.config.customFunction) {
-                    return this.config.customFunction();
-                }
-                throw new Error('custom関数が設定されていません');
-            default:
-                throw new Error(`未対応のintervalType: ${this.config.intervalType}`);
-        }
-    }
-    /**
-     * 固定秒数での遅延計算
-     */
-    calculateFixedSecondsDelay(now) {
-        const currentSeconds = now.getSeconds();
-        const targetSeconds = this.config.fixedSeconds || [0];
-        // 現在時刻より後の最初のターゲット秒を見つける
-        let nextTarget = targetSeconds.find(s => s > currentSeconds);
-        if (nextTarget === undefined) {
-            // 今分にターゲットがない場合は次の分の最初のターゲット
-            nextTarget = targetSeconds[0] + 60;
-        }
-        return (nextTarget - currentSeconds) * 1000;
-    }
-    /**
-     * Cron式での遅延計算（簡易実装）
-     */
-    calculateCronDelay(now) {
-        // 簡易実装: "秒,秒,秒 * * * * *" 形式のみ対応
-        if (!this.config.cronExpression) {
-            throw new Error('cronExpressionが設定されていません');
-        }
-        const parts = this.config.cronExpression.split(' ');
-        if (parts.length !== 6) {
-            throw new Error('Cron式の形式が不正です');
-        }
-        const secondsPart = parts[0];
-        const targetSeconds = secondsPart.split(',').map(s => parseInt(s.trim()));
-        // fixed-secondsと同じロジックを使用
-        const currentSeconds = now.getSeconds();
-        let nextTarget = targetSeconds.find(s => s > currentSeconds);
-        if (nextTarget === undefined) {
-            nextTarget = targetSeconds[0] + 60;
-        }
-        return (nextTarget - currentSeconds) * 1000;
-    }
-    /**
-     * コールバック実行
-     */
-    async executeCallback() {
-        if (!this.callback)
-            return;
-        try {
-            console.log('🔄 監視チェック実行:', new Date().toLocaleTimeString());
-            await this.callback();
-        }
-        catch (error) {
-            console.error('❌ 監視チェックエラー:', error);
-        }
-    }
-}
-// グローバルインスタンス
-let schedulerInstance = null;
-/**
- * スケジューラーのシングルトンインスタンスを取得
- */
-function getMonitoringScheduler(config) {
-    if (!schedulerInstance || config) {
-        schedulerInstance = new MonitoringScheduler(config);
-    }
-    return schedulerInstance;
-}
-/**
- * スケジューラー設定を更新（デバッグ用）
- */
-function updateMonitoringSchedule(newConfig) {
-    const scheduler = getMonitoringScheduler();
-    scheduler.updateConfig(newConfig);
-}
-/**
- * 手動実行トリガー（デバッグ用）
- */
-function triggerManualCheck() {
-    const scheduler = getMonitoringScheduler();
-    scheduler.triggerManual();
-}
-// グローバル公開（デバッグ用）
-if (typeof window !== 'undefined') {
-    window.updateMonitoringSchedule = updateMonitoringSchedule;
-    window.triggerManualCheck = triggerManualCheck;
-}
-
 
 /***/ }),
 
@@ -6298,176 +5441,11 @@ const init_page = () => {
                 }, 500);
             }
             else if (target && target.classList.contains("btn-day-reservation")) {
-                // 当日予約
-                console.log('🎫 当日予約ボタンがクリックされました');
-                showDayReservationDialog().catch(error => {
-                    console.error('❌ 当日予約ダイアログエラー:', error);
-                    showMobileErrorDialog('当日予約エラー', error);
-                });
+                // 当日予約ダイアログは削除済み - メインダイアログを使用
+                console.log('🎫 メインダイアログに統一済み');
             }
         }
     });
-};
-// スマホエラー調査用ダイアログ（詳細情報表示）
-const showMobileErrorDialog = (title, error) => {
-    // 既存のエラーダイアログがある場合は削除
-    const existingError = document.getElementById('mobile-error-dialog');
-    if (existingError) {
-        existingError.remove();
-    }
-    // エラー情報を詳細に収集
-    const errorInfo = {
-        message: error?.message || String(error),
-        stack: error?.stack || 'スタックトレースなし',
-        name: error?.name || 'Unknown',
-        userAgent: navigator.userAgent,
-        timestamp: new Date().toISOString(),
-        url: window.location.href,
-        isMobile: /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent),
-        screen: `${screen.width}x${screen.height}`,
-        viewport: `${window.innerWidth}x${window.innerHeight}`,
-        // Chrome拡張環境情報
-        chromeAvailable: typeof chrome !== 'undefined',
-        chromeRuntimeAvailable: typeof chrome !== 'undefined' && !!chrome.runtime,
-        // UserScript環境情報
-        gmInfoAvailable: typeof window.GM_info !== 'undefined',
-        gmAvailable: typeof GM !== 'undefined',
-        gmXmlHttpRequestAvailable: typeof GM_xmlhttpRequest !== 'undefined' || (typeof GM !== 'undefined' && !!GM?.xmlHttpRequest),
-        // パフォーマンス情報
-        performanceNow: performance.now(),
-        // 接続情報
-        connectionType: navigator.connection?.effectiveType || 'unknown',
-        // メモリ情報（Chrome限定）
-        memoryInfo: performance.memory ? {
-            used: performance.memory.usedJSHeapSize,
-            total: performance.memory.totalJSHeapSize,
-            limit: performance.memory.jsHeapSizeLimit
-        } : null
-    };
-    // ダイアログコンテナ
-    const dialogOverlay = document.createElement('div');
-    dialogOverlay.id = 'mobile-error-dialog';
-    dialogOverlay.style.cssText = `
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0, 0, 0, 0.8);
-        z-index: 10000;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        padding: 20px;
-        box-sizing: border-box;
-    `;
-    // ダイアログ本体
-    const dialog = document.createElement('div');
-    dialog.style.cssText = `
-        background: white;
-        border-radius: 8px;
-        padding: 20px;
-        max-width: 90%;
-        max-height: 80%;
-        overflow-y: auto;
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-    `;
-    // タイトル
-    const titleElement = document.createElement('h3');
-    titleElement.textContent = `🚨 ${title}`;
-    titleElement.style.cssText = `
-        margin: 0 0 15px 0;
-        color: #d32f2f;
-        font-size: 18px;
-    `;
-    // エラー詳細
-    const detailsElement = document.createElement('pre');
-    detailsElement.textContent = JSON.stringify(errorInfo, null, 2);
-    detailsElement.style.cssText = `
-        background: #f5f5f5;
-        border: 1px solid #ddd;
-        border-radius: 4px;
-        padding: 10px;
-        font-size: 12px;
-        white-space: pre-wrap;
-        word-wrap: break-word;
-        max-height: 300px;
-        overflow-y: auto;
-        margin: 10px 0;
-    `;
-    // ボタン群
-    const buttonGroup = document.createElement('div');
-    buttonGroup.style.cssText = `
-        display: flex;
-        gap: 10px;
-        margin-top: 15px;
-        flex-wrap: wrap;
-    `;
-    // コピーボタン
-    const copyButton = document.createElement('button');
-    copyButton.textContent = '📋 エラー情報をコピー';
-    copyButton.style.cssText = `
-        flex: 1;
-        min-width: 120px;
-        padding: 10px;
-        background: #2196f3;
-        color: white;
-        border: none;
-        border-radius: 4px;
-        cursor: pointer;
-        font-size: 14px;
-    `;
-    copyButton.addEventListener('click', async () => {
-        try {
-            await navigator.clipboard.writeText(JSON.stringify(errorInfo, null, 2));
-            copyButton.textContent = '✅ コピー完了';
-            setTimeout(() => {
-                copyButton.textContent = '📋 エラー情報をコピー';
-            }, 2000);
-        }
-        catch {
-            // クリップボードAPIが使えない場合
-            const textArea = document.createElement('textarea');
-            textArea.value = JSON.stringify(errorInfo, null, 2);
-            document.body.appendChild(textArea);
-            textArea.select();
-            document.execCommand('copy');
-            document.body.removeChild(textArea);
-            copyButton.textContent = '✅ コピー完了';
-        }
-    });
-    // 閉じるボタン
-    const closeButton = document.createElement('button');
-    closeButton.textContent = '❌ 閉じる';
-    closeButton.style.cssText = `
-        flex: 1;
-        min-width: 120px;
-        padding: 10px;
-        background: #f44336;
-        color: white;
-        border: none;
-        border-radius: 4px;
-        cursor: pointer;
-        font-size: 14px;
-    `;
-    closeButton.addEventListener('click', () => {
-        dialogOverlay.remove();
-    });
-    // DOM構築
-    buttonGroup.appendChild(copyButton);
-    buttonGroup.appendChild(closeButton);
-    dialog.appendChild(titleElement);
-    dialog.appendChild(detailsElement);
-    dialog.appendChild(buttonGroup);
-    dialogOverlay.appendChild(dialog);
-    document.body.appendChild(dialogOverlay);
-    // タップで閉じる
-    dialogOverlay.addEventListener('click', (e) => {
-        if (e.target === dialogOverlay) {
-            dialogOverlay.remove();
-        }
-    });
-    console.log('📱 スマホエラーダイアログ表示:', errorInfo);
 };
 // エラーメッセージ表示関数
 const showErrorMessage = (title, message) => {
@@ -6501,331 +5479,10 @@ const showErrorMessage = (title, message) => {
         }
     }, 10000);
 };
-// 当日予約ダイアログ表示関数
-const showDayReservationDialog = async () => {
-    console.log('🎫 当日予約ダイアログを表示します');
-    try {
-        // 万博API 全体データを取得（フィルターは表示側で制御）
-        const expoData = await fetchAllExpoReservationData();
-        createDayReservationDialog(expoData, false); // デフォルトは空きのみモード
-        // 失敗した予約の通知をチェック
-        await checkAndShowFailedReservationNotification();
-    }
-    catch (error) {
-        console.error('❌ 万博API データの取得に失敗:', error);
-        showMobileErrorDialog('データ取得エラー', error);
-    }
-};
-// 万博API 全体データ取得関数（空きなしも含む）
-const fetchAllExpoReservationData = async () => {
-    console.log('🌐 万博API から全体データを取得中...');
-    try {
-        let data;
-        // UserScript環境を最優先で判定（GM_infoやGMオブジェクトで確実に識別）
-        if (typeof window.GM_info !== 'undefined' || typeof GM !== 'undefined') {
-            // UserScript環境: GM_xmlhttpRequestを使用
-            data = await new Promise((resolve, reject) => {
-                const request = GM_xmlhttpRequest || GM?.xmlHttpRequest;
-                if (!request) {
-                    reject(new Error('GM_xmlhttpRequest not available'));
-                    return;
-                }
-                request({
-                    method: 'GET',
-                    url: 'https://expo.ebii.net/api/data',
-                    onload: (response) => {
-                        try {
-                            const jsonData = JSON.parse(response.responseText);
-                            resolve(jsonData);
-                        }
-                        catch (e) {
-                            reject(new Error('Failed to parse JSON response'));
-                        }
-                    },
-                    onerror: (error) => {
-                        reject(new Error(`Request failed: ${error}`));
-                    }
-                });
-            });
-        }
-        else if (typeof chrome !== 'undefined' && chrome.runtime) {
-            // Chrome拡張機能環境: background scriptを経由
-            const response = await new Promise((resolve, reject) => {
-                let isResolved = false;
-                // 10秒タイムアウト
-                const timeout = setTimeout(() => {
-                    if (!isResolved) {
-                        isResolved = true;
-                        reject(new Error('Chrome拡張API応答タイムアウト（10秒）- スマホ環境ではUserScript推奨'));
-                    }
-                }, 10000);
-                try {
-                    chrome.runtime.sendMessage({ action: 'fetchExpoData' }, (response) => {
-                        if (isResolved)
-                            return; // タイムアウト後は無視
-                        clearTimeout(timeout);
-                        isResolved = true;
-                        // Chrome拡張APIエラーをチェック
-                        if (chrome.runtime.lastError) {
-                            reject(new Error(`Chrome拡張APIエラー: ${chrome.runtime.lastError.message}`));
-                            return;
-                        }
-                        // 応答がundefinedの場合の処理
-                        if (!response) {
-                            reject(new Error('Chrome拡張APIから応答がありません（スマホ環境の可能性）'));
-                            return;
-                        }
-                        resolve(response);
-                    });
-                }
-                catch (error) {
-                    if (!isResolved) {
-                        clearTimeout(timeout);
-                        isResolved = true;
-                        reject(new Error(`Chrome拡張API呼び出しエラー: ${error}`));
-                    }
-                }
-            });
-            if (!response.success || !response.data) {
-                const error = new Error(response.error || 'Chrome拡張API呼び出し失敗');
-                error.context = {
-                    environment: 'chrome-extension',
-                    chromeRuntime: !!chrome?.runtime,
-                    response: response
-                };
-                throw error;
-            }
-            data = response.data;
-        }
-        else {
-            // サポートされていない環境
-            throw new Error('この機能はChrome拡張機能またはUserScript環境でのみ利用可能です');
-        }
-        console.log('✅ 万博API 全体データ取得成功:', data.length, '件のパビリオン');
-        // 全てのパビリオンを返す（フィルタリングなし）
-        return data;
-    }
-    catch (error) {
-        console.error('❌ 万博API 全体データ取得エラー:', error);
-        throw error;
-    }
-};
-// 当日予約ダイアログ作成関数
-const createDayReservationDialog = (pavilionData, showAll = false) => {
-    console.log('🏗️ 当日予約ダイアログを作成中...', pavilionData.length, '件のパビリオン');
-    // 既存のダイアログがある場合は削除
-    const existingDialog = document.getElementById('day-reservation-dialog');
-    if (existingDialog) {
-        existingDialog.remove();
-    }
-    // ダイアログ全体のコンテナ
-    const dialogOverlay = document.createElement('div');
-    dialogOverlay.id = 'day-reservation-dialog';
-    dialogOverlay.className = 'ytomo-dialog overlay';
-    // ダイアログコンテンツ
-    const dialogContent = document.createElement('div');
-    dialogContent.className = 'ytomo-dialog container day-reservation';
-    // ヘッダー
-    const header = document.createElement('div');
-    header.className = 'ytomo-dialog header';
-    // タイトル
-    const title = document.createElement('h2');
-    title.className = 'ytomo-dialog title';
-    title.textContent = '当日予約';
-    // 更新ボタン（右上）
-    const refreshButton = document.createElement('button');
-    refreshButton.className = 'ytomo-dialog refresh-button';
-    refreshButton.textContent = '🔄';
-    refreshButton.title = '更新';
-    refreshButton.addEventListener('click', async () => {
-        refreshButton.disabled = true;
-        refreshButton.textContent = '⏳';
-        // 選択状態をクリア
-        selectedTimes.clear();
-        // キャッシュもクリア
-        Promise.resolve(/* import() */).then(__webpack_require__.bind(__webpack_require__, 619)).then(({ PavilionReservationCache }) => {
-            PavilionReservationCache.clearAllReservationData();
-        }).catch(error => {
-            console.error('❌ キャッシュクリアエラー:', error);
-        });
-        try {
-            // 常に全体データを取得してフィルターで制御
-            const newData = await fetchAllExpoReservationData();
-            dialogOverlay.remove();
-            createDayReservationDialog(newData, showAll);
-        }
-        catch (error) {
-            console.error('❌ データ更新エラー:', error);
-            showMobileErrorDialog('更新エラー', error);
-        }
-        finally {
-            refreshButton.disabled = false;
-            refreshButton.textContent = '🔄';
-        }
-    });
-    // 空きのみトグルボタン（更新ボタンの左に配置）
-    const availableOnlyToggle = document.createElement('button');
-    availableOnlyToggle.className = `ytomo-dialog available-only-toggle ${!showAll ? 'active' : ''}`;
-    availableOnlyToggle.textContent = '空きのみ';
-    availableOnlyToggle.title = '空きのあるパビリオンのみ表示';
-    // 空きのみトグルイベント（フィルター切り替えのみ、データ再取得なし）
-    availableOnlyToggle.addEventListener('click', () => {
-        const isCurrentlyActive = availableOnlyToggle.classList.contains('active');
-        const newShowAll = isCurrentlyActive; // activeの場合は全表示に切り替え
-        // 選択状態をクリア
-        selectedTimes.clear();
-        // キャッシュもクリア
-        Promise.resolve(/* import() */).then(__webpack_require__.bind(__webpack_require__, 619)).then(({ PavilionReservationCache }) => {
-            PavilionReservationCache.clearAllReservationData();
-        }).catch(error => {
-            console.error('❌ キャッシュクリアエラー:', error);
-        });
-        // 既存データでダイアログを再作成（フィルター適用）
-        dialogOverlay.remove();
-        createDayReservationDialog(pavilionData, newShowAll);
-    });
-    header.appendChild(title);
-    header.appendChild(availableOnlyToggle);
-    header.appendChild(refreshButton);
-    // 説明文・通知エリア（同じ位置に配置）
-    const infoArea = document.createElement('div');
-    infoArea.className = 'day-reservation-info-area';
-    // デフォルトの説明文
-    const description = document.createElement('p');
-    description.className = 'day-reservation-description';
-    description.innerHTML = ``;
-    // 通知エリア（初期は非表示）
-    const notificationArea = document.createElement('div');
-    notificationArea.className = 'day-reservation-notification hidden';
-    infoArea.appendChild(description);
-    infoArea.appendChild(notificationArea);
-    // パビリオンリスト
-    const pavilionList = document.createElement('div');
-    pavilionList.className = 'pavilion-list';
-    // パビリオンデータが空の場合
-    if (pavilionData.length === 0) {
-        const noDataMessage = document.createElement('div');
-        noDataMessage.className = 'pavilion-list-empty';
-        noDataMessage.textContent = '現在予約可能なパビリオンはありません';
-        pavilionList.appendChild(noDataMessage);
-    }
-    else {
-        // パビリオンリストを作成（フィルター適用）
-        const filteredData = showAll ? pavilionData : pavilionData.filter(pavilion => {
-            // 空きのみモード: 空きありまたは残りわずかのパビリオンのみ表示
-            return pavilion.s.some(slot => slot.s === 0 || slot.s === 1);
-        });
-        if (filteredData.length === 0) {
-            const noDataMessage = document.createElement('div');
-            noDataMessage.className = 'pavilion-list-empty';
-            noDataMessage.textContent = showAll ? 'パビリオンデータがありません' : '現在予約可能なパビリオンはありません';
-            pavilionList.appendChild(noDataMessage);
-        }
-        else {
-            filteredData.forEach(pavilion => {
-                const pavilionItem = createPavilionListItem(pavilion, showAll);
-                pavilionList.appendChild(pavilionItem);
-            });
-        }
-    }
-    // ボタングループ
-    const buttonGroup = document.createElement('div');
-    buttonGroup.className = 'ytomo-dialog button-group';
-    // 閉じるボタン
-    const closeButton = document.createElement('button');
-    closeButton.className = 'ytomo-dialog secondary-button';
-    closeButton.textContent = '閉じる';
-    closeButton.addEventListener('click', () => {
-        dialogOverlay.remove();
-    });
-    // 右側ボタングループ
-    const rightButtonGroup = document.createElement('div');
-    rightButtonGroup.className = 'ytomo-dialog right-button-group';
-    // 選択解除ボタン（監視開始の左）- 空きのみOFFの時のみ表示
-    const clearSelectionButton = document.createElement('button');
-    clearSelectionButton.className = 'ytomo-dialog clear-selection-button';
-    clearSelectionButton.textContent = '選択解除';
-    clearSelectionButton.title = '全ての監視対象を解除';
-    clearSelectionButton.addEventListener('click', async () => {
-        try {
-            const { MonitoringCacheManager } = await Promise.resolve(/* import() */).then(__webpack_require__.bind(__webpack_require__, 76));
-            MonitoringCacheManager.clearTargets();
-            // 全ての選択状態を解除
-            const selectedButtons = document.querySelectorAll('.pavilion-time-slot.selected');
-            selectedButtons.forEach(button => {
-                button.classList.remove('selected');
-            });
-            // 監視対象数を更新
-            updateMonitoringCount();
-            console.log('🗑️ 全監視対象を解除しました');
-        }
-        catch (error) {
-            console.error('❌ 選択解除エラー:', error);
-        }
-    });
-    // 監視ボタン（右下）- 空きのみOFFの時のみ表示
-    const monitorButton = document.createElement('button');
-    monitorButton.className = 'ytomo-dialog monitor-button';
-    monitorButton.innerHTML = '監視';
-    monitorButton.title = 'パビリオン監視を開始';
-    monitorButton.addEventListener('click', async () => {
-        try {
-            const { startPavilionMonitoring, getMonitoringStatus } = await Promise.resolve(/* import() */).then(__webpack_require__.bind(__webpack_require__, 141));
-            const status = getMonitoringStatus();
-            if (status.isRunning) {
-                // 監視停止
-                const { stopPavilionMonitoring } = await Promise.resolve(/* import() */).then(__webpack_require__.bind(__webpack_require__, 141));
-                stopPavilionMonitoring();
-                monitorButton.textContent = '監視開始';
-                monitorButton.style.background = '';
-                console.log('⏹️ パビリオン監視停止');
-            }
-            else {
-                // 監視開始
-                const success = await startPavilionMonitoring();
-                if (success) {
-                    monitorButton.textContent = '監視停止';
-                    monitorButton.style.background = '#FF6B35';
-                    console.log('🚀 パビリオン監視開始');
-                }
-                else {
-                    alert('監視対象が選択されていません。満員の時間帯を選択してから監視を開始してください。');
-                }
-            }
-        }
-        catch (error) {
-            console.error('❌ 監視ボタンエラー:', error);
-            alert(`監視処理でエラーが発生しました: ${error}`);
-        }
-    });
-    // 空きのみOFFの時のみ監視関連ボタンを表示
-    if (showAll) {
-        rightButtonGroup.appendChild(clearSelectionButton);
-        rightButtonGroup.appendChild(monitorButton);
-    }
-    buttonGroup.appendChild(closeButton);
-    buttonGroup.appendChild(rightButtonGroup);
-    // DOM構築
-    dialogContent.appendChild(header);
-    dialogContent.appendChild(infoArea);
-    dialogContent.appendChild(pavilionList);
-    dialogContent.appendChild(buttonGroup);
-    dialogOverlay.appendChild(dialogContent);
-    // ダイアログを表示
-    document.body.appendChild(dialogOverlay);
-    // 背景クリックで閉じる
-    dialogOverlay.addEventListener('click', (e) => {
-        if (e.target === dialogOverlay) {
-            dialogOverlay.remove();
-        }
-    });
-    // 通知表示機能をグローバルに公開
-    window.showReservationNotification = (type, message, autoHide = true) => {
-        showReservationNotification(notificationArea, description, type, message, autoHide);
-    };
-    console.log('✅ 当日予約ダイアログ表示完了');
-};
-// 予約結果通知を表示する関数
+// 当日予約ダイアログは削除済み - メインダイアログに統一
+// 当日予約ダイアログ作成関数は削除済み - メインダイアログに統一
+// 予約結果通知を表示する関数（他モジュールから使用されているため残す）
+// @ts-ignore
 const showReservationNotification = (notificationArea, description, type, message, autoHide = true) => {
     // 通知内容を構築
     const notificationContent = document.createElement('div');
@@ -6894,59 +5551,6 @@ if (typeof window !== 'undefined') {
     };
 }
 ;
-// パビリオンリストアイテム作成関数
-const createPavilionListItem = (pavilion, showAll = false) => {
-    const item = document.createElement('div');
-    item.className = 'pavilion-item';
-    // パビリオン情報エリア
-    const infoArea = document.createElement('div');
-    infoArea.className = 'pavilion-info';
-    // パビリオン名行（名前 + 選択ボタン）
-    const nameRow = document.createElement('div');
-    nameRow.className = 'pavilion-name-row';
-    // 選択ボタン（空きのみOFFの時のみ表示）
-    const selectAllButton = document.createElement('button');
-    selectAllButton.className = 'pavilion-select-all-btn';
-    selectAllButton.textContent = '選択';
-    selectAllButton.title = 'このパビリオンの満員時間をすべて監視対象に追加';
-    // 選択ボタンのクリックイベント
-    selectAllButton.addEventListener('click', () => {
-        selectAllUnavailableSlots(pavilion, showAll);
-    });
-    // パビリオン名
-    const name = document.createElement('div');
-    name.className = 'pavilion-name';
-    name.textContent = pavilion.n;
-    // 空きのみOFFの時のみ選択ボタンを表示
-    if (showAll) {
-        nameRow.appendChild(selectAllButton);
-    }
-    nameRow.appendChild(name);
-    // 時間枠情報
-    const timeSlots = document.createElement('div');
-    timeSlots.className = 'pavilion-time-slots';
-    // 時間枠を個別のbutton要素で表示
-    const allSlots = pavilion.s || [];
-    if (allSlots.length > 0) {
-        allSlots.forEach(slot => {
-            const timeElement = createTimeSlotElement(slot, pavilion, showAll);
-            if (timeElement) {
-                timeSlots.appendChild(timeElement);
-            }
-        });
-    }
-    else {
-        timeSlots.textContent = '時間枠情報なし';
-    }
-    infoArea.appendChild(nameRow);
-    infoArea.appendChild(timeSlots);
-    item.appendChild(infoArea);
-    return item;
-};
-// ステータスアイコン取得関数
-const getStatusIcon = (status) => {
-    return status === 0 ? '🟢' : status === 1 ? '🟡' : '🔴';
-};
 // 選択状態管理（複数時間選択対応）
 const selectedTimes = new Map(); // Map<pavilionCode, Set<timeSlot>>
 // デバッグ用: 選択状況を確認
@@ -6992,147 +5596,6 @@ window.getSelectedTimes = getSelectedTimes;
 window.logSelectedTimes = logSelectedTimes;
 window.debugCache = debugCache;
 window.clearCache = clearCache;
-// 時間枠クリック処理（空き/満員に応じた分岐処理）
-const handleTimeSlotClick = (pavilionCode, timeSlot, buttonElement) => {
-    const pavilionName = buttonElement.dataset['pavilionName'] || pavilionCode;
-    const isAvailable = buttonElement.dataset['available'] === 'true';
-    if (isAvailable) {
-        // 空き時間帯: 即時予約実行
-        handleImmediateReservation(pavilionCode, pavilionName, timeSlot, buttonElement);
-    }
-    else {
-        // 満員時間帯: 監視対象選択/解除
-        handleMonitoringSelection(pavilionCode, pavilionName, timeSlot, buttonElement);
-    }
-};
-// 即時予約処理
-const handleImmediateReservation = async (pavilionCode, pavilionName, timeSlot, buttonElement) => {
-    const timeDisplay = `${timeSlot.slice(0, 2)}:${timeSlot.slice(2)}`;
-    console.log('🚀 即時予約実行:', pavilionName, timeDisplay);
-    try {
-        // 即時予約機能を使用
-        const { executeImmediateReservation } = await Promise.resolve(/* import() */).then(__webpack_require__.bind(__webpack_require__, 599));
-        const success = await executeImmediateReservation(pavilionCode, pavilionName, timeSlot, timeDisplay);
-        if (success) {
-            // 成功時の視覚的フィードバック
-            buttonElement.style.background = '#4CAF50';
-            buttonElement.style.color = 'white';
-            setTimeout(() => {
-                buttonElement.style.background = '';
-                buttonElement.style.color = '';
-            }, 2000);
-        }
-    }
-    catch (error) {
-        console.error('❌ 即時予約エラー:', error);
-        alert(`予約処理でエラーが発生しました: ${error}`);
-    }
-};
-// 監視対象選択処理
-const handleMonitoringSelection = async (pavilionCode, pavilionName, timeSlot, buttonElement) => {
-    try {
-        const { MonitoringCacheManager } = await Promise.resolve(/* import() */).then(__webpack_require__.bind(__webpack_require__, 76));
-        const isCurrentlySelected = buttonElement.classList.contains('selected');
-        const success = MonitoringCacheManager.toggleTarget(pavilionCode, timeSlot, pavilionName);
-        if (success) {
-            if (isCurrentlySelected) {
-                // 選択解除
-                buttonElement.classList.remove('selected');
-                console.log(`🗑️ 監視対象解除: ${pavilionName} - ${timeSlot}`);
-                console.log(`🔍 選択解除後のクラス: ${buttonElement.className}`);
-            }
-            else {
-                // 選択追加
-                buttonElement.classList.add('selected');
-                console.log(`✅ 監視対象追加: ${pavilionName} - ${timeSlot}`);
-                console.log(`🔍 選択後のクラス: ${buttonElement.className}`);
-                console.log(`🔍 選択後のスタイル: background=${getComputedStyle(buttonElement).backgroundColor}, border=${getComputedStyle(buttonElement).borderColor}`);
-            }
-            // 監視対象数を更新
-            updateMonitoringCount();
-        }
-    }
-    catch (error) {
-        console.error('❌ 監視対象選択エラー:', error);
-    }
-};
-// 監視対象数更新
-const updateMonitoringCount = async () => {
-    try {
-        const { MonitoringCacheManager } = await Promise.resolve(/* import() */).then(__webpack_require__.bind(__webpack_require__, 76));
-        const targets = MonitoringCacheManager.getTargets();
-        // 監視ボタンのテキストを更新
-        const monitorButton = document.querySelector('.ytomo-dialog.monitor-button');
-        if (monitorButton) {
-            monitorButton.textContent = targets.length > 0 ? `監視開始 (${targets.length})` : '監視開始';
-        }
-    }
-    catch (error) {
-        console.error('❌ 監視対象数更新エラー:', error);
-    }
-};
-// パビリオンの満員時間をすべて選択
-const selectAllUnavailableSlots = async (pavilion, showAll) => {
-    try {
-        const { MonitoringCacheManager } = await Promise.resolve(/* import() */).then(__webpack_require__.bind(__webpack_require__, 76));
-        const allSlots = pavilion.s || [];
-        let addedCount = 0;
-        for (const slot of allSlots) {
-            const isAvailable = slot.s === 0 || slot.s === 1;
-            // 満員時間のみ対象、または空きのみOFFの場合は全表示されている時間を対象
-            if (!isAvailable || (showAll && !isAvailable)) {
-                const success = MonitoringCacheManager.addTarget(pavilion.c, slot.t, pavilion.n);
-                if (success) {
-                    addedCount++;
-                    // UI上のボタンも選択状態にする
-                    const buttons = document.querySelectorAll('.pavilion-time-slot');
-                    for (const btn of buttons) {
-                        const btnElement = btn;
-                        if (btnElement.dataset['pavilionCode'] === pavilion.c &&
-                            btnElement.dataset['timeSlot'] === slot.t) {
-                            btnElement.classList.add('selected');
-                            break;
-                        }
-                    }
-                }
-            }
-        }
-        if (addedCount > 0) {
-            console.log(`✅ ${pavilion.n} の満員時間 ${addedCount}件を監視対象に追加`);
-            updateMonitoringCount();
-        }
-        else {
-            console.log(`⚠️ ${pavilion.n} に追加可能な満員時間がありません`);
-        }
-    }
-    catch (error) {
-        console.error('❌ 一括選択エラー:', error);
-    }
-};
-// 時間枠要素作成関数
-const createTimeSlotElement = (slot, pavilion, showAll) => {
-    const time = `${slot.t.slice(0, 2)}:${slot.t.slice(2)}`;
-    const isAvailable = slot.s === 0 || slot.s === 1;
-    // 空きのみON かつ 予約不可 → 表示しない
-    if (!showAll && !isAvailable) {
-        return null;
-    }
-    // 表示される時間枠はすべて選択可能（button要素）
-    const button = document.createElement('button');
-    button.className = `pavilion-time-slot clickable ${!isAvailable ? 'unavailable' : ''}`;
-    button.innerHTML = `${getStatusIcon(slot.s)}${time}`;
-    button.dataset['timeSlot'] = slot.t;
-    button.dataset['pavilionCode'] = pavilion.c;
-    button.dataset['pavilionName'] = pavilion.n;
-    button.dataset['available'] = isAvailable.toString();
-    // クリックイベント追加
-    button.addEventListener('click', (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        handleTimeSlotClick(pavilion.c, slot.t, button);
-    });
-    return button;
-};
 // 予約画面への遷移関数（Phase 3で使用予定）
 const navigateToReservation = (pavilion) => {
     console.log('🎯 予約画面への遷移:', pavilion.n);
@@ -9532,13 +7995,8 @@ class TicketManager {
                 for (const ticket of data.list) {
                     const ticketData = {
                         ticket_id: ticket.ticket_id || ticket.simple_ticket_id || '',
-                        label: ticket.item_name || 'チケット',
                         isOwn: true,
-                        entranceDates: this.extractEntranceDates(ticket),
-                        reservationTypes: this.extractReservationTypes(ticket),
-                        entranceReservations: this.extractEntranceReservations(ticket),
-                        reservationStatus: this.extractReservationStatus(ticket),
-                        schedules: ticket.schedules || []
+                        label: ticket.item_name || 'チケット',
                     };
                     tickets.push(ticketData);
                     this.tickets.set(ticketData.ticket_id, ticketData);
@@ -9629,152 +8087,48 @@ class TicketManager {
      */
     async loadExternalTicketData(ticketId, label) {
         try {
-            // 外部チケットの場合、入場予約情報のみ取得可能
-            // チケット詳細は取得できないため、最小限の情報で構成
-            const ticketData = {
+            // 外部チケット取得API（agent-ticket.jsより）
+            // 当日予約channel='5', 3日前予約channel='4' を試行
+            const channels = ['5', '4']; // 5:当日予約, 4:3日前予約
+            for (const channel of channels) {
+                try {
+                    const response = await fetch(`/api/d/proxy_tickets/${ticketId}/add_check?registered_channel=${channel}`, {
+                        credentials: 'include'
+                    });
+                    if (response.ok) {
+                        const data = await response.json();
+                        // 公式サイトのデータ構造に合わせてTicketDataに変換
+                        const ticketData = {
+                            ticket_id: data.ticket_id,
+                            isOwn: false,
+                            label: label,
+                        };
+                        // 入場予約があるかチェック
+                        try {
+                        }
+                        catch (error) {
+                            console.warn(`⚠️ 外部チケット${ticketId}の入場予約取得失敗:`, error);
+                        }
+                        console.log(`✅ 外部チケット${ticketId}をchannel=${channel}で取得成功`);
+                        return ticketData;
+                    }
+                }
+                catch (error) {
+                    console.warn(`⚠️ 外部チケット${ticketId}のchannel=${channel}取得失敗:`, error);
+                }
+            }
+            // どのchannelでも取得できない場合は最小限のデータを作成
+            console.log(`⚠️ 外部チケット${ticketId}の詳細取得失敗、最小限データで作成`);
+            return {
                 ticket_id: ticketId,
-                label: label,
                 isOwn: false,
-                entranceDates: [], // 外部チケットの日付は不明
-                reservationTypes: [], // 外部チケットの種別は不明
-                entranceReservations: [],
-                schedules: []
+                label: label,
             };
-            // 入場予約があるかチェック（可能であれば）
-            try {
-                const entranceReservations = await this.getEntranceReservationsForTicket(ticketId);
-                ticketData.entranceReservations = entranceReservations;
-            }
-            catch (error) {
-                console.warn(`⚠️ チケット${ticketId}の入場予約取得失敗:`, error);
-            }
-            return ticketData;
         }
         catch (error) {
             console.error(`❌ 外部チケット${ticketId}データ取得エラー:`, error);
             return null;
         }
-    }
-    /**
-     * 指定チケットの入場予約を取得
-     */
-    async getEntranceReservationsForTicket(_ticketId) {
-        // この機能は既存のAPI機能から実装する必要がある
-        // 現在は空配列を返す（今後実装）
-        return [];
-    }
-    /**
-     * チケットから入場可能日付を抽出（調査結果に基づく）
-     */
-    extractEntranceDates(ticket) {
-        const dates = [];
-        try {
-            // 調査結果: ticket.schedules配列から入場日付を取得
-            if (ticket.schedules && Array.isArray(ticket.schedules)) {
-                for (const schedule of ticket.schedules) {
-                    if (schedule.entrance_date) {
-                        // YYYYMMDD形式の日付
-                        dates.push(schedule.entrance_date);
-                    }
-                }
-            }
-        }
-        catch (error) {
-            console.warn('⚠️ 入場日付抽出エラー:', error);
-        }
-        return dates;
-    }
-    /**
-     * チケットから予約種類を抽出
-     */
-    extractReservationTypes(ticket) {
-        const types = [];
-        try {
-            // チケット種別情報から予約種類を判定
-            if (ticket.ticket_type) {
-                // 実装は既存のビジネスロジックに基づく
-                const type = this.determineReservationType(ticket.ticket_type);
-                if (type) {
-                    types.push(type);
-                }
-            }
-        }
-        catch (error) {
-            console.warn('⚠️ 予約種類抽出エラー:', error);
-        }
-        return types;
-    }
-    /**
-     * チケットから入場予約情報を抽出（調査結果に基づく）
-     */
-    extractEntranceReservations(ticket) {
-        const reservations = [];
-        try {
-            // 調査結果: ticket.schedules配列から入場予約情報を取得
-            if (ticket.schedules && Array.isArray(ticket.schedules)) {
-                for (const schedule of ticket.schedules) {
-                    const reservationData = {
-                        date: schedule.entrance_date || '',
-                        time: schedule.schedule_name || '', // 時間帯名
-                        location: 'east', // デフォルト値（実際の位置情報は不明）
-                        status: schedule.use_state === 0 ? 'confirmed' :
-                            schedule.use_state === 1 ? 'cancelled' : 'pending'
-                    };
-                    reservations.push(reservationData);
-                }
-            }
-        }
-        catch (error) {
-            console.warn('⚠️ 入場予約抽出エラー:', error);
-        }
-        return reservations;
-    }
-    /**
-     * チケット種別から予約種類を判定
-     */
-    determineReservationType(ticketType) {
-        // スマホでの表示問題修正：チケットが存在する場合は常にアクティブとして扱う
-        console.log('🔍 チケット種別判定:', ticketType);
-        if (!ticketType) {
-            // チケット種別が不明でも、チケットが存在する限りアクティブとして扱う
-            console.log('⚠️ チケット種別不明、デフォルト1日券として処理');
-            return {
-                type: '1日券',
-                isActive: true
-            };
-        }
-        // チケット種別に応じて判定（今後拡張可能）
-        return {
-            type: '1日券',
-            isActive: true
-        };
-    }
-    /**
-     * チケットから予約状況を抽出（調査結果に基づく）
-     */
-    extractReservationStatus(ticket) {
-        const statuses = [];
-        try {
-            // 調査結果: ticket.event_schedules配列からパビリオン予約状況を取得
-            if (ticket.event_schedules && Array.isArray(ticket.event_schedules)) {
-                for (const event of ticket.event_schedules) {
-                    const status = {
-                        pavilionId: event.event_code || '',
-                        pavilionName: event.event_name || '',
-                        date: event.entrance_date || '',
-                        time: `${event.start_time}-${event.end_time}`,
-                        status: event.use_state === 0 ? 'confirmed' :
-                            event.use_state === 1 ? 'cancelled' : 'pending',
-                        reservationType: event.registered_channel || '1日券'
-                    };
-                    statuses.push(status);
-                }
-            }
-        }
-        catch (error) {
-            console.warn('⚠️ 予約状況抽出エラー:', error);
-        }
-        return statuses;
     }
     /**
      * 外部チケットIDを追加
@@ -9847,10 +8201,7 @@ class TicketManager {
             if (ownOnly && !ticket.isOwn) {
                 continue;
             }
-            // 指定日付の入場可能チケットを選択
-            if (ticket.entranceDates.includes(date)) {
-                this.selectedTicketIds.add(ticketId);
-            }
+            this.selectedTicketIds.add(ticketId);
         }
         console.log(`✅ ${this.selectedTicketIds.size}個のチケットを選択`);
     }
@@ -9882,22 +8233,9 @@ class TicketManager {
     /**
      * 選択されたチケットの入場予約から最も遅い入場時間を取得（律速時間）
      */
-    getLatestEntranceTime(targetDate) {
-        const selectedTickets = this.getSelectedTickets();
-        let latestTime = null;
-        for (const ticket of selectedTickets) {
-            const entranceReservations = ticket.entranceReservations || [];
-            for (const reservation of entranceReservations) {
-                // 対象日付の入場予約のみを対象
-                if (reservation.date === targetDate && reservation.status === 'confirmed') {
-                    // 時間の比較（HH:MM形式）
-                    if (!latestTime || reservation.time > latestTime) {
-                        latestTime = reservation.time;
-                    }
-                }
-            }
-        }
-        return latestTime;
+    getLatestEntranceTime(_targetDate) {
+        // 現在は空の実装
+        return null;
     }
     /**
      * 全チケット一覧を取得
@@ -9909,16 +8247,7 @@ class TicketManager {
      * 利用可能な日付一覧を取得
      */
     getAvailableDates() {
-        const dates = new Set();
-        for (const ticket of this.tickets.values()) {
-            // 予約種類が有効な場合のみ日付を追加
-            if (ticket.reservationTypes.some(type => type.isActive)) {
-                for (const date of ticket.entranceDates) {
-                    dates.add(date);
-                }
-            }
-        }
-        return Array.from(dates).sort();
+        return [];
     }
     /**
      * 統合キャッシュデータを同期
@@ -11045,7 +9374,7 @@ class MainDialogFabImpl {
         await this.reactiveTicketManager.loadAllTickets();
         // デバッグ: 読み込まれたチケットID一覧
         const loadedTickets = this.ticketManager.getAllTickets();
-        console.log(`🎫 読み込まれたチケットID一覧:`, loadedTickets.map(t => `${t.ticket_id}(${t.isOwn ? '自分' : '他人'})`));
+        console.log(`🎫 読み込まれたチケットID一覧:`, loadedTickets.map(t => `${t.ticket_id}`));
         // メインダイアログコンテナを作成
         this.mainDialogContainer = document.createElement('div');
         this.mainDialogContainer.id = 'ytomo-main-dialog';
@@ -11316,9 +9645,14 @@ class MainDialogFabImpl {
                 </div>
             `;
         }
-        // 状態0の入場予約があるチケットのみ表示
+        // 状態0の入場予約があるチケット または 外部チケット(isOwnがfalse)を表示
         const validTickets = tickets.filter(ticket => {
             const schedules = ticket.schedules || [];
+            // 外部チケット（自分のものでない）は常に表示
+            if (ticket.isOwn === false) {
+                return true;
+            }
+            // 自分のチケットは状態0の入場予約があるもののみ表示
             return schedules.some((schedule) => schedule.use_state === 0);
         });
         if (validTickets.length === 0) {
@@ -11859,6 +10193,10 @@ class MainDialogFabImpl {
         }
         try {
             await this.reactiveTicketManager.addExternalTicket(ticketId, label);
+            // デバッグ: チケット追加後の状態確認
+            const allTickets = this.ticketManager.getAllTickets();
+            console.log(`🎫 チケット追加後の全チケット数: ${allTickets.length}`);
+            console.log(`🎫 追加されたチケットID: ${ticketId} が含まれているか:`, allTickets.some(t => t.ticket_id === ticketId));
             // 成功時はタブを再初期化
             await this.initializeTicketTab();
             // 入力をクリア
@@ -15443,14 +13781,822 @@ window.debugAutomationStatus = debugAutomationStatus;
 // 自動初期化
 initializeAutomation();
 
-// EXTERNAL MODULE: ./ts/modules/monitoring-scheduler.ts
-var monitoring_scheduler = __webpack_require__(723);
-// EXTERNAL MODULE: ./ts/modules/monitoring-cache.ts
-var monitoring_cache = __webpack_require__(76);
-// EXTERNAL MODULE: ./ts/modules/monitoring-service.ts
-var monitoring_service = __webpack_require__(141);
-// EXTERNAL MODULE: ./ts/modules/immediate-reservation.ts
-var immediate_reservation = __webpack_require__(599);
+;// ./ts/modules/monitoring-scheduler.ts
+/**
+ * 監視スケジューラー
+ * 変更容易な監視タイミング制御
+ */
+// デフォルト設定（毎分00,15,30,45秒）
+const monitoring_scheduler_DEFAULT_CONFIG = {
+    intervalType: 'fixed-seconds',
+    fixedSeconds: [0, 15, 30, 45]
+};
+class MonitoringScheduler {
+    constructor(config = monitoring_scheduler_DEFAULT_CONFIG) {
+        this.callback = null;
+        this.timeoutId = null;
+        this.isRunning = false;
+        this.config = { ...config };
+    }
+    /**
+     * スケジューラーを開始
+     */
+    start(callback) {
+        if (this.isRunning) {
+            this.stop();
+        }
+        this.callback = callback;
+        this.isRunning = true;
+        this.scheduleNext();
+        console.log('🕐 監視スケジューラー開始:', this.getConfigDescription());
+    }
+    /**
+     * スケジューラーを停止
+     */
+    stop() {
+        if (this.timeoutId) {
+            clearTimeout(this.timeoutId);
+            this.timeoutId = null;
+        }
+        this.isRunning = false;
+        this.callback = null;
+        console.log('⏹️ 監視スケジューラー停止');
+    }
+    /**
+     * スケジュール設定を更新
+     */
+    updateConfig(newConfig) {
+        const wasRunning = this.isRunning;
+        const oldCallback = this.callback;
+        if (wasRunning) {
+            this.stop();
+        }
+        this.config = { ...this.config, ...newConfig };
+        console.log('⚙️ スケジューラー設定更新:', this.getConfigDescription());
+        if (wasRunning && oldCallback) {
+            this.start(oldCallback);
+        }
+    }
+    /**
+     * 次回実行時刻を取得
+     */
+    getNextExecutionTime() {
+        const delay = this.calculateNextDelay();
+        return new Date(Date.now() + delay);
+    }
+    /**
+     * 現在の設定説明を取得
+     */
+    getConfigDescription() {
+        switch (this.config.intervalType) {
+            case 'fixed-seconds':
+                return `毎分${this.config.fixedSeconds?.join(',')}秒`;
+            case 'cron-like':
+                return `Cron: ${this.config.cronExpression}`;
+            case 'custom':
+                return 'カスタム関数';
+            default:
+                return '不明な設定';
+        }
+    }
+    /**
+     * 実行中かどうか
+     */
+    isActive() {
+        return this.isRunning;
+    }
+    /**
+     * 手動実行トリガー
+     */
+    triggerManual() {
+        if (this.callback) {
+            console.log('🔄 手動実行トリガー');
+            this.executeCallback();
+        }
+    }
+    /**
+     * 次回実行をスケジュール
+     */
+    scheduleNext() {
+        if (!this.isRunning)
+            return;
+        const delay = this.calculateNextDelay();
+        this.timeoutId = setTimeout(() => {
+            this.executeCallback();
+            this.scheduleNext(); // 次回をスケジュール
+        }, delay);
+        const nextTime = new Date(Date.now() + delay);
+        console.log(`⏰ 次回実行予定: ${nextTime.toLocaleTimeString()}`);
+    }
+    /**
+     * 次回実行までの遅延時間を計算
+     */
+    calculateNextDelay() {
+        const now = new Date();
+        switch (this.config.intervalType) {
+            case 'fixed-seconds':
+                return this.calculateFixedSecondsDelay(now);
+            case 'cron-like':
+                return this.calculateCronDelay(now);
+            case 'custom':
+                if (this.config.customFunction) {
+                    return this.config.customFunction();
+                }
+                throw new Error('custom関数が設定されていません');
+            default:
+                throw new Error(`未対応のintervalType: ${this.config.intervalType}`);
+        }
+    }
+    /**
+     * 固定秒数での遅延計算
+     */
+    calculateFixedSecondsDelay(now) {
+        const currentSeconds = now.getSeconds();
+        const targetSeconds = this.config.fixedSeconds || [0];
+        // 現在時刻より後の最初のターゲット秒を見つける
+        let nextTarget = targetSeconds.find(s => s > currentSeconds);
+        if (nextTarget === undefined) {
+            // 今分にターゲットがない場合は次の分の最初のターゲット
+            nextTarget = targetSeconds[0] + 60;
+        }
+        return (nextTarget - currentSeconds) * 1000;
+    }
+    /**
+     * Cron式での遅延計算（簡易実装）
+     */
+    calculateCronDelay(now) {
+        // 簡易実装: "秒,秒,秒 * * * * *" 形式のみ対応
+        if (!this.config.cronExpression) {
+            throw new Error('cronExpressionが設定されていません');
+        }
+        const parts = this.config.cronExpression.split(' ');
+        if (parts.length !== 6) {
+            throw new Error('Cron式の形式が不正です');
+        }
+        const secondsPart = parts[0];
+        const targetSeconds = secondsPart.split(',').map(s => parseInt(s.trim()));
+        // fixed-secondsと同じロジックを使用
+        const currentSeconds = now.getSeconds();
+        let nextTarget = targetSeconds.find(s => s > currentSeconds);
+        if (nextTarget === undefined) {
+            nextTarget = targetSeconds[0] + 60;
+        }
+        return (nextTarget - currentSeconds) * 1000;
+    }
+    /**
+     * コールバック実行
+     */
+    async executeCallback() {
+        if (!this.callback)
+            return;
+        try {
+            console.log('🔄 監視チェック実行:', new Date().toLocaleTimeString());
+            await this.callback();
+        }
+        catch (error) {
+            console.error('❌ 監視チェックエラー:', error);
+        }
+    }
+}
+// グローバルインスタンス
+let schedulerInstance = null;
+/**
+ * スケジューラーのシングルトンインスタンスを取得
+ */
+function getMonitoringScheduler(config) {
+    if (!schedulerInstance || config) {
+        schedulerInstance = new MonitoringScheduler(config);
+    }
+    return schedulerInstance;
+}
+/**
+ * スケジューラー設定を更新（デバッグ用）
+ */
+function updateMonitoringSchedule(newConfig) {
+    const scheduler = getMonitoringScheduler();
+    scheduler.updateConfig(newConfig);
+}
+/**
+ * 手動実行トリガー（デバッグ用）
+ */
+function triggerManualCheck() {
+    const scheduler = getMonitoringScheduler();
+    scheduler.triggerManual();
+}
+// グローバル公開（デバッグ用）
+if (typeof window !== 'undefined') {
+    window.updateMonitoringSchedule = updateMonitoringSchedule;
+    window.triggerManualCheck = triggerManualCheck;
+}
+
+;// ./ts/modules/monitoring-cache.ts
+/**
+ * 監視対象キャッシュ管理
+ * 順序ベースの監視対象データ管理
+ */
+// キャッシュキー
+const CACHE_KEYS = {
+    MONITORING_TARGETS: 'pavilion_monitoring_targets',
+    MONITORING_STATE: 'pavilion_monitoring_state'
+};
+class MonitoringCacheManager {
+    /**
+     * 監視対象を追加
+     */
+    static addTarget(pavilionCode, timeSlot, pavilionName) {
+        try {
+            const targets = this.getTargets();
+            // 既に存在するかチェック
+            const exists = targets.some(t => t.pavilionCode === pavilionCode && t.timeSlot === timeSlot);
+            if (exists) {
+                console.log('⚠️ 既に監視対象に追加済み:', pavilionCode, timeSlot);
+                return false;
+            }
+            // 新しい順序番号を決定
+            const maxOrder = targets.length > 0 ? Math.max(...targets.map(t => t.order)) : 0;
+            const newTarget = {
+                pavilionCode,
+                timeSlot,
+                pavilionName,
+                order: maxOrder + 1,
+                addedAt: Date.now()
+            };
+            targets.push(newTarget);
+            this.saveTargets(targets);
+            console.log('✅ 監視対象追加:', newTarget);
+            return true;
+        }
+        catch (error) {
+            console.error('❌ 監視対象追加エラー:', error);
+            return false;
+        }
+    }
+    /**
+     * 監視対象を削除
+     */
+    static removeTarget(pavilionCode, timeSlot) {
+        try {
+            const targets = this.getTargets();
+            const initialLength = targets.length;
+            const filteredTargets = targets.filter(t => !(t.pavilionCode === pavilionCode && t.timeSlot === timeSlot));
+            if (filteredTargets.length === initialLength) {
+                console.log('⚠️ 削除対象が見つかりません:', pavilionCode, timeSlot);
+                return false;
+            }
+            // 順序を再調整
+            const reorderedTargets = filteredTargets
+                .sort((a, b) => a.order - b.order)
+                .map((target, index) => ({
+                ...target,
+                order: index + 1
+            }));
+            this.saveTargets(reorderedTargets);
+            console.log('🗑️ 監視対象削除:', pavilionCode, timeSlot);
+            return true;
+        }
+        catch (error) {
+            console.error('❌ 監視対象削除エラー:', error);
+            return false;
+        }
+    }
+    /**
+     * 監視対象を切り替え（追加/削除）
+     */
+    static toggleTarget(pavilionCode, timeSlot, pavilionName) {
+        const exists = this.hasTarget(pavilionCode, timeSlot);
+        if (exists) {
+            return this.removeTarget(pavilionCode, timeSlot);
+        }
+        else {
+            return this.addTarget(pavilionCode, timeSlot, pavilionName);
+        }
+    }
+    /**
+     * 監視対象が存在するかチェック
+     */
+    static hasTarget(pavilionCode, timeSlot) {
+        const targets = this.getTargets();
+        return targets.some(t => t.pavilionCode === pavilionCode && t.timeSlot === timeSlot);
+    }
+    /**
+     * 全監視対象を取得（順序順）
+     */
+    static getTargets() {
+        try {
+            const data = sessionStorage.getItem(CACHE_KEYS.MONITORING_TARGETS);
+            if (!data)
+                return [];
+            const targets = JSON.parse(data);
+            return targets.sort((a, b) => a.order - b.order);
+        }
+        catch (error) {
+            console.error('❌ 監視対象取得エラー:', error);
+            return [];
+        }
+    }
+    /**
+     * 優先順位最上位の監視対象を取得
+     */
+    static getTopPriorityTarget() {
+        const targets = this.getTargets();
+        return targets.length > 0 ? targets[0] : null;
+    }
+    /**
+     * 特定パビリオンの監視対象を取得
+     */
+    static getTargetsByPavilion(pavilionCode) {
+        const targets = this.getTargets();
+        return targets.filter(t => t.pavilionCode === pavilionCode);
+    }
+    /**
+     * 監視対象をクリア
+     */
+    static clearTargets() {
+        sessionStorage.removeItem(CACHE_KEYS.MONITORING_TARGETS);
+        console.log('🗑️ 全監視対象クリア');
+    }
+    /**
+     * 監視状態を取得
+     */
+    static getMonitoringState() {
+        try {
+            const data = sessionStorage.getItem(CACHE_KEYS.MONITORING_STATE);
+            if (!data) {
+                return {
+                    targets: [],
+                    isActive: false,
+                    lastCheck: 0,
+                    nextCheck: 0,
+                    checkCount: 0
+                };
+            }
+            return JSON.parse(data);
+        }
+        catch (error) {
+            console.error('❌ 監視状態取得エラー:', error);
+            return {
+                targets: [],
+                isActive: false,
+                lastCheck: 0,
+                nextCheck: 0,
+                checkCount: 0
+            };
+        }
+    }
+    /**
+     * 監視状態を更新
+     */
+    static updateMonitoringState(updates) {
+        try {
+            const currentState = this.getMonitoringState();
+            const newState = { ...currentState, ...updates };
+            sessionStorage.setItem(CACHE_KEYS.MONITORING_STATE, JSON.stringify(newState));
+        }
+        catch (error) {
+            console.error('❌ 監視状態更新エラー:', error);
+        }
+    }
+    /**
+     * 監視統計を取得
+     */
+    static getMonitoringStats() {
+        const targets = this.getTargets();
+        const state = this.getMonitoringState();
+        return {
+            totalTargets: targets.length,
+            activeMonitoring: state.isActive,
+            lastCheckTime: state.lastCheck > 0 ?
+                new Date(state.lastCheck).toLocaleTimeString() : '未実行',
+            checkCount: state.checkCount
+        };
+    }
+    /**
+     * 監視対象を保存（内部用）
+     */
+    static saveTargets(targets) {
+        sessionStorage.setItem(CACHE_KEYS.MONITORING_TARGETS, JSON.stringify(targets));
+    }
+    /**
+     * デバッグ情報を出力
+     */
+    static debugInfo() {
+        console.group('🔍 監視キャッシュ デバッグ情報');
+        const targets = this.getTargets();
+        const state = this.getMonitoringState();
+        const stats = this.getMonitoringStats();
+        console.log('監視対象:', targets);
+        console.log('監視状態:', state);
+        console.log('統計情報:', stats);
+        console.groupEnd();
+    }
+}
+// デバッグ用グローバル公開
+if (typeof window !== 'undefined') {
+    window.debugMonitoringCache = () => MonitoringCacheManager.debugInfo();
+    window.clearMonitoringTargets = () => MonitoringCacheManager.clearTargets();
+}
+
+;// ./ts/modules/monitoring-service.ts
+/**
+ * 監視サービス
+ * API呼び出し・空き検知・自動予約実行
+ */
+
+
+
+class MonitoringService {
+    constructor() {
+        this.scheduler = getMonitoringScheduler();
+        this.isRunning = false;
+    }
+    /**
+     * 監視を開始
+     */
+    async startMonitoring() {
+        if (this.isRunning) {
+            console.log('⚠️ 監視は既に実行中です');
+            return false;
+        }
+        const targets = MonitoringCacheManager.getTargets();
+        if (targets.length === 0) {
+            console.log('⚠️ 監視対象がありません');
+            return false;
+        }
+        this.isRunning = true;
+        // 監視状態を更新
+        MonitoringCacheManager.updateMonitoringState({
+            isActive: true,
+            targets,
+            nextCheck: this.scheduler.getNextExecutionTime().getTime()
+        });
+        // スケジューラーを開始
+        this.scheduler.start(async () => {
+            await this.performMonitoringCheck();
+        });
+        console.log('🚀 パビリオン監視開始:', targets.length, '件');
+        return true;
+    }
+    /**
+     * 監視を停止
+     */
+    stopMonitoring() {
+        if (!this.isRunning) {
+            console.log('⚠️ 監視は実行されていません');
+            return;
+        }
+        this.scheduler.stop();
+        this.isRunning = false;
+        // 監視状態を更新
+        MonitoringCacheManager.updateMonitoringState({
+            isActive: false,
+            nextCheck: 0
+        });
+        console.log('⏹️ パビリオン監視停止');
+    }
+    /**
+     * 監視チェックを実行
+     */
+    async performMonitoringCheck() {
+        try {
+            const targets = MonitoringCacheManager.getTargets();
+            if (targets.length === 0) {
+                console.log('📋 監視対象がないため監視を停止します');
+                this.stopMonitoring();
+                return {
+                    success: false,
+                    checkedTargets: 0,
+                    foundAvailable: null,
+                    error: '監視対象なし'
+                };
+            }
+            console.log(`🔍 監視チェック開始 (${targets.length}件)`);
+            // 各監視対象をチェック
+            for (const target of targets) {
+                const isAvailable = await this.checkTargetAvailability(target);
+                if (isAvailable) {
+                    console.log('🎯 空きを発見:', target);
+                    // 自動予約を実行
+                    await this.executeReservation(target);
+                    // 監視対象から削除
+                    MonitoringCacheManager.removeTarget(target.pavilionCode, target.timeSlot);
+                    // 監視状態を更新
+                    const currentState = MonitoringCacheManager.getMonitoringState();
+                    MonitoringCacheManager.updateMonitoringState({
+                        lastCheck: Date.now(),
+                        checkCount: currentState.checkCount + 1,
+                        nextCheck: this.scheduler.getNextExecutionTime().getTime()
+                    });
+                    return {
+                        success: true,
+                        checkedTargets: targets.length,
+                        foundAvailable: target
+                    };
+                }
+            }
+            // 空きなしの場合
+            console.log('📋 空きなし、監視継続');
+            // 監視状態を更新
+            const currentState = MonitoringCacheManager.getMonitoringState();
+            MonitoringCacheManager.updateMonitoringState({
+                lastCheck: Date.now(),
+                checkCount: currentState.checkCount + 1,
+                nextCheck: this.scheduler.getNextExecutionTime().getTime()
+            });
+            return {
+                success: true,
+                checkedTargets: targets.length,
+                foundAvailable: null
+            };
+        }
+        catch (error) {
+            const errorMessage = error instanceof Error ? error.message : String(error);
+            console.error('❌ 監視チェックエラー:', errorMessage);
+            // エラー時も状態更新
+            const currentState = MonitoringCacheManager.getMonitoringState();
+            MonitoringCacheManager.updateMonitoringState({
+                lastCheck: Date.now(),
+                checkCount: currentState.checkCount + 1,
+                nextCheck: this.scheduler.getNextExecutionTime().getTime()
+            });
+            return {
+                success: false,
+                checkedTargets: 0,
+                foundAvailable: null,
+                error: errorMessage
+            };
+        }
+    }
+    /**
+     * 特定対象の空き状況をチェック
+     */
+    async checkTargetAvailability(target) {
+        try {
+            const availability = await this.fetchPavilionAvailability(target.pavilionCode);
+            if (!availability) {
+                console.warn('⚠️ API応答なし:', target.pavilionCode);
+                return false;
+            }
+            // 該当時間帯の空き状況をチェック
+            const targetSlot = availability.timeSlots.find(slot => slot.time === target.timeSlot);
+            if (!targetSlot) {
+                console.warn('⚠️ 該当時間帯なし:', target.timeSlot);
+                return false;
+            }
+            console.log(`📊 ${target.pavilionName} ${target.timeSlot}: ${targetSlot.available ? '空きあり' : '満員'}`);
+            return targetSlot.available;
+        }
+        catch (error) {
+            console.error('❌ 空き状況チェックエラー:', target.pavilionCode, error);
+            return false;
+        }
+    }
+    /**
+     * パビリオン空き情報をAPI取得
+     */
+    async fetchPavilionAvailability(pavilionCode) {
+        try {
+            const url = `https://expo.ebii.net/data?pavilion=${pavilionCode}`;
+            console.log('🌐 API呼び出し:', url);
+            const response = await fetch(url, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            });
+            if (!response.ok) {
+                throw new Error(`API応答エラー: ${response.status}`);
+            }
+            const data = await response.json();
+            // API応答をPavilionAvailability形式に変換
+            return this.transformApiResponse(data, pavilionCode);
+        }
+        catch (error) {
+            console.error('❌ API呼び出しエラー:', error);
+            return null;
+        }
+    }
+    /**
+     * API応答を内部形式に変換
+     */
+    transformApiResponse(apiData, pavilionCode) {
+        // TODO: 実際のAPI応答形式に合わせて実装
+        // 現在は仮実装
+        return {
+            pavilionCode,
+            pavilionName: apiData.pavilionName || `パビリオン${pavilionCode}`,
+            timeSlots: apiData.timeSlots || []
+        };
+    }
+    /**
+     * 自動予約を実行
+     */
+    async executeReservation(target) {
+        console.log('🤖 自動予約実行開始:', target);
+        try {
+            // 予約データを作成
+            const reservationData = {
+                pavilionCode: target.pavilionCode,
+                pavilionName: target.pavilionName,
+                selectedTimeSlot: target.timeSlot,
+                selectedTimeDisplay: target.timeSlot,
+                isAvailable: true,
+                timestamp: Date.now(),
+                status: 'pending'
+            };
+            // キャッシュに保存
+            pavilion_reservation_cache.PavilionReservationCache.saveReservationData(target.pavilionCode, reservationData);
+            // 予約ページを開く
+            // expoTable.jsを参照した正しいURL実装
+            const ticketIds = new URLSearchParams(window.location.search).get('id') || '';
+            const formatDateToYMD = () => {
+                const date = new Date();
+                const y = date.getFullYear();
+                const m = String(date.getMonth() + 1).padStart(2, '0');
+                const d = String(date.getDate()).padStart(2, '0');
+                return `${y}${m}${d}`;
+            };
+            const reservationUrl = `https://ticket.expo2025.or.jp/event_time/?id=${ticketIds}&event_id=${target.pavilionCode}&screen_id=108&lottery=5&entrance_date=${formatDateToYMD()}`;
+            window.location.href = reservationUrl;
+            console.log('✅ 予約ページに遷移:', reservationUrl);
+            // 監視成功通知を送信
+            this.sendNotificationToDialog('info', `監視成功: ${target.pavilionName} ${target.timeSlot} の空きを検知し予約開始`);
+        }
+        catch (error) {
+            console.error('❌ 自動予約実行エラー:', error);
+            throw error;
+        }
+    }
+    /**
+     * 監視状態を取得
+     */
+    getMonitoringStatus() {
+        const stats = MonitoringCacheManager.getMonitoringStats();
+        const nextCheck = this.scheduler.isActive() ?
+            this.scheduler.getNextExecutionTime().toLocaleTimeString() : '停止中';
+        return {
+            isRunning: this.isRunning,
+            targetCount: stats.totalTargets,
+            stats,
+            nextCheck
+        };
+    }
+    /**
+     * スケジュール設定を更新
+     */
+    updateSchedule(config) {
+        this.scheduler.updateConfig(config);
+    }
+    /**
+     * 手動チェック実行
+     */
+    async triggerManualCheck() {
+        console.log('🔄 手動チェック実行');
+        return await this.performMonitoringCheck();
+    }
+    /**
+     * ダイアログに通知を送信
+     */
+    sendNotificationToDialog(type, message) {
+        try {
+            // グローバル関数が利用可能な場合に通知を送信
+            if (typeof window.showReservationNotification === 'function') {
+                window.showReservationNotification(type, message);
+                console.log(`📢 監視通知送信: [${type}] ${message}`);
+            }
+            else {
+                console.log('⚠️ 通知関数が利用できません');
+            }
+        }
+        catch (error) {
+            console.log(`❌ 通知送信エラー: ${error}`);
+        }
+    }
+}
+// グローバルインスタンス
+let monitoringServiceInstance = null;
+/**
+ * 監視サービスのシングルトンインスタンスを取得
+ */
+function getMonitoringService() {
+    if (!monitoringServiceInstance) {
+        monitoringServiceInstance = new MonitoringService();
+    }
+    return monitoringServiceInstance;
+}
+/**
+ * 監視開始（ショートカット関数）
+ */
+async function startPavilionMonitoring() {
+    const service = getMonitoringService();
+    return await service.startMonitoring();
+}
+/**
+ * 監視停止（ショートカット関数）
+ */
+function stopPavilionMonitoring() {
+    const service = getMonitoringService();
+    service.stopMonitoring();
+}
+/**
+ * 監視状況確認（ショートカット関数）
+ */
+function getMonitoringStatus() {
+    const service = getMonitoringService();
+    return service.getMonitoringStatus();
+}
+// デバッグ用グローバル公開
+if (typeof window !== 'undefined') {
+    window.startPavilionMonitoring = startPavilionMonitoring;
+    window.stopPavilionMonitoring = stopPavilionMonitoring;
+    window.getMonitoringStatus = getMonitoringStatus;
+    window.debugMonitoringStatus = () => {
+        console.group('🔍 監視サービス状況');
+        console.log(getMonitoringStatus());
+        MonitoringCacheManager.debugInfo();
+        console.groupEnd();
+    };
+}
+
+;// ./ts/modules/immediate-reservation.ts
+/**
+ * 即時予約機能
+ * 空き時間帯での即座予約実行
+ */
+
+class ImmediateReservationService {
+    /**
+     * 即時予約を実行
+     */
+    static async executeReservation(pavilionCode, pavilionName, timeSlot, timeDisplay) {
+        console.log('🚀 即時予約実行開始:', pavilionName, timeDisplay);
+        try {
+            // 1. 通常の予約キャッシュ形式に変換して保存
+            const cacheData = {
+                pavilionCode,
+                pavilionName,
+                selectedTimeSlot: timeSlot,
+                selectedTimeDisplay: timeDisplay,
+                isAvailable: true,
+                timestamp: Date.now(),
+                status: 'pending'
+            };
+            pavilion_reservation_cache.PavilionReservationCache.saveReservationData(pavilionCode, cacheData);
+            // ページ復帰システムは無効化
+            // 3. 予約ページに遷移
+            // expoTable.jsを参照した正しいURL実装
+            const ticketIds = new URLSearchParams(window.location.search).get('id') || '';
+            const formatDateToYMD = () => {
+                const date = new Date();
+                const y = date.getFullYear();
+                const m = String(date.getMonth() + 1).padStart(2, '0');
+                const d = String(date.getDate()).padStart(2, '0');
+                return `${y}${m}${d}`;
+            };
+            const reservationUrl = `https://ticket.expo2025.or.jp/event_time/?id=${ticketIds}&event_id=${pavilionCode}&screen_id=108&lottery=5&entrance_date=${formatDateToYMD()}`;
+            window.location.href = reservationUrl;
+            console.log('✅ 予約ページに遷移:', reservationUrl);
+            console.log('🤖 自動操作が開始されます');
+            return true;
+        }
+        catch (error) {
+            console.error('❌ 即時予約実行エラー:', error);
+            return false;
+        }
+    }
+    /**
+     * 即時予約可能性をチェック
+     */
+    static canExecuteImmediate(isAvailable) {
+        return isAvailable === true;
+    }
+    /**
+     * 即時予約の説明メッセージ
+     */
+    static getExecutionMessage(pavilionName, timeDisplay) {
+        return `${pavilionName} ${timeDisplay} の予約ページを開き、自動で時間選択・申込を実行します。`;
+    }
+}
+/**
+ * 即時予約実行（ショートカット関数）
+ */
+async function executeImmediateReservation(pavilionCode, pavilionName, timeSlot, timeDisplay) {
+    return await ImmediateReservationService.executeReservation(pavilionCode, pavilionName, timeSlot, timeDisplay);
+}
+/**
+ * 即時予約可能判定（ショートカット関数）
+ */
+function canExecuteImmediateReservation(isAvailable) {
+    return ImmediateReservationService.canExecuteImmediate(isAvailable);
+}
+// デバッグ用グローバル公開
+if (typeof window !== 'undefined') {
+    window.executeImmediateReservation = executeImmediateReservation;
+    window.debugImmediateReservation = (pavilionCode, timeSlot) => {
+        console.log('🔧 即時予約デバッグ実行');
+        return executeImmediateReservation(pavilionCode, `テストパビリオン${pavilionCode}`, timeSlot, timeSlot);
+    };
+}
+
 ;// ./ts/modules/notification-system.ts
 /**
  * グローバル通知システム

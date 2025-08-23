@@ -10,6 +10,8 @@ import { CacheManager } from '../types/index.js';
  */
 export interface TicketData {
     ticket_id: string;       // 公式チケットID
+    isOwn: boolean;          // 自分のチケットかどうか
+    label?: string;          // 外部チケット用ラベル
 }
 
 /**
@@ -88,6 +90,7 @@ export class TicketManager {
                 for (const ticket of data.list) {
                     const ticketData: TicketData = {
                         ticket_id: ticket.ticket_id || ticket.simple_ticket_id || '',
+                        isOwn: true,
                         label: ticket.item_name || 'チケット',
                     };
                     tickets.push(ticketData);
@@ -207,6 +210,7 @@ export class TicketManager {
                         // 公式サイトのデータ構造に合わせてTicketDataに変換
                         const ticketData: TicketData = {
                             ticket_id: data.ticket_id,
+                            isOwn: false,
                             label: label,
                         };
 
@@ -228,6 +232,7 @@ export class TicketManager {
             console.log(`⚠️ 外部チケット${ticketId}の詳細取得失敗、最小限データで作成`);
             return {
                 ticket_id: ticketId,
+                isOwn: false,
                 label: label,
             };
 
@@ -237,14 +242,6 @@ export class TicketManager {
         }
     }
 
-    /**
-     * 指定チケットの入場予約を取得
-     */
-    private async getEntranceReservationsForTicket(_ticketId: string): Promise<EntranceReservation[]> {
-        // この機能は既存のAPI機能から実装する必要がある
-        // 現在は空配列を返す（今後実装）
-        return [];
-    }
 
 
     /**
@@ -329,6 +326,10 @@ export class TicketManager {
         this.selectedTicketIds.clear();
 
         for (const [ticketId, ticket] of this.tickets) {
+            // 自分のチケットのみの場合
+            if (ownOnly && !ticket.isOwn) {
+                continue;
+            }
             this.selectedTicketIds.add(ticketId);
         }
 
@@ -368,25 +369,9 @@ export class TicketManager {
     /**
      * 選択されたチケットの入場予約から最も遅い入場時間を取得（律速時間）
      */
-    getLatestEntranceTime(targetDate: string): string | null {
-        const selectedTickets = this.getSelectedTickets();
-        let latestTime: string | null = null;
-
-        for (const ticket of selectedTickets) {
-            const entranceReservations = ticket.entranceReservations || [];
-            
-            for (const reservation of entranceReservations) {
-                // 対象日付の入場予約のみを対象
-                if (reservation.date === targetDate && reservation.status === 'confirmed') {
-                    // 時間の比較（HH:MM形式）
-                    if (!latestTime || reservation.time > latestTime) {
-                        latestTime = reservation.time;
-                    }
-                }
-            }
-        }
-
-        return latestTime;
+    getLatestEntranceTime(_targetDate: string): string | null {
+        // 現在は空の実装
+        return null;
     }
 
     /**

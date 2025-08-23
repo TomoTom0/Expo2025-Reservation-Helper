@@ -149,7 +149,7 @@ export class MainDialogFabImpl implements MainDialogFab {
         
         // デバッグ: 読み込まれたチケットID一覧
         const loadedTickets = this.ticketManager.getAllTickets();
-        console.log(`🎫 読み込まれたチケットID一覧:`, loadedTickets.map(t => `${t.ticket_id}(${t.isOwn ? '自分' : '他人'})`));
+        console.log(`🎫 読み込まれたチケットID一覧:`, loadedTickets.map(t => `${t.ticket_id}`));
 
         // メインダイアログコンテナを作成
         this.mainDialogContainer = document.createElement('div');
