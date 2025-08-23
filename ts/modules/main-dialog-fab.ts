@@ -325,38 +325,48 @@ export class MainDialogFabImpl implements MainDialogFab {
             
             console.log('✅ ダイアログ内容初期化完了');
             
-            // スマホ環境での診断情報表示（1回のみ、詳細情報付き）
+            // スマホ環境での診断情報表示（特定日付のみ、1回のみ）
             if (/Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) && 
                 !(window as any).ytomoMobileDiagShown) {
                 (window as any).ytomoMobileDiagShown = true;
                 
                 const tickets = this.ticketManager.getAllTickets();
-                let detailedInfo = '';
+                const targetDates = ['20250511', '20250824', '20250826', '20250925'];
+                let filteredInfo = '';
                 
-                if (tickets.length > 0) {
-                    const firstTicket = tickets[0];
-                    detailedInfo = `
-第1チケット:
-ID: ${firstTicket.ticket_id}
-schedules: ${firstTicket.schedules?.length || 0}個
-event_schedules: ${(firstTicket as any).event_schedules?.length || 0}個`;
-                    
-                    if (firstTicket.schedules && firstTicket.schedules.length > 0) {
-                        const schedule = firstTicket.schedules[0];
-                        detailedInfo += `
-入場日: ${schedule.entrance_date}
-on_the_day: ${schedule.on_the_day}
-empty_frame: ${schedule.empty_frame}`;
-                        if (schedule.lotteries) {
-                            detailedInfo += `
-lotteries.day: ${schedule.lotteries.day?.length || 0}個
-lotteries.month: ${schedule.lotteries.month?.length || 0}個`;
+                // 対象日付のスケジュールのみ抽出
+                const targetSchedules: any[] = [];
+                for (const ticket of tickets) {
+                    if (ticket.schedules) {
+                        for (const schedule of ticket.schedules) {
+                            if (targetDates.includes(schedule.entrance_date)) {
+                                targetSchedules.push({
+                                    ticketId: ticket.ticket_id,
+                                    date: schedule.entrance_date,
+                                    on_the_day: schedule.on_the_day,
+                                    empty_frame: schedule.empty_frame,
+                                    lotteries_day: schedule.lotteries?.day?.length || 0,
+                                    lotteries_month: schedule.lotteries?.month?.length || 0
+                                });
+                            }
                         }
                     }
                 }
                 
+                if (targetSchedules.length > 0) {
+                    filteredInfo = '\n対象日付スケジュール:';
+                    targetSchedules.forEach((sched, index) => {
+                        filteredInfo += `\n${index + 1}. ${sched.date}
+  チケット: ${sched.ticketId}
+  当日: ${sched.on_the_day}, 空枠: ${sched.empty_frame}
+  抽選(週): ${sched.lotteries_day}, (月): ${sched.lotteries_month}`;
+                    });
+                } else {
+                    filteredInfo = '\n対象日付(5/11,8/24,8/26,9/25)のスケジュールなし';
+                }
+                
                 alert(`スマホ診断:
-チケット: ${tickets.length}個${detailedInfo}`);
+チケット: ${tickets.length}個${filteredInfo}`);
             }
         } catch (error) {
             console.error('❌ ダイアログ内容初期化エラー:', error);
@@ -400,6 +410,9 @@ lotteries.month: ${schedule.lotteries.month?.length || 0}個`;
 
             // タブカウント更新
             this.updateTicketTabCount();
+
+            // キャッシュから入場予約選択を復元
+            this.restoreEntranceSelectionFromCache();
 
             console.log('✅ チケットタブ初期化完了');
 
@@ -724,6 +737,56 @@ lotteries.month: ${schedule.lotteries.month?.length || 0}個`;
     }
 
     /**
+     * 入場予約選択をキャッシュに保存
+     */
+    private saveEntranceSelectionToCache(date: string): void {
+        try {
+            localStorage.setItem('ytomo_entrance_selection', date);
+            console.log(`💾 入場予約選択をキャッシュに保存: ${date}`);
+        } catch (error) {
+            console.warn('⚠️ 入場予約選択キャッシュ保存失敗:', error);
+        }
+    }
+
+    /**
+     * 入場予約選択をキャッシュから削除
+     */
+    private clearEntranceSelectionFromCache(): void {
+        try {
+            localStorage.removeItem('ytomo_entrance_selection');
+            console.log('🗑️ 入場予約選択キャッシュをクリア');
+        } catch (error) {
+            console.warn('⚠️ 入場予約選択キャッシュクリア失敗:', error);
+        }
+    }
+
+    /**
+     * キャッシュから入場予約選択を復元
+     */
+    private restoreEntranceSelectionFromCache(): void {
+        try {
+            const cachedDate = localStorage.getItem('ytomo_entrance_selection');
+            if (!cachedDate) return;
+
+            // キャッシュされた日付のボタンを探す
+            const targetButton = this.mainDialogContainer?.querySelector(
+                `.ytomo-entrance-date-button[data-date="${cachedDate}"]`
+            ) as HTMLButtonElement;
+
+            if (targetButton && !targetButton.disabled) {
+                targetButton.classList.add('selected');
+                console.log(`🔄 入場予約選択をキャッシュから復元: ${cachedDate}`);
+            } else {
+                // ボタンが見つからない、または無効化されている場合はキャッシュクリア
+                this.clearEntranceSelectionFromCache();
+                console.log(`🗑️ 入場予約選択復元失敗、キャッシュクリア: ${cachedDate}`);
+            }
+        } catch (error) {
+            console.warn('⚠️ 入場予約選択復元失敗:', error);
+        }
+    }
+
+    /**
      * 利用可能日付を抽出（調査結果に基づく）
      */
     private async extractAvailableDates(tickets: any[]): Promise<string[]> {
@@ -838,15 +901,21 @@ lotteries.month: ${schedule.lotteries.month?.length || 0}個`;
                     // 現在選択中のボタンをクリック → 選択解除
                     target.classList.remove('selected');
                     console.log(`🎫 入場日時選択解除: ${date}`);
+                    
+                    // キャッシュから削除
+                    this.clearEntranceSelectionFromCache();
                 } else {
-                    // 未選択のボタンをクリック → 他の日付を全て解除してから選択
-                    const allEntranceButtons = container.querySelectorAll('.ytomo-entrance-date-btn.selected');
-                    allEntranceButtons.forEach(btn => {
+                    // 未選択のボタンをクリック → 全ての入場予約ボタンを解除してから選択
+                    const allEntranceButtons = this.mainDialogContainer?.querySelectorAll('.ytomo-entrance-date-button.selected');
+                    allEntranceButtons?.forEach(btn => {
                         btn.classList.remove('selected');
                     });
                     
                     target.classList.add('selected');
-                    console.log(`🎫 入場日時選択: ${date}`);
+                    console.log(`🎫 入場日時選択: ${date} (他の日付は自動解除)`);
+                    
+                    // 選択をキャッシュに保存
+                    this.saveEntranceSelectionToCache(date);
                 }
             });
         });
@@ -1035,7 +1104,7 @@ lotteries.month: ${schedule.lotteries.month?.length || 0}個`;
         const tabCount = this.mainDialogContainer?.querySelector('#ticket-count');
         
         if (tabCount) {
-            tabCount.textContent = count > 0 ? ` (${count})` : '';
+            tabCount.textContent = ` (${count})`;
         }
     }
 
