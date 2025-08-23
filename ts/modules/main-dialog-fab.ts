@@ -325,30 +325,38 @@ export class MainDialogFabImpl implements MainDialogFab {
             
             console.log('✅ ダイアログ内容初期化完了');
             
-            // スマホ環境での診断情報表示
-            if (/Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
-                const tickets = this.ticketManager.getAllTickets();
-                const selectedTickets = this.ticketManager.getSelectedTickets();
-                const availableDates = this.ticketManager.getAvailableDates();
+            // スマホ環境での診断情報表示（1回のみ、詳細情報付き）
+            if (/Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) && 
+                !(window as any).ytomoMobileDiagShown) {
+                (window as any).ytomoMobileDiagShown = true;
                 
-                // 最初の入場予約の予約種類判定結果をサンプル取得
-                let sampleReservationStatus = '取得できず';
-                if (tickets.length > 0 && tickets[0]?.schedules?.length && tickets[0].schedules.length > 0) {
-                    try {
-                        const schedule = tickets[0].schedules[0];
-                        const lotteryData = await this.fetchLotteryCalendar(schedule?.entrance_date);
-                        const status = this.getReservationStatus(schedule, lotteryData, tickets[0]);
-                        sampleReservationStatus = status.statusText || '空白';
-                    } catch (error) {
-                        sampleReservationStatus = `エラー: ${error}`;
+                const tickets = this.ticketManager.getAllTickets();
+                let detailedInfo = '';
+                
+                if (tickets.length > 0) {
+                    const firstTicket = tickets[0];
+                    detailedInfo = `
+第1チケット:
+ID: ${firstTicket.ticket_id}
+schedules: ${firstTicket.schedules?.length || 0}個
+event_schedules: ${(firstTicket as any).event_schedules?.length || 0}個`;
+                    
+                    if (firstTicket.schedules && firstTicket.schedules.length > 0) {
+                        const schedule = firstTicket.schedules[0];
+                        detailedInfo += `
+入場日: ${schedule.entrance_date}
+on_the_day: ${schedule.on_the_day}
+empty_frame: ${schedule.empty_frame}`;
+                        if (schedule.lotteries) {
+                            detailedInfo += `
+lotteries.day: ${schedule.lotteries.day?.length || 0}個
+lotteries.month: ${schedule.lotteries.month?.length || 0}個`;
+                        }
                     }
                 }
                 
-                alert(`スマホ診断情報:
-チケット数: ${tickets.length}
-選択中: ${selectedTickets.length}  
-利用可能日: ${availableDates.length}
-サンプル予約種類: "${sampleReservationStatus}"`);
+                alert(`スマホ診断:
+チケット: ${tickets.length}個${detailedInfo}`);
             }
         } catch (error) {
             console.error('❌ ダイアログ内容初期化エラー:', error);
