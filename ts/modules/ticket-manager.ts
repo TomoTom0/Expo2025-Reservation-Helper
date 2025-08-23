@@ -9,13 +9,14 @@ import { CacheManager } from '../types/index.js';
  * チケットデータ型定義
  */
 export interface TicketData {
-    id: string;
+    ticket_id: string;       // 公式チケットID
     label?: string;           // 自分以外のチケット用ラベル
     isOwn: boolean;          // 自分のチケットかどうか
     entranceDates: string[]; // 入場可能日付リスト
     reservationTypes: ReservationType[];
     entranceReservations: EntranceReservation[];
     reservationStatus?: ReservationStatus[];
+    schedules?: any[];       // 入場予約スケジュール情報
 }
 
 /**
@@ -57,7 +58,7 @@ export interface ReservationStatus {
  */
 export class TicketManager {
     private tickets: Map<string, TicketData> = new Map();
-    private selectedTicketIds: Set<string> = new Set();
+    public selectedTicketIds: Set<string> = new Set();
     private cacheManager: CacheManager | null = null;
 
     constructor(cacheManager?: CacheManager) {
@@ -79,12 +80,12 @@ export class TicketManager {
 
             // 自分のチケットを追加
             for (const ticket of ownTickets) {
-                this.tickets.set(ticket.id, ticket);
+                this.tickets.set(ticket.ticket_id, ticket);
             }
 
             // キャッシュされた外部チケットを追加
             for (const ticket of cachedTickets) {
-                this.tickets.set(ticket.id, ticket);
+                this.tickets.set(ticket.ticket_id, ticket);
             }
 
             console.log(`✅ チケット統合管理: ${this.tickets.size}個のチケットを読み込み完了`);
@@ -127,15 +128,17 @@ export class TicketManager {
             if (data.list && Array.isArray(data.list)) {
                 for (const ticket of data.list) {
                     const ticketData: TicketData = {
-                        id: ticket.ticket_id || ticket.simple_ticket_id || '',
+                        ticket_id: ticket.ticket_id || ticket.simple_ticket_id || '',
                         label: ticket.item_name || 'チケット',
                         isOwn: true,
                         entranceDates: this.extractEntranceDates(ticket),
                         reservationTypes: this.extractReservationTypes(ticket),
                         entranceReservations: this.extractEntranceReservations(ticket),
-                        reservationStatus: this.extractReservationStatus(ticket)
+                        reservationStatus: this.extractReservationStatus(ticket),
+                        schedules: ticket.schedules || []
                     };
                     tickets.push(ticketData);
+                    this.tickets.set(ticketData.ticket_id, ticketData);
                 }
             }
 
@@ -238,12 +241,13 @@ export class TicketManager {
             // 外部チケットの場合、入場予約情報のみ取得可能
             // チケット詳細は取得できないため、最小限の情報で構成
             const ticketData: TicketData = {
-                id: ticketId,
+                ticket_id: ticketId,
                 label: label,
                 isOwn: false,
                 entranceDates: [], // 外部チケットの日付は不明
                 reservationTypes: [], // 外部チケットの種別は不明
-                entranceReservations: []
+                entranceReservations: [],
+                schedules: []
             };
 
             // 入場予約があるかチェック（可能であれば）
@@ -479,6 +483,13 @@ export class TicketManager {
         }
 
         console.log(`✅ ${this.selectedTicketIds.size}個のチケットを選択`);
+    }
+
+    /**
+     * 選択済みチケットID一覧を取得（デバッグ用）
+     */
+    getSelectedTicketIds(): Set<string> {
+        return this.selectedTicketIds;
     }
 
     /**

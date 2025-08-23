@@ -3,11 +3,13 @@
  */
 
 .ytomo-pavilion-tab {
-    padding: 0;
+    padding: 0 20px 20px 20px;
     height: 100%;
     display: flex;
     flex-direction: column;
     gap: 16px;
+    overflow-y: auto;
+    color-scheme: light;
 }
 
 /* 検索コントロールエリア */
@@ -113,12 +115,15 @@
     background: white;
     border-radius: 8px;
     border: 1px solid #e2e8f0;
-    min-height: 0;
+    min-height: 400px;
+    max-height: calc(100vh - 300px);
 }
 
 .ytomo-pavilion-item {
+    background: white;
     border-bottom: 1px solid #f1f5f9;
     transition: all 0.2s;
+    color: #374151;
 
     &:last-child {
         border-bottom: none;
@@ -230,6 +235,13 @@
     border: 1px solid;
     min-width: 80px;
     text-align: center;
+    display: block;
+    width: 100%;
+    
+    // 子要素のポインターイベントを無効化してボタン全体をクリック可能にする
+    * {
+        pointer-events: none;
+    }
 
     &.available {
         background: #dcfce7;
@@ -402,6 +414,89 @@
     }
 }
 
+/* 選択入場日表示エリア */
+.ytomo-selected-dates-display {
+    background: white;
+    border-radius: 8px;
+    padding: 12px 16px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    border: 1px solid #e2e8f0;
+    flex-shrink: 0;
+    min-height: 44px; // 表示有無でレイアウトが崩れないよう固定高さ
+    display: flex;
+    align-items: center;
+}
+
+.ytomo-selected-dates-content {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+}
+
+.ytomo-dates-label {
+    font-size: 14px;
+    font-weight: 600;
+    color: #374151;
+    flex-shrink: 0;
+}
+
+.ytomo-dates-text {
+    font-size: 14px;
+    color: #2c5aa0;
+    font-weight: 500;
+    
+    &:empty::before {
+        content: "なし";
+        color: #9ca3af;
+        font-style: italic;
+    }
+}
+
+/* 予約実行FABボタン */
+.ytomo-reservation-fab {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 56px;
+    height: 56px;
+    background: linear-gradient(135deg, #2c5aa0 0%, #1a365d 100%);
+    border: none;
+    border-radius: 28px;
+    color: white;
+    font-size: 24px;
+    cursor: pointer;
+    box-shadow: 0 4px 16px rgba(44, 90, 160, 0.3);
+    transition: all 0.3s ease;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    &:hover:not(:disabled) {
+        background: linear-gradient(135deg, #1a365d 0%, #2c5aa0 100%);
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(44, 90, 160, 0.4);
+    }
+
+    &:active:not(:disabled) {
+        transform: translateY(0);
+        box-shadow: 0 2px 8px rgba(44, 90, 160, 0.3);
+    }
+
+    &:disabled {
+        background: #94a3b8;
+        cursor: not-allowed;
+        box-shadow: 0 2px 8px rgba(148, 163, 184, 0.3);
+        opacity: 0.6;
+    }
+
+    &:focus {
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(44, 90, 160, 0.3), 0 4px 16px rgba(44, 90, 160, 0.3);
+    }
+}
+
 /* アニメーション */
 .ytomo-pavilion-item {
     animation: slideIn 0.2s ease-out;
@@ -473,93 +568,3 @@
     }
 }
 
-/* ダークモード対応（将来実装時用） */
-@media (prefers-color-scheme: dark) {
-    .ytomo-search-controls,
-    .ytomo-pavilion-list,
-    .ytomo-reservation-controls {
-        background: #374151;
-        border-color: #4b5563;
-    }
-
-    .ytomo-pavilion-item:hover {
-        background: #4b5563;
-    }
-
-    .ytomo-pavilion-name {
-        color: #f3f4f6;
-    }
-
-    .ytomo-search-input {
-        background: #4b5563;
-        border-color: #6b7280;
-        color: #f3f4f6;
-
-        &::placeholder {
-            color: #9ca3af;
-        }
-
-        &:focus {
-            border-color: #60a5fa;
-            box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.1);
-        }
-    }
-
-    .ytomo-icon-button {
-        background: #4b5563;
-        border-color: #6b7280;
-        color: #f3f4f6;
-
-        &:hover {
-            background: #6b7280;
-        }
-
-        &.active {
-            background: #60a5fa;
-            border-color: #60a5fa;
-            color: #1f2937;
-        }
-    }
-
-    .ytomo-time-slot-button.available {
-        background: #065f46;
-        border-color: #10b981;
-        color: #d1fae5;
-
-        &:hover,
-        &.selected {
-            background: #10b981;
-            color: #064e3b;
-        }
-    }
-
-    .ytomo-time-slot-button.unavailable {
-        background: #7f1d1d;
-        border-color: #ef4444;
-        color: #fecaca;
-    }
-
-    .ytomo-selected-info {
-        color: #f3f4f6;
-    }
-
-    .ytomo-pavilion-tab .ytomo-empty-state p {
-        color: #9ca3af;
-    }
-
-    .ytomo-pavilion-tab .ytomo-error p {
-        color: #f87171;
-    }
-
-    .ytomo-pavilion-list::-webkit-scrollbar-track {
-        background: #374151;
-    }
-
-    .ytomo-pavilion-list::-webkit-scrollbar-thumb {
-        background: #6b7280;
-
-        &:hover {
-            background: #9ca3af;
-        }
-    }
-}

@@ -12,7 +12,7 @@ let mainDialogVisible = false;
 export interface MainDialogFab {
     initialize(): void;
     addYTFabButton(): void;
-    showMainDialog(): void;
+    showMainDialog(): Promise<void>;
     hideMainDialog(): void;
     cleanup(): void;
 }
@@ -117,22 +117,29 @@ export class MainDialogFabImpl implements MainDialogFab {
     /**
      * メインダイアログの表示切り替え
      */
-    private toggleMainDialog(): void {
+    private async toggleMainDialog(): Promise<void> {
         if (mainDialogVisible) {
             this.hideMainDialog();
         } else {
-            this.showMainDialog();
+            await this.showMainDialog();
         }
     }
 
     /**
      * メインダイアログを表示
      */
-    showMainDialog(): void {
+    async showMainDialog(): Promise<void> {
         console.log('🎯 メインダイアログ表示');
         
         // 既存のダイアログを削除
         this.hideMainDialog();
+        
+        // チケットマネージャーにチケットデータをロード
+        await this.ticketManager.loadAllTickets();
+        
+        // デバッグ: 読み込まれたチケットID一覧
+        const loadedTickets = this.ticketManager.getAllTickets();
+        console.log(`🎫 読み込まれたチケットID一覧:`, loadedTickets.map(t => `${t.ticket_id}(${t.isOwn ? '自分' : '他人'})`));
 
         // メインダイアログコンテナを作成
         this.mainDialogContainer = document.createElement('div');
@@ -142,21 +149,20 @@ export class MainDialogFabImpl implements MainDialogFab {
         // ダイアログ内容を作成
         this.mainDialogContainer.innerHTML = `
             <div class="ytomo-dialog ytomo-main-dialog">
-                <div class="ytomo-dialog-header">
-                    <h2 class="ytomo-dialog-title">万博予約ツール</h2>
-                    <button class="ytomo-dialog-close" aria-label="閉じる">×</button>
-                </div>
                 <div class="ytomo-dialog-body">
                     <div class="ytomo-tab-navigation">
                         <button class="ytomo-tab-button active" data-tab="ticket">
                             チケット<span class="ytomo-tab-count" id="ticket-count"></span>
                         </button>
                         <button class="ytomo-tab-button" data-tab="pavilion">
-                            パビリオン<span class="ytomo-tab-type" id="pavilion-type"></span>
+                            <div class="ytomo-tab-content">
+                                <div class="ytomo-tab-title">パビリオン</div>
+                                <div class="ytomo-tab-dates" id="pavilion-tab-dates"></div>
+                            </div>
                         </button>
                         <button class="ytomo-tab-button" data-tab="third">
-                            その他
                         </button>
+                        <button class="ytomo-dialog-close" aria-label="閉じる">×</button>
                     </div>
                     <div class="ytomo-tab-content">
                         <div class="ytomo-tab-pane active" id="ticket-tab">
@@ -170,9 +176,6 @@ export class MainDialogFabImpl implements MainDialogFab {
                             </div>
                         </div>
                         <div class="ytomo-tab-pane" id="third-tab">
-                            <div class="ytomo-placeholder">
-                                <p>この機能は今後実装予定です</p>
-                            </div>
                         </div>
                     </div>
                 </div>
@@ -237,7 +240,8 @@ export class MainDialogFabImpl implements MainDialogFab {
         tabButtons.forEach(button => {
             button.addEventListener('click', (e) => {
                 const target = e.target as HTMLElement;
-                const tabName = target.dataset['tab'];
+                const tabButton = target.closest('.ytomo-tab-button') as HTMLElement;
+                const tabName = tabButton?.dataset['tab'];
                 if (tabName) {
                     this.switchTab(tabName);
                 }
@@ -270,6 +274,7 @@ export class MainDialogFabImpl implements MainDialogFab {
         });
 
         console.log(`🔄 タブ切り替え: ${tabName}`);
+        console.log(`🔍 タブ切り替え時のselectedTicketIds:`, Array.from(this.ticketManager.selectedTicketIds));
     }
 
     /**
@@ -308,29 +313,18 @@ export class MainDialogFabImpl implements MainDialogFab {
         `;
 
         try {
-            // 直接APIからチケット情報を取得
-            const response = await fetch('/api/d/my/tickets/?count=1', {
-                method: 'GET',
-                headers: {
-                    'Accept': 'application/json',
-                    'Accept-Language': 'ja,en-US;q=0.9,en;q=0.8,zh-TW;q=0.7,zh;q=0.6',
-                    'X-Api-Lang': 'ja'
-                },
-                credentials: 'same-origin'
-            });
-
-            if (!response.ok) {
-                throw new Error(`API Error: ${response.status} ${response.statusText}`);
-            }
-
-            const data = await response.json();
-            console.log('🔍 チケットAPI応答:', data);
+            // チケットマネージャーからデータを取得
+            const tickets = this.ticketManager.getAllTickets();
+            console.log('🔍 チケットマネージャーデータ:', tickets);
             
-            const tickets = data.list || [];
-            const availableDates = this.extractAvailableDates(tickets);
+            if (tickets.length === 0) {
+                throw new Error('チケットデータが見つかりません');
+            }
+            
+            const availableDates = await this.extractAvailableDates(tickets);
 
             // チケットタブUIを構築
-            this.buildTicketTabUI(ticketTab as HTMLElement, tickets, availableDates);
+            await this.buildTicketTabUI(ticketTab as HTMLElement, tickets, availableDates);
 
             // タブカウント更新
             this.updateTicketTabCount();
@@ -362,35 +356,30 @@ export class MainDialogFabImpl implements MainDialogFab {
     /**
      * チケットタブUIを構築
      */
-    private buildTicketTabUI(container: HTMLElement, tickets: any[], availableDates: string[]): void {
+    private async buildTicketTabUI(container: HTMLElement, tickets: any[], availableDates: string[]): Promise<void> {
         container.innerHTML = `
             <div class="ytomo-ticket-tab">
                 <!-- チケット簡易選択エリア -->
                 <div class="ytomo-quick-select">
-                    <div class="ytomo-quick-select-header">
-                        <label class="ytomo-toggle-container">
-                            <input type="checkbox" id="own-only-toggle" class="ytomo-toggle-input">
-                            <span class="ytomo-toggle-slider"></span>
-                            <span class="ytomo-toggle-label">自分のチケットのみ</span>
-                        </label>
-                    </div>
-                    <div class="ytomo-date-buttons" id="date-buttons-container">
-                        ${this.buildDateButtons(availableDates)}
-                    </div>
+                    <label class="ytomo-toggle-container">
+                        <input type="checkbox" id="own-only-toggle" class="ytomo-toggle-input">
+                        <span class="ytomo-toggle-slider"></span>
+                        <span class="ytomo-toggle-label">自分</span>
+                    </label>
+                    ${this.buildDateButtons(availableDates)}
                 </div>
 
                 <!-- チケット一覧エリア -->
                 <div class="ytomo-ticket-list" id="ticket-list-container">
-                    ${this.buildTicketList(tickets)}
+                    ${await this.buildTicketList(tickets)}
                 </div>
 
-                <!-- チケット追加エリア -->
-                <div class="ytomo-add-ticket">
-                    <h4>🎫 チケットID追加</h4>
-                    <div class="ytomo-add-ticket-form">
-                        <input type="text" id="ticket-id-input" placeholder="チケットIDを入力" class="ytomo-input">
-                        <input type="text" id="ticket-label-input" placeholder="ラベル（任意）" class="ytomo-input">
-                        <button id="add-ticket-button" class="ytomo-button primary">追加</button>
+                <!-- チケットID追加（同様のレイアウト） -->
+                <div class="ytomo-ticket-item ytomo-add-ticket-item">
+                    <div class="ytomo-ticket-upper">
+                        <input type="text" id="ticket-id-input" placeholder="チケットID" class="ytomo-input-inline">
+                        <input type="text" id="ticket-label-input" placeholder="Label" class="ytomo-input-inline">
+                        <button id="add-ticket-button" class="ytomo-button primary">Add</button>
                     </div>
                 </div>
             </div>
@@ -417,7 +406,7 @@ export class MainDialogFabImpl implements MainDialogFab {
     /**
      * チケット一覧を構築（調査結果に基づく）
      */
-    private buildTicketList(tickets: any[]): string {
+    private async buildTicketList(tickets: any[]): Promise<string> {
         if (tickets.length === 0) {
             return `
                 <div class="ytomo-empty-state">
@@ -426,79 +415,206 @@ export class MainDialogFabImpl implements MainDialogFab {
             `;
         }
 
-        return tickets.map(ticket => `
-            <div class="ytomo-ticket-item" data-ticket-id="${ticket.id}">
-                <div class="ytomo-ticket-header">
-                    <span class="ytomo-ticket-id">${ticket.simple_ticket_id || ticket.ticket_id || ticket.id}</span>
+        // 状態0の入場予約があるチケットのみ表示
+        const validTickets = tickets.filter(ticket => {
+            const schedules = ticket.schedules || [];
+            return schedules.some((schedule: any) => schedule.use_state === 0);
+        });
+
+        if (validTickets.length === 0) {
+            return `
+                <div class="ytomo-empty-state">
+                    <p>利用可能なチケットが見つかりませんでした</p>
+                </div>
+            `;
+        }
+
+        const ticketPromises = validTickets.map(async ticket => `
+            <div class="ytomo-ticket-item" data-ticket-id="${ticket.ticket_id}">
+                <!-- 上半分: チケットID、Me Tip、Label -->
+                <div class="ytomo-ticket-upper">
+                    <span class="ytomo-ticket-id">${ticket.ticket_id}</span>
                     <span class="ytomo-me-tip">Me</span>
                 </div>
-                <div class="ytomo-ticket-body">
+                <!-- 下半分: 入場日時ボタン（予約種類も含む） -->
+                <div class="ytomo-ticket-lower">
                     <div class="ytomo-entrance-dates">
-                        ${this.buildEntranceDateButtons(ticket.schedules || [])}
-                    </div>
-                    <div class="ytomo-reservation-types">
-                        ${this.buildReservationTypes(ticket)}
+                        ${await this.buildEntranceDateButtons(ticket.schedules || [], ticket)}
                     </div>
                 </div>
             </div>
-        `).join('');
+        `);
+        
+        const ticketResults = await Promise.all(ticketPromises);
+        return ticketResults.join('');
     }
 
     /**
      * 入場日時ボタンを構築（調査結果に基づく）
      */
-    private buildEntranceDateButtons(schedules: any[]): string {
+    private async buildEntranceDateButtons(schedules: any[], ticket: any): Promise<string> {
         if (!Array.isArray(schedules) || schedules.length === 0) {
             return '<span class="ytomo-no-entrance-dates">入場予約なし</span>';
         }
 
-        return schedules.map(schedule => `
-            <button class="ytomo-entrance-date-button" data-date="${schedule.entrance_date}" data-use-state="${schedule.use_state}">
-                ${this.formatDate(schedule.entrance_date)} ${schedule.schedule_name || ''}
-                ${schedule.use_state === 1 ? '(使用済み)' : ''}
-            </button>
-        `).join('');
+        // 状態0（未使用）の入場予約のみ表示
+        const unusedSchedules = schedules.filter(schedule => schedule.use_state === 0);
+        
+        if (unusedSchedules.length === 0) {
+            return '<span class="ytomo-no-entrance-dates">利用可能な入場予約なし</span>';
+        }
+
+        const buttonPromises = unusedSchedules.map(async schedule => {
+            // 抽選カレンダーデータを取得
+            const lotteryData = await this.fetchLotteryCalendar(schedule.entrance_date);
+            const reservationStatus = this.getReservationStatus(schedule, lotteryData, ticket);
+            const isDisabled = reservationStatus.availableTypes.length === 0;
+            
+            return `
+                <button class="ytomo-entrance-date-button${isDisabled ? ' disabled' : ''}" 
+                        data-date="${schedule.entrance_date}" 
+                        data-use-state="${schedule.use_state}"
+                        ${isDisabled ? 'disabled' : ''}>
+                    <span class="ytomo-date-text">${this.formatDate(schedule.entrance_date)} ${schedule.schedule_name || ''}</span>
+                    <div class="ytomo-reservation-status">
+                        ${reservationStatus.statusText}
+                    </div>
+                </button>
+            `;
+        });
+        
+        const buttonResults = await Promise.all(buttonPromises);
+        return buttonResults.join('');
     }
 
     /**
-     * 予約種類表示を構築（調査結果に基づく）
+     * 入場予約の詳細な予約状況を取得
      */
-    private buildReservationTypes(ticket: any): string {
-        // チケットのitem_nameから予約種類を推測、または既定値を使用
-        const ticketName = ticket.item_name || '';
-        let reservationType = '1日券'; // デフォルト
-        
-        if (ticketName.includes('3日')) {
-            reservationType = '3日券';
-        } else if (ticketName.includes('週末')) {
-            reservationType = '週末券';
-        } else if (ticketName.includes('月間')) {
-            reservationType = '月間券';
+    private getReservationStatus(schedule: any, lotteryData?: any, ticket?: any): { statusText: string, availableTypes: string[] } {
+        const statuses: string[] = [];
+        const availableTypes: string[] = [];
+
+        if (!lotteryData) {
+            return { statusText: '確認中...', availableTypes: [] };
         }
 
-        // 入場予約があるかチェックして有効性を判定
-        const hasValidReservations = ticket.schedules && 
-            Array.isArray(ticket.schedules) && 
-            ticket.schedules.some((s: any) => s.use_state === 0);
+        const now = new Date();
+        const checkPeriod = (period: any) => {
+            if (!period || !period.request_start || !period.request_end) return { isOpen: false, isExpired: false, notStarted: false };
+            const start = new Date(period.request_start);
+            const end = new Date(period.request_end);
+            return { 
+                isOpen: now >= start && now <= end,
+                isExpired: now > end,
+                notStarted: now < start
+            };
+        };
 
-        return `
-            <span class="ytomo-reservation-type ${hasValidReservations ? 'active' : 'inactive'}">
-                ${reservationType}
-            </span>
-        `;
+        const getStatusFromLottery = (lotteryArray: any[], lotteryType: '7day' | '2month', ticket: any) => {
+            // 抽選データがある場合のみ処理
+            if (lotteryArray?.length > 0) {
+                const lottery = lotteryArray[0];
+                
+                // 申し込み状態を確認
+                if (lottery.state === 0) {
+                    return '提出';
+                }
+                
+                // 当選判定: event_schedulesから実際の予約を確認
+                if (lottery.state === 1 && ticket?.event_schedules?.length > 0) {
+                    // registered_channelで予約種類を照合
+                    const lotteryChannelMap = {
+                        '7day': '2',   // 7日前抽選
+                        '2month': '1'  // 2ヶ月前抽選
+                    };
+                    const expectedChannel = lotteryChannelMap[lotteryType];
+                    
+                    const hasActualReservation = ticket.event_schedules.some((eventSchedule: any) => 
+                        eventSchedule.entrance_date === schedule.entrance_date && 
+                        eventSchedule.registered_channel === expectedChannel
+                    );
+                    
+                    return hasActualReservation ? 'あり' : '落選';
+                } else if (lottery.state === 1) {
+                    // event_schedulesがない場合は申し込み済みとして扱う
+                    return '提出';
+                } else {
+                    // その他の状態は落選
+                    return '落選';
+                }
+            }
+            return 'なし';
+        };
+
+        const processReservationType = (
+            label: string,
+            reservationStatus: string,
+            period: any
+        ) => {
+            if (period.isExpired) {
+                // 期限後は「あり」のみ表示（落選・提出は表示しない）
+                if (reservationStatus === 'あり') {
+                    statuses.push(`${label}:あり`);
+                }
+            } else if (period.isOpen) {
+                // 期限中は全状態表示
+                if (reservationStatus === 'あり') {
+                    statuses.push(`${label}:あり`);
+                } else if (reservationStatus === '提出') {
+                    statuses.push(`${label}:提出`);
+                } else if (reservationStatus === '落選') {
+                    statuses.push(`${label}:落選`);
+                } else {
+                    // 未申込で期限中
+                    statuses.push(`${label}:なし`);
+                    availableTypes.push(label);
+                }
+            }
+            // 期限前（notStarted）は表示しない
+        };
+
+        // 表示順序: 1,3,週,月
+
+        // 当日予約 - 左から1番目
+        const onTheDayStatus = schedule.on_the_day ? 'あり' : 'なし';
+        processReservationType('1', onTheDayStatus, checkPeriod(lotteryData.on_the_day_reservation));
+
+        // 空き枠予約 - 左から2番目
+        const emptyFrameStatus = schedule.empty_frame ? 'あり' : 'なし';
+        processReservationType('3', emptyFrameStatus, checkPeriod(lotteryData.empty_frame_reservation));
+
+        // 7日前抽選 - 左から3番目
+        const dayStatus = getStatusFromLottery(schedule.lotteries?.day, '7day', ticket);
+        processReservationType('週', dayStatus, checkPeriod(lotteryData.seven_days_ago_lottery));
+
+        // 2ヶ月前抽選 - 左から4番目
+        const monthStatus = getStatusFromLottery(schedule.lotteries?.month, '2month', ticket);
+        processReservationType('月', monthStatus, checkPeriod(lotteryData.two_months_ago_lottery));
+
+        return {
+            statusText: statuses.join(' '),
+            availableTypes
+        };
     }
 
     /**
      * 利用可能日付を抽出（調査結果に基づく）
      */
-    private extractAvailableDates(tickets: any[]): string[] {
+    private async extractAvailableDates(tickets: any[]): Promise<string[]> {
         const dates = new Set<string>();
         
         for (const ticket of tickets) {
             if (ticket.schedules && Array.isArray(ticket.schedules)) {
-                for (const schedule of ticket.schedules) {
-                    if (schedule.entrance_date && schedule.use_state === 0) {
-                        dates.add(schedule.entrance_date);
+                const unusedSchedules = ticket.schedules.filter((schedule: any) => schedule.use_state !== 1);
+                
+                for (const schedule of unusedSchedules) {
+                    if (schedule.entrance_date) {
+                        // 利用可能な予約タイプがあるかチェック
+                        const lotteryData = await this.fetchLotteryCalendar(schedule.entrance_date);
+                        const reservationStatus = this.getReservationStatus(schedule, lotteryData, ticket);
+                        if (reservationStatus.availableTypes.length > 0) {
+                            dates.add(schedule.entrance_date);
+                        }
                     }
                 }
             }
@@ -506,6 +622,31 @@ export class MainDialogFabImpl implements MainDialogFab {
 
         return Array.from(dates).sort();
     }
+
+    /**
+     * 抽選カレンダーデータを取得
+     */
+    private async fetchLotteryCalendar(entranceDate: string): Promise<any> {
+        try {
+            const response = await fetch(`/api/d/lottery_calendars?entrance_date=${entranceDate}`, {
+                method: 'GET',
+                headers: {
+                    'Accept-Language': 'ja,en-US;q=0.9,en;q=0.8,zh-TW;q=0.7,zh;q=0.6',
+                    'X-Api-Lang': 'ja'
+                },
+                credentials: 'same-origin'
+            });
+
+            if (!response.ok) return null;
+
+            const calendarData = await response.json();
+            return calendarData.data || calendarData;
+        } catch (error) {
+            console.error('❌ 抽選カレンダー取得エラー:', error);
+            return null;
+        }
+    }
+
 
     /**
      * 日付フォーマット（YYYYMMDD → M/D）
@@ -555,7 +696,80 @@ export class MainDialogFabImpl implements MainDialogFab {
             });
         });
 
-        // チケット追加
+        // 入場日時ボタン
+        const entranceButtons = container.querySelectorAll('.ytomo-entrance-date-button');
+        entranceButtons.forEach(button => {
+            button.addEventListener('click', (e) => {
+                const target = e.target as HTMLButtonElement;
+                if (target.disabled) return;
+
+                // 選択状態を切り替え
+                target.classList.toggle('selected');
+                
+                const date = target.dataset['date'];
+                if (date) {
+                    console.log(`🎫 入場日時選択: ${date}`);
+                    
+                    // その日付に対応するチケットを選択
+                    const ticketElement = target.closest('.ytomo-ticket-item') as HTMLElement;
+                    const ticketId = ticketElement?.dataset['ticketId'];
+                    
+                    if (ticketId) {
+                        // 入場予約ボタンの選択状態に応じてチケット選択を制御
+                        const isButtonSelected = target.classList.contains('selected');
+                        const selectedTickets = this.ticketManager.getSelectedTickets();
+                        const isTicketSelected = selectedTickets.some(t => t.ticket_id === ticketId);
+                        
+                        if (isButtonSelected && !isTicketSelected) {
+                            // ボタン選択済み、チケット未選択 → チケット選択
+                            const result = this.ticketManager.toggleTicketSelection(ticketId);
+                            console.log(`✅ チケット選択: ${ticketId} → ${result ? '追加' : '削除'}`);
+                        } else if (!isButtonSelected && isTicketSelected) {
+                            // ボタン未選択、チケット選択済み → チケット選択解除
+                            const result = this.ticketManager.toggleTicketSelection(ticketId);
+                            console.log(`✅ チケット選択解除: ${ticketId} → ${result ? '追加' : '削除'}`);
+                        }
+                        
+                        // 選択状態確認
+                        const currentSelected = this.ticketManager.getSelectedTickets();
+                        const allTickets = this.ticketManager.getAllTickets();
+                        const hasTicket = allTickets.some(t => t.ticket_id === ticketId);
+                        console.log(`🎫 現在の選択チケット数: ${currentSelected.length}`, currentSelected.map(t => t.ticket_id));
+                        console.log(`🔍 チケット${ticketId}は登録されているか: ${hasTicket}`);
+                        console.log(`🔍 入場予約ボタンでのthis.ticketManager:`, this.ticketManager);
+                        console.log(`🔍 selectedTicketIds:`, Array.from(this.ticketManager.selectedTicketIds));
+                        console.log(`🔍 tickets.has(${ticketId}):`, this.ticketManager.getAllTickets().some(t => t.ticket_id === ticketId));
+                        
+                        // UI更新
+                        this.updateTicketSelection();
+                        this.updateTicketTabCount();
+                        this.updateSelectedInfo();
+                        this.updatePavilionTabSelectedDates();
+                        
+                        console.log(`✅ 入場予約ボタンクリック: ${ticketId} - ボタン:${isButtonSelected ? '選択' : '未選択'}, チケット選択状態更新`);
+                    }
+                }
+            });
+        });
+
+        // チケットアイテムクリック
+        const ticketItems = container.querySelectorAll('.ytomo-ticket-item:not(.ytomo-add-ticket-item)');
+        ticketItems.forEach(item => {
+            item.addEventListener('click', (e) => {
+                const target = e.target as HTMLElement;
+                const ticketItem = target.closest('.ytomo-ticket-item') as HTMLElement;
+                const ticketId = ticketItem?.dataset['ticketId'];
+                
+                if (ticketId) {
+                    this.ticketManager.toggleTicketSelection(ticketId);
+                    this.updateTicketSelection();
+                    this.updateTicketTabCount();
+                    this.updateSelectedInfo();
+                }
+            });
+        });
+
+        // チケット追加ボタン
         const addButton = container.querySelector('#add-ticket-button');
         if (addButton) {
             addButton.addEventListener('click', () => {
@@ -593,12 +807,58 @@ export class MainDialogFabImpl implements MainDialogFab {
     private handleDateSelection(date: string, ownOnly: boolean): void {
         console.log(`📅 日付選択: ${date} (自分のみ: ${ownOnly})`);
         
-        // チケットマネージャーで日付別選択
-        this.ticketManager.selectTicketsByDate(date, ownOnly);
+        // 日付ボタンの選択状態を更新
+        const dateButtons = this.mainDialogContainer?.querySelectorAll('.ytomo-date-button');
+        dateButtons?.forEach(button => {
+            const buttonDate = (button as HTMLElement).dataset['date'];
+            if (buttonDate === date) {
+                button.classList.toggle('selected');
+            } else {
+                button.classList.remove('selected');
+            }
+        });
         
-        // UI更新
+        // 対応する入場予約ボタンの選択状態も更新
+        const entranceButtons = this.mainDialogContainer?.querySelectorAll('.ytomo-entrance-date-button');
+        const isDateSelected = this.mainDialogContainer?.querySelector(`.ytomo-date-button[data-date="${date}"]`)?.classList.contains('selected');
+        
+        entranceButtons?.forEach(button => {
+            const buttonDate = (button as HTMLElement).dataset['date'];
+            if (buttonDate === date) {
+                if (isDateSelected) {
+                    button.classList.add('selected');
+                } else {
+                    button.classList.remove('selected');
+                }
+            }
+        });
+        
+        // UI更新のみ（チケット選択は入場予約ボタンで制御）
         this.updateTicketSelection();
         this.updateTicketTabCount();
+        this.updateSelectedInfo();
+        this.updatePavilionTabSelectedDates();
+    }
+
+
+    /**
+     * チケット表示フィルター
+     */
+    private filterTicketDisplay(ownOnly: boolean): void {
+        const ticketItems = this.mainDialogContainer?.querySelectorAll('.ytomo-ticket-item');
+        
+        ticketItems?.forEach(item => {
+            const ticketId = (item as HTMLElement).dataset['ticketId'];
+            const ticket = this.ticketManager.getAllTickets().find(t => t.ticket_id === ticketId);
+            
+            if (ticket) {
+                if (ownOnly && !ticket.isOwn) {
+                    (item as HTMLElement).style.display = 'none';
+                } else {
+                    (item as HTMLElement).style.display = '';
+                }
+            }
+        });
     }
 
     /**
@@ -637,31 +897,11 @@ export class MainDialogFabImpl implements MainDialogFab {
     }
 
     /**
-     * チケット表示フィルター
-     */
-    private filterTicketDisplay(ownOnly: boolean): void {
-        const ticketItems = this.mainDialogContainer?.querySelectorAll('.ytomo-ticket-item');
-        
-        ticketItems?.forEach(item => {
-            const ticketId = (item as HTMLElement).dataset['ticketId'];
-            const ticket = this.ticketManager.getAllTickets().find(t => t.id === ticketId);
-            
-            if (ticket) {
-                if (ownOnly && !ticket.isOwn) {
-                    (item as HTMLElement).style.display = 'none';
-                } else {
-                    (item as HTMLElement).style.display = '';
-                }
-            }
-        });
-    }
-
-    /**
      * チケット選択状態をUI更新
      */
     private updateTicketSelection(): void {
         const selectedTickets = this.ticketManager.getSelectedTickets();
-        const selectedIds = new Set(selectedTickets.map(t => t.id));
+        const selectedIds = new Set(selectedTickets.map(t => t.ticket_id));
 
         // チケット項目の選択状態を更新
         const ticketItems = this.mainDialogContainer?.querySelectorAll('.ytomo-ticket-item');
@@ -713,8 +953,6 @@ export class MainDialogFabImpl implements MainDialogFab {
             // パビリオンタブUIを構築
             this.buildPavilionTabUI(pavilionTab as HTMLElement, reservationType);
 
-            // タブタイプ更新
-            this.updatePavilionTabType(reservationType);
 
             console.log('✅ パビリオンタブ初期化完了');
 
@@ -759,7 +997,7 @@ export class MainDialogFabImpl implements MainDialogFab {
                             <span>⭐</span>
                         </button>
                         <button id="filter-button" class="ytomo-icon-button" title="空きのみ表示">
-                            <span>🔽</span>
+                            <span>📂</span>
                         </button>
                         <button id="refresh-button" class="ytomo-icon-button" title="更新">
                             <span>🔄</span>
@@ -774,16 +1012,16 @@ export class MainDialogFabImpl implements MainDialogFab {
                     </div>
                 </div>
 
-                <!-- 予約コントロールエリア -->
-                <div class="ytomo-reservation-controls">
-                    <div class="ytomo-selected-info" id="selected-info">
-                        選択中: なし
-                    </div>
-                    <button id="reservation-button" class="ytomo-button primary" disabled>
-                        予約実行
-                    </button>
-                    <div class="ytomo-result-display" id="result-display"></div>
-                </div>
+                <!-- 予約実行FABボタン -->
+                <button id="reservation-button" class="ytomo-reservation-fab" disabled title="予約実行">
+                    📋
+                </button>
+                
+                <!-- 予約結果表示 -->
+                <div class="ytomo-result-display" id="result-display"></div>
+                
+                <!-- 選択情報表示 -->
+                <div class="ytomo-selected-info" id="selected-info">選択中: なし</div>
             </div>
         `;
 
@@ -797,20 +1035,8 @@ export class MainDialogFabImpl implements MainDialogFab {
     private determineReservationType(tickets: any[]): string {
         if (tickets.length === 0) return '1';
         
-        // 最初のチケットの予約種類を使用
-        const firstTicket = tickets[0];
-        if (firstTicket.reservationTypes?.length > 0) {
-            const type = firstTicket.reservationTypes[0].type;
-            switch (type) {
-                case '1日券': return '1';
-                case '3日券': return '3';
-                case '週末券': return '週';
-                case '月間券': return '月';
-                default: return '1';
-            }
-        }
-        
-        return '1';
+        // TODO: 実際の予約種類を判断する
+        return '';
     }
 
     /**
@@ -880,8 +1106,19 @@ export class MainDialogFabImpl implements MainDialogFab {
         try {
             this.showPavilionLoading('検索中...');
 
-            const selectedTickets = this.ticketManager.getSelectedTickets();
-            const ticketIds = selectedTickets.map(t => t.id);
+            console.log(`🔍 パビリオン検索でのthis.ticketManager:`, this.ticketManager);
+            console.log(`🔍 パビリオン検索でのselectedTicketIds:`, Array.from(this.ticketManager.selectedTicketIds));
+            console.log(`🔍 パビリオン検索でのgetSelectedTickets():`, this.ticketManager.getSelectedTickets());
+            
+            const ticketIds = Array.from(this.ticketManager.selectedTicketIds);
+            
+            console.log(`📋 検索パラメータ: query="${query}", 選択チケット数=${ticketIds.length}`);
+            
+            // 選択チケットがない場合は警告表示
+            if (ticketIds.length === 0) {
+                this.showPavilionError('チケットと入場日を選択してください');
+                return;
+            }
 
             const pavilions = await this.pavilionManager.searchPavilions(query, ticketIds);
             this.displayPavilions(pavilions);
@@ -1133,7 +1370,7 @@ export class MainDialogFabImpl implements MainDialogFab {
             time: time,
             available: !(button as HTMLButtonElement).disabled,
             selected: !isSelected,
-            reservationType: '1日券' // TODO: 実際の予約種類を取得
+            reservationType: '' // TODO: 実際の予約種類を取得
         };
 
         // パビリオンマネージャーで選択状態を更新
@@ -1194,20 +1431,51 @@ export class MainDialogFabImpl implements MainDialogFab {
     }
 
     /**
+     * 選択された日付を取得
+     */
+    private getSelectedDates(): string[] {
+        const selectedButtons = this.mainDialogContainer?.querySelectorAll('.ytomo-date-button.selected, .ytomo-entrance-date-button.selected');
+        const dates: string[] = [];
+        
+        selectedButtons?.forEach(button => {
+            const date = button.getAttribute('data-date');
+            if (date) {
+                dates.push(date);
+            }
+        });
+        
+        return [...new Set(dates)]; // 重複除去
+    }
+
+    /**
      * 選択情報を更新
      */
     private updateSelectedInfo(): void {
         const selectedTimeSlots = this.pavilionManager.getSelectedTimeSlots();
+        const selectedTickets = this.ticketManager.getSelectedTickets();
         const selectedInfo = this.mainDialogContainer?.querySelector('#selected-info');
         
         if (selectedInfo) {
-            if (selectedTimeSlots.length === 0) {
-                selectedInfo.textContent = '選択中: なし';
-            } else {
-                const { pavilionId, timeSlot } = selectedTimeSlots[0];
-                selectedInfo.textContent = `選択中: ${pavilionId} ${timeSlot.time}`;
+            const parts: string[] = [];
+            
+            // 選択チケット数
+            if (selectedTickets.length > 0) {
+                parts.push(`チケット: ${selectedTickets.length}個`);
             }
+            
+            // 選択入場日表示は削除
+            
+            // 選択時間帯
+            if (selectedTimeSlots.length > 0) {
+                const { pavilionId, timeSlot } = selectedTimeSlots[0];
+                parts.push(`予約: ${pavilionId} ${timeSlot.time}`);
+            }
+            
+            selectedInfo.textContent = parts.length > 0 ? parts.join(' | ') : '選択中: なし';
         }
+        
+        // パビリオンタブの選択入場日も更新
+        this.updatePavilionTabSelectedDates();
     }
 
     /**
@@ -1269,12 +1537,17 @@ export class MainDialogFabImpl implements MainDialogFab {
     }
 
     /**
-     * パビリオンタブタイプを更新
+     * パビリオンタブの選択入場日を更新
      */
-    private updatePavilionTabType(reservationType: string): void {
-        const tabType = this.mainDialogContainer?.querySelector('#pavilion-type');
-        if (tabType) {
-            tabType.textContent = ` (${reservationType})`;
+    private updatePavilionTabSelectedDates(): void {
+        const tabDates = this.mainDialogContainer?.querySelector('#pavilion-tab-dates');
+        const selectedDates = this.getSelectedDates();
+        
+        const dateStr = selectedDates.length > 0 ? selectedDates.map(date => this.formatDate(date)).join(', ') : '';
+        
+        // タブボタン下半分の表示
+        if (tabDates) {
+            tabDates.textContent = dateStr;
         }
     }
 
