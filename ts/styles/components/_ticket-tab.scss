@@ -399,8 +399,7 @@
 
 /* インライン入力フィールド（チケット追加用） */
 .ytomo-input-inline {
-    flex: 1;
-    min-width: 120px;
+    width: 100px;
     padding: 4px 8px;
     border: 1px solid #d1d5db;
     border-radius: 4px;
