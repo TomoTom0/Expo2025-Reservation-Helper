@@ -33,6 +33,7 @@ export interface PavilionData {
     category?: string;            // カテゴリ
     imageUrl?: string;            // 画像URL
     tags?: string[];              // タグ
+    dateStatus?: number;          // パビリオン全体の予約状況（2=満員）
 }
 
 /**
@@ -52,7 +53,6 @@ export interface ReservationRequest {
     pavilionId: string;
     timeSlotId: string;
     ticketIds: string[];          // 選択チケット
-    companions?: number;          // 同行者数
 }
 
 /**
@@ -86,22 +86,6 @@ export class PavilionManager {
         this.loadFavoritesFromCache();
     }
 
-    /**
-     * 現在のページパラメータを取得（調査結果に基づく）
-     */
-    private getCurrentPageParams() {
-        const urlParams = new URLSearchParams(window.location.search);
-        return {
-            ticketIds: urlParams.get('id')?.split(',') || [],
-            lottery: urlParams.get('lottery') || '1',
-            entranceDate: urlParams.get('entrance_date') || '',
-            eventType: urlParams.get('event_type') || '0',
-            screenId: urlParams.get('screen_id') || '108',
-            priority: urlParams.get('priority'),
-            keyword: urlParams.get('keyword') || '',
-            reserveId: urlParams.get('reserve_id') || ''
-        };
-    }
 
     /**
      * 公式API仕様に従ってAPIのURLを構築
@@ -164,8 +148,10 @@ export class PavilionManager {
                 location: item.location || '',
                 category: item.category || '',
                 imageUrl: item.image_url || '',
-                tags: item.tags || []
+                tags: item.tags || [],
+                dateStatus: item.date_status // パビリオン単位の満員判定用
             };
+
 
             return pavilion;
         } catch (error) {
@@ -450,7 +436,9 @@ export class PavilionManager {
     async makeReservation(
         pavilionId: string, 
         timeSlot: PavilionTimeSlot,
-        selectedTickets: TicketData[]
+        selectedTickets: TicketData[],
+        entranceDate: string,
+        registeredChannel: string
     ): Promise<ReservationResult> {
         console.log(`🎯 予約実行開始: ${pavilionId} - ${timeSlot.time}`);
         
@@ -465,15 +453,17 @@ export class PavilionManager {
             }
 
             // 予約リクエストを構築
+            const timeSlotForAPI = timeSlot.timeSlotId || timeSlot.time;
+            console.log('🔍 時間帯データ確認:', { timeSlot, timeSlotForAPI });
+            
             const request: ReservationRequest = {
                 pavilionId: pavilionId,
-                timeSlotId: timeSlot.timeSlotId || timeSlot.time,
-                ticketIds: selectedTickets.map(t => t.ticket_id),
-                companions: selectedTickets.length - 1
+                timeSlotId: timeSlotForAPI,
+                ticketIds: selectedTickets.map(t => t.ticket_id)
             };
 
             // 予約API実行
-            const result = await this.executeReservationAPI(request);
+            const result = await this.executeReservationAPI(request, entranceDate, registeredChannel);
             
             if (result.success) {
                 // 成功時は選択状態をクリア
@@ -506,20 +496,46 @@ export class PavilionManager {
     /**
      * 予約API実行
      */
-    private async executeReservationAPI(request: ReservationRequest): Promise<ReservationResult> {
+    private async executeReservationAPI(
+        request: ReservationRequest, 
+        entranceDate: string, 
+        registeredChannel: string
+    ): Promise<ReservationResult> {
         try {
-            // 調査結果に基づく予約API実装
-            const params = this.getCurrentPageParams();
             const reservationData = {
                 ticket_ids: request.ticketIds,
-                entrance_date: params.entranceDate,
-                start_time: request.timeSlotId, // 時間帯ID（例：1000）
+                entrance_date: entranceDate,
+                start_time: request.timeSlotId,
                 event_code: request.pavilionId,
-                registered_channel: params.lottery
+                registered_channel: registeredChannel
             };
 
-            // CSRFトークン取得
-            const csrfToken = this.getCsrfToken();
+            console.log('🔍 予約APIリクエストデータ:', reservationData);
+            console.log('🔍 JSON文字列:', JSON.stringify(reservationData));
+            console.log('🔍 request元データ:', request);
+
+            // CSRFトークンを取得
+            const getCsrfToken = () => {
+                // metaタグから取得
+                const csrfMeta = document.querySelector('meta[name="csrf-token"]');
+                if (csrfMeta) {
+                    return csrfMeta.getAttribute('content');
+                }
+                
+                // クッキーから取得
+                const cookies = document.cookie.split(';');
+                for (let cookie of cookies) {
+                    const [name, value] = cookie.trim().split('=');
+                    if (name === 'csrftoken' || name === '_token' || name === 'XSRF-TOKEN') {
+                        return decodeURIComponent(value);
+                    }
+                }
+                return null;
+            };
+
+            const csrfToken = getCsrfToken();
+            console.log('🔐 CSRFトークン:', csrfToken);
+
             const headers: Record<string, string> = {
                 'Accept': 'application/json, text/plain, */*',
                 'Accept-Language': 'ja,en-US;q=0.9,en;q=0.8,zh-TW;q=0.7,zh;q=0.6',
@@ -528,6 +544,7 @@ export class PavilionManager {
                 'X-Requested-With': 'XMLHttpRequest'
             };
 
+            // CSRFトークンがあれば追加（現在は常にnullのためスキップ）
             if (csrfToken) {
                 headers['X-CSRF-TOKEN'] = csrfToken;
             }
@@ -540,13 +557,25 @@ export class PavilionManager {
             });
 
             if (!response.ok) {
-                let errorBody = '';
-                try {
-                    errorBody = await response.text();
-                } catch (e) {
-                    // エラーレスポンス読み取り失敗は無視
+                const errorData = await response.json().catch(() => ({}));
+                console.log('🔍 エラーレスポンス詳細:', errorData);
+                
+                // 422はビジネスロジックエラー（満席、無効な選択等）
+                if (response.status === 422 && errorData.error) {
+                    const errorName = errorData.error.name || '';
+                    
+                    // 既知のエラータイプを日本語に変換
+                    if (errorName === 'schedule_out_of_stock') {
+                        throw new Error('満席');
+                    } else if (errorName === 'select_ticket_valid_error') {
+                        throw new Error('無効');
+                    } else {
+                        // その他の場合は英語でそのまま表示
+                        throw new Error(errorName || '予約エラー');
+                    }
                 }
-                throw new Error(`API Error: ${response.status} ${response.statusText}\n${errorBody}`);
+                
+                throw new Error(errorData.message || `API Error: ${response.status}`);
             }
 
             const data = await response.json();
@@ -571,26 +600,6 @@ export class PavilionManager {
         }
     }
 
-    /**
-     * CSRFトークンを取得（調査結果に基づく）
-     */
-    private getCsrfToken(): string | null {
-        // metaタグから取得
-        const csrfMeta = document.querySelector('meta[name="csrf-token"]');
-        if (csrfMeta) {
-            return csrfMeta.getAttribute('content');
-        }
-        
-        // クッキーから取得
-        const cookies = document.cookie.split(';');
-        for (let cookie of cookies) {
-            const [name, value] = cookie.trim().split('=');
-            if (name === 'csrftoken' || name === '_token' || name === 'XSRF-TOKEN') {
-                return decodeURIComponent(value);
-            }
-        }
-        return null;
-    }
 
     /**
      * 選択済み時間帯をクリア
@@ -613,6 +622,71 @@ export class PavilionManager {
      */
     getAllPavilions(): PavilionData[] {
         return Array.from(this.pavilions.values());
+    }
+
+    /**
+     * パビリオンの時間帯情報を取得
+     */
+    async getPavilionTimeSlots(eventCode: string, ticketIds: string[] = [], entranceDate?: string): Promise<PavilionTimeSlot[]> {
+        try {
+            // パビリオン詳細APIで時間帯情報を取得
+            const ticketIdsParam = ticketIds.length > 0 ? 
+                ticketIds.map(id => `ticket_ids[]=${id}`).join('&') : '';
+            const entranceDateParam = entranceDate ? `&entrance_date=${entranceDate}` : '';
+            const channelParam = `&channel=4`;
+            
+            const apiUrl = `/api/d/events/${eventCode}?${ticketIdsParam}${entranceDateParam}${channelParam}`;
+            
+            const response = await fetch(apiUrl, {
+                method: 'GET',
+                headers: {
+                    'Accept': 'application/json, text/plain, */*',
+                    'Accept-Language': 'ja,en-US;q=0.9,en;q=0.8,zh-TW;q=0.7,zh;q=0.6',
+                    'X-Api-Lang': 'ja',
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                credentials: 'include'
+            });
+
+            if (!response.ok) {
+                throw new Error(`API Error: ${response.status} ${response.statusText}`);
+            }
+
+            const data = await response.json();
+            console.log(`🕐 パビリオン${eventCode}時間帯取得:`, data);
+            console.log(`🔍 time_slots確認:`, data.time_slots);
+            console.log(`🔍 event_schedules確認:`, data.event_schedules);
+            console.log(`🔍 data全体のキー:`, Object.keys(data));
+
+            // event_schedulesオブジェクトから時間帯情報を抽出
+            const timeSlots: PavilionTimeSlot[] = [];
+            if (data.event_schedules && typeof data.event_schedules === 'object') {
+                for (const [time, schedule] of Object.entries(data.event_schedules)) {
+                    const scheduleData = schedule as any;
+                    
+                    // time_statusで空き状況を判定（2=満席、1=空きあり等を想定）
+                    const isAvailable = scheduleData.time_status !== 2;
+                    
+                    timeSlots.push({
+                        time: time, // キーが時間（例：1040, 1100）
+                        endTime: scheduleData.end_time || '',
+                        available: isAvailable,
+                        selected: false,
+                        capacity: scheduleData.capacity || 0,
+                        reserved: scheduleData.reserved || 0,
+                        reservationType: scheduleData.reservation_type || '1日券',
+                        timeSlotId: scheduleData.schedule_code || time
+                    });
+                }
+            }
+
+            console.log(`✅ パビリオン${eventCode}時間帯取得完了: ${timeSlots.length}件`);
+            return timeSlots;
+
+        } catch (error) {
+            console.error(`❌ パビリオン${eventCode}時間帯取得エラー:`, error);
+            return [];
+        }
     }
 
     /**

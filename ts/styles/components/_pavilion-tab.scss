@@ -76,6 +76,7 @@
     justify-content: center;
     transition: all 0.2s;
     font-size: 16px;
+    position: relative;
 
     &:hover {
         background: #f3f4f6;
@@ -96,6 +97,24 @@
             background: #1a365d;
         }
     }
+    
+    /* カウントバッジ */
+    .ytomo-count-badge {
+        position: absolute;
+        top: -8px;
+        right: -8px;
+        background: #ff4444;
+        color: white;
+        border-radius: 10px;
+        padding: 2px 6px;
+        font-size: 10px;
+        font-weight: bold;
+        min-width: 16px;
+        text-align: center;
+        line-height: 1.2;
+        pointer-events: none;
+        z-index: 10;
+    }
 
     &:focus {
         outline: 2px solid #2c5aa0;
@@ -111,12 +130,9 @@
 /* パビリオン一覧エリア */
 .ytomo-pavilion-list {
     flex: 1;
-    overflow-y: auto;
     background: white;
     border-radius: 8px;
     border: 1px solid #e2e8f0;
-    min-height: 400px;
-    max-height: calc(100vh - 300px);
 }
 
 .ytomo-pavilion-item {
@@ -131,6 +147,10 @@
 
     &:hover {
         background: #f8fafc;
+    }
+
+    &.hidden {
+        display: none;
     }
 }
 
@@ -235,8 +255,7 @@
     border: 1px solid;
     min-width: 80px;
     text-align: center;
-    display: block;
-    width: 100%;
+    display: inline-block;
     
     // 子要素のポインターイベントを無効化してボタン全体をクリック可能にする
     * {
@@ -249,14 +268,14 @@
         color: #166534;
 
         &:hover {
-            background: #22c55e;
-            color: white;
+            background: #bbf7d0;  // 選択より薄い色
+            color: #166534;
             transform: translateY(-1px);
             box-shadow: 0 2px 8px rgba(34, 197, 94, 0.3);
         }
 
         &.selected {
-            background: #22c55e;
+            background: #22c55e;  // しっかりとした濃い色
             color: white;
             box-shadow: 0 2px 8px rgba(34, 197, 94, 0.3);
         }
@@ -266,22 +285,29 @@
         background: #fef2f2;
         border-color: #ef4444;
         color: #991b1b;
-        cursor: not-allowed;
-        opacity: 0.6;
+        cursor: pointer;
+        opacity: 1;
 
         &:hover {
-            transform: none;
-            box-shadow: none;
+            background: #fecaca;  // hover時の色変化
+            color: #991b1b;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(239, 68, 68, 0.3);
+        }
+
+        &.selected {
+            background: #ef4444;  // 選択時の色変化
+            color: white;
+            box-shadow: 0 2px 8px rgba(239, 68, 68, 0.3);
         }
     }
 
     &:focus {
-        outline: 2px solid #2c5aa0;
-        outline-offset: 2px;
+        outline: none;  // focus囲みを削除
     }
 
-    &:disabled {
-        pointer-events: none;
+    &.hidden {
+        display: none;
     }
 }
 
@@ -326,22 +352,26 @@
     }
 }
 
+/* Cookie設定ボタンを非表示 */
+#ot-sdk-btn-floating {
+    display: none !important;
+}
+
 /* 予約結果表示 */
 .ytomo-result-display {
-    position: absolute;
-    bottom: 100%;
-    right: 16px;
-    margin-bottom: 8px;
+    position: fixed;
+    top: 20px;
+    right: 20px;
     padding: 8px 12px;
     border-radius: 6px;
     font-size: 13px;
     font-weight: 500;
     opacity: 0;
-    transform: translateY(10px);
+    transform: translateY(-10px);
     transition: all 0.3s;
     pointer-events: none;
     max-width: 300px;
-    z-index: 2147483648;
+    z-index: 10001;
 
     &.show {
         opacity: 1;
@@ -450,6 +480,63 @@
         content: "なし";
         color: #9ca3af;
         font-style: italic;
+    }
+}
+
+/* ステータスFAB（予約結果表示用） */
+.ytomo-status-fab {
+    position: fixed;
+    bottom: 86px;  /* 予約FABの上に配置 */
+    right: 20px;
+    min-width: 140px;
+    min-height: 50px;
+    border: none;
+    border-radius: 6px;
+    color: white;
+    font-size: 11px;
+    font-weight: 500;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    transition: all 0.3s ease;
+    z-index: 1001;  /* 予約FABより上 */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 8px 12px;
+    line-height: 1.2;
+    
+    /* 成功状態 */
+    &.success {
+        background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+        box-shadow: 0 4px 12px rgba(34, 197, 94, 0.4);
+    }
+    
+    /* エラー状態 */
+    &.error {
+        background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+        box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4);
+    }
+    
+    /* 情報状態 */
+    &.info {
+        background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+        box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+    }
+    
+    &:hover:not(:disabled) {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
+    }
+    
+    &:active:not(:disabled) {
+        transform: translateY(0);
+    }
+    
+    &:focus {
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.3), 0 4px 12px rgba(0, 0, 0, 0.3);
     }
 }
 

@@ -4,7 +4,7 @@
 
 公式サイトのJavaScriptファイル解析により発見した、パビリオン検索・時間帯取得・予約実行のためのAPI完全仕様。
 
-**最新更新**: 2025-08-22 - チケット管理・抽選カレンダーAPI追加
+**最新更新**: 2025-08-23 - パビリオン詳細APIレスポンス構造修正（time_slots配列）
 
 ## 必須ヘッダー（全API共通）
 
@@ -34,6 +34,20 @@ const entranceDateParam = `&entrance_date=${entranceDate}`;  // 常に必要
 const paginationParam = `&count=1&limit=999&event_type=${eventType}&next_token=`;
 ```
 
+### レスポンス構造
+```typescript
+interface SearchResponse {
+    list?: PavilionSearchItem[];  // パビリオン一覧（時間帯情報なし）
+    // その他のレスポンス情報
+}
+
+interface PavilionSearchItem {
+    event_code: string;     // パビリオンID
+    event_name: string;     // パビリオン名
+    // その他の基本情報（時間帯は含まない）
+}
+```
+
 ### 実際の例
 ```
 /api/d/events?ticket_ids[]=NCSQCZ9PC6&event_name=%E6%97%A5%E6%9C%AC&entrance_date=20250826&count=1&limit=999&event_type=0&next_token=&channel=4
@@ -60,14 +74,18 @@ const apiUrl = `/api/d/events/${eventCode}?${ticketIdsParam}${entranceDateParam}
 ### レスポンス構造
 ```typescript
 interface EventDetailResponse {
-    event_schedules: EventSchedule[];  // 時間帯情報
+    time_slots: TimeSlot[];  // 時間帯情報（実際のプロパティ名）
     // その他のイベント詳細情報
 }
 
-interface EventSchedule {
-    start_time: string;     // 開始時間
-    schedule_name: string;  // スケジュール名
-    // その他のスケジュール情報
+interface TimeSlot {
+    start_time: string;        // 開始時間
+    end_time?: string;         // 終了時間
+    available: boolean;        // 空き状況
+    capacity?: number;         // 定員
+    reserved?: number;         // 予約済み数
+    reservation_type?: string; // 予約タイプ
+    id?: string;              // スケジュールID
 }
 ```
 
@@ -422,7 +440,8 @@ enum ChannelType {
 ---
 
 **作成日**: 2025-08-22  
-**最終更新**: 2025-08-22  
-**解析対象**: event_search.js, event_time.js, app-page.js  
+**最終更新**: 2025-08-23  
+**解析対象**: event_search.js, event_time.js, app-page.js, ref/index.js実装  
 **検証環境**: 大阪万博2025公式サイト  
-**動作確認**: ✅ POST `/api/d/user_event_reservations` 実装完了・テスト済み
+**動作確認**: ✅ POST `/api/d/user_event_reservations` 実装完了・テスト済み  
+**修正履歴**: 2025-08-23 - パビリオン詳細APIレスポンス構造を`event_schedules`から`time_slots`に修正

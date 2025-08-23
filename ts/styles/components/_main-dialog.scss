@@ -14,7 +14,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    z-index: 2147483647;
+    z-index: 10000;
     opacity: 0;
     animation: fadeIn 0.2s ease-out forwards;
 }
@@ -80,7 +80,7 @@
 .ytomo-dialog-close {
     background: none;
     border: none;
-    color: white;
+    color: black;
     font-size: 24px;
     width: 32px;
     height: 32px;
@@ -92,11 +92,11 @@
     transition: background-color 0.2s;
 
     &:hover {
-        background-color: rgba(255, 255, 255, 0.15);
+        background-color: rgba(0, 0, 0, 0.1);
     }
 
     &:focus {
-        outline: 2px solid rgba(255, 255, 255, 0.5);
+        outline: 2px solid rgba(0, 0, 0, 0.5);
         outline-offset: 2px;
     }
 }
