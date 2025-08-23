@@ -10,7 +10,7 @@
 // @run-at       document-end
 // ==/UserScript==
 
-// Built: 2025/08/24 04:19:39
+// Built: 2025/08/24 04:28:25
 
 
 (function webpackUniversalModuleDefinition(root, factory) {
@@ -11706,6 +11706,11 @@ class MainDialogFabImpl {
                     console.log(`🎫 入場日時選択解除: ${date}`);
                     // キャッシュから削除
                     this.clearEntranceSelectionFromCache();
+                    // チケット選択もクリア
+                    this.reactiveTicketManager.clearSelection();
+                    console.log('🧹 チケット選択をクリア');
+                    // パビリオンタブの日付表示を更新
+                    this.updatePavilionTabSelectedDates();
                 }
                 else {
                     // 未選択のボタンをクリック → 全ての入場予約ボタンを解除してから選択
@@ -11717,6 +11722,17 @@ class MainDialogFabImpl {
                     console.log(`🎫 入場日時選択: ${date} (他の日付は自動解除)`);
                     // 選択をキャッシュに保存
                     this.saveEntranceSelectionToCache(date);
+                    // 該当日付のチケットを自動選択
+                    this.reactiveTicketManager.selectTicketsByDate(date);
+                    console.log(`🎯 該当日付 ${date} のチケットを自動選択`);
+                    // スマホデバッグ: 選択後の状態確認
+                    const selectedCount = this.reactiveTicketManager.getSelectedTicketCount();
+                    console.log(`📱 スマホデバッグ: 選択後のチケット数 = ${selectedCount}`);
+                    if (navigator.userAgent.match(/Mobi/)) {
+                        alert(`スマホ: ${date}選択後、チケット数=${selectedCount}`);
+                    }
+                    // パビリオンタブの日付表示を更新
+                    this.updatePavilionTabSelectedDates();
                 }
             });
         });
@@ -12053,6 +12069,12 @@ class MainDialogFabImpl {
             this.showPavilionLoading('お気に入りを読み込み中...');
             const { ticketIds, entranceDate } = this.getSearchParameters();
             const pavilions = await this.pavilionManager.loadFavoritePavilions();
+            // お気に入り未登録時は即座に終了
+            if (pavilions.length === 0) {
+                console.log('⭐ お気に入り未登録のため処理終了');
+                this.showPavilionError('お気に入りが登録されていません');
+                return;
+            }
             // お気に入りパビリオンは最初から全パビリオンの時間帯情報を取得
             const allPavilionIds = pavilions.map(p => p.id);
             const timeSlotsMap = await this.fetchTimeSlotsForPavilionIds(allPavilionIds, ticketIds, entranceDate);
@@ -13232,6 +13254,10 @@ class MainDialogFabImpl {
             // 既存のパビリオンに時間帯情報を設定
             for (const pavilion of this.lastSearchResults) {
                 pavilion.timeSlots = timeSlotsMap.get(pavilion.id) || [];
+                // スマホデバッグ: 時間帯情報取得確認
+                if (navigator.userAgent.match(/Mobi/) && pavilion.timeSlots.length === 0) {
+                    console.log(`📱 スマホデバッグ: ${pavilion.name}の時間帯情報が空`);
+                }
             }
             console.log(`🔄 全パビリオン更新: ${this.lastSearchResults.length}件（満員も含む）`);
             // 全パビリオンを表示
