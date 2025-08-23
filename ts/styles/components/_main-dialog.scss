@@ -75,11 +75,6 @@
     display: flex;
     align-items: center;
     gap: 8px;
-
-    &::before {
-        content: "🎡";
-        font-size: 20px;
-    }
 }
 
 .ytomo-dialog-close {
@@ -151,6 +146,25 @@
         outline: 2px solid #2c5aa0;
         outline-offset: -2px;
     }
+}
+
+.ytomo-tab-content {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    align-items: center;
+}
+
+.ytomo-tab-title {
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.ytomo-tab-dates {
+    font-size: 12px;
+    color: #6b7280;
+    line-height: 1;
+    min-height: 14px;
 }
 
 .ytomo-tab-count,

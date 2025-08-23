@@ -104,6 +104,127 @@ export class PavilionManager {
     }
 
     /**
+     * 公式API仕様に従ってAPIのURLを構築
+     */
+    private buildAPIUrl(query: string, ticketIds: string[], entranceDate?: string): string {
+        // デフォルト値の設定
+        const defaultEntranceDate = entranceDate || new Date(Date.now() + 24 * 60 * 60 * 1000)
+            .toISOString().slice(0, 10).replace(/-/g, ''); // 明日の日付
+        const defaultChannel = '4'; // fastタイプ
+        
+        // URLパラメータを構築
+        const ticketIdsParam = ticketIds.length > 0 ? 
+            ticketIds.map(id => `ticket_ids[]=${id}`).join('&') : '';
+        const eventNameParam = query ? `&event_name=${encodeURIComponent(query)}` : '';
+        const entranceDateParam = `&entrance_date=${defaultEntranceDate}`;
+        const paginationParam = `&count=1&limit=999&event_type=0&next_token=`;
+        const channelParam = `&channel=${defaultChannel}`;
+        
+        return `/api/d/events?${ticketIdsParam}${eventNameParam}${entranceDateParam}${paginationParam}${channelParam}`;
+    }
+
+
+    /**
+     * 検索結果をパース（ref/index.jsから復元）
+     */
+    private parseSearchResults(data: any): PavilionData[] {
+        const pavilions: PavilionData[] = [];
+        
+        try {
+            if (data.list && Array.isArray(data.list)) {
+                for (const item of data.list) {
+                    const pavilion = this.parseEventItem(item);
+                    if (pavilion) {
+                        pavilions.push(pavilion);
+                    }
+                }
+            }
+        } catch (error) {
+            console.error('❌ 検索結果パースエラー:', error);
+        }
+        
+        return pavilions;
+    }
+
+    /**
+     * イベント項目をパビリオンデータに変換（ref/index.jsから復元）
+     */
+    private parseEventItem(item: any): PavilionData | null {
+        try {
+            const pavilionId = item.event_code || item.id;
+            if (!pavilionId) return null;
+
+            const pavilion: PavilionData = {
+                id: pavilionId,
+                name: item.event_name || item.name || 'Unknown',
+                description: item.description || '',
+                isFavorite: this.favoriteIds.has(pavilionId),
+                timeSlots: this.parseTimeSlots(item.time_slots || []),
+                reservationStatus: this.determineReservationStatus(item),
+                location: item.location || '',
+                category: item.category || '',
+                imageUrl: item.image_url || '',
+                tags: item.tags || []
+            };
+
+            return pavilion;
+        } catch (error) {
+            console.error('❌ イベント項目パースエラー:', error);
+            return null;
+        }
+    }
+
+    /**
+     * 時間帯データをパース（ref/index.jsから復元）
+     */
+    private parseTimeSlots(timeSlots: any[]): PavilionTimeSlot[] {
+        return timeSlots.map(slot => {
+            try {
+                return {
+                    time: slot.start_time || slot.time || '',
+                    endTime: slot.end_time || '',
+                    available: slot.available !== false && slot.status !== 'full',
+                    selected: false,
+                    capacity: slot.capacity || 0,
+                    reserved: slot.reserved || 0,
+                    reservationType: slot.reservation_type || '1日券',
+                    timeSlotId: slot.id || slot.time_slot_id || ''
+                };
+            } catch (error) {
+                console.warn('⚠️ 時間帯パースエラー:', error);
+                return {
+                    time: '',
+                    endTime: '',
+                    available: false,
+                    selected: false,
+                    reservationType: '1日券'
+                };
+            }
+        }).filter(slot => slot.time); // 有効な時間帯のみ
+    }
+
+    /**
+     * 予約状況を判定（ref/index.jsから復元）
+     */
+    private determineReservationStatus(item: any): string {
+        if (item.reservation_status) {
+            return item.reservation_status;
+        }
+
+        // 時間帯の状況から判定
+        const timeSlots = item.time_slots || [];
+        const availableSlots = timeSlots.filter((slot: any) => slot.available !== false);
+        
+        if (availableSlots.length === 0) {
+            return 'full';
+        } else if (availableSlots.length < timeSlots.length / 2) {
+            return 'limited';
+        } else {
+            return 'available';
+        }
+    }
+
+    /**
      * パビリオン検索・取得
      */
     async searchPavilions(
@@ -112,23 +233,22 @@ export class PavilionManager {
         entranceDate?: string
     ): Promise<PavilionData[]> {
         console.log(`🏛️ パビリオン検索: "${query}" (チケット: ${ticketIds.length}個)`);
+        console.log(`🔍 検索チケットIDs:`, ticketIds);
         
         try {
-            // 調査結果に基づくパビリオン検索API実装
-            const params = this.getCurrentPageParams();
-            const ticketIdsParam = ticketIds.map(id => `ticket_ids[]=${id}`).join('&');
-            const eventNameParam = query ? `&event_name=${encodeURIComponent(query)}` : '';
-            const entranceDateParam = `&entrance_date=${entranceDate || params.entranceDate}`;
-            const paginationParam = `&count=1&limit=999&event_type=0&next_token=`;
-            const apiUrl = `/api/d/events?${ticketIdsParam}${eventNameParam}${entranceDateParam}${paginationParam}&channel=${params.lottery}`;
-
+            // 公式API仕様に従ってURLパラメータを構築
+            const apiUrl = this.buildAPIUrl(query, ticketIds, entranceDate);
+            console.log(`🔍 APIエンドポイント:`, apiUrl);
+            
             const response = await fetch(apiUrl, {
                 method: 'GET',
                 headers: {
+                    'Accept': 'application/json, text/plain, */*',
                     'Accept-Language': 'ja,en-US;q=0.9,en;q=0.8,zh-TW;q=0.7,zh;q=0.6',
-                    'X-Api-Lang': 'ja'
+                    'X-Api-Lang': 'ja',
+                    'X-Requested-With': 'XMLHttpRequest'
                 },
-                credentials: 'same-origin'
+                credentials: 'include'
             });
 
             if (!response.ok) {
@@ -154,105 +274,6 @@ export class PavilionManager {
         }
     }
 
-    /**
-     * 検索結果をパース
-     */
-    private parseSearchResults(data: any): PavilionData[] {
-        const pavilions: PavilionData[] = [];
-        
-        try {
-            if (data.results && Array.isArray(data.results)) {
-                for (const item of data.results) {
-                    const pavilion = this.parseEventItem(item);
-                    if (pavilion) {
-                        pavilions.push(pavilion);
-                    }
-                }
-            }
-        } catch (error) {
-            console.error('❌ 検索結果パースエラー:', error);
-        }
-
-        return pavilions;
-    }
-
-    /**
-     * イベント項目をパビリオンデータに変換
-     */
-    private parseEventItem(item: any): PavilionData | null {
-        try {
-            const pavilionId = item.event_code || item.id;
-            if (!pavilionId) return null;
-
-            const pavilion: PavilionData = {
-                id: pavilionId,
-                name: item.event_name || item.name || 'Unknown',
-                description: item.description || '',
-                isFavorite: this.favoriteIds.has(pavilionId),
-                timeSlots: this.parseTimeSlots(item.time_slots || []),
-                reservationStatus: this.determineReservationStatus(item),
-                location: item.location || '',
-                category: item.category || '',
-                imageUrl: item.image_url || '',
-                tags: item.tags || []
-            };
-
-            return pavilion;
-
-        } catch (error) {
-            console.error('❌ イベント項目パースエラー:', error);
-            return null;
-        }
-    }
-
-    /**
-     * 時間帯データをパース
-     */
-    private parseTimeSlots(timeSlots: any[]): PavilionTimeSlot[] {
-        return timeSlots.map(slot => {
-            try {
-                return {
-                    time: slot.start_time || slot.time || '',
-                    endTime: slot.end_time || '',
-                    available: slot.available !== false && slot.status !== 'full',
-                    selected: false,
-                    capacity: slot.capacity || 0,
-                    reserved: slot.reserved || 0,
-                    reservationType: slot.reservation_type || '1日券',
-                    timeSlotId: slot.id || slot.time_slot_id || ''
-                };
-            } catch (error) {
-                console.warn('⚠️ 時間帯パースエラー:', error);
-                return {
-                    time: '',
-                    available: false,
-                    selected: false,
-                    reservationType: '1日券'
-                };
-            }
-        }).filter(slot => slot.time); // 有効な時間帯のみ
-    }
-
-    /**
-     * 予約状況を判定
-     */
-    private determineReservationStatus(item: any): string {
-        if (item.reservation_status) {
-            return item.reservation_status;
-        }
-        
-        // 時間帯の状況から判定
-        const timeSlots = item.time_slots || [];
-        const availableSlots = timeSlots.filter((slot: any) => slot.available !== false);
-        
-        if (availableSlots.length === 0) {
-            return 'full';
-        } else if (availableSlots.length < timeSlots.length / 2) {
-            return 'limited';
-        } else {
-            return 'available';
-        }
-    }
 
     /**
      * お気に入りパビリオンを読み込み
@@ -447,7 +468,7 @@ export class PavilionManager {
             const request: ReservationRequest = {
                 pavilionId: pavilionId,
                 timeSlotId: timeSlot.timeSlotId || timeSlot.time,
-                ticketIds: selectedTickets.map(t => t.id),
+                ticketIds: selectedTickets.map(t => t.ticket_id),
                 companions: selectedTickets.length - 1
             };
 
@@ -585,6 +606,13 @@ export class PavilionManager {
         }
         
         console.log('🧹 選択済み時間帯をクリア');
+    }
+
+    /**
+     * 全パビリオンデータを取得
+     */
+    getAllPavilions(): PavilionData[] {
+        return Array.from(this.pavilions.values());
     }
 
     /**

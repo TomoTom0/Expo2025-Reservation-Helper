@@ -1,5 +1,6 @@
 import { PageChecker } from './page-utils';
 import { getTicketManager, TicketManager } from './ticket-manager';
+import { ReactiveTicketManager, getReactiveTicketManager } from './reactive-ticket-manager';
 import { getPavilionManager, PavilionManager } from './pavilion-manager';
 
 /**
@@ -24,6 +25,7 @@ export class MainDialogFabImpl implements MainDialogFab {
     private ytFabButton: HTMLElement | null = null;
     private mainDialogContainer: HTMLElement | null = null;
     private ticketManager!: TicketManager;
+    private reactiveTicketManager!: ReactiveTicketManager;
     private pavilionManager!: PavilionManager;
 
     /**
@@ -41,8 +43,14 @@ export class MainDialogFabImpl implements MainDialogFab {
         // チケットマネージャーを初期化
         this.ticketManager = getTicketManager();
         
+        // リアクティブチケットマネージャーを初期化
+        this.reactiveTicketManager = getReactiveTicketManager(this.ticketManager);
+        
         // パビリオンマネージャーを初期化
         this.pavilionManager = getPavilionManager();
+        
+        // リアクティブUI更新を設定
+        this.setupReactiveUIUpdaters();
 
         // 既存のFABコンテナを確認
         let fabContainer = document.getElementById('ytomo-fab-container');
@@ -135,7 +143,7 @@ export class MainDialogFabImpl implements MainDialogFab {
         this.hideMainDialog();
         
         // チケットマネージャーにチケットデータをロード
-        await this.ticketManager.loadAllTickets();
+        await this.reactiveTicketManager.loadAllTickets();
         
         // デバッグ: 読み込まれたチケットID一覧
         const loadedTickets = this.ticketManager.getAllTickets();
@@ -187,6 +195,7 @@ export class MainDialogFabImpl implements MainDialogFab {
 
         // イベントリスナーを設定
         this.setupDialogEventListeners();
+        this.setupPavilionTabEvents();
 
         // 表示状態を更新
         mainDialogVisible = true;
@@ -274,7 +283,29 @@ export class MainDialogFabImpl implements MainDialogFab {
         });
 
         console.log(`🔄 タブ切り替え: ${tabName}`);
-        console.log(`🔍 タブ切り替え時のselectedTicketIds:`, Array.from(this.ticketManager.selectedTicketIds));
+        console.log(`🔍 タブ切り替え時のselectedTicketIds:`, Array.from(this.reactiveTicketManager.getSelectedTicketIds()));
+    }
+
+    /**
+     * リアクティブUI更新を設定
+     */
+    private setupReactiveUIUpdaters(): void {
+        // チケット選択関連のUI更新をまとめて登録
+        this.reactiveTicketManager.registerUIUpdaters({
+            ticketSelection: () => {
+                this.updateTicketSelection();
+                this.updateTicketTabCount();
+                this.updateSelectedInfo();
+                this.updatePavilionTabSelectedDates();
+                this.updateReservationButton();
+            },
+            ticketList: () => {
+                // チケット一覧が変更された場合の更新
+                // 必要に応じて実装
+            }
+        });
+        
+        console.log('✅ リアクティブUI更新システム設定完了');
     }
 
     /**
@@ -703,51 +734,24 @@ export class MainDialogFabImpl implements MainDialogFab {
                 const target = e.target as HTMLButtonElement;
                 if (target.disabled) return;
 
-                // 選択状態を切り替え
-                target.classList.toggle('selected');
-                
                 const date = target.dataset['date'];
-                if (date) {
+                if (!date) return;
+
+                const isCurrentlySelected = target.classList.contains('selected');
+                
+                if (isCurrentlySelected) {
+                    // 現在選択中のボタンをクリック → 選択解除
+                    target.classList.remove('selected');
+                    console.log(`🎫 入場日時選択解除: ${date}`);
+                } else {
+                    // 未選択のボタンをクリック → 他の日付を全て解除してから選択
+                    const allEntranceButtons = container.querySelectorAll('.ytomo-entrance-date-btn.selected');
+                    allEntranceButtons.forEach(btn => {
+                        btn.classList.remove('selected');
+                    });
+                    
+                    target.classList.add('selected');
                     console.log(`🎫 入場日時選択: ${date}`);
-                    
-                    // その日付に対応するチケットを選択
-                    const ticketElement = target.closest('.ytomo-ticket-item') as HTMLElement;
-                    const ticketId = ticketElement?.dataset['ticketId'];
-                    
-                    if (ticketId) {
-                        // 入場予約ボタンの選択状態に応じてチケット選択を制御
-                        const isButtonSelected = target.classList.contains('selected');
-                        const selectedTickets = this.ticketManager.getSelectedTickets();
-                        const isTicketSelected = selectedTickets.some(t => t.ticket_id === ticketId);
-                        
-                        if (isButtonSelected && !isTicketSelected) {
-                            // ボタン選択済み、チケット未選択 → チケット選択
-                            const result = this.ticketManager.toggleTicketSelection(ticketId);
-                            console.log(`✅ チケット選択: ${ticketId} → ${result ? '追加' : '削除'}`);
-                        } else if (!isButtonSelected && isTicketSelected) {
-                            // ボタン未選択、チケット選択済み → チケット選択解除
-                            const result = this.ticketManager.toggleTicketSelection(ticketId);
-                            console.log(`✅ チケット選択解除: ${ticketId} → ${result ? '追加' : '削除'}`);
-                        }
-                        
-                        // 選択状態確認
-                        const currentSelected = this.ticketManager.getSelectedTickets();
-                        const allTickets = this.ticketManager.getAllTickets();
-                        const hasTicket = allTickets.some(t => t.ticket_id === ticketId);
-                        console.log(`🎫 現在の選択チケット数: ${currentSelected.length}`, currentSelected.map(t => t.ticket_id));
-                        console.log(`🔍 チケット${ticketId}は登録されているか: ${hasTicket}`);
-                        console.log(`🔍 入場予約ボタンでのthis.ticketManager:`, this.ticketManager);
-                        console.log(`🔍 selectedTicketIds:`, Array.from(this.ticketManager.selectedTicketIds));
-                        console.log(`🔍 tickets.has(${ticketId}):`, this.ticketManager.getAllTickets().some(t => t.ticket_id === ticketId));
-                        
-                        // UI更新
-                        this.updateTicketSelection();
-                        this.updateTicketTabCount();
-                        this.updateSelectedInfo();
-                        this.updatePavilionTabSelectedDates();
-                        
-                        console.log(`✅ 入場予約ボタンクリック: ${ticketId} - ボタン:${isButtonSelected ? '選択' : '未選択'}, チケット選択状態更新`);
-                    }
                 }
             });
         });
@@ -761,10 +765,27 @@ export class MainDialogFabImpl implements MainDialogFab {
                 const ticketId = ticketItem?.dataset['ticketId'];
                 
                 if (ticketId) {
-                    this.ticketManager.toggleTicketSelection(ticketId);
-                    this.updateTicketSelection();
-                    this.updateTicketTabCount();
-                    this.updateSelectedInfo();
+                    // 入場予約ボタンやその子要素がクリックされた場合
+                    const isEntranceButton = target.closest('.ytomo-entrance-date-btn');
+                    
+                    if (isEntranceButton) {
+                        // 入場予約ボタンの選択状態に応じてチケット選択を制御
+                        const isButtonSelected = isEntranceButton.classList.contains('selected');
+                        const selectedTickets = this.ticketManager.getSelectedTickets();
+                        const isTicketSelected = selectedTickets.some(t => t.ticket_id === ticketId);
+                        
+                        if (isButtonSelected && !isTicketSelected) {
+                            // ボタン選択済み、チケット未選択 → チケット選択
+                            this.reactiveTicketManager.toggleTicketSelection(ticketId);
+                        } else if (!isButtonSelected && isTicketSelected) {
+                            // ボタン未選択、チケット選択済み → チケット選択解除
+                            this.reactiveTicketManager.toggleTicketSelection(ticketId);
+                        }
+                    } else {
+                        // その他の領域のクリック → 通常のトグル
+                        this.reactiveTicketManager.toggleTicketSelection(ticketId);
+                    }
+                    // UI更新はリアクティブシステムで自動実行される
                 }
             });
         });
@@ -833,11 +854,7 @@ export class MainDialogFabImpl implements MainDialogFab {
             }
         });
         
-        // UI更新のみ（チケット選択は入場予約ボタンで制御）
-        this.updateTicketSelection();
-        this.updateTicketTabCount();
-        this.updateSelectedInfo();
-        this.updatePavilionTabSelectedDates();
+        // UI更新はリアクティブシステムで自動実行される（チケット選択は入場予約ボタンで制御）
     }
 
 
@@ -879,7 +896,7 @@ export class MainDialogFabImpl implements MainDialogFab {
         }
 
         try {
-            await this.ticketManager.addExternalTicket(ticketId, label);
+            await this.reactiveTicketManager.addExternalTicket(ticketId, label);
             
             // 成功時はタブを再初期化
             await this.initializeTicketTab();
@@ -1094,42 +1111,6 @@ export class MainDialogFabImpl implements MainDialogFab {
         }
     }
 
-    /**
-     * パビリオン検索処理
-     */
-    private async handlePavilionSearch(): Promise<void> {
-        console.log('🔍 パビリオン検索実行');
-
-        const searchInput = this.mainDialogContainer?.querySelector('#pavilion-search-input') as HTMLInputElement;
-        const query = searchInput?.value.trim() || '';
-
-        try {
-            this.showPavilionLoading('検索中...');
-
-            console.log(`🔍 パビリオン検索でのthis.ticketManager:`, this.ticketManager);
-            console.log(`🔍 パビリオン検索でのselectedTicketIds:`, Array.from(this.ticketManager.selectedTicketIds));
-            console.log(`🔍 パビリオン検索でのgetSelectedTickets():`, this.ticketManager.getSelectedTickets());
-            
-            const ticketIds = Array.from(this.ticketManager.selectedTicketIds);
-            
-            console.log(`📋 検索パラメータ: query="${query}", 選択チケット数=${ticketIds.length}`);
-            
-            // 選択チケットがない場合は警告表示
-            if (ticketIds.length === 0) {
-                this.showPavilionError('チケットと入場日を選択してください');
-                return;
-            }
-
-            const pavilions = await this.pavilionManager.searchPavilions(query, ticketIds);
-            this.displayPavilions(pavilions);
-
-            console.log(`✅ パビリオン検索完了: ${pavilions.length}個`);
-
-        } catch (error) {
-            console.error('❌ パビリオン検索エラー:', error);
-            this.showPavilionError('検索に失敗しました');
-        }
-    }
 
     /**
      * お気に入り読み込み処理
@@ -1430,22 +1411,6 @@ export class MainDialogFabImpl implements MainDialogFab {
         });
     }
 
-    /**
-     * 選択された日付を取得
-     */
-    private getSelectedDates(): string[] {
-        const selectedButtons = this.mainDialogContainer?.querySelectorAll('.ytomo-date-button.selected, .ytomo-entrance-date-button.selected');
-        const dates: string[] = [];
-        
-        selectedButtons?.forEach(button => {
-            const date = button.getAttribute('data-date');
-            if (date) {
-                dates.push(date);
-            }
-        });
-        
-        return [...new Set(dates)]; // 重複除去
-    }
 
     /**
      * 選択情報を更新
@@ -1541,14 +1506,185 @@ export class MainDialogFabImpl implements MainDialogFab {
      */
     private updatePavilionTabSelectedDates(): void {
         const tabDates = this.mainDialogContainer?.querySelector('#pavilion-tab-dates');
-        const selectedDates = this.getSelectedDates();
         
-        const dateStr = selectedDates.length > 0 ? selectedDates.map(date => this.formatDate(date)).join(', ') : '';
+        // 選択された入場予約ボタンの日付を取得
+        const selectedDates = new Set<string>();
+        
+        // 複数のセレクタでチェック
+        const selectors = [
+            '.ytomo-entrance-date-btn.selected',
+            '.ytomo-entrance-date-button.selected',
+            '[data-date].selected'
+        ];
+        
+        let selectedEntranceButtons: NodeListOf<Element> | undefined;
+        for (const selector of selectors) {
+            selectedEntranceButtons = this.mainDialogContainer?.querySelectorAll(selector);
+            if (selectedEntranceButtons && selectedEntranceButtons.length > 0) {
+                console.log(`🔍 入場予約ボタン発見: ${selector}, 件数: ${selectedEntranceButtons.length}`);
+                break;
+            }
+        }
+        
+        if (!selectedEntranceButtons || selectedEntranceButtons.length === 0) {
+            console.log(`⚠️ 選択済み入場予約ボタンが見つかりません`);
+        }
+        
+        selectedEntranceButtons?.forEach(button => {
+            const date = (button as HTMLElement).dataset['date'];
+            console.log(`🔍 ボタンの日付データ:`, date);
+            if (date) {
+                selectedDates.add(date);
+            }
+        });
+        
+        const dateStr = selectedDates.size > 0 ? 
+            Array.from(selectedDates).map(date => this.formatDate(date)).join(', ') : '';
         
         // タブボタン下半分の表示
         if (tabDates) {
             tabDates.textContent = dateStr;
         }
+        
+        console.log(`🗓️ パビリオンタブ日付更新: ${dateStr}`);
+    }
+
+    /**
+     * パビリオンタブのイベントリスナーを設定
+     */
+    private setupPavilionTabEvents(): void {
+        // 検索ボタン
+        const searchButton = this.mainDialogContainer?.querySelector('#search-button');
+        if (searchButton) {
+            searchButton.addEventListener('click', () => this.handlePavilionSearch());
+        }
+
+        // フィルターボタン（空きのみ表示）
+        const filterButton = this.mainDialogContainer?.querySelector('#filter-button');
+        if (filterButton) {
+            filterButton.addEventListener('click', () => this.toggleAvailableOnlyFilter());
+        }
+
+        // 更新ボタン
+        const refreshButton = this.mainDialogContainer?.querySelector('#refresh-button');
+        if (refreshButton) {
+            refreshButton.addEventListener('click', () => this.handlePavilionSearch());
+        }
+
+        // お気に入りボタン
+        const favoritesButton = this.mainDialogContainer?.querySelector('#favorites-button');
+        if (favoritesButton) {
+            favoritesButton.addEventListener('click', () => this.toggleFavoritesFilter());
+        }
+
+        // 検索入力でEnterキー
+        const searchInput = this.mainDialogContainer?.querySelector('#pavilion-search-input') as HTMLInputElement;
+        if (searchInput) {
+            searchInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    this.handlePavilionSearch();
+                }
+            });
+        }
+
+        console.log('🎪 パビリオンタブイベントリスナー設定完了');
+    }
+
+    /**
+     * パビリオン検索を実行
+     */
+    private async handlePavilionSearch(): Promise<void> {
+        try {
+            const searchInput = this.mainDialogContainer?.querySelector('#pavilion-search-input') as HTMLInputElement;
+            const query = searchInput?.value.trim() || '';
+            
+            const selectedTickets = this.reactiveTicketManager.getSelectedTickets();
+            const ticketIds = selectedTickets.map(t => t.ticket_id);
+            
+            // 選択された入場予約ボタンから日付を取得
+            const selectedEntranceButtons = this.mainDialogContainer?.querySelectorAll('.ytomo-entrance-date-btn.selected, .ytomo-entrance-date-button.selected');
+            let entranceDate: string | undefined;
+            
+            selectedEntranceButtons?.forEach(button => {
+                const date = (button as HTMLElement).dataset['date'];
+                if (date && !entranceDate) {
+                    entranceDate = date;
+                }
+            });
+
+            console.log(`🔍 パビリオン検索実行: クエリ="${query}", チケット数=${ticketIds.length}, 入場日=${entranceDate}`);
+            
+            const pavilions = await this.pavilionManager.searchPavilions(query, ticketIds, entranceDate);
+            
+            // フィルター適用
+            const filteredPavilions = this.applyFilters(pavilions);
+            
+            this.displayPavilions(filteredPavilions);
+            
+            console.log(`✅ パビリオン検索完了: ${pavilions.length}件中${filteredPavilions.length}件表示`);
+            
+        } catch (error) {
+            console.error('❌ パビリオン検索エラー:', error);
+            this.showReservationResult(`❌ 検索に失敗しました: ${error}`, 'error');
+        }
+    }
+
+    /**
+     * 空きのみフィルターを切り替え
+     */
+    private toggleAvailableOnlyFilter(): void {
+        const filterButton = this.mainDialogContainer?.querySelector('#filter-button');
+        if (!filterButton) return;
+
+        const isActive = filterButton.classList.toggle('active');
+        console.log(`📂 空きのみフィルター: ${isActive ? 'ON' : 'OFF'}`);
+
+        // 現在の検索結果に対してフィルターを再適用
+        this.reapplyFilters();
+    }
+
+    /**
+     * お気に入りフィルターを切り替え
+     */
+    private toggleFavoritesFilter(): void {
+        const favoritesButton = this.mainDialogContainer?.querySelector('#favorites-button');
+        if (!favoritesButton) return;
+
+        const isActive = favoritesButton.classList.toggle('active');
+        console.log(`⭐ お気に入りフィルター: ${isActive ? 'ON' : 'OFF'}`);
+
+        this.reapplyFilters();
+    }
+
+    /**
+     * フィルターを適用
+     */
+    private applyFilters(pavilions: any[]): any[] {
+        let filtered = [...pavilions];
+
+        const filterButton = this.mainDialogContainer?.querySelector('#filter-button');
+        const favoritesButton = this.mainDialogContainer?.querySelector('#favorites-button');
+
+        // 空きのみフィルター
+        if (filterButton?.classList.contains('active')) {
+            filtered = this.pavilionManager.filterAvailableOnly(filtered);
+        }
+
+        // お気に入りフィルター
+        if (favoritesButton?.classList.contains('active')) {
+            filtered = filtered.filter(p => p.isFavorite);
+        }
+
+        return filtered;
+    }
+
+    /**
+     * フィルターを再適用
+     */
+    private reapplyFilters(): void {
+        const allPavilions = Array.from(this.pavilionManager.getAllPavilions());
+        const filteredPavilions = this.applyFilters(allPavilions);
+        this.displayPavilions(filteredPavilions);
     }
 
     /**
@@ -1556,6 +1692,9 @@ export class MainDialogFabImpl implements MainDialogFab {
      */
     cleanup(): void {
         this.hideMainDialog();
+        
+        // リアクティブシステムを破棄
+        this.reactiveTicketManager?.destroy();
         
         if (this.ytFabButton) {
             this.ytFabButton.remove();
