@@ -10,7 +10,7 @@
 // @run-at       document-end
 // ==/UserScript==
 
-// Built: 2025/08/24 03:51:03
+// Built: 2025/08/24 04:03:25
 
 
 (function webpackUniversalModuleDefinition(root, factory) {
@@ -11558,6 +11558,53 @@ class MainDialogFabImpl {
             availableTypes
         };
         console.log('✅ 予約種類判定結果:', result);
+        // スマホ環境での詳細診断（表示決定時の情報）
+        if (/Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) &&
+            !window.ytomoDetailDiagShown) {
+            window.ytomoDetailDiagShown = true;
+            const targetDates = ['20250511', '20250824', '20250826', '20250925'];
+            if (targetDates.includes(schedule?.entrance_date)) {
+                const diagnosticInfo = {
+                    date: schedule.entrance_date,
+                    finalStatusText: result.statusText || '空白',
+                    availableTypes: result.availableTypes,
+                    // 当日予約判定詳細
+                    onTheDay: {
+                        scheduleField: schedule.on_the_day,
+                        actualReservation: ticket?.event_schedules?.some((es) => es.entrance_date === schedule.entrance_date &&
+                            es.registered_channel === '5' &&
+                            es.use_state === 0),
+                        status: (ticket?.event_schedules?.some((es) => es.entrance_date === schedule.entrance_date &&
+                            es.registered_channel === '5' &&
+                            es.use_state === 0)) ? 'あり' : 'なし'
+                    },
+                    // 空き枠予約判定詳細
+                    emptyFrame: {
+                        scheduleField: schedule.empty_frame,
+                        actualReservation: ticket?.event_schedules?.some((es) => es.entrance_date === schedule.entrance_date &&
+                            es.registered_channel === '4'),
+                        status: (ticket?.event_schedules?.some((es) => es.entrance_date === schedule.entrance_date &&
+                            es.registered_channel === '4')) ? 'あり' : 'なし'
+                    },
+                    // 期間チェック結果
+                    periods: {
+                        onTheDay: lotteryData?.on_the_day_reservation ? checkPeriod(lotteryData.on_the_day_reservation) : null,
+                        emptyFrame: lotteryData?.empty_frame_reservation ? checkPeriod(lotteryData.empty_frame_reservation) : null
+                    }
+                };
+                alert(`スマホ診断詳細:
+日付: ${diagnosticInfo.date}
+最終表示: "${diagnosticInfo.finalStatusText}"
+利用可能: [${diagnosticInfo.availableTypes.join(',')}]
+
+当日予約(1): ${diagnosticInfo.onTheDay.status}
+空き枠(3): ${diagnosticInfo.emptyFrame.status}
+
+期間状況:
+- 当日予約: ${JSON.stringify(diagnosticInfo.periods.onTheDay)}
+- 空き枠: ${JSON.stringify(diagnosticInfo.periods.emptyFrame)}`);
+            }
+        }
         return result;
     }
     /**
