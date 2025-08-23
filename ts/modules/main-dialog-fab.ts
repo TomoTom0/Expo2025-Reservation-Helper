@@ -923,9 +923,6 @@ export class MainDialogFabImpl implements MainDialogFab {
                     // スマホデバッグ: 選択後の状態確認
                     const selectedCount = this.reactiveTicketManager.getSelectedTicketCount();
                     console.log(`📱 スマホデバッグ: 選択後のチケット数 = ${selectedCount}`);
-                    if (navigator.userAgent.match(/Mobi/)) {
-                        alert(`スマホ: ${date}選択後、チケット数=${selectedCount}`);
-                    }
                     
                     // パビリオンタブの日付表示を更新
                     this.updatePavilionTabSelectedDates();

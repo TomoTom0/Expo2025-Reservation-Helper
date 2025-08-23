@@ -10,7 +10,7 @@
 // @run-at       document-end
 // ==/UserScript==
 
-// Built: 2025/08/24 04:28:25
+// Built: 2025/08/24 04:32:06
 
 
 (function webpackUniversalModuleDefinition(root, factory) {
@@ -11728,9 +11728,6 @@ class MainDialogFabImpl {
                     // スマホデバッグ: 選択後の状態確認
                     const selectedCount = this.reactiveTicketManager.getSelectedTicketCount();
                     console.log(`📱 スマホデバッグ: 選択後のチケット数 = ${selectedCount}`);
-                    if (navigator.userAgent.match(/Mobi/)) {
-                        alert(`スマホ: ${date}選択後、チケット数=${selectedCount}`);
-                    }
                     // パビリオンタブの日付表示を更新
                     this.updatePavilionTabSelectedDates();
                 }
