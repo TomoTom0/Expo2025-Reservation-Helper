@@ -1401,30 +1401,28 @@ export class MainDialogFabImpl implements MainDialogFab {
                 }
 
                 // 間隔調整（動的取得・180回制限チェック）
-                if (i < sortedTimeSlots.length - 1) {
-                    let currentInterval = this.getCurrentInterval();
-                    
-                    // 高速間隔の180回制限チェック（モード別・リアルタイム判定）
-                    const currentIntervalMode = this.getCurrentMode();
-                    if (currentIntervalMode === 'monitoring') {
-                        // 監視モード：5,15秒間隔の制限
-                        if ((currentInterval === 5 || currentInterval === 15) && this.attemptCount >= this.FAST_INTERVAL_LIMIT) {
-                            console.log(`⚠️ 監視モード ${currentInterval}秒間隔の180回制限に達しました。30秒間隔に自動変更します。`);
-                            currentInterval = 30;
-                            this.updateIntervalDropdown(30);
-                        }
-                    } else {
-                        // 予約モード：1,5秒間隔の制限
-                        if ((currentInterval === 1 || currentInterval === 5) && this.attemptCount >= this.FAST_INTERVAL_LIMIT) {
-                            console.log(`⚠️ 予約モード ${currentInterval}秒間隔の180回制限に達しました。15秒間隔に自動変更します。`);
-                            currentInterval = 15;
-                            this.updateIntervalDropdown(15);
-                        }
+                let currentInterval = this.getCurrentInterval();
+                
+                // 高速間隔の180回制限チェック（モード別・リアルタイム判定）
+                const currentIntervalMode = this.getCurrentMode();
+                if (currentIntervalMode === 'monitoring') {
+                    // 監視モード：5,15秒間隔の制限
+                    if ((currentInterval === 5 || currentInterval === 15) && this.attemptCount >= this.FAST_INTERVAL_LIMIT) {
+                        console.log(`⚠️ 監視モード ${currentInterval}秒間隔の180回制限に達しました。30秒間隔に自動変更します。`);
+                        currentInterval = 30;
+                        this.updateIntervalDropdown(30);
                     }
-                    
-                    this.attemptCount++;
-                    await this.waitWithCountdown(currentInterval);
+                } else {
+                    // 予約モード：1,5秒間隔の制限
+                    if ((currentInterval === 1 || currentInterval === 5) && this.attemptCount >= this.FAST_INTERVAL_LIMIT) {
+                        console.log(`⚠️ 予約モード ${currentInterval}秒間隔の180回制限に達しました。15秒間隔に自動変更します。`);
+                        currentInterval = 15;
+                        this.updateIntervalDropdown(15);
+                    }
                 }
+                
+                this.attemptCount++;
+                await this.waitWithCountdown(currentInterval);
 
             } catch (error) {
                 failureCount++;
