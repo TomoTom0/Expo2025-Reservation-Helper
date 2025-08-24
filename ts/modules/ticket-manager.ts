@@ -362,9 +362,16 @@ export class TicketManager {
             // 指定日付の入場予約があるかチェック
             let hasMatchingDate = false;
             if (ticket.schedules && Array.isArray(ticket.schedules)) {
-                hasMatchingDate = ticket.schedules.some(schedule => 
-                    schedule.entrance_date === date && schedule.use_state === 0
-                );
+                // 今日の日付を取得（YYYYMMDD形式）
+                const today = new Date();
+                const todayStr = `${today.getFullYear()}${String(today.getMonth() + 1).padStart(2, '0')}${String(today.getDate()).padStart(2, '0')}`;
+                
+                hasMatchingDate = ticket.schedules.some(schedule => {
+                    const isTargetDate = schedule.entrance_date === date;
+                    const isValidState = schedule.use_state === 0 || 
+                                       (schedule.use_state === 1 && date === todayStr);
+                    return isTargetDate && isValidState;
+                });
             }
             
             if (hasMatchingDate) {
@@ -411,10 +418,19 @@ export class TicketManager {
     getLatestEntranceTime(targetDate: string): string | null {
         let latestTime: string | null = null;
         
+        // 今日の日付を取得（YYYYMMDD形式）
+        const today = new Date();
+        const todayStr = `${today.getFullYear()}${String(today.getMonth() + 1).padStart(2, '0')}${String(today.getDate()).padStart(2, '0')}`;
+        
         for (const ticket of this.tickets.values()) {
             if (ticket.schedules && Array.isArray(ticket.schedules)) {
                 for (const schedule of ticket.schedules) {
-                    if (schedule.entrance_date === targetDate && schedule.use_state === 0) {
+                    // 対象日付で、状態0または（当日かつ状態1）の場合
+                    const isTargetDate = schedule.entrance_date === targetDate;
+                    const isValidState = schedule.use_state === 0 || 
+                                       (schedule.use_state === 1 && targetDate === todayStr);
+                    
+                    if (isTargetDate && isValidState) {
                         // schedule_nameから時間を抽出（例：「9:00-10:00」「14:30」など）
                         const timeMatch = schedule.schedule_name?.match(/(\d{1,2}):(\d{2})/);
                         if (timeMatch) {
