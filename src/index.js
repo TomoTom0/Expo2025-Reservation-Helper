@@ -8,7 +8,7 @@
 // @run-at       document-end
 // ==/UserScript==
 
-// Built: 2025/08/24 10:49:20
+// Built: 2025/08/24 12:05:18
 
 
 (function webpackUniversalModuleDefinition(root, factory) {
@@ -9916,7 +9916,6 @@ class MainDialogFabImpl {
                 });
                 for (const schedule of visibleSchedules) {
                     if (schedule.entrance_date) {
-                        console.log('🔍 日付デバッグ:', schedule.entrance_date, typeof schedule.entrance_date, 'use_state:', schedule.use_state);
                         // 利用可能な予約タイプがあるかチェック
                         const lotteryData = await this.fetchLotteryCalendar(schedule.entrance_date);
                         const reservationStatus = this.getReservationStatus(schedule, lotteryData, ticket);
@@ -9928,12 +9927,19 @@ class MainDialogFabImpl {
             }
         }
         const sortedDates = Array.from(dates).sort((a, b) => {
-            const dateA = new Date(a);
-            const dateB = new Date(b);
-            console.log('🔍 ソートデバッグ:', a, '=>', dateA, 'vs', b, '=>', dateB);
-            return dateA.getTime() - dateB.getTime();
+            // YYYYMMDD形式の場合は文字列比較で十分（例：20250908 < 20250911）
+            // それ以外の形式の場合はDate変換してソート
+            if (/^\d{8}$/.test(a) && /^\d{8}$/.test(b)) {
+                // YYYYMMDD形式は文字列比較
+                return a.localeCompare(b);
+            }
+            else {
+                // その他の形式はDate変換
+                const dateA = new Date(a);
+                const dateB = new Date(b);
+                return dateA.getTime() - dateB.getTime();
+            }
         });
-        console.log('🔍 ソート結果:', sortedDates);
         return sortedDates;
     }
     /**
