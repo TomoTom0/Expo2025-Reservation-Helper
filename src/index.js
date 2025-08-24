@@ -8,7 +8,7 @@
 // @run-at       document-end
 // ==/UserScript==
 
-// Built: 2025/08/24 09:47:26
+// Built: 2025/08/24 10:26:30
 
 
 (function webpackUniversalModuleDefinition(root, factory) {
@@ -8224,9 +8224,16 @@ class TicketManager {
             if (ownOnly && !ticket.isOwn) {
                 continue;
             }
-            this.selectedTicketIds.add(ticketId);
+            // 指定日付の入場予約があるかチェック
+            let hasMatchingDate = false;
+            if (ticket.schedules && Array.isArray(ticket.schedules)) {
+                hasMatchingDate = ticket.schedules.some(schedule => schedule.entrance_date === date && schedule.use_state === 0);
+            }
+            if (hasMatchingDate) {
+                this.selectedTicketIds.add(ticketId);
+            }
         }
-        console.log(`✅ ${this.selectedTicketIds.size}個のチケットを選択`);
+        console.log(`✅ ${this.selectedTicketIds.size}個のチケットを選択 (日付: ${date})`);
     }
     /**
      * 選択済みチケットID一覧を取得（デバッグ用）
@@ -8256,9 +8263,25 @@ class TicketManager {
     /**
      * 選択されたチケットの入場予約から最も遅い入場時間を取得（律速時間）
      */
-    getLatestEntranceTime(_targetDate) {
-        // 現在は空の実装
-        return null;
+    getLatestEntranceTime(targetDate) {
+        let latestTime = null;
+        for (const ticket of this.tickets.values()) {
+            if (ticket.schedules && Array.isArray(ticket.schedules)) {
+                for (const schedule of ticket.schedules) {
+                    if (schedule.entrance_date === targetDate && schedule.use_state === 0) {
+                        // schedule_nameから時間を抽出（例：「9:00-10:00」「14:30」など）
+                        const timeMatch = schedule.schedule_name?.match(/(\d{1,2}):(\d{2})/);
+                        if (timeMatch) {
+                            const time = `${timeMatch[1].padStart(2, '0')}:${timeMatch[2]}`;
+                            if (!latestTime || time > latestTime) {
+                                latestTime = time;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return latestTime;
     }
     /**
      * 全チケット一覧を取得
@@ -9291,9 +9314,44 @@ class MainDialogFabImpl {
         this.mainDialogContainer = null;
         this.lastSearchResults = [];
         this.isAvailableOnlyFilterActive = false;
+        this.dataPreloadPromise = null;
         // 180回制限カウンター
         this.attemptCount = 0;
         this.FAST_INTERVAL_LIMIT = 180;
+    }
+    /**
+     * ページ読み込み時点での事前データ読み込みを開始
+     */
+    startDataPreload() {
+        if (this.dataPreloadPromise)
+            return; // 既に開始済み
+        console.log('🚀 メインダイアログ用データの事前読み込み開始');
+        if (!page_utils/* PageChecker */.v.isTicketSite()) {
+            console.log('⚠️ チケットサイト以外では事前読み込みをスキップ');
+            return;
+        }
+        this.dataPreloadPromise = this.preloadData();
+    }
+    /**
+     * データの事前読み込み（バックグラウンド実行）
+     */
+    async preloadData() {
+        try {
+            // マネージャー初期化（軽量）
+            this.ticketManager = getTicketManager();
+            this.reactiveTicketManager = getReactiveTicketManager(this.ticketManager);
+            this.pavilionManager = getPavilionManager();
+            // 重いデータ読み込みを並列で開始
+            const preloadPromises = [
+                this.ticketManager.loadAllTickets(), // チケットデータ取得
+                // パビリオンデータの事前読み込みは現在のAPIでは不可（検索条件が必要）
+            ];
+            await Promise.allSettled(preloadPromises);
+            console.log('✅ メインダイアログ用データの事前読み込み完了');
+        }
+        catch (error) {
+            console.warn('⚠️ メインダイアログ用データの事前読み込み中にエラー:', error);
+        }
     }
     /**
      * メインダイアログFABシステムを初期化
@@ -9305,12 +9363,16 @@ class MainDialogFabImpl {
             console.log('⚠️ チケットサイト以外では初期化をスキップ');
             return;
         }
-        // チケットマネージャーを初期化
-        this.ticketManager = getTicketManager();
-        // リアクティブチケットマネージャーを初期化
-        this.reactiveTicketManager = getReactiveTicketManager(this.ticketManager);
-        // パビリオンマネージャーを初期化
-        this.pavilionManager = getPavilionManager();
+        // 事前読み込みが未開始の場合は開始
+        if (!this.dataPreloadPromise) {
+            this.startDataPreload();
+        }
+        // マネージャーの初期化確認（事前読み込み済みの場合はスキップ）
+        if (!this.ticketManager) {
+            this.ticketManager = getTicketManager();
+            this.reactiveTicketManager = getReactiveTicketManager(this.ticketManager);
+            this.pavilionManager = getPavilionManager();
+        }
         // リアクティブUI更新を設定
         this.setupReactiveUIUpdaters();
         // 既存のFABコンテナを確認
@@ -9545,13 +9607,22 @@ class MainDialogFabImpl {
      * ダイアログ内容の初期化
      */
     async initializeDialogContent() {
-        console.log('🔄 ダイアログ内容初期化開始');
+        console.log('🔄 ダイアログ内容初期化開始（並列処理）');
         try {
-            // チケットタブの初期化
-            await this.initializeTicketTab();
-            // パビリオンタブの初期化
-            await this.initializePavilionTab();
-            console.log('✅ ダイアログ内容初期化完了');
+            // チケットタブとパビリオンタブの初期化を並列実行
+            const [ticketResult, pavilionResult] = await Promise.allSettled([
+                this.initializeTicketTab(),
+                this.initializePavilionTab()
+            ]);
+            // 結果確認
+            if (ticketResult.status === 'rejected') {
+                console.error('❌ チケットタブ初期化エラー:', ticketResult.reason);
+            }
+            if (pavilionResult.status === 'rejected') {
+                console.error('❌ パビリオンタブ初期化エラー:', pavilionResult.reason);
+            }
+            const successCount = [ticketResult, pavilionResult].filter(r => r.status === 'fulfilled').length;
+            console.log(`✅ ダイアログ内容初期化完了 (成功: ${successCount}/2)`);
         }
         catch (error) {
             console.error('❌ ダイアログ内容初期化エラー:', error);
@@ -9576,8 +9647,17 @@ class MainDialogFabImpl {
             </div>
         `;
         try {
-            // チケットマネージャーからデータを読み込み
-            const tickets = await this.ticketManager.loadAllTickets();
+            // 事前読み込み完了を待機（既に完了している場合は即座に解決）
+            if (this.dataPreloadPromise) {
+                await this.dataPreloadPromise;
+            }
+            // 事前読み込み済みデータを取得（キャッシュから）
+            let tickets = this.ticketManager.getAllTickets();
+            // データがない場合は改めて読み込み
+            if (tickets.length === 0) {
+                console.log('🔄 事前読み込みデータが不足、改めて読み込み');
+                tickets = await this.ticketManager.loadAllTickets();
+            }
             console.log('🔍 チケットマネージャーデータ:', tickets);
             if (tickets.length === 0) {
                 throw new Error('チケットデータが見つかりません');
@@ -9732,7 +9812,7 @@ class MainDialogFabImpl {
                         data-use-state="${schedule.use_state}"
                         data-available-types="${reservationStatus.availableTypes.join(',')}"
                         ${isDisabled ? 'disabled' : ''}>
-                    <span class="ytomo-date-text">${this.formatDate(schedule.entrance_date)} ${schedule.schedule_name || ''}</span>
+                    <span class="ytomo-date-text">${this.formatDate(schedule.entrance_date)} ${schedule.schedule_name || this.extractTimeFromSchedule(schedule)}</span>
                     <div class="ytomo-reservation-status">
                         ${reservationStatus.statusText}
                     </div>
@@ -9821,7 +9901,7 @@ class MainDialogFabImpl {
                 }
             }
         }
-        return Array.from(dates).sort();
+        return Array.from(dates).sort((a, b) => new Date(a).getTime() - new Date(b).getTime());
     }
     /**
      * 抽選カレンダーデータを取得
@@ -10104,7 +10184,7 @@ class MainDialogFabImpl {
      * チケットタブカウントを更新
      */
     updateTicketTabCount() {
-        const count = this.ticketManager.getSelectedTicketCount();
+        const count = this.reactiveTicketManager.getSelectedTicketCount();
         const tabCount = this.mainDialogContainer?.querySelector('#ticket-count');
         if (tabCount) {
             tabCount.textContent = ` (${count})`;
@@ -10894,6 +10974,24 @@ class MainDialogFabImpl {
         return time;
     }
     /**
+     * スケジュールオブジェクトから時間情報を抽出
+     */
+    extractTimeFromSchedule(schedule) {
+        // schedule_nameがある場合はそれを使用
+        if (schedule.schedule_name) {
+            return schedule.schedule_name;
+        }
+        // entrance_timeやstart_time等の時間フィールドがあれば使用
+        if (schedule.entrance_time) {
+            return this.formatTime(schedule.entrance_time);
+        }
+        if (schedule.start_time) {
+            return this.formatTime(schedule.start_time);
+        }
+        // 時間情報が見つからない場合は空文字
+        return '';
+    }
+    /**
      * パビリオン項目のイベントリスナーを設定
      */
     setupPavilionItemEventListeners(container) {
@@ -11589,6 +11687,16 @@ function initializeMainDialogFab() {
  */
 function isMainDialogVisible() {
     return mainDialogVisible;
+}
+// ページ読み込み時点での事前データ読み込みを開始
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => {
+        mainDialogFab.startDataPreload();
+    });
+}
+else {
+    // 既にDOMが読み込み済みの場合は即座に実行
+    mainDialogFab.startDataPreload();
 }
 
 // EXTERNAL MODULE: ./ts/modules/entrance-reservation-state-manager.ts + 1 modules

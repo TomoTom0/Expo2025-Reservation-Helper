@@ -29,6 +29,47 @@ export class MainDialogFabImpl implements MainDialogFab {
     private pavilionManager!: PavilionManager;
     private lastSearchResults: any[] = [];
     private isAvailableOnlyFilterActive: boolean = false;
+    private dataPreloadPromise: Promise<void> | null = null;
+
+    /**
+     * ページ読み込み時点での事前データ読み込みを開始
+     */
+    startDataPreload(): void {
+        if (this.dataPreloadPromise) return; // 既に開始済み
+        
+        console.log('🚀 メインダイアログ用データの事前読み込み開始');
+        
+        if (!PageChecker.isTicketSite()) {
+            console.log('⚠️ チケットサイト以外では事前読み込みをスキップ');
+            return;
+        }
+        
+        this.dataPreloadPromise = this.preloadData();
+    }
+    
+    /**
+     * データの事前読み込み（バックグラウンド実行）
+     */
+    private async preloadData(): Promise<void> {
+        try {
+            // マネージャー初期化（軽量）
+            this.ticketManager = getTicketManager();
+            this.reactiveTicketManager = getReactiveTicketManager(this.ticketManager);
+            this.pavilionManager = getPavilionManager();
+            
+            // 重いデータ読み込みを並列で開始
+            const preloadPromises = [
+                this.ticketManager.loadAllTickets(), // チケットデータ取得
+                // パビリオンデータの事前読み込みは現在のAPIでは不可（検索条件が必要）
+            ];
+            
+            await Promise.allSettled(preloadPromises);
+            console.log('✅ メインダイアログ用データの事前読み込み完了');
+            
+        } catch (error) {
+            console.warn('⚠️ メインダイアログ用データの事前読み込み中にエラー:', error);
+        }
+    }
 
     /**
      * メインダイアログFABシステムを初期化
@@ -42,14 +83,17 @@ export class MainDialogFabImpl implements MainDialogFab {
             return;
         }
 
-        // チケットマネージャーを初期化
-        this.ticketManager = getTicketManager();
-        
-        // リアクティブチケットマネージャーを初期化
-        this.reactiveTicketManager = getReactiveTicketManager(this.ticketManager);
-        
-        // パビリオンマネージャーを初期化
-        this.pavilionManager = getPavilionManager();
+        // 事前読み込みが未開始の場合は開始
+        if (!this.dataPreloadPromise) {
+            this.startDataPreload();
+        }
+
+        // マネージャーの初期化確認（事前読み込み済みの場合はスキップ）
+        if (!this.ticketManager) {
+            this.ticketManager = getTicketManager();
+            this.reactiveTicketManager = getReactiveTicketManager(this.ticketManager);
+            this.pavilionManager = getPavilionManager();
+        }
         
         // リアクティブUI更新を設定
         this.setupReactiveUIUpdaters();
@@ -314,16 +358,25 @@ export class MainDialogFabImpl implements MainDialogFab {
      * ダイアログ内容の初期化
      */
     private async initializeDialogContent(): Promise<void> {
-        console.log('🔄 ダイアログ内容初期化開始');
+        console.log('🔄 ダイアログ内容初期化開始（並列処理）');
         
         try {
-            // チケットタブの初期化
-            await this.initializeTicketTab();
+            // チケットタブとパビリオンタブの初期化を並列実行
+            const [ticketResult, pavilionResult] = await Promise.allSettled([
+                this.initializeTicketTab(),
+                this.initializePavilionTab()
+            ]);
             
-            // パビリオンタブの初期化
-            await this.initializePavilionTab();
+            // 結果確認
+            if (ticketResult.status === 'rejected') {
+                console.error('❌ チケットタブ初期化エラー:', ticketResult.reason);
+            }
+            if (pavilionResult.status === 'rejected') {
+                console.error('❌ パビリオンタブ初期化エラー:', pavilionResult.reason);
+            }
             
-            console.log('✅ ダイアログ内容初期化完了');
+            const successCount = [ticketResult, pavilionResult].filter(r => r.status === 'fulfilled').length;
+            console.log(`✅ ダイアログ内容初期化完了 (成功: ${successCount}/2)`);
             
         } catch (error) {
             console.error('❌ ダイアログ内容初期化エラー:', error);
@@ -352,8 +405,20 @@ export class MainDialogFabImpl implements MainDialogFab {
         `;
 
         try {
-            // チケットマネージャーからデータを読み込み
-            const tickets = await this.ticketManager.loadAllTickets();
+            // 事前読み込み完了を待機（既に完了している場合は即座に解決）
+            if (this.dataPreloadPromise) {
+                await this.dataPreloadPromise;
+            }
+            
+            // 事前読み込み済みデータを取得（キャッシュから）
+            let tickets = this.ticketManager.getAllTickets();
+            
+            // データがない場合は改めて読み込み
+            if (tickets.length === 0) {
+                console.log('🔄 事前読み込みデータが不足、改めて読み込み');
+                tickets = await this.ticketManager.loadAllTickets();
+            }
+            
             console.log('🔍 チケットマネージャーデータ:', tickets);
             
             if (tickets.length === 0) {
@@ -530,7 +595,7 @@ export class MainDialogFabImpl implements MainDialogFab {
                         data-use-state="${schedule.use_state}"
                         data-available-types="${reservationStatus.availableTypes.join(',')}"
                         ${isDisabled ? 'disabled' : ''}>
-                    <span class="ytomo-date-text">${this.formatDate(schedule.entrance_date)} ${schedule.schedule_name || ''}</span>
+                    <span class="ytomo-date-text">${this.formatDate(schedule.entrance_date)} ${schedule.schedule_name || this.extractTimeFromSchedule(schedule)}</span>
                     <div class="ytomo-reservation-status">
                         ${reservationStatus.statusText}
                     </div>
@@ -628,7 +693,7 @@ export class MainDialogFabImpl implements MainDialogFab {
             }
         }
 
-        return Array.from(dates).sort();
+        return Array.from(dates).sort((a, b) => new Date(a).getTime() - new Date(b).getTime());
     }
 
     /**
@@ -946,7 +1011,7 @@ export class MainDialogFabImpl implements MainDialogFab {
      * チケットタブカウントを更新
      */
     private updateTicketTabCount(): void {
-        const count = this.ticketManager.getSelectedTicketCount();
+        const count = this.reactiveTicketManager.getSelectedTicketCount();
         const tabCount = this.mainDialogContainer?.querySelector('#ticket-count');
         
         if (tabCount) {
@@ -1872,6 +1937,28 @@ export class MainDialogFabImpl implements MainDialogFab {
     }
 
     /**
+     * スケジュールオブジェクトから時間情報を抽出
+     */
+    private extractTimeFromSchedule(schedule: any): string {
+        // schedule_nameがある場合はそれを使用
+        if (schedule.schedule_name) {
+            return schedule.schedule_name;
+        }
+        
+        // entrance_timeやstart_time等の時間フィールドがあれば使用
+        if (schedule.entrance_time) {
+            return this.formatTime(schedule.entrance_time);
+        }
+        
+        if (schedule.start_time) {
+            return this.formatTime(schedule.start_time);
+        }
+        
+        // 時間情報が見つからない場合は空文字
+        return '';
+    }
+
+    /**
      * パビリオン項目のイベントリスナーを設定
      */
     private setupPavilionItemEventListeners(container: HTMLElement): void {
@@ -2696,4 +2783,14 @@ export function initializeMainDialogFab(): void {
  */
 export function isMainDialogVisible(): boolean {
     return mainDialogVisible;
+}
+
+// ページ読み込み時点での事前データ読み込みを開始
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => {
+        mainDialogFab.startDataPreload();
+    });
+} else {
+    // 既にDOMが読み込み済みの場合は即座に実行
+    mainDialogFab.startDataPreload();
 }

@@ -358,10 +358,21 @@ export class TicketManager {
             if (ownOnly && !ticket.isOwn) {
                 continue;
             }
-            this.selectedTicketIds.add(ticketId);
+            
+            // 指定日付の入場予約があるかチェック
+            let hasMatchingDate = false;
+            if (ticket.schedules && Array.isArray(ticket.schedules)) {
+                hasMatchingDate = ticket.schedules.some(schedule => 
+                    schedule.entrance_date === date && schedule.use_state === 0
+                );
+            }
+            
+            if (hasMatchingDate) {
+                this.selectedTicketIds.add(ticketId);
+            }
         }
 
-        console.log(`✅ ${this.selectedTicketIds.size}個のチケットを選択`);
+        console.log(`✅ ${this.selectedTicketIds.size}個のチケットを選択 (日付: ${date})`);
     }
 
     /**
@@ -397,9 +408,27 @@ export class TicketManager {
     /**
      * 選択されたチケットの入場予約から最も遅い入場時間を取得（律速時間）
      */
-    getLatestEntranceTime(_targetDate: string): string | null {
-        // 現在は空の実装
-        return null;
+    getLatestEntranceTime(targetDate: string): string | null {
+        let latestTime: string | null = null;
+        
+        for (const ticket of this.tickets.values()) {
+            if (ticket.schedules && Array.isArray(ticket.schedules)) {
+                for (const schedule of ticket.schedules) {
+                    if (schedule.entrance_date === targetDate && schedule.use_state === 0) {
+                        // schedule_nameから時間を抽出（例：「9:00-10:00」「14:30」など）
+                        const timeMatch = schedule.schedule_name?.match(/(\d{1,2}):(\d{2})/);
+                        if (timeMatch) {
+                            const time = `${timeMatch[1].padStart(2, '0')}:${timeMatch[2]}`;
+                            if (!latestTime || time > latestTime) {
+                                latestTime = time;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        
+        return latestTime;
     }
 
     /**
