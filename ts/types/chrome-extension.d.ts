@@ -17,27 +17,6 @@ declare global {
   
   const chrome: Chrome;
 
-  // UserScript GM API型定義
-  interface GM_xmlhttpRequestResponse {
-    responseText: string;
-    status: number;
-    statusText: string;
-  }
-  
-  interface GM_xmlhttpRequestOptions {
-    method: 'GET' | 'POST' | 'PUT' | 'DELETE';
-    url: string;
-    onload?: (response: GM_xmlhttpRequestResponse) => void;
-    onerror?: (error: any) => void;
-  }
-  
-  function GM_xmlhttpRequest(options: GM_xmlhttpRequestOptions): void;
-  
-  interface GM {
-    xmlHttpRequest?: (options: GM_xmlhttpRequestOptions) => void;
-  }
-  
-  const GM: GM;
 
   // UserScript形式でのメタデータ
   interface UserScriptMetadata {
