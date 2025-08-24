@@ -11,7 +11,8 @@ import { CacheManager } from '../types/index.js';
 export interface TicketData {
     ticket_id: string;       // 公式チケットID
     isOwn: boolean;          // 自分のチケットかどうか
-    label?: string;          // 外部チケット用ラベル
+    label?: string;          // チケットラベル
+    schedules?: any[];       // 入場予約情報
 }
 
 /**
@@ -97,7 +98,17 @@ export class TicketManager {
                         ticket_id: ticket.ticket_id || ticket.simple_ticket_id || '',
                         isOwn: true,
                         label: ticket.item_name || 'チケット',
+                        schedules: ticket.schedules || []  // schedulesデータを設定
                     };
+                    
+                    // デバッグ: 自分のチケットのschedules状況を確認
+                    console.log(`📅 自分のチケット ${ticketData.ticket_id}: schedules=${ticketData.schedules?.length || 0}件`);
+                    if (ticketData.schedules && ticketData.schedules.length > 0) {
+                        ticketData.schedules.forEach((schedule: any, i: number) => {
+                            console.log(`  [${i}] entrance_date=${schedule.entrance_date}, use_state=${schedule.use_state}`);
+                        });
+                    }
+                    
                     tickets.push(ticketData);
                     this.tickets.set(ticketData.ticket_id, ticketData);
                 }
@@ -217,17 +228,20 @@ export class TicketManager {
                         
                         console.log(`✅ 外部チケット取得成功 (channel: ${testChannel}):`, data);
                         
-                        // 公式サイトのデータ構造に合わせてTicketDataに変換
+                        // 外部チケットも統一構造でschedulesデータを設定
                         const ticketData: TicketData = {
                             ticket_id: data.ticket_id,
                             isOwn: false,
                             label: label,
+                            schedules: data.schedules || []
                         };
 
-                        // 入場予約があるかチェック
-                        try {
-                        } catch (error) {
-                            console.warn(`⚠️ 外部チケット${ticketId}の入場予約取得失敗:`, error);
+                        // デバッグ: 外部チケットのschedules状況を確認
+                        console.log(`📅 外部チケット ${ticketId}: schedules=${ticketData.schedules?.length || 0}件`);
+                        if (ticketData.schedules && ticketData.schedules.length > 0) {
+                            ticketData.schedules.forEach((schedule: any, i: number) => {
+                                console.log(`  [${i}] entrance_date=${schedule.entrance_date}, use_state=${schedule.use_state}`);
+                            });
                         }
 
                         console.log(`✅ 外部チケット${ticketId}をchannel=${testChannel}で取得成功`);
@@ -244,6 +258,7 @@ export class TicketManager {
                 ticket_id: ticketId,
                 isOwn: false,
                 label: label,
+                schedules: []  // 空のschedulesを設定
             };
 
         } catch (error) {

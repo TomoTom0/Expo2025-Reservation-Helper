@@ -463,14 +463,9 @@ export class MainDialogFabImpl implements MainDialogFab {
             `;
         }
 
-        // 状態0の入場予約があるチケット または 外部チケット(isOwnがfalse)を表示
+        // 状態0の入場予約があるチケットのみ表示
         const validTickets = tickets.filter(ticket => {
             const schedules = ticket.schedules || [];
-            // 外部チケット（自分のものでない）は常に表示
-            if (ticket.isOwn === false) {
-                return true;
-            }
-            // 自分のチケットは状態0の入場予約があるもののみ表示
             return schedules.some((schedule: any) => schedule.use_state === 0);
         });
 
@@ -482,21 +477,27 @@ export class MainDialogFabImpl implements MainDialogFab {
             `;
         }
 
-        const ticketPromises = validTickets.map(async ticket => `
-            <div class="ytomo-ticket-item" data-ticket-id="${ticket.ticket_id}">
-                <!-- 上半分: チケットID、Me Tip、Label -->
-                <div class="ytomo-ticket-upper">
-                    <span class="ytomo-ticket-id">${ticket.ticket_id}</span>
-                    <span class="ytomo-me-tip">Me</span>
-                </div>
-                <!-- 下半分: 入場日時ボタン（予約種類も含む） -->
-                <div class="ytomo-ticket-lower">
-                    <div class="ytomo-entrance-dates">
-                        ${await this.buildEntranceDateButtons(ticket.schedules || [], ticket)}
+        const ticketPromises = validTickets.map(async ticket => {
+            const isExternal = ticket.isOwn === false;
+            const tipText = isExternal ? (ticket.label || 'External') : 'Me';
+            const tipClass = isExternal ? 'ytomo-external-tip' : 'ytomo-me-tip';
+            
+            return `
+                <div class="ytomo-ticket-item" data-ticket-id="${ticket.ticket_id}">
+                    <!-- 上半分: チケットID、Tip -->
+                    <div class="ytomo-ticket-upper">
+                        <span class="ytomo-ticket-id">${ticket.ticket_id}</span>
+                        <span class="${tipClass}">${tipText}</span>
+                    </div>
+                    <!-- 下半分: 入場日時ボタン（予約種類も含む） -->
+                    <div class="ytomo-ticket-lower">
+                        <div class="ytomo-entrance-dates">
+                            ${await this.buildEntranceDateButtons(ticket.schedules || [], ticket)}
+                        </div>
                     </div>
                 </div>
-            </div>
-        `);
+            `;
+        });
         
         const ticketResults = await Promise.all(ticketPromises);
         return ticketResults.join('');
