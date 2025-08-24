@@ -405,17 +405,22 @@ export class MainDialogFabImpl implements MainDialogFab {
         `;
 
         try {
+            console.log('⚡ チケットタブ初期化（事前読み込み活用）');
+            
             // 事前読み込み完了を待機（既に完了している場合は即座に解決）
             if (this.dataPreloadPromise) {
+                console.log('🔄 事前読み込み完了を待機中...');
                 await this.dataPreloadPromise;
+                console.log('✅ 事前読み込み完了');
             }
             
             // 事前読み込み済みデータを取得（キャッシュから）
             let tickets = this.ticketManager.getAllTickets();
+            console.log(`📋 キャッシュからチケット取得: ${tickets.length}件`);
             
-            // データがない場合は改めて読み込み
+            // データがない場合は改めて読み込み（フォールバック）
             if (tickets.length === 0) {
-                console.log('🔄 事前読み込みデータが不足、改めて読み込み');
+                console.log('🔄 キャッシュが空、API呼び出し実行');
                 tickets = await this.ticketManager.loadAllTickets();
             }
             
@@ -576,14 +581,25 @@ export class MainDialogFabImpl implements MainDialogFab {
             return '<span class="ytomo-no-entrance-dates">入場予約なし</span>';
         }
 
-        // 状態0（未使用）の入場予約のみ表示
-        const unusedSchedules = schedules.filter(schedule => schedule.use_state === 0);
+        // 今日の日付を取得（YYYYMMDD形式）
+        const today = new Date();
+        const todayStr = `${today.getFullYear()}${String(today.getMonth() + 1).padStart(2, '0')}${String(today.getDate()).padStart(2, '0')}`;
         
-        if (unusedSchedules.length === 0) {
+        // 状態0（未使用）の入場予約を表示、当日は状態1でも表示
+        const visibleSchedules = schedules.filter(schedule => {
+            if (schedule.use_state === 1) {
+                // 当日の場合は状態1でも表示
+                return schedule.entrance_date === todayStr;
+            }
+            // 状態0は常に表示
+            return schedule.use_state === 0;
+        });
+        
+        if (visibleSchedules.length === 0) {
             return '<span class="ytomo-no-entrance-dates">利用可能な入場予約なし</span>';
         }
 
-        const buttonPromises = unusedSchedules.map(async schedule => {
+        const buttonPromises = visibleSchedules.map(async schedule => {
             // 抽選カレンダーデータを取得
             const lotteryData = await this.fetchLotteryCalendar(schedule.entrance_date);
             const reservationStatus = this.getReservationStatus(schedule, lotteryData, ticket);
@@ -676,12 +692,25 @@ export class MainDialogFabImpl implements MainDialogFab {
     private async extractAvailableDates(tickets: any[]): Promise<string[]> {
         const dates = new Set<string>();
         
+        // 今日の日付を取得（YYYYMMDD形式）
+        const today = new Date();
+        const todayStr = `${today.getFullYear()}${String(today.getMonth() + 1).padStart(2, '0')}${String(today.getDate()).padStart(2, '0')}`;
+        
         for (const ticket of tickets) {
             if (ticket.schedules && Array.isArray(ticket.schedules)) {
-                const unusedSchedules = ticket.schedules.filter((schedule: any) => schedule.use_state !== 1);
+                // 状態1（使用済み）以外を表示、ただし当日は状態1でも表示
+                const visibleSchedules = ticket.schedules.filter((schedule: any) => {
+                    if (schedule.use_state === 1) {
+                        // 当日の場合は状態1でも表示
+                        return schedule.entrance_date === todayStr;
+                    }
+                    // 状態0は常に表示
+                    return schedule.use_state === 0;
+                });
                 
-                for (const schedule of unusedSchedules) {
+                for (const schedule of visibleSchedules) {
                     if (schedule.entrance_date) {
+                        console.log('🔍 日付デバッグ:', schedule.entrance_date, typeof schedule.entrance_date, 'use_state:', schedule.use_state);
                         // 利用可能な予約タイプがあるかチェック
                         const lotteryData = await this.fetchLotteryCalendar(schedule.entrance_date);
                         const reservationStatus = this.getReservationStatus(schedule, lotteryData, ticket);
@@ -693,7 +722,14 @@ export class MainDialogFabImpl implements MainDialogFab {
             }
         }
 
-        return Array.from(dates).sort((a, b) => new Date(a).getTime() - new Date(b).getTime());
+        const sortedDates = Array.from(dates).sort((a, b) => {
+            const dateA = new Date(a);
+            const dateB = new Date(b);
+            console.log('🔍 ソートデバッグ:', a, '=>', dateA, 'vs', b, '=>', dateB);
+            return dateA.getTime() - dateB.getTime();
+        });
+        console.log('🔍 ソート結果:', sortedDates);
+        return sortedDates;
     }
 
     /**
@@ -917,6 +953,9 @@ export class MainDialogFabImpl implements MainDialogFab {
                 } else {
                     button.classList.remove('selected');
                 }
+            } else if (isDateSelected) {
+                // 選択された日付以外の入場予約ボタンを解除
+                button.classList.remove('selected');
             }
         });
         
@@ -2707,10 +2746,14 @@ export class MainDialogFabImpl implements MainDialogFab {
                     pavilionElement.classList.remove('hidden');
                 }
                 
-                // 時間帯ボタンは全て表示（満員も押下可能）
+                // 時間帯ボタンは空きのみ表示（満員は非表示）
                 const timeSlotButtons = pavilionElement.querySelectorAll('.ytomo-time-slot-button');
                 timeSlotButtons.forEach(button => {
-                    button.classList.remove('hidden');
+                    if (button.classList.contains('unavailable')) {
+                        button.classList.add('hidden');
+                    } else {
+                        button.classList.remove('hidden');
+                    }
                 });
             } else {
                 // フィルタ無効時は全て表示
