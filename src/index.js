@@ -8,7 +8,7 @@
 // @run-at       document-end
 // ==/UserScript==
 
-// Built: 2025/08/24 12:08:31
+// Built: 2025/08/24 12:18:51
 
 
 (function webpackUniversalModuleDefinition(root, factory) {
@@ -7938,6 +7938,22 @@ class TicketManager {
         this.selectedTicketIds = new Set();
         this.cacheManager = null;
         this.cacheManager = cacheManager || null;
+        // 今日の日付を初期化時に計算（YYYYMMDD形式）
+        const today = new Date();
+        this.todayStr = `${today.getFullYear()}${String(today.getMonth() + 1).padStart(2, '0')}${String(today.getDate()).padStart(2, '0')}`;
+    }
+    /**
+     * スケジュールデータに有効フラグを付与
+     */
+    processSchedules(schedules) {
+        if (!Array.isArray(schedules))
+            return [];
+        return schedules.map(schedule => ({
+            ...schedule,
+            // 有効フラグを付与: 状態0または（当日かつ状態1）
+            isEffective: schedule.use_state === 0 ||
+                (schedule.use_state === 1 && schedule.entrance_date === this.todayStr)
+        }));
     }
     /**
      * 全チケット情報を初期化・取得
@@ -8001,7 +8017,7 @@ class TicketManager {
                         ticket_id: ticket.ticket_id || ticket.simple_ticket_id || '',
                         isOwn: true,
                         label: ticket.item_name || 'チケット',
-                        schedules: ticket.schedules || [] // schedulesデータを設定
+                        schedules: this.processSchedules(ticket.schedules || []) // フラグ付きschedulesを設定
                     };
                     // デバッグ: 自分のチケットのschedules状況を確認
                     console.log(`📅 自分のチケット ${ticketData.ticket_id}: schedules=${ticketData.schedules?.length || 0}件`);
@@ -8114,12 +8130,12 @@ class TicketManager {
                     if (response.ok) {
                         const data = await response.json();
                         console.log(`✅ 外部チケット取得成功 (channel: ${testChannel}):`, data);
-                        // 外部チケットも統一構造でschedulesデータを設定
+                        // 外部チケットも統一構造でフラグ付きschedulesデータを設定
                         const ticketData = {
                             ticket_id: data.ticket_id,
                             isOwn: false,
                             label: label,
-                            schedules: data.schedules || []
+                            schedules: this.processSchedules(data.schedules || [])
                         };
                         // デバッグ: 外部チケットのschedules状況を確認
                         console.log(`📅 外部チケット ${ticketId}: schedules=${ticketData.schedules?.length || 0}件`);
@@ -8142,7 +8158,7 @@ class TicketManager {
                 ticket_id: ticketId,
                 isOwn: false,
                 label: label,
-                schedules: [] // 空のschedulesを設定
+                schedules: this.processSchedules([]) // 空のschedulesを設定
             };
         }
         catch (error) {
@@ -8224,18 +8240,10 @@ class TicketManager {
             if (ownOnly && !ticket.isOwn) {
                 continue;
             }
-            // 指定日付の入場予約があるかチェック
+            // 指定日付の有効な入場予約があるかチェック
             let hasMatchingDate = false;
             if (ticket.schedules && Array.isArray(ticket.schedules)) {
-                // 今日の日付を取得（YYYYMMDD形式）
-                const today = new Date();
-                const todayStr = `${today.getFullYear()}${String(today.getMonth() + 1).padStart(2, '0')}${String(today.getDate()).padStart(2, '0')}`;
-                hasMatchingDate = ticket.schedules.some(schedule => {
-                    const isTargetDate = schedule.entrance_date === date;
-                    const isValidState = schedule.use_state === 0 ||
-                        (schedule.use_state === 1 && date === todayStr);
-                    return isTargetDate && isValidState;
-                });
+                hasMatchingDate = ticket.schedules.some(schedule => schedule.entrance_date === date && schedule.isEffective);
             }
             if (hasMatchingDate) {
                 this.selectedTicketIds.add(ticketId);
@@ -8273,17 +8281,11 @@ class TicketManager {
      */
     getLatestEntranceTime(targetDate) {
         let latestTime = null;
-        // 今日の日付を取得（YYYYMMDD形式）
-        const today = new Date();
-        const todayStr = `${today.getFullYear()}${String(today.getMonth() + 1).padStart(2, '0')}${String(today.getDate()).padStart(2, '0')}`;
         for (const ticket of this.tickets.values()) {
             if (ticket.schedules && Array.isArray(ticket.schedules)) {
                 for (const schedule of ticket.schedules) {
-                    // 対象日付で、状態0または（当日かつ状態1）の場合
-                    const isTargetDate = schedule.entrance_date === targetDate;
-                    const isValidState = schedule.use_state === 0 ||
-                        (schedule.use_state === 1 && targetDate === todayStr);
-                    if (isTargetDate && isValidState) {
+                    // 対象日付で有効な入場予約の場合
+                    if (schedule.entrance_date === targetDate && schedule.isEffective) {
                         // schedule_nameから時間を抽出（例：「9:00-10:00」「14:30」など）
                         const timeMatch = schedule.schedule_name?.match(/(\d{1,2}):(\d{2})/);
                         if (timeMatch) {
@@ -9773,10 +9775,10 @@ class MainDialogFabImpl {
                 </div>
             `;
         }
-        // 状態0の入場予約があるチケットのみ表示
+        // 有効な入場予約があるチケットのみ表示
         const validTickets = tickets.filter(ticket => {
             const schedules = ticket.schedules || [];
-            return schedules.some((schedule) => schedule.use_state === 0);
+            return schedules.some((schedule) => schedule.isEffective);
         });
         if (validTickets.length === 0) {
             return `
@@ -9815,18 +9817,8 @@ class MainDialogFabImpl {
         if (!Array.isArray(schedules) || schedules.length === 0) {
             return '<span class="ytomo-no-entrance-dates">入場予約なし</span>';
         }
-        // 今日の日付を取得（YYYYMMDD形式）
-        const today = new Date();
-        const todayStr = `${today.getFullYear()}${String(today.getMonth() + 1).padStart(2, '0')}${String(today.getDate()).padStart(2, '0')}`;
-        // 状態0（未使用）の入場予約を表示、当日は状態1でも表示
-        const visibleSchedules = schedules.filter(schedule => {
-            if (schedule.use_state === 1) {
-                // 当日の場合は状態1でも表示
-                return schedule.entrance_date === todayStr;
-            }
-            // 状態0は常に表示
-            return schedule.use_state === 0;
-        });
+        // 有効フラグが付いた入場予約のみを表示
+        const visibleSchedules = schedules.filter(schedule => schedule.isEffective);
         if (visibleSchedules.length === 0) {
             return '<span class="ytomo-no-entrance-dates">利用可能な入場予約なし</span>';
         }
@@ -9915,21 +9907,11 @@ class MainDialogFabImpl {
      */
     async extractAvailableDates(tickets) {
         const dates = new Set();
-        // 今日の日付を取得（YYYYMMDD形式）
-        const today = new Date();
-        const todayStr = `${today.getFullYear()}${String(today.getMonth() + 1).padStart(2, '0')}${String(today.getDate()).padStart(2, '0')}`;
         for (const ticket of tickets) {
             if (ticket.schedules && Array.isArray(ticket.schedules)) {
-                // 状態1（使用済み）以外を表示、ただし当日は状態1でも表示
-                const visibleSchedules = ticket.schedules.filter((schedule) => {
-                    if (schedule.use_state === 1) {
-                        // 当日の場合は状態1でも表示
-                        return schedule.entrance_date === todayStr;
-                    }
-                    // 状態0は常に表示
-                    return schedule.use_state === 0;
-                });
-                for (const schedule of visibleSchedules) {
+                // 有効フラグが付いたスケジュールのみを処理
+                const effectiveSchedules = ticket.schedules.filter((schedule) => schedule.isEffective);
+                for (const schedule of effectiveSchedules) {
                     if (schedule.entrance_date) {
                         // 利用可能な予約タイプがあるかチェック
                         const lotteryData = await this.fetchLotteryCalendar(schedule.entrance_date);

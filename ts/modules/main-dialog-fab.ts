@@ -533,10 +533,10 @@ export class MainDialogFabImpl implements MainDialogFab {
             `;
         }
 
-        // 状態0の入場予約があるチケットのみ表示
+        // 有効な入場予約があるチケットのみ表示
         const validTickets = tickets.filter(ticket => {
             const schedules = ticket.schedules || [];
-            return schedules.some((schedule: any) => schedule.use_state === 0);
+            return schedules.some((schedule: any) => schedule.isEffective);
         });
 
         if (validTickets.length === 0) {
@@ -581,19 +581,8 @@ export class MainDialogFabImpl implements MainDialogFab {
             return '<span class="ytomo-no-entrance-dates">入場予約なし</span>';
         }
 
-        // 今日の日付を取得（YYYYMMDD形式）
-        const today = new Date();
-        const todayStr = `${today.getFullYear()}${String(today.getMonth() + 1).padStart(2, '0')}${String(today.getDate()).padStart(2, '0')}`;
-        
-        // 状態0（未使用）の入場予約を表示、当日は状態1でも表示
-        const visibleSchedules = schedules.filter(schedule => {
-            if (schedule.use_state === 1) {
-                // 当日の場合は状態1でも表示
-                return schedule.entrance_date === todayStr;
-            }
-            // 状態0は常に表示
-            return schedule.use_state === 0;
-        });
+        // 有効フラグが付いた入場予約のみを表示
+        const visibleSchedules = schedules.filter(schedule => schedule.isEffective);
         
         if (visibleSchedules.length === 0) {
             return '<span class="ytomo-no-entrance-dates">利用可能な入場予約なし</span>';
@@ -692,23 +681,12 @@ export class MainDialogFabImpl implements MainDialogFab {
     private async extractAvailableDates(tickets: any[]): Promise<string[]> {
         const dates = new Set<string>();
         
-        // 今日の日付を取得（YYYYMMDD形式）
-        const today = new Date();
-        const todayStr = `${today.getFullYear()}${String(today.getMonth() + 1).padStart(2, '0')}${String(today.getDate()).padStart(2, '0')}`;
-        
         for (const ticket of tickets) {
             if (ticket.schedules && Array.isArray(ticket.schedules)) {
-                // 状態1（使用済み）以外を表示、ただし当日は状態1でも表示
-                const visibleSchedules = ticket.schedules.filter((schedule: any) => {
-                    if (schedule.use_state === 1) {
-                        // 当日の場合は状態1でも表示
-                        return schedule.entrance_date === todayStr;
-                    }
-                    // 状態0は常に表示
-                    return schedule.use_state === 0;
-                });
+                // 有効フラグが付いたスケジュールのみを処理
+                const effectiveSchedules = ticket.schedules.filter((schedule: any) => schedule.isEffective);
                 
-                for (const schedule of visibleSchedules) {
+                for (const schedule of effectiveSchedules) {
                     if (schedule.entrance_date) {
                         // 利用可能な予約タイプがあるかチェック
                         const lotteryData = await this.fetchLotteryCalendar(schedule.entrance_date);
