@@ -352,8 +352,8 @@ export class MainDialogFabImpl implements MainDialogFab {
         `;
 
         try {
-            // チケットマネージャーからデータを取得
-            const tickets = this.ticketManager.getAllTickets();
+            // チケットマネージャーからデータを読み込み
+            const tickets = await this.ticketManager.loadAllTickets();
             console.log('🔍 チケットマネージャーデータ:', tickets);
             
             if (tickets.length === 0) {
