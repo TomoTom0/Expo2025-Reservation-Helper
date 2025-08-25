@@ -1,7 +1,30 @@
 import { PageChecker } from './page-utils';
-import { getTicketManager, TicketManager } from './ticket-manager';
+import { getTicketManager, TicketManager, TicketData, ScheduleData } from './ticket-manager';
 import { ReactiveTicketManager, getReactiveTicketManager } from './reactive-ticket-manager';
-import { getPavilionManager, PavilionManager } from './pavilion-manager';
+import { getPavilionManager, PavilionManager, PavilionData, PavilionTimeSlot } from './pavilion-manager';
+
+/**
+ * 抽選カレンダーAPIレスポンス型定義
+ */
+interface LotteryCalendarResponse {
+    data?: LotteryCalendarData;
+    status?: string;
+    message?: string;
+}
+
+/**
+ * 抽選カレンダーデータ型定義
+ */
+interface LotteryCalendarData {
+    availableSlots?: string[];
+    status?: string;
+    lottery_type?: string;
+    registration_period?: {
+        start: string;
+        end: string;
+    };
+    // 実際に使用される他のフィールドがあれば追加
+}
 
 /**
  * メインダイアログ用FAB「yt」ボタン実装
@@ -27,7 +50,7 @@ export class MainDialogFabImpl implements MainDialogFab {
     private ticketManager!: TicketManager;
     private reactiveTicketManager!: ReactiveTicketManager;
     private pavilionManager!: PavilionManager;
-    private lastSearchResults: any[] = [];
+    private lastSearchResults: PavilionData[] = [];
     private isAvailableOnlyFilterActive: boolean = false;
     private dataPreloadPromise: Promise<void> | null = null;
 
@@ -468,7 +491,7 @@ export class MainDialogFabImpl implements MainDialogFab {
     /**
      * チケットタブUIを構築
      */
-    private async buildTicketTabUI(container: HTMLElement, tickets: any[], availableDates: string[]): Promise<void> {
+    private async buildTicketTabUI(container: HTMLElement, tickets: TicketData[], availableDates: string[]): Promise<void> {
         container.innerHTML = `
             <div class="ytomo-ticket-tab">
                 <!-- チケット簡易選択エリア -->
@@ -524,7 +547,7 @@ export class MainDialogFabImpl implements MainDialogFab {
     /**
      * チケット一覧を構築（調査結果に基づく）
      */
-    private async buildTicketList(tickets: any[]): Promise<string> {
+    private async buildTicketList(tickets: TicketData[]): Promise<string> {
         if (tickets.length === 0) {
             return `
                 <div class="ytomo-empty-state">
@@ -536,7 +559,7 @@ export class MainDialogFabImpl implements MainDialogFab {
         // 有効な入場予約があるチケットのみ表示
         const validTickets = tickets.filter(ticket => {
             const schedules = ticket.schedules || [];
-            return schedules.some((schedule: any) => schedule.isEffective);
+            return schedules.some((schedule: ScheduleData) => schedule.isEffective);
         });
 
         if (validTickets.length === 0) {
@@ -576,7 +599,7 @@ export class MainDialogFabImpl implements MainDialogFab {
     /**
      * 入場日時ボタンを構築（調査結果に基づく）
      */
-    private async buildEntranceDateButtons(schedules: any[], ticket: any): Promise<string> {
+    private async buildEntranceDateButtons(schedules: ScheduleData[], ticket: TicketData): Promise<string> {
         if (!Array.isArray(schedules) || schedules.length === 0) {
             return '<span class="ytomo-no-entrance-dates">入場予約なし</span>';
         }
@@ -615,7 +638,7 @@ export class MainDialogFabImpl implements MainDialogFab {
     /**
      * 入場予約の詳細な予約状況を取得
      */
-    private getReservationStatus(schedule: any, lotteryData?: any, ticket?: any): { statusText: string, availableTypes: string[] } {
+    private getReservationStatus(schedule: ScheduleData, lotteryData?: LotteryCalendarData | null, ticket?: TicketData): { statusText: string, availableTypes: string[] } {
         // すべての入場予約をable（選択可能）にする
         console.log('🔍 予約種類判定（すべてable）:', { schedule, lotteryData, ticket });
         
@@ -678,13 +701,13 @@ export class MainDialogFabImpl implements MainDialogFab {
     /**
      * 利用可能日付を抽出（調査結果に基づく）
      */
-    private async extractAvailableDates(tickets: any[]): Promise<string[]> {
+    private async extractAvailableDates(tickets: TicketData[]): Promise<string[]> {
         const dates = new Set<string>();
         
         for (const ticket of tickets) {
             if (ticket.schedules && Array.isArray(ticket.schedules)) {
                 // 有効フラグが付いたスケジュールのみを処理
-                const effectiveSchedules = ticket.schedules.filter((schedule: any) => schedule.isEffective);
+                const effectiveSchedules = ticket.schedules.filter((schedule: ScheduleData) => schedule.isEffective);
                 
                 for (const schedule of effectiveSchedules) {
                     if (schedule.entrance_date) {
@@ -718,7 +741,7 @@ export class MainDialogFabImpl implements MainDialogFab {
     /**
      * 抽選カレンダーデータを取得
      */
-    private async fetchLotteryCalendar(entranceDate: string): Promise<any> {
+    private async fetchLotteryCalendar(entranceDate: string): Promise<LotteryCalendarData | null> {
         try {
             const response = await fetch(`/api/d/lottery_calendars?entrance_date=${entranceDate}`, {
                 method: 'GET',
@@ -731,8 +754,23 @@ export class MainDialogFabImpl implements MainDialogFab {
 
             if (!response.ok) return null;
 
-            const calendarData = await response.json();
-            return calendarData.data || calendarData;
+            // API境界でanyを遮断し、型安全な構造に変換
+            const rawData: any = await response.json();
+            const sourceData = rawData.data || rawData;
+            
+            // 型安全なLotteryCalendarDataに変換
+            const calendarData: LotteryCalendarData = {
+                availableSlots: Array.isArray(sourceData.availableSlots) ? sourceData.availableSlots : [],
+                status: typeof sourceData.status === 'string' ? sourceData.status : undefined,
+                lottery_type: typeof sourceData.lottery_type === 'string' ? sourceData.lottery_type : undefined,
+                registration_period: sourceData.registration_period && 
+                                   typeof sourceData.registration_period === 'object' ? {
+                    start: sourceData.registration_period.start || '',
+                    end: sourceData.registration_period.end || ''
+                } : undefined
+            };
+            
+            return calendarData;
         } catch (error) {
             console.error('❌ 抽選カレンダー取得エラー:', error);
             return null;
@@ -1154,7 +1192,7 @@ export class MainDialogFabImpl implements MainDialogFab {
     /**
      * 予約種類を判定
      */
-    private determineReservationType(tickets: any[]): string {
+    private determineReservationType(tickets: TicketData[]): string {
         if (tickets.length === 0) return '1';
         
         // TODO: 実際の予約種類を判断する
@@ -1322,7 +1360,7 @@ export class MainDialogFabImpl implements MainDialogFab {
     /**
      * 単一予約実行
      */
-    private async executeSingleReservation(selectedTimeSlot: any, selectedTickets: any[]): Promise<void> {
+    private async executeSingleReservation(selectedTimeSlot: {pavilionId: string, timeSlot: PavilionTimeSlot}, selectedTickets: TicketData[]): Promise<void> {
         const { pavilionId, timeSlot } = selectedTimeSlot;
         
         // 誤操作防止オーバーレイを表示
@@ -1386,7 +1424,7 @@ export class MainDialogFabImpl implements MainDialogFab {
     /**
      * 順次予約実行（複数選択時）
      */
-    private async executeSequentialReservations(selectedTimeSlots: any[], selectedTickets: any[]): Promise<void> {
+    private async executeSequentialReservations(selectedTimeSlots: {pavilionId: string, timeSlot: PavilionTimeSlot}[], selectedTickets: TicketData[]): Promise<void> {
         // タイムスタンプ順でソート（選択順序を保持）
         const sortedTimeSlots = this.sortTimeSlotsByTimestamp(selectedTimeSlots);
         
@@ -1545,7 +1583,7 @@ export class MainDialogFabImpl implements MainDialogFab {
     /**
      * タイムスタンプ順でソート（選択順序を保持）
      */
-    private sortTimeSlotsByTimestamp(timeSlots: any[]): any[] {
+    private sortTimeSlotsByTimestamp(timeSlots: {pavilionId: string, timeSlot: PavilionTimeSlot}[]): {pavilionId: string, timeSlot: PavilionTimeSlot}[] {
         return timeSlots.map(slot => {
             // DOM要素からタイムスタンプを取得
             const button = this.mainDialogContainer?.querySelector(
@@ -1725,7 +1763,7 @@ export class MainDialogFabImpl implements MainDialogFab {
     /**
      * 全監視対象の空き状況を並列チェック（監視モード用）
      */
-    private async checkAllSlotsAvailability(timeSlots: any[], selectedTickets: any[]): Promise<{pavilionId: string, timeSlot: any} | null> {
+    private async checkAllSlotsAvailability(timeSlots: {pavilionId: string, timeSlot: PavilionTimeSlot}[], selectedTickets: TicketData[]): Promise<{pavilionId: string, timeSlot: PavilionTimeSlot} | null> {
         try {
             const entranceDate = this.getSearchParameters().entranceDate;
             if (!entranceDate) {
@@ -1816,7 +1854,7 @@ export class MainDialogFabImpl implements MainDialogFab {
     /**
      * 順次予約結果表示
      */
-    private showSequentialReservationResult(results: any[], successCount: number, failureCount: number): void {
+    private showSequentialReservationResult(results: {success: boolean, pavilionId: string, timeSlot: string, message?: string}[], successCount: number, failureCount: number): void {
         this.hideSequentialOverlay();
         
         if (successCount > 0) {
@@ -1855,7 +1893,7 @@ export class MainDialogFabImpl implements MainDialogFab {
     /**
      * パビリオン一覧を表示
      */
-    private displayPavilions(pavilions: any[]): void {
+    private displayPavilions(pavilions: PavilionData[]): void {
         const container = this.mainDialogContainer?.querySelector('#pavilion-list-container');
         if (!container) return;
 
@@ -1899,7 +1937,7 @@ export class MainDialogFabImpl implements MainDialogFab {
     /**
      * 時間帯ボタンを構築
      */
-    private buildTimeSlotButtons(timeSlots: any[], pavilionId: string): string {
+    private buildTimeSlotButtons(timeSlots: PavilionTimeSlot[], pavilionId: string): string {
         // 時間帯を数値順でソート
         const sortedTimeSlots = [...timeSlots].sort((a, b) => {
             const timeA = parseInt(a.time);
@@ -1961,7 +1999,7 @@ export class MainDialogFabImpl implements MainDialogFab {
     /**
      * スケジュールオブジェクトから時間情報を抽出
      */
-    private extractTimeFromSchedule(schedule: any): string {
+    private extractTimeFromSchedule(schedule: ScheduleData): string {
         // schedule_nameがある場合はそれを使用
         if (schedule.schedule_name) {
             return schedule.schedule_name;
@@ -2524,7 +2562,7 @@ export class MainDialogFabImpl implements MainDialogFab {
     /**
      * パビリオン一覧を検索
      */
-    private async searchPavilionList(query: string, ticketIds: string[], entranceDate?: string): Promise<any[]> {
+    private async searchPavilionList(query: string, ticketIds: string[], entranceDate?: string): Promise<PavilionData[]> {
         console.log(`🔍 パビリオン一覧検索: クエリ="${query}", チケット数=${ticketIds.length}, 入場日=${entranceDate}`);
         
         const pavilions = await this.pavilionManager.searchPavilions(query, ticketIds, entranceDate);
@@ -2536,10 +2574,10 @@ export class MainDialogFabImpl implements MainDialogFab {
     /**
      * パビリオンIDリストから時間帯情報を取得
      */
-    private async fetchTimeSlotsForPavilionIds(pavilionIds: string[], ticketIds: string[], entranceDate?: string): Promise<Map<string, any[]>> {
+    private async fetchTimeSlotsForPavilionIds(pavilionIds: string[], ticketIds: string[], entranceDate?: string): Promise<Map<string, PavilionTimeSlot[]>> {
         console.log(`🕐 時間帯情報取得開始: ${pavilionIds.length}件のパビリオン`);
         
-        const timeSlotsMap = new Map<string, any[]>();
+        const timeSlotsMap = new Map<string, PavilionTimeSlot[]>();
         
         // 並列実行でパフォーマンス向上（最大5件同時）
         const concurrency = Math.min(5, pavilionIds.length);
@@ -2570,7 +2608,7 @@ export class MainDialogFabImpl implements MainDialogFab {
     /**
      * パビリオンの時間帯情報を一括取得
      */
-    private async fetchPavilionTimeSlots(pavilions: any[], ticketIds: string[], entranceDate?: string): Promise<void> {
+    private async fetchPavilionTimeSlots(pavilions: PavilionData[], ticketIds: string[], entranceDate?: string): Promise<void> {
         // 満員パビリオン（date_status: 2）は時間帯情報を取得しない
         const availablePavilionIds = pavilions
             .filter(p => p.dateStatus !== 2)
@@ -2756,7 +2794,7 @@ export class MainDialogFabImpl implements MainDialogFab {
     /**
      * 空きパビリオン数を更新
      */
-    private updateAvailableCount(pavilions: any[]): void {
+    private updateAvailableCount(pavilions: PavilionData[]): void {
         // DOM要素ベースで空きパビリオン数を計算
         const pavilionItems = this.mainDialogContainer?.querySelectorAll('.ytomo-pavilion-item');
         let availableCount = 0;

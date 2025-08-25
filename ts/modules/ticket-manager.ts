@@ -6,13 +6,26 @@
 import { CacheManager } from '../types/index.js';
 
 /**
+ * スケジュールデータ型定義
+ */
+export interface ScheduleData {
+    entrance_date: string;      // 入場日（YYYYMMDD形式）
+    use_state: number;          // 利用状態（0:未使用, 1:入場済み, 2:使用済み等）
+    schedule_name?: string;     // スケジュール名
+    isEffective?: boolean;      // 有効フラグ（処理時に付与）
+    time_start?: string;        // 開始時間
+    time_end?: string;          // 終了時間
+    reservation_type?: string;  // 予約種別
+}
+
+/**
  * チケットデータ型定義
  */
 export interface TicketData {
-    ticket_id: string;       // 公式チケットID
-    isOwn: boolean;          // 自分のチケットかどうか
-    label?: string;          // チケットラベル
-    schedules?: any[];       // 入場予約情報
+    ticket_id: string;          // 公式チケットID
+    isOwn: boolean;             // 自分のチケットかどうか
+    label?: string;             // チケットラベル
+    schedules?: ScheduleData[]; // 入場予約情報
 }
 
 /**
@@ -34,12 +47,17 @@ export class TicketManager {
     /**
      * スケジュールデータに有効フラグを付与
      */
-    private processSchedules(schedules: any[]): any[] {
+    private processSchedules(schedules: any[]): ScheduleData[] {
         if (!Array.isArray(schedules)) return [];
         
         return schedules.map(schedule => ({
-            ...schedule,
-            // 有効フラグを付与: 状態0または（当日かつ状態1）
+            entrance_date: schedule.entrance_date || '',
+            use_state: schedule.use_state || 0,
+            schedule_name: schedule.schedule_name,
+            time_start: schedule.time_start,
+            time_end: schedule.time_end,
+            reservation_type: schedule.reservation_type,
+            // 有効フラグを付与: 状態0または（当日かつ状態1:入場済みでも当日は有効）
             isEffective: schedule.use_state === 0 || 
                         (schedule.use_state === 1 && schedule.entrance_date === this.todayStr)
         }));
