@@ -4,15 +4,6 @@ import { ReactiveTicketManager, getReactiveTicketManager } from './reactive-tick
 import { getPavilionManager, PavilionManager, PavilionData, PavilionTimeSlot } from './pavilion-manager';
 
 /**
- * 抽選カレンダーAPIレスポンス型定義
- */
-interface LotteryCalendarResponse {
-    data?: LotteryCalendarData;
-    status?: string;
-    message?: string;
-}
-
-/**
  * 抽選カレンダーデータ型定義
  */
 interface LotteryCalendarData {
@@ -1861,19 +1852,21 @@ export class MainDialogFabImpl implements MainDialogFab {
             const successResult = results.find(r => r.success);
             this.showReservationResult('予約成功', 'success');
             
-            // ステータスFAB更新
-            const pavilionName = this.lastSearchResults.find(p => p.id === successResult.pavilionId)?.name || successResult.pavilionId;
-            const entranceDate = this.getSearchParameters().entranceDate;
-            const dateTimeInfo = entranceDate ? `${this.formatDate(entranceDate)} ${this.formatTime(successResult.timeSlot)}` : '日時不明';
+            if (successResult) {
+                // ステータスFAB更新
+                const pavilionName = this.lastSearchResults.find(p => p.id === successResult.pavilionId)?.name || successResult.pavilionId;
+                const entranceDate = this.getSearchParameters().entranceDate;
+                const dateTimeInfo = entranceDate ? `${this.formatDate(entranceDate)} ${this.formatTime(successResult.timeSlot)}` : '日時不明';
             
-            const statusFab = this.mainDialogContainer?.querySelector('.ytomo-status-fab');
-            if (statusFab) {
-                statusFab.className = 'ytomo-status-fab success';
-                statusFab.innerHTML = `
-                    <div>予約成功</div>
-                    <div>${pavilionName}</div>
-                    <div>${dateTimeInfo}</div>
-                `;
+                const statusFab = this.mainDialogContainer?.querySelector('.ytomo-status-fab');
+                if (statusFab) {
+                    statusFab.className = 'ytomo-status-fab success';
+                    statusFab.innerHTML = `
+                        <div>予約成功</div>
+                        <div>${pavilionName}</div>
+                        <div>${dateTimeInfo}</div>
+                    `;
+                }
             }
         } else {
             this.showReservationResult(`全て失敗 (${failureCount}件)`, 'error');
@@ -2005,13 +1998,13 @@ export class MainDialogFabImpl implements MainDialogFab {
             return schedule.schedule_name;
         }
         
-        // entrance_timeやstart_time等の時間フィールドがあれば使用
-        if (schedule.entrance_time) {
-            return this.formatTime(schedule.entrance_time);
+        // time_startや時間フィールドがあれば使用
+        if (schedule.time_start) {
+            return this.formatTime(schedule.time_start);
         }
         
-        if (schedule.start_time) {
-            return this.formatTime(schedule.start_time);
+        if (schedule.time_end) {
+            return this.formatTime(schedule.time_end);
         }
         
         // 時間情報が見つからない場合は空文字
