@@ -34,6 +34,8 @@ if (process.env['NODE_ENV'] === 'development' || process.env['NODE_ENV'] === 'te
     });
 }
 
+// Vue.js統合は各MainDialogFabで直接実行
+
 // グローバル予約結果通知チェック（すべてのページで動作）
 const checkGlobalReservationResult = (): void => {
     try {

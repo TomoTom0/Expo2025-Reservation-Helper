@@ -43,7 +43,8 @@
       "Bash(npm run test:coverage:*)",
       "Bash(npm test:*)",
       "Bash(git tag:*)",
-      "Bash(gh release upload:*)"
+      "Bash(gh release upload:*)",
+      "Bash(npx webpack:*)"
     ],
     "deny": []
   }

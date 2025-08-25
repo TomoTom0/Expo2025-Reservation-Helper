@@ -1,0 +1,93 @@
+/**
+ * API・データ型定義（現行システムから継承・Vue対応版）
+ */
+
+// 現行システムから継承
+export interface ScheduleData {
+    entrance_date: string;      // 入場日（YYYYMMDD形式）
+    use_state: number;          // 利用状態（0:未使用, 1:入場済み, 2:使用済み等）
+    schedule_name?: string;     // スケジュール名
+    isEffective?: boolean;      // 有効フラグ（処理時に付与）
+    time_start?: string;        // 開始時間
+    time_end?: string;          // 終了時間
+    reservation_type?: string;  // 予約種別
+    selected?: boolean;         // UI選択状態フラグ
+}
+
+export interface LotteryCalendarData {
+    availableSlots?: string[];
+    status?: string;
+    lottery_type?: string;
+    registration_period?: {
+        start: string;
+        end: string;
+    };
+}
+
+export interface TicketData {
+    ticket_id: string;          // 公式チケットID
+    isOwn: boolean;             // 自分のチケットかどうか
+    label?: string;             // チケットラベル
+    schedules?: ScheduleData[]; // 入場予約情報
+}
+
+export interface TimeSlotData {
+    time: string;                 // "10:00"
+    endTime?: string;             // "11:00"
+    available: boolean;           // 予約可能かどうか
+    selected: boolean;            // 選択状態
+    capacity?: number;            // 定員
+    reserved?: number;            // 予約済み人数
+    reservationType: string;      // "normal", "lottery", "priority"
+    timeSlotId?: string;          // 時間帯ID
+}
+
+// 後方互換性のため
+export type PavilionTimeSlot = TimeSlotData;
+
+export interface PavilionData {
+    id: string;                   // パビリオンID
+    name: string;                 // パビリオン名
+    description?: string;         // 説明
+    isFavorite: boolean;          // お気に入り状態
+    timeSlots: TimeSlotData[]; // 時間帯一覧
+    reservationStatus: string;    // 予約状況
+    location?: string;            // 場所
+    category?: string;            // カテゴリ
+    imageUrl?: string;            // 画像URL
+    tags?: string[];              // タグ
+    dateStatus?: number;          // パビリオン全体の予約状況（2=満員）
+}
+
+// Vue固有の型定義
+export interface TimeSlotSelection {
+    pavilionId: string;
+    timeSlot: TimeSlotData;
+}
+
+export interface ReservationResult {
+    success: boolean;
+    pavilionId: string;
+    timeSlot: string;
+    message?: string;
+}
+
+// マネージャー型定義（現行システムからの継承）
+export interface TicketManagerInterface {
+    loadAllTickets(): Promise<TicketData[]>;
+    getAllTickets(): TicketData[];
+    getSelectedTickets(): TicketData[];
+    addTicket(ticketId: string, label?: string, isExternal?: boolean): Promise<void>;
+    selectTicket(ticketId: string, selected: boolean): void;
+}
+
+export interface PavilionManagerInterface {
+    searchPavilions(query: string, ticketIds?: string[], entranceDate?: string): Promise<PavilionData[]>;
+    refreshPavilionData(): Promise<PavilionData[]>;
+    loadFavoritePavilions?(): Promise<PavilionData[]>;
+    selectTimeSlot(pavilionId: string, timeSlot: TimeSlotData): void;
+    clearSelectedTimeSlots(): void;
+    executeReservation(pavilionId: string, timeSlot: TimeSlotData, entranceDate: string, registeredChannel: string): Promise<ReservationResult>;
+    addToFavorites?(pavilionId: string, name: string): void;
+    removeFromFavorites?(pavilionId: string): void;
+}

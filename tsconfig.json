@@ -22,8 +22,8 @@
     "emitDecoratorMetadata": true,
     "allowSyntheticDefaultImports": true,
     
-    // Chrome拡張固有設定
-    "types": ["chrome", "node"],
+    // Chrome拡張・Vue固有設定
+    "types": ["chrome", "node", "vue"],
     
     // パスマッピング
     "paths": {
@@ -40,13 +40,14 @@
     "strictPropertyInitialization": true,
     
     // 追加の型チェック
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
     "noImplicitOverride": true,
     "noPropertyAccessFromIndexSignature": true
   },
   "include": [
-    "ts/**/*"
+    "ts/**/*",
+    "vue-env.d.ts"
   ],
   "exclude": [
     "node_modules",

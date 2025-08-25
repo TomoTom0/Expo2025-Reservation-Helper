@@ -1,6 +1,7 @@
 const path = require('path');
 const webpack = require('webpack');
 const fs = require('fs');
+const { VueLoaderPlugin } = require('vue-loader');
 
 // version.datからバージョン番号を読み取り
 const getVersionFromFile = () => {
@@ -55,9 +56,14 @@ module.exports = {
   mode: 'development', // 開発モード（可読性維持）
   optimization: {
     minimize: false, // UserScriptの可読性維持のため無効化
+    splitChunks: false, // UserScript制約: chunk分割無効化
   },
   resolve: {
-    extensions: ['.ts', '.js'] // TypeScript優先で解決
+    extensions: ['.ts', '.js', '.vue'], // Vue SFC対応
+    alias: {
+      '@': path.resolve(__dirname, 'ts'), // エイリアス設定
+      'vue': 'vue/dist/vue.esm-bundler.js' // Vue runtime選択
+    }
   },
   target: 'web', // ブラウザ環境
   devtool: false, // ソースマップ無効化
@@ -66,14 +72,24 @@ module.exports = {
       banner: generateUserScriptHeader(),
       raw: true, // コメント形式として扱わない
       entryOnly: true
-    })
+    }),
+    new VueLoaderPlugin() // Vue Loader Plugin追加
   ],
   module: {
     rules: [
       {
+        test: /\.vue$/,
+        loader: 'vue-loader'
+      },
+      {
         test: /\.ts$/,
         exclude: /node_modules/,
-        use: 'ts-loader'
+        use: {
+          loader: 'ts-loader',
+          options: {
+            appendTsSuffixTo: [/\.vue$/], // .vueファイル内のTS処理
+          }
+        }
       },
       {
         test: /\.js$/,
@@ -91,6 +107,13 @@ module.exports = {
             ]
           }
         }
+      },
+      {
+        test: /\.css$/,
+        use: [
+          'style-loader', // JSに埋め込んでDOMに注入
+          'css-loader'    // CSSをJSモジュールとして読み込み
+        ]
       },
       {
         test: /\.s[ac]ss$/i,

@@ -1,5 +1,28 @@
 # 進行中の作業内容
 
+## 🚨 緊急対応中: Vue.js移行時のUserScript設計ミス修正（2025-08-25）
+
+### 問題発生
+- ❌ **ChunkLoadError**: `Loading chunk 959 failed`
+- ❌ **外部URL依存**: `https://s.yimg.jp/.../959.index.js`からchunk読み込み試行
+- ❌ **UserScript制約違反**: 動的import、chunk分割をUserScriptに導入
+- ❌ **設計ミス**: Chrome拡張機能とUserScriptの制約を混同
+
+### 根本原因
+1. **webpack設定ミス**: publicPathが外部URLに設定、chunk分割有効
+2. **技術選択ミス**: UserScriptで使用不可な動的importを導入
+3. **制約理解不足**: UserScript=単一ファイル必須の制約を無視
+
+### 修正方針
+- 🔧 **webpack.config.js修正**: chunk分割無効化、publicPath削除
+- 🔧 **動的import排除**: 全て静的importに変更
+- 🔧 **単一ファイルバンドル**: UserScript制約準拠への修正
+
+### 状態
+- 🔄 **対応中**: webpack設定とVue.js統合の根本修正が必要
+
+---
+
 ## 完了した作業: main dialogシステムのTypeScript型安全性向上（2025-08-25）
 
 ### 作業完了内容

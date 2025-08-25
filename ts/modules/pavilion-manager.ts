@@ -407,12 +407,12 @@ export class PavilionManager {
         // 既に選択済みの場合は選択解除
         if (this.selectedTimeSlots.has(key)) {
             this.selectedTimeSlots.delete(key);
-            timeSlot.selected = false;
+            // timeSlot.selected = false; // パラメータの直接変更を削除
             console.log(`🕐 時間帯選択解除: ${pavilionId} - ${timeSlot.time}`);
         } else {
             // 新規選択
             this.selectedTimeSlots.set(key, { ...timeSlot, selected: true });
-            timeSlot.selected = true;
+            // timeSlot.selected = true; // パラメータの直接変更を削除
         }
     }
 

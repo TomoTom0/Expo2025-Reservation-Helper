@@ -2,6 +2,13 @@ import { PageChecker } from './page-utils';
 import { getTicketManager, TicketManager, TicketData, ScheduleData } from './ticket-manager';
 import { ReactiveTicketManager, getReactiveTicketManager } from './reactive-ticket-manager';
 import { getPavilionManager, PavilionManager, PavilionData, PavilionTimeSlot } from './pavilion-manager';
+import { createApp, type App } from 'vue'
+import { createPinia } from 'pinia'
+import { createPersistedState } from 'pinia-plugin-persistedstate'
+import MainDialog from '../components/MainDialog.vue'
+import { useTicketsStore } from '@/stores/tickets'
+import { usePavilionsStore } from '@/stores/pavilions'
+import { useMainDialogStore } from '@/stores/mainDialog'
 
 /**
  * 抽選カレンダーデータ型定義
@@ -29,6 +36,8 @@ export interface MainDialogFab {
     addYTFabButton(): void;
     showMainDialog(): Promise<void>;
     hideMainDialog(): void;
+    showMainDialogLegacy(): Promise<void>;  // 旧実装（フォールバック用）
+    hideMainDialogLegacy(): void;           // 旧実装（フォールバック用）
     cleanup(): void;
 }
 
@@ -44,6 +53,10 @@ export class MainDialogFabImpl implements MainDialogFab {
     private lastSearchResults: PavilionData[] = [];
     private isAvailableOnlyFilterActive: boolean = false;
     private dataPreloadPromise: Promise<void> | null = null;
+    
+    // Vue.js統合
+    private vueApp: App | null = null;
+    private mountPoint: HTMLElement | null = null;
 
     /**
      * ページ読み込み時点での事前データ読み込みを開始
@@ -62,6 +75,48 @@ export class MainDialogFabImpl implements MainDialogFab {
     }
     
     /**
+     * Vue.js統合システムを初期化
+     */
+    private async initializeVueIntegration(): Promise<void> {
+        if (this.vueApp) return; // 既に初期化済み
+        
+        console.log('🚀 Vue統合システム初期化開始');
+        
+        try {
+            // マウントポイントを作成
+            this.mountPoint = document.createElement('div');
+            this.mountPoint.id = 'vue-main-dialog-integration';
+            this.mountPoint.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                pointer-events: auto;
+                z-index: 10000;
+            `;
+            document.body.appendChild(this.mountPoint);
+            
+            // Vue app作成
+            const pinia = createPinia();
+            pinia.use(createPersistedState());
+            this.vueApp = createApp(MainDialog);
+            this.vueApp.use(pinia);
+            
+            // 純粋なストアベースのため、Manager provideは不要
+            
+            // マウント
+            this.vueApp.mount(this.mountPoint);
+            
+            console.log('✅ Vue統合システム初期化完了');
+            
+        } catch (error) {
+            console.error('❌ Vue統合システム初期化エラー:', error);
+            throw error;
+        }
+    }
+    
+    /**
      * データの事前読み込み（バックグラウンド実行）
      */
     private async preloadData(): Promise<void> {
@@ -71,10 +126,35 @@ export class MainDialogFabImpl implements MainDialogFab {
             this.reactiveTicketManager = getReactiveTicketManager(this.ticketManager);
             this.pavilionManager = getPavilionManager();
             
+            // Vue版のPiniaストアも事前に初期化
+            if (!this.vueApp) {
+                await this.initializeVueIntegration();
+            }
+            
             // 重いデータ読み込みを並列で開始
             const preloadPromises = [
-                this.ticketManager.loadAllTickets(), // チケットデータ取得
-                // パビリオンデータの事前読み込みは現在のAPIでは不可（検索条件が必要）
+                this.ticketManager.loadAllTickets(), // 旧実装用チケットデータ取得
+                // Vue版用：Piniaストアのチケットデータも並行で読み込み
+                (async () => {
+                    try {
+                        // Vue Appが初期化されている場合のみストア初期化
+                        if (this.vueApp) {
+                            console.log('🏪 Piniaストア事前初期化中...');
+                            
+                            // 全ストアを並列で初期化
+                            const storeInitPromises = [
+                                this.initTicketsStore(),
+                                this.initPavilionsStore(),
+                                this.initMainDialogStore()
+                            ];
+                            
+                            await Promise.allSettled(storeInitPromises);
+                            console.log('✅ 全Piniaストア事前初期化完了');
+                        }
+                    } catch (error) {
+                        console.warn('⚠️ Piniaストア事前初期化エラー:', error);
+                    }
+                })()
             ];
             
             await Promise.allSettled(preloadPromises);
@@ -83,6 +163,30 @@ export class MainDialogFabImpl implements MainDialogFab {
         } catch (error) {
             console.warn('⚠️ メインダイアログ用データの事前読み込み中にエラー:', error);
         }
+    }
+
+    /**
+     * チケットストアの初期化
+     */
+    private async initTicketsStore(): Promise<void> {
+        const ticketsStore = useTicketsStore();
+        await ticketsStore.init();
+    }
+
+    /**
+     * パビリオンストアの初期化
+     */
+    private async initPavilionsStore(): Promise<void> {
+        const pavilionsStore = usePavilionsStore();
+        pavilionsStore.initialize();
+    }
+
+    /**
+     * メインダイアログストアの初期化
+     */
+    private async initMainDialogStore(): Promise<void> {
+        const mainDialogStore = useMainDialogStore();
+        // 設定の復元等が自動で行われるため、特別な初期化処理は不要
     }
 
     /**
@@ -187,7 +291,7 @@ export class MainDialogFabImpl implements MainDialogFab {
      */
     private async toggleMainDialog(): Promise<void> {
         if (mainDialogVisible) {
-            this.hideMainDialog();
+            this.hideMainDialogLegacy();
         } else {
             await this.showMainDialog();
         }
@@ -196,14 +300,20 @@ export class MainDialogFabImpl implements MainDialogFab {
     /**
      * メインダイアログを表示
      */
-    async showMainDialog(): Promise<void> {
-        console.log('🎯 メインダイアログ表示');
+    async showMainDialogLegacy(): Promise<void> {
+        console.log('🎯 メインダイアログ表示（旧実装）');
         
         // 既存のダイアログを削除
-        this.hideMainDialog();
+        this.hideMainDialogLegacy();
         
-        // チケットマネージャーにチケットデータをロード
-        await this.reactiveTicketManager.loadAllTickets();
+        // 事前読み込み済みかチェック
+        const existingTickets = this.ticketManager.getAllTickets();
+        if (existingTickets.length === 0) {
+            console.log('⚡ 事前読み込み未完了：チケットデータを読み込み中...');
+            await this.reactiveTicketManager.loadAllTickets();
+        } else {
+            console.log('⚡ 事前読み込み済み：チケットデータ読み込みをスキップ');
+        }
         
         // デバッグ: 読み込まれたチケットID一覧
         const loadedTickets = this.ticketManager.getAllTickets();
@@ -267,13 +377,50 @@ export class MainDialogFabImpl implements MainDialogFab {
     /**
      * メインダイアログを非表示
      */
-    hideMainDialog(): void {
+    hideMainDialogLegacy(): void {
         if (this.mainDialogContainer) {
             this.mainDialogContainer.remove();
             this.mainDialogContainer = null;
         }
         mainDialogVisible = false;
-        console.log('🎯 メインダイアログ非表示');
+        console.log('🎯 メインダイアログ非表示（旧実装）');
+    }
+
+    /**
+     * メインダイアログを表示（Vue統合版）
+     */
+    async showMainDialog(): Promise<void> {
+        console.log('🎯 Vue統合ダイアログ表示');
+        
+        // Vue統合システムを初期化（未初期化の場合）
+        await this.initializeVueIntegration();
+        
+        // カスタムイベントでVueコンポーネントにダイアログ表示を通知
+        const showEvent = new CustomEvent('main-dialog-show');
+        document.dispatchEvent(showEvent);
+        
+        // mainDialogVisibleフラグを更新（既存システムとの互換性）
+        (window as any).mainDialogVisible = true;
+    }
+
+    /**
+     * メインダイアログを非表示（Vue統合版）
+     */
+    hideMainDialog(): void {
+        console.log('🎯 Vue統合ダイアログ非表示');
+        
+        // カスタムイベントでVueコンポーネントにダイアログ非表示を通知
+        const hideEvent = new CustomEvent('main-dialog-hide');
+        document.dispatchEvent(hideEvent);
+        
+        // mainDialogVisibleフラグを更新
+        (window as any).mainDialogVisible = false;
+        
+        // 既存のクリーンアップも実行
+        if (this.mainDialogContainer) {
+            this.mainDialogContainer.remove();
+            this.mainDialogContainer = null;
+        }
     }
 
     /**
@@ -286,21 +433,21 @@ export class MainDialogFabImpl implements MainDialogFab {
         const closeButton = this.mainDialogContainer.querySelector('.ytomo-dialog-close');
         if (closeButton) {
             closeButton.addEventListener('click', () => {
-                this.hideMainDialog();
+                this.hideMainDialogLegacy();
             });
         }
 
         // オーバーレイクリックで閉じる
         this.mainDialogContainer.addEventListener('click', (e) => {
             if (e.target === this.mainDialogContainer) {
-                this.hideMainDialog();
+                this.hideMainDialogLegacy();
             }
         });
 
         // Escキーで閉じる
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape' && mainDialogVisible) {
-                this.hideMainDialog();
+                this.hideMainDialogLegacy();
             }
         });
 

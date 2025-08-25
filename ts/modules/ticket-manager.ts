@@ -139,11 +139,14 @@ export class TicketManager {
                     
                     // デバッグ: 自分のチケットのschedules状況を確認
                     console.log(`📅 自分のチケット ${ticketData.ticket_id}: schedules=${ticketData.schedules?.length || 0}件`);
+                    // チケット詳細ログは削減（必要時のみ有効化）
+                    /*
                     if (ticketData.schedules && ticketData.schedules.length > 0) {
                         ticketData.schedules.forEach((schedule: any, i: number) => {
                             console.log(`  [${i}] entrance_date=${schedule.entrance_date}, use_state=${schedule.use_state}`);
                         });
                     }
+                    */
                     
                     tickets.push(ticketData);
                     this.tickets.set(ticketData.ticket_id, ticketData);
@@ -274,11 +277,14 @@ export class TicketManager {
 
                         // デバッグ: 外部チケットのschedules状況を確認
                         console.log(`📅 外部チケット ${ticketId}: schedules=${ticketData.schedules?.length || 0}件`);
+                        // チケット詳細ログは削減（必要時のみ有効化）
+                        /*
                         if (ticketData.schedules && ticketData.schedules.length > 0) {
                             ticketData.schedules.forEach((schedule: any, i: number) => {
                                 console.log(`  [${i}] entrance_date=${schedule.entrance_date}, use_state=${schedule.use_state}`);
                             });
                         }
+                        */
 
                         console.log(`✅ 外部チケット${ticketId}をchannel=${testChannel}で取得成功`);
                         return ticketData;

@@ -32,7 +32,8 @@ export class ReactiveTicketManager {
 
         // チケット一覧関連のUI更新
         this.reactiveSystem.watch('tickets', () => {
-            console.log('🔄 ReactiveTicketManager: tickets changed');
+            // ログ削減: 必要時のみ有効化
+            // console.log('🔄 ReactiveTicketManager: tickets changed');
             this.executeUIUpdates('ticketList');
         });
     }

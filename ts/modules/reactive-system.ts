@@ -181,7 +181,8 @@ export class ReactiveSystem<T extends object> {
             });
         }
 
-        console.log(`🔄 Reactive: ${property} changed from`, oldValue, 'to', newValue);
+        // ログ削減: 必要時のみ有効化
+        // console.log(`🔄 Reactive: ${property} changed from`, oldValue, 'to', newValue);
     }
 
     /**
@@ -213,7 +214,8 @@ export class ReactiveSystem<T extends object> {
             }
         });
 
-        console.log(`🔄 Reactive: Executed ${updates.length} batched updates`);
+        // ログ削減: 必要時のみ有効化
+        // console.log(`🔄 Reactive: Executed ${updates.length} batched updates`);
     }
 
     /**
