@@ -1,4 +1,4 @@
-# 完全Vue移行実装設計書
+# 完全Vue移行実装設計書（型安全性対応版）
 
 ## 1. 実装アプローチ
 
@@ -9,8 +9,11 @@
 2. **Phase 2**: 業務ロジック完全移植  
 3. **Phase 3**: 最適化と統合テスト
 
-### 1.2 機能完全性の保証
-現行システムの全機能を100%移植するため、メソッド単位での詳細マッピングを実施。
+### 1.2 機能完全性と型安全性の保証
+現行システムの全機能を100%移植し、同時に型安全性を向上：
+- **型定義活用**: 現行で実装済みの`ScheduleData`、`LotteryCalendarData`等を継承
+- **anyの最小化**: 現行システムで88%削減達成した型安全性をVueでも維持
+- **API境界遮断**: 外部APIレスポンスの型安全処理パターンを踏襲
 
 ## 2. Vue.js アーキテクチャ設計
 
@@ -31,13 +34,65 @@ MainDialog.vue (ルートコンポーネント)
 └── ReservationOverlay.vue (予約実行オーバーレイ)
 ```
 
-### 2.2 状態管理設計（Pinia使用）
+### 2.2 型定義システム（現行から継承）
+```typescript
+// types/api.ts - 現行システムから継承
+interface ScheduleData {
+    entrance_date: string;      // 入場日（YYYYMMDD形式）
+    use_state: number;          // 利用状態（0:未使用, 1:入場済み, 2:使用済み等）
+    schedule_name?: string;     // スケジュール名
+    isEffective?: boolean;      // 有効フラグ（処理時に付与）
+    time_start?: string;        // 開始時間
+    time_end?: string;          // 終了時間
+    reservation_type?: string;  // 予約種別
+}
+
+interface LotteryCalendarData {
+    availableSlots?: string[];
+    status?: string;
+    lottery_type?: string;
+    registration_period?: {
+        start: string;
+        end: string;
+    };
+}
+
+interface TicketData {
+    ticket_id: string;          // 公式チケットID
+    isOwn: boolean;             // 自分のチケットかどうか
+    label?: string;             // チケットラベル
+    schedules?: ScheduleData[]; // 入場予約情報
+}
+
+interface PavilionData {
+    id: string;                   // パビリオンID
+    name: string;                 // パビリオン名
+    description?: string;         // 説明
+    isFavorite: boolean;          // お気に入り状態
+    timeSlots: PavilionTimeSlot[]; // 時間帯一覧
+    reservationStatus: string;    // 予約状況
+    dateStatus?: number;          // パビリオン全体の予約状況（2=満員）
+}
+
+interface PavilionTimeSlot {
+    time: string;                 // "10:00"
+    endTime?: string;             // "11:00"
+    available: boolean;           // 予約可能かどうか
+    selected: boolean;            // 選択状態
+    capacity?: number;            // 定員
+    reserved?: number;            // 予約済み人数
+    reservationType: string;      // "1日券", "3日券", "週末券", "月間券"
+    timeSlotId?: string;          // 時間帯ID
+}
+```
+
+### 2.3 状態管理設計（Pinia使用・型安全）
 ```typescript
 // stores/mainDialog.ts
 export const useMainDialogStore = defineStore('mainDialog', {
   state: () => ({
     isVisible: false,
-    activeTab: 'ticket',
+    activeTab: 'ticket' as 'ticket' | 'pavilion',
     version: '0.5.4'
   })
 })
@@ -55,8 +110,8 @@ export const useTicketsStore = defineStore('tickets', {
 // stores/pavilions.ts
 export const usePavilionsStore = defineStore('pavilions', {
   state: () => ({
-    searchResults: [] as any[],
-    selectedTimeSlots: [] as any[],
+    searchResults: [] as PavilionData[],
+    selectedTimeSlots: [] as {pavilionId: string, timeSlot: PavilionTimeSlot}[],
     isAvailableOnlyFilter: false,
     isLoading: false
   })
@@ -111,27 +166,28 @@ export const useTicketCache = () => {
 
 ### 3.2 パビリオン管理機能移植
 
-#### 検索・表示機能
+#### 検索・表示機能（型安全版）
 ```typescript
 // 現行: MainDialogFabImpl.handlePavilionSearch()
 // Vue: composables/usePavilionSearch.ts
 export const usePavilionSearch = () => {
   const pavilionsStore = usePavilionsStore()
-  const pavilionManager = inject('pavilionManager')
+  const pavilionManager = inject<PavilionManager>('pavilionManager')
   
-  const search = async (searchTerm: string = '') => {
+  const search = async (searchTerm: string = ''): Promise<void> => {
     pavilionsStore.isLoading = true
     try {
-      let pavilions
+      // 型安全なパビリオンデータ取得
+      let pavilions: PavilionData[]
       if (searchTerm.trim()) {
         pavilions = await pavilionManager.searchPavilions(searchTerm)
       } else {
         pavilions = await pavilionManager.loadFavoritePavilions()
       }
       
-      // 時間帯情報を取得（現行と同じロジック）
-      const allPavilionIds = pavilions.map(p => p.id)
-      const timeSlotsMap = await fetchTimeSlotsForPavilionIds(allPavilionIds)
+      // 時間帯情報を取得（現行と同じロジック・型安全）
+      const allPavilionIds: string[] = pavilions.map(p => p.id)
+      const timeSlotsMap: Map<string, PavilionTimeSlot[]> = await fetchTimeSlotsForPavilionIds(allPavilionIds)
       
       // パビリオンに時間帯情報を設定
       for (const pavilion of pavilions) {
@@ -149,17 +205,19 @@ export const usePavilionSearch = () => {
 }
 ```
 
-#### 予約実行システム移植
+#### 予約実行システム移植（型安全版）
 ```typescript
 // 現行: MainDialogFabImpl.handleMakeReservation()
 // Vue: composables/useReservationExecution.ts
 export const useReservationExecution = () => {
   const pavilionsStore = usePavilionsStore()
   const overlayStore = useOverlayStore()
+  const pavilionManager = inject<PavilionManager>('pavilionManager')
+  const ticketManager = inject<TicketManager>('ticketManager')
   
-  const executeReservation = async () => {
-    const selectedTimeSlots = pavilionManager.getSelectedTimeSlots()
-    const selectedTickets = ticketManager.getSelectedTickets()
+  const executeReservation = async (): Promise<void> => {
+    const selectedTimeSlots: {pavilionId: string, timeSlot: PavilionTimeSlot}[] = pavilionManager.getSelectedTimeSlots()
+    const selectedTickets: TicketData[] = ticketManager.getSelectedTickets()
     
     if (selectedTimeSlots.length === 0) {
       showNotification('時間帯を選択してください', 'error')
@@ -173,8 +231,11 @@ export const useReservationExecution = () => {
     }
   }
   
-  // 現行の複雑な予約実行ロジックを完全移植
-  const executeSingleReservation = async (timeSlot: any, tickets: any[]) => {
+  // 現行の複雑な予約実行ロジックを完全移植（型安全版）
+  const executeSingleReservation = async (
+    timeSlot: {pavilionId: string, timeSlot: PavilionTimeSlot}, 
+    tickets: TicketData[]
+  ): Promise<void> => {
     // MainDialogFabImpl.executeSingleReservation() のロジックを移植
     overlayStore.showProcessingOverlay('予約実行中...')
     try {
@@ -195,8 +256,11 @@ export const useReservationExecution = () => {
     }
   }
   
-  // 現行の監視モード・順次予約も完全移植
-  const executeSequentialReservations = async (timeSlots: any[], tickets: any[]) => {
+  // 現行の監視モード・順次予約も完全移植（型安全版）
+  const executeSequentialReservations = async (
+    timeSlots: {pavilionId: string, timeSlot: PavilionTimeSlot}[], 
+    tickets: TicketData[]
+  ): Promise<void> => {
     // MainDialogFabImpl.executeSequentialReservations() の複雑ロジックを移植
     // - 監視モード vs 順次予約モード
     // - リアルタイム空き状況チェック
@@ -490,13 +554,13 @@ export const useDataPersistence = () => {
 
 ## 6. パフォーマンス最適化
 
-### 6.1 事前読み込み機能移植
+### 6.1 事前読み込み機能移植（型安全版）
 ```typescript
 // composables/useDataPreloading.ts
 export const useDataPreloading = () => {
   const preloadPromise = ref<Promise<void> | null>(null)
   
-  const startPreload = () => {
+  const startPreload = (): Promise<void> => {
     if (preloadPromise.value) return preloadPromise.value
     
     console.log('🚀 Vue: データ事前読み込み開始')
@@ -505,12 +569,12 @@ export const useDataPreloading = () => {
     return preloadPromise.value
   }
   
-  const preloadData = async () => {
+  const preloadData = async (): Promise<void> => {
     try {
-      const ticketManager = inject('ticketManager')
+      const ticketManager = inject<TicketManager>('ticketManager')
       
-      // 現行と同じ並列読み込み
-      const preloadPromises = [
+      // 現行と同じ並列読み込み（型安全）
+      const preloadPromises: Promise<any>[] = [
         ticketManager.loadAllTickets(),
         // 他の重い処理
       ]
@@ -523,6 +587,42 @@ export const useDataPreloading = () => {
   }
   
   return { startPreload, preloadPromise }
+}
+```
+
+### 6.2 API境界処理（現行システムから継承）
+```typescript
+// composables/useApiSafety.ts
+export const useApiSafety = () => {
+  // 現行のfetchLotteryCalendar()パターンを継承
+  const fetchLotteryCalendarSafe = async (entranceDate: string): Promise<LotteryCalendarData | null> => {
+    try {
+      const response = await fetch(`/api/d/lottery_calendars?entrance_date=${entranceDate}`)
+      if (!response.ok) return null
+      
+      // API境界でanyを遮断し、型安全な構造に変換（現行と同じパターン）
+      const rawData: any = await response.json()
+      const sourceData = rawData.data || rawData
+      
+      const calendarData: LotteryCalendarData = {
+        availableSlots: Array.isArray(sourceData.availableSlots) ? sourceData.availableSlots : [],
+        status: typeof sourceData.status === 'string' ? sourceData.status : undefined,
+        lottery_type: typeof sourceData.lottery_type === 'string' ? sourceData.lottery_type : undefined,
+        registration_period: sourceData.registration_period && 
+                           typeof sourceData.registration_period === 'object' ? {
+          start: sourceData.registration_period.start || '',
+          end: sourceData.registration_period.end || ''
+        } : undefined
+      }
+      
+      return calendarData
+    } catch (error) {
+      console.error('❌ 抽選カレンダー取得エラー:', error)
+      return null
+    }
+  }
+  
+  return { fetchLotteryCalendarSafe }
 }
 ```
 
@@ -545,22 +645,37 @@ export const useDataPreloading = () => {
 
 ## 8. 実装工数見積り
 
-### Phase 1: 環境構築 (2日)
+### Phase 1: 環境構築・型基盤整備 (2-3日)
 - Vue.js/Pinia環境設定
 - webpack設定更新
+- 型定義ファイル整備（現行から継承・拡張）
 - 基本コンポーネント骨格作成
 
-### Phase 2: 機能移植 (5-7日)
-- チケット管理機能完全移植
-- パビリオン検索・表示機能移植
-- 予約実行システム移植
+### Phase 2: 機能移植（型安全版） (4-6日)
+- チケット管理機能完全移植（TicketData型活用）
+- パビリオン検索・表示機能移植（PavilionData型活用）
+- 予約実行システム移植（型安全な引数・戻り値）
 - 監視・自動予約システム移植
+- API境界処理の実装（現行パターン継承）
 
-### Phase 3: 統合・最適化 (3-4日)
+### Phase 3: 統合・最適化・検証 (3-4日)
 - 既存システムとの統合
+- 型安全性検証（tsc --noEmit実行）
 - パフォーマンス最適化
 - 全機能テスト・デバッグ
 
-**総工数: 10-13日程度**
+**総工数: 9-13日程度**
 
-現行システムの複雑さを考慮すると、完全な機能移植にはかなりの工数が必要だが、iPhone互換性問題の解決という明確な目標があるため、投資価値は高い。
+## 9. 型安全性による追加メリット
+
+### 9.1 開発効率向上
+- **IDEサポート強化**: 自動補完・エラー検出・リファクタリング支援
+- **ランタイムエラー削減**: コンパイル時に型エラーを検出
+- **保守性向上**: 型定義がドキュメントとしても機能
+
+### 9.2 品質保証
+- **現行システムで実証済み**: 88%のany削減を達成した実績
+- **API境界の安全性**: 外部APIレスポンスの型安全処理パターン確立
+- **段階的改善**: 既存の型定義を活用した低リスク移行
+
+現行システムの型安全性改善実績により、Vue移行時の品質リスクが大幅に低減され、開発効率と保守性の両立が可能。
