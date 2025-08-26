@@ -12,6 +12,7 @@ export const useTicketsStore = defineStore('tickets', () => {
   // State
   const tickets = ref<Map<string, TicketData>>(new Map())
   const selectedTicketIds = ref<Set<string>>(new Set())
+  const selectedEntranceDates = ref<Map<string, string>>(new Map()) // ticketId -> scheduleId mapping for persistence
   const isLoading = ref(false)
   const availableDates = ref<string[]>([])
   const todayStr = ref<string>(getTodayString())
@@ -20,10 +21,17 @@ export const useTicketsStore = defineStore('tickets', () => {
   const allTickets = computed(() => Array.from(tickets.value.values()))
   
   const selectedTickets = computed(() => 
-    allTickets.value.filter(ticket => selectedTicketIds.value.has(ticket.ticket_id))
+    allTickets.value.filter(ticket => 
+      ticket.schedules?.some(schedule => schedule.selected)
+    )
   )
 
-  const selectedTicketCount = computed(() => selectedTicketIds.value.size)
+  const selectedTicketCount = computed(() => {
+    // 入場予約が選択されているチケットの数
+    return allTickets.value.filter(ticket => 
+      ticket.schedules?.some(schedule => schedule.selected)
+    ).length
+  })
 
   const ownTickets = computed(() => 
     allTickets.value.filter(ticket => ticket.isOwn)
@@ -83,7 +91,7 @@ export const useTicketsStore = defineStore('tickets', () => {
         time_start: schedule.time_start,
         time_end: schedule.time_end,
         reservation_type: schedule.reservation_type,
-        // 有効フラグを付与: 状態0または（当日かつ状態1:入場済みでも当日は有効）
+        // 有効フラグを付与: 未使用または当日入場済みは有効
         isEffective: schedule.use_state === 0 || 
                      (schedule.use_state === 1 && schedule.entrance_date === todayStr.value)
       }
@@ -152,6 +160,7 @@ export const useTicketsStore = defineStore('tickets', () => {
       const dates = await extractAvailableDates()
       availableDates.value = dates
       
+      
       return Array.from(tickets.value.values())
     } finally {
       setLoading(false)
@@ -162,8 +171,6 @@ export const useTicketsStore = defineStore('tickets', () => {
    * 自分のチケット取得
    */
   const loadOwnTickets = async (): Promise<TicketData[]> => {
-    console.log('🔍 自分のチケット情報取得中...')
-    
     try {
       const response = await fetch('/api/d/my/tickets/?count=1', {
         method: 'GET',
@@ -375,16 +382,76 @@ export const useTicketsStore = defineStore('tickets', () => {
     isLoading.value = loading
   }
 
+  // 入場日時選択の永続化機能
+  const saveSelectedEntranceDate = (ticketId: string, scheduleId: string) => {
+    selectedEntranceDates.value.set(ticketId, scheduleId)
+    console.log(`💾 入場日時選択を保存: ${ticketId} -> ${scheduleId}`)
+  }
+
+  const removeSelectedEntranceDate = (ticketId: string) => {
+    selectedEntranceDates.value.delete(ticketId)
+    console.log(`🗑️ 入場日時選択を削除: ${ticketId}`)
+  }
+
+  const restoreSelectedEntranceDates = () => {
+    let restoredCount = 0
+    
+    // selectedEntranceDatesがMapでない場合はMapに変換  
+    if (!(selectedEntranceDates.value instanceof Map)) {
+      selectedEntranceDates.value = new Map()
+    }
+    
+    try {
+      // 復元前にtickets.valueが空でないことを確認
+      if (tickets.value.size === 0) {
+        console.log('⚠️ チケットデータが未ロードのため復元をスキップ')
+        return
+      }
+      
+      for (const [ticketId, scheduleId] of selectedEntranceDates.value.entries()) {
+        const ticket = tickets.value.get(ticketId)
+        if (ticket && ticket.schedules) {
+          const schedule = ticket.schedules.find(s => 
+            s.entrance_date + (s.time_start || '') === scheduleId
+          )
+          if (schedule) {
+            // Vueのリアクティビティを考慮してネストしたオブジェクトも明示的に更新
+            Object.assign(schedule, { selected: true })
+            restoredCount++
+            console.log(`🔄 復元: ${ticketId} - ${scheduleId}`)
+          } else {
+            // 見つからないスケジュールIDは削除
+            selectedEntranceDates.value.delete(ticketId)
+            console.log(`🗑️ 無効な選択を削除: ${ticketId} - ${scheduleId}`)
+          }
+        } else {
+          // 存在しないチケットの選択は削除
+          selectedEntranceDates.value.delete(ticketId)
+          console.log(`🗑️ 存在しないチケットの選択を削除: ${ticketId}`)
+        }
+      }
+      
+      if (restoredCount > 0) {
+        console.log(`✅ 入場日時選択状態復元完了: ${restoredCount}個`)
+      }
+    } catch (error) {
+      console.error('❌ 入場日時復元エラー:', error)
+      selectedEntranceDates.value = new Map()
+    }
+  }
+
   // 初期化メソッド
   const init = async (): Promise<void> => {
     console.log('🎫 チケットストア初期化開始')
     await loadAllTickets()
+    restoreSelectedEntranceDates()
   }
 
   return {
     // State
     tickets,
     selectedTicketIds,
+    selectedEntranceDates,
     isLoading,
     availableDates,
     
@@ -408,6 +475,32 @@ export const useTicketsStore = defineStore('tickets', () => {
     deselectAllTickets,
     setAvailableDates,
     setLoading,
-    extractAvailableDates
+    extractAvailableDates,
+    saveSelectedEntranceDate,
+    removeSelectedEntranceDate,
+    restoreSelectedEntranceDates
+  }
+}, {
+  persist: {
+    key: 'ytomo-tickets-store',
+    pick: ['selectedEntranceDates'], // 入場日時選択のみ永続化
+    serializer: {
+      serialize: (data: any) => {
+        // MapをObjectに変換してシリアライズ
+        const serialized = { ...data }
+        if (serialized['selectedEntranceDates'] instanceof Map) {
+          serialized['selectedEntranceDates'] = Object.fromEntries(serialized['selectedEntranceDates'])
+        }
+        return JSON.stringify(serialized)
+      },
+      deserialize: (data: string) => {
+        const parsed = JSON.parse(data)
+        // ObjectをMapに復元
+        if (parsed['selectedEntranceDates'] && typeof parsed['selectedEntranceDates'] === 'object') {
+          parsed['selectedEntranceDates'] = new Map(Object.entries(parsed['selectedEntranceDates']))
+        }
+        return parsed
+      }
+    }
   }
 })

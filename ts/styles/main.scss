@@ -16,3 +16,55 @@ table[class*='style_main__timetable__'] {
     cursor: pointer !important;
   }
 }
+
+// 公式サイトの既存要素を非表示
+#ot-sdk-btn-floating {
+  display: none !important;
+}
+
+// YTFABボタン
+.ytomo-main-fab {
+  position: fixed;
+  bottom: 80px;
+  right: 20px;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background-color: #ff6b35;
+  color: white;
+  border: none;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+  transition: all 0.2s ease;
+  z-index: 999;
+
+  &:hover {
+    transform: scale(1.1);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+  }
+
+  &:focus {
+    outline: none;
+  }
+}
+
+// メインダイアログ表示中はYTボタンを非表示
+.ytomo-dialog-overlay ~ .ytomo-main-fab {
+  display: none;
+}
+
+// ダイアログ内の全要素のfocus outline削除
+.ytomo-dialog-overlay * {
+  &:focus {
+    outline: none !important;
+  }
+}

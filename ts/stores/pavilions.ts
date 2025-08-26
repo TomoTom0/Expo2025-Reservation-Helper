@@ -49,7 +49,7 @@ export const usePavilionsStore = defineStore('pavilions', () => {
   /**
    * 初期化処理
    */
-  const initialize = () => {
+  const init = async (): Promise<void> => {
     // favoriteIdsがSetでない場合はSetに変換（persist復元時の対応）
     if (!(favoriteIds.value instanceof Set)) {
       const idsArray = Array.isArray(favoriteIds.value) ? favoriteIds.value : []
@@ -234,6 +234,10 @@ export const usePavilionsStore = defineStore('pavilions', () => {
     isLoading.value = true
     searchQuery.value = query
     
+    // 検索時は選択状態をリセット（旧ソースからの変更仕様）
+    clearSelectedTimeSlots()
+    console.log('🔄 検索実行により選択状態をリセット')
+    
     // 検索開始時に古い結果をクリア
     pavilions.value.clear()
     lastSearchResults.value = []
@@ -264,7 +268,9 @@ export const usePavilionsStore = defineStore('pavilions', () => {
       
       // Step 2: 各パビリオンの時間帯情報を取得
       console.log('⏳ 時間帯情報取得開始...')
-      await fetchPavilionTimeSlots(pavilionResults, ticketIds, entranceDate)
+      const pavilionIds = pavilionResults.map(p => p.id)
+      const timeSlotsMap = await getTimeSlotsForPavilions(pavilionIds, ticketIds, entranceDate)
+      applyTimeSlotsToData(pavilionResults, timeSlotsMap)
       
       // メモリに保存
       for (const pavilion of pavilionResults) {
@@ -283,12 +289,56 @@ export const usePavilionsStore = defineStore('pavilions', () => {
   }
 
 
+
+  /**
+   * pavilion IDsから時間帯情報をまとめて取得して返す関数
+   */
+  const getTimeSlotsForPavilions = async (pavilionIds: string[], ticketIds: string[] = [], entranceDate?: string): Promise<Map<string, TimeSlotData[]>> => {
+    const results = new Map<string, TimeSlotData[]>()
+    
+    for (const pavilionId of pavilionIds) {
+      try {
+        const timeSlots = await getPavilionTimeSlots(pavilionId, ticketIds, entranceDate)
+        results.set(pavilionId, timeSlots)
+      } catch (error) {
+        console.warn(`⚠️ パビリオン ${pavilionId} の時間帯取得に失敗:`, error)
+        results.set(pavilionId, [])
+      }
+    }
+    
+    return results
+  }
+
+  /**
+   * 既存のパビリオンデータに時間帯情報を設定する関数
+   */
+  const applyTimeSlotsToData = (pavilions: PavilionData[], timeSlotsMap: Map<string, TimeSlotData[]>): void => {
+    pavilions.forEach(pavilion => {
+      const timeSlots = timeSlotsMap.get(pavilion.id) || []
+      pavilion.timeSlots = timeSlots
+      
+      // 満員状態を更新
+      const hasAvailableSlots = timeSlots.some(slot => slot.available)
+      if (!hasAvailableSlots && timeSlots.length > 0) {
+        pavilion.dateStatus = 2 // 全て満員
+      } else if (timeSlots.length === 0) {
+        pavilion.dateStatus = 2 // 時間帯なし（満員扱い）
+      } else {
+        pavilion.dateStatus = 1 // 空きあり
+      }
+    })
+  }
+
   /**
    * お気に入り読み込み処理  
    */
-  const loadFavoritePavilions = async (): Promise<PavilionData[]> => {
+  const loadFavoritePavilions = async (entranceDate?: string, ticketIds: string[] = []): Promise<PavilionData[]> => {
     console.log('⭐ お気に入りパビリオン読み込み')
     isLoading.value = true
+    
+    // お気に入り読み込み時も選択状態をリセット
+    clearSelectedTimeSlots()
+    console.log('🔄 お気に入り読み込みにより選択状態をリセット')
 
     try {
       if (favoriteIds.value.size === 0) {
@@ -299,45 +349,34 @@ export const usePavilionsStore = defineStore('pavilions', () => {
       const favoriteIdArray = Array.from(favoriteIds.value)
       console.log(`🔍 お気に入りパビリオン検索中: ${favoriteIdArray.join(', ')}`)
 
-      // お気に入りパビリオンの基本情報を取得
-      const favoriteResults: PavilionData[] = []
-      for (const favoriteId of favoriteIdArray) {
-        try {
-          const searchUrl = `/api/d/events/${favoriteId}`
-          const response = await fetch(searchUrl, {
-            method: 'GET',
-            headers: {
-              'Accept': 'application/json',
-              'X-Api-Lang': 'ja'
-            },
-            credentials: 'include'
-          })
-          
-          if (response.ok) {
-            const data = await response.json()
-            if (data.event) {
-              const pavilion = parseEventItem(data.event)
-              if (pavilion) {
-                favoriteResults.push(pavilion)
-              }
-            }
-          }
-        } catch (error) {
-          console.warn(`⚠️ お気に入りパビリオン${favoriteId}の取得エラー:`, error)
-        }
-      }
-
-      // 時間帯情報を一括取得
-      if (favoriteResults.length > 0) {
-        await fetchPavilionTimeSlots(favoriteResults, [], undefined, true)
-      }
+      // 1. 時間帯情報をまとめて取得
+      const timeSlotsMap = await getTimeSlotsForPavilions(favoriteIdArray, ticketIds, entranceDate)
+      
+      // 2. 基本パビリオンデータを作成
+      const favoriteResults: PavilionData[] = favoriteIdArray.map(id => ({
+        id,
+        name: `パビリオン ${id}`,
+        description: '',
+        isFavorite: true,
+        timeSlots: [],
+        reservationStatus: 'available',
+        dateStatus: 1
+      }))
+      
+      // 3. 取得した時間帯情報を適用
+      applyTimeSlotsToData(favoriteResults, timeSlotsMap)
+      
+      console.log(`🔍 お気に入り取得完了: ${favoriteResults.length}件`)
       
       // 結果を保存
       favoriteResults.forEach(pavilion => {
         pavilions.value.set(pavilion.id, pavilion)
       })
 
+      // allPavilionsを更新（computed propertyの再計算をトリガー）  
       lastSearchResults.value = favoriteResults
+      console.log(`✅ お気に入り読み込み完了: ${favoriteResults.length}件をallPavilionsに反映`)
+      
       return favoriteResults
     } catch (error) {
       console.error('❌ お気に入り読み込みエラー:', error)
@@ -524,24 +563,66 @@ export const usePavilionsStore = defineStore('pavilions', () => {
     pavilionId: string, 
     timeSlot: TimeSlotData, 
     entranceDate: string, 
-    registeredChannel: string
+    registeredChannel: string,
+    ticketIds: string[] = []
   ): Promise<ReservationResult> => {
-    console.log('📋 予約実行開始:', { pavilionId, timeSlot, entranceDate, registeredChannel })
-
+    console.log('🎯 予約実行開始:', { pavilionId, timeSlot, entranceDate, registeredChannel, ticketIds })
+    
     try {
-      // TODO: 実際の予約API呼び出しを実装
-      // 現在はモックレスポンス
-      await new Promise(resolve => setTimeout(resolve, 1000))
-
-      return {
-        success: false,
-        message: '予約機能は未実装',
-        details: {
-          pavilionName: pavilions.value.get(pavilionId)?.name || '',
-          timeSlot: timeSlot.time,
-          ticketCount: 1
-        }
+      const requestBody = {
+        ticket_ids: ticketIds,
+        entrance_date: entranceDate,
+        start_time: timeSlot.time,
+        event_code: pavilionId,
+        registered_channel: registeredChannel
       }
+      
+      console.log('📡 予約API呼び出し:', requestBody)
+      
+      const response = await fetch('/api/d/user_event_reservations', {
+        method: 'POST',
+        headers: {
+          'Accept': 'application/json, text/plain, */*',
+          'Accept-Language': 'ja,en-US;q=0.9,en;q=0.8,zh-TW;q=0.7,zh;q=0.6',
+          'X-Api-Lang': 'ja',
+          'Content-Type': 'application/json',
+          'X-Requested-With': 'XMLHttpRequest'
+        },
+        credentials: 'include',
+        body: JSON.stringify(requestBody)
+      })
+      
+      const data = await response.json()
+      console.log('📡 予約API応答:', { status: response.status, data })
+      
+      if (response.ok) {
+        return {
+          success: true,
+          message: '予約に成功しました',
+          data: data,
+          details: {
+            pavilionName: pavilions.value.get(pavilionId)?.name || '',
+            timeSlot: timeSlot.time,
+            ticketCount: ticketIds.length
+          }
+        }
+      } else if (response.status === 422) {
+        // 満席は正常なビジネスエラー
+        const errorMessage = data.error?.message || '予約できませんでした'
+        return {
+          success: false,
+          message: errorMessage,
+          data: data,
+          details: {
+            pavilionName: pavilions.value.get(pavilionId)?.name || '',
+            timeSlot: timeSlot.time,
+            ticketCount: ticketIds.length
+          }
+        }
+      } else {
+        throw new Error(`HTTP ${response.status}: ${data.error?.message || response.statusText}`)
+      }
+      
     } catch (error) {
       console.error('❌ 予約実行エラー:', error)
       return {
@@ -551,9 +632,49 @@ export const usePavilionsStore = defineStore('pavilions', () => {
         details: {
           pavilionName: pavilions.value.get(pavilionId)?.name || '',
           timeSlot: timeSlot.time,
-          ticketCount: 1
+          ticketCount: ticketIds.length
         }
       }
+    }
+  }
+
+  /**
+   * 更新処理（選択リセットなし）
+   */
+  const refreshPavilions = async (query: string = '', ticketIds: string[] = [], entranceDate?: string): Promise<PavilionData[]> => {
+    console.log('🔄 パビリオン更新開始（既存結果の時間帯情報のみ再取得）')
+    isLoading.value = true
+    
+    try {
+      // 既存の検索結果があることを確認
+      if (lastSearchResults.value.length === 0) {
+        console.log('⚠️ 既存の検索結果なし - 更新対象なし')
+        return []
+      }
+
+      const existingPavilions = [...lastSearchResults.value]
+      console.log(`🔄 既存パビリオン ${existingPavilions.length}件の時間帯情報を更新`)
+      
+      // 1. 時間帯情報をまとめて取得
+      const pavilionIds = existingPavilions.map(p => p.id)
+      const timeSlotsMap = await getTimeSlotsForPavilions(pavilionIds, ticketIds, entranceDate)
+      
+      // 2. 取得した時間帯情報を既存データに適用
+      applyTimeSlotsToData(existingPavilions, timeSlotsMap)
+      
+      // 結果を保存（パビリオンメタデータは変更せず、時間帯情報のみ更新）
+      existingPavilions.forEach(pavilion => {
+        pavilions.value.set(pavilion.id, pavilion)
+      })
+      
+      lastSearchResults.value = existingPavilions
+      console.log(`✅ パビリオン更新完了: ${existingPavilions.length}件の時間帯情報を更新`)
+      return existingPavilions
+    } catch (error) {
+      console.error('❌ パビリオン更新エラー:', error)
+      throw error
+    } finally {
+      isLoading.value = false
     }
   }
 
@@ -575,7 +696,7 @@ export const usePavilionsStore = defineStore('pavilions', () => {
     favoritePavilions,
 
     // Actions
-    initialize,
+    init,
     searchPavilions,
     loadFavoritePavilions,
     addToFavorites,
@@ -587,6 +708,7 @@ export const usePavilionsStore = defineStore('pavilions', () => {
     selectAllTimeSlotsForPavilion,
     deselectAllTimeSlotsForPavilion,
     executeReservation,
+    refreshPavilions,
     
     // Internal methods (for composable)
     buildAPIUrl,

@@ -227,7 +227,7 @@ const selectedEntranceTimes = computed(() => {
 
 const filteredTickets = computed(() => {
   return allTickets.value.filter((ticket: TicketData) => {
-    // 自分のみフィルター（既存実装と同じ）
+    // 自分のみフィルター
     if (isOwnOnlyToggle.value && ticket.isOwn === false) {
       return false
     }
@@ -278,6 +278,14 @@ const handleDateSelection = (date: string) => {
       ticket.schedules.forEach((schedule: ScheduleData) => {
         if (schedule.entrance_date === date && schedule.isEffective === true) {
           schedule.selected = newSelectedState
+          
+          // 永続化状態を更新
+          if (newSelectedState) {
+            const scheduleId = schedule.entrance_date + (schedule.time_start || '')
+            ticketsStore.saveSelectedEntranceDate(ticket.ticket_id, scheduleId)
+          } else {
+            ticketsStore.removeSelectedEntranceDate(ticket.ticket_id)
+          }
         }
       })
     }
@@ -307,8 +315,10 @@ const handleEntranceDateSelection = (schedule: ScheduleData, ticket: TicketData,
   if (schedule.selected === false || !schedule.selected) {
     allTickets.value.forEach((t: TicketData) => {
       t.schedules?.forEach((s: ScheduleData) => {
-        if (s.entrance_date !== date) {
+        if (s.entrance_date !== date && s.selected) {
           s.selected = false
+          // 永続化状態からも削除（チケット選択状態は維持）
+          ticketsStore.removeSelectedEntranceDate(t.ticket_id)
         }
       })
     })
@@ -316,6 +326,15 @@ const handleEntranceDateSelection = (schedule: ScheduleData, ticket: TicketData,
   
   // この特定のスケジュールの選択状態をトグル
   schedule.selected = !schedule.selected
+  
+  
+  // 永続化状態を更新
+  if (schedule.selected) {
+    const scheduleId = schedule.entrance_date + (schedule.time_start || '')
+    ticketsStore.saveSelectedEntranceDate(ticket.ticket_id, scheduleId)
+  } else {
+    ticketsStore.removeSelectedEntranceDate(ticket.ticket_id)
+  }
   
   console.log(`入場日時 ${date} ${schedule.schedule_name || ''} を${schedule.selected ? '選択' : '選択解除'}`)
 }

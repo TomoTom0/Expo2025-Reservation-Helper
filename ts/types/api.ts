@@ -83,6 +83,7 @@ export interface TimeSlotSelection {
 export interface ReservationResult {
     success: boolean;
     message: string;
+    data?: any;
     reservationId?: string;
     error?: string;
     details?: {

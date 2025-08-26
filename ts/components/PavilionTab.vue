@@ -31,6 +31,7 @@
         >
           <span>⭐</span>
         </button>
+        <div class="ytomo-button-separator"></div>
         <button 
           id="filter-button" 
           class="ytomo-icon-button" 
@@ -43,6 +44,7 @@
           </svg>
           <span id="available-count" class="ytomo-count-badge">{{ availablePavilionsCount }}</span>
         </button>
+        <div class="ytomo-button-separator"></div>
         <button 
           id="refresh-button" 
           class="ytomo-icon-button" 
@@ -51,6 +53,12 @@
           :disabled="isLoading"
         >
           <span>🔄</span>
+          <span 
+            v-if="allPavilions.length > 0" 
+            class="ytomo-count-badge"
+          >
+            {{ allPavilions.length }}
+          </span>
         </button>
       </div>
     </div>
@@ -97,7 +105,7 @@
           </div>
           <div class="ytomo-time-slots">
             <button
-              v-for="timeSlot in pavilion.timeSlots"
+              v-for="timeSlot in getFilteredTimeSlots(pavilion)"
               :key="`${pavilion.id}-${timeSlot.time}`"
               class="ytomo-time-slot-button"
               :class="getTimeSlotClasses(pavilion.id, timeSlot)"
@@ -113,6 +121,17 @@
       </div>
     </div>
 
+    <!-- ENDLESSトグルボタン -->
+    <button 
+      id="endless-toggle-button"
+      class="ytomo-endless-toggle"
+      :class="{ active: mainDialogStore.endlessMode }"
+      title="ENDLESSモード切替"
+      @click="mainDialogStore.toggleEndlessMode"
+    >
+      ENDLESS
+    </button>
+
     <!-- 予約実行FABボタン -->
     <button 
       id="reservation-button" 
@@ -122,13 +141,19 @@
       @click="handleReservationExecution"
     >
       📋
+      <span 
+        v-if="selectedSlotsCount > 0" 
+        class="ytomo-count-badge"
+      >
+        {{ selectedSlotsCount }}
+      </span>
     </button>
     
     <!-- ステータスFAB（予約結果表示用） -->
     <button 
       id="status-fab" 
       class="ytomo-status-fab" 
-      :style="{ display: statusFabVisible ? 'block' : 'none' }"
+      :class="{ 'ytomo-visible': statusFabVisible }"
     >
       📋
     </button>
@@ -137,7 +162,7 @@
     <div 
       class="ytomo-result-display" 
       id="result-display" 
-      :style="{ display: resultDisplayVisible ? 'block' : 'none' }"
+      :class="{ 'ytomo-visible': resultDisplayVisible }"
     ></div>
     
     <!-- 選択情報表示 -->
@@ -199,7 +224,8 @@ const { allPavilions, filteredPavilions, isLoading, isAvailableOnlyFilter, avail
 
 // Composable使用
 const { 
-  searchPavilions, 
+  searchPavilions,
+  refreshPavilionData,
   loadFavoritePavilions, 
   toggleAvailableOnlyFilter, 
   addToFavorites, 
@@ -300,10 +326,15 @@ const handlePavilionSearch = async () => {
     // 選択された入場日付を取得  
     const entranceDate = selectedEntranceDate.value
     
+    // 入場予約から正しいパビリオン予約種類を取得
+    const pavilionReservationInfo = ticketsStore.selectedPavilionReservationInfo
+    const registeredChannel = pavilionReservationInfo?.activeChannel || '4' // デフォルトはfast
+    
     console.log('🎫 検索パラメータ:', { 
       query: searchInput.value.trim(), 
       ticketIds, 
-      entranceDate 
+      entranceDate,
+      registeredChannel 
     })
     
     // パビリオン検索実行
@@ -312,6 +343,12 @@ const handlePavilionSearch = async () => {
       ticketIds,
       entranceDate || undefined
     )
+    
+    // 検索直後は空きのみフィルタを自動ON（旧仕様に合わせる）
+    if (!isAvailableOnlyFilter.value) {
+      toggleAvailableOnlyFilter()
+      console.log('📂 検索後に空きのみフィルター自動ON')
+    }
     
     console.log(`✅ パビリオン検索完了: ${results.length}件`)
     hideProcessingOverlay()
@@ -327,7 +364,16 @@ const handleLoadFavorites = async () => {
     showProcessingOverlay('お気に入りを読み込み中...')
     
     const results = await loadFavoritePavilions()
+    
+    // お気に入り読み込み後はフィルターをOFFにして全て表示
+    if (isAvailableOnlyFilter.value) {
+      toggleAvailableOnlyFilter()
+      console.log('📂 お気に入り読み込み後にフィルターOFF')
+    }
+    
     console.log(`✅ お気に入り読み込み完了: ${results.length}件`)
+    console.log('🔍 現在の表示パビリオン数:', allPavilions.value.length)
+    console.log('🔍 お気に入りパビリオン:', results.map(p => p.name))
     
     hideProcessingOverlay()
   } catch (error) {
@@ -343,9 +389,19 @@ const handleToggleAvailableOnlyFilter = () => {
 
 const handleRefresh = async () => {
   try {
-    console.log('🔄 データ更新')
+    console.log('🔄 データ更新（選択リセットなし）')
     showProcessingOverlay('パビリオン情報を更新中...')
-    await searchPavilions(searchInput.value.trim())
+    
+    // 選択されたチケットIDsを取得
+    const selectedTickets = ticketsStore.allTickets.filter(ticket => 
+      ticket.schedules?.some(schedule => schedule.selected)
+    )
+    const ticketIds = selectedTickets.map(t => t.ticket_id)
+    
+    // 選択された入場日付を取得  
+    const entranceDate = selectedEntranceDate.value
+    
+    await refreshPavilionData()
     hideProcessingOverlay()
   } catch (error) {
     console.error('❌ データ更新エラー:', error)
@@ -379,6 +435,18 @@ const toggleFavorite = (pavilion: any) => {
     addToFavorites(pavilion.id, pavilion.name)  
     console.log(`⭐ お気に入り追加:`, pavilion.name)
   }
+}
+
+const getFilteredTimeSlots = (pavilion: any) => {
+  if (!pavilion.timeSlots) return []
+  
+  // フィルターONの場合は空きのある時間帯のみ表示
+  if (isAvailableOnlyFilter.value) {
+    return pavilion.timeSlots.filter((slot: TimeSlotData) => slot.available)
+  }
+  
+  // フィルターOFFの場合は全時間帯を表示
+  return pavilion.timeSlots
 }
 
 const getTimeSlotClasses = (pavilionId: string, timeSlot: TimeSlotData) => {
@@ -445,7 +513,23 @@ const handleReservationExecution = async () => {
     
     const selectedSlots = pavilionsStore.selectedTimeSlots
     const entranceDate = selectedEntranceDate.value || ''
-    const registeredChannel = '4' // fastタイプ
+    
+    // 入場予約から正しいパビリオン予約種類を取得
+    const pavilionReservationInfo = ticketsStore.selectedPavilionReservationInfo
+    if (!pavilionReservationInfo?.activeChannel) {
+      throw new Error('パビリオン予約種類が特定できません')
+    }
+    const registeredChannel = pavilionReservationInfo.activeChannel
+    
+    // 選択されたチケットIDsを取得
+    const selectedTickets = ticketsStore.allTickets.filter(ticket => 
+      ticket.schedules?.some(schedule => schedule.selected)
+    )
+    const ticketIds = selectedTickets.map(t => t.ticket_id)
+    
+    if (ticketIds.length === 0) {
+      throw new Error('チケットが選択されていません')
+    }
     
     // 各選択された時間帯に対して予約実行
     const results = []
@@ -454,7 +538,8 @@ const handleReservationExecution = async () => {
         selection.pavilionId,
         selection.timeSlot,
         entranceDate,
-        registeredChannel
+        registeredChannel,
+        ticketIds
       )
       results.push(result)
     }
@@ -514,10 +599,9 @@ const formatTimeSlot = (timeStr: string): string => {
 }
 
 // ライフサイクル
-onMounted(async () => {
+onMounted(() => {
   console.log('🏛️ PavilionTab mounted')
-  // ストアの初期化を確実に実行
-  pavilionsStore.initialize()
+  // ストア初期化はページ読み込み時に行済み
 })
 
 onUnmounted(() => {
@@ -793,14 +877,14 @@ onUnmounted(() => {
 }
 
 .ytomo-time-slot-button {
-    padding: 8px 12px;
+    padding: 6px 10px;
     border-radius: 6px;
-    font-size: 13px;
+    font-size: 12px;
     font-weight: 500;
     cursor: pointer;
     transition: all 0.2s;
     border: 1px solid;
-    min-width: 80px;
+    min-width: 70px;
     text-align: center;
     display: inline-block;
     
@@ -939,6 +1023,11 @@ onUnmounted(() => {
     pointer-events: none;
     max-width: 300px;
     z-index: 10001;
+    display: none;  /* デフォルト非表示 */
+    
+    &.ytomo-visible {
+        display: block;
+    }
 
     &.show {
         opacity: 1;
@@ -1066,13 +1155,17 @@ onUnmounted(() => {
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
     transition: all 0.3s ease;
     z-index: 1001;  /* 予約FABより上 */
-    display: flex;
+    display: none;  /* デフォルト非表示 */
     flex-direction: column;
     align-items: center;
     justify-content: center;
     text-align: center;
     padding: 8px 12px;
     line-height: 1.2;
+    
+    &.ytomo-visible {
+        display: flex;
+    }
     
     /* 成功状態 */
     &.success {
@@ -1126,6 +1219,23 @@ onUnmounted(() => {
     align-items: center;
     justify-content: center;
 
+    .ytomo-count-badge {
+        position: absolute;
+        top: -8px;
+        right: -8px;
+        background: #ff4444;
+        color: white;
+        border-radius: 10px;
+        padding: 2px 6px;
+        font-size: 10px;
+        font-weight: bold;
+        min-width: 16px;
+        text-align: center;
+        line-height: 1.2;
+        pointer-events: none;
+        z-index: 10;
+    }
+
     &:hover:not(:disabled) {
         background: linear-gradient(135deg, #1a365d 0%, #2c5aa0 100%);
         transform: translateY(-2px);
@@ -1141,12 +1251,62 @@ onUnmounted(() => {
         background: #94a3b8;
         cursor: not-allowed;
         box-shadow: 0 2px 8px rgba(148, 163, 184, 0.3);
-        opacity: 0.6;
+        opacity: 0.8;
+        display: flex; /* 無効時でも表示を維持 */
     }
 
     &:focus {
         outline: none;
     }
+}
+
+/* ENDLESSトグルボタン */
+.ytomo-endless-toggle {
+    position: fixed;
+    bottom: 96px;
+    right: 20px;
+    width: 80px;
+    height: 32px;
+    background: #6b7280;
+    border: none;
+    border-radius: 16px;
+    color: white;
+    font-size: 11px;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    transition: all 0.2s ease;
+    z-index: 998;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    &.active {
+        background: #ff8c00;
+        box-shadow: 0 2px 8px rgba(255, 140, 0, 0.4);
+    }
+
+    &:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+    }
+
+    &:active {
+        transform: translateY(0);
+    }
+
+    &:focus {
+        outline: none;
+    }
+}
+
+/* ボタン間の縦線セパレータ */
+.ytomo-button-separator {
+    width: 1px;
+    height: 32px;
+    background: #d1d5db;
+    margin: 0 6px;
+    align-self: center;
 }
 
 /* アニメーション */

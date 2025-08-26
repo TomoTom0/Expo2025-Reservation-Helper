@@ -359,17 +359,23 @@ onUnmounted(() => {
 
 .ytomo-tab-count {
     display: inline-block;
-    margin-left: 4px;
+    margin-left: 8px;
     font-size: 12px;
     color: #475569;
     font-weight: 500;
     min-width: 18px;
     text-align: center;
     transition: all 0.2s;
+    background: #f8fafc;
+    padding: 2px 6px;
+    border-radius: 10px;
+    border: 1px solid #e2e8f0;
 }
 
 .ytomo-tab-button.active .ytomo-tab-count {
     color: #2c5aa0;
+    background: #dbeafe;
+    border-color: #93c5fd;
 }
 
 .ytomo-pavilion-reservation-info {
