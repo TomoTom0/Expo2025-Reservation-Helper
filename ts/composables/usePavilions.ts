@@ -42,6 +42,7 @@ export const usePavilions = () => {
     pavilionsStore.removeFromFavorites(pavilionId)
   }
 
+  // 時間帯選択機能
   const addSelectedTimeSlot = (selection: TimeSlotSelection): void => {
     pavilionsStore.addSelectedTimeSlot(selection)
   }

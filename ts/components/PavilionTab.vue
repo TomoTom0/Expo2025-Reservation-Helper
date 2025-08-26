@@ -34,14 +34,14 @@
         <button 
           id="filter-button" 
           class="ytomo-icon-button" 
-          :class="{ active: isAvailableOnlyFilterActive }"
+          :class="{ active: isAvailableOnlyFilter }"
           title="空きのみ表示"
-          @click="toggleAvailableOnlyFilter"
+          @click="handleToggleAvailableOnlyFilter"
         >
           <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
             <path d="M4.25 5.61C6.27 8.2 10 13 10 13v6c0 .55.45 1 1 1h2c.55 0 1-.45 1-1v-6s3.72-4.8 5.74-7.39c.51-.66.04-1.61-.79-1.61H5.04c-.83 0-1.3.95-.79 1.61z"/>
           </svg>
-          <span id="available-count" class="ytomo-count-badge">{{ availableCount }}</span>
+          <span id="available-count" class="ytomo-count-badge">{{ availablePavilionsCount }}</span>
         </button>
         <button 
           id="refresh-button" 
@@ -74,10 +74,10 @@
           <div class="ytomo-pavilion-header">
             <button 
               class="ytomo-star-button"
-              :class="{ active: pavilion.isFavorite }"
+              :class="{ active: isFavorite(pavilion.id) }"
               @click="toggleFavorite(pavilion)"
             >
-              {{ pavilion.isFavorite ? '⭐' : '☆' }}
+              {{ isFavorite(pavilion.id) ? '⭐' : '☆' }}
             </button>
             <span class="ytomo-pavilion-name">{{ pavilion.name }}</span>
             <div class="ytomo-pavilion-status">
@@ -100,13 +100,13 @@
               v-for="timeSlot in pavilion.timeSlots"
               :key="`${pavilion.id}-${timeSlot.time}`"
               class="ytomo-time-slot-button"
-              :class="getTimeSlotClasses(timeSlot)"
+              :class="getTimeSlotClasses(pavilion.id, timeSlot)"
               :data-pavilion-id="pavilion.id"
               :data-time-slot="timeSlot.time"
               :disabled="!timeSlot.available"
               @click="handleTimeSlotClick(pavilion.id, timeSlot)"
             >
-              {{ timeSlot.time }}
+              {{ formatTimeSlot(timeSlot.time) }}
             </button>
           </div>
         </div>
@@ -146,6 +146,24 @@
         選択中: {{ selectedSlotsCount }}時間帯
       </div>
     </div>
+    
+    <!-- 誤操作防止オーバーレイ -->
+    <div 
+      v-if="processingOverlayVisible" 
+      class="ytomo-processing-overlay"
+      id="ytomo-pavilion-processing-overlay"
+    >
+      <div class="ytomo-processing-content">
+        <div class="ytomo-processing-spinner"></div>
+        <p class="ytomo-processing-message">{{ processingMessage }}</p>
+        <button 
+          class="ytomo-cancel-button" 
+          @click="hideProcessingOverlay"
+        >
+          キャンセル
+        </button>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -170,7 +188,6 @@ interface PavilionData {
   id: string
   name: string
   timeSlots: TimeSlotData[]
-  isFavorite: boolean
   availableSlots: number
 }
 
@@ -178,19 +195,30 @@ interface PavilionData {
 const pavilionsStore = usePavilionsStore()
 const ticketsStore = useTicketsStore()
 const mainDialogStore = useMainDialogStore()
-const { allPavilions, filteredPavilions, isLoading } = storeToRefs(pavilionsStore)
+const { allPavilions, filteredPavilions, isLoading, isAvailableOnlyFilter, availablePavilionsCount } = storeToRefs(pavilionsStore)
 
 // Composable使用
-const { searchPavilions } = usePavilions()
+const { 
+  searchPavilions, 
+  loadFavoritePavilions, 
+  toggleAvailableOnlyFilter, 
+  addToFavorites, 
+  removeFromFavorites,
+  addSelectedTimeSlot,
+  removeSelectedTimeSlot,
+  isTimeSlotSelected,
+  executeReservation 
+} = usePavilions()
 
 // ローカル状態
 const searchInput = ref('')
-const isAvailableOnlyFilterActive = ref(false)
 const statusFabVisible = ref(false)
 const resultDisplayVisible = ref(false)
+const processingOverlayVisible = ref(false)
+const processingMessage = ref('')
 
 // 計算プロパティ
-const selectedSlotsCount = computed(() => 0) // TODO: 実装
+const selectedSlotsCount = computed(() => pavilionsStore.selectedTimeSlotsCount)
 
 // 分散状態管理から選択されたスケジュール一覧を取得
 const selectedSchedules = computed(() => {
@@ -261,41 +289,99 @@ const availableCount = computed(() => {
 const handlePavilionSearch = async () => {
   try {
     console.log('🔍 パビリオン検索:', searchInput.value)
-    await searchPavilions(searchInput.value.trim())
+    showProcessingOverlay('パビリオンを検索中...')
+    
+    // 選択されたチケットIDsを取得
+    const selectedTickets = ticketsStore.allTickets.filter(ticket => 
+      ticket.schedules?.some(schedule => schedule.selected)
+    )
+    const ticketIds = selectedTickets.map(t => t.ticket_id)
+    
+    // 選択された入場日付を取得  
+    const entranceDate = selectedEntranceDate.value
+    
+    console.log('🎫 検索パラメータ:', { 
+      query: searchInput.value.trim(), 
+      ticketIds, 
+      entranceDate 
+    })
+    
+    // パビリオン検索実行
+    const results = await searchPavilions(
+      searchInput.value.trim(),
+      ticketIds,
+      entranceDate || undefined
+    )
+    
+    console.log(`✅ パビリオン検索完了: ${results.length}件`)
+    hideProcessingOverlay()
   } catch (error) {
     console.error('❌ パビリオン検索エラー:', error)
+    hideProcessingOverlay()
   }
 }
 
 const handleLoadFavorites = async () => {
   try {
     console.log('⭐ お気に入り読み込み')
-    // TODO: お気に入り読み込み実装
+    showProcessingOverlay('お気に入りを読み込み中...')
+    
+    const results = await loadFavoritePavilions()
+    console.log(`✅ お気に入り読み込み完了: ${results.length}件`)
+    
+    hideProcessingOverlay()
   } catch (error) {
     console.error('❌ お気に入り読み込みエラー:', error)
+    hideProcessingOverlay()
   }
 }
 
-const toggleAvailableOnlyFilter = () => {
-  isAvailableOnlyFilterActive.value = !isAvailableOnlyFilterActive.value
-  console.log('🔍 空きのみフィルター:', isAvailableOnlyFilterActive.value)
+const handleToggleAvailableOnlyFilter = () => {
+  toggleAvailableOnlyFilter()
+  console.log('🔍 空きのみフィルター:', isAvailableOnlyFilter.value ? 'ON' : 'OFF')
 }
 
 const handleRefresh = async () => {
   try {
     console.log('🔄 データ更新')
+    showProcessingOverlay('パビリオン情報を更新中...')
     await searchPavilions(searchInput.value.trim())
+    hideProcessingOverlay()
   } catch (error) {
     console.error('❌ データ更新エラー:', error)
+    hideProcessingOverlay()
   }
 }
 
-const toggleFavorite = (pavilion: any) => {
-  pavilion.isFavorite = !pavilion.isFavorite
-  console.log(`⭐ お気に入り${pavilion.isFavorite ? '追加' : '削除'}:`, pavilion.name)
+// 誤操作防止オーバーレイ制御
+const showProcessingOverlay = (message: string) => {
+  processingMessage.value = message
+  processingOverlayVisible.value = true
+  console.log(`🛡️ 誤操作防止オーバーレイ表示: ${message}`)
 }
 
-const getTimeSlotClasses = (timeSlot: TimeSlotData) => {
+const hideProcessingOverlay = () => {
+  processingOverlayVisible.value = false
+  processingMessage.value = ''
+  console.log('🛡️ 誤操作防止オーバーレイ非表示')
+}
+
+// お気に入り状態をリアクティブに判定
+const isFavorite = (pavilionId: string) => {
+  return pavilionsStore.favoriteIds.has(pavilionId)
+}
+
+const toggleFavorite = (pavilion: any) => {
+  if (isFavorite(pavilion.id)) {
+    removeFromFavorites(pavilion.id)
+    console.log(`⭐ お気に入り削除:`, pavilion.name)
+  } else {
+    addToFavorites(pavilion.id, pavilion.name)  
+    console.log(`⭐ お気に入り追加:`, pavilion.name)
+  }
+}
+
+const getTimeSlotClasses = (pavilionId: string, timeSlot: TimeSlotData) => {
   const classes = []
   
   if (timeSlot.available) {
@@ -304,35 +390,100 @@ const getTimeSlotClasses = (timeSlot: TimeSlotData) => {
     classes.push('unavailable', 'full')
   }
   
-  // 選択状態をチェック（TODO: 実装）
-  // if (isTimeSlotSelected(timeSlot)) {
-  //   classes.push('selected')
-  // }
+  // 選択状態をチェック
+  if (isTimeSlotSelected(pavilionId, timeSlot.time)) {
+    classes.push('selected')
+  }
   
   return classes
 }
 
 const handleTimeSlotClick = (pavilionId: string, timeSlot: TimeSlotData) => {
+  const pavilion = pavilionsStore.pavilions.get(pavilionId)
+  if (!pavilion) return
+
   if (!timeSlot.available) {
     // 満員時間帯クリック → 監視対象に追加
     console.log('🔴 満員時間帯クリック（監視対象追加予定）:', { pavilionId, timeSlot })
+    // TODO: 監視機能は後で実装
     return
   }
   
-  // 空き時間帯クリック → 即時予約
-  console.log('🟢 空き時間帯クリック（即時予約予定）:', { pavilionId, timeSlot })
+  // 空き時間帯クリック → 選択状態を切り替え
+  const isSelected = isTimeSlotSelected(pavilionId, timeSlot.time)
   
-  // TODO: 選択状態の切り替え処理を実装
+  if (isSelected) {
+    // 選択解除
+    removeSelectedTimeSlot(pavilionId, timeSlot.time)
+    console.log('🟡 時間帯選択解除:', { pavilionName: pavilion.name, timeSlot: timeSlot.time })
+  } else {
+    // 選択追加
+    const selection = {
+      pavilionId,
+      pavilionName: pavilion.name,
+      timeSlot: {
+        ...timeSlot,
+        selected: true,
+        reservationType: timeSlot.reservationType || 'normal'
+      },
+      entranceDate: selectedEntranceDate.value || ''
+    }
+    addSelectedTimeSlot(selection)
+    console.log('🟢 時間帯選択追加:', { pavilionName: pavilion.name, timeSlot: timeSlot.time })
+  }
 }
 
-const handleReservationExecution = () => {
+const handleReservationExecution = async () => {
   if (selectedSlotsCount.value === 0) {
     console.log('⚠️ 選択された時間帯なし')
     return
   }
   
-  console.log('📋 予約実行:', selectedSlotsCount.value, '件')
-  // TODO: 予約実行処理を実装
+  try {
+    console.log('📋 予約実行開始:', selectedSlotsCount.value, '件')
+    showProcessingOverlay(`${selectedSlotsCount.value}件の予約を実行中...`)
+    
+    const selectedSlots = pavilionsStore.selectedTimeSlots
+    const entranceDate = selectedEntranceDate.value || ''
+    const registeredChannel = '4' // fastタイプ
+    
+    // 各選択された時間帯に対して予約実行
+    const results = []
+    for (const selection of selectedSlots) {
+      const result = await executeReservation(
+        selection.pavilionId,
+        selection.timeSlot,
+        entranceDate,
+        registeredChannel
+      )
+      results.push(result)
+    }
+    
+    // 成功した予約数をカウント
+    const successCount = results.filter(r => r.success).length
+    const failureCount = results.length - successCount
+    
+    console.log(`📋 予約実行完了: 成功${successCount}件, 失敗${failureCount}件`)
+    
+    // 結果詳細をログ出力
+    results.forEach(result => {
+      if (result.details) {
+        console.log(`  ${result.success ? '✅' : '❌'} ${result.details.pavilionName} ${result.details.timeSlot}: ${result.message}`)
+      }
+    })
+    
+    hideProcessingOverlay()
+    
+    // 結果メッセージ表示
+    if (successCount > 0) {
+      statusFabVisible.value = true
+      setTimeout(() => { statusFabVisible.value = false }, 5000)
+    }
+    
+  } catch (error) {
+    console.error('❌ 予約実行エラー:', error)
+    hideProcessingOverlay()
+  }
 }
 
 // ヘルパー関数
@@ -348,9 +499,25 @@ const formatDate = (dateStr: string | null): string => {
   return dateStr || ''
 }
 
+const formatTimeSlot = (timeStr: string): string => {
+  // HHMM形式（例：1040, 1100）をHH:MM形式に変換
+  if (timeStr && timeStr.length === 4) {
+    const hour = timeStr.slice(0, 2)
+    const minute = timeStr.slice(2, 4)
+    return `${hour}:${minute}`
+  }
+  // 既にHH:MM形式の場合はそのまま返す
+  if (timeStr && timeStr.includes(':')) {
+    return timeStr
+  }
+  return timeStr || ''
+}
+
 // ライフサイクル
 onMounted(async () => {
   console.log('🏛️ PavilionTab mounted')
+  // ストアの初期化を確実に実行
+  pavilionsStore.initialize()
 })
 
 onUnmounted(() => {
@@ -561,6 +728,30 @@ onUnmounted(() => {
     font-weight: 500;
     color: #374151;
     line-height: 1.4;
+}
+
+.ytomo-pavilion-status {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.ytomo-status-available {
+    background: #dcfce7;
+    color: #166534;
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.ytomo-status-full {
+    background: #fef2f2;
+    color: #991b1b;
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 600;
 }
 
 .ytomo-expand-button {
@@ -1025,6 +1216,86 @@ onUnmounted(() => {
     .ytomo-pavilion-tab input:focus,
     .ytomo-pavilion-tab button:focus {
         outline: 3px solid #000;
+    }
+}
+
+/* 誤操作防止オーバーレイ */
+.ytomo-processing-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10001; /* メインダイアログより高いが、全画面ブロックは避ける */
+    opacity: 0;
+    animation: fadeIn 0.2s ease-out forwards;
+}
+
+.ytomo-processing-content {
+    background: white;
+    border-radius: 12px;
+    padding: 32px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    text-align: center;
+    min-width: 300px;
+    transform: scale(0.9);
+    animation: dialogAppear 0.2s ease-out forwards;
+}
+
+.ytomo-processing-spinner {
+    width: 40px;
+    height: 40px;
+    border: 3px solid #e2e8f0;
+    border-top-color: #2c5aa0;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 0 auto 16px;
+}
+
+.ytomo-processing-message {
+    margin: 0 0 24px;
+    color: #374151;
+    font-size: 16px;
+    font-weight: 500;
+}
+
+.ytomo-cancel-button {
+    background: #6b7280;
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 6px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+
+    &:hover {
+        background: #4b5563;
+    }
+
+    &:focus {
+        outline: 2px solid #2c5aa0;
+        outline-offset: 2px;
+    }
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* アクセシビリティ対応 */
+@media (prefers-reduced-motion: reduce) {
+    .ytomo-processing-overlay,
+    .ytomo-processing-content,
+    .ytomo-processing-spinner {
+        animation: none;
+        transition: none;
     }
 }
 </style>

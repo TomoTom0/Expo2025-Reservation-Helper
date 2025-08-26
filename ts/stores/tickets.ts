@@ -6,6 +6,7 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import type { TicketData, ScheduleData } from '@/types/api'
+import { determinePavilionReservationType, getAllPavilionReservationStatus } from '@/utils/pavilionReservationTypes'
 
 export const useTicketsStore = defineStore('tickets', () => {
   // State
@@ -31,6 +32,34 @@ export const useTicketsStore = defineStore('tickets', () => {
   const externalTickets = computed(() => 
     allTickets.value.filter(ticket => !ticket.isOwn)
   )
+
+  // 選択済み入場予約からパビリオン予約情報を取得
+  const selectedPavilionReservationInfo = computed(() => {
+    const selectedSchedules = allTickets.value.flatMap(ticket => 
+      ticket.schedules?.filter(schedule => schedule.selected) || []
+    )
+    
+    if (selectedSchedules.length === 0) {
+      return null
+    }
+    
+    // 最初の選択済みスケジュールの予約情報を取得（同じになるはず）
+    const firstSelected = selectedSchedules[0]
+    if (!firstSelected.pavilionReservationType || !firstSelected.pavilionReservationStatus) {
+      return null
+    }
+    
+    // 現在有効な予約種類を特定
+    const activeReservationType = Object.entries(firstSelected.pavilionReservationStatus)
+      .find(([type, status]) => status.periodStatus === 'active')
+    
+    return {
+      activeType: activeReservationType?.[0] || null,
+      activeChannel: firstSelected.pavilionReservationType,
+      isActive: firstSelected.pavilionReservationActive || false,
+      allStatus: firstSelected.pavilionReservationStatus
+    }
+  })
   
   // Helper function for date
   function getTodayString(): string {
@@ -41,22 +70,45 @@ export const useTicketsStore = defineStore('tickets', () => {
   // Actions - TicketManagerから完全移行
   
   /**
-   * スケジュールデータに有効フラグを付与
+   * スケジュールデータに有効フラグとパビリオン予約種類情報を付与
    */
   const processSchedules = (schedules: any[]): ScheduleData[] => {
     if (!Array.isArray(schedules)) return []
     
-    return schedules.map(schedule => ({
-      entrance_date: schedule.entrance_date || '',
-      use_state: schedule.use_state || 0,
-      schedule_name: schedule.schedule_name,
-      time_start: schedule.time_start,
-      time_end: schedule.time_end,
-      reservation_type: schedule.reservation_type,
-      // 有効フラグを付与: 状態0または（当日かつ状態1:入場済みでも当日は有効）
-      isEffective: schedule.use_state === 0 || 
-                   (schedule.use_state === 1 && schedule.entrance_date === todayStr.value)
-    }))
+    return schedules.map(schedule => {
+      const scheduleData: ScheduleData = {
+        entrance_date: schedule.entrance_date || '',
+        use_state: schedule.use_state || 0,
+        schedule_name: schedule.schedule_name,
+        time_start: schedule.time_start,
+        time_end: schedule.time_end,
+        reservation_type: schedule.reservation_type,
+        // 有効フラグを付与: 状態0または（当日かつ状態1:入場済みでも当日は有効）
+        isEffective: schedule.use_state === 0 || 
+                     (schedule.use_state === 1 && schedule.entrance_date === todayStr.value)
+      }
+      
+      // パビリオン予約種類情報を付与
+      if (scheduleData.entrance_date) {
+        const pavilionReservation = determinePavilionReservationType(scheduleData.entrance_date)
+        scheduleData.pavilionReservationType = pavilionReservation.channel
+        scheduleData.pavilionReservationActive = pavilionReservation.isActive
+        
+        // 全ての予約区分の状況も付与
+        const allStatus = getAllPavilionReservationStatus(scheduleData.entrance_date)
+        scheduleData.pavilionReservationStatus = {}
+        
+        for (const [type, status] of Object.entries(allStatus)) {
+          scheduleData.pavilionReservationStatus[type] = {
+            periodStatus: status.periodStatus,
+            submissionStatus: status.submissionStatus,
+            winningInfo: status.winningInfo
+          }
+        }
+      }
+      
+      return scheduleData
+    })
   }
 
   /**
@@ -342,6 +394,7 @@ export const useTicketsStore = defineStore('tickets', () => {
     selectedTicketCount,
     ownTickets,
     externalTickets,
+    selectedPavilionReservationInfo,
     
     // Actions
     init,

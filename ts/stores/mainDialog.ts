@@ -6,7 +6,7 @@ import { defineStore } from 'pinia'
 import { ref } from 'vue'
 
 export const useMainDialogStore = defineStore('mainDialog', () => {
-  // State
+  // State - 初期化時に強制的にfalseに設定（永続化の問題を回避）
   const isVisible = ref(false)
   const activeTab = ref<'ticket' | 'pavilion'>('ticket')
   const version = ref('0.5.4') // version.datから動的に読み込む予定

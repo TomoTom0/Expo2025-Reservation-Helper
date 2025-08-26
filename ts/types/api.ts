@@ -12,6 +12,19 @@ export interface ScheduleData {
     time_end?: string;          // 終了時間
     reservation_type?: string;  // 予約種別
     selected?: boolean;         // UI選択状態フラグ
+    
+    // パビリオン予約種類情報（入場予約種類ごとに決定）
+    pavilionReservationType?: string;  // channel値 (5,4,3,2 -> 1,3,週,月)
+    pavilionReservationActive?: boolean; // 現在有効かどうか
+    
+    // パビリオン予約区分ごとの詳細状況
+    pavilionReservationStatus?: {
+        [key: string]: {  // '月', '週', '3', '1'
+            periodStatus: 'before' | 'active' | 'expired';  // 期限前、期間中、期限切れ
+            submissionStatus: 'none' | 'submitted' | 'won';  // なし(落選含む)、提出済み、当選
+            winningInfo?: any;  // 当選情報（詳細は後ほど）
+        }
+    }
 }
 
 export interface LotteryCalendarData {
@@ -62,14 +75,21 @@ export interface PavilionData {
 // Vue固有の型定義
 export interface TimeSlotSelection {
     pavilionId: string;
+    pavilionName: string;
     timeSlot: TimeSlotData;
+    entranceDate: string;
 }
 
 export interface ReservationResult {
     success: boolean;
-    pavilionId: string;
-    timeSlot: string;
-    message?: string;
+    message: string;
+    reservationId?: string;
+    error?: string;
+    details?: {
+        pavilionName: string;
+        timeSlot: string;
+        ticketCount: number;
+    };
 }
 
 // マネージャー型定義（現行システムからの継承）

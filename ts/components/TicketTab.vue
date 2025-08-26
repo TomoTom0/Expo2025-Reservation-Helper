@@ -395,6 +395,7 @@ const isDateSelected = (date: string): boolean => {
 // ライフサイクル
 onMounted(() => {
   console.log('📋 TicketTab mounted')
+  console.log('📋 現在のチケット数:', allTickets.value.length)
 })
 
 onUnmounted(() => {

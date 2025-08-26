@@ -14,7 +14,12 @@
             @click="setActiveTab('ticket')"
             data-tab="ticket"
           >
-            チケット<span class="ytomo-tab-count" id="ticket-count">{{ selectedTicketCount }}</span>
+            <div class="ytomo-tab-content">
+              <div class="ytomo-tab-title">チケット<span class="ytomo-tab-count" id="ticket-count">{{ selectedTicketCount }}</span></div>
+              <div class="ytomo-pavilion-reservation-info" v-if="pavilionReservationInfo">
+                {{ pavilionReservationDisplayText }}
+              </div>
+            </div>
           </button>
           <button 
             class="ytomo-tab-button"
@@ -70,6 +75,7 @@ import { useTicketsStore } from '@/stores/tickets'
 import { usePavilionsStore } from '@/stores/pavilions'
 import { useTickets } from '@/composables/useTickets'
 import type { ScheduleData, TicketData } from '@/types/api'
+import { getLongNameFromShortName } from '@/utils/pavilionReservationMapping'
 import TicketTab from './TicketTab.vue'
 import PavilionTab from './PavilionTab.vue'
 
@@ -83,6 +89,37 @@ const { hideDialog, setActiveTab } = mainDialogStore
 
 // チケット関連の状態
 const selectedTicketCount = computed(() => ticketsStore.selectedTicketCount)
+
+// パビリオン予約情報
+const pavilionReservationInfo = computed(() => ticketsStore.selectedPavilionReservationInfo)
+
+// パビリオン予約情報の表示テキスト
+const pavilionReservationDisplayText = computed(() => {
+  const info = pavilionReservationInfo.value
+  if (!info) return ''
+  
+  // 現在有効な予約種類を特定
+  const activeEntry = Object.entries(info.allStatus || {})
+    .find(([type, status]) => status.periodStatus === 'active')
+  
+  if (activeEntry) {
+    const [type, status] = activeEntry
+    const longName = getLongNameFromShortName(type)
+    return `${longName} 有効`
+  }
+  
+  // 有効な期間がない場合、次の期間を探す
+  const nextEntry = Object.entries(info.allStatus || {})
+    .find(([type, status]) => status.periodStatus === 'before')
+  
+  if (nextEntry) {
+    const [type, status] = nextEntry
+    const longName = getLongNameFromShortName(type)
+    return `${longName} 期間前`
+  }
+  
+  return ''
+})
 
 // 選択されたスケジュール一覧を取得
 const selectedSchedules = computed(() => {
@@ -176,7 +213,7 @@ onMounted(() => {
   document.addEventListener('keydown', handleEscapeKey)
   document.addEventListener('main-dialog-show', handleShowEvent)
   document.addEventListener('main-dialog-hide', handleHideEvent)
-  console.log('✅ MainDialog mounted, 初期表示状態:', isVisible)
+  console.log('✅ MainDialog mounted, 初期表示状態:', isVisible.value)
 })
 
 onUnmounted(() => {
@@ -324,18 +361,27 @@ onUnmounted(() => {
     display: inline-block;
     margin-left: 4px;
     font-size: 12px;
-    background: #e2e8f0;
     color: #475569;
-    padding: 2px 6px;
-    border-radius: 10px;
+    font-weight: 500;
     min-width: 18px;
     text-align: center;
     transition: all 0.2s;
 }
 
 .ytomo-tab-button.active .ytomo-tab-count {
-    background: #2c5aa0;
-    color: white;
+    color: #2c5aa0;
+}
+
+.ytomo-pavilion-reservation-info {
+    font-size: 11px;
+    color: #64748b;
+    font-family: 'Courier New', 'Monaco', 'Menlo', monospace;
+    font-weight: 600;
+    margin-top: 1px;
+}
+
+.ytomo-tab-button.active .ytomo-pavilion-reservation-info {
+    color: #2c5aa0;
 }
 
 .ytomo-dialog-close {
