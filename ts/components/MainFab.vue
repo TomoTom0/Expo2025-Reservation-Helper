@@ -1,4 +1,17 @@
 <template>
+  <!-- 予約結果表示 -->
+  <div 
+    v-if="reservationResult"
+    class="ytomo-reservation-result"
+    :class="{ success: reservationResult.success, failed: !reservationResult.success }"
+  >
+    <div class="ytomo-result-status">
+      {{ reservationResult.success ? '予約成功' : `予約失敗: ${reservationResult.reason}` }}
+    </div>
+    <div class="ytomo-result-pavilion">{{ reservationResult.pavilionName }}</div>
+    <div class="ytomo-result-time">{{ reservationResult.datetime }}</div>
+  </div>
+  
   <button 
     class="ytomo-main-fab"
     :disabled="!isInitialized"
@@ -10,16 +23,24 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, onUnmounted } from 'vue'
 import { useMainDialogStore } from '@/stores/mainDialog'
 import { useTicketsStore } from '@/stores/tickets'
 import { usePavilionsStore } from '@/stores/pavilions'
+
+interface ReservationResult {
+  success: boolean
+  reason?: string
+  pavilionName: string
+  datetime: string
+}
 
 const mainDialogStore = useMainDialogStore()
 const ticketsStore = useTicketsStore()
 const pavilionsStore = usePavilionsStore()
 
 const isInitialized = ref(false)
+const reservationResult = ref<ReservationResult | null>(null)
 
 const handleClick = () => {
   if (isInitialized.value) {
@@ -29,9 +50,32 @@ const handleClick = () => {
   }
 }
 
+// 予約結果を表示する関数
+const showReservationResult = (result: ReservationResult) => {
+  reservationResult.value = result
+  
+  // 5秒後に自動で非表示
+  setTimeout(() => {
+    reservationResult.value = null
+  }, 5000)
+}
+
+// 予約結果イベントリスナー
+const handleReservationResult = (event: CustomEvent<ReservationResult>) => {
+  showReservationResult(event.detail)
+}
+
 onMounted(() => {
   // ストア初期化はページ読み込み時にだけ行う
   // ここではボタンを有効化するだけ
   isInitialized.value = true
+  
+  // 予約結果イベントリスナーを設定
+  document.addEventListener('reservation-result', handleReservationResult as EventListener)
+})
+
+onUnmounted(() => {
+  // イベントリスナーをクリーンアップ
+  document.removeEventListener('reservation-result', handleReservationResult as EventListener)
 })
 </script>

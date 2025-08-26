@@ -173,7 +173,7 @@ interface ReservationStatus {
 // Store アクセス
 const ticketsStore = useTicketsStore()
 const mainDialogStore = useMainDialogStore()
-const { allTickets, isLoading, selectedTickets } = storeToRefs(ticketsStore)
+const { ticketsArray, isLoading, selectedTickets } = storeToRefs(ticketsStore)
 
 // Composable使用
 const { loadAllTickets } = useTickets()
@@ -188,7 +188,7 @@ const selectedChannel = ref('5')
 // 計算プロパティ
 const availableDates = computed(() => {
   const dates = new Set<string>()
-  allTickets.value.forEach((ticket: TicketData) => {
+  ticketsArray.value.forEach((ticket: TicketData) => {
     if (ticket.schedules) {
       ticket.schedules
         .filter((schedule: ScheduleData) => schedule.isEffective === true)
@@ -201,7 +201,7 @@ const availableDates = computed(() => {
 // 選択されたスケジュール情報を集計
 const selectedSchedules = computed(() => {
   const selected: ScheduleData[] = []
-  allTickets.value.forEach((ticket: TicketData) => {
+  ticketsArray.value.forEach((ticket: TicketData) => {
     ticket.schedules?.forEach((schedule: ScheduleData) => {
       if (schedule.selected) {
         selected.push(schedule)
@@ -226,7 +226,7 @@ const selectedEntranceTimes = computed(() => {
 })
 
 const filteredTickets = computed(() => {
-  return allTickets.value.filter((ticket: TicketData) => {
+  return ticketsArray.value.filter((ticket: TicketData) => {
     // 自分のみフィルター
     if (isOwnOnlyToggle.value && ticket.isOwn === false) {
       return false
@@ -239,7 +239,7 @@ const filteredTickets = computed(() => {
 })
 
 const emptyMessage = computed(() => {
-  if (allTickets.value.length === 0) {
+  if (ticketsArray.value.length === 0) {
     return 'チケットが見つかりませんでした'
   }
   if (filteredTickets.value.length === 0 && isOwnOnlyToggle.value) {
@@ -258,7 +258,7 @@ const handleDateSelection = (date: string) => {
   
   // その日付のすべての有効なスケジュールを選択/選択解除
   const dateSchedules: ScheduleData[] = []
-  allTickets.value.forEach((ticket: TicketData) => {
+  ticketsArray.value.forEach((ticket: TicketData) => {
     ticket.schedules?.forEach((schedule: ScheduleData) => {
       if (schedule.entrance_date === date && schedule.isEffective === true) {
         dateSchedules.push(schedule)
@@ -273,7 +273,7 @@ const handleDateSelection = (date: string) => {
   const newSelectedState = !allSelected
   
   // 分散状態更新: その日付のすべてのスケジュールの選択状態を更新
-  allTickets.value.forEach((ticket: TicketData) => {
+  ticketsArray.value.forEach((ticket: TicketData) => {
     if (ticket.schedules) {
       ticket.schedules.forEach((schedule: ScheduleData) => {
         if (schedule.entrance_date === date && schedule.isEffective === true) {
@@ -313,7 +313,7 @@ const handleEntranceDateSelection = (schedule: ScheduleData, ticket: TicketData,
   
   // 入場日付は常に一つに限定される: 他の日付のスケジュール選択を解除
   if (schedule.selected === false || !schedule.selected) {
-    allTickets.value.forEach((t: TicketData) => {
+    ticketsArray.value.forEach((t: TicketData) => {
       t.schedules?.forEach((s: ScheduleData) => {
         if (s.entrance_date !== date && s.selected) {
           s.selected = false
@@ -399,7 +399,7 @@ const isScheduleSelected = (schedule: ScheduleData, ticket: TicketData): boolean
 const isDateSelected = (date: string): boolean => {
   // その日付の有効なスケジュールをすべて取得
   const dateSchedules: ScheduleData[] = []
-  allTickets.value.forEach((ticket: TicketData) => {
+  ticketsArray.value.forEach((ticket: TicketData) => {
     ticket.schedules?.forEach((schedule: ScheduleData) => {
       if (schedule.entrance_date === date && schedule.isEffective === true) {
         dateSchedules.push(schedule)
@@ -414,7 +414,9 @@ const isDateSelected = (date: string): boolean => {
 // ライフサイクル
 onMounted(() => {
   console.log('📋 TicketTab mounted')
-  console.log('📋 現在のチケット数:', allTickets.value.length)
+  console.log('📋 現在のチケット数:', ticketsArray.value.length)
+  console.log('📋 ticketsArray.value:', ticketsArray.value.length, ticketsArray.value)
+  console.log('📋 filteredTickets.value:', filteredTickets.value.length, filteredTickets.value)
 })
 
 onUnmounted(() => {

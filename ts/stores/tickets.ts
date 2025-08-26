@@ -18,32 +18,32 @@ export const useTicketsStore = defineStore('tickets', () => {
   const todayStr = ref<string>(getTodayString())
   
   // Getters (computed)
-  const allTickets = computed(() => Array.from(tickets.value.values()))
+  const ticketsArray = computed(() => Array.from(tickets.value.values()))
   
   const selectedTickets = computed(() => 
-    allTickets.value.filter(ticket => 
+    ticketsArray.value.filter(ticket => 
       ticket.schedules?.some(schedule => schedule.selected)
     )
   )
 
   const selectedTicketCount = computed(() => {
     // 入場予約が選択されているチケットの数
-    return allTickets.value.filter(ticket => 
+    return ticketsArray.value.filter(ticket => 
       ticket.schedules?.some(schedule => schedule.selected)
     ).length
   })
 
   const ownTickets = computed(() => 
-    allTickets.value.filter(ticket => ticket.isOwn)
+    ticketsArray.value.filter(ticket => ticket.isOwn)
   )
 
   const externalTickets = computed(() => 
-    allTickets.value.filter(ticket => !ticket.isOwn)
+    ticketsArray.value.filter(ticket => !ticket.isOwn)
   )
 
   // 選択済み入場予約からパビリオン予約情報を取得
   const selectedPavilionReservationInfo = computed(() => {
-    const selectedSchedules = allTickets.value.flatMap(ticket => 
+    const selectedSchedules = ticketsArray.value.flatMap(ticket => 
       ticket.schedules?.filter(schedule => schedule.selected) || []
     )
     
@@ -155,6 +155,22 @@ export const useTicketsStore = defineStore('tickets', () => {
       }
 
       console.log(`✅ チケット統合管理: ${tickets.value.size}個のチケットを読み込み完了`)
+    
+    // デバッグ: チケットデータの詳細を出力
+    console.log('🔍 チケットデータ詳細:', {
+      todayStr: todayStr.value,
+      tickets: Array.from(tickets.value.values()).map(ticket => ({
+        ticket_id: ticket.ticket_id,
+        isOwn: ticket.isOwn,
+        schedulesCount: ticket.schedules?.length || 0,
+        schedules: ticket.schedules?.map(schedule => ({
+          entrance_date: schedule.entrance_date,
+          use_state: schedule.use_state,
+          isEffective: schedule.isEffective,
+          schedule_name: schedule.schedule_name
+        }))
+      }))
+    })
       
       // 利用可能日付を抽出
       const dates = await extractAvailableDates()
@@ -319,7 +335,7 @@ export const useTicketsStore = defineStore('tickets', () => {
   const extractAvailableDates = async (): Promise<string[]> => {
     const dates = new Set<string>()
     
-    for (const ticket of allTickets.value) {
+    for (const ticket of ticketsArray.value) {
       if (ticket.schedules && Array.isArray(ticket.schedules)) {
         const effectiveSchedules = ticket.schedules.filter(schedule => schedule.isEffective)
         
@@ -365,7 +381,7 @@ export const useTicketsStore = defineStore('tickets', () => {
   }
 
   const selectAllTickets = () => {
-    allTickets.value.forEach(ticket => {
+    ticketsArray.value.forEach(ticket => {
       selectedTicketIds.value.add(ticket.ticket_id)
     })
   }
@@ -415,8 +431,7 @@ export const useTicketsStore = defineStore('tickets', () => {
             s.entrance_date + (s.time_start || '') === scheduleId
           )
           if (schedule) {
-            // Vueのリアクティビティを考慮してネストしたオブジェクトも明示的に更新
-            Object.assign(schedule, { selected: true })
+            schedule.selected = true
             restoredCount++
             console.log(`🔄 復元: ${ticketId} - ${scheduleId}`)
           } else {
@@ -456,7 +471,7 @@ export const useTicketsStore = defineStore('tickets', () => {
     availableDates,
     
     // Getters
-    allTickets,
+    ticketsArray,
     selectedTickets,
     selectedTicketCount,
     ownTickets,

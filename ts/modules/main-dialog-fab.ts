@@ -1,7 +1,6 @@
 import { PageChecker } from './page-utils';
 import { createApp, type App } from 'vue'
-import { createPinia } from 'pinia'
-import { createPersistedState } from 'pinia-plugin-persistedstate'
+import { pinia } from '../stores'
 import MainDialog from '../components/MainDialog.vue'
 import MainFab from '../components/MainFab.vue'
 
@@ -78,10 +77,6 @@ export class MainDialogFabImpl implements MainDialogFab {
      */
     private initializeVueComponents(): void {
         try {
-            // Piniaセットアップ
-            const pinia = createPinia();
-            pinia.use(createPersistedState());
-            
             // MainDialogマウントポイント作成
             this.dialogMountPoint = document.createElement('div');
             this.dialogMountPoint.id = 'vue-main-dialog';

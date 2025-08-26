@@ -11,7 +11,7 @@ export const useTickets = () => {
   const ticketsStore = useTicketsStore()
 
   // Computed properties
-  const allTickets = computed(() => ticketsStore.allTickets)
+  const allTickets = computed(() => ticketsStore.ticketsArray)
   const selectedTickets = computed(() => ticketsStore.selectedTickets)
   const selectedTicketCount = computed(() => ticketsStore.selectedTicketCount)
   const ownTickets = computed(() => ticketsStore.ownTickets)

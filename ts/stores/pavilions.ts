@@ -291,21 +291,39 @@ export const usePavilionsStore = defineStore('pavilions', () => {
 
 
   /**
-   * pavilion IDsから時間帯情報をまとめて取得して返す関数
+   * pavilion IDsから時間帯情報をまとめて取得して返す関数（並列化版）
    */
   const getTimeSlotsForPavilions = async (pavilionIds: string[], ticketIds: string[] = [], entranceDate?: string): Promise<Map<string, TimeSlotData[]>> => {
     const results = new Map<string, TimeSlotData[]>()
     
-    for (const pavilionId of pavilionIds) {
-      try {
-        const timeSlots = await getPavilionTimeSlots(pavilionId, ticketIds, entranceDate)
-        results.set(pavilionId, timeSlots)
-      } catch (error) {
-        console.warn(`⚠️ パビリオン ${pavilionId} の時間帯取得に失敗:`, error)
-        results.set(pavilionId, [])
-      }
+    console.log(`⏰ 時間帯情報並列取得開始: ${pavilionIds.length}件`)
+    
+    // 並列実行でパフォーマンス向上（最大5件同時）
+    const concurrency = Math.min(5, pavilionIds.length)
+    const chunks: string[][] = []
+    
+    for (let i = 0; i < pavilionIds.length; i += concurrency) {
+      chunks.push(pavilionIds.slice(i, i + concurrency))
     }
     
+    for (const chunk of chunks) {
+      const promises = chunk.map(async (pavilionId) => {
+        try {
+          const timeSlots = await getPavilionTimeSlots(pavilionId, ticketIds, entranceDate)
+          return { pavilionId, timeSlots }
+        } catch (error) {
+          console.warn(`⚠️ パビリオン ${pavilionId} の時間帯取得に失敗:`, error)
+          return { pavilionId, timeSlots: [] }
+        }
+      })
+      
+      const chunkResults = await Promise.all(promises)
+      chunkResults.forEach(({ pavilionId, timeSlots }) => {
+        results.set(pavilionId, timeSlots)
+      })
+    }
+    
+    console.log(`✅ 時間帯情報並列取得完了: ${results.size}件`)
     return results
   }
 

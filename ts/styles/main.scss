@@ -66,5 +66,65 @@ table[class*='style_main__timetable__'] {
 .ytomo-dialog-overlay * {
   &:focus {
     outline: none !important;
+    border: none !important;
+    box-shadow: none !important;
+  }
+}
+
+// パビリオンタブ検索入力欄のfocusスタイル削除
+.ytomo-pavilion-search-input {
+  &:focus {
+    outline: none !important;
+    border: 1px solid #e2e8f0 !important;
+    box-shadow: none !important;
+  }
+}
+
+// 予約結果表示
+.ytomo-reservation-result {
+  position: fixed;
+  bottom: 80px;
+  right: 90px;
+  min-width: 180px;
+  padding: 12px 16px;
+  border-radius: 8px;
+  color: white;
+  font-size: 12px;
+  font-weight: 500;
+  z-index: 998;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  animation: slideIn 0.3s ease-out;
+
+  &.success {
+    background-color: #10b981;
+  }
+
+  &.failed {
+    background-color: #ef4444;
+  }
+
+  .ytomo-result-status {
+    font-weight: 600;
+    margin-bottom: 4px;
+  }
+
+  .ytomo-result-pavilion {
+    margin-bottom: 2px;
+  }
+
+  .ytomo-result-time {
+    font-size: 11px;
+    opacity: 0.9;
+  }
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
   }
 }

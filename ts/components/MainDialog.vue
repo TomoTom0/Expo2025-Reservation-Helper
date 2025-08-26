@@ -124,7 +124,7 @@ const pavilionReservationDisplayText = computed(() => {
 // 選択されたスケジュール一覧を取得
 const selectedSchedules = computed(() => {
   const selected: ScheduleData[] = []
-  ticketsStore.allTickets.forEach((ticket: TicketData) => {
+  ticketsStore.ticketsArray.forEach((ticket: TicketData) => {
     ticket.schedules?.forEach((schedule: ScheduleData) => {
       if (schedule.selected) {
         selected.push(schedule)

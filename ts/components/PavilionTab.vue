@@ -249,7 +249,7 @@ const selectedSlotsCount = computed(() => pavilionsStore.selectedTimeSlotsCount)
 // 分散状態管理から選択されたスケジュール一覧を取得
 const selectedSchedules = computed(() => {
   const selected: ScheduleData[] = []
-  ticketsStore.allTickets.forEach((ticket: TicketData) => {
+  ticketsStore.ticketsArray.forEach((ticket: TicketData) => {
     ticket.schedules?.forEach((schedule: ScheduleData) => {
       if (schedule.selected) {
         selected.push(schedule)
@@ -318,7 +318,7 @@ const handlePavilionSearch = async () => {
     showProcessingOverlay('パビリオンを検索中...')
     
     // 選択されたチケットIDsを取得
-    const selectedTickets = ticketsStore.allTickets.filter(ticket => 
+    const selectedTickets = ticketsStore.ticketsArray.filter(ticket => 
       ticket.schedules?.some(schedule => schedule.selected)
     )
     const ticketIds = selectedTickets.map(t => t.ticket_id)
@@ -393,7 +393,7 @@ const handleRefresh = async () => {
     showProcessingOverlay('パビリオン情報を更新中...')
     
     // 選択されたチケットIDsを取得
-    const selectedTickets = ticketsStore.allTickets.filter(ticket => 
+    const selectedTickets = ticketsStore.ticketsArray.filter(ticket => 
       ticket.schedules?.some(schedule => schedule.selected)
     )
     const ticketIds = selectedTickets.map(t => t.ticket_id)
@@ -522,7 +522,7 @@ const handleReservationExecution = async () => {
     const registeredChannel = pavilionReservationInfo.activeChannel
     
     // 選択されたチケットIDsを取得
-    const selectedTickets = ticketsStore.allTickets.filter(ticket => 
+    const selectedTickets = ticketsStore.ticketsArray.filter(ticket => 
       ticket.schedules?.some(schedule => schedule.selected)
     )
     const ticketIds = selectedTickets.map(t => t.ticket_id)
