@@ -135,7 +135,7 @@ export class MainDialogFabImpl implements MainDialogFab {
             this.appMountPoint = null;
         }
         
-        console.log('✅ メインダイアログFABシステムクリーンアップ完了');
+        this.logger.info('メインダイアログFABシステムクリーンアップ完了');
     }
 }
 
@@ -147,7 +147,8 @@ let mainDialogFabInstance: MainDialogFab | null = null;
  */
 export const initializeMainDialogFab = (): void => {
     if (mainDialogFabInstance) {
-        console.log('🔄 メインダイアログFAB既存インスタンス削除');
+        const logger = loggers.ui;
+        logger.debug('メインダイアログFAB既存インスタンス削除');
         mainDialogFabInstance.cleanup();
     }
     
@@ -158,7 +159,8 @@ export const initializeMainDialogFab = (): void => {
 // 自動初期化（DOMContentLoaded時）
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', async () => {
-        console.log('📄 DOM読み込み完了 - ストア事前初期化');
+        const logger = loggers.ui;
+        logger.debug('DOM読み込み完了 - ストア事前初期化');
         
         // ストア初期化を先に実行
         const tempInstance = new MainDialogFabImpl()
@@ -169,7 +171,8 @@ if (document.readyState === 'loading') {
         }, 100);
     });
 } else {
-    console.log('📄 DOM既読み込み済み - ストア事前初期化');
+    const logger = loggers.ui;
+    logger.debug('DOM既読み込み済み - ストア事前初理化');
     
     // ストア初期化を先に実行
     (async () => {

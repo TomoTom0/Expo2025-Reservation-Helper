@@ -8,7 +8,7 @@
 // @run-at       document-end
 // ==/UserScript==
 
-// Built: 2025/08/27 11:18:47
+// Built: 2025/08/27 12:07:12
 
 
 (function webpackUniversalModuleDefinition(root, factory) {
@@ -1331,7 +1331,7 @@ const useTicketsStore = (0,pinia/* defineStore */.nY)('tickets', () => {
                             label: label,
                             schedules: processSchedules(data.schedules || [])
                         };
-                        console.log(`✅ 外部チケット${ticketId}をchannel=${testChannel}で取得成功`);
+                        tickets_logger.info('外部チケット取得成功', { ticketId, testChannel });
                         return ticketData;
                     }
                 }
@@ -1340,7 +1340,7 @@ const useTicketsStore = (0,pinia/* defineStore */.nY)('tickets', () => {
                 }
             }
             // どのchannelでも取得できない場合は最小限のデータを作成
-            console.log(`⚠️ 外部チケット${ticketId}の詳細取得失敗、最小限データで作成`);
+            tickets_logger.warn('外部チケット詳細取得失敗、最小限データで作成', { ticketId });
             return {
                 ticket_id: ticketId,
                 isOwn: false,
@@ -1419,7 +1419,7 @@ const useTicketsStore = (0,pinia/* defineStore */.nY)('tickets', () => {
     };
     const removeSelectedEntranceDate = (ticketId) => {
         selectedEntranceDates.value.delete(ticketId);
-        console.log(`🗑️ 入場日時選択を削除: ${ticketId}`);
+        tickets_logger.debug('入場日時選択を削除', { ticketId });
     };
     const restoreSelectedEntranceDates = () => {
         let restoredCount = 0;
@@ -1430,7 +1430,7 @@ const useTicketsStore = (0,pinia/* defineStore */.nY)('tickets', () => {
         try {
             // 復元前にtickets.valueが空でないことを確認
             if (tickets.value.size === 0) {
-                console.log('⚠️ チケットデータが未ロードのため復元をスキップ');
+                tickets_logger.warn('チケットデータが未ロードのため復元をスキップ');
                 return;
             }
             for (const [ticketId, scheduleId] of selectedEntranceDates.value.entries()) {
@@ -1440,22 +1440,22 @@ const useTicketsStore = (0,pinia/* defineStore */.nY)('tickets', () => {
                     if (schedule) {
                         schedule.selected = true;
                         restoredCount++;
-                        console.log(`🔄 復元: ${ticketId} - ${scheduleId}`);
+                        tickets_logger.debug('復元', { ticketId, scheduleId });
                     }
                     else {
                         // 見つからないスケジュールIDは削除
                         selectedEntranceDates.value.delete(ticketId);
-                        console.log(`🗑️ 無効な選択を削除: ${ticketId} - ${scheduleId}`);
+                        tickets_logger.debug('無効な選択を削除', { ticketId, scheduleId });
                     }
                 }
                 else {
                     // 存在しないチケットの選択は削除
                     selectedEntranceDates.value.delete(ticketId);
-                    console.log(`🗑️ 存在しないチケットの選択を削除: ${ticketId}`);
+                    tickets_logger.debug('存在しないチケットの選択を削除', { ticketId });
                 }
             }
             if (restoredCount > 0) {
-                console.log(`✅ 入場日時選択状態復元完了: ${restoredCount}個`);
+                tickets_logger.info('入場日時選択状態復元完了', { restoredCount });
             }
         }
         catch (error) {
@@ -1675,9 +1675,9 @@ const usePavilionsStore = (0,pinia__WEBPACK_IMPORTED_MODULE_0__/* .defineStore *
             const idsArray = Array.isArray(favoriteIds.value) ? favoriteIds.value : [];
             favoriteIds.value = new Set(idsArray);
         }
-        console.log(`📋 お気に入り初期化: ${favoriteIds.value.size}件`);
+        logger.debug('お気に入り初期化', { favoriteCount: favoriteIds.value.size });
         isInitialized.value = true;
-        console.log('✅ パビリオンストア初期化完了');
+        logger.info('パビリオンストア初期化完了');
     };
     /**
      * 公式API仕様に従ってAPIのURLを構築
@@ -1756,7 +1756,7 @@ const usePavilionsStore = (0,pinia__WEBPACK_IMPORTED_MODULE_0__/* .defineStore *
                     });
                 }
             }
-            console.log(`✅ パビリオン${pavilionId}時間帯パース完了: ${timeSlots.length}件`);
+            logger.debug('パビリオン時間帯パース完了', { pavilionId, timeSlotCount: timeSlots.length });
             // パビリオン名とタイムスロット情報を返す
             return {
                 timeSlots,
@@ -1764,7 +1764,7 @@ const usePavilionsStore = (0,pinia__WEBPACK_IMPORTED_MODULE_0__/* .defineStore *
             };
         }
         catch (error) {
-            console.warn(`⚠️ パビリオン${pavilionId}の時間帯取得エラー:`, error);
+            logger.warn('パビリオンの時間帯取得エラー', { pavilionId, error: error instanceof Error ? error.message : String(error) });
             return { timeSlots: [], pavilionName: undefined };
         }
     };
@@ -1784,7 +1784,7 @@ const usePavilionsStore = (0,pinia__WEBPACK_IMPORTED_MODULE_0__/* .defineStore *
             }
         }
         catch (error) {
-            console.error('❌ 検索結果パースエラー:', error);
+            logger.error('検索結果パースエラー', { error: error instanceof Error ? error.message : String(error) });
         }
         return pavilions;
     };
@@ -1797,13 +1797,13 @@ const usePavilionsStore = (0,pinia__WEBPACK_IMPORTED_MODULE_0__/* .defineStore *
         searchQuery.value = query;
         // 検索時は選択状態をリセット（旧ソースからの変更仕様）
         clearSelectedTimeSlots();
-        console.log('🔄 検索実行により選択状態をリセット');
+        logger.debug('検索実行により選択状態をリセット');
         // 検索開始時に古い結果をクリア
         pavilions.value.clear();
         lastSearchResults.value = [];
         try {
             const apiUrl = buildAPIUrl(query, ticketIds, entranceDate);
-            console.log('📡 API URL:', apiUrl);
+            logger.debug('API URL', { url: apiUrl });
             const response = await fetch(apiUrl, {
                 method: 'GET',
                 headers: {
@@ -1818,11 +1818,11 @@ const usePavilionsStore = (0,pinia__WEBPACK_IMPORTED_MODULE_0__/* .defineStore *
                 throw new Error(`API Error: ${response.status} ${response.statusText}`);
             }
             const data = await response.json();
-            console.log('🔍 パビリオン検索API応答:', data);
+            logger.debug('パビリオン検索API応答', data);
             const pavilionResults = parseSearchResults(data);
-            console.log(`✅ パビリオン一覧取得完了: ${pavilionResults.length}件`);
+            logger.info('パビリオン一覧取得完了', { count: pavilionResults.length });
             // Step 2: 各パビリオンの時間帯情報を取得
-            console.log('⏳ 時間帯情報取得開始...');
+            logger.debug('時間帯情報取得開始');
             const pavilionIds = pavilionResults.map(p => p.id);
             const timeSlotsMap = await getTimeSlotsForPavilions(pavilionIds, ticketIds, entranceDate);
             applyTimeSlotsToData(pavilionResults, timeSlotsMap);
@@ -1831,11 +1831,11 @@ const usePavilionsStore = (0,pinia__WEBPACK_IMPORTED_MODULE_0__/* .defineStore *
                 pavilions.value.set(pavilion.id, pavilion);
             }
             lastSearchResults.value = pavilionResults;
-            console.log(`🔍 パビリオン検索完了: ${pavilionResults.length}件（時間帯情報付き）`);
+            logger.info('パビリオン検索完了', { count: pavilionResults.length, withTimeSlots: true });
             return pavilionResults;
         }
         catch (error) {
-            console.error('❌ パビリオン検索エラー:', error);
+            logger.error('パビリオン検索エラー', { error: error instanceof Error ? error.message : String(error) });
             throw error;
         }
         finally {
@@ -1847,7 +1847,7 @@ const usePavilionsStore = (0,pinia__WEBPACK_IMPORTED_MODULE_0__/* .defineStore *
      */
     const getTimeSlotsForPavilions = async (pavilionIds, ticketIds = [], entranceDate) => {
         const results = new Map();
-        console.log(`⏰ 時間帯情報並列取得開始: ${pavilionIds.length}件`);
+        logger.debug('時間帯情報並列取得開始', { pavilionCount: pavilionIds.length });
         // 並列実行でパフォーマンス向上（最大5件同時）
         const concurrency = Math.min(5, pavilionIds.length);
         const chunks = [];
@@ -1861,7 +1861,7 @@ const usePavilionsStore = (0,pinia__WEBPACK_IMPORTED_MODULE_0__/* .defineStore *
                     return { pavilionId, timeSlots: result.timeSlots, pavilionName: result.pavilionName };
                 }
                 catch (error) {
-                    console.warn(`⚠️ パビリオン ${pavilionId} の時間帯取得に失敗:`, error);
+                    logger.warn('パビリオンの時間帯取得に失敗', { pavilionId, error: error instanceof Error ? error.message : String(error) });
                     return { pavilionId, timeSlots: [], pavilionName: undefined };
                 }
             });
@@ -1870,7 +1870,7 @@ const usePavilionsStore = (0,pinia__WEBPACK_IMPORTED_MODULE_0__/* .defineStore *
                 results.set(pavilionId, { timeSlots, pavilionName });
             });
         }
-        console.log(`✅ 時間帯情報並列取得完了: ${results.size}件`);
+        logger.debug('時間帯情報並列取得完了', { resultCount: results.size });
         return results;
     };
     /**
@@ -1902,18 +1902,18 @@ const usePavilionsStore = (0,pinia__WEBPACK_IMPORTED_MODULE_0__/* .defineStore *
      * お気に入り読み込み処理
      */
     const loadFavoritePavilions = async (entranceDate, ticketIds = []) => {
-        console.log('⭐ お気に入りパビリオン読み込み');
+        logger.debug('お気に入りパビリオン読み込み');
         isLoading.value = true;
         // お気に入り読み込み時も選択状態をリセット
         clearSelectedTimeSlots();
-        console.log('🔄 お気に入り読み込みにより選択状態をリセット');
+        logger.debug('お気に入り読み込みにより選択状態をリセット');
         try {
             if (favoriteIds.value.size === 0) {
-                console.log('⭐ お気に入り未登録のため処理終了');
+                logger.debug('お気に入り未登録のため処理終了');
                 return [];
             }
             const favoriteIdArray = Array.from(favoriteIds.value);
-            console.log(`🔍 お気に入りパビリオン検索中: ${favoriteIdArray.join(', ')}`);
+            logger.debug('お気に入りパビリオン検索中', { favoriteIds: favoriteIdArray });
             // 1. 時間帯情報をまとめて取得
             const timeSlotsMap = await getTimeSlotsForPavilions(favoriteIdArray, ticketIds, entranceDate);
             // 2. 基本パビリオンデータを作成
@@ -1928,18 +1928,18 @@ const usePavilionsStore = (0,pinia__WEBPACK_IMPORTED_MODULE_0__/* .defineStore *
             }));
             // 3. 取得した時間帯情報を適用
             applyTimeSlotsToData(favoriteResults, timeSlotsMap);
-            console.log(`🔍 お気に入り取得完了: ${favoriteResults.length}件`);
+            logger.info('お気に入り取得完了', { count: favoriteResults.length });
             // 結果を保存
             favoriteResults.forEach(pavilion => {
                 pavilions.value.set(pavilion.id, pavilion);
             });
             // allPavilionsを更新（computed propertyの再計算をトリガー）  
             lastSearchResults.value = favoriteResults;
-            console.log(`✅ お気に入り読み込み完了: ${favoriteResults.length}件をallPavilionsに反映`);
+            logger.info('お気に入り読み込み完了', { count: favoriteResults.length });
             return favoriteResults;
         }
         catch (error) {
-            console.error('❌ お気に入り読み込みエラー:', error);
+            logger.error('お気に入り読み込みエラー', { error: error instanceof Error ? error.message : String(error) });
             throw error;
         }
         finally {
@@ -1963,7 +1963,7 @@ const usePavilionsStore = (0,pinia__WEBPACK_IMPORTED_MODULE_0__/* .defineStore *
      */
     const clearAllFavorites = () => {
         favoriteIds.value.clear();
-        console.log(`🗑️ 全お気に入りクリア`);
+        logger.debug('全お気に入りクリア');
     };
     /**
      * イベント項目をパビリオンデータに変換
@@ -1989,7 +1989,7 @@ const usePavilionsStore = (0,pinia__WEBPACK_IMPORTED_MODULE_0__/* .defineStore *
             return pavilion;
         }
         catch (error) {
-            console.error('❌ イベント項目パースエラー:', error);
+            logger.error('イベント項目パースエラー', { error: error instanceof Error ? error.message : String(error) });
             return null;
         }
     };
@@ -2013,7 +2013,7 @@ const usePavilionsStore = (0,pinia__WEBPACK_IMPORTED_MODULE_0__/* .defineStore *
                 };
             }
             catch (error) {
-                console.warn('⚠️ 時間帯パースエラー:', error);
+                logger.warn('時間帯パースエラー', { error: error instanceof Error ? error.message : String(error) });
                 return {
                     time: '',
                     endTime: '',
@@ -2048,7 +2048,7 @@ const usePavilionsStore = (0,pinia__WEBPACK_IMPORTED_MODULE_0__/* .defineStore *
      */
     const addSelectedTimeSlot = (selection) => {
         selectedTimeSlots.value.push(selection);
-        console.log('⏰ 時間帯選択追加:', selection);
+        logger.debug('時間帯選択追加', selection);
     };
     /**
      * 時間帯選択を削除
@@ -2057,7 +2057,7 @@ const usePavilionsStore = (0,pinia__WEBPACK_IMPORTED_MODULE_0__/* .defineStore *
         const index = selectedTimeSlots.value.findIndex(s => s.pavilionId === pavilionId && s.timeSlot.time === time);
         if (index !== -1) {
             selectedTimeSlots.value.splice(index, 1);
-            console.log('⏰ 時間帯選択削除:', { pavilionId, time });
+            logger.debug('時間帯選択削除', { pavilionId, time });
         }
     };
     /**
@@ -2065,7 +2065,7 @@ const usePavilionsStore = (0,pinia__WEBPACK_IMPORTED_MODULE_0__/* .defineStore *
      */
     const clearSelectedTimeSlots = () => {
         selectedTimeSlots.value = [];
-        console.log('⏰ 時間帯選択クリア');
+        logger.debug('時間帯選択クリア');
     };
     /**
      * パビリオンの全時間帯を選択
@@ -2087,7 +2087,7 @@ const usePavilionsStore = (0,pinia__WEBPACK_IMPORTED_MODULE_0__/* .defineStore *
                 });
             }
         });
-        console.log(`⏰ パビリオン全時間帯選択: ${pavilion.name}`);
+        logger.debug('パビリオン全時間帯選択', { pavilionName: pavilion.name });
     };
     /**
      * パビリオンの全時間帯選択を解除
@@ -2095,13 +2095,13 @@ const usePavilionsStore = (0,pinia__WEBPACK_IMPORTED_MODULE_0__/* .defineStore *
     const deselectAllTimeSlotsForPavilion = (pavilionId) => {
         selectedTimeSlots.value = selectedTimeSlots.value.filter(s => s.pavilionId !== pavilionId);
         const pavilion = pavilions.value.get(pavilionId);
-        console.log(`⏰ パビリオン全時間帯選択解除: ${pavilion?.name || pavilionId}`);
+        logger.debug('パビリオン全時間帯選択解除', { pavilionName: pavilion?.name || pavilionId });
     };
     /**
      * 予約実行
      */
     const executeReservation = async (pavilionId, timeSlot, entranceDate, registeredChannel, ticketIds = []) => {
-        console.log('🎯 予約実行開始:', { pavilionId, timeSlot, entranceDate, registeredChannel, ticketIds });
+        logger.info('予約実行開始', { pavilionId, timeSlot: timeSlot.time, entranceDate, registeredChannel, ticketCount: ticketIds.length });
         try {
             const requestBody = {
                 ticket_ids: ticketIds,
@@ -2110,7 +2110,7 @@ const usePavilionsStore = (0,pinia__WEBPACK_IMPORTED_MODULE_0__/* .defineStore *
                 event_code: pavilionId,
                 registered_channel: registeredChannel
             };
-            console.log('📡 予約API呼び出し:', requestBody);
+            logger.debug('予約API呼び出し', requestBody);
             const response = await fetch('/api/d/user_event_reservations', {
                 method: 'POST',
                 headers: {
@@ -2124,7 +2124,7 @@ const usePavilionsStore = (0,pinia__WEBPACK_IMPORTED_MODULE_0__/* .defineStore *
                 body: JSON.stringify(requestBody)
             });
             const data = await response.json();
-            console.log('📡 予約API応答:', { status: response.status, data });
+            logger.debug('予約API応答', { status: response.status, data });
             if (response.ok) {
                 return {
                     success: true,
@@ -2156,7 +2156,7 @@ const usePavilionsStore = (0,pinia__WEBPACK_IMPORTED_MODULE_0__/* .defineStore *
             }
         }
         catch (error) {
-            console.error('❌ 予約実行エラー:', error);
+            logger.error('予約実行エラー', { error: error instanceof Error ? error.message : String(error) });
             return {
                 success: false,
                 message: '予約実行エラー',
@@ -2173,16 +2173,16 @@ const usePavilionsStore = (0,pinia__WEBPACK_IMPORTED_MODULE_0__/* .defineStore *
      * 更新処理（選択リセットなし）
      */
     const refreshPavilions = async (query = '', ticketIds = [], entranceDate) => {
-        console.log('🔄 パビリオン更新開始（既存結果の時間帯情報のみ再取得）');
+        logger.debug('パビリオン更新開始', { refreshType: '時間帯情報のみ再取得' });
         isLoading.value = true;
         try {
             // 既存の検索結果があることを確認
             if (lastSearchResults.value.length === 0) {
-                console.log('⚠️ 既存の検索結果なし - 更新対象なし');
+                logger.warn('既存の検索結果なし - 更新対象なし');
                 return [];
             }
             const existingPavilions = [...lastSearchResults.value];
-            console.log(`🔄 既存パビリオン ${existingPavilions.length}件の時間帯情報を更新`);
+            logger.debug('既存パビリオンの時間帯情報を更新', { count: existingPavilions.length });
             // 1. 時間帯情報をまとめて取得
             const pavilionIds = existingPavilions.map(p => p.id);
             const timeSlotsMap = await getTimeSlotsForPavilions(pavilionIds, ticketIds, entranceDate);
@@ -2193,11 +2193,11 @@ const usePavilionsStore = (0,pinia__WEBPACK_IMPORTED_MODULE_0__/* .defineStore *
                 pavilions.value.set(pavilion.id, pavilion);
             });
             lastSearchResults.value = existingPavilions;
-            console.log(`✅ パビリオン更新完了: ${existingPavilions.length}件の時間帯情報を更新`);
+            logger.info('パビリオン更新完了', { count: existingPavilions.length });
             return existingPavilions;
         }
         catch (error) {
-            console.error('❌ パビリオン更新エラー:', error);
+            logger.error('パビリオン更新エラー', { error: error instanceof Error ? error.message : String(error) });
             throw error;
         }
         finally {
@@ -31321,22 +31321,22 @@ function createEntranceReservationUI() {
                     const soundEnabled = entrance_reservation_state_manager/* entranceReservationStateManager */.xx.isNotificationSoundEnabled();
                     entrance_page_fab_logger.debug('予約成功時の通知音設定チェック', { soundEnabled });
                     if (soundEnabled) {
-                        console.log('🎵 予約成功 - 通知音を再生');
+                        entrance_page_fab_logger.info('予約成功 - 通知音を再生');
                         try {
                             AudioPlayer.playSuccessSound();
-                            console.log('✅ 通知音再生完了');
+                            entrance_page_fab_logger.info('通知音再生完了');
                         }
                         catch (error) {
-                            console.error('❌ 通知音再生エラー:', error);
+                            entrance_page_fab_logger.error('通知音再生エラー', { error: error instanceof Error ? error.message : String(error) });
                         }
                     }
                     else {
-                        console.log('🔇 予約成功 - 通知音は無効のため再生なし');
+                        entrance_page_fab_logger.debug('予約成功 - 通知音は無効のため再生なし');
                     }
-                    console.log('✅ 予約成功UI更新完了');
+                    entrance_page_fab_logger.info('予約成功UI更新完了');
                 }
                 else {
-                    console.warn('⚠️ 予約開始前の対象情報がnullのためUI更新をスキップ');
+                    entrance_page_fab_logger.warn('予約開始前の対象情報がnullのためUI更新をスキップ');
                 }
                 if (cacheManager) {
                     cacheManager.clearTargetSlots(); // 成功時はキャッシュクリア
@@ -31345,11 +31345,11 @@ function createEntranceReservationUI() {
             else {
                 if (result.cancelled) {
                     showStatus(`⏹️ 予約中断 (${result.attempts}回試行)`, 'orange');
-                    console.log('⏹️ ユーザーにより予約が中断されました');
+                    entrance_page_fab_logger.info('ユーザーにより予約が中断');
                 }
                 else if (result.abnormalTermination) {
                     showStatus(`🚨 異常終了 (${result.attempts}回試行) - システム停止`, 'red');
-                    console.log('🚨 予約処理が異常終了しました。システムを停止します');
+                    entrance_page_fab_logger.error('予約処理が異常終了 - システムを停止');
                 }
                 else {
                     showStatus(`予約失敗 (${result.attempts}回試行)`, 'red');
@@ -31376,7 +31376,7 @@ function createEntranceReservationUI() {
     // disabled状態でのクリックを確実に防ぐため、キャプチャーフェーズでも処理
     fabButton.addEventListener('click', (event) => {
         if (fabButton.disabled || fabButton.hasAttribute('disabled') || fabButton.classList.contains('pointer-events-none')) {
-            console.log('🚫 キャプチャーフェーズでdisabledクリックを阻止');
+            entrance_page_fab_logger.debug('キャプチャーフェーズでdisabledクリックを阻止');
             event.preventDefault();
             event.stopPropagation();
             event.stopImmediatePropagation();
@@ -31413,46 +31413,46 @@ function createEntranceReservationUI() {
     updateEfficiencyToggleButton(); // ボタン表示を更新
     // 自動選択イベントリスナーを設定
     window.addEventListener('entrance-auto-select', async (event) => {
-        console.log('🎯 自動選択イベントを受信:', event.detail);
+        entrance_page_fab_logger.debug('自動選択イベントを受信', event.detail);
         const slot = event.detail?.slot;
         if (!slot?.targetInfo) {
-            console.error('❌ 自動選択: スロット情報が無効');
+            entrance_page_fab_logger.error('自動選択: スロット情報が無効');
             return;
         }
         try {
             // オーバーレイを確実に非表示にして状態をリセット
-            console.log('🛡️ 予約移行: オーバーレイ状態をリセット');
+            entrance_page_fab_logger.debug('予約移行 - オーバーレイ状態をリセット');
             processing_overlay/* processingOverlay */.O.hide();
             // 1. 時間帯要素をクリックして選択状態にする
-            console.log(`🖱️ 自動選択: 時間帯をクリック ${slot.targetInfo.timeSlot}`);
+            entrance_page_fab_logger.info('自動選択 - 時間帯をクリック', { timeSlot: slot.targetInfo.timeSlot });
             const timeSlotElement = document.querySelector(slot.targetInfo.selector);
             if (timeSlotElement) {
                 const buttonElement = timeSlotElement.querySelector('div[role="button"]');
                 if (buttonElement) {
                     // 満員時間帯も強制選択可能（data-disabled属性に関係なく）
                     buttonElement.click();
-                    console.log(`✅ 時間帯選択完了: ${slot.targetInfo.timeSlot}`);
+                    entrance_page_fab_logger.info('時間帯選択完了', { timeSlot: slot.targetInfo.timeSlot });
                     // 2. 選択後、少し待ってから内部的に自動予約を開始
                     setTimeout(async () => {
-                        console.log('🚀 内部的に自動予約を開始');
+                        entrance_page_fab_logger.info('内部的に自動予約を開始');
                         if (entrance_reservation_state_manager/* entranceReservationStateManager */.xx.canStartReservation()) {
                             await startReservationProcess();
                         }
                         else {
-                            console.error('❌ 予約開始条件が満たされていません');
+                            entrance_page_fab_logger.error('予約開始条件が満たされていない');
                         }
                     }, 100);
                 }
                 else {
-                    console.error(`❌ 時間帯ボタンが見つからないか無効: ${slot.targetInfo.timeSlot}`);
+                    entrance_page_fab_logger.error('時間帯ボタンが見つからないか無効', { timeSlot: slot.targetInfo.timeSlot });
                 }
             }
             else {
-                console.error(`❌ 時間帯要素が見つからない: ${slot.targetInfo.selector}`);
+                entrance_page_fab_logger.error('時間帯要素が見つからない', { selector: slot.targetInfo.selector });
             }
         }
         catch (error) {
-            console.error('❌ 自動選択処理エラー:', error);
+            entrance_page_fab_logger.error('自動選択処理エラー', { error: error instanceof Error ? error.message : String(error) });
         }
     });
     // FAB表示状態を初期化・適用
@@ -31490,11 +31490,11 @@ function getCurrentReservationTarget() {
 function checkVisitTimeButtonState() {
     const visitTimeButton = document.querySelector('button.basic-btn.type2.style_full__ptzZq');
     if (!visitTimeButton) {
-        console.log('⚠️ 来場日時設定ボタンが見つかりません');
+        entrance_page_fab_logger.warn('来場日時設定ボタンが見つからない');
         return false;
     }
     const isDisabled = visitTimeButton.hasAttribute('disabled') || visitTimeButton.disabled;
-    console.log(`🔘 来場日時設定ボタン: ${isDisabled ? '無効' : '有効'}`);
+    entrance_page_fab_logger.debug('来場日時設定ボタン状態', { isDisabled });
     return !isDisabled;
 }
 // 時間帯が選択されているかチェック
@@ -31502,7 +31502,7 @@ function checkTimeSlotSelected() {
     // 選択された時間帯（aria-pressed="true"）をチェック
     const selectedTimeSlot = document.querySelector(timeSlotSelectors.selectedSlot);
     if (!selectedTimeSlot) {
-        console.log('⚠️ 時間帯が選択されていません');
+        entrance_page_fab_logger.warn('時間帯が選択されていない');
         return false;
     }
     // 選択された時間帯が満員でないかチェック
@@ -31510,7 +31510,7 @@ function checkTimeSlotSelected() {
     if (!tdElement)
         return false;
     const status = extractTdStatus(tdElement);
-    console.log(`✅ 時間帯選択済み: ${status?.timeText || 'unknown'}`);
+    entrance_page_fab_logger.debug('時間帯選択済み', { timeText: status?.timeText || 'unknown' });
     return true;
 }
 // 予約開始可能かどうかの総合判定
@@ -31518,28 +31518,28 @@ function canStartReservation() {
     const hasTimeSlotTable = checkTimeSlotTableExistsSync();
     const isTimeSlotSelected = checkTimeSlotSelected();
     const isVisitTimeButtonEnabled = checkVisitTimeButtonState();
-    console.log(`📊 予約開始条件チェック:`);
-    console.log(`  - 時間帯テーブル: ${hasTimeSlotTable ? '✅' : '❌'}`);
-    console.log(`  - 時間帯選択: ${isTimeSlotSelected ? '✅' : '❌'}`);
-    console.log(`  - 来場日時ボタン有効: ${isVisitTimeButtonEnabled ? '✅' : '❌'}`);
+    entrance_page_fab_logger.debug('予約開始条件チェック');
+    entrance_page_fab_logger.debug('時間帯テーブル状態', { hasTimeSlotTable });
+    entrance_page_fab_logger.debug('時間帯選択状態', { isTimeSlotSelected });
+    entrance_page_fab_logger.debug('来場日時ボタン有効状態', { isVisitTimeButtonEnabled });
     return hasTimeSlotTable && isTimeSlotSelected && isVisitTimeButtonEnabled;
 }
 // 初期状態をチェックしてFABを適切に設定
 function checkInitialState() {
-    console.log('🔍 初期状態をチェック中...');
+    entrance_page_fab_logger.debug('初期状態をチェック中');
     // 【統一システム連動】統一システムが責任を持つ場合はスキップ
     const currentState = entrance_reservation_state_manager/* entranceReservationStateManager */.xx.getExecutionState();
     const preferredAction = entrance_reservation_state_manager/* entranceReservationStateManager */.xx.getPreferredAction();
     if (currentState !== entrance_reservation_state_manager/* ExecutionState */.si.IDLE) {
-        console.log(`🔄 統一システム実行中 (${currentState}) - 初期状態チェックをスキップ`);
+        entrance_page_fab_logger.debug('統一システム実行中 - 初期状態チェックをスキップ', { currentState });
         return;
     }
     if (preferredAction === 'reservation') {
-        console.log(`🔄 統一システムがアクション決定済み (${preferredAction}) - 初期状態チェックをスキップ`);
+        entrance_page_fab_logger.debug('統一システムがアクション決定済み - 初期状態チェックをスキップ', { preferredAction });
         return;
     }
     // 【統一システム完全委譲】FABボタン状態は統一システムが一元管理
-    console.log('🔄 FABボタン状態は統一システムに完全委譲');
+    entrance_page_fab_logger.debug('FABボタン状態は統一システムに完全委譲');
     // 統一システムに状態更新を要求
     entrance_reservation_state_manager/* entranceReservationStateManager */.xx.updateFabDisplay();
 }
@@ -31552,9 +31552,9 @@ function startCalendarWatcher() {
     // 初期化時に入場予約状態管理にも現在の選択日付を設定
     if (entrance_page_state.calendarWatchState.currentSelectedDate) {
         entrance_reservation_state_manager/* entranceReservationStateManager */.xx.setSelectedCalendarDate(entrance_page_state.calendarWatchState.currentSelectedDate);
-        console.log(`📅 初期化時の選択日付を設定: ${entrance_page_state.calendarWatchState.currentSelectedDate}`);
+        entrance_page_fab_logger.debug('初期化時の選択日付を設定', { selectedDate: entrance_page_state.calendarWatchState.currentSelectedDate });
     }
-    console.log('📅 カレンダー変更検知を開始');
+    entrance_page_fab_logger.debug('カレンダー変更検知を開始');
     // MutationObserverでカレンダー変更・時間帯選択・ボタン状態変更を検出
     entrance_page_state.calendarWatchState.observer = new MutationObserver((mutations) => {
         let shouldUpdate = false;
@@ -31575,11 +31575,11 @@ function startCalendarWatcher() {
                 const element = mutation.target;
                 if (element.matches && element.matches('td[data-gray-out] div[role="button"]')) {
                     const ariaPressed = element.getAttribute('aria-pressed');
-                    console.log(`🔄 時間帯選択変更検出: ${ariaPressed}`);
+                    entrance_page_fab_logger.debug('時間帯選択変更検出', { ariaPressed });
                     // 入場予約状態管理システムの同期（初期化中は除外）
                     if (ariaPressed === 'true' && !entrance_page_state.calendarWatchState.isInitializing) {
                         // 選択状態変更を検出 - DOM状態から予約対象を同期
-                        console.log(`🔄 時間帯選択状態を検出`);
+                        entrance_page_fab_logger.debug('時間帯選択状態を検出');
                         setTimeout(() => {
                             syncReservationTargetFromDOM();
                             entrance_reservation_state_manager/* entranceReservationStateManager */.xx.updateFabDisplay();
@@ -31593,7 +31593,7 @@ function startCalendarWatcher() {
                 mutation.attributeName === 'disabled') {
                 const element = mutation.target;
                 if (element.matches && element.matches('button.basic-btn.type2.style_full__ptzZq')) {
-                    console.log(`🔄 来場日時ボタン状態変更検出: disabled=${element.hasAttribute('disabled')}`);
+                    entrance_page_fab_logger.debug('来場日時ボタン状態変更検出', { disabled: element.hasAttribute('disabled') });
                     shouldUpdate = true;
                 }
             }
@@ -31622,7 +31622,7 @@ async function handleCalendarChange() {
     const stateManagerSelectedDate = entrance_reservation_state_manager/* entranceReservationStateManager */.xx.getSelectedCalendarDate();
     const actualDateChanged = newSelectedDate !== stateManagerSelectedDate;
     if (calendarDateChanged) {
-        console.log(`📅 カレンダー日付変更を検出: ${entrance_page_state.calendarWatchState.currentSelectedDate} → ${newSelectedDate}`);
+        entrance_page_fab_logger.debug('カレンダー日付変更を検出', { oldDate: entrance_page_state.calendarWatchState.currentSelectedDate, newDate: newSelectedDate });
         entrance_page_state.calendarWatchState.currentSelectedDate = newSelectedDate;
         // 入場予約状態管理にも日付を設定
         if (newSelectedDate) {
@@ -31630,28 +31630,28 @@ async function handleCalendarChange() {
         }
         // 実際に日付が変更された場合のみ状態をクリア
         if (actualDateChanged) {
-            console.log(`📅 実際の日付変更確認: ${stateManagerSelectedDate} → ${newSelectedDate}`);
+            entrance_page_fab_logger.debug('実際の日付変更確認', { oldDate: stateManagerSelectedDate, newDate: newSelectedDate });
             const hasReservationTarget = entrance_reservation_state_manager/* entranceReservationStateManager */.xx.hasReservationTarget();
             if (hasReservationTarget) {
-                console.log('📅 日付変更により予約対象をクリア');
+                entrance_page_fab_logger.debug('日付変更により予約対象をクリア');
                 entrance_reservation_state_manager/* entranceReservationStateManager */.xx.clearReservationTarget();
             }
         }
         else {
-            console.log('📅 同じ日付への再クリック');
+            entrance_page_fab_logger.debug('同じ日付への再クリック');
         }
         // 予約対象がクリアされたため、即座にFAB表示を更新
         entrance_reservation_state_manager/* entranceReservationStateManager */.xx.updateFabDisplay();
     }
     else {
         // 日付は変わっていない - FABボタンの状態のみ更新
-        console.log('📅 日付変更なし - FABボタンの状態のみ更新');
+        entrance_page_fab_logger.debug('日付変更なし - FABボタンの状態のみ更新');
         // 入場予約状態管理システムを取得して状態同期
         // 公式サイトによる選択解除があった場合の状態同期
         const selectedSlot = document.querySelector(entrance_page_dom_utils/* timeSlotSelectors */.eN.selectedSlot);
         if (!selectedSlot && entrance_reservation_state_manager/* entranceReservationStateManager */.xx.hasReservationTarget()) {
             // DOM上に選択がないが入場予約状態管理に予約対象がある場合はクリア
-            console.log('🔄 公式サイトによる選択解除を検出 - 入場予約状態管理を同期');
+            entrance_page_fab_logger.debug('公式サイトによる選択解除を検出 - 入場予約状態管理を同期');
             entrance_reservation_state_manager/* entranceReservationStateManager */.xx.clearReservationTarget();
             // UI更新を確実に実行
             entrance_reservation_state_manager/* entranceReservationStateManager */.xx.updateFabDisplay();
@@ -31670,13 +31670,13 @@ function syncReservationTargetFromDOM() {
         if (tdElement && timeText) {
             const locationIndex = entrance_reservation_state_manager/* LocationHelper */.Qs.getIndexFromElement(tdElement);
             const selector = (0,entrance_page_dom_utils/* generateUniqueTdSelector */.sN)(tdElement);
-            console.log(`🔄 DOM状態から予約対象を同期: ${timeText} (位置: ${locationIndex})`);
+            entrance_page_fab_logger.debug('DOM状態から予約対象を同期', { timeText, locationIndex });
             entrance_reservation_state_manager/* entranceReservationStateManager */.xx.setReservationTarget(timeText, locationIndex, selector);
         }
     }
     else {
         // 選択状態の要素がない場合は予約対象をクリア
-        console.log(`🔄 選択状態なし - 予約対象をクリア`);
+        entrance_page_fab_logger.debug('選択状態なし - 予約対象をクリア');
         entrance_reservation_state_manager/* entranceReservationStateManager */.xx.clearReservationTarget();
     }
 }
@@ -31685,7 +31685,7 @@ function waitForTimeSlotTable(callback) {
     // まず即座にチェック（最短の場合は遅延なし）
     const timeSlotButtons = document.querySelectorAll('td[data-gray-out] div[role="button"]');
     if (timeSlotButtons.length > 0) {
-        console.log(`✅ 時間帯テーブル準備済み (${timeSlotButtons.length}個の時間帯を検出) - 即座に実行`);
+        entrance_page_fab_logger.debug('時間帯テーブル準備済み - 即座に実行', { timeSlotCount: timeSlotButtons.length });
         callback();
         return;
     }
@@ -31698,11 +31698,11 @@ function waitForTimeSlotTable(callback) {
         // 時間帯テーブルの存在確認
         const timeSlotButtons = document.querySelectorAll('td[data-gray-out] div[role="button"]');
         if (timeSlotButtons.length > 0) {
-            console.log(`✅ 時間帯テーブル準備完了 (${timeSlotButtons.length}個の時間帯を検出) - ${attempts * checkInterval}ms後`);
+            entrance_page_fab_logger.debug('時間帯テーブル準備完了', { timeSlotCount: timeSlotButtons.length, delay: attempts * checkInterval });
             callback();
         }
         else if (attempts >= maxAttempts) {
-            console.log('⚠️ 時間帯テーブルの準備がタイムアウト - 強制実行');
+            entrance_page_fab_logger.warn('時間帯テーブルの準備がタイムアウト - 強制実行');
             callback();
         }
         else {
@@ -31710,7 +31710,7 @@ function waitForTimeSlotTable(callback) {
             setTimeout(checkTableReady, checkInterval);
         }
     };
-    console.log('🔍 時間帯テーブル待機開始...');
+    entrance_page_fab_logger.debug('時間帯テーブル待機開始');
     setTimeout(checkTableReady, checkInterval);
 }
 // 時間帯tdクリック処理を設定（公式サイト仕様を利用した選択解除機能付き）
@@ -31778,35 +31778,35 @@ function setupTimeSlotClickHandlers() {
     window.timeSlotClickHandler = timeSlotClickHandler;
     // 捕獲フェーズでイベントをキャッチ
     document.addEventListener('click', timeSlotClickHandler, true);
-    console.log('✅ 公式サイト仕様を利用した時間帯選択解除ハンドラーを設定しました');
+    entrance_page_fab_logger.info('公式サイト仕様を利用した時間帯選択解除ハンドラーを設定');
 }
 // 統一自動処理管理に対応した予約処理（Phase 3で実装）
 async function entranceReservationHelper(config) {
-    console.log('🚀 統一自動処理管理による入場予約補助機能を開始します...');
+    entrance_page_fab_logger.info('統一自動処理管理による入場予約補助機能を開始');
     try {
         // 統一自動処理管理による予約処理実行
         const result = await entrance_reservation_state_manager/* entranceReservationStateManager */.xx.executeUnifiedReservationProcess(config);
         if (result.success) {
-            console.log('🎉 統一予約処理成功！');
+            entrance_page_fab_logger.info('統一予約処理成功');
         }
         else if (result.cancelled) {
-            console.log('⏹️ 統一予約処理がキャンセルされました');
+            entrance_page_fab_logger.info('統一予約処理がキャンセル');
             entrance_reservation_state_manager/* entranceReservationStateManager */.xx.stop();
         }
         else if (result.abnormalTermination) {
-            console.error('🚨 統一予約処理異常終了');
+            entrance_page_fab_logger.error('統一予約処理異常終了');
             entrance_reservation_state_manager/* entranceReservationStateManager */.xx.setShouldStop(true);
         }
         return result;
     }
     catch (error) {
         if (error.name === 'CancellationError') {
-            console.log('⏹️ 統一予約処理が中断されました');
+            entrance_page_fab_logger.info('統一予約処理が中断');
             entrance_reservation_state_manager/* entranceReservationStateManager */.xx.stop();
             return { success: false, attempts: 0, cancelled: true };
         }
         else {
-            console.error('❌ 統一予約処理でエラー:', error);
+            entrance_page_fab_logger.error('統一予約処理でエラー', { error: error instanceof Error ? error.message : String(error) });
             throw error;
         }
     }
@@ -40216,7 +40216,7 @@ class MainDialogFabImpl {
             this.appMountPoint.remove();
             this.appMountPoint = null;
         }
-        console.log('✅ メインダイアログFABシステムクリーンアップ完了');
+        this.logger.info('メインダイアログFABシステムクリーンアップ完了');
     }
 }
 // グローバルインスタンス
@@ -40226,7 +40226,8 @@ let mainDialogFabInstance = null;
  */
 const initializeMainDialogFab = () => {
     if (mainDialogFabInstance) {
-        console.log('🔄 メインダイアログFAB既存インスタンス削除');
+        const logger = utils_logger/* loggers */.C$.ui;
+        logger.debug('メインダイアログFAB既存インスタンス削除');
         mainDialogFabInstance.cleanup();
     }
     mainDialogFabInstance = new MainDialogFabImpl();
@@ -40235,7 +40236,8 @@ const initializeMainDialogFab = () => {
 // 自動初期化（DOMContentLoaded時）
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', async () => {
-        console.log('📄 DOM読み込み完了 - ストア事前初期化');
+        const logger = utils_logger/* loggers */.C$.ui;
+        logger.debug('DOM読み込み完了 - ストア事前初期化');
         // ストア初期化を先に実行
         const tempInstance = new MainDialogFabImpl();
         await tempInstance.preInitializeVueSystem();
@@ -40245,7 +40247,8 @@ if (document.readyState === 'loading') {
     });
 }
 else {
-    console.log('📄 DOM既読み込み済み - ストア事前初期化');
+    const logger = utils_logger/* loggers */.C$.ui;
+    logger.debug('DOM既読み込み済み - ストア事前初理化');
     // ストア初期化を先に実行
     (async () => {
         const tempInstance = new MainDialogFabImpl();
@@ -42149,6 +42152,7 @@ function stopAutomation() {
 
 
 
+
 // 初期化状態の管理
 let isInitialized = false;
 let isAutomationRunning = false;
@@ -42158,7 +42162,8 @@ let isAutomationRunning = false;
 function initializeAutomation() {
     if (isInitialized)
         return;
-    console.log('🤖 自動操作エンジン初期化開始');
+    const logger = utils_logger/* loggers */.C$.automation;
+    logger.info('自動操作エンジン初期化開始');
     // ページロード完了後に実行
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', checkAndStartAutomation);
@@ -42170,37 +42175,40 @@ function initializeAutomation() {
     // ページ変更時の監視（SPA対応）
     setupPageChangeListener();
     isInitialized = true;
-    console.log('✅ 自動操作エンジン初期化完了');
+    logger.info('自動操作エンジン初期化完了');
 }
 /**
  * 自動操作が必要かチェックして開始
  */
 async function checkAndStartAutomation() {
     if (isAutomationRunning) {
-        console.log('⏳ 自動操作は既に実行中です');
+        const logger = utils_logger/* loggers */.C$.automation;
+        logger.warn('自動操作は既に実行中');
         return;
     }
     try {
         // ページタイプを検知
         const pageDetector = getPageDetector();
         const pageInfo = pageDetector.extractPageInfo();
-        console.log(`📍 ページ検知: ${pageInfo.type} - ${pageInfo.url}`);
+        const logger = utils_logger/* loggers */.C$.automation;
+        logger.debug('ページ検知', { type: pageInfo.type, url: pageInfo.url });
         // 自動操作対象ページかチェック
         if (!shouldStartAutomation(pageInfo.type)) {
-            console.log(`ℹ️ ${pageInfo.type} ページでは自動操作不要`);
+            logger.debug('ページでは自動操作不要', { pageType: pageInfo.type });
             return;
         }
         // キャッシュにデータがあるかチェック
         const hasReservationData = checkReservationDataAvailable(pageInfo);
         if (!hasReservationData) {
-            console.log('📋 キャッシュに予約データがありません');
+            logger.debug('キャッシュに予約データがない');
             return;
         }
         // 自動操作を開始
         await startAutomationSafely();
     }
     catch (error) {
-        console.error('❌ 自動操作チェックエラー:', error);
+        const logger = utils_logger/* loggers */.C$.automation;
+        logger.error('自動操作チェックエラー', { error: error instanceof Error ? error.message : String(error) });
     }
 }
 /**
@@ -42210,7 +42218,8 @@ async function startAutomationSafely() {
     if (isAutomationRunning)
         return;
     isAutomationRunning = true;
-    console.log('🚀 自動操作開始');
+    const logger = utils_logger/* loggers */.C$.automation;
+    logger.info('自動操作開始');
     try {
         const engine = getAutomationEngine({
             enableLogging: true,
@@ -42218,16 +42227,16 @@ async function startAutomationSafely() {
             maxRetries: 3
         });
         const result = await engine.start();
-        console.log('📊 自動操作結果:', result);
+        logger.debug('自動操作結果', result);
         if (result.status === 'completed') {
-            console.log('✅ 自動操作正常完了');
+            logger.info('自動操作正常完了');
         }
         else if (result.status === 'failed') {
-            console.warn('⚠️ 自動操作失敗:', result.errors);
+            logger.warn('自動操作失敗', { errors: result.errors });
         }
     }
     catch (error) {
-        console.error('❌ 自動操作実行エラー:', error);
+        logger.error('自動操作実行エラー', { error: error instanceof Error ? error.message : String(error) });
     }
     finally {
         isAutomationRunning = false;
@@ -42271,7 +42280,8 @@ function setupPageChangeListener() {
         const newUrl = window.location.href;
         if (newUrl !== currentUrl) {
             currentUrl = newUrl;
-            console.log('🔄 ページ変更検知:', newUrl);
+            const logger = utils_logger/* loggers */.C$.automation;
+            logger.debug('ページ変更検知', { url: newUrl });
             // ページデテクターをリセット
             resetPageDetector();
             // 少し待ってから自動操作チェック
@@ -42300,23 +42310,25 @@ function setupPageChangeListener() {
  * デバッグ用: 手動で自動操作を実行
  */
 function debugStartAutomation() {
-    console.log('🔧 デバッグ: 手動自動操作開始');
+    const logger = utils_logger/* loggers */.C$.automation;
+    logger.debug('デバッグ - 手動自動操作開始');
     startAutomationSafely();
 }
 /**
  * デバッグ用: 現在の状態を確認
  */
 function debugAutomationStatus() {
-    console.group('🔧 自動操作エンジン状態');
-    console.log('初期化済み:', isInitialized);
-    console.log('実行中:', isAutomationRunning);
+    const logger = utils_logger/* loggers */.C$.automation;
     const pageDetector = getPageDetector();
-    console.log('ページ情報:', pageDetector.extractPageInfo());
     const pendingReservations = pavilion_reservation_cache.PavilionReservationCache.getPendingReservations();
-    console.log('待機中予約:', pendingReservations.length, pendingReservations);
     const processingReservation = pavilion_reservation_cache.PavilionReservationCache.getProcessingReservation();
-    console.log('処理中予約:', processingReservation);
-    console.groupEnd();
+    logger.debug('自動操作エンジン状態デバッグ', {
+        isInitialized,
+        isRunning: isAutomationRunning,
+        pageInfo: pageDetector.extractPageInfo(),
+        pendingReservations: { count: pendingReservations.length, data: pendingReservations },
+        processingReservation
+    });
 }
 // グローバルに公開（デバッグ用）
 window.debugStartAutomation = debugStartAutomation;
@@ -42761,12 +42773,12 @@ class MonitoringService {
      */
     async startMonitoring() {
         if (this.isRunning) {
-            console.log('⚠️ 監視は既に実行中です');
+            this.logger.warn('監視は既に実行中', { isRunning: this.isRunning });
             return false;
         }
         const targets = MonitoringCacheManager.getTargets();
         if (targets.length === 0) {
-            console.log('⚠️ 監視対象がありません');
+            this.logger.warn('監視対象がありません', { targetCount: targets.length });
             return false;
         }
         this.isRunning = true;
@@ -42780,7 +42792,7 @@ class MonitoringService {
         this.scheduler.start(async () => {
             await this.performMonitoringCheck();
         });
-        console.log('🚀 パビリオン監視開始:', targets.length, '件');
+        this.logger.info('パビリオン監視開始', { targetCount: targets.length });
         return true;
     }
     /**
@@ -42788,7 +42800,7 @@ class MonitoringService {
      */
     stopMonitoring() {
         if (!this.isRunning) {
-            console.log('⚠️ 監視は実行されていません');
+            this.logger.warn('監視は実行されていない', { isRunning: this.isRunning });
             return;
         }
         this.scheduler.stop();
@@ -42798,7 +42810,7 @@ class MonitoringService {
             isActive: false,
             nextCheck: 0
         });
-        console.log('⏹️ パビリオン監視停止');
+        this.logger.info('パビリオン監視停止');
     }
     /**
      * 監視チェックを実行
@@ -42807,7 +42819,7 @@ class MonitoringService {
         try {
             const targets = MonitoringCacheManager.getTargets();
             if (targets.length === 0) {
-                console.log('📋 監視対象がないため監視を停止します');
+                this.logger.warn('監視対象がないため監視を停止', { targetCount: targets.length });
                 this.stopMonitoring();
                 return {
                     success: false,
@@ -42816,12 +42828,12 @@ class MonitoringService {
                     error: '監視対象なし'
                 };
             }
-            console.log(`🔍 監視チェック開始 (${targets.length}件)`);
+            this.logger.info('監視チェック開始', { targetCount: targets.length });
             // 各監視対象をチェック
             for (const target of targets) {
                 const isAvailable = await this.checkTargetAvailability(target);
                 if (isAvailable) {
-                    console.log('🎯 空きを発見:', target);
+                    this.logger.info('空きを発見', { pavilionName: target.pavilionName, timeSlot: target.timeSlot, pavilionCode: target.pavilionCode });
                     // 自動予約を実行
                     await this.executeReservation(target);
                     // 監視対象から削除
@@ -42841,7 +42853,7 @@ class MonitoringService {
                 }
             }
             // 空きなしの場合
-            console.log('📋 空きなし、監視継続');
+            this.logger.debug('空きなし、監視継続');
             // 監視状態を更新
             const currentState = MonitoringCacheManager.getMonitoringState();
             MonitoringCacheManager.updateMonitoringState({
@@ -42857,7 +42869,7 @@ class MonitoringService {
         }
         catch (error) {
             const errorMessage = error instanceof Error ? error.message : String(error);
-            console.error('❌ 監視チェックエラー:', errorMessage);
+            this.logger.error('監視チェックエラー', { error: errorMessage });
             // エラー時も状態更新
             const currentState = MonitoringCacheManager.getMonitoringState();
             MonitoringCacheManager.updateMonitoringState({
@@ -42880,20 +42892,20 @@ class MonitoringService {
         try {
             const availability = await this.fetchPavilionAvailability(target.pavilionCode);
             if (!availability) {
-                console.warn('⚠️ API応答なし:', target.pavilionCode);
+                this.logger.warn('API応答なし', { pavilionCode: target.pavilionCode });
                 return false;
             }
             // 該当時間帯の空き状況をチェック
             const targetSlot = availability.timeSlots.find(slot => slot.time === target.timeSlot);
             if (!targetSlot) {
-                console.warn('⚠️ 該当時間帯なし:', target.timeSlot);
+                this.logger.warn('該当時間帯なし', { timeSlot: target.timeSlot });
                 return false;
             }
-            console.log(`📊 ${target.pavilionName} ${target.timeSlot}: ${targetSlot.available ? '空きあり' : '満員'}`);
+            this.logger.debug('監視対象空き状況', { pavilionName: target.pavilionName, timeSlot: target.timeSlot, available: targetSlot.available });
             return targetSlot.available;
         }
         catch (error) {
-            console.error('❌ 空き状況チェックエラー:', target.pavilionCode, error);
+            this.logger.error('空き状況チェックエラー', { pavilionCode: target.pavilionCode, error: error instanceof Error ? error.message : String(error) });
             return false;
         }
     }
@@ -42903,7 +42915,7 @@ class MonitoringService {
     async fetchPavilionAvailability(pavilionCode) {
         try {
             const url = `https://expo.ebii.net/data?pavilion=${pavilionCode}`;
-            console.log('🌐 API呼び出し:', url);
+            this.logger.debug('API呼び出し', { url });
             const response = await fetch(url, {
                 method: 'GET',
                 headers: {
@@ -42918,7 +42930,7 @@ class MonitoringService {
             return this.transformApiResponse(data, pavilionCode);
         }
         catch (error) {
-            console.error('❌ API呼び出しエラー:', error);
+            this.logger.error('API呼び出しエラー', { error: error instanceof Error ? error.message : String(error) });
             return null;
         }
     }
@@ -42938,7 +42950,7 @@ class MonitoringService {
      * 自動予約を実行
      */
     async executeReservation(target) {
-        console.log('🤖 自動予約実行開始:', target);
+        this.logger.info('自動予約実行開始', { pavilionName: target.pavilionName, timeSlot: target.timeSlot, pavilionCode: target.pavilionCode });
         try {
             // 予約データを作成
             const reservationData = {
@@ -42964,12 +42976,12 @@ class MonitoringService {
             };
             const reservationUrl = `https://ticket.expo2025.or.jp/event_time/?id=${ticketIds}&event_id=${target.pavilionCode}&screen_id=108&lottery=5&entrance_date=${formatDateToYMD()}`;
             window.location.href = reservationUrl;
-            console.log('✅ 予約ページに遷移:', reservationUrl);
+            this.logger.info('予約ページに遷移', { url: reservationUrl });
             // 監視成功通知を送信
             this.sendNotificationToDialog('info', `監視成功: ${target.pavilionName} ${target.timeSlot} の空きを検知し予約開始`);
         }
         catch (error) {
-            console.error('❌ 自動予約実行エラー:', error);
+            this.logger.error('自動予約実行エラー', { error: error instanceof Error ? error.message : String(error) });
             throw error;
         }
     }
@@ -42997,7 +43009,7 @@ class MonitoringService {
      * 手動チェック実行
      */
     async triggerManualCheck() {
-        console.log('🔄 手動チェック実行');
+        this.logger.info('手動チェック実行');
         return await this.performMonitoringCheck();
     }
     /**
@@ -43008,14 +43020,14 @@ class MonitoringService {
             // グローバル関数が利用可能な場合に通知を送信
             if (typeof window.showReservationNotification === 'function') {
                 window.showReservationNotification(type, message);
-                console.log(`📢 監視通知送信: [${type}] ${message}`);
+                this.logger.info('監視通知送信', { type, message });
             }
             else {
-                console.log('⚠️ 通知関数が利用できません');
+                this.logger.warn('通知関数が利用できない');
             }
         }
         catch (error) {
-            console.log(`❌ 通知送信エラー: ${error}`);
+            this.logger.error('通知送信エラー', { error: error instanceof Error ? error.message : String(error) });
         }
     }
 }

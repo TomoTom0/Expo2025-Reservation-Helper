@@ -6,6 +6,7 @@
 import { getPageDetector, resetPageDetector } from './page-detector';
 import { getAutomationEngine } from './automation-engine';
 import { PavilionReservationCache } from './pavilion-reservation-cache';
+import { loggers } from '../utils/logger';
 
 // 初期化状態の管理
 let isInitialized = false;
@@ -17,7 +18,8 @@ let isAutomationRunning = false;
 function initializeAutomation(): void {
     if (isInitialized) return;
 
-    console.log('🤖 自動操作エンジン初期化開始');
+    const logger = loggers.automation;
+    logger.info('自動操作エンジン初期化開始');
 
     // ページロード完了後に実行
     if (document.readyState === 'loading') {
@@ -31,7 +33,7 @@ function initializeAutomation(): void {
     setupPageChangeListener();
 
     isInitialized = true;
-    console.log('✅ 自動操作エンジン初期化完了');
+    logger.info('自動操作エンジン初期化完了');
 }
 
 /**
@@ -39,7 +41,8 @@ function initializeAutomation(): void {
  */
 async function checkAndStartAutomation(): Promise<void> {
     if (isAutomationRunning) {
-        console.log('⏳ 自動操作は既に実行中です');
+        const logger = loggers.automation;
+        logger.warn('自動操作は既に実行中');
         return;
     }
 
@@ -48,11 +51,12 @@ async function checkAndStartAutomation(): Promise<void> {
         const pageDetector = getPageDetector();
         const pageInfo = pageDetector.extractPageInfo();
 
-        console.log(`📍 ページ検知: ${pageInfo.type} - ${pageInfo.url}`);
+        const logger = loggers.automation;
+        logger.debug('ページ検知', { type: pageInfo.type, url: pageInfo.url });
 
         // 自動操作対象ページかチェック
         if (!shouldStartAutomation(pageInfo.type)) {
-            console.log(`ℹ️ ${pageInfo.type} ページでは自動操作不要`);
+            logger.debug('ページでは自動操作不要', { pageType: pageInfo.type });
             return;
         }
 
@@ -60,7 +64,7 @@ async function checkAndStartAutomation(): Promise<void> {
         const hasReservationData = checkReservationDataAvailable(pageInfo);
         
         if (!hasReservationData) {
-            console.log('📋 キャッシュに予約データがありません');
+            logger.debug('キャッシュに予約データがない');
             return;
         }
 
@@ -68,7 +72,8 @@ async function checkAndStartAutomation(): Promise<void> {
         await startAutomationSafely();
 
     } catch (error) {
-        console.error('❌ 自動操作チェックエラー:', error);
+        const logger = loggers.automation;
+        logger.error('自動操作チェックエラー', { error: error instanceof Error ? error.message : String(error) });
     }
 }
 
@@ -79,7 +84,8 @@ async function startAutomationSafely(): Promise<void> {
     if (isAutomationRunning) return;
 
     isAutomationRunning = true;
-    console.log('🚀 自動操作開始');
+    const logger = loggers.automation;
+    logger.info('自動操作開始');
 
     try {
         const engine = getAutomationEngine({
@@ -90,16 +96,16 @@ async function startAutomationSafely(): Promise<void> {
 
         const result = await engine.start();
         
-        console.log('📊 自動操作結果:', result);
+        logger.debug('自動操作結果', result);
         
         if (result.status === 'completed') {
-            console.log('✅ 自動操作正常完了');
+            logger.info('自動操作正常完了');
         } else if (result.status === 'failed') {
-            console.warn('⚠️ 自動操作失敗:', result.errors);
+            logger.warn('自動操作失敗', { errors: result.errors });
         }
 
     } catch (error) {
-        console.error('❌ 自動操作実行エラー:', error);
+        logger.error('自動操作実行エラー', { error: error instanceof Error ? error.message : String(error) });
     } finally {
         isAutomationRunning = false;
     }
@@ -149,7 +155,8 @@ function setupPageChangeListener(): void {
         const newUrl = window.location.href;
         if (newUrl !== currentUrl) {
             currentUrl = newUrl;
-            console.log('🔄 ページ変更検知:', newUrl);
+            const logger = loggers.automation;
+            logger.debug('ページ変更検知', { url: newUrl });
             
             // ページデテクターをリセット
             resetPageDetector();
@@ -186,7 +193,8 @@ function setupPageChangeListener(): void {
  * デバッグ用: 手動で自動操作を実行
  */
 function debugStartAutomation(): void {
-    console.log('🔧 デバッグ: 手動自動操作開始');
+    const logger = loggers.automation;
+    logger.debug('デバッグ - 手動自動操作開始');
     startAutomationSafely();
 }
 
@@ -194,20 +202,18 @@ function debugStartAutomation(): void {
  * デバッグ用: 現在の状態を確認
  */
 function debugAutomationStatus(): void {
-    console.group('🔧 自動操作エンジン状態');
-    console.log('初期化済み:', isInitialized);
-    console.log('実行中:', isAutomationRunning);
-    
+    const logger = loggers.automation;
     const pageDetector = getPageDetector();
-    console.log('ページ情報:', pageDetector.extractPageInfo());
-    
     const pendingReservations = PavilionReservationCache.getPendingReservations();
-    console.log('待機中予約:', pendingReservations.length, pendingReservations);
-    
     const processingReservation = PavilionReservationCache.getProcessingReservation();
-    console.log('処理中予約:', processingReservation);
     
-    console.groupEnd();
+    logger.debug('自動操作エンジン状態デバッグ', {
+        isInitialized,
+        isRunning: isAutomationRunning,
+        pageInfo: pageDetector.extractPageInfo(),
+        pendingReservations: { count: pendingReservations.length, data: pendingReservations },
+        processingReservation
+    });
 }
 
 // グローバルに公開（デバッグ用）

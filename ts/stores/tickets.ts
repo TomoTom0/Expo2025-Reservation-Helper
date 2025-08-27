@@ -320,7 +320,7 @@ export const useTicketsStore = defineStore('tickets', () => {
               schedules: processSchedules(data.schedules || [])
             }
 
-            console.log(`✅ 外部チケット${ticketId}をchannel=${testChannel}で取得成功`)
+            logger.info('外部チケット取得成功', { ticketId, testChannel });
             return ticketData
           }
         } catch (error) {
@@ -329,7 +329,7 @@ export const useTicketsStore = defineStore('tickets', () => {
       }
       
       // どのchannelでも取得できない場合は最小限のデータを作成
-      console.log(`⚠️ 外部チケット${ticketId}の詳細取得失敗、最小限データで作成`)
+      logger.warn('外部チケット詳細取得失敗、最小限データで作成', { ticketId });
       return {
         ticket_id: ticketId,
         isOwn: false,
@@ -420,7 +420,7 @@ export const useTicketsStore = defineStore('tickets', () => {
 
   const removeSelectedEntranceDate = (ticketId: string) => {
     selectedEntranceDates.value.delete(ticketId)
-    console.log(`🗑️ 入場日時選択を削除: ${ticketId}`)
+    logger.debug('入場日時選択を削除', { ticketId });
   }
 
   const restoreSelectedEntranceDates = () => {
@@ -434,7 +434,7 @@ export const useTicketsStore = defineStore('tickets', () => {
     try {
       // 復元前にtickets.valueが空でないことを確認
       if (tickets.value.size === 0) {
-        console.log('⚠️ チケットデータが未ロードのため復元をスキップ')
+        logger.warn('チケットデータが未ロードのため復元をスキップ');
         return
       }
       
@@ -447,21 +447,21 @@ export const useTicketsStore = defineStore('tickets', () => {
           if (schedule) {
             schedule.selected = true
             restoredCount++
-            console.log(`🔄 復元: ${ticketId} - ${scheduleId}`)
+            logger.debug('復元', { ticketId, scheduleId });
           } else {
             // 見つからないスケジュールIDは削除
             selectedEntranceDates.value.delete(ticketId)
-            console.log(`🗑️ 無効な選択を削除: ${ticketId} - ${scheduleId}`)
+            logger.debug('無効な選択を削除', { ticketId, scheduleId });
           }
         } else {
           // 存在しないチケットの選択は削除
           selectedEntranceDates.value.delete(ticketId)
-          console.log(`🗑️ 存在しないチケットの選択を削除: ${ticketId}`)
+          logger.debug('存在しないチケットの選択を削除', { ticketId });
         }
       }
       
       if (restoredCount > 0) {
-        console.log(`✅ 入場日時選択状態復元完了: ${restoredCount}個`)
+        logger.info('入場日時選択状態復元完了', { restoredCount });
       }
     } catch (error) {
       console.error('❌ 入場日時復元エラー:', error)

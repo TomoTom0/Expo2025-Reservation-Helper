@@ -38,13 +38,13 @@ export class MonitoringService {
      */
     async startMonitoring(): Promise<boolean> {
         if (this.isRunning) {
-            console.log('⚠️ 監視は既に実行中です');
+            this.logger.warn('監視は既に実行中', { isRunning: this.isRunning });
             return false;
         }
 
         const targets = MonitoringCacheManager.getTargets();
         if (targets.length === 0) {
-            console.log('⚠️ 監視対象がありません');
+            this.logger.warn('監視対象がありません', { targetCount: targets.length });
             return false;
         }
 
@@ -62,7 +62,7 @@ export class MonitoringService {
             await this.performMonitoringCheck();
         });
 
-        console.log('🚀 パビリオン監視開始:', targets.length, '件');
+        this.logger.info('パビリオン監視開始', { targetCount: targets.length });
         return true;
     }
 
@@ -71,7 +71,7 @@ export class MonitoringService {
      */
     stopMonitoring(): void {
         if (!this.isRunning) {
-            console.log('⚠️ 監視は実行されていません');
+            this.logger.warn('監視は実行されていない', { isRunning: this.isRunning });
             return;
         }
 
@@ -84,7 +84,7 @@ export class MonitoringService {
             nextCheck: 0
         });
 
-        console.log('⏹️ パビリオン監視停止');
+        this.logger.info('パビリオン監視停止');
     }
 
     /**
@@ -96,7 +96,7 @@ export class MonitoringService {
             const targets = MonitoringCacheManager.getTargets();
             
             if (targets.length === 0) {
-                console.log('📋 監視対象がないため監視を停止します');
+                this.logger.warn('監視対象がないため監視を停止', { targetCount: targets.length });
                 this.stopMonitoring();
                 return {
                     success: false,
@@ -106,14 +106,14 @@ export class MonitoringService {
                 };
             }
 
-            console.log(`🔍 監視チェック開始 (${targets.length}件)`);
+            this.logger.info('監視チェック開始', { targetCount: targets.length });
 
             // 各監視対象をチェック
             for (const target of targets) {
                 const isAvailable = await this.checkTargetAvailability(target);
                 
                 if (isAvailable) {
-                    console.log('🎯 空きを発見:', target);
+                    this.logger.info('空きを発見', { pavilionName: target.pavilionName, timeSlot: target.timeSlot, pavilionCode: target.pavilionCode });
                     
                     // 自動予約を実行
                     await this.executeReservation(target);
@@ -138,7 +138,7 @@ export class MonitoringService {
             }
 
             // 空きなしの場合
-            console.log('📋 空きなし、監視継続');
+            this.logger.debug('空きなし、監視継続');
             
             // 監視状態を更新
             const currentState = MonitoringCacheManager.getMonitoringState();
@@ -156,7 +156,7 @@ export class MonitoringService {
 
         } catch (error) {
             const errorMessage = error instanceof Error ? error.message : String(error);
-            console.error('❌ 監視チェックエラー:', errorMessage);
+            this.logger.error('監視チェックエラー', { error: errorMessage });
 
             // エラー時も状態更新
             const currentState = MonitoringCacheManager.getMonitoringState();
@@ -183,7 +183,7 @@ export class MonitoringService {
             const availability = await this.fetchPavilionAvailability(target.pavilionCode);
             
             if (!availability) {
-                console.warn('⚠️ API応答なし:', target.pavilionCode);
+                this.logger.warn('API応答なし', { pavilionCode: target.pavilionCode });
                 return false;
             }
 
@@ -193,15 +193,15 @@ export class MonitoringService {
             );
 
             if (!targetSlot) {
-                console.warn('⚠️ 該当時間帯なし:', target.timeSlot);
+                this.logger.warn('該当時間帯なし', { timeSlot: target.timeSlot });
                 return false;
             }
 
-            console.log(`📊 ${target.pavilionName} ${target.timeSlot}: ${targetSlot.available ? '空きあり' : '満員'}`);
+            this.logger.debug('監視対象空き状況', { pavilionName: target.pavilionName, timeSlot: target.timeSlot, available: targetSlot.available });
             return targetSlot.available;
 
         } catch (error) {
-            console.error('❌ 空き状況チェックエラー:', target.pavilionCode, error);
+            this.logger.error('空き状況チェックエラー', { pavilionCode: target.pavilionCode, error: error instanceof Error ? error.message : String(error) });
             return false;
         }
     }
@@ -213,7 +213,7 @@ export class MonitoringService {
         try {
             const url = `https://expo.ebii.net/data?pavilion=${pavilionCode}`;
             
-            console.log('🌐 API呼び出し:', url);
+            this.logger.debug('API呼び出し', { url });
             
             const response = await fetch(url, {
                 method: 'GET',
@@ -232,7 +232,7 @@ export class MonitoringService {
             return this.transformApiResponse(data, pavilionCode);
 
         } catch (error) {
-            console.error('❌ API呼び出しエラー:', error);
+            this.logger.error('API呼び出しエラー', { error: error instanceof Error ? error.message : String(error) });
             return null;
         }
     }
@@ -254,7 +254,7 @@ export class MonitoringService {
      * 自動予約を実行
      */
     private async executeReservation(target: MonitoringTarget): Promise<void> {
-        console.log('🤖 自動予約実行開始:', target);
+        this.logger.info('自動予約実行開始', { pavilionName: target.pavilionName, timeSlot: target.timeSlot, pavilionCode: target.pavilionCode });
 
         try {
             // 予約データを作成
@@ -285,13 +285,13 @@ export class MonitoringService {
             const reservationUrl = `https://ticket.expo2025.or.jp/event_time/?id=${ticketIds}&event_id=${target.pavilionCode}&screen_id=108&lottery=5&entrance_date=${formatDateToYMD()}`;
             window.location.href = reservationUrl;
 
-            console.log('✅ 予約ページに遷移:', reservationUrl);
+            this.logger.info('予約ページに遷移', { url: reservationUrl });
             
             // 監視成功通知を送信
             this.sendNotificationToDialog('info', `監視成功: ${target.pavilionName} ${target.timeSlot} の空きを検知し予約開始`);
 
         } catch (error) {
-            console.error('❌ 自動予約実行エラー:', error);
+            this.logger.error('自動予約実行エラー', { error: error instanceof Error ? error.message : String(error) });
             throw error;
         }
     }
@@ -328,7 +328,7 @@ export class MonitoringService {
      * 手動チェック実行
      */
     async triggerManualCheck(): Promise<MonitoringResult> {
-        console.log('🔄 手動チェック実行');
+        this.logger.info('手動チェック実行');
         return await this.performMonitoringCheck();
     }
 
@@ -340,12 +340,12 @@ export class MonitoringService {
             // グローバル関数が利用可能な場合に通知を送信
             if (typeof (window as any).showReservationNotification === 'function') {
                 (window as any).showReservationNotification(type, message);
-                console.log(`📢 監視通知送信: [${type}] ${message}`);
+                this.logger.info('監視通知送信', { type, message });
             } else {
-                console.log('⚠️ 通知関数が利用できません');
+                this.logger.warn('通知関数が利用できない');
             }
         } catch (error) {
-            console.log(`❌ 通知送信エラー: ${error}`);
+            this.logger.error('通知送信エラー', { error: error instanceof Error ? error.message : String(error) });
         }
     }
 }

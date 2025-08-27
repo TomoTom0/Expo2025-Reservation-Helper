@@ -267,20 +267,20 @@ function createEntranceReservationUI(): void {
                     logger.debug('予約成功時の通知音設定チェック', { soundEnabled });
                     
                     if (soundEnabled) {
-                        console.log('🎵 予約成功 - 通知音を再生');
+                        logger.info('予約成功 - 通知音を再生');
                         try {
                             AudioPlayer.playSuccessSound();
-                            console.log('✅ 通知音再生完了');
+                            logger.info('通知音再生完了');
                         } catch (error) {
-                            console.error('❌ 通知音再生エラー:', error);
+                            logger.error('通知音再生エラー', { error: error instanceof Error ? error.message : String(error) });
                         }
                     } else {
-                        console.log('🔇 予約成功 - 通知音は無効のため再生なし');
+                        logger.debug('予約成功 - 通知音は無効のため再生なし');
                     }
                     
-                    console.log('✅ 予約成功UI更新完了');
+                    logger.info('予約成功UI更新完了');
                 } else {
-                    console.warn('⚠️ 予約開始前の対象情報がnullのためUI更新をスキップ');
+                    logger.warn('予約開始前の対象情報がnullのためUI更新をスキップ');
                 }
                 
                 if (cacheManager) {
@@ -289,10 +289,10 @@ function createEntranceReservationUI(): void {
             } else {
                 if (result.cancelled) {
                     showStatus(`⏹️ 予約中断 (${result.attempts}回試行)`, 'orange');
-                    console.log('⏹️ ユーザーにより予約が中断されました');
+                    logger.info('ユーザーにより予約が中断');
                 } else if (result.abnormalTermination) {
                     showStatus(`🚨 異常終了 (${result.attempts}回試行) - システム停止`, 'red');
-                    console.log('🚨 予約処理が異常終了しました。システムを停止します');
+                    logger.error('予約処理が異常終了 - システムを停止');
                 } else {
                     showStatus(`予約失敗 (${result.attempts}回試行)`, 'red');
                 }
@@ -318,7 +318,7 @@ function createEntranceReservationUI(): void {
     // disabled状態でのクリックを確実に防ぐため、キャプチャーフェーズでも処理
     fabButton.addEventListener('click', (event) => {
         if (fabButton.disabled || fabButton.hasAttribute('disabled') || fabButton.classList.contains('pointer-events-none')) {
-            console.log('🚫 キャプチャーフェーズでdisabledクリックを阻止');
+            logger.debug('キャプチャーフェーズでdisabledクリックを阻止');
             event.preventDefault();
             event.stopPropagation();
             event.stopImmediatePropagation();
@@ -366,10 +366,10 @@ function createEntranceReservationUI(): void {
 
     // 自動選択イベントリスナーを設定
     window.addEventListener('entrance-auto-select', async (event: any) => {
-        console.log('🎯 自動選択イベントを受信:', event.detail);
+        logger.debug('自動選択イベントを受信', event.detail);
         const slot = event.detail?.slot;
         if (!slot?.targetInfo) {
-            console.error('❌ 自動選択: スロット情報が無効');
+            logger.error('自動選択: スロット情報が無効');
             return;
         }
         
@@ -377,37 +377,37 @@ function createEntranceReservationUI(): void {
                 
             
             // オーバーレイを確実に非表示にして状態をリセット
-            console.log('🛡️ 予約移行: オーバーレイ状態をリセット');
+            logger.debug('予約移行 - オーバーレイ状態をリセット');
             processingOverlay.hide();
             
             // 1. 時間帯要素をクリックして選択状態にする
-            console.log(`🖱️ 自動選択: 時間帯をクリック ${slot.targetInfo.timeSlot}`);
+            logger.info('自動選択 - 時間帯をクリック', { timeSlot: slot.targetInfo.timeSlot });
             const timeSlotElement = document.querySelector(slot.targetInfo.selector);
             if (timeSlotElement) {
                 const buttonElement = timeSlotElement.querySelector('div[role="button"]') as HTMLElement;
                 if (buttonElement) {
                     // 満員時間帯も強制選択可能（data-disabled属性に関係なく）
                     buttonElement.click();
-                    console.log(`✅ 時間帯選択完了: ${slot.targetInfo.timeSlot}`);
+                    logger.info('時間帯選択完了', { timeSlot: slot.targetInfo.timeSlot });
                     
                     // 2. 選択後、少し待ってから内部的に自動予約を開始
                     setTimeout(async () => {
-                        console.log('🚀 内部的に自動予約を開始');
+                        logger.info('内部的に自動予約を開始');
                         if (entranceReservationStateManager.canStartReservation()) {
                             await startReservationProcess();
                         } else {
-                            console.error('❌ 予約開始条件が満たされていません');
+                            logger.error('予約開始条件が満たされていない');
                         }
                     }, 100);
                 } else {
-                    console.error(`❌ 時間帯ボタンが見つからないか無効: ${slot.targetInfo.timeSlot}`);
+                    logger.error('時間帯ボタンが見つからないか無効', { timeSlot: slot.targetInfo.timeSlot });
                 }
             } else {
-                console.error(`❌ 時間帯要素が見つからない: ${slot.targetInfo.selector}`);
+                logger.error('時間帯要素が見つからない', { selector: slot.targetInfo.selector });
             }
             
         } catch (error) {
-            console.error('❌ 自動選択処理エラー:', error);
+            logger.error('自動選択処理エラー', { error: error instanceof Error ? error.message : String(error) });
         }
     });
     
@@ -455,12 +455,12 @@ function checkVisitTimeButtonState(): boolean {
     const visitTimeButton = document.querySelector('button.basic-btn.type2.style_full__ptzZq') as HTMLButtonElement;
     
     if (!visitTimeButton) {
-        console.log('⚠️ 来場日時設定ボタンが見つかりません');
+        logger.warn('来場日時設定ボタンが見つからない');
         return false;
     }
     
     const isDisabled = visitTimeButton.hasAttribute('disabled') || visitTimeButton.disabled;
-    console.log(`🔘 来場日時設定ボタン: ${isDisabled ? '無効' : '有効'}`);
+    logger.debug('来場日時設定ボタン状態', { isDisabled });
     
     return !isDisabled;
 }
@@ -471,7 +471,7 @@ function checkTimeSlotSelected(): boolean {
     const selectedTimeSlot = document.querySelector(timeSlotSelectors.selectedSlot);
     
     if (!selectedTimeSlot) {
-        console.log('⚠️ 時間帯が選択されていません');
+        logger.warn('時間帯が選択されていない');
         return false;
     }
     
@@ -480,7 +480,7 @@ function checkTimeSlotSelected(): boolean {
     if (!tdElement) return false;
     const status = extractTdStatus(tdElement);
     
-    console.log(`✅ 時間帯選択済み: ${status?.timeText || 'unknown'}`);
+    logger.debug('時間帯選択済み', { timeText: status?.timeText || 'unknown' });
     return true;
 }
 
@@ -490,34 +490,34 @@ function canStartReservation(): boolean {
     const isTimeSlotSelected = checkTimeSlotSelected();
     const isVisitTimeButtonEnabled = checkVisitTimeButtonState();
     
-    console.log(`📊 予約開始条件チェック:`);
-    console.log(`  - 時間帯テーブル: ${hasTimeSlotTable ? '✅' : '❌'}`);
-    console.log(`  - 時間帯選択: ${isTimeSlotSelected ? '✅' : '❌'}`);
-    console.log(`  - 来場日時ボタン有効: ${isVisitTimeButtonEnabled ? '✅' : '❌'}`);
+    logger.debug('予約開始条件チェック');
+    logger.debug('時間帯テーブル状態', { hasTimeSlotTable });
+    logger.debug('時間帯選択状態', { isTimeSlotSelected });
+    logger.debug('来場日時ボタン有効状態', { isVisitTimeButtonEnabled });
     
     return hasTimeSlotTable && isTimeSlotSelected && isVisitTimeButtonEnabled;
 }
 
 // 初期状態をチェックしてFABを適切に設定
 function checkInitialState(): void {
-    console.log('🔍 初期状態をチェック中...');
+    logger.debug('初期状態をチェック中');
     
     // 【統一システム連動】統一システムが責任を持つ場合はスキップ
     const currentState = entranceReservationStateManager.getExecutionState();
     const preferredAction = entranceReservationStateManager.getPreferredAction();
     
     if (currentState !== ExecutionState.IDLE) {
-        console.log(`🔄 統一システム実行中 (${currentState}) - 初期状態チェックをスキップ`);
+        logger.debug('統一システム実行中 - 初期状態チェックをスキップ', { currentState });
         return;
     }
     
     if (preferredAction === 'reservation') {
-        console.log(`🔄 統一システムがアクション決定済み (${preferredAction}) - 初期状態チェックをスキップ`);
+        logger.debug('統一システムがアクション決定済み - 初期状態チェックをスキップ', { preferredAction });
         return;
     }
     
     // 【統一システム完全委譲】FABボタン状態は統一システムが一元管理
-    console.log('🔄 FABボタン状態は統一システムに完全委譲');
+    logger.debug('FABボタン状態は統一システムに完全委譲');
     
     // 統一システムに状態更新を要求
     entranceReservationStateManager.updateFabDisplay();
@@ -533,10 +533,10 @@ function startCalendarWatcher(): void {
     // 初期化時に入場予約状態管理にも現在の選択日付を設定
     if (calendarWatchState.currentSelectedDate) {
         entranceReservationStateManager.setSelectedCalendarDate(calendarWatchState.currentSelectedDate);
-        console.log(`📅 初期化時の選択日付を設定: ${calendarWatchState.currentSelectedDate}`);
+        logger.debug('初期化時の選択日付を設定', { selectedDate: calendarWatchState.currentSelectedDate });
     }
     
-    console.log('📅 カレンダー変更検知を開始');
+    logger.debug('カレンダー変更検知を開始');
     
     // MutationObserverでカレンダー変更・時間帯選択・ボタン状態変更を検出
     calendarWatchState.observer = new MutationObserver((mutations) => {
@@ -560,12 +560,12 @@ function startCalendarWatcher(): void {
                 const element = mutation.target as HTMLElement;
                 if (element.matches && element.matches('td[data-gray-out] div[role="button"]')) {
                     const ariaPressed = element.getAttribute('aria-pressed');
-                    console.log(`🔄 時間帯選択変更検出: ${ariaPressed}`);
+                    logger.debug('時間帯選択変更検出', { ariaPressed });
                     
                     // 入場予約状態管理システムの同期（初期化中は除外）
                     if (ariaPressed === 'true' && !calendarWatchState.isInitializing) {
                         // 選択状態変更を検出 - DOM状態から予約対象を同期
-                        console.log(`🔄 時間帯選択状態を検出`);
+                        logger.debug('時間帯選択状態を検出');
                         setTimeout(() => {
                             syncReservationTargetFromDOM();
                             entranceReservationStateManager.updateFabDisplay();
@@ -581,7 +581,7 @@ function startCalendarWatcher(): void {
                 mutation.attributeName === 'disabled') {
                 const element = mutation.target as HTMLElement;
                 if (element.matches && element.matches('button.basic-btn.type2.style_full__ptzZq')) {
-                    console.log(`🔄 来場日時ボタン状態変更検出: disabled=${element.hasAttribute('disabled')}`);
+                    logger.debug('来場日時ボタン状態変更検出', { disabled: element.hasAttribute('disabled') });
                     shouldUpdate = true;
                 }
             }
@@ -615,7 +615,7 @@ async function handleCalendarChange(): Promise<void> {
     const actualDateChanged = newSelectedDate !== stateManagerSelectedDate;
     
     if (calendarDateChanged) {
-        console.log(`📅 カレンダー日付変更を検出: ${calendarWatchState.currentSelectedDate} → ${newSelectedDate}`);
+        logger.debug('カレンダー日付変更を検出', { oldDate: calendarWatchState.currentSelectedDate, newDate: newSelectedDate });
         
         
         calendarWatchState.currentSelectedDate = newSelectedDate;
@@ -627,16 +627,16 @@ async function handleCalendarChange(): Promise<void> {
         
         // 実際に日付が変更された場合のみ状態をクリア
         if (actualDateChanged) {
-            console.log(`📅 実際の日付変更確認: ${stateManagerSelectedDate} → ${newSelectedDate}`);
+            logger.debug('実際の日付変更確認', { oldDate: stateManagerSelectedDate, newDate: newSelectedDate });
             
             const hasReservationTarget = entranceReservationStateManager.hasReservationTarget();
             
             if (hasReservationTarget) {
-                console.log('📅 日付変更により予約対象をクリア');
+                logger.debug('日付変更により予約対象をクリア');
                 entranceReservationStateManager.clearReservationTarget();
             }
         } else {
-            console.log('📅 同じ日付への再クリック');
+            logger.debug('同じ日付への再クリック');
         }
         
         
@@ -645,14 +645,14 @@ async function handleCalendarChange(): Promise<void> {
         
     } else {
         // 日付は変わっていない - FABボタンの状態のみ更新
-        console.log('📅 日付変更なし - FABボタンの状態のみ更新');
+        logger.debug('日付変更なし - FABボタンの状態のみ更新');
         
         // 入場予約状態管理システムを取得して状態同期
         // 公式サイトによる選択解除があった場合の状態同期
         const selectedSlot = document.querySelector(timeSlotSelectors.selectedSlot);
         if (!selectedSlot && entranceReservationStateManager.hasReservationTarget()) {
             // DOM上に選択がないが入場予約状態管理に予約対象がある場合はクリア
-            console.log('🔄 公式サイトによる選択解除を検出 - 入場予約状態管理を同期');
+            logger.debug('公式サイトによる選択解除を検出 - 入場予約状態管理を同期');
             entranceReservationStateManager.clearReservationTarget();
             // UI更新を確実に実行
             entranceReservationStateManager.updateFabDisplay();
@@ -678,12 +678,12 @@ function syncReservationTargetFromDOM(): void {
             const locationIndex = LocationHelper.getIndexFromElement(tdElement);
             const selector = generateUniqueTdSelector(tdElement);
             
-            console.log(`🔄 DOM状態から予約対象を同期: ${timeText} (位置: ${locationIndex})`);
+            logger.debug('DOM状態から予約対象を同期', { timeText, locationIndex });
             entranceReservationStateManager.setReservationTarget(timeText, locationIndex, selector);
         }
     } else {
         // 選択状態の要素がない場合は予約対象をクリア
-        console.log(`🔄 選択状態なし - 予約対象をクリア`);
+        logger.debug('選択状態なし - 予約対象をクリア');
         entranceReservationStateManager.clearReservationTarget();
     }
 }
@@ -694,7 +694,7 @@ function waitForTimeSlotTable(callback: () => void): void {
     const timeSlotButtons = document.querySelectorAll('td[data-gray-out] div[role="button"]');
     
     if (timeSlotButtons.length > 0) {
-        console.log(`✅ 時間帯テーブル準備済み (${timeSlotButtons.length}個の時間帯を検出) - 即座に実行`);
+        logger.debug('時間帯テーブル準備済み - 即座に実行', { timeSlotCount: timeSlotButtons.length });
         callback();
         return;
     }
@@ -711,10 +711,10 @@ function waitForTimeSlotTable(callback: () => void): void {
         const timeSlotButtons = document.querySelectorAll('td[data-gray-out] div[role="button"]');
         
         if (timeSlotButtons.length > 0) {
-            console.log(`✅ 時間帯テーブル準備完了 (${timeSlotButtons.length}個の時間帯を検出) - ${attempts * checkInterval}ms後`);
+            logger.debug('時間帯テーブル準備完了', { timeSlotCount: timeSlotButtons.length, delay: attempts * checkInterval });
             callback();
         } else if (attempts >= maxAttempts) {
-            console.log('⚠️ 時間帯テーブルの準備がタイムアウト - 強制実行');
+            logger.warn('時間帯テーブルの準備がタイムアウト - 強制実行');
             callback();
         } else {
             // 時間帯テーブル待機中（ログ削減）
@@ -722,7 +722,7 @@ function waitForTimeSlotTable(callback: () => void): void {
         }
     };
     
-    console.log('🔍 時間帯テーブル待機開始...');
+    logger.debug('時間帯テーブル待機開始');
     setTimeout(checkTableReady, checkInterval);
 }
 
@@ -806,24 +806,24 @@ function setupTimeSlotClickHandlers(): void {
     // 捕獲フェーズでイベントをキャッチ
     document.addEventListener('click', timeSlotClickHandler, true);
     
-    console.log('✅ 公式サイト仕様を利用した時間帯選択解除ハンドラーを設定しました');
+    logger.info('公式サイト仕様を利用した時間帯選択解除ハンドラーを設定');
 }
 
 // 統一自動処理管理に対応した予約処理（Phase 3で実装）
 async function entranceReservationHelper(config: ReservationConfig): Promise<ReservationResult> {
-    console.log('🚀 統一自動処理管理による入場予約補助機能を開始します...');
+    logger.info('統一自動処理管理による入場予約補助機能を開始');
     
     try {
         // 統一自動処理管理による予約処理実行
         const result = await entranceReservationStateManager.executeUnifiedReservationProcess(config);
         
         if (result.success) {
-            console.log('🎉 統一予約処理成功！');
+            logger.info('統一予約処理成功');
         } else if (result.cancelled) {
-            console.log('⏹️ 統一予約処理がキャンセルされました');
+            logger.info('統一予約処理がキャンセル');
             entranceReservationStateManager.stop();
         } else if (result.abnormalTermination) {
-            console.error('🚨 統一予約処理異常終了');
+            logger.error('統一予約処理異常終了');
             entranceReservationStateManager.setShouldStop(true);
         }
         
@@ -831,11 +831,11 @@ async function entranceReservationHelper(config: ReservationConfig): Promise<Res
         
     } catch (error: any) {
         if (error.name === 'CancellationError') {
-            console.log('⏹️ 統一予約処理が中断されました');
+            logger.info('統一予約処理が中断');
             entranceReservationStateManager.stop();
             return { success: false, attempts: 0, cancelled: true };
         } else {
-            console.error('❌ 統一予約処理でエラー:', error);
+            logger.error('統一予約処理でエラー', { error: error instanceof Error ? error.message : String(error) });
             throw error;
         }
     }

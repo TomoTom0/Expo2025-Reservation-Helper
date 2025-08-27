@@ -44,7 +44,8 @@
       "Bash(npm test:*)",
       "Bash(git tag:*)",
       "Bash(gh release upload:*)",
-      "Bash(npx webpack:*)"
+      "Bash(npx webpack:*)",
+      "Bash(npm run type-check:*)"
     ],
     "deny": []
   }

@@ -59,9 +59,9 @@ export const usePavilionsStore = defineStore('pavilions', () => {
       const idsArray = Array.isArray(favoriteIds.value) ? favoriteIds.value : []
       favoriteIds.value = new Set(idsArray)
     }
-    console.log(`📋 お気に入り初期化: ${favoriteIds.value.size}件`)
+    logger.debug('お気に入り初期化', { favoriteCount: favoriteIds.value.size })
     isInitialized.value = true
-    console.log('✅ パビリオンストア初期化完了')
+    logger.info('パビリオンストア初期化完了')
   }
 
   /**
@@ -156,7 +156,7 @@ export const usePavilionsStore = defineStore('pavilions', () => {
         }
       }
       
-      console.log(`✅ パビリオン${pavilionId}時間帯パース完了: ${timeSlots.length}件`)
+      logger.debug('パビリオン時間帯パース完了', { pavilionId, timeSlotCount: timeSlots.length })
       
       // パビリオン名とタイムスロット情報を返す
       return {
@@ -165,7 +165,7 @@ export const usePavilionsStore = defineStore('pavilions', () => {
       }
       
     } catch (error) {
-      console.warn(`⚠️ パビリオン${pavilionId}の時間帯取得エラー:`, error)
+      logger.warn('パビリオンの時間帯取得エラー', { pavilionId, error: error instanceof Error ? error.message : String(error) })
       return { timeSlots: [], pavilionName: undefined }
     }
   }
@@ -187,7 +187,7 @@ export const usePavilionsStore = defineStore('pavilions', () => {
         }
       }
     } catch (error) {
-      console.error('❌ 検索結果パースエラー:', error)
+      logger.error('検索結果パースエラー', { error: error instanceof Error ? error.message : String(error) })
     }
     
     return pavilions
@@ -204,7 +204,7 @@ export const usePavilionsStore = defineStore('pavilions', () => {
     
     // 検索時は選択状態をリセット（旧ソースからの変更仕様）
     clearSelectedTimeSlots()
-    console.log('🔄 検索実行により選択状態をリセット')
+    logger.debug('検索実行により選択状態をリセット')
     
     // 検索開始時に古い結果をクリア
     pavilions.value.clear()
@@ -212,7 +212,7 @@ export const usePavilionsStore = defineStore('pavilions', () => {
     
     try {
       const apiUrl = buildAPIUrl(query, ticketIds, entranceDate)
-      console.log('📡 API URL:', apiUrl)
+      logger.debug('API URL', { url: apiUrl })
       
       const response = await fetch(apiUrl, {
         method: 'GET',
@@ -230,12 +230,12 @@ export const usePavilionsStore = defineStore('pavilions', () => {
       }
 
       const data = await response.json()
-      console.log('🔍 パビリオン検索API応答:', data)
+      logger.debug('パビリオン検索API応答', data)
       const pavilionResults = parseSearchResults(data)
-      console.log(`✅ パビリオン一覧取得完了: ${pavilionResults.length}件`)
+      logger.info('パビリオン一覧取得完了', { count: pavilionResults.length })
       
       // Step 2: 各パビリオンの時間帯情報を取得
-      console.log('⏳ 時間帯情報取得開始...')
+      logger.debug('時間帯情報取得開始')
       const pavilionIds = pavilionResults.map(p => p.id)
       const timeSlotsMap = await getTimeSlotsForPavilions(pavilionIds, ticketIds, entranceDate)
       applyTimeSlotsToData(pavilionResults, timeSlotsMap)
@@ -246,10 +246,10 @@ export const usePavilionsStore = defineStore('pavilions', () => {
       }
       
       lastSearchResults.value = pavilionResults
-      console.log(`🔍 パビリオン検索完了: ${pavilionResults.length}件（時間帯情報付き）`)
+      logger.info('パビリオン検索完了', { count: pavilionResults.length, withTimeSlots: true })
       return pavilionResults
     } catch (error) {
-      console.error('❌ パビリオン検索エラー:', error)
+      logger.error('パビリオン検索エラー', { error: error instanceof Error ? error.message : String(error) })
       throw error
     } finally {
       isLoading.value = false
@@ -264,7 +264,7 @@ export const usePavilionsStore = defineStore('pavilions', () => {
   const getTimeSlotsForPavilions = async (pavilionIds: string[], ticketIds: string[] = [], entranceDate?: string): Promise<Map<string, { timeSlots: TimeSlotData[], pavilionName?: string }>> => {
     const results = new Map<string, { timeSlots: TimeSlotData[], pavilionName?: string }>()
     
-    console.log(`⏰ 時間帯情報並列取得開始: ${pavilionIds.length}件`)
+    logger.debug('時間帯情報並列取得開始', { pavilionCount: pavilionIds.length })
     
     // 並列実行でパフォーマンス向上（最大5件同時）
     const concurrency = Math.min(5, pavilionIds.length)
@@ -280,7 +280,7 @@ export const usePavilionsStore = defineStore('pavilions', () => {
           const result = await getPavilionTimeSlots(pavilionId, ticketIds, entranceDate)
           return { pavilionId, timeSlots: result.timeSlots, pavilionName: result.pavilionName }
         } catch (error) {
-          console.warn(`⚠️ パビリオン ${pavilionId} の時間帯取得に失敗:`, error)
+          logger.warn('パビリオンの時間帯取得に失敗', { pavilionId, error: error instanceof Error ? error.message : String(error) })
           return { pavilionId, timeSlots: [], pavilionName: undefined }
         }
       })
@@ -291,7 +291,7 @@ export const usePavilionsStore = defineStore('pavilions', () => {
       })
     }
     
-    console.log(`✅ 時間帯情報並列取得完了: ${results.size}件`)
+    logger.debug('時間帯情報並列取得完了', { resultCount: results.size })
     return results
   }
 
@@ -325,21 +325,21 @@ export const usePavilionsStore = defineStore('pavilions', () => {
    * お気に入り読み込み処理  
    */
   const loadFavoritePavilions = async (entranceDate?: string, ticketIds: string[] = []): Promise<PavilionData[]> => {
-    console.log('⭐ お気に入りパビリオン読み込み')
+    logger.debug('お気に入りパビリオン読み込み')
     isLoading.value = true
     
     // お気に入り読み込み時も選択状態をリセット
     clearSelectedTimeSlots()
-    console.log('🔄 お気に入り読み込みにより選択状態をリセット')
+    logger.debug('お気に入り読み込みにより選択状態をリセット')
 
     try {
       if (favoriteIds.value.size === 0) {
-        console.log('⭐ お気に入り未登録のため処理終了')
+        logger.debug('お気に入り未登録のため処理終了')
         return []
       }
 
       const favoriteIdArray = Array.from(favoriteIds.value)
-      console.log(`🔍 お気に入りパビリオン検索中: ${favoriteIdArray.join(', ')}`)
+      logger.debug('お気に入りパビリオン検索中', { favoriteIds: favoriteIdArray })
 
       // 1. 時間帯情報をまとめて取得
       const timeSlotsMap = await getTimeSlotsForPavilions(favoriteIdArray, ticketIds, entranceDate)
@@ -358,7 +358,7 @@ export const usePavilionsStore = defineStore('pavilions', () => {
       // 3. 取得した時間帯情報を適用
       applyTimeSlotsToData(favoriteResults, timeSlotsMap)
       
-      console.log(`🔍 お気に入り取得完了: ${favoriteResults.length}件`)
+      logger.info('お気に入り取得完了', { count: favoriteResults.length })
       
       // 結果を保存
       favoriteResults.forEach(pavilion => {
@@ -367,11 +367,11 @@ export const usePavilionsStore = defineStore('pavilions', () => {
 
       // allPavilionsを更新（computed propertyの再計算をトリガー）  
       lastSearchResults.value = favoriteResults
-      console.log(`✅ お気に入り読み込み完了: ${favoriteResults.length}件をallPavilionsに反映`)
+      logger.info('お気に入り読み込み完了', { count: favoriteResults.length })
       
       return favoriteResults
     } catch (error) {
-      console.error('❌ お気に入り読み込みエラー:', error)
+      logger.error('お気に入り読み込みエラー', { error: error instanceof Error ? error.message : String(error) })
       throw error
     } finally {
       isLoading.value = false
@@ -397,7 +397,7 @@ export const usePavilionsStore = defineStore('pavilions', () => {
    */
   const clearAllFavorites = () => {
     favoriteIds.value.clear()
-    console.log(`🗑️ 全お気に入りクリア`)
+    logger.debug('全お気に入りクリア')
   }
 
 
@@ -426,7 +426,7 @@ export const usePavilionsStore = defineStore('pavilions', () => {
       return pavilion
       
     } catch (error) {
-      console.error('❌ イベント項目パースエラー:', error)
+      logger.error('イベント項目パースエラー', { error: error instanceof Error ? error.message : String(error) })
       return null
     }
   }
@@ -450,7 +450,7 @@ export const usePavilionsStore = defineStore('pavilions', () => {
           timeSlotId: slot.id || slot.time_slot_id || ''
         }
       } catch (error) {
-        console.warn('⚠️ 時間帯パースエラー:', error)
+        logger.warn('時間帯パースエラー', { error: error instanceof Error ? error.message : String(error) })
         return {
           time: '',
           endTime: '',
@@ -486,7 +486,7 @@ export const usePavilionsStore = defineStore('pavilions', () => {
    */
   const addSelectedTimeSlot = (selection: TimeSlotSelection): void => {
     selectedTimeSlots.value.push(selection)
-    console.log('⏰ 時間帯選択追加:', selection)
+    logger.debug('時間帯選択追加', selection)
   }
 
   /**
@@ -498,7 +498,7 @@ export const usePavilionsStore = defineStore('pavilions', () => {
     )
     if (index !== -1) {
       selectedTimeSlots.value.splice(index, 1)
-      console.log('⏰ 時間帯選択削除:', { pavilionId, time })
+      logger.debug('時間帯選択削除', { pavilionId, time })
     }
   }
 
@@ -507,7 +507,7 @@ export const usePavilionsStore = defineStore('pavilions', () => {
    */
   const clearSelectedTimeSlots = (): void => {
     selectedTimeSlots.value = []
-    console.log('⏰ 時間帯選択クリア')
+    logger.debug('時間帯選択クリア')
   }
 
   /**
@@ -534,7 +534,7 @@ export const usePavilionsStore = defineStore('pavilions', () => {
       }
     })
 
-    console.log(`⏰ パビリオン全時間帯選択: ${pavilion.name}`)
+    logger.debug('パビリオン全時間帯選択', { pavilionName: pavilion.name })
   }
 
   /**
@@ -545,7 +545,7 @@ export const usePavilionsStore = defineStore('pavilions', () => {
       s => s.pavilionId !== pavilionId
     )
     const pavilion = pavilions.value.get(pavilionId)
-    console.log(`⏰ パビリオン全時間帯選択解除: ${pavilion?.name || pavilionId}`)
+    logger.debug('パビリオン全時間帯選択解除', { pavilionName: pavilion?.name || pavilionId })
   }
 
   /**
@@ -558,7 +558,7 @@ export const usePavilionsStore = defineStore('pavilions', () => {
     registeredChannel: string,
     ticketIds: string[] = []
   ): Promise<ReservationResult> => {
-    console.log('🎯 予約実行開始:', { pavilionId, timeSlot, entranceDate, registeredChannel, ticketIds })
+    logger.info('予約実行開始', { pavilionId, timeSlot: timeSlot.time, entranceDate, registeredChannel, ticketCount: ticketIds.length })
     
     try {
       const requestBody = {
@@ -569,7 +569,7 @@ export const usePavilionsStore = defineStore('pavilions', () => {
         registered_channel: registeredChannel
       }
       
-      console.log('📡 予約API呼び出し:', requestBody)
+      logger.debug('予約API呼び出し', requestBody)
       
       const response = await fetch('/api/d/user_event_reservations', {
         method: 'POST',
@@ -585,7 +585,7 @@ export const usePavilionsStore = defineStore('pavilions', () => {
       })
       
       const data = await response.json()
-      console.log('📡 予約API応答:', { status: response.status, data })
+      logger.debug('予約API応答', { status: response.status, data })
       
       if (response.ok) {
         return {
@@ -616,7 +616,7 @@ export const usePavilionsStore = defineStore('pavilions', () => {
       }
       
     } catch (error) {
-      console.error('❌ 予約実行エラー:', error)
+      logger.error('予約実行エラー', { error: error instanceof Error ? error.message : String(error) })
       return {
         success: false,
         message: '予約実行エラー',
@@ -634,18 +634,18 @@ export const usePavilionsStore = defineStore('pavilions', () => {
    * 更新処理（選択リセットなし）
    */
   const refreshPavilions = async (query: string = '', ticketIds: string[] = [], entranceDate?: string): Promise<PavilionData[]> => {
-    console.log('🔄 パビリオン更新開始（既存結果の時間帯情報のみ再取得）')
+    logger.debug('パビリオン更新開始', { refreshType: '時間帯情報のみ再取得' })
     isLoading.value = true
     
     try {
       // 既存の検索結果があることを確認
       if (lastSearchResults.value.length === 0) {
-        console.log('⚠️ 既存の検索結果なし - 更新対象なし')
+        logger.warn('既存の検索結果なし - 更新対象なし')
         return []
       }
 
       const existingPavilions = [...lastSearchResults.value]
-      console.log(`🔄 既存パビリオン ${existingPavilions.length}件の時間帯情報を更新`)
+      logger.debug('既存パビリオンの時間帯情報を更新', { count: existingPavilions.length })
       
       // 1. 時間帯情報をまとめて取得
       const pavilionIds = existingPavilions.map(p => p.id)
@@ -660,10 +660,10 @@ export const usePavilionsStore = defineStore('pavilions', () => {
       })
       
       lastSearchResults.value = existingPavilions
-      console.log(`✅ パビリオン更新完了: ${existingPavilions.length}件の時間帯情報を更新`)
+      logger.info('パビリオン更新完了', { count: existingPavilions.length })
       return existingPavilions
     } catch (error) {
-      console.error('❌ パビリオン更新エラー:', error)
+      logger.error('パビリオン更新エラー', { error: error instanceof Error ? error.message : String(error) })
       throw error
     } finally {
       isLoading.value = false
