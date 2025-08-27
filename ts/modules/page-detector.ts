@@ -2,6 +2,8 @@
  * ページ検知・判定モジュール
  * 万博予約サイトの各ページを識別し、適切な処理を決定
  */
+import { loggers } from '../utils/logger';
+const logger = loggers.ui;
 
 // ページタイプの定義
 export type PageType = 
@@ -234,21 +236,23 @@ export class PageDetector {
      */
     logPageInfo(): void {
         const pageInfo = this.extractPageInfo();
-        console.group('📍 ページ情報');
-        console.log('タイプ:', pageInfo.type);
-        console.log('URL:', pageInfo.url);
-        console.log('準備状態:', pageInfo.isReady);
-        console.log('タイトル:', pageInfo.title);
+        
+        const logData: any = {
+            type: pageInfo.type,
+            url: pageInfo.url,
+            isReady: pageInfo.isReady,
+            title: pageInfo.title
+        };
         
         if (pageInfo.pavilionCode) {
-            console.log('パビリオンコード:', pageInfo.pavilionCode);
+            logData.pavilionCode = pageInfo.pavilionCode;
         }
         
         if (pageInfo.ticketId) {
-            console.log('チケットID:', pageInfo.ticketId);
+            logData.ticketId = pageInfo.ticketId;
         }
         
-        console.groupEnd();
+        logger.debug('ページ情報', logData);
     }
 }
 

@@ -10,6 +10,8 @@ import type {
     TdStatus,
     TimeSlotTarget
 } from '../types/index.js';
+import { loggers } from '../utils/logger';
+const logger = loggers.ui;
 
 // 統一時間帯状態判定関数をimport
 import { detectTimeslotStatus } from './timeslot-status-detector';
@@ -113,14 +115,14 @@ export async function waitForCalendar(timeout: number = 10000): Promise<boolean>
     const startTime = Date.now();
     const checkInterval = 100; // 待機間隔を長めに設定
     
-    console.log('カレンダーとtime要素の出現を待機中...');
+    logger.debug('カレンダーとtime要素の出現を待機中');
     
     while (Date.now() - startTime < timeout) {
         // time[datetime]要素が実際に存在するかを確認
         const timeElements = document.querySelectorAll('time[datetime]');
         
         if (timeElements.length > 0) {
-            console.log(`✅ カレンダーとtime要素が見つかりました (${timeElements.length}個のtime要素)`);
+            logger.debug('カレンダーとtime要素が見つかりました', { timeElementCount: timeElements.length });
             
             // 追加待機: time要素が見つかってもすぐに使用せず、少し待つ
             await new Promise(resolve => setTimeout(resolve, 200));
@@ -138,13 +140,17 @@ export async function waitForCalendar(timeout: number = 10000): Promise<boolean>
         await new Promise(resolve => setTimeout(resolve, checkInterval));
     }
     
-    console.log('⏰ カレンダー待機がタイムアウトしました');
+    logger.warn('カレンダー待機がタイムアウトしました');
     
     // デバッグ情報
     const allTables = document.querySelectorAll('table');
     const allButtons = document.querySelectorAll('[role="button"]');
     const allTimeElements = document.querySelectorAll('time');
-    console.log(`🔍 最終状態: table=${allTables.length}, button=${allButtons.length}, time=${allTimeElements.length}`);
+    logger.debug('最終状態', { 
+        tableCount: allTables.length, 
+        buttonCount: allButtons.length, 
+        timeElementCount: allTimeElements.length 
+    });
     
     return false;
 }

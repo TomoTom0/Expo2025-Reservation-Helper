@@ -3,6 +3,8 @@
 
 // 型定義のインポート
 import type { CacheManager, Dependencies } from '../types/index.js';
+import { loggers } from '../utils/logger';
+const logger = loggers.automation;
 
 // ============================================================================
 // キャッシュ管理機能
@@ -39,10 +41,10 @@ return {
                 return null;
             }
             
-            console.log('📖 キャッシュから時間帯を読み込み:', parsed.timeSlot);
+            logger.debug('キャッシュから時間帯を読み込み', { timeSlot: parsed.timeSlot });
             return parsed;
         } catch (error) {
-            console.error('❌ キャッシュ読み込みエラー:', error);
+            logger.error('キャッシュ読み込みエラー', { error });
             return null;
         }
     },
@@ -61,14 +63,14 @@ return {
                 }
                 
                 const targetTexts = parsed.targets?.map((t: any) => t.timeSlot).join(', ') || '不明';
-                console.log(`📖 複数キャッシュを読み込み: ${targetTexts} (${parsed.targets?.length || 0}個)`);
+                logger.debug('複数キャッシュを読み込み', { targetTexts, count: parsed.targets?.length || 0 });
                 return parsed;
             }
             
             // 後方互換性：古い単一キャッシュを確認
             const oldData = this.loadTargetSlot();
             if (oldData) {
-                console.log('📖 単一キャッシュを複数形式に変換中...');
+                logger.debug('単一キャッシュを複数形式に変換中');
                 return {
                     targets: [oldData],
                     selectedDate: oldData.selectedDate,
@@ -80,7 +82,7 @@ return {
             
             return null;
         } catch (error) {
-            console.error('❌ 複数キャッシュ読み込みエラー:', error);
+            logger.error('複数キャッシュ読み込みエラー', { error });
             return null;
         }
     },
@@ -90,9 +92,9 @@ return {
         try {
             localStorage.removeItem(this.generateKey('target_slots'));
             localStorage.removeItem(this.generateKey('target_slot')); // 古い形式もクリア
-            console.log('🗑️ 複数キャッシュをクリア');
+            logger.debug('複数キャッシュをクリア');
         } catch (error) {
-            console.error('❌ 複数キャッシュクリアエラー:', error);
+            logger.error('複数キャッシュクリアエラー', { error });
         }
     },
     

@@ -27,15 +27,7 @@ import './immediate-reservation';
 import './notification-system'; // グローバル通知システム
 import './page-return-system'; // ページ復帰システム
 
-// テスト環境・開発環境でのみtest-exportsをimport
-// 本番環境では webpack の tree shaking で除外される
-if (process.env['NODE_ENV'] === 'development' || process.env['NODE_ENV'] === 'test') {
-    import('./test-exports').then(() => {
-        logger.info('テスト用exports読み込み完了');
-    }).catch(err => {
-        logger.warn('テスト用exports読み込み失敗', err);
-    });
-}
+// test-exportsは削除されました（不要なテストファイルのため）
 
 // Vue.js統合は各MainDialogFabで直接実行
 

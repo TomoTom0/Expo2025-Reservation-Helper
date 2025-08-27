@@ -2,6 +2,8 @@
  * グローバル通知システム
  * ダイアログの状態に関係なく通知を表示できる永続的なシステム
  */
+import { loggers } from '../utils/logger';
+const logger = loggers.ui;
 
 export interface NotificationOptions {
     type: 'success' | 'error' | 'warning' | 'info';
@@ -30,7 +32,7 @@ class GlobalNotificationSystem {
         // ページに追加
         document.body.appendChild(this.notificationContainer);
         
-        console.log('✅ グローバル通知システム初期化完了');
+        logger.info('グローバル通知システム初期化完了');
     }
 
     /**
@@ -63,7 +65,7 @@ class GlobalNotificationSystem {
             }, duration);
         }
         
-        console.log(`📢 通知表示: [${options.type}] ${options.message}`);
+        logger.info('通知表示', { type: options.type, message: options.message });
         
         return notificationId;
     }
@@ -168,4 +170,4 @@ if (document.readyState === 'loading') {
     globalNotificationSystem.initialize();
 }
 
-console.log('✅ グローバル通知システムモジュール読み込み完了');
+logger.info('グローバル通知システムモジュール読み込み完了');

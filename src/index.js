@@ -8,7 +8,7 @@
 // @run-at       document-end
 // ==/UserScript==
 
-// Built: 2025/08/27 10:17:20
+// Built: 2025/08/27 11:18:47
 
 
 (function webpackUniversalModuleDefinition(root, factory) {
@@ -40,7 +40,8 @@ return /******/ (() => { // webpackBootstrap
 /* harmony export */ });
 /* unused harmony exports checkTimeSlotTableExistsSync, getCurrentEntranceConfig, getCurrentMode, updateStatusBadge, scheduleReload, stopReloadCountdown */
 /* harmony import */ var _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(608);
-/* harmony import */ var _entrance_page_dom_utils__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(484);
+/* harmony import */ var _utils_logger__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(911);
+/* harmony import */ var _entrance_page_dom_utils__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(484);
 /**
  * 入場予約ページコア機能モジュール
  *
@@ -61,8 +62,10 @@ return /******/ (() => { // webpackBootstrap
 // ==================== 依存モジュール import ====================
 // 統一状態管理システム
 
+
 // DOM操作ユーティリティ
 
+const logger = _utils_logger__WEBPACK_IMPORTED_MODULE_1__/* .loggers */ .C$.tickets;
 // ============================================================================
 // 時間帯分析システム - Section 5
 // 【機能】
@@ -95,12 +98,12 @@ const setCacheManager = (_cm) => {
 async function waitForTimeSlotTable(timeout = 10000) {
     const startTime = Date.now();
     const checkInterval = 50; // 50msで高速チェック（レスポンシブな検知）
-    console.log('🔍 時間帯テーブルの動的読み込みを待機中...');
+    logger.info('時間帯テーブルの動的読み込みを待機中');
     // ポーリングループ: タイムアウトまで継続
     while (Date.now() - startTime < timeout) {
         // 時間帯テーブルの存在確認
         if (checkTimeSlotTableExistsSync()) {
-            console.log('✅ 時間帯テーブル検出成功 - DOM要素が利用可能です');
+            logger.info('時間帯テーブル検出成功 - DOM要素が利用可能');
             return true;
         }
         // CPU負荷軽減のためのランダム待機（ジッター防止）
@@ -108,13 +111,13 @@ async function waitForTimeSlotTable(timeout = 10000) {
         await new Promise(resolve => setTimeout(resolve, waitTime));
     }
     // タイムアウト時のエラーログ
-    console.error(`⚠️ 時間帯テーブル待機タイムアウト (${timeout}ms) - DOM要素が読み込まれませんでした`);
+    logger.error('時間帯テーブル待機タイムアウト', { timeout, message: 'DOM要素が読み込まれませんでした' });
     return false;
 }
 // 時間帯テーブルの存在確認（同期版）
 function checkTimeSlotTableExistsSync() {
     // 実際の時間帯要素をチェック（時間を含むもの）
-    const allElements = document.querySelectorAll(_entrance_page_dom_utils__WEBPACK_IMPORTED_MODULE_1__/* .timeSlotSelectors */ .eN.timeSlotCells);
+    const allElements = document.querySelectorAll(_entrance_page_dom_utils__WEBPACK_IMPORTED_MODULE_2__/* .timeSlotSelectors */ .eN.timeSlotCells);
     const actualTimeSlots = [];
     allElements.forEach(el => {
         const text = el.textContent?.trim();
@@ -677,9 +680,12 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   toggleFABVisibility: () => (/* binding */ toggleFABVisibility),
 /* harmony export */   updateFABVisibility: () => (/* binding */ updateFABVisibility)
 /* harmony export */ });
+/* harmony import */ var _utils_logger__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(911);
 // ============================================================================
 // 【2. 状態管理オブジェクト】
 // ============================================================================
+
+const logger = _utils_logger__WEBPACK_IMPORTED_MODULE_0__/* .loggers */ .C$.ui;
 let entranceReservationState = {
     isRunning: false,
     shouldStop: false,
@@ -705,7 +711,7 @@ function loadFABVisibility() {
         }
     }
     catch (e) {
-        console.warn('FAB表示状態の読み込みに失敗しました:', e);
+        logger.warn('FAB表示状態の読み込みに失敗', { error: e });
     }
 }
 function saveFABVisibility(isVisible) {
@@ -714,7 +720,7 @@ function saveFABVisibility(isVisible) {
         localStorage.setItem(fabVisibilityState.cacheKey, JSON.stringify(isVisible));
     }
     catch (e) {
-        console.warn('FAB表示状態の保存に失敗しました:', e);
+        logger.warn('FAB表示状態の保存に失敗', { error: e });
     }
 }
 function toggleFABVisibility() {
@@ -751,7 +757,7 @@ function createFABToggleButton() {
     // 買い物アイコンが見つからない場合、ヘッダー内の右端要素を探す
     let targetElement = shoppingIcon;
     if (!targetElement) {
-        console.log('🛒 買い物アイコンが見つかりません。ヘッダー右端要素を探索中...');
+        logger.debug('買い物アイコンが見つかりません。ヘッダー右端要素を探索中');
         // ヘッダー要素を探す
         const headerSelectors = [
             '.style_sp_title_box__oK11Q',
@@ -767,7 +773,7 @@ function createFABToggleButton() {
             try {
                 headerElement = document.querySelector(selector);
                 if (headerElement) {
-                    console.log(`📋 ヘッダー要素発見: ${selector}`);
+                    logger.debug('ヘッダー要素発見', { selector });
                     break;
                 }
             }
@@ -783,14 +789,14 @@ function createFABToggleButton() {
                 const rect = el.getBoundingClientRect();
                 if (rect.width > 20 && rect.height > 20) {
                     targetElement = el;
-                    console.log(`🎯 右端要素を買い物アイコン候補として使用: ${el.tagName}`);
+                    logger.debug('右端要素を買い物アイコン候補として使用', { tagName: el.tagName });
                     break;
                 }
             }
         }
     }
     if (!targetElement) {
-        console.warn('買い物アイコンまたは配置基準要素が見つかりません');
+        logger.warn('買い物アイコンまたは配置基準要素が見つかりません');
         return;
     }
     // 既存のアイコンデザインに合わせたli要素を作成
@@ -844,7 +850,7 @@ function createFABToggleButton() {
         parentUl.insertBefore(toggleLi, targetElement);
     }
     else {
-        console.warn('ul要素が見つかりません。body直下に追加します');
+        logger.warn('ul要素が見つかりません。body直下に追加します');
         document.body.appendChild(toggleLi);
     }
 }
@@ -2389,6 +2395,7 @@ const identify_page_type = (url) => {
 /* unused harmony export ProcessingOverlay */
 /* harmony import */ var _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(608);
 /* harmony import */ var _page_utils__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(372);
+/* harmony import */ var _utils_logger__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(911);
 /**
  * 自動処理中の誤動作防止オーバーレイシステム
  *
@@ -2397,6 +2404,8 @@ const identify_page_type = (url) => {
  */
 
 
+
+const logger = _utils_logger__WEBPACK_IMPORTED_MODULE_2__/* .loggers */ .C$.ui;
 class ProcessingOverlay {
     constructor() {
         this.overlayElement = null;
@@ -2464,7 +2473,7 @@ class ProcessingOverlay {
         document.addEventListener('keydown', this.handleKeyDown.bind(this));
         // bodyに追加
         document.body.appendChild(this.overlayElement);
-        console.log('🛡️ 自動処理誤動作防止オーバーレイを初期化');
+        logger.info('自動処理誤動作防止オーバーレイを初期化');
     }
     /**
      * URL変化監視の設定（SPA対応）
@@ -2487,23 +2496,23 @@ class ProcessingOverlay {
         window.addEventListener('popstate', () => {
             this.onUrlChanged();
         });
-        console.log('🌐 URL変化監視を設定');
+        logger.debug('URL変化監視を設定');
     }
     /**
      * URL変化時の処理
      */
     onUrlChanged() {
         if (this.isActive && this.currentProcessType) {
-            console.log('🌐 URL変化検出 - オーバーレイ状態確認中');
+            logger.debug('URL変化検出 - オーバーレイ状態確認中');
             // より長い遅延を設けて、意図的な画面遷移と区別
             setTimeout(() => {
                 // 依然としてアクティブな場合のみ再初期化
                 if (this.isActive && this.currentProcessType) {
-                    console.log('🔄 オーバーレイを迅速再設定');
+                    logger.debug('オーバーレイを迅速再設定');
                     this.reinitializeOverlay();
                 }
                 else {
-                    console.log('🚫 処理完了により再初期化をスキップ');
+                    logger.debug('処理完了により再初期化をスキップ');
                 }
             }, 500);
         }
@@ -2514,7 +2523,7 @@ class ProcessingOverlay {
     reinitializeOverlay() {
         if (!this.isActive || !this.currentProcessType)
             return;
-        console.log('🔄 オーバーレイ迅速再初期化中...');
+        logger.debug('オーバーレイ迅速再初期化中');
         // 既存のオーバーレイを削除
         if (this.overlayElement) {
             this.overlayElement.remove();
@@ -2525,7 +2534,7 @@ class ProcessingOverlay {
         const processType = this.currentProcessType;
         this.isActive = false; // showメソッドが実行されるようにリセット
         this.show(processType);
-        console.log('✅ オーバーレイ迅速再初期化完了');
+        logger.debug('オーバーレイ迅速再初期化完了');
     }
     /**
      * キーボードイベントハンドラー
@@ -2559,7 +2568,7 @@ class ProcessingOverlay {
     show(processType = 'reservation') {
         if (!this.overlayElement || this.isActive)
             return;
-        console.log(`🛡️ 誤動作防止オーバーレイ表示: ${processType}`);
+        logger.info('誤動作防止オーバーレイ表示', { processType });
         // メッセージをプロセスタイプに応じて更新
         const messageText = this.overlayElement.querySelector('.processing-message-text');
         const targetText = this.overlayElement.querySelector('.processing-target-text');
@@ -30822,11 +30831,14 @@ ___CSS_LOADER_EXPORT___.push([module.id, `.ytomo-processing-overlay[data-v-4cf52
 /* harmony export */   sN: () => (/* binding */ generateUniqueTdSelector)
 /* harmony export */ });
 /* unused harmony exports tableSelectors, getTdPositionInfo, findSameTdElement, extractTdStatus, waitForCalendar */
+/* harmony import */ var _utils_logger__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(911);
 // ============================================================================
 // 【入場予約DOM操作ユーティリティ】 
 // ============================================================================
 // 循環参照解決のための基盤モジュール
 // DOM操作、セレクタ定義、基本的な待機関数を提供
+
+const logger = _utils_logger__WEBPACK_IMPORTED_MODULE_0__/* .loggers */ .C$.ui;
 // 統一時間帯状態判定関数をimport
 
 // テーブルセレクタ辞書
@@ -30913,12 +30925,12 @@ function extractTdStatus(tdElement) {
 async function waitForCalendar(timeout = 10000) {
     const startTime = Date.now();
     const checkInterval = 100; // 待機間隔を長めに設定
-    console.log('カレンダーとtime要素の出現を待機中...');
+    logger.debug('カレンダーとtime要素の出現を待機中');
     while (Date.now() - startTime < timeout) {
         // time[datetime]要素が実際に存在するかを確認
         const timeElements = document.querySelectorAll('time[datetime]');
         if (timeElements.length > 0) {
-            console.log(`✅ カレンダーとtime要素が見つかりました (${timeElements.length}個のtime要素)`);
+            logger.debug('カレンダーとtime要素が見つかりました', { timeElementCount: timeElements.length });
             // 追加待機: time要素が見つかってもすぐに使用せず、少し待つ
             await new Promise(resolve => setTimeout(resolve, 200));
             return true;
@@ -30931,12 +30943,16 @@ async function waitForCalendar(timeout = 10000) {
         }
         await new Promise(resolve => setTimeout(resolve, checkInterval));
     }
-    console.log('⏰ カレンダー待機がタイムアウトしました');
+    logger.warn('カレンダー待機がタイムアウトしました');
     // デバッグ情報
     const allTables = document.querySelectorAll('table');
     const allButtons = document.querySelectorAll('[role="button"]');
     const allTimeElements = document.querySelectorAll('time');
-    console.log(`🔍 最終状態: table=${allTables.length}, button=${allButtons.length}, time=${allTimeElements.length}`);
+    logger.debug('最終状態', {
+        tableCount: allTables.length,
+        buttonCount: allButtons.length,
+        timeElementCount: allTimeElements.length
+    });
     return false;
 }
 
@@ -30959,6 +30975,28 @@ async function waitForCalendar(timeout = 10000) {
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1___default()((_node_modules_css_loader_dist_runtime_noSourceMaps_js__WEBPACK_IMPORTED_MODULE_0___default()));
 // Module
 ___CSS_LOADER_EXPORT___.push([module.id, `.ytomo-ticket-tab[data-v-556ba6fb]{padding:0 12px 20px 12px;height:100%;overflow-y:auto;color-scheme:light}@media(max-width: 768px){.ytomo-ticket-tab[data-v-556ba6fb]{padding:0 8px 16px 8px}}.ytomo-quick-select[data-v-556ba6fb]{background:#fff;border-radius:8px;padding:12px;box-shadow:0 1px 3px rgba(0,0,0,.1);border:1px solid #e2e8f0;flex-shrink:0;display:flex;align-items:center;gap:10px;flex-wrap:wrap}.ytomo-toggle-container[data-v-556ba6fb]{display:flex;align-items:center;cursor:pointer;user-select:none}.ytomo-toggle-input[data-v-556ba6fb]{display:none}.ytomo-toggle-slider[data-v-556ba6fb]{position:relative;width:44px;height:24px;background:#cbd5e1;border-radius:12px;transition:background-color .2s;margin-right:8px}.ytomo-toggle-slider[data-v-556ba6fb]::before{content:"";position:absolute;top:2px;left:2px;width:20px;height:20px;background:#fff;border-radius:50%;transition:transform .2s}.ytomo-toggle-input:checked+.ytomo-toggle-slider[data-v-556ba6fb]{background:#2c5aa0}.ytomo-toggle-input:checked+.ytomo-toggle-slider[data-v-556ba6fb]::before{transform:translateX(20px)}.ytomo-toggle-label[data-v-556ba6fb]{font-size:14px;font-weight:500;color:#374151}.ytomo-date-buttons[data-v-556ba6fb]{display:flex;flex-wrap:wrap;gap:8px;flex:1}.ytomo-entrance-date-button[data-v-556ba6fb],.ytomo-date-button[data-v-556ba6fb]{background:#e0f2fe;border:1px solid #0891b2;border-radius:4px;padding:4px 8px;font-size:12px;color:#0c4a6e;cursor:pointer;transition:all .2s;display:flex;flex-direction:column;gap:2px;align-items:center}.ytomo-entrance-date-button[data-v-556ba6fb] *,.ytomo-date-button[data-v-556ba6fb] *{pointer-events:none}.ytomo-entrance-date-button[data-v-556ba6fb]:focus,.ytomo-date-button[data-v-556ba6fb]:focus{outline:none;box-shadow:none}.ytomo-entrance-date-button[data-v-556ba6fb]:hover,.ytomo-date-button[data-v-556ba6fb]:hover{background:#dbeafe;color:#0c4a6e;transform:translateY(-1px);box-shadow:0 2px 4px rgba(186,230,253,.3)}.selected.ytomo-entrance-date-button[data-v-556ba6fb],.selected.ytomo-date-button[data-v-556ba6fb]{background:#0284c7;color:#fff;border-color:#0284c7;outline:2px solid #0284c7;outline-offset:-1px}.ytomo-entrance-date-button[data-v-556ba6fb]:active,.ytomo-date-button[data-v-556ba6fb]:active{transform:translateY(0);box-shadow:none}.disabled.ytomo-entrance-date-button[data-v-556ba6fb],.disabled.ytomo-date-button[data-v-556ba6fb],.ytomo-entrance-date-button[data-v-556ba6fb]:disabled,.ytomo-date-button[data-v-556ba6fb]:disabled{background:#e2e8f0;border-color:#94a3b8;color:#475569;cursor:not-allowed}.disabled.ytomo-entrance-date-button[data-v-556ba6fb]:hover,.disabled.ytomo-date-button[data-v-556ba6fb]:hover,.ytomo-entrance-date-button[data-v-556ba6fb]:disabled:hover,.ytomo-date-button[data-v-556ba6fb]:disabled:hover{background:#e2e8f0;color:#475569;transform:none;box-shadow:none}.ytomo-ticket-tab[data-v-556ba6fb]{padding:0 12px 20px 12px;height:100%;overflow-y:auto;color-scheme:light}@media(max-width: 768px){.ytomo-ticket-tab[data-v-556ba6fb]{padding:0 8px 16px 8px}}.ytomo-quick-select[data-v-556ba6fb]{background:#fff;border-radius:8px;padding:16px;box-shadow:0 1px 3px rgba(0,0,0,.1);border:1px solid #e2e8f0;flex-shrink:0;display:flex;align-items:center;gap:10px;flex-wrap:wrap;min-height:52px}.ytomo-toggle-container[data-v-556ba6fb]{display:flex;align-items:center;cursor:pointer;user-select:none}.ytomo-toggle-input[data-v-556ba6fb]{display:none}.ytomo-toggle-slider[data-v-556ba6fb]{position:relative;width:44px;height:24px;background:#cbd5e1;border-radius:12px;transition:background-color .2s;margin-right:8px}.ytomo-toggle-slider[data-v-556ba6fb]::before{content:"";position:absolute;top:2px;left:2px;width:20px;height:20px;background:#fff;border-radius:50%;transition:transform .2s}.ytomo-toggle-input:checked+.ytomo-toggle-slider[data-v-556ba6fb]{background:#2c5aa0}.ytomo-toggle-input:checked+.ytomo-toggle-slider[data-v-556ba6fb]::before{transform:translateX(20px)}.ytomo-toggle-label[data-v-556ba6fb]{font-size:14px;font-weight:500;color:#374151}.ytomo-date-buttons[data-v-556ba6fb]{display:flex;flex-wrap:wrap;gap:8px;flex:1}.ytomo-ticket-list[data-v-556ba6fb]{display:flex;flex-direction:column;gap:8px;margin-bottom:20px}.ytomo-ticket-item[data-v-556ba6fb]{background:#fff;border-radius:6px;border:1px solid #e2e8f0;overflow:hidden;transition:all .2s}.ytomo-ticket-item.hidden[data-v-556ba6fb]{display:none}.ytomo-ticket-item[data-v-556ba6fb]:hover{border-color:#cbd5e1;box-shadow:0 2px 4px rgba(0,0,0,.1)}.ytomo-ticket-item.selected[data-v-556ba6fb]{border-color:#2c5aa0;box-shadow:0 0 0 2px rgba(44,90,160,.2)}.ytomo-ticket-upper[data-v-556ba6fb]{background:#e2e8f0;padding:8px 12px;display:flex;align-items:center;gap:8px;border-bottom:1px solid #cbd5e1}.ytomo-ticket-id[data-v-556ba6fb]{font-family:"Courier New",monospace;font-size:13px;font-weight:600;color:#374151;background:#e2e8f0;padding:2px 6px;border-radius:3px}.ytomo-me-tip[data-v-556ba6fb]{background:linear-gradient(135deg, #10b981 0%, #059669 100%);color:#fff;padding:2px 6px;border-radius:10px;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.3px}.ytomo-external-tip[data-v-556ba6fb]{background:linear-gradient(135deg, #f59e0b 0%, #d97706 100%);color:#fff;padding:2px 6px;border-radius:10px;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.3px}.ytomo-item-name[data-v-556ba6fb]{background:linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);color:#fff;padding:2px 6px;border-radius:10px;font-size:9px;font-weight:500;max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.ytomo-label-tag[data-v-556ba6fb]{background:linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);color:#fff;padding:2px 6px;border-radius:10px;font-size:10px;font-weight:600}.ytomo-ticket-lower[data-v-556ba6fb]{padding:8px 12px;display:flex;flex-direction:column;gap:8px}.ytomo-entrance-dates[data-v-556ba6fb]{display:flex;flex-wrap:wrap;gap:6px}.ytomo-reservation-types[data-v-556ba6fb]{display:flex;flex-wrap:wrap;gap:6px;align-items:center}.ytomo-reservation-type[data-v-556ba6fb]{padding:4px 8px;border-radius:4px;font-size:12px;font-weight:500}.ytomo-reservation-type.active[data-v-556ba6fb]{background:#dcfce7;color:#166534;border:1px solid #22c55e}.ytomo-reservation-type.inactive[data-v-556ba6fb]{background:#fef2f2;color:#991b1b;border:1px solid #ef4444}.ytomo-no-reservation-types[data-v-556ba6fb]{color:#6b7280;font-size:12px;font-style:italic}.ytomo-add-ticket[data-v-556ba6fb]{background:#fff;border-radius:8px;padding:16px;border:2px dashed #cbd5e1;margin-top:20px}.ytomo-add-ticket h4[data-v-556ba6fb]{margin:0 0 12px 0;color:#374151;font-size:14px;font-weight:600}.ytomo-add-ticket-form[data-v-556ba6fb]{display:flex;gap:8px;align-items:center;flex-wrap:wrap}@media(max-width: 768px){.ytomo-add-ticket-form[data-v-556ba6fb]{flex-direction:column;align-items:stretch;gap:12px}}.ytomo-input-inline[data-v-556ba6fb]{padding:4px 8px;border:1px solid #d1d5db;border-radius:4px;font-size:12px;transition:border-color .2s;background:#fff}.ytomo-input-inline[data-v-556ba6fb]:focus{outline:none;border-color:#2c5aa0;box-shadow:0 0 0 2px rgba(44,90,160,.1)}.ytomo-input-inline[data-v-556ba6fb]::placeholder{color:#9ca3af}.ytomo-input-inline.ytomo-input-ticket-id[data-v-556ba6fb]{width:120px}.ytomo-input-inline.ytomo-input-label[data-v-556ba6fb]{width:60px}.ytomo-select-inline[data-v-556ba6fb]{padding:4px 8px;border:1px solid #d1d5db;border-radius:4px;font-size:12px;background:#fff;cursor:pointer;width:50px}.ytomo-select-inline[data-v-556ba6fb]:focus{outline:none;border-color:#2c5aa0;box-shadow:0 0 0 2px rgba(44,90,160,.1)}.ytomo-ticket-item[data-v-556ba6fb]:hover{border-color:#cbd5e1;box-shadow:0 2px 4px rgba(0,0,0,.1)}.ytomo-ticket-item.selected[data-v-556ba6fb]{border-color:#2c5aa0;box-shadow:0 0 0 2px rgba(44,90,160,.2)}.ytomo-ticket-upper[data-v-556ba6fb]{background:#e2e8f0;padding:8px 12px;display:flex;align-items:center;gap:8px;border-bottom:1px solid #cbd5e1}.ytomo-ticket-id[data-v-556ba6fb]{font-family:"Courier New",monospace;font-size:13px;font-weight:600;color:#374151;background:#e2e8f0;padding:2px 6px;border-radius:3px}.ytomo-me-tip[data-v-556ba6fb]{background:linear-gradient(135deg, #10b981 0%, #059669 100%);color:#fff;padding:2px 6px;border-radius:10px;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.3px}.ytomo-external-tip[data-v-556ba6fb]{background:linear-gradient(135deg, #f59e0b 0%, #d97706 100%);color:#fff;padding:2px 6px;border-radius:10px;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.3px}.ytomo-ticket-lower[data-v-556ba6fb]{padding:8px 12px;display:flex;flex-direction:column;gap:8px}.ytomo-entrance-date-button .ytomo-reservation-status[data-v-556ba6fb]{background:hsla(0,0%,100%,.9);color:#0891b2;padding:2px 4px;border-radius:3px;font-size:9px;font-weight:500;line-height:1.1;text-align:center}.ytomo-entrance-date-button .ytomo-reservation-status[data-v-556ba6fb]:empty{background:rgba(0,0,0,0);padding:0}.ytomo-entrance-date-button:hover .ytomo-reservation-status[data-v-556ba6fb]{background:hsla(0,0%,100%,.95);color:#0ea5e9}.ytomo-entrance-date-button:hover .ytomo-reservation-status[data-v-556ba6fb]:empty{background:rgba(0,0,0,0)}.ytomo-entrance-date-button.selected .ytomo-reservation-status[data-v-556ba6fb]{background:hsla(0,0%,100%,.95);color:#0891b2}.ytomo-entrance-date-button.selected .ytomo-reservation-status[data-v-556ba6fb]:empty{background:rgba(0,0,0,0)}.ytomo-entrance-date-button.disabled .ytomo-reservation-status[data-v-556ba6fb]{background:hsla(0,0%,100%,.9);color:#475569}.ytomo-entrance-date-button.disabled .ytomo-reservation-status[data-v-556ba6fb]:empty{background:rgba(0,0,0,0)}.ytomo-no-entrance-dates[data-v-556ba6fb]{color:#6b7280;font-size:12px;font-style:italic}.ytomo-input-inline[data-v-556ba6fb]{padding:4px 8px;border:1px solid #d1d5db;border-radius:4px;font-size:12px;transition:border-color .2s;background:#fff}.ytomo-input-inline[data-v-556ba6fb]:focus{outline:none;border-color:#2c5aa0;box-shadow:0 0 0 2px rgba(44,90,160,.1)}.ytomo-input-inline[data-v-556ba6fb]::placeholder{color:#9ca3af}.ytomo-input-inline.ytomo-input-ticket-id[data-v-556ba6fb]{width:120px}.ytomo-input-inline.ytomo-input-label[data-v-556ba6fb]{width:60px}.ytomo-select-inline[data-v-556ba6fb]{padding:4px 8px;border:1px solid #d1d5db;border-radius:4px;font-size:12px;background:#fff;cursor:pointer;width:50px}.ytomo-select-inline[data-v-556ba6fb]:focus{outline:none;border-color:#2c5aa0;box-shadow:0 0 0 2px rgba(44,90,160,.1)}.ytomo-button[data-v-556ba6fb]{padding:8px 16px;border:none;border-radius:6px;font-size:14px;font-weight:500;cursor:pointer;transition:all .2s;display:inline-flex;align-items:center;justify-content:center;white-space:nowrap}.ytomo-button.primary[data-v-556ba6fb]{background:linear-gradient(135deg, #2c5aa0 0%, #1a365d 100%);color:#fff}.ytomo-button.primary[data-v-556ba6fb]:hover{background:linear-gradient(135deg, #1a365d 0%, #2c5aa0 100%);transform:translateY(-1px);box-shadow:0 4px 12px rgba(44,90,160,.3)}.ytomo-button.primary[data-v-556ba6fb]:active{transform:translateY(0)}.ytomo-button.retry-button[data-v-556ba6fb]{background:linear-gradient(135deg, #f59e0b 0%, #d97706 100%);color:#fff;margin-top:12px}.ytomo-button.retry-button[data-v-556ba6fb]:hover{background:linear-gradient(135deg, #d97706 0%, #f59e0b 100%)}.ytomo-button[data-v-556ba6fb]:focus{outline:2px solid #2c5aa0;outline-offset:2px}.ytomo-button[data-v-556ba6fb]:disabled{opacity:.5;cursor:not-allowed;transform:none !important}.ytomo-empty-state[data-v-556ba6fb]{text-align:center;padding:40px 20px;color:#6b7280;font-style:italic}.ytomo-empty-state p[data-v-556ba6fb]{margin:0;font-size:14px}.ytomo-error[data-v-556ba6fb]{text-align:center;padding:40px 20px;color:#dc2626}.ytomo-error h3[data-v-556ba6fb]{margin:0 0 8px 0;font-size:16px;color:#dc2626}.ytomo-error p[data-v-556ba6fb]{margin:0;font-size:14px;color:#6b7280}.ytomo-ticket-tab .ytomo-loading[data-v-556ba6fb]{height:150px}.ytomo-ticket-item[data-v-556ba6fb]{animation:slideIn-556ba6fb .2s ease-out}@keyframes slideIn-556ba6fb{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}@media(prefers-reduced-motion: reduce){.ytomo-ticket-item[data-v-556ba6fb],.ytomo-button[data-v-556ba6fb],.ytomo-date-button[data-v-556ba6fb],.ytomo-entrance-date-button[data-v-556ba6fb],.ytomo-toggle-slider[data-v-556ba6fb],.ytomo-input-inline[data-v-556ba6fb]{animation:none;transition:none}}@media(prefers-contrast: high){.ytomo-ticket-item[data-v-556ba6fb]{border-width:3px}.ytomo-ticket-item.selected[data-v-556ba6fb]{border-width:4px}.ytomo-button[data-v-556ba6fb]:focus,.ytomo-input-inline[data-v-556ba6fb]:focus,.ytomo-date-button[data-v-556ba6fb]:focus,.ytomo-entrance-date-button[data-v-556ba6fb]:focus,.ytomo-input-inline[data-v-556ba6fb]:focus,.ytomo-select-inline[data-v-556ba6fb]:focus{outline:3px solid #000}}.ytomo-empty-state[data-v-556ba6fb]{text-align:center;padding:40px 20px;color:#6b7280;font-style:italic}.ytomo-empty-state p[data-v-556ba6fb]{margin:0;font-size:14px}.ytomo-error[data-v-556ba6fb]{text-align:center;padding:40px 20px;color:#dc2626}.ytomo-error h3[data-v-556ba6fb]{margin:0 0 8px 0;font-size:16px;color:#dc2626}.ytomo-error p[data-v-556ba6fb]{margin:0;font-size:14px;color:#6b7280}.ytomo-ticket-list[data-v-556ba6fb]::-webkit-scrollbar{width:6px}.ytomo-ticket-list[data-v-556ba6fb]::-webkit-scrollbar-track{background:#f1f5f9;border-radius:3px}.ytomo-ticket-list[data-v-556ba6fb]::-webkit-scrollbar-thumb{background:#cbd5e1;border-radius:3px}.ytomo-ticket-list[data-v-556ba6fb]::-webkit-scrollbar-thumb:hover{background:#94a3b8}.ytomo-ticket-item[data-v-556ba6fb]{animation:slideIn-556ba6fb .2s ease-out}@keyframes slideIn-556ba6fb{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}`, ""]);
+// Exports
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
+
+
+/***/ }),
+
+/***/ 500:
+/***/ ((module, __webpack_exports__, __webpack_require__) => {
+
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   A: () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _node_modules_css_loader_dist_runtime_noSourceMaps_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(601);
+/* harmony import */ var _node_modules_css_loader_dist_runtime_noSourceMaps_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_css_loader_dist_runtime_noSourceMaps_js__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(314);
+/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1__);
+// Imports
+
+
+var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1___default()((_node_modules_css_loader_dist_runtime_noSourceMaps_js__WEBPACK_IMPORTED_MODULE_0___default()));
+// Module
+___CSS_LOADER_EXPORT___.push([module.id, `.ytomo-pavilion-tab[data-v-1573fbb0]{padding:0 8px 20px 8px;height:100%;display:flex;flex-direction:column;gap:16px;overflow-y:auto;color-scheme:light}.ytomo-search-controls[data-v-1573fbb0]{background:#fff;border-radius:8px;padding:12px;box-shadow:0 1px 3px rgba(0,0,0,.1);border:1px solid #e2e8f0;flex-shrink:0;display:flex;gap:12px;align-items:center}@media(max-width: 600px){.ytomo-search-controls[data-v-1573fbb0]{flex-direction:column;align-items:stretch;gap:12px}}.ytomo-search-input-container[data-v-1573fbb0]{flex:1}.ytomo-search-input[data-v-1573fbb0]{width:100%;padding:10px 16px;border:1px solid #d1d5db;border-radius:8px;font-size:14px;transition:all .2s}.ytomo-search-input[data-v-1573fbb0]:focus{outline:none;border-color:#2c5aa0}.ytomo-search-input[data-v-1573fbb0]::placeholder{color:#9ca3af}.ytomo-control-buttons[data-v-1573fbb0]{display:flex;gap:8px;flex-shrink:0}@media(max-width: 600px){.ytomo-control-buttons[data-v-1573fbb0]{justify-content:center}}.ytomo-icon-button[data-v-1573fbb0]{width:40px;height:40px;border:1px solid #d1d5db;border-radius:8px;background:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s;font-size:16px;position:relative}.ytomo-icon-button[data-v-1573fbb0]:hover{background:#f3f4f6;border-color:#9ca3af;transform:translateY(-1px)}.ytomo-icon-button[data-v-1573fbb0]:active{transform:translateY(0)}.ytomo-icon-button.active[data-v-1573fbb0]{background:#2c5aa0;border-color:#2c5aa0;color:#fff}.ytomo-icon-button.active[data-v-1573fbb0]:hover{background:#1a365d}.ytomo-icon-button .ytomo-count-badge[data-v-1573fbb0]{position:absolute;top:-8px;right:-8px;background:#f44;color:#fff;border-radius:10px;padding:2px 6px;font-size:10px;font-weight:bold;min-width:16px;text-align:center;line-height:1.2;pointer-events:none;z-index:10}.ytomo-icon-button[data-v-1573fbb0]:focus{outline:none}.ytomo-icon-button span[data-v-1573fbb0]{display:block;line-height:1}.ytomo-pavilion-list[data-v-1573fbb0]{flex:1;background:#fff;border-radius:8px;border:1px solid #e2e8f0}.ytomo-pavilion-item[data-v-1573fbb0]{background:#fff;border-bottom:1px solid #f1f5f9;transition:all .2s;color:#374151}.ytomo-pavilion-item[data-v-1573fbb0]:last-child{border-bottom:none}.ytomo-pavilion-item[data-v-1573fbb0]:hover{background:#f8fafc}.ytomo-pavilion-item.hidden[data-v-1573fbb0]{display:none}.ytomo-pavilion-header[data-v-1573fbb0]{display:flex;align-items:center;gap:12px;padding:16px;cursor:pointer}.ytomo-star-button[data-v-1573fbb0]{background:none;border:none;font-size:18px;cursor:pointer;transition:background-color .2s;padding:4px;border-radius:4px;width:26px;height:26px;display:flex;align-items:center;justify-content:center;flex-shrink:0}.ytomo-star-button[data-v-1573fbb0]:hover{background:rgba(255,193,7,.1)}.ytomo-star-button.favorite[data-v-1573fbb0]{color:#ffc107}.ytomo-star-button[data-v-1573fbb0]:focus{outline:none}.ytomo-pavilion-checkbox-container[data-v-1573fbb0]{display:flex;align-items:center;cursor:pointer}.ytomo-pavilion-checkbox[data-v-1573fbb0]{width:16px;height:16px;cursor:pointer}.ytomo-pavilion-name[data-v-1573fbb0]{flex:1;font-size:15px;font-weight:500;color:#374151;line-height:1.4}.ytomo-pavilion-status[data-v-1573fbb0]{display:flex;align-items:center;gap:8px}.ytomo-status-available[data-v-1573fbb0]{background:#dcfce7;color:#166534;padding:4px 8px;border-radius:12px;font-size:12px;font-weight:600}.ytomo-status-full[data-v-1573fbb0]{background:#fef2f2;color:#991b1b;padding:4px 8px;border-radius:12px;font-size:12px;font-weight:600}.ytomo-expand-button[data-v-1573fbb0]{background:none;border:none;font-size:12px;color:#6b7280;cursor:pointer;padding:4px 8px;border-radius:4px;transition:all .2s}.ytomo-expand-button[data-v-1573fbb0]:hover{background:#f3f4f6;color:#374151}.ytomo-expand-button.expanded[data-v-1573fbb0]{background:#e2e8f0;color:#374151}.ytomo-expand-button[data-v-1573fbb0]:focus{outline:none}.ytomo-time-slots[data-v-1573fbb0]{padding:0 16px 16px 16px;display:flex;flex-wrap:wrap;gap:8px;transition:all .3s ease}.ytomo-time-slots.hidden[data-v-1573fbb0]{display:none}.ytomo-time-slot-button[data-v-1573fbb0]{padding:6px 10px;border-radius:6px;font-size:12px;font-weight:500;cursor:pointer;transition:all .2s;border:1px solid;min-width:70px;text-align:center;display:inline-block}.ytomo-time-slot-button[data-v-1573fbb0] *{pointer-events:none}.ytomo-time-slot-button.available[data-v-1573fbb0]{background:#dcfce7;border-color:#22c55e;color:#166534}.ytomo-time-slot-button.available[data-v-1573fbb0]:hover{background:#bbf7d0;color:#166534;transform:translateY(-1px);box-shadow:0 2px 8px rgba(34,197,94,.3)}.ytomo-time-slot-button.available.selected[data-v-1573fbb0]{background:#22c55e;color:#fff;box-shadow:0 2px 8px rgba(34,197,94,.3)}.ytomo-time-slot-button.unavailable[data-v-1573fbb0]{background:#fef2f2;border-color:#ef4444;color:#991b1b;cursor:pointer;opacity:1}.ytomo-time-slot-button.unavailable[data-v-1573fbb0]:hover{background:#fecaca;color:#991b1b;transform:translateY(-1px);box-shadow:0 2px 8px rgba(239,68,68,.3)}.ytomo-time-slot-button.unavailable.selected[data-v-1573fbb0]{background:#ef4444;color:#fff;box-shadow:0 2px 8px rgba(239,68,68,.3)}.ytomo-time-slot-button.rate-limited[data-v-1573fbb0]{background:#f3f4f6;border-color:#9ca3af;color:#6b7280;cursor:not-allowed;opacity:.6}.ytomo-time-slot-button.rate-limited[data-v-1573fbb0]:hover{background:#f3f4f6;color:#6b7280;transform:none;box-shadow:none}.ytomo-time-slot-button.rate-limited[data-v-1573fbb0]:disabled{cursor:not-allowed;pointer-events:none}.ytomo-time-slot-button[data-v-1573fbb0]:focus{outline:none}.ytomo-time-slot-button.hidden[data-v-1573fbb0]{display:none}.ytomo-reservation-controls[data-v-1573fbb0]{background:#fff;border-radius:8px;padding:16px;box-shadow:0 1px 3px rgba(0,0,0,.1);border:1px solid #e2e8f0;flex-shrink:0;display:flex;align-items:center;gap:16px;position:relative}@media(max-width: 600px){.ytomo-reservation-controls[data-v-1573fbb0]{flex-direction:column;align-items:stretch;gap:12px}}.ytomo-selected-info[data-v-1573fbb0]{flex:1;font-size:14px;color:#374151;font-weight:500}@media(max-width: 600px){.ytomo-selected-info[data-v-1573fbb0]{text-align:center}}.ytomo-reservation-controls .ytomo-button[data-v-1573fbb0]{padding:10px 20px;font-weight:600;white-space:nowrap}@media(max-width: 600px){.ytomo-reservation-controls .ytomo-button[data-v-1573fbb0]{width:100%}}#ot-sdk-btn-floating[data-v-1573fbb0]{display:none !important}.ytomo-result-display[data-v-1573fbb0]{position:fixed;top:20px;right:20px;padding:8px 12px;border-radius:6px;font-size:13px;font-weight:500;opacity:0;transform:translateY(-10px);transition:all .3s;pointer-events:none;max-width:300px;z-index:10001;display:none}.ytomo-result-display.ytomo-visible[data-v-1573fbb0]{display:block}.ytomo-result-display.show[data-v-1573fbb0]{opacity:1;transform:translateY(0)}.ytomo-result-display.success[data-v-1573fbb0]{background:#22c55e;color:#fff}.ytomo-result-display.error[data-v-1573fbb0]{background:#ef4444;color:#fff}.ytomo-result-display.info[data-v-1573fbb0]{background:#3b82f6;color:#fff}@media(max-width: 600px){.ytomo-result-display[data-v-1573fbb0]{position:static;transform:none;margin:8px 0 0 0;text-align:center}}.ytomo-pavilion-tab .ytomo-empty-state[data-v-1573fbb0],.ytomo-pavilion-tab .ytomo-error[data-v-1573fbb0]{padding:40px 20px;text-align:center}.ytomo-pavilion-tab .ytomo-empty-state p[data-v-1573fbb0]{margin:0;color:#6b7280;font-size:14px}.ytomo-pavilion-tab .ytomo-error p[data-v-1573fbb0]{margin:0;color:#dc2626;font-size:14px}.ytomo-pavilion-tab .ytomo-loading[data-v-1573fbb0]{height:150px}.ytomo-pavilion-list[data-v-1573fbb0]::-webkit-scrollbar{width:6px}.ytomo-pavilion-list[data-v-1573fbb0]::-webkit-scrollbar-track{background:#f1f5f9;border-radius:3px}.ytomo-pavilion-list[data-v-1573fbb0]::-webkit-scrollbar-thumb{background:#cbd5e1;border-radius:3px}.ytomo-pavilion-list[data-v-1573fbb0]::-webkit-scrollbar-thumb:hover{background:#94a3b8}.ytomo-selected-dates-display[data-v-1573fbb0]{background:#fff;border-radius:8px;padding:10px 16px;box-shadow:0 1px 3px rgba(0,0,0,.1);border:1px solid #e2e8f0;flex-shrink:0;min-height:36px;display:flex;align-items:center}.ytomo-selected-dates-content[data-v-1573fbb0]{display:flex;align-items:center;gap:8px;width:100%}.ytomo-dates-label[data-v-1573fbb0]{font-size:14px;font-weight:600;color:#374151;flex-shrink:0}.ytomo-dates-text[data-v-1573fbb0]{font-size:14px;color:#2c5aa0;font-weight:500}.ytomo-dates-text[data-v-1573fbb0]:empty::before{content:"なし";color:#9ca3af;font-style:italic}.ytomo-status-fab[data-v-1573fbb0]{position:fixed;bottom:86px;right:20px;min-width:120px;min-height:50px;border:none;border-radius:6px;color:#fff;font-size:11px;font-weight:500;cursor:pointer;box-shadow:0 4px 12px rgba(0,0,0,.3);transition:all .3s ease;z-index:1001;display:none;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:8px 12px;line-height:1.2}.ytomo-status-fab.ytomo-visible[data-v-1573fbb0]{display:flex}.ytomo-status-fab.success[data-v-1573fbb0]{background:linear-gradient(135deg, #22c55e 0%, #16a34a 100%);box-shadow:0 4px 12px rgba(34,197,94,.4)}.ytomo-status-fab.error[data-v-1573fbb0]{background:linear-gradient(135deg, #ef4444 0%, #dc2626 100%);box-shadow:0 4px 12px rgba(239,68,68,.4)}.ytomo-status-fab.info[data-v-1573fbb0]{background:linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);box-shadow:0 4px 12px rgba(59,130,246,.4)}.ytomo-status-fab[data-v-1573fbb0]:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 6px 16px rgba(0,0,0,.4)}.ytomo-status-fab[data-v-1573fbb0]:active:not(:disabled){transform:translateY(0)}.ytomo-status-fab[data-v-1573fbb0]:focus{outline:none}.ytomo-reservation-fab[data-v-1573fbb0]{position:fixed;bottom:20px;right:20px;width:56px;height:56px;background:linear-gradient(135deg, #2c5aa0 0%, #1a365d 100%);border:none;border-radius:28px;color:#fff;font-size:24px;cursor:pointer;box-shadow:0 4px 16px rgba(44,90,160,.3);transition:all .3s ease;z-index:1000;display:flex;align-items:center;justify-content:center}.ytomo-reservation-fab .ytomo-count-badge[data-v-1573fbb0]{position:absolute;top:-8px;right:-8px;background:#f44;color:#fff;border-radius:10px;padding:2px 6px;font-size:10px;font-weight:bold;min-width:16px;text-align:center;line-height:1.2;pointer-events:none;z-index:10}.ytomo-reservation-fab[data-v-1573fbb0]:hover:not(:disabled){background:linear-gradient(135deg, #1a365d 0%, #2c5aa0 100%);transform:translateY(-2px);box-shadow:0 6px 20px rgba(44,90,160,.4)}.ytomo-reservation-fab[data-v-1573fbb0]:active:not(:disabled){transform:translateY(0);box-shadow:0 2px 8px rgba(44,90,160,.3)}.ytomo-reservation-fab[data-v-1573fbb0]:disabled{background:#94a3b8;cursor:not-allowed;box-shadow:0 2px 8px rgba(148,163,184,.3);opacity:.8;display:flex}.ytomo-reservation-fab[data-v-1573fbb0]:focus{outline:none}.ytomo-endless-toggle[data-v-1573fbb0]{position:fixed;bottom:96px;right:20px;width:40px;height:32px;background:#6b7280;border:none;border-radius:16px;color:#fff;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.3);transition:all .2s ease;z-index:998;display:flex;align-items:center;justify-content:center}.ytomo-endless-toggle.active[data-v-1573fbb0]{background:#ff8c00;box-shadow:0 2px 8px rgba(255,140,0,.4)}.ytomo-endless-toggle[data-v-1573fbb0]:hover{transform:translateY(-1px);box-shadow:0 4px 12px rgba(0,0,0,.4)}.ytomo-endless-toggle[data-v-1573fbb0]:active{transform:translateY(0)}.ytomo-endless-toggle[data-v-1573fbb0]:focus{outline:none}.ytomo-button-separator[data-v-1573fbb0]{width:1px;height:32px;background:#d1d5db;margin:0 6px;align-self:center}.ytomo-pavilion-item[data-v-1573fbb0]{animation:slideIn-1573fbb0 .2s ease-out}@keyframes slideIn-1573fbb0{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}.ytomo-time-slot-button.available[data-v-1573fbb0]:hover{animation:pulse-1573fbb0 .6s ease-in-out}@keyframes pulse-1573fbb0{0%{transform:translateY(-1px)}50%{transform:translateY(-2px)}100%{transform:translateY(-1px)}}.ytomo-pavilion-tab input[data-v-1573fbb0]:focus{outline:none;border-color:#2c5aa0}.ytomo-pavilion-tab button[data-v-1573fbb0]:focus{outline:none}@media(prefers-reduced-motion: reduce){.ytomo-pavilion-item[data-v-1573fbb0],.ytomo-time-slot-button[data-v-1573fbb0],.ytomo-icon-button[data-v-1573fbb0],.ytomo-result-display[data-v-1573fbb0],.ytomo-time-slots[data-v-1573fbb0]{animation:none;transition:none}.ytomo-time-slot-button.available[data-v-1573fbb0]:hover{animation:none;transform:none}}@media(prefers-contrast: high){.ytomo-pavilion-item[data-v-1573fbb0]{border-bottom-width:2px}.ytomo-time-slot-button[data-v-1573fbb0]{border-width:2px}.ytomo-icon-button.active[data-v-1573fbb0]{border-width:3px}.ytomo-pavilion-tab input[data-v-1573fbb0]:focus,.ytomo-pavilion-tab button[data-v-1573fbb0]:focus{outline:3px solid #000}}.ytomo-processing-overlay[data-v-1573fbb0]{position:fixed;top:0;left:0;width:100%;height:100%;background-color:rgba(0,0,0,.7);display:flex;align-items:center;justify-content:center;z-index:10001;opacity:0;animation:fadeIn .2s ease-out forwards}.ytomo-processing-content[data-v-1573fbb0]{background:#fff;border-radius:12px;padding:32px;box-shadow:0 20px 60px rgba(0,0,0,.3);text-align:center;min-width:300px;transform:scale(0.9);animation:dialogAppear .2s ease-out forwards}.ytomo-processing-spinner[data-v-1573fbb0]{width:40px;height:40px;border:3px solid #e2e8f0;border-top-color:#2c5aa0;border-radius:50%;animation:spin-1573fbb0 1s linear infinite;margin:0 auto 16px}.ytomo-processing-message[data-v-1573fbb0]{margin:0 0 24px;color:#374151;font-size:16px;font-weight:500}.ytomo-cancel-button[data-v-1573fbb0]{background:#6b7280;color:#fff;border:none;padding:12px 24px;border-radius:6px;font-size:14px;cursor:pointer;transition:background-color .2s}.ytomo-cancel-button[data-v-1573fbb0]:hover{background:#4b5563}.ytomo-cancel-button[data-v-1573fbb0]:focus{outline:2px solid #2c5aa0;outline-offset:2px}@keyframes spin-1573fbb0{to{transform:rotate(360deg)}}@media(prefers-reduced-motion: reduce){.ytomo-processing-overlay[data-v-1573fbb0],.ytomo-processing-content[data-v-1573fbb0],.ytomo-processing-spinner[data-v-1573fbb0]{animation:none;transition:none}}`, ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -31073,6 +31111,8 @@ class AudioPlayer {
     }
 }
 
+// EXTERNAL MODULE: ./ts/utils/logger.ts
+var logger = __webpack_require__(911);
 // EXTERNAL MODULE: ./ts/modules/processing-overlay.ts
 var processing_overlay = __webpack_require__(385);
 // EXTERNAL MODULE: ./ts/modules/entrance-page-state.ts
@@ -31087,6 +31127,8 @@ var entrance_reservation_state_manager = __webpack_require__(608);
 // 統一処理移行により個別importは不要
 // 音声再生用import
 
+
+const entrance_page_fab_logger = logger/* loggers */.C$.tickets;
 // entrance-page-stateからのimport
 
 
@@ -31199,13 +31241,13 @@ function createEntranceReservationUI() {
             await startReservationProcess();
         }
         else {
-            console.log('⚠️ 入場予約状態管理システム: 実行可能なアクションなし');
+            entrance_page_fab_logger.warn('入場予約状態管理システム: 実行可能なアクションなし');
         }
         return;
     });
     // 予約中断処理
     function stopReservationProcess() {
-        console.log('⏹️ 予約を中断');
+        entrance_page_fab_logger.info('予約を中断');
         entrance_reservation_state_manager/* entranceReservationStateManager */.xx.setShouldStop(true);
         showStatus('予約処理を中断中...', 'orange');
         // 中断フラグ設定後、UIを即座に更新
@@ -31213,19 +31255,19 @@ function createEntranceReservationUI() {
     }
     // 予約開始処理
     async function startReservationProcess() {
-        console.log('🚀 入場予約状態管理システムによる予約開始');
+        entrance_page_fab_logger.info('入場予約状態管理システムによる予約開始');
         // DOM状態から予約対象を同期（予約開始前に必須）
         syncReservationTargetFromDOM();
         // 統一予約開始処理
         if (!entrance_reservation_state_manager/* entranceReservationStateManager */.xx.startReservation()) {
-            console.error('❌ 予約開始に失敗しました');
+            entrance_page_fab_logger.error('予約開始に失敗しました');
             showStatus('予約開始失敗', 'red');
             return;
         }
-        console.log('🔄 予約開始成功、FABボタン状態更新中...');
+        entrance_page_fab_logger.info('予約開始成功、FABボタン状態更新中');
         // デバッグ: 実行状態を確認
         const currentState = entrance_reservation_state_manager/* entranceReservationStateManager */.xx.getExecutionState();
-        console.log(`🔄 [予約開始後] 実行状態: ${currentState}`);
+        entrance_page_fab_logger.info('予約開始後実行状態', { currentState });
         // 予約に切り替わった場合にオーバーレイを更新
         processing_overlay/* processingOverlay */.O.show('reservation');
         showStatus('予約処理実行中...', 'blue');
@@ -31233,7 +31275,7 @@ function createEntranceReservationUI() {
         // デバッグ: FABボタンの現在の状態を確認
         const mainButton = document.getElementById('ytomo-main-fab');
         if (mainButton) {
-            console.log(`🔄 [予約開始後] FABボタン状態: disabled=${mainButton.disabled}, title="${mainButton.title}"`);
+            entrance_page_fab_logger.debug('FABボタン状態(予約開始後)', { disabled: mainButton.disabled, title: mainButton.title });
         }
         // 予約対象表示は統一システムで管理
         // 設定オブジェクトを作成
@@ -31265,10 +31307,10 @@ function createEntranceReservationUI() {
         };
         // 予約開始前に予約対象情報を保存（成功時のUI更新用）
         const reservationTarget = entrance_reservation_state_manager/* entranceReservationStateManager */.xx.getReservationTarget();
-        console.log('🔍 予約開始前の対象情報:', reservationTarget);
+        entrance_page_fab_logger.info('予約開始前の対象情報', reservationTarget);
         try {
             const result = await entranceReservationHelper(config);
-            console.log('🔍 entranceReservationHelper戻り値:', result);
+            entrance_page_fab_logger.debug('entranceReservationHelper戻り値', result);
             if (result.success) {
                 showStatus(`🎉 予約成功！(${result.attempts}回試行)`, 'green');
                 // 予約開始前に保存した対象情報で成功情報を設定
@@ -31277,7 +31319,7 @@ function createEntranceReservationUI() {
                     entrance_reservation_state_manager/* entranceReservationStateManager */.xx.updateFabDisplay(); // FAB表示更新
                     // 通知音が有効な場合は成功音を再生
                     const soundEnabled = entrance_reservation_state_manager/* entranceReservationStateManager */.xx.isNotificationSoundEnabled();
-                    console.log(`🔍 予約成功時の通知音設定チェック: ${soundEnabled ? '有効' : '無効'}`);
+                    entrance_page_fab_logger.debug('予約成功時の通知音設定チェック', { soundEnabled });
                     if (soundEnabled) {
                         console.log('🎵 予約成功 - 通知音を再生');
                         try {
@@ -31894,6 +31936,8 @@ var entrance_page_dom_utils = __webpack_require__(484);
 var entrance_page_core = __webpack_require__(45);
 // EXTERNAL MODULE: ./ts/modules/processing-overlay.ts
 var processing_overlay = __webpack_require__(385);
+// EXTERNAL MODULE: ./ts/utils/logger.ts
+var logger = __webpack_require__(911);
 ;// ./ts/modules/unified-automation-manager.ts
 /**
  * 統一自動処理管理システム
@@ -31902,6 +31946,8 @@ var processing_overlay = __webpack_require__(385);
  * AbortController による即座中断を実現
  */
 
+
+const unified_automation_manager_logger = logger/* loggers */.C$.automation;
 // カスタム例外クラス
 class CancellationError extends Error {
     constructor(message) {
@@ -31915,7 +31961,7 @@ class UnifiedAutomationManager {
         this.controller = null;
         this.currentProcess = 'idle';
         this.stateManager = stateManager;
-        console.log('🔧 統一自動処理管理システム初期化', this.stateManager ? '完了' : '失敗');
+        unified_automation_manager_logger.info('統一自動処理管理システム初期化', { success: !!this.stateManager });
     }
     // ============================================================================
     // 統一処理実行フレームワーク
@@ -31930,7 +31976,7 @@ class UnifiedAutomationManager {
         this.currentProcess = processType;
         this.controller = new AbortController();
         try {
-            console.log(`🚀 統一自動処理開始: ${processType}`);
+            unified_automation_manager_logger.info('統一自動処理開始', { processType });
             // 誤動作防止オーバーレイを表示（efficiency-waitは除外）
             if (processType !== 'efficiency-wait') {
                 processing_overlay/* processingOverlay */.O.show(processType);
@@ -31940,10 +31986,10 @@ class UnifiedAutomationManager {
         catch (error) {
             if (error instanceof Error && error.name === 'AbortError') {
                 const cancellationError = new CancellationError(`${processType} was cancelled`);
-                console.log(`⏹️ 統一自動処理中断: ${processType}`);
+                unified_automation_manager_logger.info('統一自動処理中断', { processType });
                 throw cancellationError;
             }
-            console.error(`❌ 統一自動処理エラー: ${processType}`, error);
+            unified_automation_manager_logger.error('統一自動処理エラー', { processType, error });
             throw error;
         }
         finally {
@@ -32007,7 +32053,7 @@ class UnifiedAutomationManager {
         if (totalWaitMs > 1000) {
             // 長時間待機は100ms間隔で分割
             const longWaitMs = totalWaitMs - 100; // 最後100msは精密待機
-            console.log(`🎯 統一効率モード待機: ${Math.floor(longWaitMs / 1000)}秒`);
+            unified_automation_manager_logger.info('統一効率モード待機', { waitSeconds: Math.floor(longWaitMs / 1000) });
             await this.waitWithCancellation(longWaitMs, signal);
         }
         // 最終精密調整（100ms以下）
@@ -32091,16 +32137,16 @@ class UnifiedAutomationManager {
     async reservationLoop(config, signal) {
         const { selectors, selectorTexts, timeouts } = config;
         let attempts = 0;
-        console.log('🚀 統一予約処理ループを開始します...');
+        unified_automation_manager_logger.info('統一予約処理ループを開始');
         while (true) {
             attempts++;
-            console.log(`試行回数: ${attempts}`);
+            unified_automation_manager_logger.debug('試行回数', { attempts });
             // 中断チェック
             this.throwIfAborted(signal);
             // 対象一貫性検証
             if (this.stateManager && this.stateManager.validateTargetConsistency) {
                 if (!this.stateManager.validateTargetConsistency()) {
-                    console.error('🚨 予約対象が変更されたため処理を中断します');
+                    unified_automation_manager_logger.error('予約対象が変更されたため処理を中断');
                     throw new Error('TargetConsistencyError');
                 }
             }
@@ -32110,7 +32156,7 @@ class UnifiedAutomationManager {
                 statusDiv.innerText = `試行中... (${attempts}回目)`;
             }
             try {
-                console.log('1. submitボタンを待機中...');
+                unified_automation_manager_logger.debug('submitボタンを待機中');
                 const submitButton = await this.waitForElementWithCancellation(selectors.submit, timeouts.waitForSubmit, signal);
                 // 中断チェック
                 this.throwIfAborted(signal);
@@ -32119,9 +32165,9 @@ class UnifiedAutomationManager {
                     this.stateManager.setAttempts(attempts);
                 }
                 // 効率モード対応のsubmitクリック実行
-                console.log('2. submitボタンをクリック...');
+                unified_automation_manager_logger.debug('submitボタンをクリック');
                 await this.executeEfficiencyTimingSubmit(submitButton, config, signal);
-                console.log('3. レスポンスを待機中...');
+                unified_automation_manager_logger.debug('レスポンスを待機中');
                 const responseSelectors = {
                     change: selectors.change,
                     success: selectors.success,
@@ -32377,6 +32423,8 @@ class UnifiedAutomationManager {
 
 
 
+
+const entrance_reservation_state_manager_logger = logger/* loggers */.C$.tickets;
 // ============================================================================
 // 型定義
 // ============================================================================
@@ -33827,28 +33875,6 @@ module.exports = insertBySelector;
 
 /***/ }),
 
-/***/ 787:
-/***/ ((module, __webpack_exports__, __webpack_require__) => {
-
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   A: () => (__WEBPACK_DEFAULT_EXPORT__)
-/* harmony export */ });
-/* harmony import */ var _node_modules_css_loader_dist_runtime_noSourceMaps_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(601);
-/* harmony import */ var _node_modules_css_loader_dist_runtime_noSourceMaps_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_css_loader_dist_runtime_noSourceMaps_js__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(314);
-/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1__);
-// Imports
-
-
-var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1___default()((_node_modules_css_loader_dist_runtime_noSourceMaps_js__WEBPACK_IMPORTED_MODULE_0___default()));
-// Module
-___CSS_LOADER_EXPORT___.push([module.id, `.ytomo-sequential-overlay[data-v-17efe212]{position:fixed;top:0;left:0;width:100%;height:100%;background-color:rgba(0,0,0,.8);display:flex;align-items:center;justify-content:center;z-index:10002;opacity:0;animation:fadeIn-17efe212 .2s ease-out forwards}.ytomo-sequential-content[data-v-17efe212]{background:#fff;border-radius:12px;padding:32px;box-shadow:0 20px 60px rgba(0,0,0,.3);text-align:center;min-width:400px;max-width:500px;transform:scale(0.9);animation:dialogAppear-17efe212 .2s ease-out forwards}.ytomo-sequential-content h3[data-v-17efe212]{margin:0 0 24px 0;color:#374151;font-size:20px;font-weight:600}.ytomo-sequential-settings[data-v-17efe212]{margin-bottom:24px}.ytomo-sequential-settings .ytomo-mode-setting[data-v-17efe212]{margin-bottom:16px}.ytomo-sequential-settings .ytomo-mode-setting label[data-v-17efe212]{display:block;margin-bottom:8px;font-size:14px;font-weight:500;color:#374151}.ytomo-sequential-settings .ytomo-mode-buttons[data-v-17efe212]{display:flex;gap:8px;justify-content:center}.ytomo-sequential-settings .ytomo-mode-button[data-v-17efe212]{padding:8px 16px;border:1px solid #d1d5db;border-radius:6px;background:#fff;color:#374151;cursor:pointer;transition:all .2s;font-size:14px}.ytomo-sequential-settings .ytomo-mode-button[data-v-17efe212]:hover{background:#f3f4f6;border-color:#9ca3af}.ytomo-sequential-settings .ytomo-mode-button.active[data-v-17efe212]{background:#2c5aa0;border-color:#2c5aa0;color:#fff}.ytomo-sequential-settings .ytomo-mode-button[data-v-17efe212]:focus{outline:none}.ytomo-sequential-settings .ytomo-interval-setting label[data-v-17efe212]{display:block;margin-bottom:8px;font-size:14px;font-weight:500;color:#374151}.ytomo-sequential-settings .ytomo-interval-dropdown[data-v-17efe212]{padding:8px 12px;border:1px solid #d1d5db;border-radius:6px;background:#fff;font-size:14px;min-width:120px}.ytomo-sequential-settings .ytomo-interval-dropdown[data-v-17efe212]:focus{outline:none;border-color:#2c5aa0}.ytomo-sequential-progress[data-v-17efe212]{margin-bottom:24px}.ytomo-sequential-progress .ytomo-sequential-current[data-v-17efe212]{font-size:18px;font-weight:600;color:#2c5aa0;margin-bottom:8px}.ytomo-sequential-progress .ytomo-sequential-target[data-v-17efe212]{font-size:14px;color:#374151;margin-bottom:4px}.ytomo-sequential-progress .ytomo-sequential-countdown[data-v-17efe212]{font-size:16px;font-weight:500;color:#ef4444}.ytomo-cancel-button[data-v-17efe212]{background:#6b7280;color:#fff;border:none;padding:12px 24px;border-radius:6px;font-size:14px;font-weight:500;cursor:pointer;transition:background-color .2s}.ytomo-cancel-button[data-v-17efe212]:hover{background:#4b5563}.ytomo-cancel-button[data-v-17efe212]:focus{outline:none}@keyframes fadeIn-17efe212{to{opacity:1}}@keyframes dialogAppear-17efe212{to{transform:scale(1)}}@media(prefers-reduced-motion: reduce){.ytomo-sequential-overlay[data-v-17efe212],.ytomo-sequential-content[data-v-17efe212]{animation:none;transition:none}}`, ""]);
-// Exports
-/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
-
-
-/***/ }),
-
 /***/ 799:
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
@@ -33928,12 +33954,16 @@ class ReservationDataUtils {
     }
 }
 
+// EXTERNAL MODULE: ./ts/utils/logger.ts
+var logger = __webpack_require__(911);
 ;// ./ts/modules/pavilion-reservation-cache.ts
 /**
  * パビリオン予約キャッシュ管理モジュール
  * sessionStorageを使用した予約データの保存・取得
  */
 
+
+const pavilion_reservation_cache_logger = logger/* loggers */.C$.automation;
 class PavilionReservationCache {
     /**
      * sessionStorageへの安全な保存
@@ -33945,7 +33975,7 @@ class PavilionReservationCache {
             return true;
         }
         catch (error) {
-            console.error('❌ Cache save error:', error);
+            pavilion_reservation_cache_logger.error('キャッシュ保存エラー', { error });
             return false;
         }
     }
@@ -33960,7 +33990,7 @@ class PavilionReservationCache {
             return JSON.parse(item);
         }
         catch (error) {
-            console.error('❌ Cache load error:', error);
+            pavilion_reservation_cache_logger.error('キャッシュ読み込みエラー', { error });
             return null;
         }
     }
@@ -33972,7 +34002,7 @@ class PavilionReservationCache {
             sessionStorage.removeItem(key);
         }
         catch (error) {
-            console.error('❌ Cache remove error:', error);
+            pavilion_reservation_cache_logger.error('キャッシュ削除エラー', { error });
         }
     }
     // ============ 予約データ管理 ============
@@ -33985,7 +34015,7 @@ class PavilionReservationCache {
         allData[key] = data;
         const success = this.setItem(CACHE_KEYS.RESERVATION_DATA, allData);
         if (success) {
-            console.log(`💾 予約データ保存: ${key} - ${data.selectedTimeDisplay}`);
+            pavilion_reservation_cache_logger.info('予約データ保存', { key, timeDisplay: data.selectedTimeDisplay });
         }
         return success;
     }
@@ -34000,13 +34030,13 @@ class PavilionReservationCache {
             return null;
         // データ有効性チェック
         if (!ReservationDataUtils.isValidReservationData(data)) {
-            console.warn(`⚠️ 無効な予約データ: ${key}`);
+            pavilion_reservation_cache_logger.warn('無効な予約データ', { key });
             this.removeReservationData(pavilionCode, timeSlot);
             return null;
         }
         // 期限チェック
         if (ReservationDataUtils.isDataExpired(data.timestamp)) {
-            console.warn(`⏰ 期限切れデータ: ${key}`);
+            pavilion_reservation_cache_logger.warn('期限切れデータ', { key });
             this.removeReservationData(pavilionCode, timeSlot);
             return null;
         }
@@ -34051,7 +34081,7 @@ class PavilionReservationCache {
         const key = generateReservationKey(pavilionCode, timeSlot);
         delete allData[key];
         this.setItem(CACHE_KEYS.RESERVATION_DATA, allData);
-        console.log(`🗑️ 予約データ削除: ${key}`);
+        pavilion_reservation_cache_logger.info('予約データ削除', { key });
     }
     /**
      * 特定パビリオンの全予約データを削除
@@ -34067,7 +34097,7 @@ class PavilionReservationCache {
         }
         if (deletedCount > 0) {
             this.setItem(CACHE_KEYS.RESERVATION_DATA, allData);
-            console.log(`🗑️ パビリオン予約データ削除: ${pavilionCode} (${deletedCount}件)`);
+            pavilion_reservation_cache_logger.info('パビリオン予約データ削除', { pavilionCode, deletedCount });
         }
     }
     /**
@@ -34075,7 +34105,7 @@ class PavilionReservationCache {
      */
     static clearAllReservationData() {
         this.removeItem(CACHE_KEYS.RESERVATION_DATA);
-        console.log('🧹 全予約データクリア');
+        pavilion_reservation_cache_logger.info('全予約データクリア');
     }
     /**
      * 予約データの状態を更新
@@ -34095,7 +34125,7 @@ class PavilionReservationCache {
     static saveAutomationState(state) {
         const success = this.setItem(CACHE_KEYS.AUTOMATION_STATE, state);
         if (success) {
-            console.log(`🤖 自動操作状態保存: ${state.currentStep}`);
+            pavilion_reservation_cache_logger.info('自動操作状態保存', { currentStep: state.currentStep });
         }
         return success;
     }
@@ -34110,7 +34140,7 @@ class PavilionReservationCache {
      */
     static clearAutomationState() {
         this.removeItem(CACHE_KEYS.AUTOMATION_STATE);
-        console.log('🧹 自動操作状態クリア');
+        pavilion_reservation_cache_logger.info('自動操作状態クリア');
     }
     // ============ ユーザー設定管理 ============
     /**
@@ -34159,19 +34189,19 @@ class PavilionReservationCache {
         }
         if (cleanedCount > 0) {
             this.setItem(CACHE_KEYS.RESERVATION_DATA, allData);
-            console.log(`🧹 期限切れデータ削除: ${cleanedCount}件`);
+            pavilion_reservation_cache_logger.info('期限切れデータ削除', { cleanedCount });
         }
     }
     /**
      * デバッグ用: 全キャッシュ内容を表示
      */
     static debugLogAllCache() {
-        console.group('📋 パビリオン予約キャッシュ内容');
-        console.log('予約データ:', this.getAllReservationData());
-        console.log('自動操作状態:', this.getAutomationState());
-        console.log('ユーザー設定:', this.getUserPreferences());
-        console.log('キャッシュサイズ:', `${this.getCacheSize()} bytes`);
-        console.groupEnd();
+        pavilion_reservation_cache_logger.debug('パビリオン予約キャッシュ内容', {
+            reservationData: this.getAllReservationData(),
+            automationState: this.getAutomationState(),
+            userPreferences: this.getUserPreferences(),
+            cacheSize: this.getCacheSize()
+        });
     }
     /**
      * 時間選択UIとの連携用: 選択データをキャッシュに保存
@@ -34467,7 +34497,7 @@ const loggers = {
 
 /***/ }),
 
-/***/ 919:
+/***/ 934:
 /***/ ((module, __webpack_exports__, __webpack_require__) => {
 
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
@@ -34482,7 +34512,7 @@ const loggers = {
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1___default()((_node_modules_css_loader_dist_runtime_noSourceMaps_js__WEBPACK_IMPORTED_MODULE_0___default()));
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, `.ytomo-pavilion-tab[data-v-6a1f136a]{padding:0 8px 20px 8px;height:100%;display:flex;flex-direction:column;gap:16px;overflow-y:auto;color-scheme:light}.ytomo-search-controls[data-v-6a1f136a]{background:#fff;border-radius:8px;padding:12px;box-shadow:0 1px 3px rgba(0,0,0,.1);border:1px solid #e2e8f0;flex-shrink:0;display:flex;gap:12px;align-items:center}@media(max-width: 600px){.ytomo-search-controls[data-v-6a1f136a]{flex-direction:column;align-items:stretch;gap:12px}}.ytomo-search-input-container[data-v-6a1f136a]{flex:1}.ytomo-search-input[data-v-6a1f136a]{width:100%;padding:10px 16px;border:1px solid #d1d5db;border-radius:8px;font-size:14px;transition:all .2s}.ytomo-search-input[data-v-6a1f136a]:focus{outline:none;border-color:#2c5aa0}.ytomo-search-input[data-v-6a1f136a]::placeholder{color:#9ca3af}.ytomo-control-buttons[data-v-6a1f136a]{display:flex;gap:8px;flex-shrink:0}@media(max-width: 600px){.ytomo-control-buttons[data-v-6a1f136a]{justify-content:center}}.ytomo-icon-button[data-v-6a1f136a]{width:40px;height:40px;border:1px solid #d1d5db;border-radius:8px;background:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s;font-size:16px;position:relative}.ytomo-icon-button[data-v-6a1f136a]:hover{background:#f3f4f6;border-color:#9ca3af;transform:translateY(-1px)}.ytomo-icon-button[data-v-6a1f136a]:active{transform:translateY(0)}.ytomo-icon-button.active[data-v-6a1f136a]{background:#2c5aa0;border-color:#2c5aa0;color:#fff}.ytomo-icon-button.active[data-v-6a1f136a]:hover{background:#1a365d}.ytomo-icon-button .ytomo-count-badge[data-v-6a1f136a]{position:absolute;top:-8px;right:-8px;background:#f44;color:#fff;border-radius:10px;padding:2px 6px;font-size:10px;font-weight:bold;min-width:16px;text-align:center;line-height:1.2;pointer-events:none;z-index:10}.ytomo-icon-button[data-v-6a1f136a]:focus{outline:none}.ytomo-icon-button span[data-v-6a1f136a]{display:block;line-height:1}.ytomo-pavilion-list[data-v-6a1f136a]{flex:1;background:#fff;border-radius:8px;border:1px solid #e2e8f0}.ytomo-pavilion-item[data-v-6a1f136a]{background:#fff;border-bottom:1px solid #f1f5f9;transition:all .2s;color:#374151}.ytomo-pavilion-item[data-v-6a1f136a]:last-child{border-bottom:none}.ytomo-pavilion-item[data-v-6a1f136a]:hover{background:#f8fafc}.ytomo-pavilion-item.hidden[data-v-6a1f136a]{display:none}.ytomo-pavilion-header[data-v-6a1f136a]{display:flex;align-items:center;gap:12px;padding:16px;cursor:pointer}.ytomo-star-button[data-v-6a1f136a]{background:none;border:none;font-size:18px;cursor:pointer;transition:background-color .2s;padding:4px;border-radius:4px;width:26px;height:26px;display:flex;align-items:center;justify-content:center;flex-shrink:0}.ytomo-star-button[data-v-6a1f136a]:hover{background:rgba(255,193,7,.1)}.ytomo-star-button.favorite[data-v-6a1f136a]{color:#ffc107}.ytomo-star-button[data-v-6a1f136a]:focus{outline:none}.ytomo-pavilion-checkbox-container[data-v-6a1f136a]{display:flex;align-items:center;cursor:pointer}.ytomo-pavilion-checkbox[data-v-6a1f136a]{width:16px;height:16px;cursor:pointer}.ytomo-pavilion-name[data-v-6a1f136a]{flex:1;font-size:15px;font-weight:500;color:#374151;line-height:1.4}.ytomo-pavilion-status[data-v-6a1f136a]{display:flex;align-items:center;gap:8px}.ytomo-status-available[data-v-6a1f136a]{background:#dcfce7;color:#166534;padding:4px 8px;border-radius:12px;font-size:12px;font-weight:600}.ytomo-status-full[data-v-6a1f136a]{background:#fef2f2;color:#991b1b;padding:4px 8px;border-radius:12px;font-size:12px;font-weight:600}.ytomo-expand-button[data-v-6a1f136a]{background:none;border:none;font-size:12px;color:#6b7280;cursor:pointer;padding:4px 8px;border-radius:4px;transition:all .2s}.ytomo-expand-button[data-v-6a1f136a]:hover{background:#f3f4f6;color:#374151}.ytomo-expand-button.expanded[data-v-6a1f136a]{background:#e2e8f0;color:#374151}.ytomo-expand-button[data-v-6a1f136a]:focus{outline:none}.ytomo-time-slots[data-v-6a1f136a]{padding:0 16px 16px 16px;display:flex;flex-wrap:wrap;gap:8px;transition:all .3s ease}.ytomo-time-slots.hidden[data-v-6a1f136a]{display:none}.ytomo-time-slot-button[data-v-6a1f136a]{padding:6px 10px;border-radius:6px;font-size:12px;font-weight:500;cursor:pointer;transition:all .2s;border:1px solid;min-width:70px;text-align:center;display:inline-block}.ytomo-time-slot-button[data-v-6a1f136a] *{pointer-events:none}.ytomo-time-slot-button.available[data-v-6a1f136a]{background:#dcfce7;border-color:#22c55e;color:#166534}.ytomo-time-slot-button.available[data-v-6a1f136a]:hover{background:#bbf7d0;color:#166534;transform:translateY(-1px);box-shadow:0 2px 8px rgba(34,197,94,.3)}.ytomo-time-slot-button.available.selected[data-v-6a1f136a]{background:#22c55e;color:#fff;box-shadow:0 2px 8px rgba(34,197,94,.3)}.ytomo-time-slot-button.unavailable[data-v-6a1f136a]{background:#fef2f2;border-color:#ef4444;color:#991b1b;cursor:pointer;opacity:1}.ytomo-time-slot-button.unavailable[data-v-6a1f136a]:hover{background:#fecaca;color:#991b1b;transform:translateY(-1px);box-shadow:0 2px 8px rgba(239,68,68,.3)}.ytomo-time-slot-button.unavailable.selected[data-v-6a1f136a]{background:#ef4444;color:#fff;box-shadow:0 2px 8px rgba(239,68,68,.3)}.ytomo-time-slot-button.rate-limited[data-v-6a1f136a]{background:#f3f4f6;border-color:#9ca3af;color:#6b7280;cursor:not-allowed;opacity:.6}.ytomo-time-slot-button.rate-limited[data-v-6a1f136a]:hover{background:#f3f4f6;color:#6b7280;transform:none;box-shadow:none}.ytomo-time-slot-button.rate-limited[data-v-6a1f136a]:disabled{cursor:not-allowed;pointer-events:none}.ytomo-time-slot-button[data-v-6a1f136a]:focus{outline:none}.ytomo-time-slot-button.hidden[data-v-6a1f136a]{display:none}.ytomo-reservation-controls[data-v-6a1f136a]{background:#fff;border-radius:8px;padding:16px;box-shadow:0 1px 3px rgba(0,0,0,.1);border:1px solid #e2e8f0;flex-shrink:0;display:flex;align-items:center;gap:16px;position:relative}@media(max-width: 600px){.ytomo-reservation-controls[data-v-6a1f136a]{flex-direction:column;align-items:stretch;gap:12px}}.ytomo-selected-info[data-v-6a1f136a]{flex:1;font-size:14px;color:#374151;font-weight:500}@media(max-width: 600px){.ytomo-selected-info[data-v-6a1f136a]{text-align:center}}.ytomo-reservation-controls .ytomo-button[data-v-6a1f136a]{padding:10px 20px;font-weight:600;white-space:nowrap}@media(max-width: 600px){.ytomo-reservation-controls .ytomo-button[data-v-6a1f136a]{width:100%}}#ot-sdk-btn-floating[data-v-6a1f136a]{display:none !important}.ytomo-result-display[data-v-6a1f136a]{position:fixed;top:20px;right:20px;padding:8px 12px;border-radius:6px;font-size:13px;font-weight:500;opacity:0;transform:translateY(-10px);transition:all .3s;pointer-events:none;max-width:300px;z-index:10001;display:none}.ytomo-result-display.ytomo-visible[data-v-6a1f136a]{display:block}.ytomo-result-display.show[data-v-6a1f136a]{opacity:1;transform:translateY(0)}.ytomo-result-display.success[data-v-6a1f136a]{background:#22c55e;color:#fff}.ytomo-result-display.error[data-v-6a1f136a]{background:#ef4444;color:#fff}.ytomo-result-display.info[data-v-6a1f136a]{background:#3b82f6;color:#fff}@media(max-width: 600px){.ytomo-result-display[data-v-6a1f136a]{position:static;transform:none;margin:8px 0 0 0;text-align:center}}.ytomo-pavilion-tab .ytomo-empty-state[data-v-6a1f136a],.ytomo-pavilion-tab .ytomo-error[data-v-6a1f136a]{padding:40px 20px;text-align:center}.ytomo-pavilion-tab .ytomo-empty-state p[data-v-6a1f136a]{margin:0;color:#6b7280;font-size:14px}.ytomo-pavilion-tab .ytomo-error p[data-v-6a1f136a]{margin:0;color:#dc2626;font-size:14px}.ytomo-pavilion-tab .ytomo-loading[data-v-6a1f136a]{height:150px}.ytomo-pavilion-list[data-v-6a1f136a]::-webkit-scrollbar{width:6px}.ytomo-pavilion-list[data-v-6a1f136a]::-webkit-scrollbar-track{background:#f1f5f9;border-radius:3px}.ytomo-pavilion-list[data-v-6a1f136a]::-webkit-scrollbar-thumb{background:#cbd5e1;border-radius:3px}.ytomo-pavilion-list[data-v-6a1f136a]::-webkit-scrollbar-thumb:hover{background:#94a3b8}.ytomo-selected-dates-display[data-v-6a1f136a]{background:#fff;border-radius:8px;padding:10px 16px;box-shadow:0 1px 3px rgba(0,0,0,.1);border:1px solid #e2e8f0;flex-shrink:0;min-height:36px;display:flex;align-items:center}.ytomo-selected-dates-content[data-v-6a1f136a]{display:flex;align-items:center;gap:8px;width:100%}.ytomo-dates-label[data-v-6a1f136a]{font-size:14px;font-weight:600;color:#374151;flex-shrink:0}.ytomo-dates-text[data-v-6a1f136a]{font-size:14px;color:#2c5aa0;font-weight:500}.ytomo-dates-text[data-v-6a1f136a]:empty::before{content:"なし";color:#9ca3af;font-style:italic}.ytomo-status-fab[data-v-6a1f136a]{position:fixed;bottom:86px;right:20px;min-width:120px;min-height:50px;border:none;border-radius:6px;color:#fff;font-size:11px;font-weight:500;cursor:pointer;box-shadow:0 4px 12px rgba(0,0,0,.3);transition:all .3s ease;z-index:1001;display:none;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:8px 12px;line-height:1.2}.ytomo-status-fab.ytomo-visible[data-v-6a1f136a]{display:flex}.ytomo-status-fab.success[data-v-6a1f136a]{background:linear-gradient(135deg, #22c55e 0%, #16a34a 100%);box-shadow:0 4px 12px rgba(34,197,94,.4)}.ytomo-status-fab.error[data-v-6a1f136a]{background:linear-gradient(135deg, #ef4444 0%, #dc2626 100%);box-shadow:0 4px 12px rgba(239,68,68,.4)}.ytomo-status-fab.info[data-v-6a1f136a]{background:linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);box-shadow:0 4px 12px rgba(59,130,246,.4)}.ytomo-status-fab[data-v-6a1f136a]:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 6px 16px rgba(0,0,0,.4)}.ytomo-status-fab[data-v-6a1f136a]:active:not(:disabled){transform:translateY(0)}.ytomo-status-fab[data-v-6a1f136a]:focus{outline:none}.ytomo-reservation-fab[data-v-6a1f136a]{position:fixed;bottom:20px;right:20px;width:56px;height:56px;background:linear-gradient(135deg, #2c5aa0 0%, #1a365d 100%);border:none;border-radius:28px;color:#fff;font-size:24px;cursor:pointer;box-shadow:0 4px 16px rgba(44,90,160,.3);transition:all .3s ease;z-index:1000;display:flex;align-items:center;justify-content:center}.ytomo-reservation-fab .ytomo-count-badge[data-v-6a1f136a]{position:absolute;top:-8px;right:-8px;background:#f44;color:#fff;border-radius:10px;padding:2px 6px;font-size:10px;font-weight:bold;min-width:16px;text-align:center;line-height:1.2;pointer-events:none;z-index:10}.ytomo-reservation-fab[data-v-6a1f136a]:hover:not(:disabled){background:linear-gradient(135deg, #1a365d 0%, #2c5aa0 100%);transform:translateY(-2px);box-shadow:0 6px 20px rgba(44,90,160,.4)}.ytomo-reservation-fab[data-v-6a1f136a]:active:not(:disabled){transform:translateY(0);box-shadow:0 2px 8px rgba(44,90,160,.3)}.ytomo-reservation-fab[data-v-6a1f136a]:disabled{background:#94a3b8;cursor:not-allowed;box-shadow:0 2px 8px rgba(148,163,184,.3);opacity:.8;display:flex}.ytomo-reservation-fab[data-v-6a1f136a]:focus{outline:none}.ytomo-endless-toggle[data-v-6a1f136a]{position:fixed;bottom:96px;right:20px;width:40px;height:32px;background:#6b7280;border:none;border-radius:16px;color:#fff;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.3);transition:all .2s ease;z-index:998;display:flex;align-items:center;justify-content:center}.ytomo-endless-toggle.active[data-v-6a1f136a]{background:#ff8c00;box-shadow:0 2px 8px rgba(255,140,0,.4)}.ytomo-endless-toggle[data-v-6a1f136a]:hover{transform:translateY(-1px);box-shadow:0 4px 12px rgba(0,0,0,.4)}.ytomo-endless-toggle[data-v-6a1f136a]:active{transform:translateY(0)}.ytomo-endless-toggle[data-v-6a1f136a]:focus{outline:none}.ytomo-button-separator[data-v-6a1f136a]{width:1px;height:32px;background:#d1d5db;margin:0 6px;align-self:center}.ytomo-pavilion-item[data-v-6a1f136a]{animation:slideIn-6a1f136a .2s ease-out}@keyframes slideIn-6a1f136a{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}.ytomo-time-slot-button.available[data-v-6a1f136a]:hover{animation:pulse-6a1f136a .6s ease-in-out}@keyframes pulse-6a1f136a{0%{transform:translateY(-1px)}50%{transform:translateY(-2px)}100%{transform:translateY(-1px)}}.ytomo-pavilion-tab input[data-v-6a1f136a]:focus{outline:none;border-color:#2c5aa0}.ytomo-pavilion-tab button[data-v-6a1f136a]:focus{outline:none}@media(prefers-reduced-motion: reduce){.ytomo-pavilion-item[data-v-6a1f136a],.ytomo-time-slot-button[data-v-6a1f136a],.ytomo-icon-button[data-v-6a1f136a],.ytomo-result-display[data-v-6a1f136a],.ytomo-time-slots[data-v-6a1f136a]{animation:none;transition:none}.ytomo-time-slot-button.available[data-v-6a1f136a]:hover{animation:none;transform:none}}@media(prefers-contrast: high){.ytomo-pavilion-item[data-v-6a1f136a]{border-bottom-width:2px}.ytomo-time-slot-button[data-v-6a1f136a]{border-width:2px}.ytomo-icon-button.active[data-v-6a1f136a]{border-width:3px}.ytomo-pavilion-tab input[data-v-6a1f136a]:focus,.ytomo-pavilion-tab button[data-v-6a1f136a]:focus{outline:3px solid #000}}.ytomo-processing-overlay[data-v-6a1f136a]{position:fixed;top:0;left:0;width:100%;height:100%;background-color:rgba(0,0,0,.7);display:flex;align-items:center;justify-content:center;z-index:10001;opacity:0;animation:fadeIn .2s ease-out forwards}.ytomo-processing-content[data-v-6a1f136a]{background:#fff;border-radius:12px;padding:32px;box-shadow:0 20px 60px rgba(0,0,0,.3);text-align:center;min-width:300px;transform:scale(0.9);animation:dialogAppear .2s ease-out forwards}.ytomo-processing-spinner[data-v-6a1f136a]{width:40px;height:40px;border:3px solid #e2e8f0;border-top-color:#2c5aa0;border-radius:50%;animation:spin-6a1f136a 1s linear infinite;margin:0 auto 16px}.ytomo-processing-message[data-v-6a1f136a]{margin:0 0 24px;color:#374151;font-size:16px;font-weight:500}.ytomo-cancel-button[data-v-6a1f136a]{background:#6b7280;color:#fff;border:none;padding:12px 24px;border-radius:6px;font-size:14px;cursor:pointer;transition:background-color .2s}.ytomo-cancel-button[data-v-6a1f136a]:hover{background:#4b5563}.ytomo-cancel-button[data-v-6a1f136a]:focus{outline:2px solid #2c5aa0;outline-offset:2px}@keyframes spin-6a1f136a{to{transform:rotate(360deg)}}@media(prefers-reduced-motion: reduce){.ytomo-processing-overlay[data-v-6a1f136a],.ytomo-processing-content[data-v-6a1f136a],.ytomo-processing-spinner[data-v-6a1f136a]{animation:none;transition:none}}`, ""]);
+___CSS_LOADER_EXPORT___.push([module.id, `.ytomo-sequential-overlay[data-v-d07463ac]{position:fixed;top:0;left:0;width:100%;height:100%;background-color:rgba(0,0,0,.8);display:flex;align-items:center;justify-content:center;z-index:10002;opacity:0;animation:fadeIn-d07463ac .2s ease-out forwards}.ytomo-sequential-content[data-v-d07463ac]{background:#fff;border-radius:12px;padding:32px;box-shadow:0 20px 60px rgba(0,0,0,.3);text-align:center;min-width:400px;max-width:500px;transform:scale(0.9);animation:dialogAppear-d07463ac .2s ease-out forwards}.ytomo-sequential-content h3[data-v-d07463ac]{margin:0 0 24px 0;color:#374151;font-size:20px;font-weight:600}.ytomo-sequential-settings[data-v-d07463ac]{margin-bottom:24px}.ytomo-sequential-settings .ytomo-mode-setting[data-v-d07463ac]{margin-bottom:16px}.ytomo-sequential-settings .ytomo-mode-setting label[data-v-d07463ac]{display:block;margin-bottom:8px;font-size:14px;font-weight:500;color:#374151}.ytomo-sequential-settings .ytomo-mode-buttons[data-v-d07463ac]{display:flex;gap:8px;justify-content:center}.ytomo-sequential-settings .ytomo-mode-button[data-v-d07463ac]{padding:8px 16px;border:1px solid #d1d5db;border-radius:6px;background:#fff;color:#374151;cursor:pointer;transition:all .2s;font-size:14px}.ytomo-sequential-settings .ytomo-mode-button[data-v-d07463ac]:hover{background:#f3f4f6;border-color:#9ca3af}.ytomo-sequential-settings .ytomo-mode-button.active[data-v-d07463ac]{background:#2c5aa0;border-color:#2c5aa0;color:#fff}.ytomo-sequential-settings .ytomo-mode-button[data-v-d07463ac]:focus{outline:none}.ytomo-sequential-settings .ytomo-interval-setting label[data-v-d07463ac]{display:block;margin-bottom:8px;font-size:14px;font-weight:500;color:#374151}.ytomo-sequential-settings .ytomo-interval-dropdown[data-v-d07463ac]{padding:8px 12px;border:1px solid #d1d5db;border-radius:6px;background:#fff;font-size:14px;min-width:120px}.ytomo-sequential-settings .ytomo-interval-dropdown[data-v-d07463ac]:focus{outline:none;border-color:#2c5aa0}.ytomo-sequential-progress[data-v-d07463ac]{margin-bottom:24px}.ytomo-sequential-progress .ytomo-sequential-current[data-v-d07463ac]{font-size:18px;font-weight:600;color:#2c5aa0;margin-bottom:8px}.ytomo-sequential-progress .ytomo-sequential-target[data-v-d07463ac]{font-size:14px;color:#374151;margin-bottom:4px}.ytomo-sequential-progress .ytomo-sequential-countdown[data-v-d07463ac]{font-size:16px;font-weight:500;color:#ef4444}.ytomo-cancel-button[data-v-d07463ac]{background:#6b7280;color:#fff;border:none;padding:12px 24px;border-radius:6px;font-size:14px;font-weight:500;cursor:pointer;transition:background-color .2s}.ytomo-cancel-button[data-v-d07463ac]:hover{background:#4b5563}.ytomo-cancel-button[data-v-d07463ac]:focus{outline:none}@keyframes fadeIn-d07463ac{to{opacity:1}}@keyframes dialogAppear-d07463ac{to{transform:scale(1)}}@media(prefers-reduced-motion: reduce){.ytomo-sequential-overlay[data-v-d07463ac],.ytomo-sequential-content[data-v-d07463ac]{animation:none;transition:none}}`, ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -34576,6 +34606,8 @@ ___CSS_LOADER_EXPORT___.push([module.id, `.ytomo-pavilion-tab[data-v-6a1f136a]{p
 /************************************************************************/
 var __webpack_exports__ = {};
 
+// EXTERNAL MODULE: ./ts/utils/logger.ts
+var utils_logger = __webpack_require__(911);
 // EXTERNAL MODULE: ./node_modules/style-loader/dist/runtime/injectStylesIntoStyleTag.js
 var injectStylesIntoStyleTag = __webpack_require__(72);
 var injectStylesIntoStyleTag_default = /*#__PURE__*/__webpack_require__.n(injectStylesIntoStyleTag);
@@ -34628,6 +34660,8 @@ var update = injectStylesIntoStyleTag_default()(main/* default */.A, options);
 // ============================================================================
 // スタイルのインポート
 
+
+const logger = utils_logger/* loggers */.C$.pavilions;
 // SCSSファイルからスタイルが自動的にインポートされるため、insert_style関数は不要
 // 検索ワードを正規表現に変換する関数
 // val_searchには以下の3種類に大別されるワードが含まれる
@@ -34739,11 +34773,11 @@ const init_page = () => {
         const scrollX = window.scrollX;
         const scrollY = window.scrollY;
         const arr_btn = document.querySelectorAll("button.style_more_btn__ymb22:not([disabled])");
-        console.log(`🔄 load_more_auto実行: もっと見るボタン${arr_btn.length}個`);
+        logger.info('load_more_auto実行', { buttonCount: arr_btn.length });
         if (arr_btn.length > 0) {
             // 件数変化をログ出力
             const beforeCounts = getItemCounts();
-            console.log(`📊 クリック前の件数: ${beforeCounts.visible}/${beforeCounts.total}`);
+            logger.debug('クリック前の件数', { visible: beforeCounts.visible, total: beforeCounts.total });
             arr_btn[0].click();
             // 件数表示を継続的に更新（読み込み速度に影響しない）
             const updateInterval = setInterval(() => {
@@ -34755,18 +34789,18 @@ const init_page = () => {
                 scrollTo(scrollX, scrollY);
                 // 件数変化をログ出力
                 const afterCounts = getItemCounts();
-                console.log(`📊 クリック後の件数: ${afterCounts.visible}/${afterCounts.total}`);
+                logger.debug('クリック後の件数', { visible: afterCounts.visible, total: afterCounts.total });
                 // 次の読み込みを即座に実行
                 clearInterval(updateInterval);
                 load_more_auto();
             }, 500);
         }
         else {
-            console.log(`✅ load_more_auto完了: もっと見るボタンがありません`);
+            logger.info('load_more_auto完了: もっと見るボタンがありません');
             // 完了時にも件数表示を更新
             if (window.updatePavilionCounts) {
                 window.updatePavilionCounts();
-                console.log(`📊 完了時の件数表示を更新`);
+                logger.debug('完了時の件数表示を更新');
             }
         }
     };
@@ -34806,9 +34840,9 @@ const init_page = () => {
         // 全ての「もっと見る」ボタンをチェック（disabled含む）
         const allMoreButtons = document.querySelectorAll("button.style_more_btn__ymb22");
         const enabledMoreButtons = document.querySelectorAll("button.style_more_btn__ymb22:not([disabled])");
-        console.log(`🔍 もっと見るボタンチェック: 全体${allMoreButtons.length}個, 有効${enabledMoreButtons.length}個`);
+        logger.debug('もっと見るボタンチェック', { total: allMoreButtons.length, enabled: enabledMoreButtons.length });
         allMoreButtons.forEach((btn, index) => {
-            console.log(`  ボタン${index + 1}: disabled=${btn.hasAttribute('disabled')}, text="${btn.textContent?.trim()}"`);
+            logger.debug('ボタン詳細', { index: index + 1, disabled: btn.hasAttribute('disabled'), text: btn.textContent?.trim() });
         });
         // 有効な「もっと見る」ボタンがある場合のみtrue
         return enabledMoreButtons.length > 0;
@@ -34821,7 +34855,7 @@ const init_page = () => {
         // 状態が変化した時のみログ出力
         const currentState = { hasMore, isLoading, buttonCount: loadAllButtons.length };
         if (JSON.stringify(currentState) !== JSON.stringify(updateLoadAllButtonState.lastState)) {
-            console.log(`🔧 すべて読み込みボタン状態更新: もっと見るボタン=${hasMore ? 'あり' : 'なし'}, 実行中=${isLoading}`);
+            logger.debug('すべて読み込みボタン状態更新', { hasMore, isLoading });
             updateLoadAllButtonState.lastState = currentState;
         }
         loadAllButtons.forEach((btn) => {
@@ -34887,7 +34921,7 @@ const init_page = () => {
             const newText = `${counts.visible}/${counts.total}`;
             // 件数が変化した時のみログ出力
             if (countsText.innerText !== newText) {
-                console.log(`📊 件数表示更新: ${newText}`);
+                logger.debug('件数表示更新', { newText });
                 countsText.innerText = newText;
             }
             // 「空きのみ」ボタンのテキストも更新
@@ -34949,7 +34983,7 @@ const init_page = () => {
                     mutation.target instanceof Element &&
                     mutation.target.classList.contains('style_more_btn__ymb22')) {
                     shouldUpdate = true;
-                    console.log('📍 もっと見るボタンのdisabled属性変化を検知');
+                    logger.debug('もっと見るボタンのdisabled属性変化を検知');
                 }
                 // 新しい「もっと見る」ボタンの追加/削除を検知
                 if (mutation.type === 'childList') {
@@ -35478,6 +35512,112 @@ async function clickElement(element, config) {
 
 // EXTERNAL MODULE: ./ts/modules/entrance-page-state.ts
 var entrance_page_state = __webpack_require__(241);
+;// ./ts/modules/cache-manager.ts
+
+const cache_manager_logger = utils_logger/* loggers */.C$.automation;
+// ============================================================================
+// キャッシュ管理機能
+const createCacheManager = (_dependencies = {}) => {
+    return {
+        // キー生成（URLベース）
+        generateKey(suffix = '') {
+            const url = new URL(window.location.href);
+            const baseKey = `expo2025_entrance_${url.searchParams.get('reserve_id') || 'default'}`;
+            return suffix ? `${baseKey}_${suffix}` : baseKey;
+        },
+        // 空の保存処理
+        saveTargetSlots() {
+            return;
+        },
+        // 後方互換性のため残す
+        saveTargetSlot(_slotInfo) {
+            this.saveTargetSlots();
+        },
+        // キャッシュ時間帯を読み込み
+        loadTargetSlot() {
+            try {
+                const data = localStorage.getItem(this.generateKey('target_slot'));
+                if (!data)
+                    return null;
+                const parsed = JSON.parse(data);
+                // 24時間以内のデータのみ有効
+                if (Date.now() - parsed.timestamp > 24 * 60 * 60 * 1000) {
+                    this.clearTargetSlot();
+                    return null;
+                }
+                cache_manager_logger.debug('キャッシュから時間帯を読み込み', { timeSlot: parsed.timeSlot });
+                return parsed;
+            }
+            catch (error) {
+                cache_manager_logger.error('キャッシュ読み込みエラー', { error });
+                return null;
+            }
+        },
+        // 複数キャッシュを読み込み（後方互換性あり）
+        loadTargetSlots() {
+            try {
+                // 新形式の複数キャッシュを確認
+                const newData = localStorage.getItem(this.generateKey('target_slots'));
+                if (newData) {
+                    const parsed = JSON.parse(newData);
+                    // 24時間以内のデータのみ有効
+                    if (Date.now() - parsed.timestamp > 24 * 60 * 60 * 1000) {
+                        this.clearTargetSlots();
+                        return null;
+                    }
+                    const targetTexts = parsed.targets?.map((t) => t.timeSlot).join(', ') || '不明';
+                    cache_manager_logger.debug('複数キャッシュを読み込み', { targetTexts, count: parsed.targets?.length || 0 });
+                    return parsed;
+                }
+                // 後方互換性：古い単一キャッシュを確認
+                const oldData = this.loadTargetSlot();
+                if (oldData) {
+                    cache_manager_logger.debug('単一キャッシュを複数形式に変換中');
+                    return {
+                        targets: [oldData],
+                        selectedDate: oldData.selectedDate,
+                        timestamp: oldData.timestamp,
+                        url: oldData.url,
+                        retryCount: oldData.retryCount
+                    };
+                }
+                return null;
+            }
+            catch (error) {
+                cache_manager_logger.error('複数キャッシュ読み込みエラー', { error });
+                return null;
+            }
+        },
+        // 複数キャッシュをクリア
+        clearTargetSlots() {
+            try {
+                localStorage.removeItem(this.generateKey('target_slots'));
+                localStorage.removeItem(this.generateKey('target_slot')); // 古い形式もクリア
+                cache_manager_logger.debug('複数キャッシュをクリア');
+            }
+            catch (error) {
+                cache_manager_logger.error('複数キャッシュクリアエラー', { error });
+            }
+        },
+        // 後方互換性のため残す
+        clearTargetSlot() {
+            this.clearTargetSlots();
+        },
+        // 試行回数を更新
+        updateRetryCount(count) {
+            const cached = this.loadTargetSlot();
+            if (cached) {
+                cached.retryCount = count;
+                cached.timestamp = Date.now();
+                localStorage.setItem(this.generateKey('target_slot'), JSON.stringify(cached));
+            }
+        },
+    };
+}; // createCacheManager の終了
+// エクスポート
+
+// ============================================================================
+
 // EXTERNAL MODULE: ./ts/modules/entrance-page-dom-utils.ts
 var entrance_page_dom_utils = __webpack_require__(484);
 // EXTERNAL MODULE: ./ts/modules/entrance-page-core.ts
@@ -35550,110 +35690,6 @@ const init_entrance_page = (dependencies = {}) => {
     console.log("入場予約機能の初期化完了");
 };
 
-;// ./ts/modules/cache-manager.ts
-// ============================================================================
-// キャッシュ管理機能
-const createCacheManager = (_dependencies = {}) => {
-    return {
-        // キー生成（URLベース）
-        generateKey(suffix = '') {
-            const url = new URL(window.location.href);
-            const baseKey = `expo2025_entrance_${url.searchParams.get('reserve_id') || 'default'}`;
-            return suffix ? `${baseKey}_${suffix}` : baseKey;
-        },
-        // 空の保存処理
-        saveTargetSlots() {
-            return;
-        },
-        // 後方互換性のため残す
-        saveTargetSlot(_slotInfo) {
-            this.saveTargetSlots();
-        },
-        // キャッシュ時間帯を読み込み
-        loadTargetSlot() {
-            try {
-                const data = localStorage.getItem(this.generateKey('target_slot'));
-                if (!data)
-                    return null;
-                const parsed = JSON.parse(data);
-                // 24時間以内のデータのみ有効
-                if (Date.now() - parsed.timestamp > 24 * 60 * 60 * 1000) {
-                    this.clearTargetSlot();
-                    return null;
-                }
-                console.log('📖 キャッシュから時間帯を読み込み:', parsed.timeSlot);
-                return parsed;
-            }
-            catch (error) {
-                console.error('❌ キャッシュ読み込みエラー:', error);
-                return null;
-            }
-        },
-        // 複数キャッシュを読み込み（後方互換性あり）
-        loadTargetSlots() {
-            try {
-                // 新形式の複数キャッシュを確認
-                const newData = localStorage.getItem(this.generateKey('target_slots'));
-                if (newData) {
-                    const parsed = JSON.parse(newData);
-                    // 24時間以内のデータのみ有効
-                    if (Date.now() - parsed.timestamp > 24 * 60 * 60 * 1000) {
-                        this.clearTargetSlots();
-                        return null;
-                    }
-                    const targetTexts = parsed.targets?.map((t) => t.timeSlot).join(', ') || '不明';
-                    console.log(`📖 複数キャッシュを読み込み: ${targetTexts} (${parsed.targets?.length || 0}個)`);
-                    return parsed;
-                }
-                // 後方互換性：古い単一キャッシュを確認
-                const oldData = this.loadTargetSlot();
-                if (oldData) {
-                    console.log('📖 単一キャッシュを複数形式に変換中...');
-                    return {
-                        targets: [oldData],
-                        selectedDate: oldData.selectedDate,
-                        timestamp: oldData.timestamp,
-                        url: oldData.url,
-                        retryCount: oldData.retryCount
-                    };
-                }
-                return null;
-            }
-            catch (error) {
-                console.error('❌ 複数キャッシュ読み込みエラー:', error);
-                return null;
-            }
-        },
-        // 複数キャッシュをクリア
-        clearTargetSlots() {
-            try {
-                localStorage.removeItem(this.generateKey('target_slots'));
-                localStorage.removeItem(this.generateKey('target_slot')); // 古い形式もクリア
-                console.log('🗑️ 複数キャッシュをクリア');
-            }
-            catch (error) {
-                console.error('❌ 複数キャッシュクリアエラー:', error);
-            }
-        },
-        // 後方互換性のため残す
-        clearTargetSlot() {
-            this.clearTargetSlots();
-        },
-        // 試行回数を更新
-        updateRetryCount(count) {
-            const cached = this.loadTargetSlot();
-            if (cached) {
-                cached.retryCount = count;
-                cached.timestamp = Date.now();
-                localStorage.setItem(this.generateKey('target_slot'), JSON.stringify(cached));
-            }
-        },
-    };
-}; // createCacheManager の終了
-// エクスポート
-
-// ============================================================================
-
 // EXTERNAL MODULE: ./ts/modules/processing-overlay.ts
 var processing_overlay = __webpack_require__(385);
 ;// ./ts/modules/companion-ticket-page.ts
@@ -35665,6 +35701,8 @@ var processing_overlay = __webpack_require__(385);
 // - FABダイアログによる一括操作
 // - 同行者追加画面での自動処理
 
+
+const companion_ticket_page_logger = utils_logger/* loggers */.C$.tickets;
 // URL検出と画面判定
 function isTicketSelectionPage() {
     return window.location.href.includes('ticket_selection');
@@ -35684,10 +35722,10 @@ function getAlreadyAddedTicketIds() {
                 addedTicketIds.add(ticketId);
             }
         });
-        console.log(`🔍 画面で検出された追加済みチケットID: ${Array.from(addedTicketIds).join(', ')}`);
+        companion_ticket_page_logger.info('画面で検出された追加済みチケットID', { ticketIds: Array.from(addedTicketIds) });
     }
     catch (error) {
-        console.error('追加済みチケットID検出エラー:', error);
+        companion_ticket_page_logger.error('追加済みチケットID検出エラー', error);
     }
     return addedTicketIds;
 }
@@ -35702,11 +35740,11 @@ class CompanionTicketManager {
             const stored = localStorage.getItem(CompanionTicketManager.STORAGE_KEY);
             if (stored) {
                 this.ticketIds = JSON.parse(stored);
-                console.log(`✅ 保存済みチケットID ${this.ticketIds.length}件を読み込みました`);
+                companion_ticket_page_logger.info('保存済みチケットID読み込み完了', { count: this.ticketIds.length });
             }
         }
         catch (error) {
-            console.warn('チケットIDの読み込みに失敗:', error);
+            companion_ticket_page_logger.warn('チケットIDの読み込みに失敗', error);
             this.ticketIds = [];
         }
     }
@@ -35716,7 +35754,7 @@ class CompanionTicketManager {
             localStorage.setItem(CompanionTicketManager.STORAGE_KEY, JSON.stringify(this.ticketIds));
         }
         catch (error) {
-            console.error('チケットIDの保存に失敗:', error);
+            companion_ticket_page_logger.error('チケットIDの保存に失敗', error);
         }
     }
     // チケットID追加
@@ -35725,7 +35763,7 @@ class CompanionTicketManager {
             return false;
         // 重複チェック
         if (this.ticketIds.some(ticket => ticket.id === id)) {
-            console.log(`チケットID ${id} は既に登録済みです`);
+            companion_ticket_page_logger.warn('チケットIDは既に登録済み', { id });
             return false;
         }
         const now = Date.now();
@@ -35743,7 +35781,7 @@ class CompanionTicketManager {
         };
         this.ticketIds.unshift(newTicket); // 先頭に追加（最新順）
         this.saveTicketIds();
-        console.log(`✅ チケットID "${id}" を追加しました`);
+        companion_ticket_page_logger.info('チケットID追加完了', { id });
         return true;
     }
     // チケットID削除
@@ -35752,7 +35790,7 @@ class CompanionTicketManager {
         this.ticketIds = this.ticketIds.filter(ticket => ticket.id !== id);
         if (this.ticketIds.length < initialLength) {
             this.saveTicketIds();
-            console.log(`🗑️ チケットID "${id}" を削除しました`);
+            companion_ticket_page_logger.info('チケットID削除完了', { id });
             return true;
         }
         return false;
@@ -35773,7 +35811,7 @@ class CompanionTicketManager {
     clearAll() {
         this.ticketIds = [];
         localStorage.removeItem(CompanionTicketManager.STORAGE_KEY);
-        console.log('🧹 全チケットIDをクリアしました');
+        companion_ticket_page_logger.info('全チケットIDをクリアしました');
     }
 }
 CompanionTicketManager.STORAGE_KEY = 'ytomo-companion-tickets';
@@ -35793,7 +35831,7 @@ class CompanionProcessManager {
     // 処理開始
     startProcess(ticketIds) {
         if (this.state.isRunning) {
-            console.warn('同行者追加処理は既に実行中です');
+            companion_ticket_page_logger.warn('同行者追加処理は既に実行中です');
             return;
         }
         this.state = {
@@ -35803,7 +35841,7 @@ class CompanionProcessManager {
             errorCount: 0,
             errors: []
         };
-        console.log(`🚀 同行者追加処理開始: ${ticketIds.length}件のチケットID`);
+        companion_ticket_page_logger.info('同行者追加処理開始', { ticketCount: ticketIds.length });
         // 同行者処理用オーバーレイを表示
         processing_overlay/* processingOverlay */.O.show('companion');
         this.processNext();
@@ -35812,7 +35850,7 @@ class CompanionProcessManager {
     async processNext() {
         // 中断チェック
         if (!this.state.isRunning) {
-            console.log('🛑 処理が中断されたため、次の処理をスキップします');
+            companion_ticket_page_logger.warn('処理が中断されたため、次の処理をスキップ');
             return;
         }
         if (this.state.queuedTicketIds.length === 0) {
@@ -37960,7 +37998,9 @@ if (typeof window !== 'undefined') {
  */
 
 
+
 const useMainDialogStore = (0,pinia/* defineStore */.nY)('mainDialog', () => {
+    const logger = utils_logger/* loggers */.C$.ui;
     // State - 初期化時に強制的にfalseに設定（永続化の問題を回避）
     const isVisible = (0,vue_esm_bundler/* ref */.KR)(false);
     const activeTab = (0,vue_esm_bundler/* ref */.KR)('ticket');
@@ -37984,7 +38024,7 @@ const useMainDialogStore = (0,pinia/* defineStore */.nY)('mainDialog', () => {
     };
     const toggleEndlessMode = () => {
         endlessMode.value = !endlessMode.value;
-        console.log(`🔄 ENDLESSモード: ${endlessMode.value ? 'ON' : 'OFF'}`);
+        logger.info('ENDLESSモード切り替え', { enabled: endlessMode.value });
     };
     // 入場日時選択は各scheduleのselectedフラグで管理するため、ここでは削除
     return {
@@ -38107,8 +38147,10 @@ var pavilionReservationMapping = __webpack_require__(579);
  */
 
 
+
 const useTickets = () => {
     const ticketsStore = (0,tickets.useTicketsStore)();
+    const logger = utils_logger/* loggers */.C$.tickets;
     // Computed properties
     const allTickets = (0,vue_esm_bundler/* computed */.EW)(() => ticketsStore.ticketsArray);
     const selectedTickets = (0,vue_esm_bundler/* computed */.EW)(() => ticketsStore.selectedTickets);
@@ -38123,12 +38165,12 @@ const useTickets = () => {
     };
     const addTicket = async (ticketId, label = '', channel = 4) => {
         try {
-            console.log(`✅ チケット追加: ${ticketId} (channel: ${channel})`);
+            logger.info('チケット追加', { ticketId, channel });
             // チケット一覧を再読み込み
             await loadAllTickets();
         }
         catch (error) {
-            console.error('❌ チケット追加エラー:', error);
+            logger.error('チケット追加エラー', error);
             throw error;
         }
     };
@@ -38148,7 +38190,7 @@ const useTickets = () => {
             return cachedDate;
         }
         catch (error) {
-            console.warn('入場選択キャッシュ復元エラー:', error);
+            logger.warn('入場選択キャッシュ復元エラー', error);
             return null;
         }
     };
@@ -38157,11 +38199,11 @@ const useTickets = () => {
             localStorage.setItem('ytomo_entrance_selection', date);
         }
         catch (error) {
-            console.warn('入場選択キャッシュ保存エラー:', error);
+            logger.warn('入場選択キャッシュ保存エラー', error);
         }
     };
     const loadFavoriteTickets = async () => {
-        console.log('⭐ お気に入りチケット読み込み開始');
+        logger.info('お気に入りチケット読み込み開始');
         await loadAllTickets();
     };
     return {
@@ -38887,10 +38929,13 @@ const _hoisted_26 = {
 
 
 
-// Store アクセス
+
+// Logger setup
 /* harmony default export */ const PavilionTabvue_type_script_setup_true_lang_ts = (/*@__PURE__*/(0,vue_esm_bundler/* defineComponent */.pM)({
     __name: 'PavilionTab',
     setup(__props) {
+        const logger = utils_logger/* loggers */.C$.ui;
+        // Store アクセス
         const pavilionsStore = (0,pavilions.usePavilionsStore)();
         const ticketsStore = (0,tickets.useTicketsStore)();
         const mainDialogStore = useMainDialogStore();
@@ -38923,7 +38968,7 @@ const _hoisted_26 = {
         // 選択された入場予約のうち、最も遅い入場時刻+10分を取得（HH:MM形式）
         const getLatestEntranceTime = () => {
             if (selectedSchedules.value.length === 0) {
-                console.log('⏰ 選択された入場予約なし');
+                logger.debug('選択された入場予約なし');
                 return '';
             }
             // 各スケジュールの日時文字列を比較可能な形式に変換して最新を取得
@@ -38991,7 +39036,7 @@ const _hoisted_26 = {
         // メソッド
         const handlePavilionSearch = async () => {
             try {
-                console.log('🔍 パビリオン検索:', searchInput.value);
+                logger.info('パビリオン検索開始', { query: searchInput.value });
                 showProcessingOverlay('パビリオンを検索中...');
                 // 選択されたチケットIDsを取得
                 const selectedTickets = ticketsStore.ticketsArray.filter(ticket => ticket.schedules?.some(schedule => schedule.selected));
@@ -39001,9 +39046,9 @@ const _hoisted_26 = {
                 // 入場予約から正しいパビリオン予約種類を取得
                 const pavilionReservationInfo = ticketsStore.selectedPavilionReservationInfo;
                 const registeredChannel = pavilionReservationInfo?.activeChannel || '4'; // デフォルトはfast
-                console.log('🎫 検索パラメータ:', {
+                logger.info('検索パラメータ', {
                     query: searchInput.value.trim(),
-                    ticketIds,
+                    ticketIds: ticketIds.length,
                     entranceDate,
                     registeredChannel
                 });
@@ -39012,19 +39057,19 @@ const _hoisted_26 = {
                 // 検索直後は空きのみフィルタを自動ON（旧仕様に合わせる）
                 if (!isAvailableOnlyFilter.value) {
                     toggleAvailableOnlyFilter();
-                    console.log('📂 検索後に空きのみフィルター自動ON');
+                    logger.info('検索後に空きのみフィルター自動ON');
                 }
-                console.log(`✅ パビリオン検索完了: ${results.length}件`);
+                logger.info('パビリオン検索完了', { count: results.length });
                 hideProcessingOverlay();
             }
             catch (error) {
-                console.error('❌ パビリオン検索エラー:', error);
+                logger.error('パビリオン検索エラー', error);
                 hideProcessingOverlay();
             }
         };
         const handleLoadFavorites = async () => {
             try {
-                console.log('⭐ お気に入り読み込み');
+                logger.info('お気に入り読み込み開始');
                 showProcessingOverlay('お気に入りを読み込み中...');
                 // 選択されたチケットIDsを取得
                 const selectedTickets = ticketsStore.ticketsArray.filter(ticket => ticket.schedules?.some(schedule => schedule.selected));
@@ -39035,25 +39080,27 @@ const _hoisted_26 = {
                 // お気に入り読み込み後はフィルターをOFFにして全て表示
                 if (isAvailableOnlyFilter.value) {
                     toggleAvailableOnlyFilter();
-                    console.log('📂 お気に入り読み込み後にフィルターOFF');
+                    logger.info('お気に入り読み込み後にフィルターOFF');
                 }
-                console.log(`✅ お気に入り読み込み完了: ${results.length}件`);
-                console.log('🔍 現在の表示パビリオン数:', allPavilions.value.length);
-                console.log('🔍 お気に入りパビリオン:', results.map(p => p.name));
+                logger.info('お気に入り読み込み完了', {
+                    loadedCount: results.length,
+                    displayCount: allPavilions.value.length,
+                    favoriteNames: results.map(p => p.name)
+                });
                 hideProcessingOverlay();
             }
             catch (error) {
-                console.error('❌ お気に入り読み込みエラー:', error);
+                logger.error('お気に入り読み込みエラー', error);
                 hideProcessingOverlay();
             }
         };
         const handleToggleAvailableOnlyFilter = () => {
             toggleAvailableOnlyFilter();
-            console.log('🔍 空きのみフィルター:', isAvailableOnlyFilter.value ? 'ON' : 'OFF');
+            logger.info('空きのみフィルター切り替え', { enabled: isAvailableOnlyFilter.value });
         };
         const handleRefresh = async () => {
             try {
-                console.log('🔄 データ更新（選択リセットなし）');
+                logger.info('データ更新開始（選択リセットなし）');
                 showProcessingOverlay('パビリオン情報を更新中...');
                 // 選択されたチケットIDsを取得
                 const selectedTickets = ticketsStore.ticketsArray.filter(ticket => ticket.schedules?.some(schedule => schedule.selected));
@@ -39064,18 +39111,18 @@ const _hoisted_26 = {
                 hideProcessingOverlay();
             }
             catch (error) {
-                console.error('❌ データ更新エラー:', error);
+                logger.error('データ更新エラー', error);
                 hideProcessingOverlay();
             }
         };
         // オーバーレイ制御（ストア連携）
         const showProcessingOverlay = (message) => {
             overlaysStore.showProcessingOverlay(message);
-            console.log(`🛡️ 誤操作防止オーバーレイ表示: ${message}`);
+            logger.debug('誤操作防止オーバーレイ表示', { message });
         };
         const hideProcessingOverlay = () => {
             overlaysStore.hideProcessingOverlay();
-            console.log('🛡️ 誤操作防止オーバーレイ非表示');
+            logger.debug('誤操作防止オーバーレイ非表示');
         };
         // お気に入り状態をリアクティブに判定
         const isFavorite = (pavilionId) => {
@@ -39084,11 +39131,11 @@ const _hoisted_26 = {
         const toggleFavorite = (pavilion) => {
             if (isFavorite(pavilion.id)) {
                 removeFromFavorites(pavilion.id);
-                console.log(`⭐ お気に入り削除:`, pavilion.name);
+                logger.info('お気に入り削除', { pavilionName: pavilion.name });
             }
             else {
                 addToFavorites(pavilion.id, pavilion.name);
-                console.log(`⭐ お気に入り追加:`, pavilion.name);
+                logger.info('お気に入り追加', { pavilionName: pavilion.name });
             }
         };
         const getFilteredTimeSlots = (pavilion) => {
@@ -39121,17 +39168,17 @@ const _hoisted_26 = {
                 return;
             // 満員時間帯でも選択可能（監視機能のため）
             if (!timeSlot.available) {
-                console.log('🔴 満員時間帯クリック（選択）:', { pavilionId, timeSlot });
+                logger.info('満員時間帯クリック（選択）', { pavilionId, timeSlot: timeSlot.time });
             }
             else {
-                console.log('🟢 空き時間帯クリック（選択）:', { pavilionId, timeSlot });
+                logger.info('空き時間帯クリック（選択）', { pavilionId, timeSlot: timeSlot.time });
             }
             // 空き時間帯クリック → 選択状態を切り替え
             const isSelected = isTimeSlotSelected(pavilionId, timeSlot.time);
             if (isSelected) {
                 // 選択解除
                 removeSelectedTimeSlot(pavilionId, timeSlot.time);
-                console.log('🟡 時間帯選択解除:', { pavilionName: pavilion.name, timeSlot: timeSlot.time });
+                logger.info('時間帯選択解除', { pavilionName: pavilion.name, timeSlot: timeSlot.time });
             }
             else {
                 // 選択追加
@@ -39146,16 +39193,16 @@ const _hoisted_26 = {
                     entranceDate: selectedEntranceDate.value || ''
                 };
                 addSelectedTimeSlot(selection);
-                console.log('🟢 時間帯選択追加:', { pavilionName: pavilion.name, timeSlot: timeSlot.time });
+                logger.info('時間帯選択追加', { pavilionName: pavilion.name, timeSlot: timeSlot.time });
             }
         };
         const handleReservationExecution = async () => {
             if (selectedSlotsCount.value === 0) {
-                console.log('⚠️ 選択された時間帯なし');
+                logger.warn('選択された時間帯なし');
                 return;
             }
             try {
-                console.log('📋 予約実行開始:', selectedSlotsCount.value, '件');
+                logger.info('予約実行開始', { selectedCount: selectedSlotsCount.value });
                 // 順次予約オーバーレイを表示
                 overlaysStore.showSequentialOverlay(selectedSlotsCount.value);
                 const selectedSlots = pavilionsStore.selectedTimeSlots;
@@ -39181,11 +39228,24 @@ const _hoisted_26 = {
                 // 成功した予約数をカウント
                 const successCount = results.filter(r => r.success).length;
                 const failureCount = results.length - successCount;
-                console.log(`📋 予約実行完了: 成功${successCount}件, 失敗${failureCount}件`);
+                logger.info('予約実行完了', { successCount, failureCount });
                 // 結果詳細をログ出力
                 results.forEach(result => {
                     if (result.details) {
-                        console.log(`  ${result.success ? '✅' : '❌'} ${result.details.pavilionName} ${result.details.timeSlot}: ${result.message}`);
+                        if (result.success) {
+                            logger.info('予約成功', {
+                                pavilionName: result.details.pavilionName,
+                                timeSlot: result.details.timeSlot,
+                                message: result.message
+                            });
+                        }
+                        else {
+                            logger.warn('予約失敗', {
+                                pavilionName: result.details.pavilionName,
+                                timeSlot: result.details.timeSlot,
+                                message: result.message
+                            });
+                        }
                     }
                 });
                 hideProcessingOverlay();
@@ -39210,7 +39270,7 @@ const _hoisted_26 = {
                 }
             }
             catch (error) {
-                console.error('❌ 予約実行エラー:', error);
+                logger.error('予約実行エラー', error);
                 overlaysStore.hideSequentialOverlay();
             }
         };
@@ -39238,7 +39298,7 @@ const _hoisted_26 = {
             // デバッグログ
             const isDisabled = slotStartTime <= latestEntranceTime;
             if (isDisabled) {
-                console.log(`⏰ 時間帯disabled: ${slotStartTime} <= ${latestEntranceTime}`);
+                logger.debug('時間帯disabled', { slotStartTime, latestEntranceTime });
             }
             // 時間比較（HH:MM形式で辞書順比較）
             return isDisabled;
@@ -39258,11 +39318,11 @@ const _hoisted_26 = {
         };
         // ライフサイクル
         (0,vue_esm_bundler/* onMounted */.sV)(() => {
-            console.log('🏛️ PavilionTab mounted');
+            logger.info('PavilionTab mounted');
             // ストア初期化はページ読み込み時に行済み
         });
         (0,vue_esm_bundler/* onUnmounted */.hi)(() => {
-            console.log('🗑️ PavilionTab unmounted');
+            logger.info('PavilionTab unmounted');
         });
         return (_ctx, _cache) => {
             return ((0,vue_esm_bundler/* openBlock */.uX)(), (0,vue_esm_bundler/* createElementBlock */.CE)("div", PavilionTabvue_type_script_setup_true_lang_ts_hoisted_1, [
@@ -39430,9 +39490,9 @@ const _hoisted_26 = {
 
 ;// ./ts/components/PavilionTab.vue?vue&type=script&setup=true&lang=ts
  
-// EXTERNAL MODULE: ./node_modules/css-loader/dist/cjs.js!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/sass-loader/dist/cjs.js!./node_modules/vue-loader/dist/index.js??ruleSet[1].rules[8].use[0]!./ts/components/PavilionTab.vue?vue&type=style&index=0&id=6a1f136a&scoped=true&lang=scss
-var PavilionTabvue_type_style_index_0_id_6a1f136a_scoped_true_lang_scss = __webpack_require__(919);
-;// ./node_modules/style-loader/dist/cjs.js!./node_modules/css-loader/dist/cjs.js!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/sass-loader/dist/cjs.js!./node_modules/vue-loader/dist/index.js??ruleSet[1].rules[8].use[0]!./ts/components/PavilionTab.vue?vue&type=style&index=0&id=6a1f136a&scoped=true&lang=scss
+// EXTERNAL MODULE: ./node_modules/css-loader/dist/cjs.js!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/sass-loader/dist/cjs.js!./node_modules/vue-loader/dist/index.js??ruleSet[1].rules[8].use[0]!./ts/components/PavilionTab.vue?vue&type=style&index=0&id=1573fbb0&scoped=true&lang=scss
+var PavilionTabvue_type_style_index_0_id_1573fbb0_scoped_true_lang_scss = __webpack_require__(500);
+;// ./node_modules/style-loader/dist/cjs.js!./node_modules/css-loader/dist/cjs.js!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/sass-loader/dist/cjs.js!./node_modules/vue-loader/dist/index.js??ruleSet[1].rules[8].use[0]!./ts/components/PavilionTab.vue?vue&type=style&index=0&id=1573fbb0&scoped=true&lang=scss
 
       
       
@@ -39444,22 +39504,22 @@ var PavilionTabvue_type_style_index_0_id_6a1f136a_scoped_true_lang_scss = __webp
       
       
 
-var PavilionTabvue_type_style_index_0_id_6a1f136a_scoped_true_lang_scss_options = {};
+var PavilionTabvue_type_style_index_0_id_1573fbb0_scoped_true_lang_scss_options = {};
 
-PavilionTabvue_type_style_index_0_id_6a1f136a_scoped_true_lang_scss_options.styleTagTransform = (styleTagTransform_default());
-PavilionTabvue_type_style_index_0_id_6a1f136a_scoped_true_lang_scss_options.setAttributes = (setAttributesWithoutAttributes_default());
-PavilionTabvue_type_style_index_0_id_6a1f136a_scoped_true_lang_scss_options.insert = insertBySelector_default().bind(null, "head");
-PavilionTabvue_type_style_index_0_id_6a1f136a_scoped_true_lang_scss_options.domAPI = (styleDomAPI_default());
-PavilionTabvue_type_style_index_0_id_6a1f136a_scoped_true_lang_scss_options.insertStyleElement = (insertStyleElement_default());
+PavilionTabvue_type_style_index_0_id_1573fbb0_scoped_true_lang_scss_options.styleTagTransform = (styleTagTransform_default());
+PavilionTabvue_type_style_index_0_id_1573fbb0_scoped_true_lang_scss_options.setAttributes = (setAttributesWithoutAttributes_default());
+PavilionTabvue_type_style_index_0_id_1573fbb0_scoped_true_lang_scss_options.insert = insertBySelector_default().bind(null, "head");
+PavilionTabvue_type_style_index_0_id_1573fbb0_scoped_true_lang_scss_options.domAPI = (styleDomAPI_default());
+PavilionTabvue_type_style_index_0_id_1573fbb0_scoped_true_lang_scss_options.insertStyleElement = (insertStyleElement_default());
 
-var PavilionTabvue_type_style_index_0_id_6a1f136a_scoped_true_lang_scss_update = injectStylesIntoStyleTag_default()(PavilionTabvue_type_style_index_0_id_6a1f136a_scoped_true_lang_scss/* default */.A, PavilionTabvue_type_style_index_0_id_6a1f136a_scoped_true_lang_scss_options);
-
-
+var PavilionTabvue_type_style_index_0_id_1573fbb0_scoped_true_lang_scss_update = injectStylesIntoStyleTag_default()(PavilionTabvue_type_style_index_0_id_1573fbb0_scoped_true_lang_scss/* default */.A, PavilionTabvue_type_style_index_0_id_1573fbb0_scoped_true_lang_scss_options);
 
 
-       /* harmony default export */ const components_PavilionTabvue_type_style_index_0_id_6a1f136a_scoped_true_lang_scss = (PavilionTabvue_type_style_index_0_id_6a1f136a_scoped_true_lang_scss/* default */.A && PavilionTabvue_type_style_index_0_id_6a1f136a_scoped_true_lang_scss/* default */.A.locals ? PavilionTabvue_type_style_index_0_id_6a1f136a_scoped_true_lang_scss/* default */.A.locals : undefined);
 
-;// ./ts/components/PavilionTab.vue?vue&type=style&index=0&id=6a1f136a&scoped=true&lang=scss
+
+       /* harmony default export */ const components_PavilionTabvue_type_style_index_0_id_1573fbb0_scoped_true_lang_scss = (PavilionTabvue_type_style_index_0_id_1573fbb0_scoped_true_lang_scss/* default */.A && PavilionTabvue_type_style_index_0_id_1573fbb0_scoped_true_lang_scss/* default */.A.locals ? PavilionTabvue_type_style_index_0_id_1573fbb0_scoped_true_lang_scss/* default */.A.locals : undefined);
+
+;// ./ts/components/PavilionTab.vue?vue&type=style&index=0&id=1573fbb0&scoped=true&lang=scss
 
 ;// ./ts/components/PavilionTab.vue
 
@@ -39468,7 +39528,7 @@ var PavilionTabvue_type_style_index_0_id_6a1f136a_scoped_true_lang_scss_update =
 ;
 
 
-const PavilionTab_exports_ = /*#__PURE__*/(0,exportHelper/* default */.A)(PavilionTabvue_type_script_setup_true_lang_ts, [['__scopeId',"data-v-6a1f136a"]])
+const PavilionTab_exports_ = /*#__PURE__*/(0,exportHelper/* default */.A)(PavilionTabvue_type_script_setup_true_lang_ts, [['__scopeId',"data-v-1573fbb0"]])
 
 /* harmony default export */ const PavilionTab = (PavilionTab_exports_);
 ;// ./node_modules/ts-loader/index.js??clonedRuleSet-1.use!./node_modules/vue-loader/dist/index.js??ruleSet[1].rules[8].use[0]!./ts/components/MainDialog.vue?vue&type=script&setup=true&lang=ts
@@ -39847,10 +39907,12 @@ const SequentialReservationOverlayvue_type_script_setup_true_lang_ts_hoisted_9 =
 const SequentialReservationOverlayvue_type_script_setup_true_lang_ts_hoisted_10 = { class: "ytomo-sequential-target" };
 const SequentialReservationOverlayvue_type_script_setup_true_lang_ts_hoisted_11 = { class: "ytomo-sequential-countdown" };
 
+
 /* harmony default export */ const SequentialReservationOverlayvue_type_script_setup_true_lang_ts = (/*@__PURE__*/(0,vue_esm_bundler/* defineComponent */.pM)({
     __name: 'SequentialReservationOverlay',
     setup(__props) {
         const overlaysStore = useOverlaysStore();
+        const logger = utils_logger/* loggers */.C$.ui;
         const handleOverlayClick = (e) => {
             e.preventDefault();
             e.stopPropagation();
@@ -39867,7 +39929,7 @@ const SequentialReservationOverlayvue_type_script_setup_true_lang_ts_hoisted_11 
         };
         const cancelSequentialReservation = () => {
             overlaysStore.hideSequentialOverlay();
-            console.log('🚫 順次予約をキャンセルしました');
+            logger.info('順次予約をキャンセルしました');
         };
         return (_ctx, _cache) => {
             return ((0,vue_esm_bundler/* openBlock */.uX)(), (0,vue_esm_bundler/* createBlock */.Wv)(vue_esm_bundler/* Teleport */.Im, { to: "body" }, [
@@ -39936,9 +39998,9 @@ const SequentialReservationOverlayvue_type_script_setup_true_lang_ts_hoisted_11 
 
 ;// ./ts/components/SequentialReservationOverlay.vue?vue&type=script&setup=true&lang=ts
  
-// EXTERNAL MODULE: ./node_modules/css-loader/dist/cjs.js!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/sass-loader/dist/cjs.js!./node_modules/vue-loader/dist/index.js??ruleSet[1].rules[8].use[0]!./ts/components/SequentialReservationOverlay.vue?vue&type=style&index=0&id=17efe212&scoped=true&lang=scss
-var SequentialReservationOverlayvue_type_style_index_0_id_17efe212_scoped_true_lang_scss = __webpack_require__(787);
-;// ./node_modules/style-loader/dist/cjs.js!./node_modules/css-loader/dist/cjs.js!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/sass-loader/dist/cjs.js!./node_modules/vue-loader/dist/index.js??ruleSet[1].rules[8].use[0]!./ts/components/SequentialReservationOverlay.vue?vue&type=style&index=0&id=17efe212&scoped=true&lang=scss
+// EXTERNAL MODULE: ./node_modules/css-loader/dist/cjs.js!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/sass-loader/dist/cjs.js!./node_modules/vue-loader/dist/index.js??ruleSet[1].rules[8].use[0]!./ts/components/SequentialReservationOverlay.vue?vue&type=style&index=0&id=d07463ac&scoped=true&lang=scss
+var SequentialReservationOverlayvue_type_style_index_0_id_d07463ac_scoped_true_lang_scss = __webpack_require__(934);
+;// ./node_modules/style-loader/dist/cjs.js!./node_modules/css-loader/dist/cjs.js!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/sass-loader/dist/cjs.js!./node_modules/vue-loader/dist/index.js??ruleSet[1].rules[8].use[0]!./ts/components/SequentialReservationOverlay.vue?vue&type=style&index=0&id=d07463ac&scoped=true&lang=scss
 
       
       
@@ -39950,22 +40012,22 @@ var SequentialReservationOverlayvue_type_style_index_0_id_17efe212_scoped_true_l
       
       
 
-var SequentialReservationOverlayvue_type_style_index_0_id_17efe212_scoped_true_lang_scss_options = {};
+var SequentialReservationOverlayvue_type_style_index_0_id_d07463ac_scoped_true_lang_scss_options = {};
 
-SequentialReservationOverlayvue_type_style_index_0_id_17efe212_scoped_true_lang_scss_options.styleTagTransform = (styleTagTransform_default());
-SequentialReservationOverlayvue_type_style_index_0_id_17efe212_scoped_true_lang_scss_options.setAttributes = (setAttributesWithoutAttributes_default());
-SequentialReservationOverlayvue_type_style_index_0_id_17efe212_scoped_true_lang_scss_options.insert = insertBySelector_default().bind(null, "head");
-SequentialReservationOverlayvue_type_style_index_0_id_17efe212_scoped_true_lang_scss_options.domAPI = (styleDomAPI_default());
-SequentialReservationOverlayvue_type_style_index_0_id_17efe212_scoped_true_lang_scss_options.insertStyleElement = (insertStyleElement_default());
+SequentialReservationOverlayvue_type_style_index_0_id_d07463ac_scoped_true_lang_scss_options.styleTagTransform = (styleTagTransform_default());
+SequentialReservationOverlayvue_type_style_index_0_id_d07463ac_scoped_true_lang_scss_options.setAttributes = (setAttributesWithoutAttributes_default());
+SequentialReservationOverlayvue_type_style_index_0_id_d07463ac_scoped_true_lang_scss_options.insert = insertBySelector_default().bind(null, "head");
+SequentialReservationOverlayvue_type_style_index_0_id_d07463ac_scoped_true_lang_scss_options.domAPI = (styleDomAPI_default());
+SequentialReservationOverlayvue_type_style_index_0_id_d07463ac_scoped_true_lang_scss_options.insertStyleElement = (insertStyleElement_default());
 
-var SequentialReservationOverlayvue_type_style_index_0_id_17efe212_scoped_true_lang_scss_update = injectStylesIntoStyleTag_default()(SequentialReservationOverlayvue_type_style_index_0_id_17efe212_scoped_true_lang_scss/* default */.A, SequentialReservationOverlayvue_type_style_index_0_id_17efe212_scoped_true_lang_scss_options);
-
-
+var SequentialReservationOverlayvue_type_style_index_0_id_d07463ac_scoped_true_lang_scss_update = injectStylesIntoStyleTag_default()(SequentialReservationOverlayvue_type_style_index_0_id_d07463ac_scoped_true_lang_scss/* default */.A, SequentialReservationOverlayvue_type_style_index_0_id_d07463ac_scoped_true_lang_scss_options);
 
 
-       /* harmony default export */ const components_SequentialReservationOverlayvue_type_style_index_0_id_17efe212_scoped_true_lang_scss = (SequentialReservationOverlayvue_type_style_index_0_id_17efe212_scoped_true_lang_scss/* default */.A && SequentialReservationOverlayvue_type_style_index_0_id_17efe212_scoped_true_lang_scss/* default */.A.locals ? SequentialReservationOverlayvue_type_style_index_0_id_17efe212_scoped_true_lang_scss/* default */.A.locals : undefined);
 
-;// ./ts/components/SequentialReservationOverlay.vue?vue&type=style&index=0&id=17efe212&scoped=true&lang=scss
+
+       /* harmony default export */ const components_SequentialReservationOverlayvue_type_style_index_0_id_d07463ac_scoped_true_lang_scss = (SequentialReservationOverlayvue_type_style_index_0_id_d07463ac_scoped_true_lang_scss/* default */.A && SequentialReservationOverlayvue_type_style_index_0_id_d07463ac_scoped_true_lang_scss/* default */.A.locals ? SequentialReservationOverlayvue_type_style_index_0_id_d07463ac_scoped_true_lang_scss/* default */.A.locals : undefined);
+
+;// ./ts/components/SequentialReservationOverlay.vue?vue&type=style&index=0&id=d07463ac&scoped=true&lang=scss
 
 ;// ./ts/components/SequentialReservationOverlay.vue
 
@@ -39974,7 +40036,7 @@ var SequentialReservationOverlayvue_type_style_index_0_id_17efe212_scoped_true_l
 ;
 
 
-const SequentialReservationOverlay_exports_ = /*#__PURE__*/(0,exportHelper/* default */.A)(SequentialReservationOverlayvue_type_script_setup_true_lang_ts, [['__scopeId',"data-v-17efe212"]])
+const SequentialReservationOverlay_exports_ = /*#__PURE__*/(0,exportHelper/* default */.A)(SequentialReservationOverlayvue_type_script_setup_true_lang_ts, [['__scopeId',"data-v-d07463ac"]])
 
 /* harmony default export */ const SequentialReservationOverlay = (SequentialReservationOverlay_exports_);
 ;// ./node_modules/ts-loader/index.js??clonedRuleSet-1.use!./node_modules/vue-loader/dist/index.js??ruleSet[1].rules[8].use[0]!./ts/App.vue?vue&type=script&setup=true&lang=ts
@@ -40049,6 +40111,7 @@ const App_exports_ = Appvue_type_script_setup_true_lang_ts;
 
 
 
+
 /**
  * 簡素化されたメインダイアログFAB実装
  * Vue/Piniaのみに依存、旧システムは完全に削除
@@ -40062,25 +40125,26 @@ class MainDialogFabImpl {
         this.vueApp = null;
         this.appMountPoint = null;
         this.pageChecker = null;
+        this.logger = utils_logger/* loggers */.C$.ui;
     }
     /**
      * メインダイアログFABシステムを初期化
      */
     initialize() {
-        console.log('🎯 メインダイアログFAB初期化開始（Vue/Piniaのみ）');
+        this.logger.info('メインダイアログFAB初期化開始（Vue/Piniaのみ）');
         // PageCheckerを初期化
         if (!this.pageChecker) {
             this.pageChecker = new page_utils/* PageChecker */.v();
         }
         // VueでFABボタンとダイアログを作成
         this.initializeVueComponents();
-        console.log('✅ メインダイアログFAB初期化完了（Vue/Piniaのみ）');
+        this.logger.info('メインダイアログFAB初期化完了（Vue/Piniaのみ）');
     }
     /**
      * ページ読み込み時のVue統合システム事前初期化
      */
     async preInitializeVueSystem() {
-        console.log('🚀 Vue統合システム事前初期化開始');
+        this.logger.info('Vue統合システム事前初期化開始');
         // ストア初期化をページ読み込み時に1回だけ行う
         try {
             const { useTicketsStore } = await Promise.resolve(/* import() */).then(__webpack_require__.bind(__webpack_require__, 305));
@@ -40091,10 +40155,10 @@ class MainDialogFabImpl {
                 ticketsStore.init(),
                 pavilionsStore.init()
             ]);
-            console.log('✅ 全ストア初期化完了');
+            this.logger.info('全ストア初期化完了');
         }
         catch (error) {
-            console.error('❌ ストア初期化エラー:', error);
+            this.logger.error('ストア初期化エラー', error);
         }
     }
     /**
@@ -40110,10 +40174,10 @@ class MainDialogFabImpl {
             this.vueApp = (0,vue_esm_bundler/* createApp */.Ef)(App);
             this.vueApp.use(stores_pinia);
             this.vueApp.mount(this.appMountPoint);
-            console.log('✅ Vueアプリケーション初期化完了');
+            this.logger.info('Vueアプリケーション初期化完了');
         }
         catch (error) {
-            console.error('❌ Vueアプリケーション初期化エラー:', error);
+            this.logger.error('Vueアプリケーション初期化エラー', error);
             throw error;
         }
     }
@@ -40127,21 +40191,21 @@ class MainDialogFabImpl {
      * メインダイアログを表示（Vue統合版）
      */
     async showMainDialog() {
-        console.log('🎯 Vue統合ダイアログ表示（Vueコンポーネントで実装済み）');
+        this.logger.info('Vue統合ダイアログ表示（Vueコンポーネントで実装済み）');
         // Vueコンポーネントで実装済み
     }
     /**
      * メインダイアログを非表示
      */
     hideMainDialog() {
-        console.log('🔄 Vue統合ダイアログ非表示（Vueコンポーネントで実装済み）');
+        this.logger.info('Vue統合ダイアログ非表示（Vueコンポーネントで実装済み）');
         // Vueコンポーネントで実装済み
     }
     /**
      * システムをクリーンアップ
      */
     cleanup() {
-        console.log('🧹 メインダイアログFABシステムクリーンアップ');
+        this.logger.info('メインダイアログFABシステムクリーンアップ');
         // Vue appをアンマウント
         if (this.vueApp) {
             this.vueApp.unmount();
@@ -40231,6 +40295,8 @@ var entrance_reservation_state_manager = __webpack_require__(608);
 
 // 統一状態管理システム（アプリケーションの中核）
 
+
+const app_router_logger = utils_logger/* loggers */.C$.ui;
 // ==================== グローバル変数・型定義 ====================
 // ============================================================================
 // メインアプリケーションルーターシステム - Section 8
@@ -40250,7 +40316,7 @@ var entrance_reservation_state_manager = __webpack_require__(608);
  * - ytomo-ticket-selection-fab-container: チケット選択FAB
  */
 function cleanupAllFABs() {
-    console.log('🧹 全FABクリーンアップ開始 - ページ遷移時のUI競合防止');
+    app_router_logger.debug('全FABクリーンアップ開始 - ページ遷移時のUI競合防止');
     // クリーンアップ対象のFAB IDリスト
     const fabSelectors = [
         'ytomo-fab-container', // 入場予約メインFAB
@@ -40263,14 +40329,14 @@ function cleanupAllFABs() {
         if (fab) {
             fab.remove();
             removedCount++;
-            console.log(`🗑️ ${id} を削除しました`);
+            app_router_logger.debug('FAB削除', { id });
         }
     });
     if (removedCount === 0) {
-        console.log('🧹 クリーンアップ対象のFABは見つかりませんでした');
+        app_router_logger.debug('クリーンアップ対象のFABは見つかりませんでした');
     }
     else {
-        console.log(`🧹 FABクリーンアップ完了: ${removedCount}個削除`);
+        app_router_logger.debug('FABクリーンアップ完了', { removedCount });
         // スマホ向けの追加処理: DOMの確実な更新を待つ
         if (isMobileDevice()) {
             setTimeout(() => {
@@ -40280,7 +40346,7 @@ function cleanupAllFABs() {
                     if (remainingFab) {
                         remainingFab.style.display = 'none';
                         remainingFab.remove();
-                        console.log(`📱 スマホ向け遅延削除: ${id}`);
+                        app_router_logger.debug('スマホ向け遅延削除', { id });
                     }
                 });
             }, 100);
@@ -40313,16 +40379,16 @@ let isPageInitializing = false;
 // ページ初期化時に既存データを移行
 const initializeUnifiedStateManager = () => {
     if (isUnifiedStateManagerInitialized) {
-        console.log('🔄 入場予約状態管理システムは既に初期化済みです');
+        app_router_logger.debug('入場予約状態管理システムは既に初期化済みです');
         return;
     }
     try {
         // 状態管理システム初期化
         isUnifiedStateManagerInitialized = true;
-        console.log('✅ 入場予約状態管理システム初期化完了');
+        app_router_logger.info('入場予約状態管理システム初期化完了');
     }
     catch (error) {
-        console.error('⚠️ 入場予約状態管理システム初期化エラー:', error);
+        app_router_logger.error('入場予約状態管理システム初期化エラー', { error });
     }
 };
 // entrance-page-ui、entrance-page-fabにcacheManagerを設定
@@ -40346,10 +40412,10 @@ const trigger_init = (url_record) => {
         if (page_type === 'ticket_selection') {
             const ticketSelectionFab = document.getElementById('ytomo-ticket-selection-fab-container');
             if (!ticketSelectionFab) {
-                console.log(`🔄 ${page_type}ページでチケット選択FABが消失しているため再作成します`);
+                app_router_logger.debug('チケット選択FABが消失しているため再作成', { page_type });
             }
             else {
-                console.log(`✅ ${page_type}ページでチケット選択FABが既に存在します、スキップ`);
+                app_router_logger.debug('チケット選択FABが既に存在します、スキップ', { page_type });
                 return;
             }
         }
@@ -40370,7 +40436,7 @@ const trigger_init = (url_record) => {
                 clearInterval(interval_judge);
                 init_page();
                 isPageInitializing = false;
-                console.log("ytomo extension loaded (pavilion reservation)");
+                app_router_logger.info('ytomo extension loaded (pavilion reservation)');
             }
         }, 500);
     }
@@ -40397,12 +40463,12 @@ const trigger_init = (url_record) => {
                         return;
                     const selectedSlot = document.querySelector('td[data-gray-out] div[role="button"][aria-pressed="true"]');
                     if (selectedSlot && entrance_reservation_state_manager/* entranceReservationStateManager */.xx && !entrance_reservation_state_manager/* entranceReservationStateManager */.xx.hasReservationTarget()) {
-                        console.log('🔄 選択状態の後続同期を実行');
+                        app_router_logger.debug('選択状態の後続同期を実行');
                         initializeUnifiedStateManager();
                     }
                 }, 5000); // 頻度を2秒から5秒に下げる
                 isPageInitializing = false;
-                console.log("ytomo extension loaded (entrance reservation)");
+                app_router_logger.info('ytomo extension loaded (entrance reservation)');
             }
         }, 500);
     }
@@ -40414,7 +40480,7 @@ const trigger_init = (url_record) => {
         const interval_companion = setInterval(() => {
             if (document.body && (document.readyState === 'complete' || document.readyState === 'interactive')) {
                 clearInterval(interval_companion);
-                console.log(`🎫 ${page_type}ページを初期化します`);
+                app_router_logger.info('ページを初期化', { page_type });
                 // ヘッダートグルボタンを作成
                 (0,entrance_page_state.createFABToggleButton)();
                 // ページタイプ別初期化
@@ -40429,14 +40495,14 @@ const trigger_init = (url_record) => {
                     initCompanionTicketFeature();
                 }
                 isPageInitializing = false;
-                console.log(`ytomo extension loaded (${page_type})`);
+                app_router_logger.info('ytomo extension loaded', { page_type });
             }
         }, 500);
     }
     else {
         // 対象外のページの場合はログ出力のみ
-        console.log(`🔍 対象外ページ: ${url_record}`);
-        console.log("ytomo extension: no action needed for this page");
+        app_router_logger.debug('対象外ページ', { url_record });
+        app_router_logger.debug('ytomo extension: no action needed for this page');
         currentPageType = null;
         isPageInitializing = false;
     }
@@ -40445,9 +40511,9 @@ const trigger_init = (url_record) => {
 function initializeExtension() {
     try {
         // SPA対応: URL変更を複数の方法で監視する
-        console.log('🚀 ytomo extension 初期化開始');
-        console.log(`🔗 現在のURL: ${window.location.href}`);
-        console.log(`🔗 document.readyState: ${document.readyState}`);
+        app_router_logger.info('ytomo extension 初期化開始');
+        app_router_logger.debug('現在のURL', { url: window.location.href });
+        app_router_logger.debug('document.readyState', { readyState: document.readyState });
         const url = window.location.href;
         trigger_init(url);
         // メインダイアログFAB初期化（全ページ共通）
@@ -40457,7 +40523,7 @@ function initializeExtension() {
         window.addEventListener('popstate', () => {
             const new_url = window.location.href;
             if (new_url !== url_record) {
-                console.log(`🔄 popstate URL変更検出: ${url_record} -> ${new_url}`);
+                app_router_logger.debug('popstate URL変更検出', { oldUrl: url_record, newUrl: new_url });
                 url_record = new_url;
                 setTimeout(() => trigger_init(url_record), 500);
             }
@@ -40466,24 +40532,24 @@ function initializeExtension() {
         const originalPushState = history.pushState;
         const originalReplaceState = history.replaceState;
         history.pushState = function (state, title, url) {
-            console.log(`📍 pushState called:`, arguments);
+            app_router_logger.debug('pushState called', { arguments });
             originalPushState.apply(history, [state, title, url]);
             setTimeout(() => {
                 const new_url = window.location.href;
                 if (new_url !== url_record) {
-                    console.log(`🔄 pushState URL変更検出: ${url_record} -> ${new_url}`);
+                    app_router_logger.debug('pushState URL変更検出', { oldUrl: url_record, newUrl: new_url });
                     url_record = new_url;
                     setTimeout(() => trigger_init(url_record), 500);
                 }
             }, 100);
         };
         history.replaceState = function (state, title, url) {
-            console.log(`📍 replaceState called:`, arguments);
+            app_router_logger.debug('replaceState called', { arguments });
             originalReplaceState.apply(history, [state, title, url]);
             setTimeout(() => {
                 const new_url = window.location.href;
                 if (new_url !== url_record) {
-                    console.log(`🔄 replaceState URL変更検出: ${url_record} -> ${new_url}`);
+                    app_router_logger.debug('replaceState URL変更検出', { oldUrl: url_record, newUrl: new_url });
                     url_record = new_url;
                     setTimeout(() => trigger_init(url_record), 500);
                 }
@@ -40523,11 +40589,11 @@ function initializeExtension() {
                 }
             }
         }, 2000); // 2秒間隔でFABチェック
-        console.log('👀 SPA対応URL監視設定完了');
+        app_router_logger.info('SPA対応URL監視設定完了');
     }
     catch (e) {
         // エラー時の処理
-        console.error("ytomo extension error", e);
+        app_router_logger.error('ytomo extension error', { error: e });
         // alert(e);
     }
 }
@@ -40548,6 +40614,8 @@ else {
  * ページ検知・判定モジュール
  * 万博予約サイトの各ページを識別し、適切な処理を決定
  */
+
+const page_detector_logger = utils_logger/* loggers */.C$.ui;
 // URL パターンの定義
 const URL_PATTERNS = {
     RESERVATION_TIME: /\/event_time\/\?.*event_id=([^&]+)/,
@@ -40724,18 +40792,19 @@ class PageDetector {
      */
     logPageInfo() {
         const pageInfo = this.extractPageInfo();
-        console.group('📍 ページ情報');
-        console.log('タイプ:', pageInfo.type);
-        console.log('URL:', pageInfo.url);
-        console.log('準備状態:', pageInfo.isReady);
-        console.log('タイトル:', pageInfo.title);
+        const logData = {
+            type: pageInfo.type,
+            url: pageInfo.url,
+            isReady: pageInfo.isReady,
+            title: pageInfo.title
+        };
         if (pageInfo.pavilionCode) {
-            console.log('パビリオンコード:', pageInfo.pavilionCode);
+            logData.pavilionCode = pageInfo.pavilionCode;
         }
         if (pageInfo.ticketId) {
-            console.log('チケットID:', pageInfo.ticketId);
+            logData.ticketId = pageInfo.ticketId;
         }
-        console.groupEnd();
+        page_detector_logger.debug('ページ情報', logData);
     }
 }
 // シングルトンインスタンス
@@ -41591,6 +41660,7 @@ function destroyAutomationOverlay() {
  */
 
 
+
 // test-exports用にexport
 
 
@@ -41616,6 +41686,7 @@ class AutomationEngine {
         this.failedCount = 0;
         this.errors = [];
         this.currentReservation = null;
+        this.logger = utils_logger/* loggers */.C$.automation;
         this.config = { ...DEFAULT_CONFIG, ...config };
         // オーバーレイイベントハンドラーを設定
         this.overlay.setEventHandler((type) => {
@@ -41919,22 +41990,21 @@ class AutomationEngine {
      */
     log(message) {
         if (this.config.enableLogging) {
-            const timestamp = new Date().toLocaleTimeString();
-            console.log(`[${timestamp}] 🤖 ${message}`);
+            this.logger.info(message);
         }
     }
     /**
      * デバッグ情報を出力
      */
     debugInfo() {
-        console.group('🔧 自動操作エンジン - デバッグ情報');
-        console.log('状態:', this.status);
-        console.log('設定:', this.config);
-        console.log('実行結果:', this.getResult());
-        console.log('現在の予約:', this.currentReservation);
-        console.log('ページ情報:', this.pageDetector.extractPageInfo());
-        console.log('DOM情報:', this.domUtils.getPageDebugInfo());
-        console.groupEnd();
+        this.logger.debug('自動操作エンジンデバッグ情報', {
+            status: this.status,
+            config: this.config,
+            result: this.getResult(),
+            currentReservation: this.currentReservation,
+            pageInfo: this.pageDetector.extractPageInfo(),
+            domInfo: this.domUtils.getPageDebugInfo()
+        });
     }
     /**
      * グローバル通知を表示
@@ -42467,6 +42537,8 @@ if (typeof window !== 'undefined') {
  * 監視対象キャッシュ管理
  * 順序ベースの監視対象データ管理
  */
+
+const monitoring_cache_logger = utils_logger/* loggers */.C$.monitoring;
 // キャッシュキー
 const CACHE_KEYS = {
     MONITORING_TARGETS: 'pavilion_monitoring_targets',
@@ -42482,7 +42554,7 @@ class MonitoringCacheManager {
             // 既に存在するかチェック
             const exists = targets.some(t => t.pavilionCode === pavilionCode && t.timeSlot === timeSlot);
             if (exists) {
-                console.log('⚠️ 既に監視対象に追加済み:', pavilionCode, timeSlot);
+                monitoring_cache_logger.warn('既に監視対象に追加済み', { pavilionCode, timeSlot });
                 return false;
             }
             // 新しい順序番号を決定
@@ -42496,11 +42568,11 @@ class MonitoringCacheManager {
             };
             targets.push(newTarget);
             this.saveTargets(targets);
-            console.log('✅ 監視対象追加:', newTarget);
+            monitoring_cache_logger.info('監視対象追加', newTarget);
             return true;
         }
         catch (error) {
-            console.error('❌ 監視対象追加エラー:', error);
+            monitoring_cache_logger.error('監視対象追加エラー', { error });
             return false;
         }
     }
@@ -42513,7 +42585,7 @@ class MonitoringCacheManager {
             const initialLength = targets.length;
             const filteredTargets = targets.filter(t => !(t.pavilionCode === pavilionCode && t.timeSlot === timeSlot));
             if (filteredTargets.length === initialLength) {
-                console.log('⚠️ 削除対象が見つかりません:', pavilionCode, timeSlot);
+                monitoring_cache_logger.warn('削除対象が見つかりません', { pavilionCode, timeSlot });
                 return false;
             }
             // 順序を再調整
@@ -42524,11 +42596,11 @@ class MonitoringCacheManager {
                 order: index + 1
             }));
             this.saveTargets(reorderedTargets);
-            console.log('🗑️ 監視対象削除:', pavilionCode, timeSlot);
+            monitoring_cache_logger.info('監視対象削除', { pavilionCode, timeSlot });
             return true;
         }
         catch (error) {
-            console.error('❌ 監視対象削除エラー:', error);
+            monitoring_cache_logger.error('監視対象削除エラー', { error });
             return false;
         }
     }
@@ -42563,7 +42635,7 @@ class MonitoringCacheManager {
             return targets.sort((a, b) => a.order - b.order);
         }
         catch (error) {
-            console.error('❌ 監視対象取得エラー:', error);
+            monitoring_cache_logger.error('監視対象取得エラー', { error });
             return [];
         }
     }
@@ -42586,7 +42658,7 @@ class MonitoringCacheManager {
      */
     static clearTargets() {
         sessionStorage.removeItem(CACHE_KEYS.MONITORING_TARGETS);
-        console.log('🗑️ 全監視対象クリア');
+        monitoring_cache_logger.info('全監視対象クリア');
     }
     /**
      * 監視状態を取得
@@ -42606,7 +42678,7 @@ class MonitoringCacheManager {
             return JSON.parse(data);
         }
         catch (error) {
-            console.error('❌ 監視状態取得エラー:', error);
+            monitoring_cache_logger.error('監視状態取得エラー', { error });
             return {
                 targets: [],
                 isActive: false,
@@ -42626,7 +42698,7 @@ class MonitoringCacheManager {
             sessionStorage.setItem(CACHE_KEYS.MONITORING_STATE, JSON.stringify(newState));
         }
         catch (error) {
-            console.error('❌ 監視状態更新エラー:', error);
+            monitoring_cache_logger.error('監視状態更新エラー', { error });
         }
     }
     /**
@@ -42653,14 +42725,14 @@ class MonitoringCacheManager {
      * デバッグ情報を出力
      */
     static debugInfo() {
-        console.group('🔍 監視キャッシュ デバッグ情報');
         const targets = this.getTargets();
         const state = this.getMonitoringState();
         const stats = this.getMonitoringStats();
-        console.log('監視対象:', targets);
-        console.log('監視状態:', state);
-        console.log('統計情報:', stats);
-        console.groupEnd();
+        monitoring_cache_logger.debug('監視キャッシュ デバッグ情報', {
+            targets,
+            state,
+            stats
+        });
     }
 }
 // デバッグ用グローバル公開
@@ -42677,10 +42749,12 @@ if (typeof window !== 'undefined') {
 
 
 
+
 class MonitoringService {
     constructor() {
         this.scheduler = getMonitoringScheduler();
         this.isRunning = false;
+        this.logger = utils_logger/* loggers */.C$.monitoring;
     }
     /**
      * 監視を開始
@@ -43075,6 +43149,8 @@ if (typeof window !== 'undefined') {
  * グローバル通知システム
  * ダイアログの状態に関係なく通知を表示できる永続的なシステム
  */
+
+const notification_system_logger = utils_logger/* loggers */.C$.ui;
 class GlobalNotificationSystem {
     constructor() {
         this.notificationContainer = null;
@@ -43093,7 +43169,7 @@ class GlobalNotificationSystem {
         this.notificationContainer.className = 'ytomo-global-notification-container';
         // ページに追加
         document.body.appendChild(this.notificationContainer);
-        console.log('✅ グローバル通知システム初期化完了');
+        notification_system_logger.info('グローバル通知システム初期化完了');
     }
     /**
      * 通知を表示
@@ -43119,7 +43195,7 @@ class GlobalNotificationSystem {
                 this.hide(notificationId);
             }, duration);
         }
-        console.log(`📢 通知表示: [${options.type}] ${options.message}`);
+        notification_system_logger.info('通知表示', { type: options.type, message: options.message });
         return notificationId;
     }
     /**
@@ -43207,7 +43283,7 @@ else {
     // 既にDOMが読み込まれている場合は即座に初期化
     globalNotificationSystem.initialize();
 }
-console.log('✅ グローバル通知システムモジュール読み込み完了');
+notification_system_logger.info('グローバル通知システムモジュール読み込み完了');
 
 ;// ./ts/modules/page-return-system.ts
 /**
@@ -43216,6 +43292,8 @@ console.log('✅ グローバル通知システムモジュール読み込み完
  * 適切な手続きを経て元のページに復帰する
  */
 
+
+const page_return_system_logger = utils_logger/* loggers */.C$.ui;
 class PageReturnSystem {
     /**
      * 現在のページ情報を解析して保存
@@ -43225,13 +43303,13 @@ class PageReturnSystem {
             const pageInfo = this.analyzeCurrentPage();
             if (pageInfo) {
                 sessionStorage.setItem(this.STORAGE_KEY, JSON.stringify(pageInfo));
-                console.log('📄 ページ情報を保存:', pageInfo);
+                page_return_system_logger.info('ページ情報を保存', pageInfo);
                 return pageInfo;
             }
             return null;
         }
         catch (error) {
-            console.error('❌ ページ情報保存エラー:', error);
+            page_return_system_logger.error('ページ情報保存エラー', error);
             return null;
         }
     }
@@ -43351,6 +43429,8 @@ PageReturnSystem.STORAGE_KEY = 'expo_page_return_info';
  * メインエントリーポイント
  * 各sectionモジュールをimportすることで、webpackで統合されたバンドルを作成
  */
+
+const main_logger = utils_logger/* loggers */.C$.ui;
 // すべてのモジュールをimport（副作用importも含む）
 
 
@@ -43370,10 +43450,7 @@ PageReturnSystem.STORAGE_KEY = 'expo_page_return_info';
 
  // グローバル通知システム
  // ページ復帰システム
-// テスト環境・開発環境でのみtest-exportsをimport
-// 本番環境では webpack の tree shaking で除外される
-if (false) // removed by dead control flow
-{}
+// test-exportsは削除されました（不要なテストファイルのため）
 // Vue.js統合は各MainDialogFabで直接実行
 // グローバル予約結果通知チェック（すべてのページで動作）
 const checkGlobalReservationResult = () => {
@@ -43386,7 +43463,7 @@ const checkGlobalReservationResult = () => {
             if (typeof window.showReservationNotification === 'function') {
                 window.showReservationNotification('error', `予約に失敗しました: ${failureInfo.pavilionName} ${failureInfo.timeDisplay}～（${failureInfo.reason}）`, false // 自動非表示しない
                 );
-                console.log('📢 グローバル失敗通知を表示しました');
+                main_logger.info('グローバル失敗通知を表示しました');
             }
             // 表示完了後、sessionStorageをクリア
             sessionStorage.removeItem('expo_reservation_failure');
@@ -43399,14 +43476,14 @@ const checkGlobalReservationResult = () => {
             if (typeof window.showReservationNotification === 'function') {
                 window.showReservationNotification(resultInfo.type, resultInfo.message, false // 自動非表示しない
                 );
-                console.log('📢 グローバル結果通知を表示しました:', resultInfo.type, resultInfo.message);
+                main_logger.info('グローバル結果通知を表示しました', { type: resultInfo.type, message: resultInfo.message });
             }
             // 表示完了後、sessionStorageをクリア
             sessionStorage.removeItem('expo_reservation_result');
         }
     }
     catch (error) {
-        console.error('❌ グローバル結果通知チェックエラー:', error);
+        main_logger.error('グローバル結果通知チェックエラー', error);
     }
 };
 // DOMContentLoaded時にグローバル予約結果通知をチェック

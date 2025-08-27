@@ -6,6 +6,8 @@ import type {
     EntranceReservationState, 
     CalendarWatchState 
 } from '../types/index.js';
+import { loggers } from '../utils/logger';
+const logger = loggers.ui;
 
 let entranceReservationState: EntranceReservationState = {
     isRunning: false,
@@ -44,7 +46,7 @@ function loadFABVisibility(): void {
             fabVisibilityState.isVisible = JSON.parse(saved);
         }
     } catch (e) {
-        console.warn('FAB表示状態の読み込みに失敗しました:', e);
+        logger.warn('FAB表示状態の読み込みに失敗', { error: e });
     }
 }
 
@@ -53,7 +55,7 @@ function saveFABVisibility(isVisible: boolean): void {
         fabVisibilityState.isVisible = isVisible;
         localStorage.setItem(fabVisibilityState.cacheKey, JSON.stringify(isVisible));
     } catch (e) {
-        console.warn('FAB表示状態の保存に失敗しました:', e);
+        logger.warn('FAB表示状態の保存に失敗', { error: e });
     }
 }
 
@@ -97,7 +99,7 @@ export function createFABToggleButton(): void {
     // 買い物アイコンが見つからない場合、ヘッダー内の右端要素を探す
     let targetElement = shoppingIcon;
     if (!targetElement) {
-        console.log('🛒 買い物アイコンが見つかりません。ヘッダー右端要素を探索中...');
+        logger.debug('買い物アイコンが見つかりません。ヘッダー右端要素を探索中');
         
         // ヘッダー要素を探す
         const headerSelectors = [
@@ -115,7 +117,7 @@ export function createFABToggleButton(): void {
             try {
                 headerElement = document.querySelector(selector);
                 if (headerElement) {
-                    console.log(`📋 ヘッダー要素発見: ${selector}`);
+                    logger.debug('ヘッダー要素発見', { selector });
                     break;
                 }
             } catch (e) {
@@ -131,7 +133,7 @@ export function createFABToggleButton(): void {
                 const rect = el.getBoundingClientRect();
                 if (rect.width > 20 && rect.height > 20) {
                     targetElement = el;
-                    console.log(`🎯 右端要素を買い物アイコン候補として使用: ${el.tagName}`);
+                    logger.debug('右端要素を買い物アイコン候補として使用', { tagName: el.tagName });
                     break;
                 }
             }
@@ -139,7 +141,7 @@ export function createFABToggleButton(): void {
     }
     
     if (!targetElement) {
-        console.warn('買い物アイコンまたは配置基準要素が見つかりません');
+        logger.warn('買い物アイコンまたは配置基準要素が見つかりません');
         return;
     }
     
@@ -203,7 +205,7 @@ export function createFABToggleButton(): void {
         // 買い物アイコンの直前に挿入
         parentUl.insertBefore(toggleLi, targetElement);
     } else {
-        console.warn('ul要素が見つかりません。body直下に追加します');
+        logger.warn('ul要素が見つかりません。body直下に追加します');
         document.body.appendChild(toggleLi);
     }
 }

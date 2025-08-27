@@ -2,6 +2,8 @@
  * 監視対象キャッシュ管理
  * 順序ベースの監視対象データ管理
  */
+import { loggers } from '../utils/logger';
+const logger = loggers.monitoring;
 
 // 監視対象データ
 export interface MonitoringTarget {
@@ -42,7 +44,7 @@ export class MonitoringCacheManager {
             );
             
             if (exists) {
-                console.log('⚠️ 既に監視対象に追加済み:', pavilionCode, timeSlot);
+                logger.warn('既に監視対象に追加済み', { pavilionCode, timeSlot });
                 return false;
             }
             
@@ -60,11 +62,11 @@ export class MonitoringCacheManager {
             targets.push(newTarget);
             this.saveTargets(targets);
             
-            console.log('✅ 監視対象追加:', newTarget);
+            logger.info('監視対象追加', newTarget);
             return true;
             
         } catch (error) {
-            console.error('❌ 監視対象追加エラー:', error);
+            logger.error('監視対象追加エラー', { error });
             return false;
         }
     }
@@ -82,7 +84,7 @@ export class MonitoringCacheManager {
             );
             
             if (filteredTargets.length === initialLength) {
-                console.log('⚠️ 削除対象が見つかりません:', pavilionCode, timeSlot);
+                logger.warn('削除対象が見つかりません', { pavilionCode, timeSlot });
                 return false;
             }
             
@@ -96,11 +98,11 @@ export class MonitoringCacheManager {
             
             this.saveTargets(reorderedTargets);
             
-            console.log('🗑️ 監視対象削除:', pavilionCode, timeSlot);
+            logger.info('監視対象削除', { pavilionCode, timeSlot });
             return true;
             
         } catch (error) {
-            console.error('❌ 監視対象削除エラー:', error);
+            logger.error('監視対象削除エラー', { error });
             return false;
         }
     }
@@ -140,7 +142,7 @@ export class MonitoringCacheManager {
             return targets.sort((a, b) => a.order - b.order);
             
         } catch (error) {
-            console.error('❌ 監視対象取得エラー:', error);
+            logger.error('監視対象取得エラー', { error });
             return [];
         }
     }
@@ -166,7 +168,7 @@ export class MonitoringCacheManager {
      */
     static clearTargets(): void {
         sessionStorage.removeItem(CACHE_KEYS.MONITORING_TARGETS);
-        console.log('🗑️ 全監視対象クリア');
+        logger.info('全監視対象クリア');
     }
     
     /**
@@ -188,7 +190,7 @@ export class MonitoringCacheManager {
             return JSON.parse(data) as MonitoringState;
             
         } catch (error) {
-            console.error('❌ 監視状態取得エラー:', error);
+            logger.error('監視状態取得エラー', { error });
             return {
                 targets: [],
                 isActive: false,
@@ -210,7 +212,7 @@ export class MonitoringCacheManager {
             sessionStorage.setItem(CACHE_KEYS.MONITORING_STATE, JSON.stringify(newState));
             
         } catch (error) {
-            console.error('❌ 監視状態更新エラー:', error);
+            logger.error('監視状態更新エラー', { error });
         }
     }
     
@@ -246,17 +248,15 @@ export class MonitoringCacheManager {
      * デバッグ情報を出力
      */
     static debugInfo(): void {
-        console.group('🔍 監視キャッシュ デバッグ情報');
-        
         const targets = this.getTargets();
         const state = this.getMonitoringState();
         const stats = this.getMonitoringStats();
         
-        console.log('監視対象:', targets);
-        console.log('監視状態:', state);
-        console.log('統計情報:', stats);
-        
-        console.groupEnd();
+        logger.debug('監視キャッシュ デバッグ情報', {
+            targets,
+            state,
+            stats
+        });
     }
 }
 

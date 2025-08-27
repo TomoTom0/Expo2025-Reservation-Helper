@@ -12,6 +12,8 @@ import {
     ReservationDataUtils,
     generateReservationKey
 } from './reservation-data';
+import { loggers } from '../utils/logger';
+const logger = loggers.automation;
 
 export class PavilionReservationCache {
     /**
@@ -23,7 +25,7 @@ export class PavilionReservationCache {
             sessionStorage.setItem(key, serialized);
             return true;
         } catch (error) {
-            console.error('❌ Cache save error:', error);
+            logger.error('キャッシュ保存エラー', { error });
             return false;
         }
     }
@@ -37,7 +39,7 @@ export class PavilionReservationCache {
             if (!item) return null;
             return JSON.parse(item) as T;
         } catch (error) {
-            console.error('❌ Cache load error:', error);
+            logger.error('キャッシュ読み込みエラー', { error });
             return null;
         }
     }
@@ -49,7 +51,7 @@ export class PavilionReservationCache {
         try {
             sessionStorage.removeItem(key);
         } catch (error) {
-            console.error('❌ Cache remove error:', error);
+            logger.error('キャッシュ削除エラー', { error });
         }
     }
 
@@ -65,7 +67,7 @@ export class PavilionReservationCache {
         
         const success = this.setItem(CACHE_KEYS.RESERVATION_DATA, allData);
         if (success) {
-            console.log(`💾 予約データ保存: ${key} - ${data.selectedTimeDisplay}`);
+            logger.info('予約データ保存', { key, timeDisplay: data.selectedTimeDisplay });
         }
         return success;
     }
@@ -82,14 +84,14 @@ export class PavilionReservationCache {
         
         // データ有効性チェック
         if (!ReservationDataUtils.isValidReservationData(data)) {
-            console.warn(`⚠️ 無効な予約データ: ${key}`);
+            logger.warn('無効な予約データ', { key });
             this.removeReservationData(pavilionCode, timeSlot);
             return null;
         }
         
         // 期限チェック
         if (ReservationDataUtils.isDataExpired(data.timestamp)) {
-            console.warn(`⏰ 期限切れデータ: ${key}`);
+            logger.warn('期限切れデータ', { key });
             this.removeReservationData(pavilionCode, timeSlot);
             return null;
         }
@@ -140,7 +142,7 @@ export class PavilionReservationCache {
         const key = generateReservationKey(pavilionCode, timeSlot);
         delete allData[key];
         this.setItem(CACHE_KEYS.RESERVATION_DATA, allData);
-        console.log(`🗑️ 予約データ削除: ${key}`);
+        logger.info('予約データ削除', { key });
     }
 
     /**
@@ -159,7 +161,7 @@ export class PavilionReservationCache {
         
         if (deletedCount > 0) {
             this.setItem(CACHE_KEYS.RESERVATION_DATA, allData);
-            console.log(`🗑️ パビリオン予約データ削除: ${pavilionCode} (${deletedCount}件)`);
+            logger.info('パビリオン予約データ削除', { pavilionCode, deletedCount });
         }
     }
 
@@ -168,7 +170,7 @@ export class PavilionReservationCache {
      */
     static clearAllReservationData(): void {
         this.removeItem(CACHE_KEYS.RESERVATION_DATA);
-        console.log('🧹 全予約データクリア');
+        logger.info('全予約データクリア');
     }
 
     /**
@@ -192,7 +194,7 @@ export class PavilionReservationCache {
     static saveAutomationState(state: AutomationState): boolean {
         const success = this.setItem(CACHE_KEYS.AUTOMATION_STATE, state);
         if (success) {
-            console.log(`🤖 自動操作状態保存: ${state.currentStep}`);
+            logger.info('自動操作状態保存', { currentStep: state.currentStep });
         }
         return success;
     }
@@ -209,7 +211,7 @@ export class PavilionReservationCache {
      */
     static clearAutomationState(): void {
         this.removeItem(CACHE_KEYS.AUTOMATION_STATE);
-        console.log('🧹 自動操作状態クリア');
+        logger.info('自動操作状態クリア');
     }
 
     // ============ ユーザー設定管理 ============
@@ -265,7 +267,7 @@ export class PavilionReservationCache {
         
         if (cleanedCount > 0) {
             this.setItem(CACHE_KEYS.RESERVATION_DATA, allData);
-            console.log(`🧹 期限切れデータ削除: ${cleanedCount}件`);
+            logger.info('期限切れデータ削除', { cleanedCount });
         }
     }
 
@@ -273,14 +275,12 @@ export class PavilionReservationCache {
      * デバッグ用: 全キャッシュ内容を表示
      */
     static debugLogAllCache(): void {
-        console.group('📋 パビリオン予約キャッシュ内容');
-        
-        console.log('予約データ:', this.getAllReservationData());
-        console.log('自動操作状態:', this.getAutomationState());
-        console.log('ユーザー設定:', this.getUserPreferences());
-        console.log('キャッシュサイズ:', `${this.getCacheSize()} bytes`);
-        
-        console.groupEnd();
+        logger.debug('パビリオン予約キャッシュ内容', {
+            reservationData: this.getAllReservationData(),
+            automationState: this.getAutomationState(),
+            userPreferences: this.getUserPreferences(),
+            cacheSize: this.getCacheSize()
+        });
     }
 
     /**
