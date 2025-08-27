@@ -2,6 +2,8 @@
  * 時間帯状態判定の統一関数
  * DOM要素を与えて状態を返すシンプルな共通関数
  */
+import { loggers } from '../utils/logger';
+const logger = loggers.ui;
 
 export interface TimeslotStatus {
     isAvailable: boolean;   // 利用可能（空きあり）
@@ -22,7 +24,7 @@ export function detectTimeslotStatus(tdElement: HTMLTableCellElement | null): Ti
     // DOM構造: .btnDivまたはdiv[role="button"]
     const buttonDiv = (tdElement.querySelector('.btnDiv') || tdElement.querySelector('div[role="button"]')) as HTMLElement;
     if (!buttonDiv) {
-        console.log(`🔍 [統一関数] buttonDiv not found in td:`, tdElement.innerHTML.substring(0, 200));
+        logger.debug('[統一関数] buttonDiv not found in td', { innerHTML: tdElement.innerHTML.substring(0, 200) });
         return null;
     }
     

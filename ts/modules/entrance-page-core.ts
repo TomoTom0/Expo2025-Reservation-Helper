@@ -104,11 +104,11 @@ function checkTimeSlotTableExistsSync(): boolean {
     
     if (actualTimeSlots.length > 0) {
         // ログを削除
-        // console.log(`✅ 実際の時間帯要素を${actualTimeSlots.length}個検出`);
+        // logger.debug('実際の時間帯要素を検出', { count: actualTimeSlots.length });
         return true;
     }
     
-    // console.log('❌ 実際の時間帯要素が見つかりません（カレンダー日付のみ）');
+    // logger.warn('実際の時間帯要素が見つかりません（カレンダー日付のみ）');
     return false;
 }
 
@@ -155,7 +155,7 @@ export const setCacheManagerForSection6 = (cm: CacheManager): void => {
 // entranceReservationHelperを設定するヘルパー関数（互換性のため保持）
 export const setEntranceReservationHelper = (helper: Function): void => {
     // 必要な場合は、entrance-page-coreに設定
-    console.log('setEntranceReservationHelper called:', typeof helper);
+    logger.debug('setEntranceReservationHelper called', { helperType: typeof helper });
 };
 
 
@@ -298,13 +298,13 @@ export function updateStatusBadge(mode: string): void {
 
 // 統一されたリロードスケジュール関数
 export function scheduleReload(seconds: number = 30): void {
-    console.log(`🔄 統一リロードスケジュール開始: ${seconds}秒`);
+    logger.info('統一リロードスケジュール開始', { seconds });
     
     
     // 入場予約状態管理システムでリロードカウントダウンを開始
     if (entranceReservationStateManager) {
         entranceReservationStateManager.scheduleReload(seconds);
-        console.log(`📊 リロードスケジュール時の状態: ${entranceReservationStateManager.getExecutionState()}`);
+        logger.debug('リロードスケジュール時の状態', { state: entranceReservationStateManager.getExecutionState() });
     }
     
     
@@ -319,7 +319,7 @@ export function stopReloadCountdown(): void {
     // 呼び出し元を特定するためのスタックトレース
     const stack = new Error().stack;
     const caller = stack?.split('\n')[2]?.trim() || 'unknown';
-    console.log(`🛑 stopReloadCountdown() 呼び出し元: ${caller}`);
+    logger.debug('stopReloadCountdown呼び出し', { caller });
     
     // 入場予約状態管理システムでリロードカウントダウンを停止
     if (entranceReservationStateManager) {
@@ -340,7 +340,7 @@ export function isInterruptionAllowed(): boolean {
     // リロード直前3秒間は中断不可（時間を短縮して中断可能期間を延長）
     if (entranceReservationStateManager) {
         const isNearReload = false;
-        // console.log(`🔍 中断可否チェック: nearReload=${isNearReload}`);
+        // logger.debug('中断可否チェック', { nearReload: isNearReload });
         return !isNearReload;
     }
     return true; // フォールバック：統合システムが利用できない場合は中断を許可
@@ -354,16 +354,16 @@ export async function restoreFromCache(): Promise<void> {
     const cached = cacheManagerSection6.loadTargetSlots();
     if (!cached) return;
     
-    console.log('🔄 キャッシュから状態を復元中...');
+    logger.debug('キャッシュから状態を復元中');
     
     // キャッシュされた日付と現在のカレンダー日付を比較し、必要に応じて日付移動を実行
     if (cached.selectedDate && cached.targets && cached.targets.length > 0) {
         const currentSelectedDate = getCurrentSelectedCalendarDate();
         
-        console.log(`📅 日付比較: キャッシュ=${cached.selectedDate}, 現在=${currentSelectedDate}`);
+        logger.debug('日付比較', { cachedDate: cached.selectedDate, currentDate: currentSelectedDate });
         
         if (cached.selectedDate !== currentSelectedDate) {
-            console.log(`📅 キャッシュされた日付への移動が必要: ${cached.selectedDate}`);
+            logger.info('キャッシュされた日付への移動が必要', { targetDate: cached.selectedDate });;
             
             // カレンダーが利用可能になるまで待機
             const calendarReady = await waitForCalendar(5000);
@@ -379,7 +379,7 @@ export async function restoreFromCache(): Promise<void> {
                 return;
             }
             
-            console.log(`✅ キャッシュされた日付に移動完了: ${cached.selectedDate}`);
+            logger.info('キャッシュされた日付に移動完了', { targetDate: cached.selectedDate });
             
             // 日付移動後、時間帯テーブルが更新されるまで待機
             const tableReady = await waitForTimeSlotTable(5000);
@@ -394,7 +394,7 @@ export async function restoreFromCache(): Promise<void> {
     // カレンダー読み込み完了を待機（短縮: 5秒）
     const hasCalendar = await waitForCalendar(5000);
     if (!hasCalendar) {
-        console.log('❌ カレンダーの読み込みがタイムアウトしました');
+        logger.warn('カレンダーの読み込みがタイムアウトしました');
         cacheManagerSection6.clearTargetSlots();
         return;
     }
@@ -405,7 +405,7 @@ export async function restoreFromCache(): Promise<void> {
         // メインボタンの表示更新
         entranceReservationStateManager.updateFabDisplay();
         
-        console.log('✅ キャッシュ復元完了');
+        logger.info('キャッシュ復元完了');
         
     }, 200);
 }
@@ -446,7 +446,7 @@ function getCurrentSelectedCalendarDate(): string | null {
                     return datetime;
                 } else if (datetime === 'N/A') {
                     hasNADatetime = true;
-                    console.log(`📅 datetime="N/A"を検出 - DOM更新待機中...`);
+                    logger.debug('datetime="N/A"を検出 - DOM更新待機中');
                 }
             }
         }
@@ -458,7 +458,7 @@ function getCurrentSelectedCalendarDate(): string | null {
             if (timeElement) {
                 const datetime = timeElement.getAttribute('datetime');
                 if (datetime && datetime !== 'N/A') {
-                    console.log(`📅 現在選択中のカレンダー日付（フォールバック）: ${datetime}`);
+                    logger.debug('現在選択中のカレンダー日付（フォールバック）', { datetime });
                     return datetime;
                 } else if (datetime === 'N/A') {
                     hasNADatetime = true;
@@ -467,9 +467,9 @@ function getCurrentSelectedCalendarDate(): string | null {
         }
         
         if (hasNADatetime) {
-            console.log('⚠️ datetime="N/A"のため日付取得を待機中...');
+            logger.warn('datetime="N/A"のため日付取得を待機中');
         } else {
-            console.log('⚠️ 選択中のカレンダー日付が見つかりません');
+            logger.warn('選択中のカレンダー日付が見つかりません');
         }
         
         return null;
@@ -481,7 +481,7 @@ function getCurrentSelectedCalendarDate(): string | null {
 
 // 動的待機版のカレンダー日付取得（強化版）
 async function waitForValidCalendarDate(maxRetries: number = 30, interval: number = 200): Promise<string | null> {
-    console.log('📅 カレンダー日付取得の動的待機を開始...');
+    logger.debug('カレンダー日付取得の動的待機を開始');
     
     for (let i = 0; i < maxRetries; i++) {
         // まずtime要素の存在を確認
@@ -490,7 +490,7 @@ async function waitForValidCalendarDate(maxRetries: number = 30, interval: numbe
         if (timeElements.length === 0) {
             // 50回に1回だけログ出力（過剰ログ防止）
             if ((i + 1) % 50 === 0) {
-                console.log(`⏳ time要素待機中 (${i + 1}/${maxRetries})`);
+                logger.debug('time要素待機中', { attempt: i + 1, maxRetries });
             }
             await new Promise(resolve => setTimeout(resolve, interval));
             continue;
@@ -498,38 +498,38 @@ async function waitForValidCalendarDate(maxRetries: number = 30, interval: numbe
         
         const date = getCurrentSelectedCalendarDate();
         if (date) {
-            console.log(`📅 動的待機で日付取得成功: ${date} (${i + 1}回目)`);
+            logger.info('動的待機で日付取得成功', { date, attempt: i + 1 });;
             return date;
         }
         
-        console.log(`⏳ 日付取得リトライ中 (${i + 1}/${maxRetries}) - time要素は${timeElements.length}個存在`);
+        logger.debug('日付取得リトライ中', { attempt: i + 1, maxRetries, timeElementCount: timeElements.length });
         
         if (i < maxRetries - 1) {
             await new Promise(resolve => setTimeout(resolve, interval));
         }
     }
     
-    console.log(`⚠️ ${maxRetries}回の動的待機後も日付取得に失敗`);
+    logger.warn('動的待機後も日付取得に失敗', { maxRetries });
     return null;
 }
 
 // 指定された日付のカレンダーをクリック
 async function clickCalendarDate(targetDate: string): Promise<boolean> {
-    console.log(`📅 指定日付のカレンダークリックを試行: ${targetDate}`);
+    logger.debug('指定日付のカレンダークリックを試行', { targetDate });
     
     try {
         // 指定日付のカレンダー要素を検索（実際のHTML構造に基づく）
         const timeElement = document.querySelector(`time[datetime="${targetDate}"]`) as HTMLTimeElement;
         if (!timeElement) {
-            console.log(`❌ 指定日付のtime要素が見つかりません: ${targetDate}`);
+            logger.warn('指定日付のtime要素が見つかりません', { targetDate });
             
             // デバッグ: 利用可能なカレンダー要素を表示
             const allCalendarElements = document.querySelectorAll('time[datetime]');
-            console.log(`🔍 利用可能なカレンダー要素数: ${allCalendarElements.length}`);
+            logger.debug('利用可能なカレンダー要素数', { count: allCalendarElements.length });
             allCalendarElements.forEach((el, i) => {
                 if (i < 5) { // 最初の5個だけ表示
                     const datetime = el.getAttribute('datetime');
-                    console.log(`  [${i}] datetime="${datetime}" (${el.tagName})`);
+                    logger.debug('カレンダー要素', { index: i, datetime, tagName: el.tagName });
                 }
             });
             
@@ -540,18 +540,18 @@ async function clickCalendarDate(targetDate: string): Promise<boolean> {
         const targetElement = timeElement.closest('div[role="button"]') as HTMLElement;
         
         if (!targetElement) {
-            console.log(`❌ 指定日付のボタン要素が見つかりません: ${targetDate}`);
+            logger.warn('指定日付のボタン要素が見つかりません', { targetDate });
             return false;
         }
         
         // クリック可能かチェック
         if (targetElement.getAttribute('tabindex') === '-1' || targetElement.hasAttribute('data-pointer-none')) {
-            console.log(`❌ 指定日付はクリック不可です: ${targetDate}`);
+            logger.warn('指定日付はクリック不可', { targetDate });
             return false;
         }
         
         // クリック実行
-        console.log(`🖱️ 日付をクリック: ${targetDate}`);
+        logger.info('日付をクリック', { targetDate });
         const clickEvent = new MouseEvent('click', {
             view: window,
             bubbles: true,
@@ -569,10 +569,10 @@ async function clickCalendarDate(targetDate: string): Promise<boolean> {
                             (targetElement.querySelector('time') as HTMLTimeElement)?.getAttribute('datetime') === targetDate;
         
         if (isNowSelected) {
-            console.log('✅ カレンダー日付のクリックが成功しました');
+            logger.info('カレンダー日付のクリックが成功しました');
             return true;
         } else {
-            console.log('⚠️ カレンダークリックは実行されましたが、選択状態の確認ができません');
+            logger.warn('カレンダークリックは実行されましたが、選択状態の確認ができません');
             return true; // 実行は成功したとして進行
         }
         

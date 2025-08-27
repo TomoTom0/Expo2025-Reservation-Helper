@@ -7,6 +7,7 @@ import { getMonitoringScheduler, ScheduleConfig } from './monitoring-scheduler';
 import { MonitoringCacheManager, MonitoringTarget } from './monitoring-cache';
 import { PavilionReservationCache } from './pavilion-reservation-cache';
 import { loggers } from '../utils/logger';
+const logger = loggers.monitoring;
 
 // API応答の型定義
 interface PavilionAvailability {
@@ -394,7 +395,7 @@ if (typeof window !== 'undefined') {
     (window as any).getMonitoringStatus = getMonitoringStatus;
     (window as any).debugMonitoringStatus = () => {
         console.group('🔍 監視サービス状況');
-        console.log(getMonitoringStatus());
+        logger.debug('監視状態', getMonitoringStatus());
         MonitoringCacheManager.debugInfo();
         console.groupEnd();
     };

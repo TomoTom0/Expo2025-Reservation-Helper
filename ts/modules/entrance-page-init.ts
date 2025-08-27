@@ -4,6 +4,8 @@
 
 // 型定義のインポート
 import type { Dependencies } from '../types/index.js';
+import { loggers } from '../utils/logger';
+const logger = loggers.ui;
 
 // 入場予約ページ初期化可能か判定
 export const judge_entrance_init = (): boolean => {
@@ -74,5 +76,5 @@ export const init_entrance_page = (dependencies: Dependencies = {}): void => {
         if (setPageLoadingStateFn) setPageLoadingStateFn(false);
     })();
     
-    console.log("入場予約機能の初期化完了");
+    logger.info('入場予約機能の初期化完了');
 }
