@@ -14,6 +14,7 @@ export const useTicketsStore = defineStore('tickets', () => {
   const selectedTicketIds = ref<Set<string>>(new Set())
   const selectedEntranceDates = ref<Map<string, string>>(new Map()) // ticketId -> scheduleId mapping for persistence
   const isLoading = ref(false)
+  const isInitialized = ref(false)
   const availableDates = ref<string[]>([])
   const todayStr = ref<string>(getTodayString())
   
@@ -84,11 +85,21 @@ export const useTicketsStore = defineStore('tickets', () => {
     if (!Array.isArray(schedules)) return []
     
     return schedules.map(schedule => {
+      
+      // schedule_nameから時刻情報を抽出（例: "9:00-" → "9:00"）
+      let timeStart = undefined
+      if (schedule.schedule_name) {
+        const timeMatch = schedule.schedule_name.match(/(\d{1,2}:\d{2})/)
+        if (timeMatch) {
+          timeStart = timeMatch[1]
+        }
+      }
+      
       const scheduleData: ScheduleData = {
         entrance_date: schedule.entrance_date || '',
         use_state: schedule.use_state || 0,
         schedule_name: schedule.schedule_name,
-        time_start: schedule.time_start,
+        time_start: timeStart,
         time_end: schedule.time_end,
         reservation_type: schedule.reservation_type,
         // 有効フラグを付与: 未使用または当日入場済みは有効
@@ -460,6 +471,8 @@ export const useTicketsStore = defineStore('tickets', () => {
     console.log('🎫 チケットストア初期化開始')
     await loadAllTickets()
     restoreSelectedEntranceDates()
+    isInitialized.value = true
+    console.log('✅ チケットストア初期化完了')
   }
 
   return {
@@ -468,6 +481,7 @@ export const useTicketsStore = defineStore('tickets', () => {
     selectedTicketIds,
     selectedEntranceDates,
     isLoading,
+    isInitialized,
     availableDates,
     
     // Getters

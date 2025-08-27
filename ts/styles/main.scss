@@ -66,16 +66,15 @@ table[class*='style_main__timetable__'] {
 .ytomo-dialog-overlay * {
   &:focus {
     outline: none !important;
-    border: none !important;
     box-shadow: none !important;
   }
 }
 
-// パビリオンタブ検索入力欄のfocusスタイル削除
+// パビリオンタブ検索入力欄のfocusスタイル
 .ytomo-pavilion-search-input {
   &:focus {
     outline: none !important;
-    border: 1px solid #e2e8f0 !important;
+    border: 1px solid #2c5aa0 !important;
     box-shadow: none !important;
   }
 }

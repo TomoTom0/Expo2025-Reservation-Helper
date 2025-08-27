@@ -23,7 +23,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useMainDialogStore } from '@/stores/mainDialog'
 import { useTicketsStore } from '@/stores/tickets'
 import { usePavilionsStore } from '@/stores/pavilions'
@@ -39,7 +39,9 @@ const mainDialogStore = useMainDialogStore()
 const ticketsStore = useTicketsStore()
 const pavilionsStore = usePavilionsStore()
 
-const isInitialized = ref(false)
+const isInitialized = computed(() => {
+  return ticketsStore.isInitialized && pavilionsStore.isInitialized
+})
 const reservationResult = ref<ReservationResult | null>(null)
 
 const handleClick = () => {
@@ -66,10 +68,6 @@ const handleReservationResult = (event: CustomEvent<ReservationResult>) => {
 }
 
 onMounted(() => {
-  // ストア初期化はページ読み込み時にだけ行う
-  // ここではボタンを有効化するだけ
-  isInitialized.value = true
-  
   // 予約結果イベントリスナーを設定
   document.addEventListener('reservation-result', handleReservationResult as EventListener)
 })

@@ -111,7 +111,7 @@
               :class="getTimeSlotClasses(pavilion.id, timeSlot)"
               :data-pavilion-id="pavilion.id"
               :data-time-slot="timeSlot.time"
-              :disabled="!timeSlot.available"
+              :disabled="isTimeSlotDisabledByEntranceTime(timeSlot)"
               @click="handleTimeSlotClick(pavilion.id, timeSlot)"
             >
               {{ formatTimeSlot(timeSlot.time) }}
@@ -129,7 +129,9 @@
       title="ENDLESSモード切替"
       @click="mainDialogStore.toggleEndlessMode"
     >
-      ENDLESS
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M18.6 6.62c-1.44 0-2.8.56-3.77 1.53L12 10.66 10.48 9.14c-.64-.64-1.49-.99-2.4-.99-1.87 0-3.39 1.51-3.39 3.38s1.52 3.38 3.39 3.38c.91 0 1.76-.35 2.4-.99L12 12.4l1.52 1.52c.64.64 1.49.99 2.4.99 1.87 0 3.39-1.51 3.39-3.38s-1.52-3.38-3.39-3.38c-.9 0-1.76.35-2.4.99l-.96.96-.96-.96c-.64-.64-1.5-.99-2.4-.99z"/>
+      </svg>
     </button>
 
     <!-- 予約実行FABボタン -->
@@ -172,23 +174,6 @@
       </div>
     </div>
     
-    <!-- 誤操作防止オーバーレイ -->
-    <div 
-      v-if="processingOverlayVisible" 
-      class="ytomo-processing-overlay"
-      id="ytomo-pavilion-processing-overlay"
-    >
-      <div class="ytomo-processing-content">
-        <div class="ytomo-processing-spinner"></div>
-        <p class="ytomo-processing-message">{{ processingMessage }}</p>
-        <button 
-          class="ytomo-cancel-button" 
-          @click="hideProcessingOverlay"
-        >
-          キャンセル
-        </button>
-      </div>
-    </div>
   </div>
 </template>
 
@@ -198,6 +183,7 @@ import { storeToRefs } from 'pinia'
 import { usePavilionsStore } from '@/stores/pavilions'
 import { useTicketsStore } from '@/stores/tickets'
 import { useMainDialogStore } from '@/stores/mainDialog'
+import { useOverlaysStore } from '@/stores/overlays'
 import { usePavilions } from '@/composables/usePavilions'
 import type { ScheduleData, TicketData } from '@/types/api'
 
@@ -220,6 +206,7 @@ interface PavilionData {
 const pavilionsStore = usePavilionsStore()
 const ticketsStore = useTicketsStore()
 const mainDialogStore = useMainDialogStore()
+const overlaysStore = useOverlaysStore()
 const { allPavilions, filteredPavilions, isLoading, isAvailableOnlyFilter, availablePavilionsCount } = storeToRefs(pavilionsStore)
 
 // Composable使用
@@ -240,8 +227,6 @@ const {
 const searchInput = ref('')
 const statusFabVisible = ref(false)
 const resultDisplayVisible = ref(false)
-const processingOverlayVisible = ref(false)
-const processingMessage = ref('')
 
 // 計算プロパティ
 const selectedSlotsCount = computed(() => pavilionsStore.selectedTimeSlotsCount)
@@ -264,7 +249,38 @@ const selectedEntranceDate = computed(() => {
   return selectedSchedules.value.length > 0 ? selectedSchedules.value[0].entrance_date : null
 })
 
-// 選択された入場予約のうち、最も遅い入場日時を取得
+// 選択された入場予約のうち、最も遅い入場時刻+10分を取得（HH:MM形式）
+const getLatestEntranceTime = (): string => {
+  if (selectedSchedules.value.length === 0) {
+    console.log('⏰ 選択された入場予約なし')
+    return ''
+  }
+  
+  // 各スケジュールの日時文字列を比較可能な形式に変換して最新を取得
+  const latest = selectedSchedules.value.reduce((latest, current) => {
+    const latestDateTime = `${latest.entrance_date}${latest.time_start || '0000'}`
+    const currentDateTime = `${current.entrance_date}${current.time_start || '0000'}`
+    return currentDateTime > latestDateTime ? current : latest
+  })
+  
+  
+  // time_startをHH:MM形式に変換
+  let timeStr = latest.time_start || ''
+  
+  // 時間に10分を追加
+  if (timeStr && timeStr.includes(':')) {
+    const [hours, minutes] = timeStr.split(':').map(Number)
+    const totalMinutes = hours * 60 + minutes + 10
+    const newHours = Math.floor(totalMinutes / 60)
+    const newMinutes = totalMinutes % 60
+    const result = `${newHours.toString().padStart(2, '0')}:${newMinutes.toString().padStart(2, '0')}`
+    return result
+  }
+  
+  return ''
+}
+
+// 選択された入場予約のうち、最も遅い入場日時を取得（表示用）
 const latestEntranceDateTime = computed(() => {
   if (selectedSchedules.value.length === 0) return ''
   
@@ -363,7 +379,16 @@ const handleLoadFavorites = async () => {
     console.log('⭐ お気に入り読み込み')
     showProcessingOverlay('お気に入りを読み込み中...')
     
-    const results = await loadFavoritePavilions()
+    // 選択されたチケットIDsを取得
+    const selectedTickets = ticketsStore.ticketsArray.filter(ticket => 
+      ticket.schedules?.some(schedule => schedule.selected)
+    )
+    const ticketIds = selectedTickets.map(t => t.ticket_id)
+    
+    // 選択された入場日付を取得  
+    const entranceDate = selectedEntranceDate.value
+    
+    const results = await loadFavoritePavilions(entranceDate || undefined, ticketIds)
     
     // お気に入り読み込み後はフィルターをOFFにして全て表示
     if (isAvailableOnlyFilter.value) {
@@ -401,7 +426,7 @@ const handleRefresh = async () => {
     // 選択された入場日付を取得  
     const entranceDate = selectedEntranceDate.value
     
-    await refreshPavilionData()
+    await refreshPavilionData(ticketIds, entranceDate || undefined)
     hideProcessingOverlay()
   } catch (error) {
     console.error('❌ データ更新エラー:', error)
@@ -409,16 +434,14 @@ const handleRefresh = async () => {
   }
 }
 
-// 誤操作防止オーバーレイ制御
+// オーバーレイ制御（ストア連携）
 const showProcessingOverlay = (message: string) => {
-  processingMessage.value = message
-  processingOverlayVisible.value = true
+  overlaysStore.showProcessingOverlay(message)
   console.log(`🛡️ 誤操作防止オーバーレイ表示: ${message}`)
 }
 
 const hideProcessingOverlay = () => {
-  processingOverlayVisible.value = false
-  processingMessage.value = ''
+  overlaysStore.hideProcessingOverlay()
   console.log('🛡️ 誤操作防止オーバーレイ非表示')
 }
 
@@ -470,11 +493,11 @@ const handleTimeSlotClick = (pavilionId: string, timeSlot: TimeSlotData) => {
   const pavilion = pavilionsStore.pavilions.get(pavilionId)
   if (!pavilion) return
 
+  // 満員時間帯でも選択可能（監視機能のため）
   if (!timeSlot.available) {
-    // 満員時間帯クリック → 監視対象に追加
-    console.log('🔴 満員時間帯クリック（監視対象追加予定）:', { pavilionId, timeSlot })
-    // TODO: 監視機能は後で実装
-    return
+    console.log('🔴 満員時間帯クリック（選択）:', { pavilionId, timeSlot })
+  } else {
+    console.log('🟢 空き時間帯クリック（選択）:', { pavilionId, timeSlot })
   }
   
   // 空き時間帯クリック → 選択状態を切り替え
@@ -509,7 +532,9 @@ const handleReservationExecution = async () => {
   
   try {
     console.log('📋 予約実行開始:', selectedSlotsCount.value, '件')
-    showProcessingOverlay(`${selectedSlotsCount.value}件の予約を実行中...`)
+    
+    // 順次予約オーバーレイを表示
+    overlaysStore.showSequentialOverlay(selectedSlotsCount.value)
     
     const selectedSlots = pavilionsStore.selectedTimeSlots
     const entranceDate = selectedEntranceDate.value || ''
@@ -559,6 +584,22 @@ const handleReservationExecution = async () => {
     
     hideProcessingOverlay()
     
+    // 予約結果をMainFab.vueと同様の形式で発火
+    results.forEach(result => {
+      if (result.details) {
+        const reservationResult = {
+          success: result.success,
+          reason: result.success ? undefined : result.message,
+          pavilionName: result.details.pavilionName || '',
+          datetime: `${formatDate(entranceDate)} ${result.details.timeSlot || ''}`
+        }
+        
+        // CustomEventでMainFab.vueに結果を通知
+        const event = new CustomEvent('reservation-result', { detail: reservationResult })
+        document.dispatchEvent(event)
+      }
+    })
+    
     // 結果メッセージ表示
     if (successCount > 0) {
       statusFabVisible.value = true
@@ -567,7 +608,7 @@ const handleReservationExecution = async () => {
     
   } catch (error) {
     console.error('❌ 予約実行エラー:', error)
-    hideProcessingOverlay()
+    overlaysStore.hideSequentialOverlay()
   }
 }
 
@@ -584,6 +625,25 @@ const formatDate = (dateStr: string | null): string => {
   return dateStr || ''
 }
 
+// 入場時刻制約により時間帯がdisabledかどうかを判定
+const isTimeSlotDisabledByEntranceTime = (timeSlot: TimeSlotData): boolean => {
+  const latestEntranceTime = getLatestEntranceTime()
+  if (!latestEntranceTime) return false
+  
+  // 時間帯の開始時間をHH:MM形式に変換
+  const slotStartTime = formatTimeSlot(timeSlot.time)
+  if (!slotStartTime) return false
+  
+  // デバッグログ
+  const isDisabled = slotStartTime <= latestEntranceTime
+  if (isDisabled) {
+    console.log(`⏰ 時間帯disabled: ${slotStartTime} <= ${latestEntranceTime}`)
+  }
+  
+  // 時間比較（HH:MM形式で辞書順比較）
+  return isDisabled
+}
+
 const formatTimeSlot = (timeStr: string): string => {
   // HHMM形式（例：1040, 1100）をHH:MM形式に変換
   if (timeStr && timeStr.length === 4) {
@@ -597,6 +657,7 @@ const formatTimeSlot = (timeStr: string): string => {
   }
   return timeStr || ''
 }
+
 
 // ライフサイクル
 onMounted(() => {
@@ -777,9 +838,15 @@ onUnmounted(() => {
     border: none;
     font-size: 18px;
     cursor: pointer;
-    transition: all 0.2s;
+    transition: background-color 0.2s;
     padding: 4px;
     border-radius: 4px;
+    width: 26px;
+    height: 26px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
 
     &:hover {
         background: rgba(255, 193, 7, 0.1);
@@ -1265,14 +1332,12 @@ onUnmounted(() => {
     position: fixed;
     bottom: 96px;
     right: 20px;
-    width: 80px;
+    width: 40px;
     height: 32px;
     background: #6b7280;
     border: none;
     border-radius: 16px;
     color: white;
-    font-size: 11px;
-    font-weight: bold;
     cursor: pointer;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
     transition: all 0.2s ease;
@@ -1337,7 +1402,11 @@ onUnmounted(() => {
 }
 
 /* フォーカス状態の統一 */
-.ytomo-pavilion-tab input:focus,
+.ytomo-pavilion-tab input:focus {
+    outline: none;
+    border-color: #2c5aa0;
+}
+
 .ytomo-pavilion-tab button:focus {
     outline: none;
 }

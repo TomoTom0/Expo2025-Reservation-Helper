@@ -1,8 +1,7 @@
 import { PageChecker } from './page-utils';
 import { createApp, type App } from 'vue'
 import { pinia } from '../stores'
-import MainDialog from '../components/MainDialog.vue'
-import MainFab from '../components/MainFab.vue'
+import RootApp from '../App.vue'
 
 /**
  * 簡素化されたメインダイアログFAB実装
@@ -24,10 +23,8 @@ export interface MainDialogFab {
  * YTFABボタンの実装（Vue統合版）
  */
 export class MainDialogFabImpl implements MainDialogFab {
-    private vueDialogApp: App | null = null;
-    private vueFabApp: App | null = null;
-    private dialogMountPoint: HTMLElement | null = null;
-    private fabMountPoint: HTMLElement | null = null;
+    private vueApp: App | null = null;
+    private appMountPoint: HTMLElement | null = null;
     private pageChecker: PageChecker | null = null;
 
     /**
@@ -73,34 +70,24 @@ export class MainDialogFabImpl implements MainDialogFab {
     }
     
     /**
-     * Vueコンポーネントを初期化
+     * Vueアプリケーションを初期化
      */
     private initializeVueComponents(): void {
         try {
-            // MainDialogマウントポイント作成
-            this.dialogMountPoint = document.createElement('div');
-            this.dialogMountPoint.id = 'vue-main-dialog';
-            document.body.appendChild(this.dialogMountPoint);
+            // アプリケーションマウントポイント作成
+            this.appMountPoint = document.createElement('div');
+            this.appMountPoint.id = 'vue-app';
+            document.body.appendChild(this.appMountPoint);
             
-            // MainFabマウントポイント作成
-            this.fabMountPoint = document.createElement('div');
-            this.fabMountPoint.id = 'vue-main-fab';
-            document.body.appendChild(this.fabMountPoint);
+            // 単一Vue app作成・マウント
+            this.vueApp = createApp(RootApp);
+            this.vueApp.use(pinia);
+            this.vueApp.mount(this.appMountPoint);
             
-            // MainDialog Vue app作成・マウント
-            this.vueDialogApp = createApp(MainDialog);
-            this.vueDialogApp.use(pinia);
-            this.vueDialogApp.mount(this.dialogMountPoint);
-            
-            // MainFab Vue app作成・マウント
-            this.vueFabApp = createApp(MainFab);
-            this.vueFabApp.use(pinia);
-            this.vueFabApp.mount(this.fabMountPoint);
-            
-            console.log('✅ Vueコンポーネント初期化完了');
+            console.log('✅ Vueアプリケーション初期化完了');
             
         } catch (error) {
-            console.error('❌ Vueコンポーネント初期化エラー:', error);
+            console.error('❌ Vueアプリケーション初期化エラー:', error);
             throw error;
         }
     }
@@ -134,26 +121,16 @@ export class MainDialogFabImpl implements MainDialogFab {
     cleanup(): void {
         console.log('🧹 メインダイアログFABシステムクリーンアップ');
         
-        // Vue appsをアンマウント
-        if (this.vueDialogApp) {
-            this.vueDialogApp.unmount();
-            this.vueDialogApp = null;
-        }
-        
-        if (this.vueFabApp) {
-            this.vueFabApp.unmount();
-            this.vueFabApp = null;
+        // Vue appをアンマウント
+        if (this.vueApp) {
+            this.vueApp.unmount();
+            this.vueApp = null;
         }
         
         // マウントポイントを削除
-        if (this.dialogMountPoint) {
-            this.dialogMountPoint.remove();
-            this.dialogMountPoint = null;
-        }
-        
-        if (this.fabMountPoint) {
-            this.fabMountPoint.remove();
-            this.fabMountPoint = null;
+        if (this.appMountPoint) {
+            this.appMountPoint.remove();
+            this.appMountPoint = null;
         }
         
         console.log('✅ メインダイアログFABシステムクリーンアップ完了');

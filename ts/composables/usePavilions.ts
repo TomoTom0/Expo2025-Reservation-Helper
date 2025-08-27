@@ -30,8 +30,8 @@ export const usePavilions = () => {
     return await pavilionsStore.searchPavilions(query, ticketIds, entranceDate)
   }
 
-  const loadFavoritePavilions = async (): Promise<PavilionData[]> => {
-    return await pavilionsStore.loadFavoritePavilions()
+  const loadFavoritePavilions = async (entranceDate?: string, ticketIds: string[] = []): Promise<PavilionData[]> => {
+    return await pavilionsStore.loadFavoritePavilions(entranceDate, ticketIds)
   }
 
   const addToFavorites = (pavilionId: string, name: string): void => {
@@ -77,10 +77,10 @@ export const usePavilions = () => {
     pavilionsStore.toggleAvailableOnlyFilter()
   }
 
-  const refreshPavilionData = async (): Promise<PavilionData[]> => {
+  const refreshPavilionData = async (ticketIds: string[] = [], entranceDate?: string): Promise<PavilionData[]> => {
     // 前回の検索クエリで更新（選択リセットなし）
     const currentQuery = pavilionsStore.searchQuery
-    return await pavilionsStore.refreshPavilions(currentQuery)
+    return await pavilionsStore.refreshPavilions(currentQuery, ticketIds, entranceDate)
   }
 
   // ユーティリティ関数

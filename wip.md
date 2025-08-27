@@ -256,6 +256,167 @@ if (pageInfo.type === 'reservation_time' && !pageInfo.isReady) {
 - `isEffective`プロパティの値と計算過程の検証
 - ストア初期化タイミングとVueコンポーネントマウント順序の確認
 
+## 現在の作業：オーバーレイコンポーネントの独立化
+
+### 🎯 問題点の特定
+**問題**: ダイアログコンポーネント内にオーバーレイを配置すると、Teleportを使っても画面全体を正しく覆わない可能性がある
+
+### 📋 実装方針の変更
+**変更前**: PavilionTab.vue内にオーバーレイコンポーネントを配置
+```vue
+<template>
+  <div class="ytomo-pavilion-tab">
+    <!-- ダイアログ内容 -->
+    <ProcessingOverlay />  <!-- ❌ ダイアログ内配置 -->
+    <SequentialReservationOverlay />
+  </div>
+</template>
+```
+
+**変更後**: ルートレベルでオーバーレイを管理
+- オーバーレイコンポーネントをアプリケーションルート（main.ts）で配置
+- ストアを通じた完全な独立制御
+- Teleportによる`document.body`への直接配置
+
+### 🛠️ 作成済みファイル
+1. **OverlaysStore**: `/ts/stores/overlays.ts` ✅
+   - 誤操作防止オーバーレイの状態管理
+   - 順次予約オーバーレイの状態管理
+   - オーバーレイ表示/非表示制御メソッド
+
+2. **ProcessingOverlay.vue**: `/ts/components/ProcessingOverlay.vue` ✅
+   - シンプルなスピナー+メッセージ表示
+   - Teleportによる`document.body`配置
+
+3. **SequentialReservationOverlay.vue**: `/ts/components/SequentialReservationOverlay.vue` ✅
+   - モード切替（予約/監視）
+   - 間隔設定（1,5,15,30,60秒）
+   - 進捗表示・カウントダウン
+   - キャンセル機能
+
+### 🔧 必要な修正作業
+- [x] PavilionTab.vue内のオーバーレイコンポーネント配置を削除
+- [x] MainDialog.vue内にオーバーレイコンポーネントを一時的に配置（同一Vueアプリ内での動作確認）
+- [ ] **重要な構成問題**: 複数の独立したVueアプリではなく、App.vueを基軸とした単一Vueアプリ構成に変更が必要
+
+### 🚨 発見された根本的な設計問題
+
+#### 現在の不適切な構成
+```typescript
+// main-dialog-fab.ts
+private vueDialogApp: App | null = null;  // MainDialog用アプリ
+private vueFabApp: App | null = null;     // MainFab用アプリ
+```
+
+**問題点**:
+1. **独立したVueアプリ**: MainDialogとMainFabが別々のVueアプリとして動作
+2. **データ共有の複雑性**: 同じPiniaストアを使用するが、アプリが分離されているため管理が複雑
+3. **非標準な構成**: Vue.jsの標準的なSPA構成ではない
+
+#### 正しい構成（要修正）
+```typescript
+// 単一のVueアプリ
+const app = createApp(App)  // App.vueが基軸
+app.use(pinia)
+app.mount('#app')
+```
+
+**App.vue内の構成**:
+```vue
+<template>
+  <div id="app">
+    <MainFab />
+    <MainDialog />
+    <ProcessingOverlay />
+    <SequentialReservationOverlay />
+  </div>
+</template>
+```
+
+### ✅ 完了した修正作業
+1. **App.vue作成**: 基軸となるルートコンポーネント ✅
+2. **main-dialog-fab.ts改修**: 複数アプリから単一アプリ構成への変更 ✅
+3. **全コンポーネント統合**: App.vue内でのコンポーネント管理 ✅
+4. **ストア共有の簡素化**: 単一アプリ内での自然なストア共有 ✅
+
+### 🔧 追加修正作業
+- [x] **schedule_nameから時刻抽出**: APIデータの`time_start`が`undefined`の問題を修正
+- [x] **デバッグログ削減**: 過剰なconsole.log出力を整理
+
+## 🔄 進行中の作業：カスタムLogger設計・実装
+
+### 📋 現在の問題
+- **console.log乱用**: デバッグ目的で大量のconsole.logが散在している状態
+- **ログレベル未分離**: エラー、警告、情報、デバッグが混在
+- **本番環境での制御不可**: 不要なログが本番でも出力される
+- **統一性の欠如**: ログフォーマットがバラバラで追跡しにくい
+
+### 🎯 設計要件
+#### 基本機能
+1. **ログレベル分離**: ERROR, WARN, INFO, DEBUG の4段階
+2. **環境別制御**: 本番環境では ERROR, WARN のみ出力
+3. **統一フォーマット**: `[LEVEL] [MODULE] メッセージ` 形式
+4. **モジュール分類**: 各機能ごとのモジュール名で分類
+
+#### 拡張機能
+1. **条件付きログ**: 特定条件下でのみ出力するオプション
+2. **パフォーマンス計測**: 処理時間測定機能
+3. **ログ収集**: 将来的なログ分析のためのデータ蓄積
+
+### 🏗️ 実装設計
+
+#### 1. Logger基本構造
+```typescript
+// ts/utils/logger.ts
+interface LoggerConfig {
+  level: 'ERROR' | 'WARN' | 'INFO' | 'DEBUG'
+  module: string
+  enabled: boolean
+}
+
+class CustomLogger {
+  constructor(private config: LoggerConfig) {}
+  
+  error(message: string, data?: any): void
+  warn(message: string, data?: any): void  
+  info(message: string, data?: any): void
+  debug(message: string, data?: any): void
+  
+  // パフォーマンス測定
+  time(label: string): void
+  timeEnd(label: string): void
+}
+```
+
+#### 2. モジュール別Logger作成
+```typescript
+// 各モジュールでの使用例
+const logger = createLogger('PAVILION', 'DEBUG')
+logger.info('パビリオン検索開始', { query, count: results.length })
+logger.debug('API応答', responseData)
+logger.error('検索エラー', error)
+```
+
+#### 3. 環境別設定
+```typescript
+// 本番: ERROR, WARN のみ
+// 開発: 全レベル出力
+const LOG_LEVEL = process.env.NODE_ENV === 'production' ? 'WARN' : 'DEBUG'
+```
+
+### 📝 実装計画
+1. **Logger基本クラス作成** ⭐ **次のタスク**
+2. **モジュール別Logger定義**
+3. **既存console.log置き換え** (段階的実施)
+4. **パフォーマンス測定機能追加**
+
+### 🎯 置き換え対象モジュール
+- **tickets.ts**: チケット管理関連
+- **pavilions.ts**: パビリオン検索・時間帯取得
+- **PavilionTab.vue**: UI操作・検索実行
+- **automation-engine.ts**: 自動予約エンジン
+- **monitoring-service.ts**: 監視サービス
+
 ## 過去の完了作業：Vue.jsコンポーネントのスタイル整理
 
 ### 🎨 スタイル定義の方針統一 ✅
