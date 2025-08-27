@@ -170,7 +170,7 @@ export const setEntranceReservationHelper = (helper: Function): void => {
 export function getCurrentMode(): string {
     // 入場予約状態管理システムを取得（必須）
     if (!entranceReservationStateManager) {
-        console.warn('⚠️ EntranceReservationStateManager が利用できません');
+        logger.warn('EntranceReservationStateManagerが利用できません');
         return 'idle';
     }
     
@@ -368,14 +368,14 @@ export async function restoreFromCache(): Promise<void> {
             // カレンダーが利用可能になるまで待機
             const calendarReady = await waitForCalendar(5000);
             if (!calendarReady) {
-                console.error('❌ カレンダーの準備完了を待機中にタイムアウトしました');
+                logger.error('カレンダーの準備完了待機タイムアウト');
                 return;
             }
             
             // 指定日付のカレンダーをクリック
             const dateClickSuccess = await clickCalendarDate(cached.selectedDate);
             if (!dateClickSuccess) {
-                console.error(`❌ キャッシュされた日付への移動に失敗: ${cached.selectedDate}`);
+                logger.error('キャッシュされた日付への移動失敗', { selectedDate: cached.selectedDate });
                 return;
             }
             
@@ -384,7 +384,7 @@ export async function restoreFromCache(): Promise<void> {
             // 日付移動後、時間帯テーブルが更新されるまで待機
             const tableReady = await waitForTimeSlotTable(5000);
             if (!tableReady) {
-                console.error('❌ 時間帯テーブルの更新完了を待機中にタイムアウトしました');
+                logger.error('時間帯テーブル更新完了待機タイムアウト');
                 return;
             }
         }
@@ -474,7 +474,7 @@ function getCurrentSelectedCalendarDate(): string | null {
         
         return null;
     } catch (error) {
-        console.error('❌ カレンダー日付取得エラー:', error);
+        logger.error('カレンダー日付取得エラー', error);
         return null;
     }
 }
@@ -577,7 +577,7 @@ async function clickCalendarDate(targetDate: string): Promise<boolean> {
         }
         
     } catch (error) {
-        console.error('❌ カレンダー日付クリックエラー:', error);
+        logger.error('カレンダー日付クリックエラー', error);
         return false;
     }
 }

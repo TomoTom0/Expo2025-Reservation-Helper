@@ -3,6 +3,9 @@
  * UserScript環境での音声通知機能を提供
  */
 
+import { loggers } from '../utils/logger';
+const logger = loggers.ui;
+
 export class AudioPlayer {
     /**
      * 8ビット風成功音を再生
@@ -47,7 +50,7 @@ export class AudioPlayer {
             });
             
         } catch (error) {
-            console.error('Success sound playback failed:', error);
+            logger.error('成功音再生失敗', error);
         }
     }
 
@@ -75,7 +78,7 @@ export class AudioPlayer {
             oscillator.start(audioContext.currentTime);
             oscillator.stop(audioContext.currentTime + duration / 1000);
         } catch (error) {
-            console.error('Beep sound playback failed:', error);
+            logger.error('ビープ音再生失敗', error);
         }
     }
 

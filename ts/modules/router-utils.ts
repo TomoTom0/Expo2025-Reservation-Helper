@@ -3,6 +3,9 @@
  * Content Script環境でのCSP制限を回避してPage ContextのRouterにアクセス
  */
 
+import { loggers } from '../utils/logger';
+const logger = loggers.automation;
+
 /**
  * Page ContextのNext.js Routerの存在確認
  * CSP制限を回避してonclick属性経由でアクセス
@@ -10,10 +13,10 @@
  */
 export function checkNextRouter(): { exists: boolean; type: string } | null {
     try {
-        console.log('🔍 Router存在確認 - CSP制限回避方式');
+        logger.info('Router存在確認 - CSP制限回避方式');
         
         // Content Script contextでの確認
-        console.log('Content Script - window.next:', (window as any).next);
+        logger.debug('Content Script - window.next', { next: (window as any).next });
         
         // DOM操作でPage contextの情報取得
         const testDiv = document.createElement('div');
@@ -30,21 +33,21 @@ export function checkNextRouter(): { exists: boolean; type: string } | null {
         const result = testDiv.dataset['router'];
         document.body.removeChild(testDiv);
         
-        console.log('Page context Router情報:', result);
+        logger.debug('Page context Router情報', { result });
         
         if (result) {
             const routerInfo = JSON.parse(result);
             if (routerInfo.exists) {
-                console.log('✅ Page contextでRouter存在確認');
+                logger.info('Page contextでRouter存在確認');
                 return routerInfo;
             }
         }
         
-        console.log('⚠️ Page contextでRouter未発見');
+        logger.warn('Page contextでRouter未発見');
         return null;
         
     } catch (e) {
-        console.error('Router存在確認エラー:', e);
+        logger.error('Router存在確認エラー', e);
         return null;
     }
 }
@@ -57,12 +60,12 @@ export function checkNextRouter(): { exists: boolean; type: string } | null {
  */
 export function executeRouterPush(url: string): boolean {
     try {
-        console.log('🔍 Router.push()実行開始:', url);
+        logger.info('Router.push()実行開始', { url });
         
         // Router存在確認
         const routerInfo = checkNextRouter();
         if (!routerInfo?.exists) {
-            console.error('❌ Router が存在しません');
+            logger.error('Router が存在しません');
             return false;
         }
         
@@ -74,11 +77,11 @@ export function executeRouterPush(url: string): boolean {
         pushDiv.click();
         document.body.removeChild(pushDiv);
         
-        console.log('✅ Router.push()実行完了:', url);
+        logger.info('Router.push()実行完了', { url });
         return true;
         
     } catch (e) {
-        console.error('❌ Router.push()実行エラー:', e);
+        logger.error('Router.push()実行エラー', e);
         return false;
     }
 }
@@ -102,9 +105,10 @@ export const RouterUtils = {
      */
     logInfo(): void {
         const routerInfo = checkNextRouter();
-        console.log('=== Next.js Router情報 ===');
-        console.log('存在:', routerInfo?.exists || false);
-        console.log('型:', routerInfo?.type || 'unknown');
-        console.log('Content Script context - window.next:', (window as any).next);
+        logger.info('Next.js Router情報', {
+            exists: routerInfo?.exists || false,
+            type: routerInfo?.type || 'unknown',
+            contentScriptNext: (window as any).next
+        });
     }
 };

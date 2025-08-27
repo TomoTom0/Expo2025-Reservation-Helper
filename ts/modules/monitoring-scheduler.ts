@@ -3,6 +3,9 @@
  * 変更容易な監視タイミング制御
  */
 
+import { loggers } from '../utils/logger';
+const logger = loggers.monitoring;
+
 // スケジュール設定の型定義
 export interface ScheduleConfig {
     intervalType: 'fixed-seconds' | 'cron-like' | 'custom';
@@ -42,7 +45,7 @@ export class MonitoringScheduler {
         this.isRunning = true;
         this.scheduleNext();
         
-        console.log('🕐 監視スケジューラー開始:', this.getConfigDescription());
+        logger.info('監視スケジューラー開始', { config: this.getConfigDescription() });
     }
 
     /**
@@ -57,7 +60,7 @@ export class MonitoringScheduler {
         this.isRunning = false;
         this.callback = null;
         
-        console.log('⏹️ 監視スケジューラー停止');
+        logger.info('監視スケジューラー停止');
     }
 
     /**
@@ -73,7 +76,7 @@ export class MonitoringScheduler {
 
         this.config = { ...this.config, ...newConfig };
         
-        console.log('⚙️ スケジューラー設定更新:', this.getConfigDescription());
+        logger.info('スケジューラー設定更新', { config: this.getConfigDescription() });
 
         if (wasRunning && oldCallback) {
             this.start(oldCallback);
@@ -116,7 +119,7 @@ export class MonitoringScheduler {
      */
     triggerManual(): void {
         if (this.callback) {
-            console.log('🔄 手動実行トリガー');
+            logger.debug('手動実行トリガー');
             this.executeCallback();
         }
     }
@@ -135,7 +138,7 @@ export class MonitoringScheduler {
         }, delay);
 
         const nextTime = new Date(Date.now() + delay);
-        console.log(`⏰ 次回実行予定: ${nextTime.toLocaleTimeString()}`);
+        logger.debug('次回実行予定', { nextTime: nextTime.toLocaleTimeString() });
     }
 
     /**
@@ -215,10 +218,10 @@ export class MonitoringScheduler {
         if (!this.callback) return;
 
         try {
-            console.log('🔄 監視チェック実行:', new Date().toLocaleTimeString());
+            logger.debug('監視チェック実行', { time: new Date().toLocaleTimeString() });
             await this.callback();
         } catch (error) {
-            console.error('❌ 監視チェックエラー:', error);
+            logger.error('監視チェックエラー', error);
         }
     }
 }

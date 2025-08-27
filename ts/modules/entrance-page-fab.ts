@@ -298,7 +298,7 @@ function createEntranceReservationUI(): void {
                 }
             }
         } catch (error) {
-            console.error('予約処理エラー:', error);
+            logger.error('予約処理エラー', error);
             const errorMessage = error instanceof Error ? error.message : String(error);
             
             if (errorMessage === 'TargetConsistencyError') {

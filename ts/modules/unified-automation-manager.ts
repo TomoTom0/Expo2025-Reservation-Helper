@@ -249,7 +249,7 @@ export class UnifiedAutomationManager {
         
         while (true) {
             attempts++;
-            logger.debug('試行回数', { attempts });
+            logger.info('試行回数', { attempts });
             
             // 中断チェック
             this.throwIfAborted(signal);
@@ -302,29 +302,29 @@ export class UnifiedAutomationManager {
                     selectorTexts
                 );
                 
-                console.log(`レスポンス検出: ${response.key}`);
+                logger.debug('レスポンス検出', { responseKey: response.key });
                 
                 if (response.key === 'change') {
-                    console.log('変更ボタンをクリックして最終結果を待機...');
+                    logger.debug('変更ボタンをクリックして最終結果を待機');
                     
                     // changeダイアログ出現を記録
                     if (this.stateManager && this.stateManager.markChangeDialogAppeared) {
-                        console.log('🔄 changeダイアログ記録を実行...');
+                        logger.debug('changeダイアログ記録を実行');
                         this.stateManager.markChangeDialogAppeared();
-                        console.log('🔄 changeダイアログ記録完了');
+                        logger.debug('changeダイアログ記録完了');
                     } else {
-                        console.log('⚠️ stateManagerまたはmarkChangeDialogAppeared関数が見つからない');
+                        logger.warn('stateManagerまたはmarkChangeDialogAppeared関数が見つからない');
                     }
                     
                     await this.executeFixedDelayClick(response.element, config, signal);
                     
-                    console.log('success/failureを待機中...');
+                    logger.debug('success/failureを待機中');
                     const finalSelectors = {
                         success: selectors.success,
                         failure: selectors.failure
                     };
                     
-                    console.log(`⏰ 最大${timeouts.waitForResponse / 1000}秒間待機開始...`);
+                    logger.debug('最大待機開始', { timeoutSeconds: timeouts.waitForResponse / 1000 });
                     const startTime = Date.now();
                     
                     const finalResponse = await this.waitForAnyElementWithCancellation(
@@ -335,13 +335,13 @@ export class UnifiedAutomationManager {
                     );
                     
                     const elapsedTime = Math.round((Date.now() - startTime) / 1000);
-                    console.log(`✅ 最終レスポンス検出: ${finalResponse.key} (${elapsedTime}秒後)`);
+                    logger.info('最終レスポンス検出', { responseKey: finalResponse.key, elapsedTimeSeconds: elapsedTime });
                     
                     if (finalResponse.key === 'success') {
-                        console.log('🎉 予約成功！処理を終了します。');
+                        logger.info('予約成功！処理を終了します');
                         return { success: true, attempts };
                     } else {
-                        console.log('予約失敗。closeボタンをクリックして再試行します。');
+                        logger.debug('予約失敗。closeボタンをクリックして再試行します');
                         const closeButton = await this.waitForElementWithCancellation(
                             selectors.close, 
                             timeouts.waitForClose, 
@@ -354,10 +354,10 @@ export class UnifiedAutomationManager {
                         );
                     }
                 } else if (response.key === 'success') {
-                    console.log('🎉 予約成功！処理を終了します。');
+                    logger.info('予約成功！処理を終了します');
                     return { success: true, attempts };
                 } else if (response.key === 'failure') {
-                    console.log('予約失敗。closeボタンをクリックして再試行します。');
+                    logger.debug('予約失敗。closeボタンをクリックして再試行します');
                     const closeButton = await this.waitForElementWithCancellation(
                         selectors.close, 
                         timeouts.waitForClose, 
@@ -377,11 +377,11 @@ export class UnifiedAutomationManager {
                 }
                 
                 const errorMessage = error instanceof Error ? error.message : String(error);
-                console.error(`エラーが発生しました (試行 ${attempts}):`, errorMessage);
+                logger.error('エラーが発生しました', { attempts, errorMessage });
                 
                 // タイムアウトエラーは異常終了
                 if (errorMessage.includes('いずれの要素も見つかりません') || errorMessage.includes('要素が見つかりませんでした')) {
-                    console.error('🚨 予約処理異常終了: 3分待っても成功/失敗の結果が返りませんでした');
+                    logger.error('予約処理異常終了: 3分待っても成功/失敗の結果が返りませんでした');
                     return { success: false, attempts, abnormalTermination: true };
                 }
                 
@@ -409,7 +409,7 @@ export class UnifiedAutomationManager {
         
         if (!isEfficiencyMode) {
             // 通常モード: そのままクリック
-            console.log('⚡ 通常モード: 効率待機なしでクリック実行');
+            logger.debug('通常モード: 効率待機なしでクリック実行');
             await this.executeStandardClick(submitButton, config, signal);
             return;
         }
@@ -420,48 +420,48 @@ export class UnifiedAutomationManager {
         
         if (hasChangeDialogAppeared) {
             // changeダイアログが既に出現済み: submitは即座押下（changeでタイミング調整）
-            console.log('⚡ 効率モード: changeダイアログ出現済みのため即座押下');
+            logger.debug('効率モード: changeダイアログ出現済みのため即座押下');
             await this.executeStandardClick(submitButton, config, signal);
             return;
         }
         
         // 効率モード: 目標時間（00秒/30秒）への調整待機
-        console.log('🚀 統一効率モード: submit標的時刻調整開始');
+        logger.info('統一効率モード: submit標的時刻調整開始');
         
         // 効率モードで現在時刻から新しく目標時刻を計算
         if (!this.stateManager || !this.stateManager.calculateNext00or30Seconds) {
-            console.error('⚠️ calculateNext00or30Secondsメソッドが利用できません');
+            logger.warn('calculateNext00or30Secondsメソッドが利用できません');
             await this.executeStandardClick(submitButton, config, signal);
             return;
         }
         
         // 毎回新しく計算して最新の目標時刻を取得
         const nextTarget = this.stateManager.calculateNext00or30Seconds();
-        console.log('🔄 効率モード: 最新の目標時刻を計算');
+        logger.debug('効率モード: 最新の目標時刻を計算');
         
         // 計算した目標時刻を保存
         this.stateManager.setNextSubmitTarget(nextTarget);
         const waitMs = nextTarget.getTime() - Date.now();
         
-        console.log(`🎯 統一効率モード待機: 目標時刻 ${nextTarget.toLocaleTimeString()}`);
-        console.log(`🎯 待機時間: ${Math.floor(waitMs/1000)}秒`);
+        logger.debug('統一効率モード待機', { targetTime: nextTarget.toLocaleTimeString() });
+        logger.debug('待機時間', { waitSeconds: Math.floor(waitMs/1000) });
         
         if (waitMs < 0) {
-            console.warn('⚠️ 目標時刻が過去になっています - 即座実行');
+            logger.warn('目標時刻が過去になっています - 即座実行');
         } else if (waitMs < 15000) {
-            console.warn(`⚠️ 待機時間が15秒未満: ${Math.floor(waitMs/1000)}秒`);
+            logger.warn('待機時間が15秒未満', { waitSeconds: Math.floor(waitMs/1000) });
         }
         
         await this.waitForTargetTime(nextTarget, signal);
         
         // 標的時刻でsubmitクリック実行
-        console.log(`🚀 submitクリック実行 (${new Date().toLocaleTimeString()})`);
+        logger.info('submitクリック実行', { timestamp: new Date().toLocaleTimeString() });
         await this.executeStandardClick(submitButton, config, signal);
         
         // submitクリック後、次のサイクル用の目標時刻を即座に更新
         if (this.stateManager && this.stateManager.updateNextSubmitTarget) {
             this.stateManager.updateNextSubmitTarget();
-            console.log('⚡ 効率モード: submitクリック後に次回目標時刻を更新');
+            logger.debug('効率モード: submitクリック後に次回目標時刻を更新');
         }
     }
 
@@ -476,37 +476,37 @@ export class UnifiedAutomationManager {
         const needsTimingAdjustment = this.stateManager && this.stateManager.needsChangeDialogTimingAdjustment ? 
             this.stateManager.needsChangeDialogTimingAdjustment() : false;
         
-        console.log(`🔍 効率モード: ${isEfficiencyMode}, changeダイアログタイミング調整必要: ${needsTimingAdjustment}`);
+        logger.debug('効率モード状態確認', { isEfficiencyMode, needsTimingAdjustment });
         
         if (isEfficiencyMode && needsTimingAdjustment) {
             // 効率モード: changeダイアログのタイミング調整が記録されている場合のみ00秒/30秒調整
-            console.log('🚀 統一効率モード: changeダイアログ標的時刻調整開始');
+            logger.info('統一効率モード: changeダイアログ標的時刻調整開始');
             
             // 効率モードで現在時刻から新しく目標時刻を計算
             if (!this.stateManager || !this.stateManager.calculateNext00or30Seconds) {
-                console.error('⚠️ calculateNext00or30Secondsメソッドが利用できません');
+                logger.warn('calculateNext00or30Secondsメソッドが利用できません');
                 await this.executeStandardClick(element, config, signal);
                 return;
             }
             
             // 毎回新しく計算して最新の目標時刻を取得
             const nextTarget = this.stateManager.calculateNext00or30Seconds();
-            console.log('🔄 効率モード: changeダイアログ用最新目標時刻を計算');
+            logger.debug('効率モード: changeダイアログ用最新目標時刻を計算');
             
             const waitMs = nextTarget.getTime() - Date.now();
             
-            console.log(`🎯 統一効率モード待機(change): 目標時刻 ${nextTarget.toLocaleTimeString()}`);
-            console.log(`🎯 待機時間(change): ${Math.floor(waitMs/1000)}秒`);
+            logger.debug('統一効率モード待機(change)', { targetTime: nextTarget.toLocaleTimeString() });
+            logger.debug('待機時間(change)', { waitSeconds: Math.floor(waitMs/1000) });
             
             if (waitMs < 0) {
-                console.warn('⚠️ 目標時刻が過去になっています - 即座実行');
+                logger.warn('目標時刻が過去になっています - 即座実行');
             } else if (waitMs < 15000) {
-                console.warn(`⚠️ 待機時間が15秒未満: ${Math.floor(waitMs/1000)}秒`);
+                logger.warn('待機時間が15秒未満', { waitSeconds: Math.floor(waitMs/1000) });
             }
             
             await this.waitForTargetTime(nextTarget, signal);
             
-            console.log(`🚀 changeダイアログクリック実行 (${new Date().toLocaleTimeString()})`);
+            logger.info('changeダイアログクリック実行', { timestamp: new Date().toLocaleTimeString() });
             
             // タイミング調整完了を記録
             if (this.stateManager && this.stateManager.markChangeDialogTimingAdjusted) {
@@ -515,7 +515,7 @@ export class UnifiedAutomationManager {
         } else if (isEfficiencyMode) {
             // 効率モードだがchangeダイアログのタイミング調整が不要な場合は通常の固定待機
             const randomDelay = 1500 + Math.random() * 1500; // 1500~3000ms
-            console.log(`⏳ 効率モード固定待機(changeダイアログ記録なし): ${Math.round(randomDelay)}ms`);
+            logger.debug('効率モード固定待機(changeダイアログ記録なし)', { delayMs: Math.round(randomDelay) });
             
             await this.waitWithCancellation(randomDelay, signal);
         }
@@ -555,7 +555,7 @@ export class UnifiedAutomationManager {
      */
     abort(): void {
         if (this.controller) {
-            console.log('🛑 統一自動処理を即座中断');
+            logger.warn('統一自動処理を即座中断');
             this.controller.abort();
         }
     }
@@ -590,6 +590,6 @@ export class UnifiedAutomationManager {
     private cleanup(): void {
         this.currentProcess = 'idle';
         this.controller = null;
-        console.log('🧹 統一自動処理クリーンアップ完了');
+        logger.debug('統一自動処理クリーンアップ完了');
     }
 }

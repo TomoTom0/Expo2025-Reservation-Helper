@@ -3,6 +3,9 @@
  * 循環import回避のための共通モジュール
  */
 
+import { loggers } from '../utils/logger';
+const logger = loggers.automation;
+
 /**
  * ページチェッカー
  */
@@ -59,7 +62,7 @@ export const identify_page_type = (url: string): string | null => {
             return "agent_ticket";
         }
     } catch (error) {
-        console.error(`URL解析エラー: ${error}`);
+        logger.error('URL解析エラー', error);
     }
     
     return null;

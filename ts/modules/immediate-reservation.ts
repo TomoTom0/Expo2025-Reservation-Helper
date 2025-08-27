@@ -4,6 +4,8 @@
  */
 
 import { PavilionReservationCache } from './pavilion-reservation-cache';
+import { loggers } from '../utils/logger';
+const logger = loggers.automation;
 
 // 即時予約データ
 export interface ImmediateReservationData {
@@ -28,7 +30,7 @@ export class ImmediateReservationService {
         timeDisplay: string
     ): Promise<boolean> {
         
-        console.log('🚀 即時予約実行開始:', pavilionName, timeDisplay);
+        logger.info('即時予約実行開始', { pavilionName, timeDisplay });
         
         try {
             // 1. 通常の予約キャッシュ形式に変換して保存
@@ -60,13 +62,13 @@ export class ImmediateReservationService {
             const reservationUrl = `https://ticket.expo2025.or.jp/event_time/?id=${ticketIds}&event_id=${pavilionCode}&screen_id=108&lottery=5&entrance_date=${formatDateToYMD()}`;
             window.location.href = reservationUrl;
             
-            console.log('✅ 予約ページに遷移:', reservationUrl);
-            console.log('🤖 自動操作が開始されます');
+            logger.info('予約ページに遷移', { reservationUrl });
+            logger.info('自動操作が開始されます');
             
             return true;
             
         } catch (error) {
-            console.error('❌ 即時予約実行エラー:', error);
+            logger.error('即時予約実行エラー', error);
             return false;
         }
     }
@@ -115,7 +117,7 @@ export function canExecuteImmediateReservation(isAvailable: boolean): boolean {
 if (typeof window !== 'undefined') {
     (window as any).executeImmediateReservation = executeImmediateReservation;
     (window as any).debugImmediateReservation = (pavilionCode: string, timeSlot: string) => {
-        console.log('🔧 即時予約デバッグ実行');
+        logger.debug('即時予約デバッグ実行');
         return executeImmediateReservation(
             pavilionCode,
             `テストパビリオン${pavilionCode}`,

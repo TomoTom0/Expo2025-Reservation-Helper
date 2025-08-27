@@ -76,8 +76,11 @@ import { usePavilionsStore } from '@/stores/pavilions'
 import { useTickets } from '@/composables/useTickets'
 import type { ScheduleData, TicketData } from '@/types/api'
 import { getLongNameFromShortName } from '@/utils/pavilionReservationMapping'
+import { loggers } from '@/utils/logger'
 import TicketTab from './TicketTab.vue'
 import PavilionTab from './PavilionTab.vue'
+
+const logger = loggers.ui
 
 const mainDialogStore = useMainDialogStore()
 const ticketsStore = useTicketsStore()
@@ -192,14 +195,14 @@ const handleEscapeKey = (e: KeyboardEvent) => {
 
 // カスタムイベントハンドラー
 const handleShowEvent = async () => {
-  console.log('🎯 main-dialog-showイベント受信')
+  logger.debug('main-dialog-showイベント受信')
   mainDialogStore.showDialog()
   
   // 事前読み込み完了により初期化処理は不要
 }
 
 const handleHideEvent = () => {
-  console.log('🎯 main-dialog-hideイベント受信') 
+  logger.debug('main-dialog-hideイベント受信')
   mainDialogStore.hideDialog()
 }
 
@@ -213,14 +216,14 @@ onMounted(() => {
   document.addEventListener('keydown', handleEscapeKey)
   document.addEventListener('main-dialog-show', handleShowEvent)
   document.addEventListener('main-dialog-hide', handleHideEvent)
-  console.log('✅ MainDialog mounted, 初期表示状態:', isVisible.value)
+  logger.info('MainDialog mounted', { 初期表示状態: isVisible.value })
 })
 
 onUnmounted(() => {
   document.removeEventListener('keydown', handleEscapeKey)
   document.removeEventListener('main-dialog-show', handleShowEvent)
   document.removeEventListener('main-dialog-hide', handleHideEvent)
-  console.log('🗑️ MainDialog unmounted')
+  logger.info('MainDialog unmounted')
 })
 </script>
 

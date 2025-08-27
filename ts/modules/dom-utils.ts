@@ -3,6 +3,9 @@
  * 万博予約ページでの自動操作に必要なDOM操作を提供
  */
 
+import { loggers } from '../utils/logger';
+const logger = loggers.ui;
+
 // DOM操作の結果
 export interface DOMOperationResult {
     success: boolean;
@@ -148,7 +151,7 @@ export class DOMUtils {
             const clickEvent = new Event('click', { bubbles: true });
             targetRadio.dispatchEvent(clickEvent);
 
-            console.log(`⏰ 時間選択完了: ${timeSlot}`);
+            logger.info('時間選択完了', { timeSlot });
             
             return {
                 success: true,
@@ -190,7 +193,7 @@ export class DOMUtils {
                     
                     button.click();
                     
-                    console.log(`🔘 申込ボタンクリック: ${selector}`);
+                    logger.info('申込ボタンクリック', { selector });
                     
                     return {
                         success: true,

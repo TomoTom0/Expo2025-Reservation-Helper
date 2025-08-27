@@ -211,7 +211,7 @@ class CompanionProcessManager {
         const ticketId = this.state.queuedTicketIds.shift()!;
         this.state.currentTicketId = ticketId;
 
-        console.log(`📝 処理中: ${ticketId} (残り${this.state.queuedTicketIds.length}件)`);
+        logger.info('処理中', { ticketId, remaining: this.state.queuedTicketIds.length });
 
         try {
             const success = await this.processTicketId(ticketId);
@@ -228,14 +228,14 @@ class CompanionProcessManager {
             } else {
                 this.handleError(ticketId, '処理に失敗しました');
                 // 失敗時は処理を中断
-                console.log('❌ 同行者追加処理に失敗したため処理を中断します');
+                logger.error('同行者追加処理に失敗したため処理を中断します');
                 this.completeProcess();
                 return;
             }
         } catch (error) {
             this.handleError(ticketId, error instanceof Error ? error.message : '不明なエラー');
             // エラー時も処理を中断
-            console.log('❌ 同行者追加処理でエラーが発生したため処理を中断します');
+            logger.error('同行者追加処理でエラーが発生したため処理を中断します');
             this.completeProcess();
             return;
         }
@@ -243,12 +243,12 @@ class CompanionProcessManager {
 
     // 個別チケットID処理（実際の同行者追加処理）
     private async processTicketId(ticketId: string): Promise<boolean> {
-        console.log(`🎫 チケットID ${ticketId} の処理開始`);
+        logger.info('チケットID処理開始', { ticketId });
 
         try {
             // 中断チェック
             if (!this.state.isRunning) {
-                console.log('🛑 処理が中断されたため、チケット処理を停止します');
+                logger.warn('処理が中断されたため、チケット処理を停止します');
                 return false;
             }
 
@@ -261,7 +261,7 @@ class CompanionProcessManager {
 
                 // 中断チェック
                 if (!this.state.isRunning) {
-                    console.log('🛑 処理が中断されたため、画面遷移後の処理を停止します');
+                    logger.warn('処理が中断されたため、画面遷移後の処理を停止します');
                     return false;
                 }
 
@@ -271,7 +271,7 @@ class CompanionProcessManager {
 
             // 中断チェック
             if (!this.state.isRunning) {
-                console.log('🛑 処理が中断されたため、チケットID入力前に処理を停止します');
+                logger.warn('処理が中断されたため、チケットID入力前に処理を停止します');
                 return false;
             }
 
@@ -288,26 +288,26 @@ class CompanionProcessManager {
 
             // 中断チェック
             if (!this.state.isRunning) {
-                console.log('🛑 処理が中断されたため、入力後の処理を停止します');
+                logger.warn('処理が中断されたため、入力後の処理を停止します');
                 return false;
             }
 
             // 入力後の安定化待機（UI更新を確実に待つ）
-            console.log('⏳ 入力後の安定化待機中...');
+            logger.debug('入力後の安定化待機中');
             await new Promise(resolve => setTimeout(resolve, 1000));
 
             // 中断チェック
             if (!this.state.isRunning) {
-                console.log('🛑 処理が中断されたため、安定化待機後の処理を停止します');
+                logger.warn('処理が中断されたため、安定化待機後の処理を停止します');
                 return false;
             }
 
             // 再度値を確認（フォーム状態の最終検証）
             const inputField = document.getElementById('agent_ticket_id_register') as HTMLInputElement;
             if (inputField && inputField.value !== ticketId) {
-                console.warn(`⚠️ 最終検証で値の不一致を検出: "${inputField.value}" ≠ "${ticketId}"`);
+                logger.warn('最終検証で値の不一致を検出', { inputValue: inputField.value, expectedTicketId: ticketId });
                 // 再入力を試行
-                console.log('🔄 値の再設定を実行中...');
+                logger.debug('値の再設定を実行中');
                 inputField.value = ticketId;
                 inputField.dispatchEvent(new Event('input', { bubbles: true }));
                 inputField.dispatchEvent(new Event('change', { bubbles: true }));
@@ -315,7 +315,7 @@ class CompanionProcessManager {
 
             // 中断チェック
             if (!this.state.isRunning) {
-                console.log('🛑 処理が中断されたため、追加ボタンクリック前に処理を停止します');
+                logger.warn('処理が中断されたため、追加ボタンクリック前に処理を停止します');
                 return false;
             }
 
@@ -327,7 +327,7 @@ class CompanionProcessManager {
 
             // 中断チェック
             if (!this.state.isRunning) {
-                console.log('🛑 処理が中断されたため、処理完了待機前に停止します');
+                logger.warn('処理が中断されたため、処理完了待機前に停止します');
                 return false;
             }
 
@@ -336,36 +336,36 @@ class CompanionProcessManager {
                 
                 // 中断チェック
                 if (!this.state.isRunning) {
-                    console.log('🛑 処理が中断されたため、処理完了後の戻り処理を停止します');
+                    logger.warn('処理が中断されたため、処理完了後の戻り処理を停止します');
                     return false;
                 }
                 
                 if (result && this.state.queuedTicketIds.length === 0) {
                     // 成功かつ残りのチケットがない場合（最後のチケット）のみチケット選択画面に戻る
-                    console.log('✅ 最後のチケット処理成功、チケット選択画面に戻ります');
+                    logger.info('最後のチケット処理成功、チケット選択画面に戻ります');
                     await this.returnToTicketSelection();
                 } else if (result) {
                     // 成功だが残りのチケットがある場合は戻らない
-                    console.log(`✅ 同行者追加成功、残り${this.state.queuedTicketIds.length}件のため画面戻りはスキップ`);
+                    logger.info('同行者追加成功、残り件数のため画面戻りはスキップ', { remaining: this.state.queuedTicketIds.length });
                 } else {
-                    console.log('❌ 同行者追加失敗、次の処理へ');
+                    logger.error('同行者追加失敗、次の処理へ');
                 }
                 
                 return result;
             } catch (error) {
-                console.error('❌ 処理完了待機でタイムアウト:', error);
+                logger.error('処理完了待機でタイムアウト', error);
                 return false;
             }
 
         } catch (error) {
-            console.error(`❌ チケットID ${ticketId} の処理エラー:`, error);
+            logger.error('チケットIDの処理エラー', { ticketId, error });
             return false;
         }
     }
 
     // 同行者追加ボタンをクリック（チケット選択画面、動的待機付き）
     private async clickCompanionAddButton(): Promise<boolean> {
-        console.log('🔍 同行者追加ボタンを探しています...');
+        logger.debug('同行者追加ボタンを探しています');
         
         // 複数のセレクタを試行
         const selectors = [
@@ -386,7 +386,7 @@ class CompanionProcessManager {
                         ? element.parentElement 
                         : element;
                     
-                    console.log(`✅ セレクタ "${selector}" でボタンを発見:`, clickTarget);
+                    logger.debug('セレクタでボタンを発見', { selector, clickTarget });
                     
                     // スマホ対応：タッチイベントも試行
                     clickTarget.click();
@@ -397,15 +397,15 @@ class CompanionProcessManager {
                         clickTarget.dispatchEvent(new TouchEvent('touchend', { bubbles: true }));
                     }
                     
-                    console.log('✅ 同行者追加ボタンをクリックしました');
+                    logger.info('同行者追加ボタンをクリックしました');
                     return true;
                 }
             } catch (error) {
-                console.log(`⚠️ セレクタ "${selector}" では見つかりませんでした`);
+                logger.warn('セレクタでは見つかりませんでした', { selector });
             }
         }
         
-        console.error('❌ 全てのセレクタで同行者追加ボタンが見つかりませんでした');
+        logger.error('全てのセレクタで同行者追加ボタンが見つかりませんでした');
         return false;
     }
 
@@ -418,7 +418,7 @@ class CompanionProcessManager {
         return new Promise((resolve, reject) => {
             const checkTransition = () => {
                 if (isAgentTicketPage() && document.getElementById('agent_ticket_id_register')) {
-                    console.log('✅ 同行者追加画面への遷移完了（入力欄も確認済み）');
+                    logger.info('同行者追加画面への遷移完了（入力欄も確認済み）');
                     resolve();
                     return;
                 }
@@ -465,20 +465,20 @@ class CompanionProcessManager {
     // Gemini推奨: 統一されたReact対応入力処理
     private async performInput(inputField: HTMLInputElement, ticketId: string): Promise<boolean> {
         try {
-            console.log(`🎯 チケットID入力開始: "${ticketId}"`);
-            console.log('⚛️ Gemini推奨: 統一React入力処理を実行中...');
+            logger.debug('チケットID入力開始', { ticketId });
+            logger.info('Gemini推奨: 統一React入力処理を実行中...');
             
             return await this.unifiedReactInput(inputField, ticketId);
             
         } catch (error) {
-            console.error('❌ チケットID入力エラー:', error);
+            logger.error('チケットID入力エラー', error);
             return false;
         }
     }
     
     // Gemini推奨: 統一されたReact入力処理（最も信頼性が高い）
     private async unifiedReactInput(inputField: HTMLInputElement, value: string): Promise<boolean> {
-        console.log('🔄 統一React入力処理開始');
+        logger.info('統一React入力処理開始');
         
         try {
             // Step 1: Native value setter (React wrappersをバイパス)
@@ -488,7 +488,7 @@ class CompanionProcessManager {
             )?.set;
             
             if (!nativeInputValueSetter) {
-                console.error('❌ ネイティブvalueセッターが見つかりません');
+                logger.error('ネイティブvalueセッターが見つかりません');
                 return false;
             }
             
@@ -497,7 +497,7 @@ class CompanionProcessManager {
             
             // Step 3: Set value using native setter
             nativeInputValueSetter.call(inputField, value);
-            console.log(`📝 ネイティブセッターで値設定完了: "${value}"`);
+            logger.debug('ネイティブセッターで値設定完了', { value });
             
             // Step 4: Find React Fiber instance for onChange
             const reactFiberKey = Object.keys(inputField).find(key => 
@@ -510,7 +510,7 @@ class CompanionProcessManager {
                                 fiberInstance?.pendingProps?.onChange;
                 
                 if (onChange && typeof onChange === 'function') {
-                    console.log('⚛️ React onChange直接呼び出し実行中...');
+                    logger.info('React onChange直接呼び出し実行中...');
                     onChange({ target: inputField, currentTarget: inputField });
                 }
             }
@@ -524,16 +524,16 @@ class CompanionProcessManager {
             
             // Step 7: Verify success
             const success = inputField.value === value;
-            console.log(`🔄 統一React入力結果: ${success ? '✅ 成功' : '❌ 失敗'}`);
+            logger.debug('統一React入力結果', { success: success ? '成功' : '失敗' });
             
             if (!success) {
-                console.warn(`⚠️ 値の不一致: 期待="${value}", 実際="${inputField.value}"`);
+                logger.warn('値の不一致', { expected: value, actual: inputField.value });
             }
             
             return success;
             
         } catch (error) {
-            console.error('❌ 統一React入力処理エラー:', error);
+            logger.error('統一React入力処理エラー', error);
             return false;
         }
     }
@@ -544,7 +544,7 @@ class CompanionProcessManager {
 
     // 追加ボタンをクリック（動的待機付き）
     private async clickAddButton(): Promise<boolean> {
-        console.log('🔍 追加ボタンを探しています...');
+        logger.debug('追加ボタンを探しています...');
         
         // 動的待機でボタンを取得（iPhone Safariでも確実）
         const addButton = await this.waitForElement<HTMLButtonElement>(
@@ -553,7 +553,7 @@ class CompanionProcessManager {
         );
         
         if (!addButton) {
-            console.error('❌ 追加ボタンが見つかりません（タイムアウト）');
+            logger.error('追加ボタンが見つかりません（タイムアウト）');
             return false;
         }
 
@@ -562,23 +562,23 @@ class CompanionProcessManager {
         const maxRetries = 10;
         
         while (addButton.disabled && retryCount < maxRetries) {
-            console.log(`⏳ 追加ボタンが無効化中... (${retryCount + 1}/${maxRetries})`);
+            logger.debug('追加ボタンが無効化中...', { retryCount: retryCount + 1, maxRetries });
             await new Promise(resolve => setTimeout(resolve, 500));
             retryCount++;
         }
         
         if (addButton.disabled) {
-            console.warn('⚠️ 追加ボタンが無効化されています');
+            logger.warn('追加ボタンが無効化されています');
             return false;
         }
 
         // タッチイベント対応のクリック
         try {
             addButton.click();
-            console.log('✅ 追加ボタンをクリックしました');
+            logger.info('追加ボタンをクリックしました');
             return true; // クリック成功のみを返す（処理完了は上位で待機）
         } catch (error) {
-            console.error('❌ 追加ボタンのクリックでエラー:', error);
+            logger.error('追加ボタンのクリックでエラー', error);
             return false;
         }
     }
@@ -595,7 +595,7 @@ class CompanionProcessManager {
                 const errorMessage = document.querySelector('.style_main__error_message__oE5HC');
                 if (errorMessage) {
                     const errorText = errorMessage.textContent?.trim() || '不明なエラー';
-                    console.log(`❌ 処理エラー検出: ${errorText}`);
+                    logger.error('処理エラー検出', { errorText });
                     resolve(false); // 明確な失敗
                     return;
                 }
@@ -605,14 +605,14 @@ class CompanionProcessManager {
                 const nextButton = document.querySelector('button.basic-btn.type2:not(.style_main__register_btn__FHBxM)');
                 
                 if (successArea || nextButton) {
-                    console.log('✅ 処理成功を検出');
+                    logger.info('処理成功を検出');
                     resolve(true); // 明確な成功
                     return;
                 }
 
                 elapsed += checkInterval;
                 if (elapsed >= maxWaitTime) {
-                    console.warn('⚠️ 処理完了の確認がタイムアウトしました');
+                    logger.warn('処理完了の確認がタイムアウトしました');
                     reject(new Error('処理完了タイムアウト')); // タイムアウトは失敗扱い
                     return;
                 }
@@ -626,7 +626,7 @@ class CompanionProcessManager {
 
     // 同行者追加成功後にチケット選択画面に戻る
     private async returnToTicketSelection(): Promise<void> {
-        console.log('🔄 チケット選択画面への戻り処理開始');
+        logger.debug('チケット選択画面への戻り処理開始');
         
         try {
             // 「次へ」ボタンを探してクリック
@@ -636,17 +636,17 @@ class CompanionProcessManager {
             );
             
             if (nextButton) {
-                console.log('🔘 「次へ」ボタンをクリック');
+                logger.debug('「次へ」ボタンをクリック');
                 nextButton.click();
                 
                 // チケット選択画面への戻りを待機
                 await this.waitForTicketSelectionPage();
             } else {
-                console.warn('⚠️ 「次へ」ボタンが見つかりません');
+                logger.warn('「次へ」ボタンが見つかりません');
             }
             
         } catch (error) {
-            console.error('❌ チケット選択画面への戻りでエラー:', error);
+            logger.error('チケット選択画面への戻りでエラー', error);
         }
     }
 
@@ -660,7 +660,7 @@ class CompanionProcessManager {
             const checkReturn = () => {
                 // URLでチケット選択画面を確認
                 if (isTicketSelectionPage()) {
-                    console.log('✅ チケット選択画面への戻りを確認（URL判定）');
+                    logger.info('チケット選択画面への戻りを確認（URL判定）');
                     resolve();
                     return;
                 }
@@ -678,14 +678,14 @@ class CompanionProcessManager {
                 );
                 
                 if (ticketSelection) {
-                    console.log('✅ チケット選択画面への戻りを確認（DOM要素判定）');
+                    logger.info('チケット選択画面への戻りを確認（DOM要素判定）');
                     resolve();
                     return;
                 }
 
                 elapsed += checkInterval;
                 if (elapsed >= maxWaitTime) {
-                    console.warn('⚠️ チケット選択画面への戻りがタイムアウト');
+                    logger.warn('チケット選択画面への戻りがタイムアウト');
                     resolve();
                     return;
                 }
@@ -707,14 +707,14 @@ class CompanionProcessManager {
                 const element = document.querySelector(selector) as T;
                 
                 if (element) {
-                    console.log(`✅ 要素が見つかりました: ${selector}`);
+                    logger.info('要素が見つかりました', { selector });
                     resolve(element);
                     return;
                 }
 
                 elapsed += checkInterval;
                 if (elapsed >= timeout) {
-                    console.warn(`⚠️ 要素待機タイムアウト: ${selector} (${timeout}ms)`);
+                    logger.warn('要素待機タイムアウト', { selector, timeout });
                     resolve(null);
                     return;
                 }
@@ -734,13 +734,13 @@ class CompanionProcessManager {
             message,
             timestamp: Date.now()
         });
-        console.error(`❌ チケットID ${ticketId}: ${message}`);
+        logger.error('チケットID処理エラー', { ticketId, message });
     }
 
     // 処理完了
     private completeProcess(): void {
         const { successCount, errorCount } = this.state;
-        console.log(`✅ 同行者追加処理完了: 成功${successCount}件, エラー${errorCount}件`);
+        logger.info('同行者追加処理完了', { successCount, errorCount });
         
         this.state.isRunning = false;
         this.state.currentTicketId = undefined;
@@ -755,7 +755,7 @@ class CompanionProcessManager {
     // 処理停止
     stopProcess(): void {
         if (this.state.isRunning) {
-            console.log('🛑 同行者追加処理を停止しました');
+            logger.warn('同行者追加処理を停止しました');
             this.state.isRunning = false;
             this.state.currentTicketId = undefined;
             this.state.queuedTicketIds = [];
@@ -764,7 +764,7 @@ class CompanionProcessManager {
             if (this.currentTimeoutId !== null) {
                 clearTimeout(this.currentTimeoutId);
                 this.currentTimeoutId = null;
-                console.log('⏰ 待機中のタイマーを中断しました');
+                logger.debug('待機中のタイマーを中断しました');
             }
             
             // オーバーレイを非表示
@@ -801,16 +801,16 @@ export function initializeTicketSelectionPage(): void {
 }
 
 export function initializeAgentTicketPage(): void {
-    console.log('👥 同行者追加画面を初期化中...');
+    logger.debug('同行者追加画面を初期化中...');
     
     // 現在のページがagent_ticketか確認
     if (!window.location.href.includes('agent_ticket')) {
-        console.log('🚫 agent_ticketページではないため初期化をスキップ');
+        logger.debug('agent_ticketページではないため初期化をスキップ');
         return;
     }
     
     // 同行者追加画面ではFABは不要
-    console.log('✅ 同行者追加画面の初期化完了（FAB作成なし）');
+    logger.info('同行者追加画面の初期化完了（FAB作成なし）');
 }
 
 // FABダイアログ作成（画面に応じて切り替え）
@@ -830,7 +830,7 @@ export function createCompanionTicketFAB(): void {
 
 // 日付ボタンのみを更新（既存FAB再利用時）
 function updateDateButtonsOnly(subButtonsContainer: HTMLElement): void {
-    console.log('🗓️ 日付ボタンのみ更新します');
+    logger.debug('日付ボタンのみ更新します');
     
     const tickets = getTicketElements();
     const availableDates = getAvailableDates(tickets);
@@ -838,10 +838,10 @@ function updateDateButtonsOnly(subButtonsContainer: HTMLElement): void {
     // 既存の日付ボタンをクリア
     const existingDateButtons = subButtonsContainer.querySelectorAll('.ytomo-date-button');
     existingDateButtons.forEach(btn => btn.remove());
-    console.log(`🗑️ 既存の日付ボタン${existingDateButtons.length}個を削除`);
+    logger.debug('既存の日付ボタンを削除', { count: existingDateButtons.length });
     
     if (availableDates.length === 0) {
-        console.log('📅 利用可能な日付がないため、日付ボタンは作成しません');
+        logger.debug('利用可能な日付がないため、日付ボタンは作成しません');
         return;
     }
     
@@ -875,7 +875,7 @@ function updateDateButtonsOnly(subButtonsContainer: HTMLElement): void {
         }
     });
     
-    console.log(`✅ 日付ボタン更新完了: ${Math.min(availableDates.length, 3)}個のボタンを作成`);
+    logger.info('日付ボタン更新完了', { buttonCount: Math.min(availableDates.length, 3) });
 }
 
 // チケット選択画面用のFAB（展開可能）
@@ -884,7 +884,7 @@ function createTicketSelectionFAB(): void {
     // 既存FABコンテナがある場合は子ボタンのみ更新
     const existingFabContainer = document.getElementById('ytomo-ticket-selection-fab-container');
     if (existingFabContainer) {
-        console.log('✅ 既存のチケット選択FABコンテナを再利用し、子ボタンを更新します');
+        logger.info('既存のチケット選択FABコンテナを再利用し、子ボタンを更新します');
         
         // 既存の子ボタンコンテナを取得
         const existingSubContainer = existingFabContainer.querySelector('#ytomo-companion-sub-buttons');
@@ -1045,14 +1045,14 @@ function createTicketSelectionFAB(): void {
         const tickets = getTicketElements();
         
         if (tickets.length > 0) {
-            console.log(`🎫 チケット${tickets.length}件を検出、日付ボタンを更新します`);
+            logger.debug('チケットを検出、日付ボタンを更新します', { ticketCount: tickets.length });
             createDynamicDateButtons();
         } else if (retryCount < maxRetries) {
             retryCount++;
-            console.log(`⏳ チケット検出待機中... (${retryCount}/${maxRetries})`);
+            logger.debug('チケット検出待機中...', { retryCount, maxRetries });
             setTimeout(waitForTicketsAndUpdate, 500);
         } else {
-            console.warn('⚠️ チケット検出がタイムアウトしました');
+            logger.warn('チケット検出がタイムアウトしました');
         }
     };
     
@@ -1206,7 +1206,7 @@ function extractVisitingDate(ticketElement: Element): Date | null {
         const date = new Date(year, month, day);
         return date;
     } catch (error) {
-        console.error('日付抽出エラー:', error);
+        logger.error('日付抽出エラー', error);
         return null;
     }
 }
@@ -1257,7 +1257,7 @@ function uncheckAllTickets(): void {
         });
         
         if (uncheckedCount > 0) {
-            console.log(`✅ ${uncheckedCount}件のチケットチェックを外しました`);
+            logger.info('チケットチェックを外しました', { uncheckedCount });
         }
     };
     
@@ -1533,12 +1533,12 @@ function showDateSelectionDialog(availableDates: Date[]): void {
 
 // 直近日付選択機能（findNearestDateと同じロジックを使用）
 function toggleNearestDateSelection(targetDate: Date): void {
-    console.log('🗓️ 直近日付選択機能を実行');
-    console.log(`🎯 指定された日付: ${targetDate.toDateString()}`);
+    logger.debug('直近日付選択機能を実行');
+    logger.debug('指定された日付', { targetDate: targetDate.toDateString() });
     
     const tickets = getTicketElements();
     if (tickets.length === 0) {
-        console.warn('⚠️ チケット要素が見つかりません');
+        logger.warn('チケット要素が見つかりません');
         showCustomAlert('チケットが見つかりません');
         return;
     }
@@ -1558,9 +1558,9 @@ function toggleNearestDateSelection(targetDate: Date): void {
         }
     }
 
-    console.log(`📊 対象日付チケット数: ${targetDateTickets.length}`);
+    logger.debug('対象日付チケット数', { count: targetDateTickets.length });
     if (targetDateTickets.length === 0) {
-        console.warn('⚠️ 対象日付のチケットが見つかりません');
+        logger.warn('対象日付のチケットが見つかりません');
         showCustomAlert('対象日付のチケットが見つかりません');
         return;
     }
@@ -1575,14 +1575,14 @@ function toggleNearestDateSelection(targetDate: Date): void {
                 try {
                     cb.click();
                 } catch (error) {
-                    console.warn(`⚠️ [${index}] 解除クリック時エラー:`, error);
+                    logger.warn('解除クリック時エラー', { index, error });
                     // フォールバック: 手動でchecked状態を変更
                     cb.checked = false;
                     cb.dispatchEvent(new Event('change', { bubbles: true }));
                 }
             }
         });
-        console.log('✅ 直近日付選択を解除しました');
+        logger.info('直近日付選択を解除しました');
     } else {
         // 全て解除してから直近日付のみを選択
         checkboxes.forEach((cb, index) => {
@@ -1590,7 +1590,7 @@ function toggleNearestDateSelection(targetDate: Date): void {
                 try {
                     cb.click();
                 } catch (error) {
-                    console.warn(`⚠️ [${index}] 解除クリック時エラー:`, error);
+                    logger.warn('解除クリック時エラー', { index, error });
                     // フォールバック: 手動でchecked状態を変更
                     cb.checked = false;
                     cb.dispatchEvent(new Event('change', { bubbles: true }));
@@ -1607,18 +1607,18 @@ function toggleNearestDateSelection(targetDate: Date): void {
                 try {
                     checkbox.click();
                 } catch (error) {
-                    console.warn(`⚠️ [${index}] クリック時エラー:`, error);
+                    logger.warn('クリック時エラー', { index, error });
                     // フォールバック: 手動でchecked状態を変更
                     checkbox.checked = !checkbox.checked;
                     checkbox.dispatchEvent(new Event('change', { bubbles: true }));
                 }
             } else {
-                console.warn(`⚠️ [${index}] チェックボックスが見つかりません`);
+                logger.warn('チェックボックスが見つかりません', { index });
             }
         });
 
         const dateStr = formatDateForLabel(targetDate);
-        console.log(`✅ 対象日付(${dateStr})のチケット${targetDateTickets.length}件を選択しました`);
+        logger.info('対象日付のチケットを選択しました', { dateStr, count: targetDateTickets.length });
         
         // チケット選択後、submitボタンの自動押下を実行
         setTimeout(() => autoSubmitTicketSelection(), 500);
@@ -1632,7 +1632,7 @@ function toggleNearestDateSelection(targetDate: Date): void {
  * チケット選択後のsubmitボタン自動押下
  */
 function autoSubmitTicketSelection(): void {
-    console.log('🚀 submitボタン自動押下を実行');
+    logger.debug('submitボタン自動押下を実行');
     
     try {
         // submitボタンを検索（複数の可能なセレクタで）
@@ -1648,13 +1648,13 @@ function autoSubmitTicketSelection(): void {
         for (const selector of submitSelectors) {
             submitButton = document.querySelector(selector) as HTMLElement;
             if (submitButton) {
-                console.log(`✅ submitボタンを発見: ${selector}`);
+                logger.info('submitボタンを発見', { selector });
                 break;
             }
         }
         
         if (!submitButton) {
-            console.warn('⚠️ submitボタンが見つかりません');
+            logger.warn('submitボタンが見つかりません');
             // フォールバック: disabled状態のボタンも含めて検索
             const fallbackSelectors = [
                 'a.style_ticket_selection__submit__U0a_C.basic-btn.to-send.type2',
@@ -1665,7 +1665,7 @@ function autoSubmitTicketSelection(): void {
             for (const selector of fallbackSelectors) {
                 submitButton = document.querySelector(selector) as HTMLElement;
                 if (submitButton) {
-                    console.log(`⚠️ disabled状態のsubmitボタンを発見: ${selector}`);
+                    logger.warn('disabled状態のsubmitボタンを発見', { selector });
                     break;
                 }
             }
@@ -1678,7 +1678,7 @@ function autoSubmitTicketSelection(): void {
                              (submitButton as HTMLButtonElement).disabled;
             
             if (isDisabled) {
-                console.log('⏳ submitボタンがdisabled状態です。有効化を待機...');
+                logger.debug('submitボタンがdisabled状態です。有効化を待機...');
                 // disabled状態の場合、短時間待機してから再試行
                 setTimeout(() => {
                     autoSubmitTicketSelection();
@@ -1686,7 +1686,7 @@ function autoSubmitTicketSelection(): void {
                 return;
             }
             
-            console.log('🎯 submitボタンをクリックします');
+            logger.debug('submitボタンをクリックします');
             
             // 誤動作防止オーバーレイを表示
             processingOverlay.show('companion');
@@ -1704,7 +1704,7 @@ function autoSubmitTicketSelection(): void {
                 submitButton.click();
             }
             
-            console.log('✅ submitボタンクリック完了');
+            logger.info('submitボタンクリック完了');
             
             // 処理完了後オーバーレイを非表示（少し遅延）
             setTimeout(() => {
@@ -1712,12 +1712,12 @@ function autoSubmitTicketSelection(): void {
             }, 2000);
             
         } else {
-            console.error('❌ submitボタンが全く見つかりません');
+            logger.error('submitボタンが全く見つかりません');
             showCustomAlert('申込みボタンが見つかりません');
         }
         
     } catch (error) {
-        console.error('❌ submitボタン自動押下エラー:', error);
+        logger.error('submitボタン自動押下エラー', error);
         processingOverlay.hide();
         showCustomAlert('申込み処理でエラーが発生しました');
     }
@@ -1725,7 +1725,7 @@ function autoSubmitTicketSelection(): void {
 
 // チケット選択変更の監視を開始
 function startTicketSelectionMonitoring(): void {
-    console.log('👀 チケット選択監視を開始します');
+    logger.debug('チケット選択監視を開始します');
     
     // MutationObserverでチェックボックスの変更を監視
     const observer = new MutationObserver((mutations) => {
@@ -1773,9 +1773,9 @@ function startTicketSelectionMonitoring(): void {
             attributes: true,
             attributeFilter: ['checked']
         });
-        console.log('✅ チケット選択監視設定完了');
+        logger.info('チケット選択監視設定完了');
     } else {
-        console.warn('⚠️ チケットコンテナが見つからないため監視を開始できませんでした');
+        logger.warn('チケットコンテナが見つからないため監視を開始できませんでした');
     }
     
     // DOM変更イベントリスナーも追加（フォールバック）
@@ -1900,7 +1900,7 @@ function setupDialogEvents(dialog: HTMLElement): void {
 
     // スマホ対応：入力完了待機のための強化処理
     const handleAddTicket = async () => {
-        console.log('🔄 チケット追加処理開始...');
+        logger.info('チケット追加処理開始...');
         
         // 段階的待機：フォーカス→IME→入力完了
         await new Promise(resolve => setTimeout(resolve, 500)); // 初回待機を延長
@@ -1915,7 +1915,8 @@ function setupDialogEvents(dialog: HTMLElement): void {
             ticketId = getInputValue(newTicketInput);
             label = getInputValue(newLabelInput);
             
-            console.log(`🔍 入力値取得試行 ${retryCount + 1}:`, { 
+            logger.debug('入力値取得試行', { 
+                retryCount: retryCount + 1,
                 ticketId: ticketId || '(空)', 
                 label: label || '(空)',
                 inputValue: newTicketInput.value || '(空)',
@@ -1932,13 +1933,13 @@ function setupDialogEvents(dialog: HTMLElement): void {
             // 取得できない場合は追加待機
             retryCount++;
             if (retryCount < maxRetries) {
-                console.log(`⏳ 入力値が空のため ${200}ms 待機後リトライ...`);
+                logger.debug('入力値が空のため待機後リトライ...', { waitTime: 200 });
                 await new Promise(resolve => setTimeout(resolve, 200));
             }
         }
         
         if (ticketId) {
-            console.log('📝 有効な入力値を確認、追加処理実行');
+            logger.info('有効な入力値を確認、追加処理実行');
             if (companionTicketManager.addTicketId(ticketId, label)) {
                 // 強制リセット（確実なクリア）
                 forceResetInput(newTicketInput);
@@ -1950,13 +1951,13 @@ function setupDialogEvents(dialog: HTMLElement): void {
                 await new Promise(resolve => setTimeout(resolve, 100));
                 
                 updateTicketList();
-                console.log('✅ チケットID追加成功:', ticketId);
+                logger.info('チケットID追加成功', { ticketId });
             } else {
-                console.error('❌ チケットID追加失敗（無効または重複）:', ticketId);
+                logger.error('チケットID追加失敗（無効または重複）', { ticketId });
                 showCustomAlert('チケットIDが無効または既に登録済みです');
             }
         } else {
-            console.error('❌ 入力値の取得に失敗しました（全リトライ終了）');
+            logger.error('入力値の取得に失敗しました（全リトライ終了）');
             showCustomAlert('チケットIDを入力してください');
         }
     };
@@ -1964,14 +1965,14 @@ function setupDialogEvents(dialog: HTMLElement): void {
     // 追加ボタンクリック（スマホ対応）
     addBtn?.addEventListener('click', (e) => {
         e.preventDefault();
-        console.log('🖱️ 追加ボタンクリック');
+        logger.debug('追加ボタンクリック');
         handleAddTicket();
     });
 
     // タッチイベントも追加（スマホ対応）
     addBtn?.addEventListener('touchend', (e) => {
         e.preventDefault();
-        console.log('👆 追加ボタンタッチ');
+        logger.debug('追加ボタンタッチ');
         handleAddTicket();
     });
 
@@ -1982,26 +1983,26 @@ function setupDialogEvents(dialog: HTMLElement): void {
         // IME変換開始
         input.addEventListener('compositionstart', () => {
             isComposing = true;
-            console.log('🔤 IME変換開始');
+            logger.debug('IME変換開始');
         });
         
         // IME変換完了
         input.addEventListener('compositionend', () => {
             isComposing = false;
-            console.log('✅ IME変換完了');
+            logger.debug('IME変換完了');
         });
         
         // Enterキー（IME完了後のみ）
         input.addEventListener('keypress', (e) => {
             if (e.key === 'Enter' && !isComposing) {
-                console.log('⌨️ Enter押下');
+                logger.debug('Enter押下');
                 handleAddTicket();
             }
         });
         
         // フォーカス失失時の処理（スマホキーボード閉じる時）
         input.addEventListener('blur', () => {
-            console.log('👁️ フォーカス離脱:', input.id, 'value:', input.value);
+            logger.debug('フォーカス離脱', { inputId: input.id, value: input.value });
         });
     };
 
@@ -2031,7 +2032,7 @@ function setupDialogEvents(dialog: HTMLElement): void {
     dialog.querySelector('#execute-btn')?.addEventListener('click', () => {
         const selectedIds = getSelectedTicketIds();
         if (selectedIds.length > 0) {
-            console.log(`🚀 ${selectedIds.length}件のチケットで同行者追加処理を開始します`);
+            logger.info('チケットで同行者追加処理を開始します', { count: selectedIds.length });
             companionProcessManager.startProcess(selectedIds);
             dialog.closest('#ytomo-companion-dialog')?.remove();
         } else {
@@ -2159,7 +2160,7 @@ function copyTicketIdToClipboard(ticketId: string, copyButton: HTMLButtonElement
             navigator.clipboard.writeText(ticketId).then(() => {
                 showCopySuccessAnimation(ticketId, copyButton);
             }).catch((error) => {
-                console.error('クリップボードコピーエラー:', error);
+                logger.error('クリップボードコピーエラー', error);
                 fallbackCopyToClipboard(ticketId, copyButton);
             });
         } else {
@@ -2167,7 +2168,7 @@ function copyTicketIdToClipboard(ticketId: string, copyButton: HTMLButtonElement
             fallbackCopyToClipboard(ticketId, copyButton);
         }
     } catch (error) {
-        console.error('チケットIDコピーエラー:', error);
+        logger.error('チケットIDコピーエラー', error);
         showCustomAlert('コピーに失敗しました');
     }
 }
@@ -2193,14 +2194,14 @@ function fallbackCopyToClipboard(ticketId: string, copyButton: HTMLButtonElement
             showCustomAlert('コピーに失敗しました');
         }
     } catch (error) {
-        console.error('フォールバックコピーエラー:', error);
+        logger.error('フォールバックコピーエラー', error);
         showCustomAlert('コピーに失敗しました');
     }
 }
 
 // コピー成功アニメーション表示
 function showCopySuccessAnimation(ticketId: string, copyButton: HTMLButtonElement): void {
-    console.log(`✅ チケットID "${ticketId}" をクリップボードにコピーしました`);
+    logger.info('チケットIDをクリップボードにコピーしました', { ticketId });
     
     // ボタンを成功状態に変更
     copyButton.classList.add('copy-success');
@@ -2258,7 +2259,7 @@ function getSelectedTicketIds(): string[] {
     
     if (selectedIds.length !== filteredIds.length) {
         const excludedCount = selectedIds.length - filteredIds.length;
-        console.log(`⚠️ 既に選択済みのチケット ${excludedCount}件を処理対象から除外しました`);
+        logger.warn('既に選択済みのチケットを処理対象から除外しました', { excludedCount });
     }
     
     return filteredIds;
@@ -2359,20 +2360,20 @@ function showCustomConfirm(message: string, onConfirm: () => void): void {
 
 // 初期化関数
 export function initCompanionTicketFeature(): void {
-    console.log('🎫 同行者追加機能を初期化中...');
-    console.log(`📍 現在のURL: ${window.location.href}`);
-    console.log(`📍 document.readyState: ${document.readyState}`);
-    console.log(`📍 document.body: ${document.body ? 'available' : 'null'}`);
+    logger.debug('同行者追加機能を初期化中...');
+    logger.debug('現在のURL', { url: window.location.href });
+    logger.debug('document.readyState', { readyState: document.readyState });
+    logger.debug('document.body', { bodyStatus: document.body ? 'available' : 'null' });
     
     if (isTicketSelectionPage()) {
-        console.log('📋 チケット選択画面を検出しました');
+        logger.debug('チケット選択画面を検出しました');
         createCompanionTicketFAB();
     } else if (isAgentTicketPage()) {
-        console.log('🤝 同行者追加画面を検出しました');
+        logger.debug('同行者追加画面を検出しました');
         createCompanionTicketFAB(); // 進行状況FAB作成
     } else {
-        console.log('❌ 対象外の画面です');
+        logger.debug('対象外の画面です');
     }
     
-    console.log('🎫 同行者追加機能初期化完了');
+    logger.info('同行者追加機能初期化完了');
 }

@@ -404,14 +404,14 @@ const init_page = (): void => {
                             const moreButtons = node.querySelectorAll('button.style_more_btn__ymb22');
                             if (moreButtons.length > 0) {
                                 shouldUpdate = true;
-                                console.log('📍 新しいもっと見るボタンの追加を検知');
+                                logger.debug('新しいもっと見るボタンの追加を検知');
                             }
                             
                             // 検索アイテムの追加を検知
                             const searchItems = node.querySelectorAll('div.style_search_item_row__moqWC');
                             if (searchItems.length > 0) {
                                 shouldUpdateCounts = true;
-                                console.log('📍 新しい検索アイテムの追加を検知');
+                                logger.debug('新しい検索アイテムの追加を検知');
                             }
                         }
                     });
@@ -421,7 +421,7 @@ const init_page = (): void => {
                             const moreButtons = node.querySelectorAll('button.style_more_btn__ymb22');
                             if (moreButtons.length > 0) {
                                 shouldUpdate = true;
-                                console.log('📍 もっと見るボタンの削除を検知');
+                                logger.debug('もっと見るボタンの削除を検知');
                             }
                         }
                     });
@@ -509,7 +509,7 @@ const init_page = (): void => {
         setTimeout(() => {
             // 最初と最後のチェックのみログ出力
             if (index === 0 || index === checkIntervals.length - 1) {
-                console.log(`🕐 状態チェック${index + 1} (${delay}ms後)`);
+                logger.debug('状態チェック', { index: index + 1, delayMs: delay });
             }
             updateLoadAllButtonState();
             // 件数表示も更新
@@ -522,7 +522,7 @@ const init_page = (): void => {
     // DOM Content Loadedイベント後にもチェック
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', () => {
-            console.log('📋 DOMContentLoaded後の状態チェック');
+            logger.info('DOMContentLoaded後の状態チェック');
             setTimeout(() => {
                 updateLoadAllButtonState();
                 // 失敗した予約の通知をチェック（ページ読み込み時）
@@ -545,13 +545,13 @@ const init_page = (): void => {
             if (target && target.classList.contains("btn-load-all")) {
                 // すべて読み込み
                 const button = target as HTMLButtonElement;
-                console.log('🚀 すべて読み込み開始');
-                console.log(`🔧 クリック対象ボタン:`, button);
-                console.log(`🔧 実行前の状態: disabled=${button.disabled}, classes=${button.className}`);
+                logger.info('すべて読み込み開始');
+                logger.debug('クリック対象ボタン', button);
+                logger.debug('実行前の状態', { disabled: button.disabled, classes: button.className });
                 
                 // 既に実行中の場合は何もしない
                 if (button.classList.contains("btn-loading")) {
-                    console.log('⚠️ すでに実行中のため無視');
+                    logger.warn('すでに実行中のため無視');
                     return;
                 }
                 
@@ -559,9 +559,9 @@ const init_page = (): void => {
                 button.disabled = true;
                 button.classList.remove("btn-enabled");
                 button.classList.add("btn-disabled", "btn-loading");
-                console.log(`🔧 実行開始時の状態設定完了: disabled=${button.disabled}, classes=${button.className}`);
-                console.log(`🔧 実際のHTML disabled属性:`, button.hasAttribute('disabled'));
-                console.log(`🔧 computedStyle background:`, window.getComputedStyle(button).backgroundColor);
+                logger.debug('実行開始時の状態設定完了', { disabled: button.disabled, classes: button.className });
+                logger.debug('実際のHTML disabled属性', { hasDisabledAttr: button.hasAttribute('disabled') });
+                logger.debug('computedStyle background', { backgroundColor: window.getComputedStyle(button).backgroundColor });
                 
                 // 他の「すべて読み込み」ボタンも同時に無効化
                 document.querySelectorAll("button.btn-load-all").forEach((btn) => {
@@ -574,7 +574,7 @@ const init_page = (): void => {
                 });
                 
                 load_more_auto().then(() => {
-                    console.log('✅ すべて読み込み完了');
+                    logger.info('すべて読み込み完了');
                     // 全ての「すべて読み込み」ボタンのloading状態を解除
                     document.querySelectorAll("button.btn-load-all").forEach((btn) => {
                         const loadBtn = btn as HTMLButtonElement;
@@ -674,7 +674,7 @@ const init_page = (): void => {
             }
             else if (target && target.classList.contains("btn-day-reservation")) {
                 // 当日予約ダイアログは削除済み - メインダイアログを使用
-                console.log('🎫 メインダイアログに統一済み');
+                logger.info('メインダイアログに統一済み');
             }
         }
     })
@@ -806,7 +806,7 @@ const getNotificationIcon = (type: 'success' | 'error' | 'warning' | 'info'): st
 // テスト用のグローバル関数を公開
 if (typeof window !== 'undefined') {
     (window as any).testReservationNotification = () => {
-        console.log('🧪 通知テスト実行');
+        logger.debug('通知テスト実行');
         if (typeof (window as any).showReservationNotification === 'function') {
             (window as any).showReservationNotification('success', '予約完了: テストパビリオン 15:00～');
             setTimeout(() => {
@@ -819,7 +819,7 @@ if (typeof window !== 'undefined') {
                 (window as any).showReservationNotification('info', '監視成功: 日本館 1300 の空きを検知し予約開始');
             }, 6000);
         } else {
-            console.error('❌ 通知関数が利用できません');
+            logger.error('通知関数が利用できません');
         }
     };
 };
@@ -842,14 +842,16 @@ const getSelectedTimes = (): Record<string, string[]> => {
 const logSelectedTimes = (): void => {
     const selections = getSelectedTimes();
     if (Object.keys(selections).length === 0) {
-        console.log('📋 時間選択状況: 選択なし');
+        logger.debug('時間選択状況: 選択なし');
         return;
     }
     
-    console.log('📋 時間選択状況:');
-    Object.entries(selections).forEach(([pavilionCode, timeSlots]) => {
-        const times = timeSlots.map(slot => `${slot.slice(0, 2)}:${slot.slice(2)}`).join(', ');
-        console.log(`  ${pavilionCode}: ${times} (${timeSlots.length}件)`);
+    logger.debug('時間選択状況', {
+        selections: Object.entries(selections).reduce((acc, [pavilionCode, timeSlots]) => {
+            const times = timeSlots.map(slot => `${slot.slice(0, 2)}:${slot.slice(2)}`).join(', ');
+            acc[pavilionCode] = { times, count: timeSlots.length };
+            return acc;
+        }, {} as Record<string, { times: string; count: number }>)
     });
 };
 
@@ -858,7 +860,7 @@ const debugCache = (): void => {
     import('./pavilion-reservation-cache').then(({ PavilionReservationCache }) => {
         PavilionReservationCache.debugLogAllCache();
     }).catch(error => {
-        console.error('❌ キャッシュデバッグエラー:', error);
+        logger.error('キャッシュデバッグエラー', error);
     });
 };
 
@@ -866,9 +868,9 @@ const debugCache = (): void => {
 const clearCache = (): void => {
     import('./pavilion-reservation-cache').then(({ PavilionReservationCache }) => {
         PavilionReservationCache.clearAllReservationData();
-        console.log('🧹 パビリオン予約キャッシュをクリアしました');
+        logger.info('パビリオン予約キャッシュをクリアしました');
     }).catch(error => {
-        console.error('❌ キャッシュクリアエラー:', error);
+        logger.error('キャッシュクリアエラー', error);
     });
 };
 
@@ -883,7 +885,7 @@ const clearCache = (): void => {
 
 // 予約画面への遷移関数（Phase 3で使用予定）
 const navigateToReservation = (pavilion: PavilionData): void => {
-    console.log('🎯 予約画面への遷移:', pavilion.n);
+    logger.info('予約画面への遷移', { pavilionName: pavilion.n });
     
     // ダイアログを閉じる
     const dialog = document.getElementById('day-reservation-dialog');
@@ -947,7 +949,7 @@ const checkAndShowFailedReservationNotification = async (): Promise<void> => {
                     `予約に失敗しました: ${failureInfo.pavilionName} ${failureInfo.timeDisplay}～（${failureInfo.reason}）`,
                     false // 自動非表示しない
                 );
-                console.log('📢 異常リダイレクトによる失敗通知を表示しました');
+                logger.warn('異常リダイレクトによる失敗通知を表示しました');
             }
             
             // 表示完了後、sessionStorageをクリア
@@ -973,14 +975,14 @@ const checkAndShowFailedReservationNotification = async (): Promise<void> => {
                     `予約に失敗しました: ${latestFailed.pavilionName} ${latestFailed.selectedTimeDisplay}～`,
                     false // 自動非表示しない
                 );
-                console.log('📢 失敗した予約の通知を表示しました');
+                logger.warn('失敗した予約の通知を表示しました');
             }
             
             // 通知を表示した予約データを削除（重複表示を防ぐ）
             PavilionReservationCache.removeReservationData(latestFailed.pavilionCode, latestFailed.selectedTimeSlot);
         }
     } catch (error) {
-        console.error('❌ 失敗予約通知チェックエラー:', error);
+        logger.error('失敗予約通知チェックエラー', error);
     }
 };
 

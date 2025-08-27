@@ -4,6 +4,8 @@
  */
 
 import { PavilionReservationCache } from './pavilion-reservation-cache';
+import { loggers } from '../utils/logger';
+const logger = loggers.automation;
 
 /**
  * 自動予約を開始する共通関数
@@ -19,7 +21,7 @@ export async function startAutomationReservation(
     timeSlot: string,
     timeDisplay: string
 ): Promise<boolean> {
-    console.log('🚀 自動予約開始:', pavilionName, timeDisplay);
+    logger.info('自動予約開始', { pavilionName, timeDisplay });
     
     try {
         // 遷移先URLを構築
@@ -54,13 +56,13 @@ export async function startAutomationReservation(
         // 予約ページに遷移
         window.location.href = reservationUrl;
         
-        console.log('✅ 予約ページに遷移:', reservationUrl);
-        console.log('🤖 自動操作が開始されます');
+        logger.info('予約ページに遷移', { reservationUrl });
+        logger.info('自動操作が開始されます');
         
         return true;
         
     } catch (error) {
-        console.error('❌ 自動予約開始エラー:', error);
+        logger.error('自動予約開始エラー', error);
         return false;
     }
 }

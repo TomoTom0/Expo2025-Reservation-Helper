@@ -27,6 +27,9 @@ import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useMainDialogStore } from '@/stores/mainDialog'
 import { useTicketsStore } from '@/stores/tickets'
 import { usePavilionsStore } from '@/stores/pavilions'
+import { loggers } from '@/utils/logger'
+
+const logger = loggers.ui
 
 interface ReservationResult {
   success: boolean
@@ -48,7 +51,7 @@ const handleClick = () => {
   if (isInitialized.value) {
     mainDialogStore.showDialog()
   } else {
-    console.log('⏳ 初期化中のため、しばらくお待ちください...')
+    logger.warn('初期化中のため待機中')
   }
 }
 

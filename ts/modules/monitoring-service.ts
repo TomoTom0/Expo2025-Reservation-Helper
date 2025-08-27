@@ -394,9 +394,8 @@ if (typeof window !== 'undefined') {
     (window as any).stopPavilionMonitoring = stopPavilionMonitoring;
     (window as any).getMonitoringStatus = getMonitoringStatus;
     (window as any).debugMonitoringStatus = () => {
-        console.group('🔍 監視サービス状況');
-        logger.debug('監視状態', getMonitoringStatus());
+        const status = getMonitoringStatus();
+        logger.info('監視サービス状況', status);
         MonitoringCacheManager.debugInfo();
-        console.groupEnd();
     };
 }

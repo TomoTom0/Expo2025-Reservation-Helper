@@ -53,7 +53,7 @@ class PageReturnSystem {
             }
             return null;
         } catch (error) {
-            console.error('❌ ページ情報取得エラー:', error);
+            logger.error('ページ情報取得エラー', error);
             return null;
         }
     }
@@ -64,7 +64,7 @@ class PageReturnSystem {
     static async returnToSavedPage(): Promise<boolean> {
         const pageInfo = this.getSavedPageInfo();
         if (!pageInfo) {
-            console.log('⚠️ 復帰用ページ情報がありません');
+            logger.warn('復帰用ページ情報がありません');
             return false;
         }
         
@@ -73,11 +73,11 @@ class PageReturnSystem {
             if (success) {
                 // 復帰成功時は情報をクリア
                 sessionStorage.removeItem(this.STORAGE_KEY);
-                console.log('✅ ページ復帰完了');
+                logger.info('ページ復帰完了');
             }
             return success;
         } catch (error) {
-            console.error('❌ ページ復帰エラー:', error);
+            logger.error('ページ復帰エラー', error);
             return false;
         }
     }
@@ -89,16 +89,16 @@ class PageReturnSystem {
         const url = window.location.href;
         const urlParams = new URLSearchParams(window.location.search);
         
-        console.log('🔍 ページ解析中:', url);
+        logger.debug('ページ解析中', { url });
         
         // 既存のページ検知システムを使用
         const pageDetector = getPageDetector();
         const pageInfo = pageDetector.extractPageInfo();
         
-        console.log('🔍 既存システムでのページタイプ:', pageInfo.type);
+        logger.debug('既存システムでのページタイプ', { pageType: pageInfo.type });
         
         if (pageInfo.type === 'pavilion_search') {
-            console.log('✅ パビリオン検索ページと判定');
+            logger.info('パビリオン検索ページと判定');
             return {
                 pageType: 'pavilion_search',
                 parameters: {
@@ -109,7 +109,7 @@ class PageReturnSystem {
             };
         }
         
-        console.log('⚠️ 未対応のページタイプです:', url, 'detected:', pageInfo.type);
+        logger.warn('未対応のページタイプです', { url, detectedType: pageInfo.type });
         return null;
     }
     
@@ -117,14 +117,14 @@ class PageReturnSystem {
      * ページタイプに応じた復帰手続きを実行
      */
     private static async executePageReturn(pageInfo: PageInfo): Promise<boolean> {
-        console.log(`🔄 ページ復帰開始: ${pageInfo.pageType}`, pageInfo.parameters);
+        logger.info('ページ復帰開始', { pageType: pageInfo.pageType, parameters: pageInfo.parameters });
         
         switch (pageInfo.pageType) {
             case 'pavilion_search':
                 return await this.returnToPavilionSearch(pageInfo.parameters);
                 
             default:
-                console.error('❌ 未対応のページタイプ:', pageInfo.pageType);
+                logger.error('未対応のページタイプ', { pageType: pageInfo.pageType });
                 return false;
         }
     }
@@ -136,13 +136,13 @@ class PageReturnSystem {
         try {
             const id = params['id'];
             if (!id) {
-                console.error('❌ パビリオン検索復帰: idパラメータが不足');
+                logger.error('パビリオン検索復帰: idパラメータが不足');
                 return false;
             }
             
             // まずチケット選択画面に遷移
             const ticketSelectionUrl = `https://ticket.expo2025.or.jp/ticket_selection/?screen_id=018&lottery=4&id=${id}`;
-            console.log(`🎫 チケット選択画面に遷移: ${ticketSelectionUrl}`);
+            logger.info('チケット選択画面に遷移', { ticketSelectionUrl });
             
             window.location.href = ticketSelectionUrl;
             
@@ -151,7 +151,7 @@ class PageReturnSystem {
             return true;
             
         } catch (error) {
-            console.error('❌ パビリオン検索復帰エラー:', error);
+            logger.error('パビリオン検索復帰エラー', error);
             return false;
         }
     }
@@ -161,7 +161,7 @@ class PageReturnSystem {
      */
     static clearSavedPageInfo(): void {
         sessionStorage.removeItem(this.STORAGE_KEY);
-        console.log('🗑️ ページ復帰情報をクリア');
+        logger.info('ページ復帰情報をクリア');
     }
 }
 

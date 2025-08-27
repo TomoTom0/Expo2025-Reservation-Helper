@@ -163,7 +163,10 @@ import { storeToRefs } from 'pinia'
 import { useTicketsStore } from '@/stores/tickets'
 import { useMainDialogStore } from '@/stores/mainDialog'
 import { useTickets } from '@/composables/useTickets'
+import { loggers } from '@/utils/logger'
 import type { ScheduleData, TicketData, LotteryCalendarData, ReservationResult } from '@/types/api'
+
+const logger = loggers.ui
 
 interface ReservationStatus {
   statusText: string
@@ -250,11 +253,11 @@ const emptyMessage = computed(() => {
 
 // メソッド
 const handleOwnOnlyToggle = () => {
-  console.log('自分のみ表示:', isOwnOnlyToggle.value)
+  logger.debug('自分のみ表示', { isOwnOnlyToggle: isOwnOnlyToggle.value })
 }
 
 const handleDateSelection = (date: string) => {
-  console.log(`📅 日付ボタン選択: ${date}`)
+  logger.debug('日付ボタン選択', { date })
   
   // その日付のすべての有効なスケジュールを選択/選択解除
   const dateSchedules: ScheduleData[] = []
@@ -291,12 +294,12 @@ const handleDateSelection = (date: string) => {
     }
   })
   
-  console.log(`📅 日付 ${date} のスケジュール ${newSelectedState ? '全選択' : '全選択解除'} (${dateSchedules.length}件)`)
+  logger.info('日付スケジュール操作', { date, 操作: newSelectedState ? '全選択' : '全選択解除', 件数: dateSchedules.length })
 }
 
 const handleTicketSelection = (ticket: TicketData) => {
   // チケット選択ロジック（既存実装に従い、入場予約選択で連動するため無効化予定）
-  console.log('チケット選択:', ticket.ticket_id)
+  logger.info('チケット選択', { ticketId: ticket.ticket_id })
 }
 
 const handleEntranceDateSelection = (schedule: ScheduleData, ticket: TicketData, event: Event) => {
@@ -305,10 +308,10 @@ const handleEntranceDateSelection = (schedule: ScheduleData, ticket: TicketData,
   if (target.disabled) return
   
   const date = schedule.entrance_date
-  console.log('入場日時選択:', { 
+  logger.info('入場日時選択', {
     ticketId: ticket.ticket_id,
     date: date,
-    scheduleName: schedule.schedule_name 
+    scheduleName: schedule.schedule_name
   })
   
   // 入場日付は常に一つに限定される: 他の日付のスケジュール選択を解除
@@ -336,13 +339,13 @@ const handleEntranceDateSelection = (schedule: ScheduleData, ticket: TicketData,
     ticketsStore.removeSelectedEntranceDate(ticket.ticket_id)
   }
   
-  console.log(`入場日時 ${date} ${schedule.schedule_name || ''} を${schedule.selected ? '選択' : '選択解除'}`)
+  logger.info('入場日時状態変更', { date, scheduleName: schedule.schedule_name || '', 状態: schedule.selected ? '選択' : '選択解除' })
 }
 
 const handleAddTicket = async () => {
   if (!newTicketId.value.trim()) return
   
-  console.log('チケット追加:', {
+  logger.info('チケット追加', {
     id: newTicketId.value,
     label: newTicketLabel.value,
     channel: selectedChannel.value
@@ -413,14 +416,15 @@ const isDateSelected = (date: string): boolean => {
 
 // ライフサイクル
 onMounted(() => {
-  console.log('📋 TicketTab mounted')
-  console.log('📋 現在のチケット数:', ticketsArray.value.length)
-  console.log('📋 ticketsArray.value:', ticketsArray.value.length, ticketsArray.value)
-  console.log('📋 filteredTickets.value:', filteredTickets.value.length, filteredTickets.value)
+  logger.info('TicketTab mounted', {
+    現在のチケット数: ticketsArray.value.length,
+    ticketsArrayサイズ: ticketsArray.value.length,
+    filteredTicketsサイズ: filteredTickets.value.length
+  })
 })
 
 onUnmounted(() => {
-  console.log('🗑️ TicketTab unmounted')
+  logger.info('TicketTab unmounted')
 })
 </script>
 

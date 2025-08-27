@@ -9,6 +9,9 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
+import { loggers } from '@/utils/logger'
+
+const logger = loggers.ui
 
 // Reactive state
 const count = ref(0)
@@ -24,7 +27,7 @@ const increment = () => {
 
 // Lifecycle
 onMounted(() => {
-  console.log('✅ Vue component mounted successfully')
+  logger.info('Vue component mounted successfully')
 })
 </script>
 

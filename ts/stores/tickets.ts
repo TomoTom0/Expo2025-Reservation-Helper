@@ -152,7 +152,7 @@ export const useTicketsStore = defineStore('tickets', () => {
           tickets.value.set(ticket.ticket_id, ticket)
         }
       } catch (error) {
-        console.error('❌ 自分のチケット取得エラー:', error)
+        logger.error('自分のチケット取得エラー', error)
       }
 
       // 外部チケットを取得（エラーがあっても自分のチケットには影響しない）
@@ -219,7 +219,7 @@ export const useTicketsStore = defineStore('tickets', () => {
       const data = await response.json()
       
       if (!data.list || !Array.isArray(data.list)) {
-        console.warn('⚠️ チケットデータが期待する形式ではありません:', data)
+        logger.warn('チケットデータが期待する形式ではありません', data)
         return []
       }
 
@@ -231,7 +231,7 @@ export const useTicketsStore = defineStore('tickets', () => {
       }))
       
     } catch (error) {
-      console.error('❌ 自分のチケット取得API エラー:', error)
+      logger.error('自分のチケット取得API エラー', error)
       return []
     }
   }
@@ -291,7 +291,7 @@ export const useTicketsStore = defineStore('tickets', () => {
         }
       }
     } catch (error) {
-      console.error('❌ キャッシュからの外部チケットID取得エラー:', error)
+      logger.error('キャッシュからの外部チケットID取得エラー', error)
     }
 
     return externalTickets
@@ -324,7 +324,7 @@ export const useTicketsStore = defineStore('tickets', () => {
             return ticketData
           }
         } catch (error) {
-          console.warn(`⚠️ 外部チケット${ticketId}のchannel=${testChannel}取得失敗:`, error)
+          logger.warn('外部チケット取得失敗', { ticketId, testChannel, error })
         }
       }
       
@@ -338,7 +338,7 @@ export const useTicketsStore = defineStore('tickets', () => {
       }
       
     } catch (error) {
-      console.error(`❌ 外部チケット${ticketId}の取得エラー:`, error)
+      logger.error('外部チケット取得エラー', { ticketId, error })
       return null
     }
   }
@@ -415,7 +415,7 @@ export const useTicketsStore = defineStore('tickets', () => {
   // 入場日時選択の永続化機能
   const saveSelectedEntranceDate = (ticketId: string, scheduleId: string) => {
     selectedEntranceDates.value.set(ticketId, scheduleId)
-    console.log(`💾 入場日時選択を保存: ${ticketId} -> ${scheduleId}`)
+    logger.debug('入場日時選択を保存', { ticketId, scheduleId })
   }
 
   const removeSelectedEntranceDate = (ticketId: string) => {
@@ -464,7 +464,7 @@ export const useTicketsStore = defineStore('tickets', () => {
         logger.info('入場日時選択状態復元完了', { restoredCount });
       }
     } catch (error) {
-      console.error('❌ 入場日時復元エラー:', error)
+      logger.error('入場日時復元エラー', error)
       selectedEntranceDates.value = new Map()
     }
   }

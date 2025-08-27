@@ -236,7 +236,7 @@ export class ProcessingOverlay {
         if (processType === 'reservation' && currentPageType === 'entrance_reservation') {
             const existingNotificationToggle = this.overlayElement.querySelector('#ytomo-notification-toggle');
             if (!existingNotificationToggle) {
-                console.log('🔊 show()で通知音トグルボタンを追加中...');
+                logger.debug('show()で通知音トグルボタンを追加中');
                 this.addNotificationToggleButton();
             }
         }
@@ -269,7 +269,7 @@ export class ProcessingOverlay {
     public hide(): void {
         if (!this.overlayElement || !this.isActive) return;
         
-        console.log('🛡️ 誤動作防止オーバーレイ非表示');
+        logger.info('誤動作防止オーバーレイ非表示');
         
         // 非表示アニメーション
         this.overlayElement.classList.remove('visible');
@@ -408,7 +408,7 @@ export class ProcessingOverlay {
             // カウントダウン対象がない場合はクリア
             this.clearCountdown();
         } catch (error) {
-            console.warn('カウントダウン更新エラー:', error);
+            logger.warn('カウントダウン更新エラー', error);
         }
     }
 
@@ -438,14 +438,14 @@ export class ProcessingOverlay {
         // bodyに追加
         document.body.appendChild(abortButton);
         
-        console.log('🛑 処理中断ボタンを作成しました');
+        logger.info('処理中断ボタンを作成しました');
     }
     
     /**
      * 中断ボタンクリック処理
      */
     private handleAbortClick(): void {
-        console.log('🛑 処理中断ボタンがクリックされました');
+        logger.info('処理中断ボタンがクリックされました');
         
         // 処理タイプに応じて中断処理を実行
         if (this.currentProcessType === 'companion') {
@@ -465,7 +465,7 @@ export class ProcessingOverlay {
      * 同行者処理の中断
      */
     private abortCompanionProcess(): void {
-        console.log('🛑 同行者追加処理を中断中...');
+        logger.info('同行者追加処理を中断中');
         
         // companion-ticket-pageのプロセスマネージャーを停止
         try {
@@ -474,12 +474,12 @@ export class ProcessingOverlay {
             const companionProcessManager = (window as any).companionProcessManager;
             if (companionProcessManager && typeof companionProcessManager.stopProcess === 'function') {
                 companionProcessManager.stopProcess();
-                console.log('✅ 同行者追加処理を正常に中断しました');
+                logger.info('同行者追加処理を正常に中断しました');
             } else {
-                console.warn('⚠️ companionProcessManagerが見つかりません');
+                logger.warn('companionProcessManagerが見つかりません');
             }
         } catch (error) {
-            console.error('❌ 同行者処理中断でエラー:', error);
+            logger.error('同行者処理中断でエラー', error);
         }
     }
     
@@ -487,7 +487,7 @@ export class ProcessingOverlay {
      * 予約処理の中断
      */
     private abortReservationProcess(): void {
-        console.log('🛑 予約処理を中断中...');
+        logger.info('予約処理を中断中');
         
         // 既存の予約中断処理と連携
         try {
@@ -496,7 +496,7 @@ export class ProcessingOverlay {
                 fabButton.click();
             }
         } catch (error) {
-            console.error('❌ 予約処理中断でエラー:', error);
+            logger.error('予約処理中断でエラー', error);
         }
     }
     
@@ -507,7 +507,7 @@ export class ProcessingOverlay {
         const abortButton = document.getElementById('ytomo-processing-abort-button');
         if (abortButton) {
             abortButton.remove();
-            console.log('🛑 処理中断ボタンを削除しました');
+            logger.info('処理中断ボタンを削除しました');
         }
     }
     
@@ -526,7 +526,7 @@ export class ProcessingOverlay {
             const fabContainer = document.getElementById(id);
             if (fabContainer) {
                 fabContainer.className = fabContainer.className.replace(/z-\w+/g, '').trim() + ' z-above-overlay';
-                console.log(`🛡️ FABコンテナ "${id}" をオーバーレイより前面に調整`);
+                logger.debug('FABコンテナをオーバーレイより前面に調整', { id });
             }
         });
     }
@@ -551,12 +551,12 @@ export class ProcessingOverlay {
                 fabButton.style.visibility = 'visible';
                 fabButton.style.opacity = '1';
                 fabFound = true;
-                console.log(`🛡️ [システム連動] FABボタン "${id}" を中断可能状態に設定`);
+                logger.debug('システム連動 FABボタンを中断可能状態に設定', { id });
             }
         });
         
         if (!fabFound) {
-            console.warn('⚠️ 中断用FABボタンが見つかりません - 全画面検索実行');
+            logger.warn('中断用FABボタンが見つかりません - 全画面検索実行');
             // フォールバック：全画面でFABボタンを検索
             const allFabs = document.querySelectorAll('[id*="fab"]') as NodeListOf<HTMLButtonElement>;
             allFabs.forEach(fab => {
@@ -565,7 +565,7 @@ export class ProcessingOverlay {
                     fab.style.display = 'flex';
                     fab.style.visibility = 'visible';
                     fab.style.opacity = '1';
-                    console.log(`🛡️ [フォールバック] FABボタン "${fab.id}" を発見・有効化`);
+                    logger.debug('フォールバック FABボタンを発見・有効化', { id: fab.id });
                 }
             });
         }
@@ -657,7 +657,7 @@ export class ProcessingOverlay {
      */
     private handleNotificationToggle(): void {
         const isEnabled = entranceReservationStateManager.toggleNotificationSound();
-        console.log(`🔊 通知音設定変更: ${isEnabled ? '有効' : '無効'}`);
+        logger.info('通知音設定変更', { isEnabled });
         
         // ボタンの表示を更新
         const toggleButton = document.getElementById('ytomo-notification-toggle');
@@ -676,7 +676,7 @@ export class ProcessingOverlay {
         const messageArea = this.overlayElement.querySelector('.processing-message-area');
         if (!messageArea) return;
         
-        console.log('🔊 通知音トグルボタンを動的に追加中...');
+        logger.debug('通知音トグルボタンを動的に追加中');
         
         const notificationToggle = document.createElement('button');
         notificationToggle.id = 'ytomo-notification-toggle';
@@ -698,9 +698,9 @@ export class ProcessingOverlay {
         
         if (warningText && cancelArea) {
             messageArea.insertBefore(notificationToggle, cancelArea);
-            console.log('✅ 通知音トグルボタンを動的に追加完了');
+            logger.info('通知音トグルボタンを動的に追加完了');
         } else {
-            console.warn('⚠️ 挿入位置要素が見つかりません');
+            logger.warn('挿入位置要素が見つかりません');
         }
     }
     
@@ -737,7 +737,7 @@ export class ProcessingOverlay {
         this.stopCountdownMonitoring();
         this.isActive = false;
         
-        console.log('🛡️ 誤動作防止オーバーレイを破棄');
+        logger.info('誤動作防止オーバーレイを破棄');
     }
 }
 
