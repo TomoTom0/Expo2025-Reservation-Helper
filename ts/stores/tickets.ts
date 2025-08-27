@@ -130,6 +130,11 @@ export const useTicketsStore = defineStore('tickets', () => {
       }
       
       return scheduleData
+    }).sort((a, b) => {
+      // 入場日時順でソート
+      const dateTimeA = `${a.entrance_date}${a.time_start || '0000'}`
+      const dateTimeB = `${b.entrance_date}${b.time_start || '0000'}`
+      return dateTimeA.localeCompare(dateTimeB)
     })
   }
 

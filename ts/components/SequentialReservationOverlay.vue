@@ -1,66 +1,59 @@
 <template>
   <Teleport to="body">
     <div 
-      v-if="overlaysStore.sequentialOverlayVisible"
+      v-if="sequentialReservationStore.state.isRunning"
       class="ytomo-sequential-overlay"
       id="ytomo-sequential-overlay"
       @click="handleOverlayClick"
     >
       <div class="ytomo-sequential-content">
-        <h3>順次予約実行中</h3>
-        <div class="ytomo-sequential-settings">
-          <div class="ytomo-mode-setting">
-            <label>実行モード:</label>
-            <div class="ytomo-mode-buttons">
-              <button 
-                id="ytomo-reservation-mode" 
-                class="ytomo-mode-button"
-                :class="{ active: !overlaysStore.sequentialState.isMonitoringMode }"
-                @click="switchToReservationMode"
-              >
-                予約モード
-              </button>
-              <button 
-                id="ytomo-monitoring-mode" 
-                class="ytomo-mode-button"
-                :class="{ active: overlaysStore.sequentialState.isMonitoringMode }"
-                @click="switchToMonitoringMode"
-              >
-                監視モード
-              </button>
-            </div>
-          </div>
-          <div class="ytomo-interval-setting">
-            <label for="ytomo-interval-select">実行間隔:</label>
-            <select 
-              id="ytomo-interval-select" 
-              class="ytomo-interval-dropdown"
-              :value="overlaysStore.sequentialState.currentInterval"
-              @change="onIntervalChange"
+        <h3>順次予約実行中 {{ sequentialReservationStore.state.currentTargetIndex + 1 }}/{{ sequentialReservationStore.state.reservationTargets.length }}</h3>
+        <div class="ytomo-sequential-settings-row">
+          <div class="ytomo-mode-buttons">
+            <button 
+              id="ytomo-reservation-mode" 
+              class="ytomo-mode-button"
+              :class="{ active: !sequentialReservationStore.state.nextMonitoringMode }"
+              @click="switchToReservationMode"
             >
-              <option v-if="!overlaysStore.sequentialState.isMonitoringMode" value="1">1秒</option>
-              <option value="5">5秒</option>
-              <option value="15">15秒</option>
-              <option value="30">30秒</option>
-              <option value="60">60秒</option>
-            </select>
+              予約
+            </button>
+            <button 
+              id="ytomo-monitoring-mode" 
+              class="ytomo-mode-button"
+              :class="{ active: sequentialReservationStore.state.nextMonitoringMode }"
+              @click="switchToMonitoringMode"
+            >
+              監視
+            </button>
           </div>
+          <select 
+            id="ytomo-interval-select" 
+            class="ytomo-interval-dropdown"
+            :value="sequentialReservationStore.state.nextIntervalTime"
+            @change="onIntervalChange"
+          >
+            <option v-if="!sequentialReservationStore.state.nextMonitoringMode" value="1">1秒</option>
+            <option value="5">5秒</option>
+            <option value="15">15秒</option>
+            <option value="30">30秒</option>
+            <option value="60">60秒</option>
+          </select>
         </div>
         <div class="ytomo-sequential-progress">
-          <div class="ytomo-sequential-current">
-            {{ overlaysStore.sequentialState.currentReservationIndex }}/{{ overlaysStore.sequentialState.totalReservationsCount }}
+          <div class="ytomo-sequential-target">
+            <div v-if="currentTarget" class="current-target">
+              <div class="pavilion-name">{{ currentTarget.pavilionName }}</div>
+              <div class="time-slot-button">{{ currentTarget.timeSlot }}</div>
+            </div>
           </div>
-          <div class="ytomo-sequential-target">{{ overlaysStore.sequentialState.currentTarget }}</div>
-          <div class="ytomo-sequential-countdown">{{ overlaysStore.sequentialState.countdownText }}</div>
-        </div>
-        <div class="ytomo-sequential-controls">
-          <button 
-            id="ytomo-cancel-sequential" 
-            class="ytomo-cancel-button"
-            @click="cancelSequentialReservation"
-          >
-            キャンセル
-          </button>
+          <div class="ytomo-sequential-status">
+            <div class="ytomo-sequential-current">
+              {{ sequentialReservationStore.state.currentTargetIndex + 1 }}/{{ sequentialReservationStore.state.reservationTargets.length }}
+              <span v-if="sequentialReservationStore.state.endlessMode" class="endless-indicator">♾️</span>
+            </div>
+            <div class="ytomo-sequential-countdown">{{ sequentialReservationStore.state.countdownText }}</div>
+          </div>
         </div>
       </div>
     </div>
@@ -68,11 +61,22 @@
 </template>
 
 <script setup lang="ts">
+import { computed } from 'vue'
 import { useOverlaysStore } from '@/stores/overlays'
+import { useSequentialReservationStore } from '@/stores/sequentialReservation'
 import { loggers } from '@/utils/logger'
 
 const overlaysStore = useOverlaysStore()
+const sequentialReservationStore = useSequentialReservationStore()
 const logger = loggers.ui
+
+const currentTarget = computed(() => {
+  const state = sequentialReservationStore.state
+  if (state.reservationTargets.length > 0 && state.currentTargetIndex >= 0) {
+    return state.reservationTargets[state.currentTargetIndex]
+  }
+  return null
+})
 
 const handleOverlayClick = (e: Event) => {
   e.preventDefault()
@@ -80,21 +84,22 @@ const handleOverlayClick = (e: Event) => {
 }
 
 const switchToReservationMode = () => {
-  overlaysStore.switchSequentialMode(false)
+  sequentialReservationStore.setNextMonitoringMode(false)
 }
 
 const switchToMonitoringMode = () => {
-  overlaysStore.switchSequentialMode(true)
+  sequentialReservationStore.setNextMonitoringMode(true)
 }
 
 const onIntervalChange = (e: Event) => {
   const target = e.target as HTMLSelectElement
-  overlaysStore.setSequentialInterval(parseInt(target.value))
+  sequentialReservationStore.setNextInterval(parseInt(target.value))
 }
 
 const cancelSequentialReservation = () => {
+  sequentialReservationStore.stopSequentialReservation()
   overlaysStore.hideSequentialOverlay()
-  logger.info('順次予約をキャンセルしました')
+  logger.info('継続予約をキャンセルしました')
 }
 </script>
 
@@ -133,25 +138,16 @@ const cancelSequentialReservation = () => {
   }
 }
 
-.ytomo-sequential-settings {
+.ytomo-sequential-settings-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
   margin-bottom: 24px;
-  
-  .ytomo-mode-setting {
-    margin-bottom: 16px;
-    
-    label {
-      display: block;
-      margin-bottom: 8px;
-      font-size: 14px;
-      font-weight: 500;
-      color: #374151;
-    }
-  }
   
   .ytomo-mode-buttons {
     display: flex;
     gap: 8px;
-    justify-content: center;
   }
   
   .ytomo-mode-button {
@@ -180,16 +176,6 @@ const cancelSequentialReservation = () => {
     }
   }
   
-  .ytomo-interval-setting {
-    label {
-      display: block;
-      margin-bottom: 8px;
-      font-size: 14px;
-      font-weight: 500;
-      color: #374151;
-    }
-  }
-  
   .ytomo-interval-dropdown {
     padding: 8px 12px;
     border: 1px solid #d1d5db;
@@ -207,46 +193,62 @@ const cancelSequentialReservation = () => {
 
 .ytomo-sequential-progress {
   margin-bottom: 24px;
-  
-  .ytomo-sequential-current {
-    font-size: 18px;
-    font-weight: 600;
-    color: #2c5aa0;
-    margin-bottom: 8px;
-  }
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
   
   .ytomo-sequential-target {
+    flex: 1;
     font-size: 14px;
     color: #374151;
-    margin-bottom: 4px;
+    
+    .current-target {
+      text-align: left;
+      
+      .pavilion-name {
+        font-weight: 600;
+        font-size: 16px;
+        margin-bottom: 8px;
+      }
+      
+      .time-slot-button {
+        display: inline-block;
+        padding: 4px 8px;
+        background: #2c5aa0;
+        color: white;
+        border-radius: 4px;
+        font-size: 12px;
+        font-weight: 500;
+        border: 1px solid #2c5aa0;
+      }
+    }
   }
   
-  .ytomo-sequential-countdown {
-    font-size: 16px;
-    font-weight: 500;
-    color: #ef4444;
+  .ytomo-sequential-status {
+    flex-shrink: 0;
+    text-align: right;
+    
+    .ytomo-sequential-current {
+      font-size: 18px;
+      font-weight: 600;
+      color: #2c5aa0;
+      margin-bottom: 4px;
+      
+      .endless-indicator {
+        margin-left: 8px;
+        font-size: 16px;
+      }
+    }
+    
+    .ytomo-sequential-countdown {
+      font-size: 16px;
+      font-weight: 500;
+      color: #ef4444;
+    }
   }
 }
 
-.ytomo-cancel-button {
-  background: #6b7280;
-  color: white;
-  border: none;
-  padding: 12px 24px;
-  border-radius: 6px;
-  font-size: 14px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: background-color 0.2s;
-
-  &:hover {
-    background: #4b5563;
-  }
-
-  &:focus {
-    outline: none;
-  }
-}
 
 @keyframes fadeIn {
   to {

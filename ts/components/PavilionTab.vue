@@ -122,34 +122,39 @@
     </div>
 
     <!-- ENDLESSトグルボタン -->
-    <button 
-      id="endless-toggle-button"
-      class="ytomo-endless-toggle"
-      :class="{ active: mainDialogStore.endlessMode }"
-      title="ENDLESSモード切替"
-      @click="mainDialogStore.toggleEndlessMode"
-    >
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-        <path d="M18.6 6.62c-1.44 0-2.8.56-3.77 1.53L12 10.66 10.48 9.14c-.64-.64-1.49-.99-2.4-.99-1.87 0-3.39 1.51-3.39 3.38s1.52 3.38 3.39 3.38c.91 0 1.76-.35 2.4-.99L12 12.4l1.52 1.52c.64.64 1.49.99 2.4.99 1.87 0 3.39-1.51 3.39-3.38s-1.52-3.38-3.39-3.38c-.9 0-1.76.35-2.4.99l-.96.96-.96-.96c-.64-.64-1.5-.99-2.4-.99z"/>
-      </svg>
-    </button>
-
-    <!-- 予約実行FABボタン -->
-    <button 
-      id="reservation-button" 
-      class="ytomo-reservation-fab" 
-      :disabled="selectedSlotsCount === 0"
-      :title="`予約実行 (${selectedSlotsCount}件選択中)`"
-      @click="handleReservationExecution"
-    >
-      📋
-      <span 
-        v-if="selectedSlotsCount > 0" 
-        class="ytomo-count-badge"
+    <Teleport to="body">
+      <button 
+        id="endless-toggle-button"
+        class="ytomo-endless-toggle"
+        :class="{ active: sequentialReservationStore.state.endlessMode }"
+        title="ENDLESSモード切替"
+        @click="handleEndlessToggle"
       >
-        {{ selectedSlotsCount }}
-      </span>
-    </button>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M18.6 6.62c-1.44 0-2.8.56-3.77 1.53L12 10.66 10.48 9.14c-.64-.64-1.49-.99-2.4-.99-1.87 0-3.39 1.51-3.39 3.38s1.52 3.38 3.39 3.38c.91 0 1.76-.35 2.4-.99L12 12.4l1.52 1.52c.64.64 1.49.99 2.4.99 1.87 0 3.39-1.51 3.39-3.38s-1.52-3.38-3.39-3.38c-.9 0-1.76.35-2.4.99l-.96.96-.96-.96c-.64-.64-1.5-.99-2.4-.99z"/>
+        </svg>
+      </button>
+    </Teleport>
+
+    <!-- 予約実行/中断FABボタン -->
+    <Teleport to="body">
+      <button 
+        id="reservation-button" 
+        class="ytomo-reservation-fab" 
+        :class="{ 'abort-mode': sequentialReservationStore.state.isRunning }"
+        :disabled="!sequentialReservationStore.state.isRunning && selectedSlotsCount === 0"
+        :title="sequentialReservationStore.state.isRunning ? '順次予約を中断' : `予約実行 (${selectedSlotsCount}件選択中)`"
+        @click="handleReservationExecution"
+      >
+        {{ sequentialReservationStore.state.isRunning ? '中断' : '📋' }}
+        <span 
+          v-if="!sequentialReservationStore.state.isRunning && selectedSlotsCount > 0" 
+          class="ytomo-count-badge"
+        >
+          {{ selectedSlotsCount }}
+        </span>
+      </button>
+    </Teleport>
     
     <!-- ステータスFAB（予約結果表示用） -->
     <button 
@@ -184,6 +189,7 @@ import { usePavilionsStore } from '@/stores/pavilions'
 import { useTicketsStore } from '@/stores/tickets'
 import { useMainDialogStore } from '@/stores/mainDialog'
 import { useOverlaysStore } from '@/stores/overlays'
+import { useSequentialReservationStore } from '@/stores/sequentialReservation'
 import { usePavilions } from '@/composables/usePavilions'
 import type { ScheduleData, TicketData } from '@/types/api'
 import { loggers } from '@/utils/logger'
@@ -206,11 +212,18 @@ interface PavilionData {
 // Logger setup
 const logger = loggers.ui
 
+// ENDLESSモード切り替えハンドラ
+const handleEndlessToggle = () => {
+  sequentialReservationStore.setEndlessMode(!sequentialReservationStore.state.endlessMode)
+  logger.info('ENDLESSモード切り替え', { enabled: sequentialReservationStore.state.endlessMode })
+}
+
 // Store アクセス
 const pavilionsStore = usePavilionsStore()
 const ticketsStore = useTicketsStore()
 const mainDialogStore = useMainDialogStore()
 const overlaysStore = useOverlaysStore()
+const sequentialReservationStore = useSequentialReservationStore()
 const { allPavilions, filteredPavilions, isLoading, isAvailableOnlyFilter, availablePavilionsCount } = storeToRefs(pavilionsStore)
 
 // Composable使用
@@ -233,7 +246,13 @@ const statusFabVisible = ref(false)
 const resultDisplayVisible = ref(false)
 
 // 計算プロパティ
-const selectedSlotsCount = computed(() => pavilionsStore.selectedTimeSlotsCount)
+// 現在表示されているパビリオンの選択時間帯数のみを計算
+const selectedSlotsCount = computed(() => {
+  const filteredPavilionIds = new Set(pavilionsStore.filteredPavilions.map(p => p.id))
+  return pavilionsStore.selectedTimeSlots.filter(slot => 
+    filteredPavilionIds.has(slot.pavilionId)
+  ).length
+})
 
 // 分散状態管理から選択されたスケジュール一覧を取得
 const selectedSchedules = computed(() => {
@@ -256,7 +275,6 @@ const selectedEntranceDate = computed(() => {
 // 選択された入場予約のうち、最も遅い入場時刻+10分を取得（HH:MM形式）
 const getLatestEntranceTime = (): string => {
   if (selectedSchedules.value.length === 0) {
-    logger.debug('選択された入場予約なし')
     return ''
   }
   
@@ -531,6 +549,13 @@ const handleTimeSlotClick = (pavilionId: string, timeSlot: TimeSlotData) => {
 }
 
 const handleReservationExecution = async () => {
+  // 順次予約実行中の場合は中断処理
+  if (sequentialReservationStore.state.isRunning) {
+    sequentialReservationStore.stopSequentialReservation()
+    logger.info('順次予約を中断しました')
+    return
+  }
+
   if (selectedSlotsCount.value === 0) {
     logger.warn('選択された時間帯なし')
     return
@@ -539,10 +564,11 @@ const handleReservationExecution = async () => {
   try {
     logger.info('予約実行開始', { selectedCount: selectedSlotsCount.value })
     
-    // 順次予約オーバーレイを表示
-    overlaysStore.showSequentialOverlay(selectedSlotsCount.value)
-    
-    const selectedSlots = pavilionsStore.selectedTimeSlots
+    // 現在表示されているパビリオンの選択時間帯のみを取得
+    const filteredPavilionIds = new Set(pavilionsStore.filteredPavilions.map(p => p.id))
+    const selectedSlots = pavilionsStore.selectedTimeSlots.filter(slot => 
+      filteredPavilionIds.has(slot.pavilionId)
+    )
     const entranceDate = selectedEntranceDate.value || ''
     
     // 入場予約から正しいパビリオン予約種類を取得
@@ -562,18 +588,27 @@ const handleReservationExecution = async () => {
       throw new Error('チケットが選択されていません')
     }
     
-    // 各選択された時間帯に対して予約実行
-    const results = []
-    for (const selection of selectedSlots) {
-      const result = await executeReservation(
-        selection.pavilionId,
-        selection.timeSlot,
-        entranceDate,
-        registeredChannel,
-        ticketIds
-      )
-      results.push(result)
-    }
+    // 予約対象をReservationTarget形式に変換
+    const reservationTargets = selectedSlots.map(selection => ({
+      pavilionId: selection.pavilionId,
+      pavilionName: selection.pavilionName,
+      timeSlot: formatTimeSlot(selection.timeSlot.time),
+      entranceDate,
+      registeredChannel,
+      ticketIds
+    }))
+    
+    // 継続予約開始 - 必要な情報を渡して継続予約storeに委譲
+    const endlessMode = sequentialReservationStore.state.endlessMode
+    sequentialReservationStore.startSequentialReservation(reservationTargets, endlessMode)
+    
+    // 継続予約storeに予約実行を完全委譲
+    const results = await sequentialReservationStore.executeSequentialReservation(
+      pavilionsStore.executeReservation, // 予約実行関数
+      selectedSlots,                      // TimeSlotData検索用
+      formatTimeSlot,                     // フォーマット関数
+      logger                              // ログ出力用
+    )
     
     // 成功した予約数をカウント
     const successCount = results.filter(r => r.success).length
@@ -600,6 +635,7 @@ const handleReservationExecution = async () => {
       }
     })
     
+    // 継続予約の場合はダイアログは隠さない（sequentialReservationStoreで管理）
     hideProcessingOverlay()
     
     // 予約結果をMainFab.vueと同様の形式で発火
@@ -625,8 +661,46 @@ const handleReservationExecution = async () => {
     }
     
   } catch (error) {
-    logger.error('予約実行エラー', error)
-    overlaysStore.hideSequentialOverlay()
+    logger.error('継続予約実行エラー', error)
+    sequentialReservationStore.stopSequentialReservation()
+  }
+}
+
+// ENDLESS OFF時の予約失敗後時間帯情報非同期更新
+const updateTimeSlotInfoAsync = async () => {
+  try {
+    logger.info('予約失敗後の時間帯情報非同期更新を実行中')
+    
+    // 選択されたチケットIDsを取得
+    const selectedTickets = ticketsStore.ticketsArray.filter(ticket => 
+      ticket.schedules?.some(schedule => schedule.selected)
+    )
+    const ticketIds = selectedTickets.map(t => t.ticket_id)
+    
+    if (ticketIds.length === 0) {
+      logger.warn('時間帯情報更新: チケットが選択されていません')
+      return
+    }
+    
+    // 選択された入場日付を取得
+    const entranceDate = selectedEntranceDate.value
+    if (!entranceDate) {
+      logger.warn('時間帯情報更新: 入場日付が選択されていません')
+      return
+    }
+    
+    // 現在の検索クエリを取得（最後の検索を再実行）
+    const currentQuery = searchInput.value.trim()
+    
+    // refreshPavilionsメソッドを使用して時間帯情報を更新
+    await pavilionsStore.refreshPavilions(currentQuery, ticketIds, entranceDate)
+    
+    logger.info('予約失敗後の時間帯情報非同期更新完了')
+    
+  } catch (error) {
+    logger.error('時間帯情報非同期更新でエラー', { 
+      error: error instanceof Error ? error.message : String(error)
+    })
   }
 }
 
@@ -1042,6 +1116,22 @@ onUnmounted(() => {
         outline: none;  // focus囲みを削除
     }
 
+    &:disabled {
+        background: #f3f4f6;
+        border-color: #d1d5db;
+        color: #9ca3af;
+        cursor: not-allowed;
+        opacity: 0.6;
+        pointer-events: none;
+        
+        &:hover {
+            background: #f3f4f6;
+            color: #9ca3af;
+            transform: none;
+            box-shadow: none;
+        }
+    }
+
     &.hidden {
         display: none;
     }
@@ -1287,7 +1377,7 @@ onUnmounted(() => {
 /* 予約実行FABボタン */
 .ytomo-reservation-fab {
     position: fixed;
-    bottom: 20px;
+    bottom: 80px;
     right: 20px;
     width: 56px;
     height: 56px;
@@ -1299,7 +1389,7 @@ onUnmounted(() => {
     cursor: pointer;
     box-shadow: 0 4px 16px rgba(44, 90, 160, 0.3);
     transition: all 0.3s ease;
-    z-index: 1000;
+    z-index: 10003;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -1343,12 +1433,22 @@ onUnmounted(() => {
     &:focus {
         outline: none;
     }
+
+    &.abort-mode {
+        background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
+        font-size: 14px;
+        font-weight: bold;
+
+        &:hover:not(:disabled) {
+            background: linear-gradient(135deg, #991b1b 0%, #7f1d1d 100%);
+        }
+    }
 }
 
 /* ENDLESSトグルボタン */
 .ytomo-endless-toggle {
     position: fixed;
-    bottom: 96px;
+    bottom: 156px;
     right: 20px;
     width: 40px;
     height: 32px;
@@ -1359,7 +1459,7 @@ onUnmounted(() => {
     cursor: pointer;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
     transition: all 0.2s ease;
-    z-index: 998;
+    z-index: 10003;
     display: flex;
     align-items: center;
     justify-content: center;

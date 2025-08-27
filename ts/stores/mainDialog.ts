@@ -13,14 +13,12 @@ export const useMainDialogStore = defineStore('mainDialog', () => {
   const isVisible = ref(false)
   const activeTab = ref<'ticket' | 'pavilion'>('ticket')
   const version = ref('0.5.4') // version.datから動的に読み込む予定
-  const endlessMode = ref(false) // ENDLESSモードの状態
   // selectedEntranceDate は計算プロパティで取得するため削除
 
   // Getters
   const getIsVisible = () => isVisible.value
   const getActiveTab = () => activeTab.value
   const getVersion = () => version.value
-  const getEndlessMode = () => endlessMode.value
 
   // Actions
   const showDialog = () => {
@@ -35,10 +33,6 @@ export const useMainDialogStore = defineStore('mainDialog', () => {
     activeTab.value = tab
   }
 
-  const toggleEndlessMode = () => {
-    endlessMode.value = !endlessMode.value
-    logger.info('ENDLESSモード切り替え', { enabled: endlessMode.value })
-  }
 
   // 入場日時選択は各scheduleのselectedフラグで管理するため、ここでは削除
 
@@ -47,24 +41,21 @@ export const useMainDialogStore = defineStore('mainDialog', () => {
     isVisible,
     activeTab,
     version,
-    endlessMode,
     
     // Getters
     getIsVisible,
     getActiveTab,
     getVersion,
-    getEndlessMode,
     
     // Actions
     showDialog,
     hideDialog,
-    setActiveTab,
-    toggleEndlessMode
+    setActiveTab
   }
 }, {
   // Store全体をlocalStorageに自動永続化
   persist: {
     key: 'ytomo-main-dialog',
-    pick: ['activeTab', 'endlessMode'] // 永続化したい状態のみ指定
+    pick: ['activeTab'] // 永続化したい状態のみ指定
   }
 })

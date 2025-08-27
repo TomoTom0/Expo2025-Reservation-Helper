@@ -301,7 +301,7 @@ export const usePavilionsStore = defineStore('pavilions', () => {
   const applyTimeSlotsToData = (pavilions: PavilionData[], timeSlotsMap: Map<string, { timeSlots: TimeSlotData[], pavilionName?: string }>): void => {
     pavilions.forEach(pavilion => {
       const data = timeSlotsMap.get(pavilion.id)
-      const timeSlots = data?.timeSlots || []
+      const timeSlots = (data?.timeSlots || []).sort((a, b) => a.time.localeCompare(b.time))
       pavilion.timeSlots = timeSlots
       
       // パビリオン名が取得できた場合は更新

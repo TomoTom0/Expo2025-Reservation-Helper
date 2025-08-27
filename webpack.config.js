@@ -73,6 +73,9 @@ module.exports = {
       raw: true, // コメント形式として扱わない
       entryOnly: true
     }),
+    new webpack.DefinePlugin({
+      'process.env.LOG_LEVEL': JSON.stringify(process.env.LOG_LEVEL || 'WARN')
+    }),
     new VueLoaderPlugin() // Vue Loader Plugin追加
   ],
   module: {

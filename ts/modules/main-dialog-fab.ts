@@ -76,6 +76,9 @@ export class MainDialogFabImpl implements MainDialogFab {
      */
     private initializeVueComponents(): void {
         try {
+            // ytomoページの場合は即座にmainタグをクリア
+            this.handleYtomoPageImmediate();
+            
             // アプリケーションマウントポイント作成
             this.appMountPoint = document.createElement('div');
             this.appMountPoint.id = 'vue-app';
@@ -93,6 +96,47 @@ export class MainDialogFabImpl implements MainDialogFab {
             throw error;
         }
     }
+    
+    /**
+     * ytomoページの即座処理（mainタグクリア）
+     */
+    private handleYtomoPageImmediate(): void {
+        // ytomoページ判定
+        if (window.location.pathname !== '/ytomo') {
+            return;
+        }
+        
+        this.logger.info('ytomoページ検出 - mainタグを即座にクリア');
+        
+        // mainタグを探して即座にクリア
+        const waitForMainAndClear = () => {
+            const mainElement = document.querySelector('main');
+            if (mainElement) {
+                mainElement.innerHTML = '';
+                
+                // 読み込み中表示を追加
+                const loadingContainer = document.createElement('div');
+                loadingContainer.className = 'ytomo-loading-container';
+                loadingContainer.innerHTML = `
+                    <div class="ytomo-loading-content">
+                        <div class="ytomo-loading-spinner"></div>
+                        <div class="ytomo-loading-text">読み込み中...</div>
+                    </div>
+                `;
+                mainElement.appendChild(loadingContainer);
+                
+                // スタイルは_ytomo-page.scssで管理
+                
+                this.logger.info('ytomoページmainタグクリア完了');
+            } else {
+                // mainタグが見つからない場合は100ms後に再試行
+                setTimeout(waitForMainAndClear, 100);
+            }
+        };
+        
+        waitForMainAndClear();
+    }
+    
     
     /**
      * 旧インターフェース用の空実装

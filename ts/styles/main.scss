@@ -8,6 +8,7 @@
 @use './components/main-dialog';
 @use './components/ticket-tab';
 @use './components/pavilion-tab';
+@use './components/ytomo-page';
 
 // 時間帯テーブル内の満員時間帯を常にクリック可能にする
 table[class*='style_main__timetable__'] {

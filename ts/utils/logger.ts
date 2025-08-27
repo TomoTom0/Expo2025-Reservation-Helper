@@ -23,9 +23,9 @@ const LOG_PRIORITIES: Record<LogLevel, number> = {
   DEBUG: 3
 }
 
-// ビルド時のログレベル設定（デフォルト: WARN）
+// ビルド時のログレベル設定（環境変数で制御、デフォルト: WARN）
 // WARN以上（WARN, ERROR）のみが出力される
-const BUILD_LOG_LEVEL: LogLevel = 'WARN'
+const BUILD_LOG_LEVEL: LogLevel = (process.env['LOG_LEVEL'] as LogLevel) || 'WARN'
 
 // グローバルログ設定（ビルド時設定で初期化）
 let globalLogLevel: LogLevel = BUILD_LOG_LEVEL

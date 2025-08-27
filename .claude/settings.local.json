@@ -47,7 +47,8 @@
       "Bash(npx webpack:*)",
       "Bash(npm run type-check:*)",
       "Bash(for:*)",
-      "Bash(git log:*)"
+      "Bash(git log:*)",
+      "Bash(LOG_LEVEL=DEBUG mise run build-rsync)"
     ],
     "deny": []
   }
