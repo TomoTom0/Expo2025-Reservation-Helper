@@ -2,6 +2,9 @@
 
 // 音声再生用import
 import { AudioPlayer } from './audio-player';
+import { loggers } from '../utils/logger';
+
+const logger = loggers.tickets;
 
 // entrance-page-stateからのimport
 import { processingOverlay } from './processing-overlay';
@@ -165,7 +168,7 @@ function createEntranceReservationUI(): void {
         if (preferredAction === 'reservation') {
             await startReservationProcess();
         } else {
-            console.log('⚠️ 入場予約状態管理システム: 実行可能なアクションなし');
+            logger.warn('入場予約状態管理システム: 実行可能なアクションなし');
         }
         
         return;
@@ -174,7 +177,7 @@ function createEntranceReservationUI(): void {
 
     // 予約中断処理
     function stopReservationProcess(): void {
-        console.log('⏹️ 予約を中断');
+        logger.info('予約を中断');
         entranceReservationStateManager.setShouldStop(true);
         showStatus('予約処理を中断中...', 'orange');
         
@@ -185,23 +188,23 @@ function createEntranceReservationUI(): void {
 
     // 予約開始処理
     async function startReservationProcess(): Promise<void> {
-        console.log('🚀 入場予約状態管理システムによる予約開始');
+        logger.info('入場予約状態管理システムによる予約開始');
         
         // DOM状態から予約対象を同期（予約開始前に必須）
         syncReservationTargetFromDOM();
         
         // 統一予約開始処理
         if (!entranceReservationStateManager.startReservation()) {
-            console.error('❌ 予約開始に失敗しました');
+            logger.error('予約開始に失敗しました');
             showStatus('予約開始失敗', 'red');
             return;
         }
         
-        console.log('🔄 予約開始成功、FABボタン状態更新中...');
+        logger.info('予約開始成功、FABボタン状態更新中');
         
         // デバッグ: 実行状態を確認
         const currentState = entranceReservationStateManager.getExecutionState();
-        console.log(`🔄 [予約開始後] 実行状態: ${currentState}`);
+        logger.info('予約開始後実行状態', { currentState });
         
         // 予約に切り替わった場合にオーバーレイを更新
         processingOverlay.show('reservation');
@@ -212,7 +215,7 @@ function createEntranceReservationUI(): void {
         // デバッグ: FABボタンの現在の状態を確認
         const mainButton = document.getElementById('ytomo-main-fab') as HTMLButtonElement;
         if (mainButton) {
-            console.log(`🔄 [予約開始後] FABボタン状態: disabled=${mainButton.disabled}, title="${mainButton.title}"`);
+            logger.debug('FABボタン状態(予約開始後)', { disabled: mainButton.disabled, title: mainButton.title });
         }
         // 予約対象表示は統一システムで管理
         
@@ -246,11 +249,11 @@ function createEntranceReservationUI(): void {
         
         // 予約開始前に予約対象情報を保存（成功時のUI更新用）
         const reservationTarget = entranceReservationStateManager.getReservationTarget();
-        console.log('🔍 予約開始前の対象情報:', reservationTarget);
+        logger.info('予約開始前の対象情報', reservationTarget);
         
         try {
             const result = await entranceReservationHelper(config);
-            console.log('🔍 entranceReservationHelper戻り値:', result);
+            logger.debug('entranceReservationHelper戻り値', result);
             if (result.success) {
                 showStatus(`🎉 予約成功！(${result.attempts}回試行)`, 'green');
                 
@@ -261,7 +264,7 @@ function createEntranceReservationUI(): void {
                     
                     // 通知音が有効な場合は成功音を再生
                     const soundEnabled = entranceReservationStateManager.isNotificationSoundEnabled();
-                    console.log(`🔍 予約成功時の通知音設定チェック: ${soundEnabled ? '有効' : '無効'}`);
+                    logger.debug('予約成功時の通知音設定チェック', { soundEnabled });
                     
                     if (soundEnabled) {
                         console.log('🎵 予約成功 - 通知音を再生');

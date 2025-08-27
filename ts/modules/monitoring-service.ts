@@ -6,6 +6,7 @@
 import { getMonitoringScheduler, ScheduleConfig } from './monitoring-scheduler';
 import { MonitoringCacheManager, MonitoringTarget } from './monitoring-cache';
 import { PavilionReservationCache } from './pavilion-reservation-cache';
+import { loggers } from '../utils/logger';
 
 // API応答の型定義
 interface PavilionAvailability {
@@ -30,6 +31,7 @@ interface MonitoringResult {
 export class MonitoringService {
     private scheduler = getMonitoringScheduler();
     private isRunning: boolean = false;
+    private logger = loggers.monitoring;
 
     /**
      * 監視を開始

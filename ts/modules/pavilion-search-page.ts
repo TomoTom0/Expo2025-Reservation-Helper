@@ -10,6 +10,9 @@ import type {
     ElementSearchResult
 } from '../types/index.js';
 
+import { loggers } from '../utils/logger';
+const logger = loggers.pavilions;
+
 // SCSSファイルからスタイルが自動的にインポートされるため、insert_style関数は不要
 
 // 検索ワードを正規表現に変換する関数
@@ -137,12 +140,12 @@ const init_page = (): void => {
         const scrollY = window.scrollY;
         const arr_btn = document.querySelectorAll("button.style_more_btn__ymb22:not([disabled])");
         
-        console.log(`🔄 load_more_auto実行: もっと見るボタン${arr_btn.length}個`);
+        logger.info('load_more_auto実行', { buttonCount: arr_btn.length });
         
         if (arr_btn.length > 0) {
             // 件数変化をログ出力
             const beforeCounts = getItemCounts();
-            console.log(`📊 クリック前の件数: ${beforeCounts.visible}/${beforeCounts.total}`);
+            logger.debug('クリック前の件数', { visible: beforeCounts.visible, total: beforeCounts.total });
             
             (arr_btn[0] as HTMLElement).click();
             // 件数表示を継続的に更新（読み込み速度に影響しない）
@@ -157,18 +160,18 @@ const init_page = (): void => {
                 
                 // 件数変化をログ出力
                 const afterCounts = getItemCounts();
-                console.log(`📊 クリック後の件数: ${afterCounts.visible}/${afterCounts.total}`);
+                logger.debug('クリック後の件数', { visible: afterCounts.visible, total: afterCounts.total });
                 
                 // 次の読み込みを即座に実行
                 clearInterval(updateInterval);
                 load_more_auto();
             }, 500)
         } else {
-            console.log(`✅ load_more_auto完了: もっと見るボタンがありません`);
+            logger.info('load_more_auto完了: もっと見るボタンがありません');
             // 完了時にも件数表示を更新
             if ((window as any).updatePavilionCounts) {
                 (window as any).updatePavilionCounts();
-                console.log(`📊 完了時の件数表示を更新`);
+                logger.debug('完了時の件数表示を更新');
             }
         }
     }
@@ -215,9 +218,9 @@ const init_page = (): void => {
         const allMoreButtons = document.querySelectorAll("button.style_more_btn__ymb22");
         const enabledMoreButtons = document.querySelectorAll("button.style_more_btn__ymb22:not([disabled])");
         
-        console.log(`🔍 もっと見るボタンチェック: 全体${allMoreButtons.length}個, 有効${enabledMoreButtons.length}個`);
+        logger.debug('もっと見るボタンチェック', { total: allMoreButtons.length, enabled: enabledMoreButtons.length });
         allMoreButtons.forEach((btn, index) => {
-            console.log(`  ボタン${index + 1}: disabled=${btn.hasAttribute('disabled')}, text="${btn.textContent?.trim()}"`);
+            logger.debug('ボタン詳細', { index: index + 1, disabled: btn.hasAttribute('disabled'), text: btn.textContent?.trim() });
         });
         
         // 有効な「もっと見る」ボタンがある場合のみtrue
@@ -233,7 +236,7 @@ const init_page = (): void => {
         // 状態が変化した時のみログ出力
         const currentState = { hasMore, isLoading, buttonCount: loadAllButtons.length };
         if (JSON.stringify(currentState) !== JSON.stringify((updateLoadAllButtonState as any).lastState)) {
-            console.log(`🔧 すべて読み込みボタン状態更新: もっと見るボタン=${hasMore ? 'あり' : 'なし'}, 実行中=${isLoading}`);
+            logger.debug('すべて読み込みボタン状態更新', { hasMore, isLoading });
             (updateLoadAllButtonState as any).lastState = currentState;
         }
         
@@ -312,7 +315,7 @@ const init_page = (): void => {
             
             // 件数が変化した時のみログ出力
             if (countsText.innerText !== newText) {
-                console.log(`📊 件数表示更新: ${newText}`);
+                logger.debug('件数表示更新', { newText });
                 countsText.innerText = newText;
             }
             
@@ -389,7 +392,7 @@ const init_page = (): void => {
                     mutation.target instanceof Element &&
                     mutation.target.classList.contains('style_more_btn__ymb22')) {
                     shouldUpdate = true;
-                    console.log('📍 もっと見るボタンのdisabled属性変化を検知');
+                    logger.debug('もっと見るボタンのdisabled属性変化を検知');
                 }
                 
                 // 新しい「もっと見る」ボタンの追加/削除を検知

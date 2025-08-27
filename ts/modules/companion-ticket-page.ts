@@ -7,6 +7,9 @@
 // - 同行者追加画面での自動処理
 
 import { processingOverlay } from './processing-overlay';
+import { loggers } from '../utils/logger';
+
+const logger = loggers.tickets;
 
 // URL検出と画面判定
 export function isTicketSelectionPage(): boolean {
@@ -32,9 +35,9 @@ function getAlreadyAddedTicketIds(): Set<string> {
             }
         });
         
-        console.log(`🔍 画面で検出された追加済みチケットID: ${Array.from(addedTicketIds).join(', ')}`);
+        logger.info('画面で検出された追加済みチケットID', { ticketIds: Array.from(addedTicketIds) });
     } catch (error) {
-        console.error('追加済みチケットID検出エラー:', error);
+        logger.error('追加済みチケットID検出エラー', error);
     }
     
     return addedTicketIds;
@@ -62,10 +65,10 @@ class CompanionTicketManager {
             const stored = localStorage.getItem(CompanionTicketManager.STORAGE_KEY);
             if (stored) {
                 this.ticketIds = JSON.parse(stored);
-                console.log(`✅ 保存済みチケットID ${this.ticketIds.length}件を読み込みました`);
+                logger.info('保存済みチケットID読み込み完了', { count: this.ticketIds.length });
             }
         } catch (error) {
-            console.warn('チケットIDの読み込みに失敗:', error);
+            logger.warn('チケットIDの読み込みに失敗', error);
             this.ticketIds = [];
         }
     }
@@ -75,7 +78,7 @@ class CompanionTicketManager {
         try {
             localStorage.setItem(CompanionTicketManager.STORAGE_KEY, JSON.stringify(this.ticketIds));
         } catch (error) {
-            console.error('チケットIDの保存に失敗:', error);
+            logger.error('チケットIDの保存に失敗', error);
         }
     }
 
@@ -85,7 +88,7 @@ class CompanionTicketManager {
         
         // 重複チェック
         if (this.ticketIds.some(ticket => ticket.id === id)) {
-            console.log(`チケットID ${id} は既に登録済みです`);
+            logger.warn('チケットIDは既に登録済み', { id });
             return false;
         }
 
@@ -106,7 +109,7 @@ class CompanionTicketManager {
 
         this.ticketIds.unshift(newTicket); // 先頭に追加（最新順）
         this.saveTicketIds();
-        console.log(`✅ チケットID "${id}" を追加しました`);
+        logger.info('チケットID追加完了', { id });
         return true;
     }
 
@@ -117,7 +120,7 @@ class CompanionTicketManager {
         
         if (this.ticketIds.length < initialLength) {
             this.saveTicketIds();
-            console.log(`🗑️ チケットID "${id}" を削除しました`);
+            logger.info('チケットID削除完了', { id });
             return true;
         }
         return false;
@@ -141,7 +144,7 @@ class CompanionTicketManager {
     clearAll(): void {
         this.ticketIds = [];
         localStorage.removeItem(CompanionTicketManager.STORAGE_KEY);
-        console.log('🧹 全チケットIDをクリアしました');
+        logger.info('全チケットIDをクリアしました');
     }
 }
 
@@ -172,7 +175,7 @@ class CompanionProcessManager {
     // 処理開始
     startProcess(ticketIds: string[]): void {
         if (this.state.isRunning) {
-            console.warn('同行者追加処理は既に実行中です');
+            logger.warn('同行者追加処理は既に実行中です');
             return;
         }
 
@@ -184,7 +187,7 @@ class CompanionProcessManager {
             errors: []
         };
 
-        console.log(`🚀 同行者追加処理開始: ${ticketIds.length}件のチケットID`);
+        logger.info('同行者追加処理開始', { ticketCount: ticketIds.length });
         
         // 同行者処理用オーバーレイを表示
         processingOverlay.show('companion');
@@ -196,7 +199,7 @@ class CompanionProcessManager {
     private async processNext(): Promise<void> {
         // 中断チェック
         if (!this.state.isRunning) {
-            console.log('🛑 処理が中断されたため、次の処理をスキップします');
+            logger.warn('処理が中断されたため、次の処理をスキップ');
             return;
         }
         

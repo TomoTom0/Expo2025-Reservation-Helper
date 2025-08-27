@@ -186,6 +186,7 @@ import { useMainDialogStore } from '@/stores/mainDialog'
 import { useOverlaysStore } from '@/stores/overlays'
 import { usePavilions } from '@/composables/usePavilions'
 import type { ScheduleData, TicketData } from '@/types/api'
+import { loggers } from '@/utils/logger'
 
 // 型定義
 interface TimeSlotData {
@@ -201,6 +202,9 @@ interface PavilionData {
   timeSlots: TimeSlotData[]
   availableSlots: number
 }
+
+// Logger setup
+const logger = loggers.ui
 
 // Store アクセス
 const pavilionsStore = usePavilionsStore()
@@ -252,7 +256,7 @@ const selectedEntranceDate = computed(() => {
 // 選択された入場予約のうち、最も遅い入場時刻+10分を取得（HH:MM形式）
 const getLatestEntranceTime = (): string => {
   if (selectedSchedules.value.length === 0) {
-    console.log('⏰ 選択された入場予約なし')
+    logger.debug('選択された入場予約なし')
     return ''
   }
   
@@ -330,7 +334,7 @@ const availableCount = computed(() => {
 // メソッド
 const handlePavilionSearch = async () => {
   try {
-    console.log('🔍 パビリオン検索:', searchInput.value)
+    logger.info('パビリオン検索開始', { query: searchInput.value })
     showProcessingOverlay('パビリオンを検索中...')
     
     // 選択されたチケットIDsを取得
@@ -346,9 +350,9 @@ const handlePavilionSearch = async () => {
     const pavilionReservationInfo = ticketsStore.selectedPavilionReservationInfo
     const registeredChannel = pavilionReservationInfo?.activeChannel || '4' // デフォルトはfast
     
-    console.log('🎫 検索パラメータ:', { 
+    logger.info('検索パラメータ', { 
       query: searchInput.value.trim(), 
-      ticketIds, 
+      ticketIds: ticketIds.length, 
       entranceDate,
       registeredChannel 
     })
@@ -363,20 +367,20 @@ const handlePavilionSearch = async () => {
     // 検索直後は空きのみフィルタを自動ON（旧仕様に合わせる）
     if (!isAvailableOnlyFilter.value) {
       toggleAvailableOnlyFilter()
-      console.log('📂 検索後に空きのみフィルター自動ON')
+      logger.info('検索後に空きのみフィルター自動ON')
     }
     
-    console.log(`✅ パビリオン検索完了: ${results.length}件`)
+    logger.info('パビリオン検索完了', { count: results.length })
     hideProcessingOverlay()
   } catch (error) {
-    console.error('❌ パビリオン検索エラー:', error)
+    logger.error('パビリオン検索エラー', error)
     hideProcessingOverlay()
   }
 }
 
 const handleLoadFavorites = async () => {
   try {
-    console.log('⭐ お気に入り読み込み')
+    logger.info('お気に入り読み込み開始')
     showProcessingOverlay('お気に入りを読み込み中...')
     
     // 選択されたチケットIDsを取得
@@ -393,28 +397,30 @@ const handleLoadFavorites = async () => {
     // お気に入り読み込み後はフィルターをOFFにして全て表示
     if (isAvailableOnlyFilter.value) {
       toggleAvailableOnlyFilter()
-      console.log('📂 お気に入り読み込み後にフィルターOFF')
+      logger.info('お気に入り読み込み後にフィルターOFF')
     }
     
-    console.log(`✅ お気に入り読み込み完了: ${results.length}件`)
-    console.log('🔍 現在の表示パビリオン数:', allPavilions.value.length)
-    console.log('🔍 お気に入りパビリオン:', results.map(p => p.name))
+    logger.info('お気に入り読み込み完了', {
+      loadedCount: results.length,
+      displayCount: allPavilions.value.length,
+      favoriteNames: results.map(p => p.name)
+    })
     
     hideProcessingOverlay()
   } catch (error) {
-    console.error('❌ お気に入り読み込みエラー:', error)
+    logger.error('お気に入り読み込みエラー', error)
     hideProcessingOverlay()
   }
 }
 
 const handleToggleAvailableOnlyFilter = () => {
   toggleAvailableOnlyFilter()
-  console.log('🔍 空きのみフィルター:', isAvailableOnlyFilter.value ? 'ON' : 'OFF')
+  logger.info('空きのみフィルター切り替え', { enabled: isAvailableOnlyFilter.value })
 }
 
 const handleRefresh = async () => {
   try {
-    console.log('🔄 データ更新（選択リセットなし）')
+    logger.info('データ更新開始（選択リセットなし）')
     showProcessingOverlay('パビリオン情報を更新中...')
     
     // 選択されたチケットIDsを取得
@@ -429,7 +435,7 @@ const handleRefresh = async () => {
     await refreshPavilionData(ticketIds, entranceDate || undefined)
     hideProcessingOverlay()
   } catch (error) {
-    console.error('❌ データ更新エラー:', error)
+    logger.error('データ更新エラー', error)
     hideProcessingOverlay()
   }
 }
@@ -437,12 +443,12 @@ const handleRefresh = async () => {
 // オーバーレイ制御（ストア連携）
 const showProcessingOverlay = (message: string) => {
   overlaysStore.showProcessingOverlay(message)
-  console.log(`🛡️ 誤操作防止オーバーレイ表示: ${message}`)
+  logger.debug('誤操作防止オーバーレイ表示', { message })
 }
 
 const hideProcessingOverlay = () => {
   overlaysStore.hideProcessingOverlay()
-  console.log('🛡️ 誤操作防止オーバーレイ非表示')
+  logger.debug('誤操作防止オーバーレイ非表示')
 }
 
 // お気に入り状態をリアクティブに判定
@@ -453,10 +459,10 @@ const isFavorite = (pavilionId: string) => {
 const toggleFavorite = (pavilion: any) => {
   if (isFavorite(pavilion.id)) {
     removeFromFavorites(pavilion.id)
-    console.log(`⭐ お気に入り削除:`, pavilion.name)
+    logger.info('お気に入り削除', { pavilionName: pavilion.name })
   } else {
     addToFavorites(pavilion.id, pavilion.name)  
-    console.log(`⭐ お気に入り追加:`, pavilion.name)
+    logger.info('お気に入り追加', { pavilionName: pavilion.name })
   }
 }
 
@@ -495,9 +501,9 @@ const handleTimeSlotClick = (pavilionId: string, timeSlot: TimeSlotData) => {
 
   // 満員時間帯でも選択可能（監視機能のため）
   if (!timeSlot.available) {
-    console.log('🔴 満員時間帯クリック（選択）:', { pavilionId, timeSlot })
+    logger.info('満員時間帯クリック（選択）', { pavilionId, timeSlot: timeSlot.time })
   } else {
-    console.log('🟢 空き時間帯クリック（選択）:', { pavilionId, timeSlot })
+    logger.info('空き時間帯クリック（選択）', { pavilionId, timeSlot: timeSlot.time })
   }
   
   // 空き時間帯クリック → 選択状態を切り替え
@@ -506,7 +512,7 @@ const handleTimeSlotClick = (pavilionId: string, timeSlot: TimeSlotData) => {
   if (isSelected) {
     // 選択解除
     removeSelectedTimeSlot(pavilionId, timeSlot.time)
-    console.log('🟡 時間帯選択解除:', { pavilionName: pavilion.name, timeSlot: timeSlot.time })
+    logger.info('時間帯選択解除', { pavilionName: pavilion.name, timeSlot: timeSlot.time })
   } else {
     // 選択追加
     const selection = {
@@ -520,18 +526,18 @@ const handleTimeSlotClick = (pavilionId: string, timeSlot: TimeSlotData) => {
       entranceDate: selectedEntranceDate.value || ''
     }
     addSelectedTimeSlot(selection)
-    console.log('🟢 時間帯選択追加:', { pavilionName: pavilion.name, timeSlot: timeSlot.time })
+    logger.info('時間帯選択追加', { pavilionName: pavilion.name, timeSlot: timeSlot.time })
   }
 }
 
 const handleReservationExecution = async () => {
   if (selectedSlotsCount.value === 0) {
-    console.log('⚠️ 選択された時間帯なし')
+    logger.warn('選択された時間帯なし')
     return
   }
   
   try {
-    console.log('📋 予約実行開始:', selectedSlotsCount.value, '件')
+    logger.info('予約実行開始', { selectedCount: selectedSlotsCount.value })
     
     // 順次予約オーバーレイを表示
     overlaysStore.showSequentialOverlay(selectedSlotsCount.value)
@@ -573,12 +579,24 @@ const handleReservationExecution = async () => {
     const successCount = results.filter(r => r.success).length
     const failureCount = results.length - successCount
     
-    console.log(`📋 予約実行完了: 成功${successCount}件, 失敗${failureCount}件`)
+    logger.info('予約実行完了', { successCount, failureCount })
     
     // 結果詳細をログ出力
     results.forEach(result => {
       if (result.details) {
-        console.log(`  ${result.success ? '✅' : '❌'} ${result.details.pavilionName} ${result.details.timeSlot}: ${result.message}`)
+        if (result.success) {
+          logger.info('予約成功', {
+            pavilionName: result.details.pavilionName,
+            timeSlot: result.details.timeSlot,
+            message: result.message
+          })
+        } else {
+          logger.warn('予約失敗', {
+            pavilionName: result.details.pavilionName,
+            timeSlot: result.details.timeSlot,
+            message: result.message
+          })
+        }
       }
     })
     
@@ -607,7 +625,7 @@ const handleReservationExecution = async () => {
     }
     
   } catch (error) {
-    console.error('❌ 予約実行エラー:', error)
+    logger.error('予約実行エラー', error)
     overlaysStore.hideSequentialOverlay()
   }
 }
@@ -637,7 +655,7 @@ const isTimeSlotDisabledByEntranceTime = (timeSlot: TimeSlotData): boolean => {
   // デバッグログ
   const isDisabled = slotStartTime <= latestEntranceTime
   if (isDisabled) {
-    console.log(`⏰ 時間帯disabled: ${slotStartTime} <= ${latestEntranceTime}`)
+    logger.debug('時間帯disabled', { slotStartTime, latestEntranceTime })
   }
   
   // 時間比較（HH:MM形式で辞書順比較）
@@ -661,12 +679,12 @@ const formatTimeSlot = (timeStr: string): string => {
 
 // ライフサイクル
 onMounted(() => {
-  console.log('🏛️ PavilionTab mounted')
+  logger.info('PavilionTab mounted')
   // ストア初期化はページ読み込み時に行済み
 })
 
 onUnmounted(() => {
-  console.log('🗑️ PavilionTab unmounted')
+  logger.info('PavilionTab unmounted')
 })
 </script>
 

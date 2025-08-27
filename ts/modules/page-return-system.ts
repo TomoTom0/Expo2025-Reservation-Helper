@@ -5,6 +5,9 @@
  */
 
 import { getPageDetector } from './page-detector';
+import { loggers } from '../utils/logger';
+
+const logger = loggers.ui;
 
 export interface PageInfo {
     pageType: string;
@@ -29,12 +32,12 @@ class PageReturnSystem {
             const pageInfo = this.analyzeCurrentPage();
             if (pageInfo) {
                 sessionStorage.setItem(this.STORAGE_KEY, JSON.stringify(pageInfo));
-                console.log('📄 ページ情報を保存:', pageInfo);
+                logger.info('ページ情報を保存', pageInfo);
                 return pageInfo;
             }
             return null;
         } catch (error) {
-            console.error('❌ ページ情報保存エラー:', error);
+            logger.error('ページ情報保存エラー', error);
             return null;
         }
     }

@@ -19,11 +19,14 @@
 // ==================== 依存モジュール import ====================
 // 統一状態管理システム
 import { entranceReservationStateManager } from './entrance-reservation-state-manager';
+import { loggers } from '../utils/logger';
 
 // DOM操作ユーティリティ
 import {
     timeSlotSelectors  // 時間帯関連のDOMセレクタ群
 } from './entrance-page-dom-utils';
+
+const logger = loggers.tickets;
 
 // TypeScript型定義
 import type { 
@@ -65,13 +68,13 @@ async function waitForTimeSlotTable(timeout: number = 10000): Promise<boolean> {
     const startTime = Date.now();
     const checkInterval = 50; // 50msで高速チェック（レスポンシブな検知）
     
-    console.log('🔍 時間帯テーブルの動的読み込みを待機中...');
+    logger.info('時間帯テーブルの動的読み込みを待機中');
     
     // ポーリングループ: タイムアウトまで継続
     while (Date.now() - startTime < timeout) {
         // 時間帯テーブルの存在確認
         if (checkTimeSlotTableExistsSync()) {
-            console.log('✅ 時間帯テーブル検出成功 - DOM要素が利用可能です');
+            logger.info('時間帯テーブル検出成功 - DOM要素が利用可能');
             return true;
         }
         
@@ -81,7 +84,7 @@ async function waitForTimeSlotTable(timeout: number = 10000): Promise<boolean> {
     }
     
     // タイムアウト時のエラーログ
-    console.error(`⚠️ 時間帯テーブル待機タイムアウト (${timeout}ms) - DOM要素が読み込まれませんでした`);
+    logger.error('時間帯テーブル待機タイムアウト', { timeout, message: 'DOM要素が読み込まれませんでした' });
     return false;
 }
 

@@ -4,8 +4,11 @@
 
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
+import { loggers } from '@/utils/logger'
 
 export const useMainDialogStore = defineStore('mainDialog', () => {
+  const logger = loggers.ui
+  
   // State - 初期化時に強制的にfalseに設定（永続化の問題を回避）
   const isVisible = ref(false)
   const activeTab = ref<'ticket' | 'pavilion'>('ticket')
@@ -34,7 +37,7 @@ export const useMainDialogStore = defineStore('mainDialog', () => {
 
   const toggleEndlessMode = () => {
     endlessMode.value = !endlessMode.value
-    console.log(`🔄 ENDLESSモード: ${endlessMode.value ? 'ON' : 'OFF'}`)
+    logger.info('ENDLESSモード切り替え', { enabled: endlessMode.value })
   }
 
   // 入場日時選択は各scheduleのselectedフラグで管理するため、ここでは削除

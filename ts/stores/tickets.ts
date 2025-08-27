@@ -6,6 +6,9 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import type { TicketData, ScheduleData } from '@/types/api'
+import { loggers } from '@/utils/logger'
+
+const logger = loggers.tickets
 import { determinePavilionReservationType, getAllPavilionReservationStatus } from '@/utils/pavilionReservationTypes'
 
 export const useTicketsStore = defineStore('tickets', () => {
@@ -134,7 +137,7 @@ export const useTicketsStore = defineStore('tickets', () => {
    * 全チケット情報を初期化・取得
    */
   const loadAllTickets = async (): Promise<TicketData[]> => {
-    console.log('🎫 チケット統合管理: 全チケット情報取得開始')
+    logger.info('全チケット情報取得開始')
     setLoading(true)
     
     try {
@@ -142,7 +145,7 @@ export const useTicketsStore = defineStore('tickets', () => {
       let ownTickets: TicketData[] = []
       try {
         ownTickets = await loadOwnTickets()
-        console.log(`✅ 自分のチケット: ${ownTickets.length}個取得完了`)
+        logger.info(`自分のチケット取得完了: ${ownTickets.length}個`)
         
         // 自分のチケットを追加
         for (const ticket of ownTickets) {
@@ -155,20 +158,20 @@ export const useTicketsStore = defineStore('tickets', () => {
       // 外部チケットを取得（エラーがあっても自分のチケットには影響しない）
       try {
         const cachedTickets = await loadCachedExternalTickets()
-        console.log(`✅ 外部チケット: ${cachedTickets.length}個取得完了`)
+        logger.info(`外部チケット取得完了: ${cachedTickets.length}個`)
         
         // キャッシュされた外部チケットを追加
         for (const ticket of cachedTickets) {
           tickets.value.set(ticket.ticket_id, ticket)
         }
       } catch (error) {
-        console.error('❌ 外部チケット取得エラー（自分のチケットは正常）:', error)
+        logger.error('外部チケット取得エラー（自分のチケットは正常）', error)
       }
 
-      console.log(`✅ チケット統合管理: ${tickets.value.size}個のチケットを読み込み完了`)
+      logger.info(`チケット統合管理完了: ${tickets.value.size}個のチケット読み込み完了`)
     
     // デバッグ: チケットデータの詳細を出力
-    console.log('🔍 チケットデータ詳細:', {
+    logger.debug('チケットデータ詳細', {
       todayStr: todayStr.value,
       tickets: Array.from(tickets.value.values()).map(ticket => ({
         ticket_id: ticket.ticket_id,
@@ -468,11 +471,11 @@ export const useTicketsStore = defineStore('tickets', () => {
 
   // 初期化メソッド
   const init = async (): Promise<void> => {
-    console.log('🎫 チケットストア初期化開始')
+    logger.info('チケットストア初期化開始')
     await loadAllTickets()
     restoreSelectedEntranceDates()
     isInitialized.value = true
-    console.log('✅ チケットストア初期化完了')
+    logger.info('チケットストア初期化完了')
   }
 
   return {

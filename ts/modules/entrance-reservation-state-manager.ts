@@ -23,6 +23,9 @@ import { getCurrentSelectedCalendarDate } from './entrance-page-core';
 import { UnifiedAutomationManager, CancellationError } from './unified-automation-manager';
 // processing-overlayへの依存を削除（循環依存解決）
 import type { ReservationConfig, ReservationResult } from '../types/index.js';
+import { loggers } from '../utils/logger';
+
+const logger = loggers.tickets;
 
 // ============================================================================
 // 型定義

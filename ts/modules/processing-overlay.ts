@@ -7,6 +7,9 @@
 
 import { entranceReservationStateManager, ExecutionState } from './entrance-reservation-state-manager';
 import { identify_page_type } from './page-utils';
+import { loggers } from '../utils/logger';
+
+const logger = loggers.ui;
 
 export class ProcessingOverlay {
     private overlayElement: HTMLElement | null = null;
@@ -93,7 +96,7 @@ export class ProcessingOverlay {
         // bodyに追加
         document.body.appendChild(this.overlayElement);
         
-        console.log('🛡️ 自動処理誤動作防止オーバーレイを初期化');
+        logger.info('自動処理誤動作防止オーバーレイを初期化');
     }
     
     /**
@@ -121,7 +124,7 @@ export class ProcessingOverlay {
             this.onUrlChanged();
         });
         
-        console.log('🌐 URL変化監視を設定');
+        logger.debug('URL変化監視を設定');
     }
     
     /**
@@ -129,16 +132,16 @@ export class ProcessingOverlay {
      */
     private onUrlChanged(): void {
         if (this.isActive && this.currentProcessType) {
-            console.log('🌐 URL変化検出 - オーバーレイ状態確認中');
+            logger.debug('URL変化検出 - オーバーレイ状態確認中');
             
             // より長い遅延を設けて、意図的な画面遷移と区別
             setTimeout(() => {
                 // 依然としてアクティブな場合のみ再初期化
                 if (this.isActive && this.currentProcessType) {
-                    console.log('🔄 オーバーレイを迅速再設定');
+                    logger.debug('オーバーレイを迅速再設定');
                     this.reinitializeOverlay();
                 } else {
-                    console.log('🚫 処理完了により再初期化をスキップ');
+                    logger.debug('処理完了により再初期化をスキップ');
                 }
             }, 500);
         }
@@ -150,7 +153,7 @@ export class ProcessingOverlay {
     private reinitializeOverlay(): void {
         if (!this.isActive || !this.currentProcessType) return;
         
-        console.log('🔄 オーバーレイ迅速再初期化中...');
+        logger.debug('オーバーレイ迅速再初期化中');
         
         // 既存のオーバーレイを削除
         if (this.overlayElement) {
@@ -165,7 +168,7 @@ export class ProcessingOverlay {
         this.isActive = false; // showメソッドが実行されるようにリセット
         this.show(processType);
         
-        console.log('✅ オーバーレイ迅速再初期化完了');
+        logger.debug('オーバーレイ迅速再初期化完了');
     }
     
     /**
@@ -203,7 +206,7 @@ export class ProcessingOverlay {
     public show(processType: 'reservation' | 'companion' = 'reservation'): void {
         if (!this.overlayElement || this.isActive) return;
         
-        console.log(`🛡️ 誤動作防止オーバーレイ表示: ${processType}`);
+        logger.info('誤動作防止オーバーレイ表示', { processType });
         
         // メッセージをプロセスタイプに応じて更新
         const messageText = this.overlayElement.querySelector('.processing-message-text');

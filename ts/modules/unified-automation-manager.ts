@@ -8,6 +8,9 @@
 // 型定義のインポート
 import type { ReservationConfig, ReservationResult } from '../types/index.js';
 import { processingOverlay } from './processing-overlay';
+import { loggers } from '../utils/logger';
+
+const logger = loggers.automation;
 
 // カスタム例外クラス
 export class CancellationError extends Error {
@@ -25,7 +28,7 @@ export class UnifiedAutomationManager {
 
     constructor(stateManager: any) {
         this.stateManager = stateManager;
-        console.log('🔧 統一自動処理管理システム初期化', this.stateManager ? '完了' : '失敗');
+        logger.info('統一自動処理管理システム初期化', { success: !!this.stateManager });
     }
 
     // ============================================================================
@@ -46,7 +49,7 @@ export class UnifiedAutomationManager {
         this.controller = new AbortController();
 
         try {
-            console.log(`🚀 統一自動処理開始: ${processType}`);
+            logger.info('統一自動処理開始', { processType });
             
             // 誤動作防止オーバーレイを表示（efficiency-waitは除外）
             if (processType !== 'efficiency-wait') {
@@ -57,10 +60,10 @@ export class UnifiedAutomationManager {
         } catch (error) {
             if (error instanceof Error && error.name === 'AbortError') {
                 const cancellationError = new CancellationError(`${processType} was cancelled`);
-                console.log(`⏹️ 統一自動処理中断: ${processType}`);
+                logger.info('統一自動処理中断', { processType });
                 throw cancellationError;
             }
-            console.error(`❌ 統一自動処理エラー: ${processType}`, error);
+            logger.error('統一自動処理エラー', { processType, error });
             throw error;
         } finally {
             // 誤動作防止オーバーレイを非表示
@@ -134,7 +137,7 @@ export class UnifiedAutomationManager {
         if (totalWaitMs > 1000) {
             // 長時間待機は100ms間隔で分割
             const longWaitMs = totalWaitMs - 100; // 最後100msは精密待機
-            console.log(`🎯 統一効率モード待機: ${Math.floor(longWaitMs/1000)}秒`);
+            logger.info('統一効率モード待機', { waitSeconds: Math.floor(longWaitMs/1000) });
             await this.waitWithCancellation(longWaitMs, signal);
         }
 
@@ -242,11 +245,11 @@ export class UnifiedAutomationManager {
         const { selectors, selectorTexts, timeouts } = config;
         let attempts = 0;
         
-        console.log('🚀 統一予約処理ループを開始します...');
+        logger.info('統一予約処理ループを開始');
         
         while (true) {
             attempts++;
-            console.log(`試行回数: ${attempts}`);
+            logger.debug('試行回数', { attempts });
             
             // 中断チェック
             this.throwIfAborted(signal);
@@ -254,7 +257,7 @@ export class UnifiedAutomationManager {
             // 対象一貫性検証
             if (this.stateManager && this.stateManager.validateTargetConsistency) {
                 if (!this.stateManager.validateTargetConsistency()) {
-                    console.error('🚨 予約対象が変更されたため処理を中断します');
+                    logger.error('予約対象が変更されたため処理を中断');
                     throw new Error('TargetConsistencyError');
                 }
             }
@@ -266,7 +269,7 @@ export class UnifiedAutomationManager {
             }
             
             try {
-                console.log('1. submitボタンを待機中...');
+                logger.debug('submitボタンを待機中');
                 const submitButton = await this.waitForElementWithCancellation(
                     selectors.submit, 
                     timeouts.waitForSubmit, 
@@ -282,10 +285,10 @@ export class UnifiedAutomationManager {
                 }
                 
                 // 効率モード対応のsubmitクリック実行
-                console.log('2. submitボタンをクリック...');
+                logger.debug('submitボタンをクリック');
                 await this.executeEfficiencyTimingSubmit(submitButton, config, signal);
                 
-                console.log('3. レスポンスを待機中...');
+                logger.debug('レスポンスを待機中');
                 const responseSelectors = {
                     change: selectors.change,
                     success: selectors.success,

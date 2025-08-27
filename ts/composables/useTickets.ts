@@ -6,9 +6,11 @@
 import { computed } from 'vue'
 import { useTicketsStore } from '@/stores/tickets'
 import type { TicketData } from '@/types/api'
+import { loggers } from '@/utils/logger'
 
 export const useTickets = () => {
   const ticketsStore = useTicketsStore()
+  const logger = loggers.tickets
 
   // Computed properties
   const allTickets = computed(() => ticketsStore.ticketsArray)
@@ -26,13 +28,13 @@ export const useTickets = () => {
 
   const addTicket = async (ticketId: string, label: string = '', channel: number = 4): Promise<void> => {
     try {
-      console.log(`✅ チケット追加: ${ticketId} (channel: ${channel})`)
+      logger.info('チケット追加', { ticketId, channel })
       
       // チケット一覧を再読み込み
       await loadAllTickets()
       
     } catch (error) {
-      console.error('❌ チケット追加エラー:', error)
+      logger.error('チケット追加エラー', error)
       throw error
     }
   }
@@ -55,7 +57,7 @@ export const useTickets = () => {
       const cachedDate = localStorage.getItem('ytomo_entrance_selection')
       return cachedDate
     } catch (error) {
-      console.warn('入場選択キャッシュ復元エラー:', error)
+      logger.warn('入場選択キャッシュ復元エラー', error)
       return null
     }
   }
@@ -64,12 +66,12 @@ export const useTickets = () => {
     try {
       localStorage.setItem('ytomo_entrance_selection', date)
     } catch (error) {
-      console.warn('入場選択キャッシュ保存エラー:', error)
+      logger.warn('入場選択キャッシュ保存エラー', error)
     }
   }
 
   const loadFavoriteTickets = async (): Promise<void> => {
-    console.log('⭐ お気に入りチケット読み込み開始')
+    logger.info('お気に入りチケット読み込み開始')
     await loadAllTickets()
   }
 

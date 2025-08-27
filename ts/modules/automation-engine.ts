@@ -5,6 +5,7 @@
 
 import { getPageDetector, PageInfo } from './page-detector';
 import { getDOMUtils } from './dom-utils';
+import { loggers } from '../utils/logger';
 
 // test-exports用にexport
 export { getPageDetector } from './page-detector';
@@ -62,6 +63,7 @@ export class AutomationEngine {
     private failedCount: number = 0;
     private errors: string[] = [];
     private currentReservation: ReservationCacheData | null = null;
+    private logger = loggers.automation;
 
     constructor(config: Partial<AutomationConfig> = {}) {
         this.config = { ...DEFAULT_CONFIG, ...config };
@@ -443,8 +445,7 @@ export class AutomationEngine {
      */
     private log(message: string): void {
         if (this.config.enableLogging) {
-            const timestamp = new Date().toLocaleTimeString();
-            console.log(`[${timestamp}] 🤖 ${message}`);
+            this.logger.info(message);
         }
     }
 
@@ -452,14 +453,14 @@ export class AutomationEngine {
      * デバッグ情報を出力
      */
     debugInfo(): void {
-        console.group('🔧 自動操作エンジン - デバッグ情報');
-        console.log('状態:', this.status);
-        console.log('設定:', this.config);
-        console.log('実行結果:', this.getResult());
-        console.log('現在の予約:', this.currentReservation);
-        console.log('ページ情報:', this.pageDetector.extractPageInfo());
-        console.log('DOM情報:', this.domUtils.getPageDebugInfo());
-        console.groupEnd();
+        this.logger.debug('自動操作エンジンデバッグ情報', {
+            status: this.status,
+            config: this.config,
+            result: this.getResult(),
+            currentReservation: this.currentReservation,
+            pageInfo: this.pageDetector.extractPageInfo(),
+            domInfo: this.domUtils.getPageDebugInfo()
+        });
     }
 
 

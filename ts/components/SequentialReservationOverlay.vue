@@ -69,8 +69,10 @@
 
 <script setup lang="ts">
 import { useOverlaysStore } from '@/stores/overlays'
+import { loggers } from '@/utils/logger'
 
 const overlaysStore = useOverlaysStore()
+const logger = loggers.ui
 
 const handleOverlayClick = (e: Event) => {
   e.preventDefault()
@@ -92,7 +94,7 @@ const onIntervalChange = (e: Event) => {
 
 const cancelSequentialReservation = () => {
   overlaysStore.hideSequentialOverlay()
-  console.log('🚫 順次予約をキャンセルしました')
+  logger.info('順次予約をキャンセルしました')
 }
 </script>
 

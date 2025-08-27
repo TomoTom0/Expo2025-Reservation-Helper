@@ -3,6 +3,9 @@
  * 各sectionモジュールをimportすることで、webpackで統合されたバンドルを作成
  */
 
+import { loggers } from '@/utils/logger';
+const logger = loggers.ui;
+
 // すべてのモジュールをimport（副作用importも含む）
 import './pavilion-search-page';
 import './entrance-page-init';
@@ -28,9 +31,9 @@ import './page-return-system'; // ページ復帰システム
 // 本番環境では webpack の tree shaking で除外される
 if (process.env['NODE_ENV'] === 'development' || process.env['NODE_ENV'] === 'test') {
     import('./test-exports').then(() => {
-        console.log('🧪 テスト用exports読み込み完了');
+        logger.info('テスト用exports読み込み完了');
     }).catch(err => {
-        console.warn('テスト用exports読み込み失敗:', err);
+        logger.warn('テスト用exports読み込み失敗', err);
     });
 }
 
@@ -51,7 +54,7 @@ const checkGlobalReservationResult = (): void => {
                     `予約に失敗しました: ${failureInfo.pavilionName} ${failureInfo.timeDisplay}～（${failureInfo.reason}）`,
                     false // 自動非表示しない
                 );
-                console.log('📢 グローバル失敗通知を表示しました');
+                logger.info('グローバル失敗通知を表示しました');
             }
             
             // 表示完了後、sessionStorageをクリア
@@ -70,14 +73,14 @@ const checkGlobalReservationResult = (): void => {
                     resultInfo.message,
                     false // 自動非表示しない
                 );
-                console.log('📢 グローバル結果通知を表示しました:', resultInfo.type, resultInfo.message);
+                logger.info('グローバル結果通知を表示しました', { type: resultInfo.type, message: resultInfo.message });
             }
             
             // 表示完了後、sessionStorageをクリア
             sessionStorage.removeItem('expo_reservation_result');
         }
     } catch (error) {
-        console.error('❌ グローバル結果通知チェックエラー:', error);
+        logger.error('グローバル結果通知チェックエラー', error);
     }
 };
 

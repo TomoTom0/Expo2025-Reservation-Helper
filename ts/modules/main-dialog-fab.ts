@@ -2,6 +2,7 @@ import { PageChecker } from './page-utils';
 import { createApp, type App } from 'vue'
 import { pinia } from '../stores'
 import RootApp from '../App.vue'
+import { loggers } from '../utils/logger'
 
 /**
  * 簡素化されたメインダイアログFAB実装
@@ -26,12 +27,13 @@ export class MainDialogFabImpl implements MainDialogFab {
     private vueApp: App | null = null;
     private appMountPoint: HTMLElement | null = null;
     private pageChecker: PageChecker | null = null;
+    private logger = loggers.ui;
 
     /**
      * メインダイアログFABシステムを初期化
      */
     initialize(): void {
-        console.log('🎯 メインダイアログFAB初期化開始（Vue/Piniaのみ）');
+        this.logger.info('メインダイアログFAB初期化開始（Vue/Piniaのみ）');
         
         // PageCheckerを初期化
         if (!this.pageChecker) {
@@ -41,14 +43,14 @@ export class MainDialogFabImpl implements MainDialogFab {
         // VueでFABボタンとダイアログを作成
         this.initializeVueComponents();
         
-        console.log('✅ メインダイアログFAB初期化完了（Vue/Piniaのみ）');
+        this.logger.info('メインダイアログFAB初期化完了（Vue/Piniaのみ）');
     }
     
     /**
      * ページ読み込み時のVue統合システム事前初期化
      */
     async preInitializeVueSystem(): Promise<void> {
-        console.log('🚀 Vue統合システム事前初期化開始');
+        this.logger.info('Vue統合システム事前初期化開始');
         
         // ストア初期化をページ読み込み時に1回だけ行う
         try {
@@ -63,9 +65,9 @@ export class MainDialogFabImpl implements MainDialogFab {
                 pavilionsStore.init()
             ])
             
-            console.log('✅ 全ストア初期化完了')
+            this.logger.info('全ストア初期化完了')
         } catch (error) {
-            console.error('❌ ストア初期化エラー:', error)
+            this.logger.error('ストア初期化エラー', error)
         }
     }
     
@@ -84,10 +86,10 @@ export class MainDialogFabImpl implements MainDialogFab {
             this.vueApp.use(pinia);
             this.vueApp.mount(this.appMountPoint);
             
-            console.log('✅ Vueアプリケーション初期化完了');
+            this.logger.info('Vueアプリケーション初期化完了');
             
         } catch (error) {
-            console.error('❌ Vueアプリケーション初期化エラー:', error);
+            this.logger.error('Vueアプリケーション初期化エラー', error);
             throw error;
         }
     }
@@ -103,7 +105,7 @@ export class MainDialogFabImpl implements MainDialogFab {
      * メインダイアログを表示（Vue統合版）
      */
     async showMainDialog(): Promise<void> {
-        console.log('🎯 Vue統合ダイアログ表示（Vueコンポーネントで実装済み）');
+        this.logger.info('Vue統合ダイアログ表示（Vueコンポーネントで実装済み）');
         // Vueコンポーネントで実装済み
     }
 
@@ -111,7 +113,7 @@ export class MainDialogFabImpl implements MainDialogFab {
      * メインダイアログを非表示
      */
     hideMainDialog(): void {
-        console.log('🔄 Vue統合ダイアログ非表示（Vueコンポーネントで実装済み）');
+        this.logger.info('Vue統合ダイアログ非表示（Vueコンポーネントで実装済み）');
         // Vueコンポーネントで実装済み
     }
 
@@ -119,7 +121,7 @@ export class MainDialogFabImpl implements MainDialogFab {
      * システムをクリーンアップ
      */
     cleanup(): void {
-        console.log('🧹 メインダイアログFABシステムクリーンアップ');
+        this.logger.info('メインダイアログFABシステムクリーンアップ');
         
         // Vue appをアンマウント
         if (this.vueApp) {
