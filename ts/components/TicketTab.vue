@@ -147,11 +147,13 @@
               <div v-if="reservationStatus" class="ytomo-pavilion-reservation-group">
                 <div class="ytomo-reservation-type-header">
                   <div class="ytomo-reservation-type-badge">{{ getReservationTypeName(String(reservationType)) }}</div>
-                  <div class="ytomo-period-status" :class="`status-${(reservationStatus as any).periodStatus || 'none'}`">
-                    {{ getPeriodStatusText((reservationStatus as any).periodStatus || 'none') }}
-                  </div>
-                  <div class="ytomo-submission-status" :class="`status-${(reservationStatus as any).submissionStatus || 'none'}`">
-                    {{ getSubmissionStatusText((reservationStatus as any).submissionStatus || 'none') }}
+                  <div class="ytomo-status-badges">
+                    <div class="ytomo-period-status" :class="`status-${(reservationStatus as any).periodStatus || 'none'}`">
+                      {{ getPeriodStatusText((reservationStatus as any).periodStatus || 'none') }}
+                    </div>
+                    <div class="ytomo-submission-status" :class="`status-${(reservationStatus as any).submissionStatus || 'none'}`">
+                      {{ getSubmissionStatusText((reservationStatus as any).submissionStatus || 'none') }}
+                    </div>
                   </div>
                 </div>
                 
@@ -170,7 +172,7 @@
                 
                 <!-- 当選情報がない場合 -->
                 <div v-else-if="(reservationStatus as any).submissionStatus === 'none'" class="ytomo-pavilion-info ytomo-no-info">
-                  {{ (reservationStatus as any).periodStatus === 'before' ? '受付前' : (reservationStatus as any).periodStatus === 'active' ? '受付中・未申請' : '受付終了・申請なし' }}
+                  {{ getStatusText((reservationStatus as any).periodStatus, (reservationStatus as any).submissionStatus) }}
                 </div>
               </div>
             </template>
@@ -648,6 +650,12 @@ const formatEntranceDate = (dateStr: string): string => {
     return `${year}/${month}/${day}`
   }
   return dateStr
+}
+
+const getStatusText = (periodStatus: string, submissionStatus: string): string => {
+  const periodText = getPeriodStatusText(periodStatus)
+  const submissionText = getSubmissionStatusText(submissionStatus)
+  return `${periodText}・${submissionText}`
 }
 
 // ライフサイクル
@@ -1376,7 +1384,7 @@ onUnmounted(() => {
 .ytomo-reservation-type-header {
     display: flex;
     align-items: center;
-    gap: 8px;
+    justify-content: space-between;
     margin-bottom: 8px;
 }
 
@@ -1388,6 +1396,13 @@ onUnmounted(() => {
     font-size: 11px;
     font-weight: 600;
     white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.ytomo-status-badges {
+    display: flex;
+    align-items: center;
+    gap: 6px;
 }
 
 .ytomo-period-status, .ytomo-submission-status {
