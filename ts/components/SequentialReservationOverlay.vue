@@ -52,11 +52,7 @@
               <div class="time-slot-button">{{ currentTarget.timeSlot }}</div>
             </div>
           </div>
-          <div class="ytomo-sequential-status">
-            <div class="ytomo-sequential-current">
-              {{ sequentialReservationStore.state.currentTargetIndex + 1 }}/{{ sequentialReservationStore.state.reservationTargets.length }}
-            </div>
-          </div>
+          <!-- パビリオン名横の「1/1」表示を削除 -->
         </div>
       </div>
     </div>

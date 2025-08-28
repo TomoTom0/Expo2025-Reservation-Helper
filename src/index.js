@@ -8,7 +8,7 @@
 // @run-at       document-end
 // ==/UserScript==
 
-// Built: 2025/08/28 19:07:46
+// Built: 2025/08/28 23:25:49
 
 
 (function webpackUniversalModuleDefinition(root, factory) {
@@ -668,294 +668,6 @@ module.exports = styleTagTransform;
 
 /***/ }),
 
-/***/ 236:
-/***/ ((module, __webpack_exports__, __webpack_require__) => {
-
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   A: () => (__WEBPACK_DEFAULT_EXPORT__)
-/* harmony export */ });
-/* harmony import */ var _node_modules_css_loader_dist_runtime_noSourceMaps_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(601);
-/* harmony import */ var _node_modules_css_loader_dist_runtime_noSourceMaps_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_css_loader_dist_runtime_noSourceMaps_js__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(314);
-/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1__);
-// Imports
-
-
-var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1___default()((_node_modules_css_loader_dist_runtime_noSourceMaps_js__WEBPACK_IMPORTED_MODULE_0___default()));
-// Module
-___CSS_LOADER_EXPORT___.push([module.id, `
-/* ダイアログオーバーレイ */
-.ytomo-dialog-overlay[data-v-10411f86] {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.6);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 10000;
-    opacity: 0;
-    animation: fadeIn-10411f86 0.2s ease-out forwards;
-    overflow-y: auto;
-}
-@keyframes fadeIn-10411f86 {
-to {
-        opacity: 1;
-}
-}
-
-/* メインダイアログコンテナ */
-.ytomo-main-dialog[data-v-10411f86] {
-    background: white;
-    border-radius: 12px;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-    width: 90vw;
-    max-width: 800px;
-    min-width: 600px;
-    height: 80vh;
-    max-height: 700px;
-    min-height: 500px;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-    transform: scale(0.9);
-    animation: dialogAppear-10411f86 0.2s ease-out forwards;
-}
-@media (max-width: 768px) {
-.ytomo-main-dialog[data-v-10411f86] {
-        width: 95vw;
-        height: 90vh;
-        min-width: 320px;
-        min-height: 400px;
-}
-}
-@keyframes dialogAppear-10411f86 {
-to {
-        transform: scale(1);
-}
-}
-
-/* ダイアログボディ */
-.ytomo-dialog-body[data-v-10411f86] {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-    background: #f8fafc;
-}
-
-/* タブナビゲーション */
-.ytomo-tab-navigation[data-v-10411f86] {
-    display: flex;
-    background: white;
-    border-bottom: 1px solid #e2e8f0;
-    flex-shrink: 0;
-    position: relative;
-}
-.ytomo-tab-button[data-v-10411f86] {
-    flex: 1;
-    background: none;
-    border: none;
-    padding: 16px 12px;
-    font-size: 14px;
-    font-weight: 500;
-    color: #64748b;
-    cursor: pointer;
-    position: relative;
-    transition: all 0.2s;
-    border-bottom: 3px solid transparent;
-}
-.ytomo-tab-button[data-v-10411f86]:hover {
-    background-color: #f1f5f9;
-    color: #475569;
-}
-.ytomo-tab-button.active[data-v-10411f86] {
-    color: #2c5aa0;
-    background-color: #f8fafc;
-    border-bottom-color: #2c5aa0;
-}
-.ytomo-tab-button[data-v-10411f86]:focus {
-    outline: 2px solid #2c5aa0;
-    outline-offset: -2px;
-}
-.ytomo-tab-content[data-v-10411f86] {
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-    align-items: center;
-}
-.ytomo-tab-title[data-v-10411f86] {
-    font-size: 14px;
-    font-weight: 500;
-}
-.ytomo-tab-dates[data-v-10411f86] {
-    font-size: 12px;
-    color: #6b7280;
-    line-height: 1.2;
-    min-height: 14px;
-    display: flex;
-    flex-direction: column;
-    gap: 1px;
-}
-.ytomo-latest-time[data-v-10411f86] {
-    font-size: 11px;
-    color: #059669;
-    font-weight: 500;
-}
-.ytomo-tab-count[data-v-10411f86] {
-    display: inline-block;
-    margin-left: 8px;
-    font-size: 12px;
-    color: #475569;
-    font-weight: 500;
-    min-width: 18px;
-    text-align: center;
-    transition: all 0.2s;
-    background: #f8fafc;
-    padding: 2px 6px;
-    border-radius: 10px;
-    border: 1px solid #e2e8f0;
-}
-.ytomo-tab-button.active .ytomo-tab-count[data-v-10411f86] {
-    color: #2c5aa0;
-    background: #dbeafe;
-    border-color: #93c5fd;
-}
-.ytomo-pavilion-reservation-info[data-v-10411f86] {
-    font-size: 11px;
-    color: #64748b;
-    font-family: 'Courier New', 'Monaco', 'Menlo', monospace;
-    font-weight: 600;
-    margin-top: 1px;
-}
-.ytomo-tab-button.active .ytomo-pavilion-reservation-info[data-v-10411f86] {
-    color: #2c5aa0;
-}
-.ytomo-dialog-close[data-v-10411f86] {
-    position: absolute;
-    right: 16px;
-    top: 50%;
-    transform: translateY(-50%);
-    background: none;
-    border: none;
-    color: black;
-    font-size: 24px;
-    width: 32px;
-    height: 32px;
-    border-radius: 6px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: background-color 0.2s;
-}
-.ytomo-dialog-close[data-v-10411f86]:hover {
-    background-color: rgba(0, 0, 0, 0.1);
-}
-.ytomo-dialog-close[data-v-10411f86]:focus {
-    outline: 2px solid rgba(0, 0, 0, 0.5);
-    outline-offset: 2px;
-}
-
-/* タブコンテンツ */
-.ytomo-tab-content[data-v-10411f86] {
-    flex: 1;
-    overflow: hidden;
-    position: relative;
-}
-.ytomo-tab-pane[data-v-10411f86] {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    opacity: 0;
-    transform: translateX(20px);
-    transition: all 0.2s ease-out;
-    overflow-y: auto;
-    padding: 20px;
-    display: none;
-}
-.ytomo-tab-pane.active[data-v-10411f86] {
-    opacity: 1;
-    transform: translateX(0);
-    display: block;
-}
-
-/* ローディング表示 */
-.ytomo-loading[data-v-10411f86] {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    height: 200px;
-    text-align: center;
-}
-.ytomo-loading[data-v-10411f86]::before {
-    content: "";
-    width: 40px;
-    height: 40px;
-    border: 3px solid #e2e8f0;
-    border-top-color: #2c5aa0;
-    border-radius: 50%;
-    animation: spin-10411f86 1s linear infinite;
-    margin-bottom: 16px;
-}
-.ytomo-loading p[data-v-10411f86] {
-    margin: 0;
-    color: #64748b;
-    font-size: 14px;
-}
-@keyframes spin-10411f86 {
-to {
-        transform: rotate(360deg);
-}
-}
-
-/* アクセシビリティ対応 */
-@media (prefers-reduced-motion: reduce) {
-.ytomo-dialog-overlay[data-v-10411f86],
-    .ytomo-main-dialog[data-v-10411f86],
-    .ytomo-tab-pane[data-v-10411f86],
-    .ytomo-tab-button[data-v-10411f86],
-    .ytomo-loading[data-v-10411f86]::before {
-        animation: none;
-        transition: none;
-}
-}
-
-/* ハイコントラストモード対応 */
-@media (prefers-contrast: high) {
-.ytomo-main-dialog[data-v-10411f86] {
-        border: 2px solid #000;
-}
-.ytomo-tab-button.active[data-v-10411f86] {
-        border-bottom-width: 4px;
-}
-.ytomo-dialog-close[data-v-10411f86]:focus,
-    .ytomo-tab-button[data-v-10411f86]:focus {
-        outline: 3px solid #000;
-}
-}
-
-/* ダークモード対応を無効化（明示的にライトテーマを強制） */
-.ytomo-dialog-overlay[data-v-10411f86] {
-    color-scheme: light;
-}
-.ytomo-main-dialog[data-v-10411f86] {
-    color-scheme: light;
-    background: white !important;
-    color: #1f2937 !important;
-}
-`, ""]);
-// Exports
-/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
-
-
-/***/ }),
-
 /***/ 241:
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
@@ -1165,6 +877,28 @@ exports.A = (sfc, props) => {
     }
     return target;
 };
+
+
+/***/ }),
+
+/***/ 268:
+/***/ ((module, __webpack_exports__, __webpack_require__) => {
+
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   A: () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _node_modules_css_loader_dist_runtime_noSourceMaps_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(601);
+/* harmony import */ var _node_modules_css_loader_dist_runtime_noSourceMaps_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_css_loader_dist_runtime_noSourceMaps_js__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(314);
+/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1__);
+// Imports
+
+
+var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1___default()((_node_modules_css_loader_dist_runtime_noSourceMaps_js__WEBPACK_IMPORTED_MODULE_0___default()));
+// Module
+___CSS_LOADER_EXPORT___.push([module.id, `.ytomo-ticket-tab[data-v-53e7c5f4]{padding:0 12px 20px 12px;height:100%;overflow-y:auto;color-scheme:light}@media(max-width: 768px){.ytomo-ticket-tab[data-v-53e7c5f4]{padding:0 8px 16px 8px}}.ytomo-quick-select[data-v-53e7c5f4]{background:#fff;border-radius:8px;padding:12px;box-shadow:0 1px 3px rgba(0,0,0,.1);border:1px solid #e2e8f0;flex-shrink:0;display:flex;align-items:center;gap:10px;flex-wrap:wrap}.ytomo-quick-select .ytomo-control-left[data-v-53e7c5f4]{display:flex;align-items:center;gap:12px;margin-right:auto}.ytomo-refresh-button[data-v-53e7c5f4]{display:flex;align-items:center;gap:6px;padding:6px 12px;background:#f8fafc;border:1px solid #cbd5e1;border-radius:6px;color:#475569;font-size:12px;font-weight:500;cursor:pointer;transition:all .2s ease}.ytomo-refresh-button[data-v-53e7c5f4]:hover:not(:disabled){background:#e2e8f0;border-color:#94a3b8}.ytomo-refresh-button[data-v-53e7c5f4]:disabled{opacity:.6;cursor:not-allowed;background:#f1f5f9}.ytomo-refresh-icon[data-v-53e7c5f4]{flex-shrink:0}.ytomo-refresh-icon.rotating[data-v-53e7c5f4]{animation:spin-53e7c5f4 1s linear infinite}@keyframes spin-53e7c5f4{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}.ytomo-toggle-container[data-v-53e7c5f4]{display:flex;align-items:center;cursor:pointer;user-select:none}.ytomo-toggle-input[data-v-53e7c5f4]{display:none}.ytomo-toggle-slider[data-v-53e7c5f4]{position:relative;width:44px;height:24px;background:#cbd5e1;border-radius:12px;transition:background-color .2s;margin-right:8px}.ytomo-toggle-slider[data-v-53e7c5f4]::before{content:"";position:absolute;top:2px;left:2px;width:20px;height:20px;background:#fff;border-radius:50%;transition:transform .2s}.ytomo-toggle-input:checked+.ytomo-toggle-slider[data-v-53e7c5f4]{background:#2c5aa0}.ytomo-toggle-input:checked+.ytomo-toggle-slider[data-v-53e7c5f4]::before{transform:translateX(20px)}.ytomo-toggle-label[data-v-53e7c5f4]{font-size:14px;font-weight:500;color:#374151}.ytomo-date-buttons[data-v-53e7c5f4]{display:flex;flex-wrap:wrap;gap:8px;flex:1}.ytomo-entrance-date-button[data-v-53e7c5f4],.ytomo-date-button[data-v-53e7c5f4]{background:#e0f2fe;border:1px solid #0891b2;border-radius:4px;padding:4px 8px;font-size:12px;color:#0c4a6e;cursor:pointer;transition:all .2s;display:flex;flex-direction:column;gap:2px;align-items:center}.ytomo-entrance-date-button[data-v-53e7c5f4] *,.ytomo-date-button[data-v-53e7c5f4] *{pointer-events:none}.ytomo-entrance-date-button[data-v-53e7c5f4]:focus,.ytomo-date-button[data-v-53e7c5f4]:focus{outline:none;box-shadow:none}.ytomo-entrance-date-button[data-v-53e7c5f4]:hover,.ytomo-date-button[data-v-53e7c5f4]:hover{background:#dbeafe;color:#0c4a6e;transform:translateY(-1px);box-shadow:0 2px 4px rgba(186,230,253,.3)}.selected.ytomo-entrance-date-button[data-v-53e7c5f4],.selected.ytomo-date-button[data-v-53e7c5f4]{background:#0284c7;color:#fff;border-color:#0284c7;outline:2px solid #0284c7;outline-offset:-1px}.ytomo-entrance-date-button[data-v-53e7c5f4]:active,.ytomo-date-button[data-v-53e7c5f4]:active{transform:translateY(0);box-shadow:none}.disabled.ytomo-entrance-date-button[data-v-53e7c5f4],.disabled.ytomo-date-button[data-v-53e7c5f4],.ytomo-entrance-date-button[data-v-53e7c5f4]:disabled,.ytomo-date-button[data-v-53e7c5f4]:disabled{background:#e2e8f0;border-color:#94a3b8;color:#475569;cursor:not-allowed}.disabled.ytomo-entrance-date-button[data-v-53e7c5f4]:hover,.disabled.ytomo-date-button[data-v-53e7c5f4]:hover,.ytomo-entrance-date-button[data-v-53e7c5f4]:disabled:hover,.ytomo-date-button[data-v-53e7c5f4]:disabled:hover{background:#e2e8f0;color:#475569;transform:none;box-shadow:none}.ytomo-ticket-tab[data-v-53e7c5f4]{padding:0 12px 20px 12px;height:100%;overflow-y:auto;color-scheme:light}@media(max-width: 768px){.ytomo-ticket-tab[data-v-53e7c5f4]{padding:0 8px 16px 8px}}.ytomo-quick-select[data-v-53e7c5f4]{background:#fff;border-radius:8px;padding:16px;box-shadow:0 1px 3px rgba(0,0,0,.1);border:1px solid #e2e8f0;flex-shrink:0;display:flex;align-items:center;gap:10px;flex-wrap:wrap;min-height:52px}.ytomo-toggle-container[data-v-53e7c5f4]{display:flex;align-items:center;cursor:pointer;user-select:none}.ytomo-toggle-input[data-v-53e7c5f4]{display:none}.ytomo-toggle-slider[data-v-53e7c5f4]{position:relative;width:44px;height:24px;background:#cbd5e1;border-radius:12px;transition:background-color .2s;margin-right:8px}.ytomo-toggle-slider[data-v-53e7c5f4]::before{content:"";position:absolute;top:2px;left:2px;width:20px;height:20px;background:#fff;border-radius:50%;transition:transform .2s}.ytomo-toggle-input:checked+.ytomo-toggle-slider[data-v-53e7c5f4]{background:#2c5aa0}.ytomo-toggle-input:checked+.ytomo-toggle-slider[data-v-53e7c5f4]::before{transform:translateX(20px)}.ytomo-toggle-label[data-v-53e7c5f4]{font-size:14px;font-weight:500;color:#374151}.ytomo-date-buttons[data-v-53e7c5f4]{display:flex;flex-wrap:wrap;gap:8px;flex:1}.ytomo-ticket-list[data-v-53e7c5f4]{display:flex;flex-direction:column;gap:8px;margin-bottom:20px}.ytomo-ticket-item[data-v-53e7c5f4]{background:#fff;border-radius:6px;border:1px solid #e2e8f0;overflow:hidden;transition:all .2s}.ytomo-ticket-item[data-v-53e7c5f4]:first-of-type{margin-top:12px}.hidden[data-v-53e7c5f4]{display:none}.ytomo-ticket-item[data-v-53e7c5f4]:hover{border-color:#cbd5e1;box-shadow:0 2px 4px rgba(0,0,0,.1)}.ytomo-ticket-item.selected[data-v-53e7c5f4]{border-color:#2c5aa0;box-shadow:0 0 0 2px rgba(44,90,160,.2)}.ytomo-ticket-upper[data-v-53e7c5f4]{background:#e2e8f0;padding:8px 12px;display:flex;align-items:center;gap:8px;border-bottom:1px solid #cbd5e1}.ytomo-ticket-id[data-v-53e7c5f4]{font-family:"Courier New",monospace;font-size:13px;font-weight:600;color:#374151;background:#e2e8f0;padding:2px 6px;border-radius:3px}.ytomo-me-tip[data-v-53e7c5f4]{background:linear-gradient(135deg, #10b981 0%, #059669 100%);color:#fff;padding:2px 6px;border-radius:10px;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.3px}.ytomo-external-tip[data-v-53e7c5f4]{background:linear-gradient(135deg, #f59e0b 0%, #d97706 100%);color:#fff;padding:2px 6px;border-radius:10px;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.3px}.ytomo-ticket-delete-button[data-v-53e7c5f4]{background:#ef4444;color:#fff;border:none;border-radius:50%;width:20px;height:20px;font-size:14px;font-weight:bold;cursor:pointer;display:flex;align-items:center;justify-content:center;margin-left:auto;transition:all .2s ease}.ytomo-ticket-delete-button[data-v-53e7c5f4]:hover{background:#dc2626;transform:scale(1.1)}.ytomo-item-name[data-v-53e7c5f4]{background:linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);color:#fff;padding:2px 6px;border-radius:10px;font-size:9px;font-weight:500;max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.ytomo-label-tag[data-v-53e7c5f4]{background:linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);color:#fff;padding:2px 6px;border-radius:10px;font-size:10px;font-weight:600}.ytomo-ticket-lower[data-v-53e7c5f4]{padding:8px 12px;display:flex;flex-direction:column;gap:8px}.ytomo-entrance-dates[data-v-53e7c5f4]{display:flex;flex-wrap:wrap;gap:6px}.ytomo-reservation-types[data-v-53e7c5f4]{display:flex;flex-wrap:wrap;gap:6px;align-items:center}.ytomo-reservation-type[data-v-53e7c5f4]{padding:4px 8px;border-radius:4px;font-size:12px;font-weight:500}.ytomo-reservation-type.active[data-v-53e7c5f4]{background:#dcfce7;color:#166534;border:1px solid #22c55e}.ytomo-reservation-type.inactive[data-v-53e7c5f4]{background:#fef2f2;color:#991b1b;border:1px solid #ef4444}.ytomo-no-reservation-types[data-v-53e7c5f4]{color:#6b7280;font-size:12px;font-style:italic}.ytomo-add-ticket[data-v-53e7c5f4]{background:#fff;border-radius:8px;padding:16px;border:2px dashed #cbd5e1;margin-top:20px}.ytomo-add-ticket h4[data-v-53e7c5f4]{margin:0 0 12px 0;color:#374151;font-size:14px;font-weight:600}.ytomo-add-result[data-v-53e7c5f4]{margin-top:8px;padding:8px 12px;border-radius:4px;font-size:12px;font-weight:500;text-align:center}.ytomo-add-result.success[data-v-53e7c5f4]{background:#dcfce7;color:#166534;border:1px solid #22c55e}.ytomo-add-result.error[data-v-53e7c5f4]{background:#fee2e2;color:#dc2626;border:1px solid #ef4444}.ytomo-add-ticket-form[data-v-53e7c5f4]{display:flex;gap:8px;align-items:center;flex-wrap:wrap}@media(max-width: 768px){.ytomo-add-ticket-form[data-v-53e7c5f4]{flex-direction:column;align-items:stretch;gap:12px}}.ytomo-input-inline[data-v-53e7c5f4]{padding:4px 8px;border:1px solid #d1d5db;border-radius:4px;font-size:12px;transition:border-color .2s;background:#fff}.ytomo-input-inline[data-v-53e7c5f4]:focus{outline:none;border-color:#2c5aa0;box-shadow:0 0 0 2px rgba(44,90,160,.1)}.ytomo-input-inline[data-v-53e7c5f4]::placeholder{color:#9ca3af}.ytomo-input-inline.ytomo-input-ticket-id[data-v-53e7c5f4]{width:120px}.ytomo-input-inline.ytomo-input-label[data-v-53e7c5f4]{width:60px}.ytomo-select-inline[data-v-53e7c5f4]{padding:4px 8px;border:1px solid #d1d5db;border-radius:4px;font-size:12px;background:#fff;cursor:pointer;width:50px}.ytomo-select-inline[data-v-53e7c5f4]:focus{outline:none;border-color:#2c5aa0;box-shadow:0 0 0 2px rgba(44,90,160,.1)}.ytomo-ticket-upper[data-v-53e7c5f4]{background:#e2e8f0;padding:8px 12px;display:flex;align-items:center;gap:8px;border-bottom:1px solid #cbd5e1}.ytomo-ticket-id[data-v-53e7c5f4]{font-family:"Courier New",monospace;font-size:13px;font-weight:600;color:#374151;background:#e2e8f0;padding:2px 6px;border-radius:3px}.ytomo-me-tip[data-v-53e7c5f4]{background:linear-gradient(135deg, #10b981 0%, #059669 100%);color:#fff;padding:2px 6px;border-radius:10px;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.3px}.ytomo-external-tip[data-v-53e7c5f4]{background:linear-gradient(135deg, #f59e0b 0%, #d97706 100%);color:#fff;padding:2px 6px;border-radius:10px;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.3px}.ytomo-ticket-lower[data-v-53e7c5f4]{padding:8px 12px;display:flex;flex-direction:column;gap:8px}.ytomo-entrance-date-button .ytomo-reservation-status[data-v-53e7c5f4]{background:hsla(0,0%,100%,.9);color:#0891b2;padding:2px 4px;border-radius:3px;font-size:9px;font-weight:500;line-height:1.1;text-align:center}.ytomo-entrance-date-button .ytomo-reservation-status[data-v-53e7c5f4]:empty{background:rgba(0,0,0,0);padding:0}.ytomo-entrance-date-button:hover .ytomo-reservation-status[data-v-53e7c5f4]{background:hsla(0,0%,100%,.95);color:#0ea5e9}.ytomo-entrance-date-button:hover .ytomo-reservation-status[data-v-53e7c5f4]:empty{background:rgba(0,0,0,0)}.ytomo-reservation-type-indicator[data-v-53e7c5f4]{display:inline-block;width:16px;height:13px;font-size:10px;font-weight:400;text-align:center;line-height:13px;border-radius:3px;border:1px solid rgba(0,0,0,0);-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif}.ytomo-reservation-type-indicator.indicator-won[data-v-53e7c5f4]{background:#10b981;color:#fff;border-color:#059669}.ytomo-reservation-type-indicator.indicator-active[data-v-53e7c5f4]{background:#10b981;color:#fff;border-color:#059669}.ytomo-reservation-type-indicator.indicator-before[data-v-53e7c5f4]{background:#6b7280;color:#fff;border-color:#4b5563}.ytomo-reservation-type-indicator.indicator-none[data-v-53e7c5f4]{background:#e5e7eb;color:#6b7280;border-color:#d1d5db}.ytomo-no-reservation[data-v-53e7c5f4]{font-style:italic;color:#9ca3af}.ytomo-entrance-date-button.selected .ytomo-reservation-status[data-v-53e7c5f4]{background:hsla(0,0%,100%,.95);color:#0891b2}.ytomo-entrance-date-button.selected .ytomo-reservation-status[data-v-53e7c5f4]:empty{background:rgba(0,0,0,0)}.ytomo-entrance-date-button.disabled .ytomo-reservation-status[data-v-53e7c5f4]{background:hsla(0,0%,100%,.9);color:#475569}.ytomo-entrance-date-button.disabled .ytomo-reservation-status[data-v-53e7c5f4]:empty{background:rgba(0,0,0,0)}.ytomo-entrance-date-button .ytomo-schedule-line[data-v-53e7c5f4]{padding:2px 0;font-size:11px;line-height:1.2}.ytomo-entrance-date-button .ytomo-schedule-line.ytomo-reservation-line[data-v-53e7c5f4]{color:#6b7280;display:flex;align-items:center;gap:4px;font-size:10px}.ytomo-entrance-date-button .ytomo-schedule-divider[data-v-53e7c5f4]{height:1px;background:#d1d5db;margin:3px 0;width:100%;opacity:.8}.ytomo-entrance-date-button.selected .ytomo-schedule-line.ytomo-reservation-line[data-v-53e7c5f4]{color:hsla(0,0%,100%,.8)}.ytomo-entrance-date-button.selected .ytomo-schedule-divider[data-v-53e7c5f4]{background:hsla(0,0%,100%,.4)}.ytomo-entrance-date-group[data-v-53e7c5f4]{display:flex;gap:6px;align-items:stretch}.ytomo-expand-button[data-v-53e7c5f4]{background:#f8fafc;border:1px solid #cbd5e1;color:#374151;font-size:12px;font-weight:600;padding:3px 8px;cursor:pointer;border-radius:4px;transition:all .2s ease;min-width:24px;height:50%;display:flex;align-items:center;justify-content:center;align-self:flex-end}.ytomo-expand-button[data-v-53e7c5f4]:disabled{background:#f3f4f6;border-color:#d1d5db;color:#9ca3af;cursor:not-allowed;opacity:.5}.ytomo-expand-button[data-v-53e7c5f4]:hover{background:#e2e8f0;border-color:#94a3b8;transform:translateY(-1px)}.ytomo-expand-button[data-v-53e7c5f4]:active{transform:translateY(0)}.ytomo-expand-button[data-v-53e7c5f4]:focus{outline:none;box-shadow:0 0 0 2px rgba(44,90,160,.2)}.ytomo-pavilion-details[data-v-53e7c5f4]{margin-top:12px;padding:12px;background:#f8fafc;border-radius:6px;border:1px solid #e2e8f0}.ytomo-schedule-detail[data-v-53e7c5f4]{margin-bottom:16px}.ytomo-schedule-detail[data-v-53e7c5f4]:last-child{margin-bottom:0}.ytomo-schedule-date-header[data-v-53e7c5f4]{font-weight:600;color:#334155;margin-bottom:8px;font-size:13px;padding-bottom:4px;border-bottom:1px solid #e2e8f0}.ytomo-pavilion-reservation-group[data-v-53e7c5f4]{margin-bottom:12px;padding:8px 0;border-bottom:1px solid #e5e7eb}.ytomo-pavilion-reservation-group[data-v-53e7c5f4]:last-child{margin-bottom:0;border-bottom:none}.ytomo-reservation-header[data-v-53e7c5f4]{display:flex;align-items:flex-start;gap:12px}.ytomo-reservation-left[data-v-53e7c5f4]{display:flex;flex-direction:column;gap:4px;min-width:80px;flex-shrink:0}.ytomo-reservation-right[data-v-53e7c5f4]{flex:1;display:flex;flex-direction:column;gap:4px}.ytomo-reservation-type-badge[data-v-53e7c5f4]{padding:2px 8px;border-radius:12px;font-size:11px;font-weight:600;white-space:nowrap;text-align:center}.ytomo-reservation-type-badge.badge-won[data-v-53e7c5f4]{background:#10b981;color:#fff}.ytomo-reservation-type-badge.badge-expired[data-v-53e7c5f4]{background:#ef4444;color:#fff}.ytomo-reservation-type-badge.badge-before[data-v-53e7c5f4]{background:#f59e0b;color:#fff}.ytomo-reservation-type-badge.badge-submitted[data-v-53e7c5f4]{background:#8b5cf6;color:#fff}.ytomo-reservation-type-badge.badge-none[data-v-53e7c5f4]{background:#6b7280;color:#fff}.ytomo-time-slot-badge[data-v-53e7c5f4]{background:#f8fafc;color:#475569;padding:2px 8px;border-radius:8px;font-size:11px;font-weight:500;text-align:center;border:1px solid #e2e8f0}.ytomo-time-slot-badge[data-v-53e7c5f4]:empty::after{content:"—"}.ytomo-pavilion-name[data-v-53e7c5f4]{font-weight:600;color:#334155;font-size:13px;line-height:1.3}.ytomo-pavilion-name.ytomo-status-text[data-v-53e7c5f4]{color:#6b7280;font-style:italic;font-weight:500}.ytomo-use-status[data-v-53e7c5f4]{color:#475569;font-size:11px;font-weight:500}.ytomo-reservation-type-header[data-v-53e7c5f4]{display:flex;flex-direction:column;gap:4px;min-width:80px;flex-shrink:0}.ytomo-reservation-type-badge[data-v-53e7c5f4]{background:#3b82f6;color:#fff;padding:4px 8px;border-radius:4px;font-size:10px;font-weight:600;text-align:center;line-height:1.2}.ytomo-time-slot-badge[data-v-53e7c5f4]{background:#2c5aa0;color:#fff;padding:3px 6px;border-radius:3px;font-size:10px;font-weight:500;text-align:center;line-height:1.2}.ytomo-pavilion-info[data-v-53e7c5f4]{flex:1;color:#374151;font-size:12px;line-height:1.4;display:flex;align-items:center}.ytomo-no-entrance-dates[data-v-53e7c5f4]{color:#6b7280;font-size:12px;font-style:italic}.ytomo-input-inline[data-v-53e7c5f4]{padding:4px 8px;border:1px solid #d1d5db;border-radius:4px;font-size:12px;transition:border-color .2s;background:#fff}.ytomo-input-inline[data-v-53e7c5f4]:focus{outline:none;border-color:#2c5aa0;box-shadow:0 0 0 2px rgba(44,90,160,.1)}.ytomo-input-inline[data-v-53e7c5f4]::placeholder{color:#9ca3af}.ytomo-input-inline.ytomo-input-ticket-id[data-v-53e7c5f4]{width:120px}.ytomo-input-inline.ytomo-input-label[data-v-53e7c5f4]{width:60px}.ytomo-select-inline[data-v-53e7c5f4]{padding:4px 8px;border:1px solid #d1d5db;border-radius:4px;font-size:12px;background:#fff;cursor:pointer;width:50px}.ytomo-select-inline[data-v-53e7c5f4]:focus{outline:none;border-color:#2c5aa0;box-shadow:0 0 0 2px rgba(44,90,160,.1)}.ytomo-button[data-v-53e7c5f4]{padding:8px 16px;border:none;border-radius:6px;font-size:14px;font-weight:500;cursor:pointer;transition:all .2s;display:inline-flex;align-items:center;justify-content:center;white-space:nowrap}.ytomo-button.primary[data-v-53e7c5f4]{background:linear-gradient(135deg, #2c5aa0 0%, #1a365d 100%);color:#fff}.ytomo-button.primary[data-v-53e7c5f4]:hover{background:linear-gradient(135deg, #1a365d 0%, #2c5aa0 100%);transform:translateY(-1px);box-shadow:0 4px 12px rgba(44,90,160,.3)}.ytomo-button.primary[data-v-53e7c5f4]:active{transform:translateY(0)}.ytomo-button.retry-button[data-v-53e7c5f4]{background:linear-gradient(135deg, #f59e0b 0%, #d97706 100%);color:#fff;margin-top:12px}.ytomo-button.retry-button[data-v-53e7c5f4]:hover{background:linear-gradient(135deg, #d97706 0%, #f59e0b 100%)}.ytomo-button[data-v-53e7c5f4]:focus{outline:2px solid #2c5aa0;outline-offset:2px}.ytomo-button[data-v-53e7c5f4]:disabled{opacity:.5;cursor:not-allowed;transform:none !important}.ytomo-empty-state[data-v-53e7c5f4]{text-align:center;padding:40px 20px;color:#6b7280;font-style:italic}.ytomo-empty-state p[data-v-53e7c5f4]{margin:0;font-size:14px}.ytomo-error[data-v-53e7c5f4]{text-align:center;padding:40px 20px;color:#dc2626}.ytomo-error h3[data-v-53e7c5f4]{margin:0 0 8px 0;font-size:16px;color:#dc2626}.ytomo-error p[data-v-53e7c5f4]{margin:0;font-size:14px;color:#6b7280}.ytomo-ticket-tab .ytomo-loading[data-v-53e7c5f4]{height:150px}.ytomo-ticket-item[data-v-53e7c5f4]{animation:slideIn-53e7c5f4 .2s ease-out}@keyframes slideIn-53e7c5f4{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}@media(prefers-reduced-motion: reduce){.ytomo-ticket-item[data-v-53e7c5f4],.ytomo-button[data-v-53e7c5f4],.ytomo-date-button[data-v-53e7c5f4],.ytomo-entrance-date-button[data-v-53e7c5f4],.ytomo-toggle-slider[data-v-53e7c5f4],.ytomo-input-inline[data-v-53e7c5f4]{animation:none;transition:none}}@media(prefers-contrast: high){.ytomo-ticket-item[data-v-53e7c5f4]{border-width:3px}.ytomo-ticket-item.selected[data-v-53e7c5f4]{border-width:4px}.ytomo-button[data-v-53e7c5f4]:focus,.ytomo-input-inline[data-v-53e7c5f4]:focus,.ytomo-date-button[data-v-53e7c5f4]:focus,.ytomo-entrance-date-button[data-v-53e7c5f4]:focus,.ytomo-input-inline[data-v-53e7c5f4]:focus,.ytomo-select-inline[data-v-53e7c5f4]:focus{outline:3px solid #000}}.ytomo-empty-state[data-v-53e7c5f4]{text-align:center;padding:40px 20px;color:#6b7280;font-style:italic}.ytomo-empty-state p[data-v-53e7c5f4]{margin:0;font-size:14px}.ytomo-error[data-v-53e7c5f4]{text-align:center;padding:40px 20px;color:#dc2626}.ytomo-error h3[data-v-53e7c5f4]{margin:0 0 8px 0;font-size:16px;color:#dc2626}.ytomo-error p[data-v-53e7c5f4]{margin:0;font-size:14px;color:#6b7280}.ytomo-ticket-list[data-v-53e7c5f4]::-webkit-scrollbar{width:6px}.ytomo-ticket-list[data-v-53e7c5f4]::-webkit-scrollbar-track{background:#f1f5f9;border-radius:3px}.ytomo-ticket-list[data-v-53e7c5f4]::-webkit-scrollbar-thumb{background:#cbd5e1;border-radius:3px}.ytomo-ticket-list[data-v-53e7c5f4]::-webkit-scrollbar-thumb:hover{background:#94a3b8}.ytomo-ticket-item[data-v-53e7c5f4]{animation:slideIn-53e7c5f4 .2s ease-out}@keyframes slideIn-53e7c5f4{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}`, ""]);
+// Exports
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
 
 /***/ }),
@@ -1918,7 +1652,7 @@ const usePavilionsStore = (0,pinia__WEBPACK_IMPORTED_MODULE_0__/* .defineStore *
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1___default()((_node_modules_css_loader_dist_runtime_noSourceMaps_js__WEBPACK_IMPORTED_MODULE_0___default()));
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, `#ytomo-status-badge.countdown-warning{background:rgba(255,0,0,.9)}.ytomo-efficiency-toggle{width:45px;height:32px;border-radius:16px;color:#fff;border:none;font-size:10px;font-weight:bold;cursor:pointer;transition:all .2s ease;box-shadow:0 2px 8px rgba(0,0,0,.3);display:flex;align-items:center;justify-content:center;pointer-events:auto;margin-bottom:8px}.ytomo-efficiency-toggle.efficiency-enabled{background:rgba(255,140,0,.9)}.ytomo-efficiency-toggle.efficiency-disabled{background:rgba(128,128,128,.9)}.ytomo-efficiency-toggle:hover{transform:scale(1.1);box-shadow:0 4px 12px rgba(0,0,0,.4)}.ytomo-efficiency-toggle:active{transform:scale(0.95)}button.ext-ytomo{height:40px;width:auto;min-width:60px;padding:0px 8px;background:#006821;color:#fff}button.ext-ytomo.no-after:after{background:rgba(0,0,0,0) none repeat 0 0/auto auto padding-box border-box scroll}button.ext-ytomo.btn-done{background:#4a4c4a}button.ext-ytomo:hover{background:#02862b}.fab-sub-btn{color:#fff;border:none;border-radius:20px;padding:8px 16px;font-size:12px;white-space:nowrap;transition:all .2s ease}.fab-sub-btn.btn-enabled{background:#006821;cursor:pointer;opacity:1}.fab-sub-btn.btn-enabled:hover{background:#02862b;transform:scale(1.05)}.fab-sub-btn.btn-enabled.btn-done{background:#4a4c4a}.fab-sub-btn.btn-enabled.btn-done:hover{background:#606260}.fab-sub-btn.btn-disabled,.fab-sub-btn.btn-loading{background:gray;cursor:not-allowed;opacity:.6}.fab-sub-btn.btn-disabled:hover,.fab-sub-btn.btn-loading:hover{background:gray;transform:scale(1)}.fab-sub-btn:disabled{background:gray !important;cursor:not-allowed !important;opacity:.6 !important}.fab-sub-btn:disabled:hover{background:gray !important;transform:scale(1) !important}button.ext-ytomo.pavilion-sub-btn.btn-disabled,button.ext-ytomo.pavilion-sub-btn.btn-loading{background:gray;cursor:not-allowed;opacity:.6}button.ext-ytomo.pavilion-sub-btn.btn-disabled:hover,button.ext-ytomo.pavilion-sub-btn.btn-loading:hover{background:gray;transform:scale(1)}.safe-none,.ytomo-none,.filter-none{display:none}.fab-sub-btn span.button-count{font-family:"Courier New","Monaco",monospace;font-weight:bold;color:#ffeb3b;vertical-align:baseline}button.ext-ytomo.pavilion-sub-btn.ytomo-date-button.date-selected{border:2px solid #4caf50;box-shadow:0 0 8px rgba(76,175,80,.6)}div.div-flex{display:flex;justify-content:center;margin:5px}div.div-flex input.ext-tomo.search{flex:1;padding:8px 12px;border:1px solid #ddd;border-radius:4px;font-size:14px;margin-right:8px}div.div-flex input.ext-tomo.search:focus{outline:none;border-color:#006821;box-shadow:0 0 0 2px rgba(0,104,33,.2)}div.div-flex button.btn-filter-without-load{height:auto;min-height:40px;width:auto;min-width:60px;padding:0px 8px;color:#fff;margin:5px;background:#006821;border:none;border-radius:4px;cursor:pointer;font-size:14px}div.div-flex button.btn-filter-without-load:hover{background:#02862b}div.div-flex button.btn-filter-without-load:active{background:#005417}div.div-flex button.btn-filter-without-load:disabled{background:gray;cursor:not-allowed}.js-show{display:block}.js-hide{display:none}.js-visible{visibility:visible}.js-invisible{visibility:hidden}.js-enabled{pointer-events:auto;opacity:1}.js-disabled{pointer-events:none;opacity:.6}.js-green{background:#228b22;color:#fff}.js-red{background:#dc3545;color:#fff}.js-gray{background:gray;color:#fff}.btn-success-highlight{background:#00c800;color:#fff}.status-bg-green{background:rgba(0,128,0,.9)}.status-bg-red{background:rgba(255,0,0,.9)}.status-bg-orange{background:rgba(255,140,0,.9)}.status-bg-blue{background:rgba(0,104,33,.9)}.status-bg-default{background:rgba(0,0,0,.8)}#ytomo-status-badge{background:linear-gradient(135deg, rgba(0, 0, 0, 0.9), rgba(40, 40, 40, 0.9));color:#fff;padding:8px 16px;border-radius:20px;font-size:12px;font-weight:bold;white-space:pre-line;box-shadow:0 4px 12px rgba(0,0,0,.3),0 2px 6px rgba(0,0,0,.2);border:2px solid hsla(0,0%,100%,.15);pointer-events:none}#ytomo-status-badge.ytomo-status-waiting{background:linear-gradient(135deg, rgba(0, 0, 0, 0.9), rgba(40, 40, 40, 0.9))}#ytomo-status-badge.ytomo-status-reservation{background:linear-gradient(135deg, rgba(255, 140, 0, 0.9), rgba(255, 165, 0, 0.9))}#ytomo-status-badge.ytomo-status-reservation.ytomo-status-countdown-warning{background:linear-gradient(135deg, rgba(255, 0, 0, 0.9), rgba(220, 53, 69, 0.9))}#ytomo-status-badge.ytomo-status-cooldown{background:linear-gradient(135deg, rgba(255, 107, 53, 0.9), rgba(255, 140, 0, 0.9))}.ytomo-header li.fab-toggle-li{display:inline-block;margin-right:8px}.ytomo-header li.fab-toggle-li button.fab-toggle-button{background:none;border:none;cursor:pointer;padding:0;color:#fff;transition:all .2s ease;display:flex;align-items:center;justify-content:center}.ytomo-header li.fab-toggle-li button.fab-toggle-button:hover{color:#ddd}.ytomo-header li.fab-toggle-li button.fab-toggle-button figure.fab-toggle-figure{width:auto;height:24px;display:flex;align-items:center;justify-content:center;padding:0 4px}.ytomo-pavilion-fab button.ytomo-fab{position:relative}.ytomo-pavilion-fab button.ytomo-fab:hover{transform:scale(1.15);box-shadow:0 8px 25px rgba(0,0,0,.5),0 4px 12px rgba(0,0,0,.3);border-width:4px}.ytomo-pavilion-fab .ytomo-fab-inner-content .pavilion-fab-expand-icon{font-size:8px;line-height:1;margin-bottom:1px;opacity:.8}.ytomo-pavilion-fab .ytomo-fab-inner-content .pavilion-fab-brand-text{font-size:7px;font-weight:normal;line-height:1;margin-bottom:2px;opacity:.7}.ytomo-pavilion-fab .ytomo-fab-inner-content .pavilion-fab-counts-text{font-size:12px;font-weight:bold;line-height:1}.ytomo-pavilion-fab .pavilion-sub-actions-container{display:none;flex-direction:column;gap:8px;align-items:flex-end;margin-bottom:8px}.ytomo-pavilion-fab .pavilion-sub-actions-container.expanded{display:flex}.ytomo-pavilion-fab .pavilion-sub-actions-container button.pavilion-sub-btn.base-style{color:#fff;border:none;border-radius:20px;padding:8px 16px;font-size:12px;white-space:nowrap;box-shadow:0 2px 8px rgba(0,0,0,.3);transition:all .2s ease}.ytomo-companion-dialog{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;z-index:8999;padding:20px;box-sizing:border-box}.ytomo-companion-dialog .dialog-content{background:#fff;border-radius:12px;padding:24px;width:100%;max-width:500px;max-height:90vh;overflow-y:auto;box-shadow:0 10px 40px rgba(0,0,0,.3)}@media(max-width: 768px){.ytomo-companion-dialog .dialog-content{max-width:95vw;max-height:85vh;padding:16px;border-radius:8px}}.ytomo-companion-dialog .dialog-content .input-row{display:flex;gap:8px;margin-bottom:12px}@media(max-width: 480px){.ytomo-companion-dialog .dialog-content .input-row{flex-direction:column;gap:12px}}.ytomo-companion-dialog .dialog-content .input-row input{padding:12px 8px;border:1px solid #ddd;border-radius:4px;font-size:16px}.ytomo-companion-dialog .dialog-content .input-row input:focus{outline:none;border-color:#4caf50;box-shadow:0 0 0 2px rgba(76,175,80,.2)}.ytomo-companion-dialog .dialog-content .input-row button{padding:12px 16px;background:#4caf50;color:#fff;border:none;border-radius:4px;cursor:pointer;font-size:14px;white-space:nowrap;min-width:60px}.ytomo-companion-dialog .dialog-content .input-row button:hover{background:#45a049}.ytomo-companion-dialog .dialog-content .input-row button:active{background:#3d8b40}.ytomo-abort-button{position:fixed;bottom:100px;right:24px;z-index:9001;background:#f44336;color:#fff;border:none;border-radius:50%;width:64px;height:64px;font-size:12px;font-weight:bold;cursor:pointer;box-shadow:0 4px 12px rgba(244,67,54,.4);transition:all .3s ease;display:flex;align-items:center;justify-content:center}.ytomo-abort-button:hover{transform:scale(1.1);box-shadow:0 6px 20px rgba(244,67,54,.6)}.ytomo-abort-button:active{transform:scale(0.95)}.copy-ticket-btn{margin-left:8px;padding:6px;background:#f0f0f0;border:1px solid #ddd;border-radius:4px;cursor:pointer;display:flex;align-items:center;justify-content:center;min-width:32px;height:32px;transition:all .3s ease}.copy-ticket-btn:hover{background:#e0e0e0;border-color:#ccc}.copy-ticket-btn:active{transform:scale(0.95)}.copy-ticket-btn svg{color:#666;transition:all .3s ease}.copy-ticket-btn.copy-success{background:rgba(76,175,80,.1);border-color:#4caf50}.copy-ticket-btn.copy-success svg{color:#4caf50}.dialog-btn{padding:8px 16px;border:none;border-radius:4px;cursor:pointer;font-size:14px;font-weight:bold;transition:all .2s ease}.dialog-btn.btn-cancel{background:#666;color:#fff}.dialog-btn.btn-cancel:hover{background:#555}.dialog-btn.btn-delete{background:#f44336;color:#fff}.dialog-btn.btn-delete:hover{background:#d32f2f}.dialog-btn.btn-execute{background:#2196f3;color:#fff}.dialog-btn.btn-execute:hover{background:#1976d2}.dialog-btn.btn-execute.btn-disabled{background:#ccc;color:#666;cursor:not-allowed}.dialog-btn.btn-execute.btn-disabled:hover{background:#ccc}.ticket-row{display:flex;align-items:center;padding:8px;border-bottom:1px solid #eee;transition:background-color .2s ease;cursor:pointer}.ticket-row:last-child{border-bottom:none}.ticket-row.already-added{position:relative;opacity:.6;background:repeating-linear-gradient(45deg, transparent, transparent 8px, rgba(255, 140, 0, 0.1) 8px, rgba(255, 140, 0, 0.1) 16px)}.ticket-row.already-added::after{content:"追加済み";position:absolute;top:4px;right:40px;background:rgba(255,140,0,.9);color:#fff;font-size:10px;font-weight:bold;padding:2px 6px;border-radius:3px;pointer-events:none}.ticket-row.already-added input[type=checkbox]{opacity:.5;cursor:not-allowed}.ticket-row.already-added .copy-ticket-btn{opacity:1;background:#f8f8f8;border-color:#bbb}.ticket-row.already-added .copy-ticket-btn:hover{background:#e8e8e8;border-color:#999}.ytomo-fab{width:56px;height:56px;border-radius:50%;color:#fff;border:none;box-shadow:0 6px 20px rgba(0,0,0,.4),0 2px 8px rgba(0,0,0,.2);border:3px solid hsla(0,0%,100%,.2);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:bold;transition:all .3s ease;position:relative;overflow:hidden;pointer-events:auto}.ytomo-fab-enabled{background:#ff8c00;opacity:.9;cursor:pointer;pointer-events:auto}.ytomo-fab-disabled{background:gray;opacity:.6;cursor:not-allowed;pointer-events:none}.ytomo-fab-running{background:#dc3545;opacity:.9;cursor:pointer;pointer-events:auto}.ytomo-fab.state-idle{background:gray;opacity:.6;cursor:not-allowed;pointer-events:none}.ytomo-fab.pointer-events-none{pointer-events:none}.ytomo-fab.pointer-events-auto{pointer-events:auto}.ytomo-fab.state-enabled{background:#ff8c00;opacity:.9;cursor:pointer;pointer-events:auto}.ytomo-fab.state-running{background:#dc3545;opacity:.9;cursor:pointer;pointer-events:auto}.ytomo-fab.state-reservation{background:#ff8c00;opacity:.9;cursor:pointer;pointer-events:auto}.ytomo-fab:hover{transform:scale(1.15);box-shadow:0 8px 25px rgba(0,0,0,.5),0 4px 12px rgba(0,0,0,.3)}.ytomo-fab.reservation-enabled{background:#006821;opacity:.9;cursor:pointer}.ytomo-fab.reservation-disabled{background:gray;opacity:.9;cursor:not-allowed}.ytomo-fab.cooldown-warning{background:#ff6b35}.ytomo-fab.cooldown-normal{background:#007bff}.ytomo-fab-container{position:fixed;bottom:100px;right:24px;z-index:9001;display:flex;flex-direction:column;align-items:flex-end;gap:12px;pointer-events:auto}.ytomo-fab-container.z-normal{z-index:1000}.ytomo-fab-container.z-above-overlay{z-index:9001}.ytomo-fab-container.visible{display:flex}.ytomo-fab-container.hidden{display:none}.ytomo-fab-content{position:relative;display:flex;flex-direction:column-reverse;align-items:center;gap:8px;opacity:0;transform:scale(0.8) translateY(10px);transition:all .3s cubic-bezier(0.175, 0.885, 0.32, 1.275);pointer-events:none}.ytomo-fab-content.expanded{opacity:1;transform:scale(1) translateY(0);pointer-events:auto}.ytomo-sub-fab{width:45px;height:32px;border-radius:16px;background:rgba(0,104,33,.9);color:#fff;border:none;font-size:11px;font-weight:bold;cursor:pointer;transition:all .2s ease;box-shadow:0 2px 8px rgba(0,0,0,.3);display:flex;align-items:center;justify-content:center;pointer-events:auto}.ytomo-sub-fab:hover{background:rgba(2,134,43,.9);transform:scale(1.1);box-shadow:0 4px 12px rgba(0,0,0,.4)}.ytomo-sub-fab:active{transform:scale(0.95)}.ytomo-pavilion-fab-container{position:fixed;bottom:100px;right:24px;z-index:9001;display:flex;flex-direction:column;gap:12px;align-items:flex-end;pointer-events:auto}.ytomo-ticket-selection-fab-container{position:fixed;bottom:100px;right:24px;z-index:9001;display:flex;flex-direction:column;gap:12px;align-items:flex-end;pointer-events:auto}.ytomo-ticket-selection-fab-container.z-normal{z-index:1000}.ytomo-ticket-selection-fab-container.z-above-overlay{z-index:9001}.ytomo-ticket-selection-fab-container #ytomo-companion-sub-buttons{display:flex;flex-direction:column;gap:8px;align-items:flex-end;transition:all .3s ease}.ytomo-fab-inner-content{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;pointer-events:none}.ytomo-reservation-target-display{background:linear-gradient(135deg, rgba(0, 123, 255, 0.95), rgba(0, 86, 179, 0.95));color:#fff;padding:8px 12px;border-radius:12px;font-size:12px;font-weight:bold;text-align:center;box-shadow:0 3px 10px rgba(0,0,0,.3);border:2px solid hsla(0,0%,100%,.3);min-width:80px;max-width:120px;white-space:pre-line;overflow:visible;text-overflow:clip;transition:all .3s ease;pointer-events:auto;cursor:pointer}.ytomo-reservation-target-display:hover{transform:scale(1.05);box-shadow:0 4px 14px rgba(0,0,0,.4)}.ytomo-reservation-target-display.hidden{display:none}.ytomo-reservation-target-display.visible{display:block}input.ext-tomo.search{height:50px;min-width:200px;max-width:min(300px,100%);font-family:quicksand;font-size:16px;-webkit-appearance:textfield;-moz-appearance:textfield;appearance:textfield;border:1px solid #222426;border-radius:25px;box-shadow:0 1px 0 0 #ccc;padding:0 0 0 10px;flex:1 1}.day-reservation-info-area{position:relative;min-height:50px}.day-reservation-description{margin:10px 0;color:#666;font-size:14px;line-height:1.5;text-align:center}.day-reservation-description.hidden{display:none}.day-reservation-notification{margin:10px 0}.day-reservation-notification.hidden{display:none}.day-reservation-notification .notification-content{padding:12px 16px;border-radius:8px;font-size:14px;font-weight:500;display:flex;align-items:center;justify-content:space-between;min-height:24px;position:relative}.day-reservation-notification .notification-content .notification-message{flex:1;margin-left:8px;margin-right:8px}.day-reservation-notification .notification-content .notification-close{background:none;border:none;font-size:18px;font-weight:bold;cursor:pointer;padding:0;width:20px;height:20px;display:flex;align-items:center;justify-content:center;opacity:.7;transition:opacity .2s ease}.day-reservation-notification .notification-content .notification-close:hover{opacity:1}.day-reservation-notification .notification-content.success{background-color:#d4edda;color:#155724;border:1px solid #c3e6cb}.day-reservation-notification .notification-content.success .notification-close{color:#155724}.day-reservation-notification .notification-content.error{background-color:#f8d7da;color:#721c24;border:1px solid #f5c6cb}.day-reservation-notification .notification-content.error .notification-close{color:#721c24}.day-reservation-notification .notification-content.warning{background-color:#fff3cd;color:#856404;border:1px solid #ffeaa7}.day-reservation-notification .notification-content.warning .notification-close{color:#856404}.day-reservation-notification .notification-content.info{background-color:#d1ecf1;color:#0c5460;border:1px solid #bee5eb}.day-reservation-notification .notification-content.info .notification-close{color:#0c5460}.ytomo-icon.expand-icon{font-size:8px;line-height:1;color:#fff;font-weight:bold;text-align:center;pointer-events:none}.ytomo-icon.countdown-text{font-size:6px;line-height:1;color:#fff;font-weight:bold;text-align:center;margin-top:1px;pointer-events:none}.ytomo-toggle.toggle-li{position:fixed;bottom:10px;left:10px;z-index:1000;list-style:none;margin:0;padding:0}.ytomo-toggle.toggle-button{width:50px;height:30px;background:rgba(255,140,0,.8);border:none;border-radius:15px;cursor:pointer;transition:all .3s ease;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:bold;position:relative;overflow:hidden}.ytomo-toggle.toggle-button.enabled{color:#fff}.ytomo-toggle.toggle-button.disabled{color:#ddd}.ytomo-toggle.toggle-figure{width:100%;height:100%;margin:0;padding:0;border:none;background:rgba(0,0,0,0);pointer-events:none}.ytomo-dialog.overlay{position:fixed;top:0;left:0;width:100%;height:100%;background-color:rgba(0,0,0,.5);z-index:1000;display:flex;justify-content:center;align-items:center}.ytomo-dialog.container{background:#fff;border-radius:8px;padding:20px;max-width:400px;width:90%;max-height:70vh;overflow-y:auto;box-shadow:0 4px 12px rgba(0,0,0,.3)}.ytomo-dialog.container.day-reservation{max-width:600px;max-height:80vh}.ytomo-dialog.title{margin:0 0 16px 0;color:#333;font-size:18px;font-weight:bold}.ytomo-dialog.button-group{display:flex;justify-content:flex-end;gap:10px;margin-top:20px}.ytomo-dialog.primary-button{background:#006821;color:#fff;border:none;padding:10px 20px;border-radius:4px;cursor:pointer;font-size:14px}.ytomo-dialog.primary-button:hover{background:#02862b}.ytomo-dialog.primary-button:disabled{background:gray;cursor:not-allowed}.ytomo-dialog.secondary-button{background:rgba(0,0,0,0);color:#666;border:1px solid #ccc;padding:10px 20px;border-radius:4px;cursor:pointer;font-size:14px}.ytomo-dialog.secondary-button:hover{background:#f5f5f5}.ytomo-progress.counter{display:inline-block;margin-left:8px;padding:2px 6px;background:rgba(0,0,0,.3);border-radius:10px;font-size:10px;color:#fff;font-weight:bold}.ytomo-dialog.clear-selection-button{background:#dc3545;color:#fff;border:none;border-radius:20px;padding:8px 16px;font-size:14px;font-weight:bold;cursor:pointer;transition:all .2s ease;white-space:nowrap}.ytomo-dialog.clear-selection-button:hover{transform:translateY(-1px);box-shadow:0 4px 8px rgba(0,0,0,.2)}.ytomo-dialog.clear-selection-button:active{transform:translateY(0)}.ytomo-dialog.monitor-button{background:#fd7e14;color:#fff;border:none;border-radius:20px;padding:8px 16px;font-size:14px;font-weight:bold;cursor:pointer;transition:all .2s ease;white-space:nowrap}.ytomo-dialog.monitor-button:hover{transform:translateY(-1px);box-shadow:0 4px 8px rgba(0,0,0,.2)}.ytomo-dialog.monitor-button:active{transform:translateY(0)}.pavilion-name-row{display:flex;align-items:center;gap:8px;margin-bottom:8px}.pavilion-name-row .pavilion-name{flex:1;font-weight:bold;color:#333}.pavilion-select-all-btn{padding:2px 8px;font-size:11px;background-color:#007bff;color:#fff;border:none;border-radius:4px;cursor:pointer;transition:all .2s ease}.pavilion-select-all-btn:hover{background-color:#0056b3;transform:scale(1.05)}.pavilion-select-all-btn:active{transform:scale(0.95)}.ytomo-error-message{position:fixed;top:20px;right:20px;background:#f44;color:#fff;padding:15px;border-radius:5px;box-shadow:0 2px 10px rgba(0,0,0,.3);z-index:1001;max-width:300px;font-size:14px;line-height:1.4}.ytomo-error-message .error-title{font-weight:bold;margin-bottom:5px}.ytomo-error-message .error-close-btn{margin-top:10px;padding:5px 10px;background:hsla(0,0%,100%,.2);border:none;border-radius:3px;color:#fff;cursor:pointer;font-size:12px}.ytomo-error-message .error-close-btn:hover{background:hsla(0,0%,100%,.3)}.ytomo-flex-column-center{display:flex;flex-direction:column;align-items:center}.ytomo-brand-text{font-size:8px;font-weight:bold;margin-top:2px}.ytomo-dialog.overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;z-index:1000;padding:20px;box-sizing:border-box}.ytomo-dialog.container{background:#fff;border-radius:12px;padding:24px;max-width:800px;max-height:80vh;overflow-y:auto;box-shadow:0 10px 40px rgba(0,0,0,.3);width:100%}@media(max-width: 600px){.ytomo-dialog.container{padding-bottom:60px;max-height:85vh}}.ytomo-dialog.header{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;gap:8px}.ytomo-dialog.header .ytomo-dialog.title{flex-grow:1}.ytomo-dialog.title{margin:0;color:#333;font-size:24px;font-weight:bold}.ytomo-dialog.refresh-button{background:#006821;color:#fff;border:none;border-radius:50%;width:40px;height:40px;font-size:16px;cursor:pointer;transition:all .2s ease;display:flex;align-items:center;justify-content:center}.ytomo-dialog.refresh-button:hover{background:#02862b;transform:scale(1.1)}.ytomo-dialog.refresh-button:disabled{background:#ccc;cursor:not-allowed;transform:none}.ytomo-dialog.right-button-group{display:flex;gap:12px;align-items:center}.ytomo-dialog.available-only-toggle{background:#6c757d;color:#fff;border:none;border-radius:20px;padding:8px 16px;font-size:14px;font-weight:bold;cursor:pointer;transition:all .2s ease;white-space:nowrap}.ytomo-dialog.available-only-toggle.active{background:#006821;box-shadow:0 0 0 2px rgba(0,104,33,.3)}.ytomo-dialog.available-only-toggle:hover{transform:translateY(-1px);box-shadow:0 4px 8px rgba(0,0,0,.2)}.ytomo-dialog.available-only-toggle:disabled{background:#ccc;cursor:not-allowed;transform:none;box-shadow:none}.ytomo-dialog.button-group{display:flex;gap:12px;justify-content:space-between;margin-top:24px}.ytomo-dialog.secondary-button{background:#6c757d;color:#fff;border:none;border-radius:20px;padding:8px 16px;font-size:14px;font-weight:bold;cursor:pointer;transition:all .2s ease;white-space:nowrap}.ytomo-dialog.secondary-button:hover{transform:translateY(-1px);box-shadow:0 4px 8px rgba(0,0,0,.2)}.ytomo-dialog.monitor-button{background:#fd7e14;color:#fff;border:none;border-radius:20px;padding:8px 16px;font-size:14px;font-weight:bold;cursor:pointer;transition:all .2s ease;white-space:nowrap}.ytomo-dialog.monitor-button:hover{transform:translateY(-1px);box-shadow:0 4px 8px rgba(0,0,0,.2)}.day-reservation-description{color:#666;line-height:1.6;margin:0 0 20px 0}.pavilion-list{max-height:400px;overflow-y:auto;border:1px solid #ddd;border-radius:4px;margin-bottom:16px}.pavilion-list-empty{padding:20px;text-align:center;color:#666}.pavilion-item{display:flex;justify-content:space-between;align-items:center;padding:12px;border-bottom:1px solid #eee;transition:background-color .2s;cursor:pointer}.pavilion-item:hover{background-color:#f5f5f5}.pavilion-item:last-child{border-bottom:none}.pavilion-item.monitored{background-color:rgba(253,126,20,.1);border-left:4px solid #fd7e14}.pavilion-item.monitored:hover{background-color:rgba(253,126,20,.15)}.pavilion-info{flex:1}.pavilion-info .pavilion-name{font-weight:bold;margin-bottom:4px}.pavilion-info .pavilion-time-slots{font-size:12px;color:#666;display:flex;flex-wrap:wrap;gap:8px;margin-top:8px;max-width:100%}@media(max-width: 600px){.pavilion-info .pavilion-time-slots{gap:6px;margin-top:6px}}.pavilion-info .pavilion-time-slots .pavilion-time-slot{font-size:12px;padding:4px 8px;border-radius:6px;border:1px solid rgba(0,0,0,0);min-width:60px;text-align:center;white-space:nowrap}@media(max-width: 600px){.pavilion-info .pavilion-time-slots .pavilion-time-slot{font-size:11px;padding:3px 6px;min-width:55px}}@media(max-width: 400px){.pavilion-info .pavilion-time-slots .pavilion-time-slot{font-size:10px;padding:2px 4px;min-width:50px}}.pavilion-info .pavilion-time-slots .pavilion-time-slot.clickable{background:rgba(0,0,0,0);border-color:#dee2e6;cursor:pointer;transition:all .2s ease}.pavilion-info .pavilion-time-slots .pavilion-time-slot.clickable:hover:not(.selected){background:#f8f9fa;border-color:#adb5bd;transform:translateY(-1px);box-shadow:0 2px 4px rgba(0,0,0,.1)}.pavilion-info .pavilion-time-slots .pavilion-time-slot.clickable:active{transform:translateY(0);box-shadow:0 1px 2px rgba(0,0,0,.1)}.pavilion-info .pavilion-time-slots .pavilion-time-slot.clickable.selected{background:rgba(0,104,33,.25);border-color:#006821;border-width:2px;color:#006821;font-weight:bold}@media(max-width: 600px){.pavilion-info .pavilion-time-slots .pavilion-time-slot.clickable.selected{background:rgba(0,104,33,.35);border-width:3px}}.pavilion-info .pavilion-time-slots .pavilion-time-slot.clickable.selected:hover{background:rgba(0,104,33,.3)}@media(max-width: 600px){.pavilion-info .pavilion-time-slots .pavilion-time-slot.clickable.selected:hover{background:rgba(0,104,33,.4)}}.pavilion-info .pavilion-time-slots .pavilion-time-slot.clickable.selected:active{background:rgba(0,104,33,.35)}@media(max-width: 600px){.pavilion-info .pavilion-time-slots .pavilion-time-slot.clickable.selected:active{background:rgba(0,104,33,.45)}}.pavilion-info .pavilion-time-slots .pavilion-time-slot.clickable.unavailable{background:rgba(0,0,0,0);border-color:#ffc107;color:#dc6c00}.pavilion-info .pavilion-time-slots .pavilion-time-slot.clickable.unavailable:hover:not(.selected){background:#fff3cd;border-color:#ffb300;transform:translateY(-1px);box-shadow:0 2px 4px rgba(255,193,7,.2)}.pavilion-info .pavilion-time-slots .pavilion-time-slot.clickable.unavailable.selected{background:rgba(255,193,7,.35);border-color:#ffc107;border-width:2px;color:#dc6c00;font-weight:bold}@media(max-width: 600px){.pavilion-info .pavilion-time-slots .pavilion-time-slot.clickable.unavailable.selected{background:rgba(255,193,7,.45);border-width:3px}}.pavilion-info .pavilion-time-slots .pavilion-time-slot.clickable.unavailable.selected:hover{background:rgba(255,193,7,.4)}@media(max-width: 600px){.pavilion-info .pavilion-time-slots .pavilion-time-slot.clickable.unavailable.selected:hover{background:rgba(255,193,7,.5)}}.pavilion-info .pavilion-time-slots .pavilion-time-slot.clickable.unavailable.selected:active{background:rgba(255,193,7,.45)}@media(max-width: 600px){.pavilion-info .pavilion-time-slots .pavilion-time-slot.clickable.unavailable.selected:active{background:rgba(255,193,7,.55)}}.pavilion-button-area{display:flex;gap:8px;align-items:center}.pavilion-button-area .pavilion-reserve-button{padding:8px 16px;background-color:#006821;color:#fff;border:none;border-radius:4px;cursor:pointer;font-size:12px;transition:background-color .2s;white-space:nowrap}.pavilion-button-area .pavilion-reserve-button:hover:not(:disabled){background-color:#02862b}.pavilion-button-area .pavilion-reserve-button:disabled{background:#ccc;color:#666;cursor:not-allowed}.pavilion-button-area .pavilion-monitor-checkbox{margin-right:12px;transform:scale(1.2);accent-color:#fd7e14;flex-shrink:0}.pavilion-button-area .pavilion-no-slots{font-size:12px;color:#999}.ytomo-global-notification-container{position:fixed;top:20px;right:20px;z-index:2000;max-width:400px;width:100%;display:flex;flex-direction:column;gap:10px}@media(max-width: 600px){.ytomo-global-notification-container{top:10px;right:10px;left:10px;max-width:none}}.ytomo-global-notification{background:#fff;border-radius:8px;padding:16px;box-shadow:0 4px 12px rgba(0,0,0,.15);border-left:4px solid #ccc;display:flex;align-items:center;gap:12px;font-size:14px;font-weight:500;transform:translateX(100%);opacity:0;transition:all .3s ease}.ytomo-global-notification.show{transform:translateX(0);opacity:1}.ytomo-global-notification.hide{transform:translateX(100%);opacity:0}.ytomo-global-notification .notification-message{flex:1;line-height:1.4}.ytomo-global-notification .notification-close{background:none;border:none;font-size:18px;font-weight:bold;cursor:pointer;padding:0;width:20px;height:20px;display:flex;align-items:center;justify-content:center;opacity:.7;transition:opacity .2s ease}.ytomo-global-notification .notification-close:hover{opacity:1}.ytomo-global-notification.success{background-color:#d4edda;color:#155724;border-left-color:#28a745}.ytomo-global-notification.success .notification-close{color:#155724}.ytomo-global-notification.error{background-color:#f8d7da;color:#721c24;border-left-color:#dc3545}.ytomo-global-notification.error .notification-close{color:#721c24}.ytomo-global-notification.warning{background-color:#fff3cd;color:#856404;border-left-color:#ffc107}.ytomo-global-notification.warning .notification-close{color:#856404}.ytomo-global-notification.info{background-color:#d1ecf1;color:#0c5460;border-left-color:#17a2b8}.ytomo-global-notification.info .notification-close{color:#0c5460}.ytomo-processing-overlay{position:fixed;top:0;left:0;right:0;bottom:0;width:100vw;height:100vh;background:rgba(0,0,0,.3);z-index:9000;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(1px);transition:all .3s ease;pointer-events:auto}.ytomo-processing-overlay.z-normal{z-index:9000}.ytomo-processing-overlay.z-below-fab{z-index:8999}.ytomo-processing-overlay.hidden{opacity:0;visibility:hidden;pointer-events:none}.ytomo-processing-overlay.visible{opacity:1;visibility:visible;pointer-events:auto}.ytomo-processing-overlay .processing-message-area{background:hsla(0,0%,100%,.95);border-radius:12px;padding:24px 32px;text-align:center;box-shadow:0 8px 32px rgba(0,0,0,.3);border:2px solid rgba(255,140,0,.3);max-width:400px;margin:20px}@media(max-width: 768px){.ytomo-processing-overlay .processing-message-area{padding:20px 24px;margin:16px;max-width:90vw}}.ytomo-processing-overlay .processing-message-text{font-size:20px;font-weight:bold;color:#333;margin-bottom:8px;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}@media(max-width: 768px){.ytomo-processing-overlay .processing-message-text{font-size:18px;margin-bottom:6px}}.ytomo-processing-overlay .processing-target-text{font-size:16px;font-weight:600;color:#333;margin-bottom:12px;white-space:pre-line;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;text-align:center}@media(max-width: 768px){.ytomo-processing-overlay .processing-target-text{font-size:14px;margin-bottom:10px}}.ytomo-processing-overlay .processing-countdown-text{font-size:18px;font-weight:bold;color:#e67e00;margin-bottom:12px;font-family:"SF Mono","Monaco","Consolas",monospace;text-align:center;text-shadow:0 1px 2px rgba(0,0,0,.1)}@media(max-width: 768px){.ytomo-processing-overlay .processing-countdown-text{font-size:16px;margin-bottom:10px}}.ytomo-processing-overlay .processing-countdown-text.countdown-warning{color:#dc3545;animation:countdownPulse 1s ease-in-out infinite;text-shadow:0 0 8px rgba(220,53,69,.4)}.ytomo-processing-overlay .processing-warning-text{font-size:14px;color:#666;margin-bottom:16px;line-height:1.4;transition:all .3s ease}@media(max-width: 768px){.ytomo-processing-overlay .processing-warning-text{font-size:13px;margin-bottom:14px}}.ytomo-processing-overlay .processing-warning-text.warning-flash{color:#dc3545;font-weight:bold;transform:scale(1.05);animation:flash .5s ease-in-out 2}.ytomo-processing-overlay .notification-toggle-btn{display:flex;align-items:center;justify-content:center;width:40px;height:40px;border:none;border-radius:50%;cursor:pointer;transition:all .2s ease;margin-bottom:16px;box-shadow:0 2px 6px rgba(0,0,0,.15);font-size:20px;line-height:1}@media(max-width: 768px){.ytomo-processing-overlay .notification-toggle-btn{width:36px;height:36px;margin-bottom:14px;font-size:18px}}.ytomo-processing-overlay .notification-toggle-btn:hover{transform:scale(1.05);box-shadow:0 4px 10px rgba(0,0,0,.2)}.ytomo-processing-overlay .notification-toggle-btn:active{transform:scale(0.95)}.ytomo-processing-overlay .notification-toggle-btn.enabled{background:#4caf50;color:#fff}.ytomo-processing-overlay .notification-toggle-btn.enabled:hover{background:#45a049}.ytomo-processing-overlay .notification-toggle-btn.muted{background:#f44336;color:#fff}.ytomo-processing-overlay .notification-toggle-btn.muted:hover{background:#e53935}.ytomo-processing-overlay .processing-cancel-area{font-size:12px;color:#888;font-style:italic}@media(max-width: 768px){.ytomo-processing-overlay .processing-cancel-area{font-size:11px}}@keyframes flash{0%,100%{opacity:1}50%{opacity:.7}}@keyframes countdownPulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.8;transform:scale(1.05)}}.ytomo-processing-overlay.efficiency-mode .processing-message-area{border-color:rgba(255,140,0,.5);background:linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(255, 248, 220, 0.95))}.ytomo-processing-overlay.efficiency-mode .processing-message-text{color:#e67e00}.ytomo-processing-overlay.monitoring-mode .processing-message-area{border-color:rgba(0,104,33,.5);background:linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(240, 255, 240, 0.95))}.ytomo-processing-overlay.monitoring-mode .processing-message-text{color:#004d1a}@media(prefers-reduced-motion: reduce){.ytomo-processing-overlay{transition:none}.ytomo-processing-overlay .processing-warning-text.warning-flash{animation:none;transform:none}}.ytomo-dialog.overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.7);z-index:1000;display:flex;align-items:center;justify-content:center;padding:20px;box-sizing:border-box}.ytomo-dialog.container.debug-dialog{background:#fff;border-radius:12px;padding:0;max-width:90%;max-height:85%;min-width:600px;box-shadow:0 8px 32px rgba(0,0,0,.3);display:flex;flex-direction:column;overflow:hidden}@media(max-width: 768px){.ytomo-dialog.container.debug-dialog{min-width:auto;max-width:95%;max-height:90%}}.ytomo-dialog.header{display:flex;align-items:center;justify-content:space-between;padding:20px 24px;border-bottom:1px solid #e0e0e0;background:#f8f9fa;border-radius:12px 12px 0 0}.ytomo-dialog.title{margin:0;font-size:20px;color:#333;font-weight:600}.ytomo-dialog.close-button{background:none;border:none;font-size:24px;cursor:pointer;color:#666;padding:5px;border-radius:4px}.ytomo-dialog.close-button:hover{background:rgba(0,0,0,.1)}.debug-content{padding:24px;overflow-y:auto;flex:1}.debug-section{margin-bottom:32px}.debug-section:last-child{margin-bottom:0}.debug-section h3{margin:0 0 12px 0;font-size:18px;color:#333;font-weight:600}.debug-section p{margin:0 0 16px 0;color:#666;line-height:1.5}.debug-input-group{display:flex;align-items:center;gap:12px;margin-bottom:20px;flex-wrap:wrap}.debug-input-group label{font-weight:500;color:#333;min-width:120px}.debug-input-group input{flex:1;min-width:200px;padding:10px 12px;border:2px solid #e0e0e0;border-radius:6px;font-size:14px;transition:border-color .2s ease}.debug-input-group input:focus{outline:none;border-color:#007bff}.debug-input-group input::placeholder{color:#999}.debug-input-group button{background:#007bff;color:#fff;border:none;padding:10px 20px;border-radius:6px;font-size:14px;font-weight:500;cursor:pointer;transition:background-color .2s ease;white-space:nowrap}.debug-input-group button:hover:not(:disabled){background:#0056b3}.debug-input-group button:disabled{background:#6c757d;cursor:not-allowed}.debug-results-area h4{margin:0 0 12px 0;font-size:16px;color:#333;font-weight:600}.debug-results-display{background:#f8f9fa;border:1px solid #e0e0e0;border-radius:6px;padding:16px;font-family:"Courier New",Monaco,monospace;font-size:12px;line-height:1.4;max-height:300px;overflow-y:auto;white-space:pre-wrap;word-wrap:break-word;color:#333}.debug-results-display .json-key{color:#d73a49;font-weight:bold}.debug-results-display .json-string{color:#032f62}.debug-results-display .json-number{color:#005cc5}.debug-results-display .json-boolean{color:#e36209}.debug-results-display .json-null{color:#6f42c1}@media(max-width: 768px){.debug-input-group{flex-direction:column;align-items:stretch}.debug-input-group label{min-width:auto}.debug-input-group input{min-width:auto}.debug-input-group button{align-self:flex-start}.ytomo-dialog.container.debug-dialog{min-width:auto}.debug-content{padding:16px}}.ytomo-dialog.overlay{animation:fadeIn .2s ease-out}.ytomo-dialog.container.debug-dialog{animation:slideIn .3s ease-out}@keyframes fadeIn{from{opacity:0}to{opacity:1}}@keyframes slideIn{from{opacity:0;transform:translateY(-20px) scale(0.95)}to{opacity:1;transform:translateY(0) scale(1)}}.ytomo-processing-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background-color:rgba(0,0,0,.3);display:flex;align-items:center;justify-content:center;z-index:1001;pointer-events:auto;overflow-y:auto}.ytomo-processing-content{background:hsla(0,0%,100%,.7);border-radius:12px;padding:30px;text-align:center;box-shadow:0 10px 40px rgba(0,0,0,.2);min-width:200px;pointer-events:auto;backdrop-filter:blur(1px)}.ytomo-processing-spinner{width:40px;height:40px;border:3px solid #e2e8f0;border-top-color:#2c5aa0;border-radius:50%;animation:spin 1s linear infinite;margin:0 auto 16px}.ytomo-processing-message{color:#374151;font-size:14px;font-weight:500}@keyframes spin{to{transform:rotate(360deg)}}.ytomo-input{flex:1;padding:8px 12px;border:1px solid #d1d5db;border-radius:6px;font-size:14px;transition:border-color .2s}.ytomo-input:focus{outline:none;border-color:#2c5aa0;box-shadow:0 0 0 3px rgba(44,90,160,.1)}.ytomo-input::placeholder{color:#9ca3af}.ytomo-button{padding:8px 16px;border:none;border-radius:6px;font-size:14px;font-weight:500;cursor:pointer;transition:all .2s;display:inline-flex;align-items:center;justify-content:center;white-space:nowrap}.ytomo-button.primary{background:linear-gradient(135deg, #2c5aa0 0%, #1a365d 100%);color:#fff}.ytomo-button.primary:hover{background:linear-gradient(135deg, #1a365d 0%, #2c5aa0 100%);transform:translateY(-1px);box-shadow:0 4px 12px rgba(44,90,160,.3)}.ytomo-button.primary:active{transform:translateY(0)}.ytomo-button.retry-button{background:linear-gradient(135deg, #f59e0b 0%, #d97706 100%);color:#fff;margin-top:12px}.ytomo-button.retry-button:hover{background:linear-gradient(135deg, #d97706 0%, #f59e0b 100%)}.ytomo-button:focus{outline:2px solid #2c5aa0;outline-offset:2px}.ytomo-button:disabled{opacity:.5;cursor:not-allowed;transform:none !important}@media(prefers-reduced-motion: reduce){.ytomo-button,.ytomo-input{animation:none;transition:none}}@media(prefers-contrast: high){.ytomo-button:focus,.ytomo-input:focus{outline:3px solid #000}}.ytomo-loading-container{width:100%;max-width:800px;margin:20px auto;padding:20px;display:flex;align-items:center;justify-content:center;min-height:400px}.ytomo-loading-content{text-align:center;display:flex;flex-direction:column;align-items:center;gap:20px}.ytomo-loading-spinner{width:40px;height:40px;border:3px solid #f3f4f6;border-top:3px solid #2c5aa0;border-radius:50%;animation:spin 1s linear infinite}.ytomo-loading-text{font-size:16px;color:#6b7280;font-weight:500}@keyframes spin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}#ytomo-page-dialog-container .ytomo-dialog-overlay{position:relative !important;background:rgba(0,0,0,0) !important;width:100% !important;height:auto !important;display:block !important;max-width:800px;margin:20px auto;padding:20px;z-index:auto !important}#ytomo-page-dialog-container .ytomo-main-dialog{position:relative !important;transform:none !important;margin:0 !important;box-shadow:0 10px 40px rgba(0,0,0,.1) !important;border:1px solid #e2e8f0 !important;min-width:auto !important;width:100% !important;max-width:none !important;z-index:auto !important}#ytomo-page-dialog-container *{z-index:auto !important}table[class*=style_main__timetable__] td[data-gray-out] div[role=button][data-disabled=true]{pointer-events:auto !important;cursor:pointer !important}#ot-sdk-btn-floating{display:none !important}header{z-index:10000 !important}.ytomo-main-fab{position:fixed;bottom:80px;right:20px;width:56px;height:56px;border-radius:50%;background-color:#ff6b35;color:#fff;border:none;font-size:16px;font-weight:bold;cursor:pointer;box-shadow:0 2px 10px rgba(0,0,0,.3);transition:all .2s ease;z-index:999}.ytomo-main-fab:hover{transform:scale(1.1);box-shadow:0 4px 15px rgba(0,0,0,.4)}.ytomo-main-fab:disabled{opacity:.5;cursor:not-allowed;transform:none;box-shadow:0 2px 10px rgba(0,0,0,.3)}.ytomo-main-fab:focus{outline:none}.ytomo-dialog-overlay~.ytomo-main-fab{display:none}.ytomo-dialog-overlay *:focus{outline:none !important;box-shadow:none !important}.ytomo-pavilion-search-input:focus{outline:none !important;border:1px solid #2c5aa0 !important;box-shadow:none !important}.ytomo-reservation-result{position:fixed;bottom:80px;right:90px;min-width:180px;padding:12px 16px;border-radius:8px;color:#fff;font-size:12px;font-weight:500;z-index:9001;box-shadow:0 4px 12px rgba(0,0,0,.3);animation:slideIn .3s ease-out}.ytomo-reservation-result.success{background-color:#10b981}.ytomo-reservation-result.failed{background-color:#ef4444}.ytomo-reservation-result .ytomo-result-status{font-weight:700;font-size:14px;margin-bottom:6px;text-shadow:0 1px 2px rgba(0,0,0,.2)}.ytomo-reservation-result .ytomo-result-pavilion{font-weight:500;font-size:11px;margin-bottom:4px;text-shadow:0 1px 1px rgba(0,0,0,.1);opacity:.9}.ytomo-reservation-result .ytomo-result-time{font-size:15px;font-weight:600;opacity:1;text-shadow:0 1px 2px rgba(0,0,0,.15)}@keyframes slideIn{from{opacity:0;transform:translateX(20px)}to{opacity:1;transform:translateX(0)}}`, ""]);
+___CSS_LOADER_EXPORT___.push([module.id, `#ytomo-status-badge.countdown-warning{background:rgba(255,0,0,.9)}.ytomo-efficiency-toggle{width:45px;height:32px;border-radius:16px;color:#fff;border:none;font-size:10px;font-weight:bold;cursor:pointer;transition:all .2s ease;box-shadow:0 2px 8px rgba(0,0,0,.3);display:flex;align-items:center;justify-content:center;pointer-events:auto;margin-bottom:8px}.ytomo-efficiency-toggle.efficiency-enabled{background:rgba(255,140,0,.9)}.ytomo-efficiency-toggle.efficiency-disabled{background:rgba(128,128,128,.9)}.ytomo-efficiency-toggle:hover{transform:scale(1.1);box-shadow:0 4px 12px rgba(0,0,0,.4)}.ytomo-efficiency-toggle:active{transform:scale(0.95)}button.ext-ytomo{height:40px;width:auto;min-width:60px;padding:0px 8px;background:#006821;color:#fff}button.ext-ytomo.no-after:after{background:rgba(0,0,0,0) none repeat 0 0/auto auto padding-box border-box scroll}button.ext-ytomo.btn-done{background:#4a4c4a}button.ext-ytomo:hover{background:#02862b}.fab-sub-btn{color:#fff;border:none;border-radius:20px;padding:8px 16px;font-size:12px;white-space:nowrap;transition:all .2s ease}.fab-sub-btn.btn-enabled{background:#006821;cursor:pointer;opacity:1}.fab-sub-btn.btn-enabled:hover{background:#02862b;transform:scale(1.05)}.fab-sub-btn.btn-enabled.btn-done{background:#4a4c4a}.fab-sub-btn.btn-enabled.btn-done:hover{background:#606260}.fab-sub-btn.btn-disabled,.fab-sub-btn.btn-loading{background:gray;cursor:not-allowed;opacity:.6}.fab-sub-btn.btn-disabled:hover,.fab-sub-btn.btn-loading:hover{background:gray;transform:scale(1)}.fab-sub-btn:disabled{background:gray !important;cursor:not-allowed !important;opacity:.6 !important}.fab-sub-btn:disabled:hover{background:gray !important;transform:scale(1) !important}button.ext-ytomo.pavilion-sub-btn.btn-disabled,button.ext-ytomo.pavilion-sub-btn.btn-loading{background:gray;cursor:not-allowed;opacity:.6}button.ext-ytomo.pavilion-sub-btn.btn-disabled:hover,button.ext-ytomo.pavilion-sub-btn.btn-loading:hover{background:gray;transform:scale(1)}.safe-none,.ytomo-none,.filter-none{display:none}.fab-sub-btn span.button-count{font-family:"Courier New","Monaco",monospace;font-weight:bold;color:#ffeb3b;vertical-align:baseline}button.ext-ytomo.pavilion-sub-btn.ytomo-date-button.date-selected{border:2px solid #4caf50;box-shadow:0 0 8px rgba(76,175,80,.6)}div.div-flex{display:flex;justify-content:center;margin:5px}div.div-flex input.ext-tomo.search{flex:1;padding:8px 12px;border:1px solid #ddd;border-radius:4px;font-size:14px;margin-right:8px}div.div-flex input.ext-tomo.search:focus{outline:none;border-color:#006821;box-shadow:0 0 0 2px rgba(0,104,33,.2)}div.div-flex button.btn-filter-without-load{height:auto;min-height:40px;width:auto;min-width:60px;padding:0px 8px;color:#fff;margin:5px;background:#006821;border:none;border-radius:4px;cursor:pointer;font-size:14px}div.div-flex button.btn-filter-without-load:hover{background:#02862b}div.div-flex button.btn-filter-without-load:active{background:#005417}div.div-flex button.btn-filter-without-load:disabled{background:gray;cursor:not-allowed}.js-show{display:block}.js-hide{display:none}.js-visible{visibility:visible}.js-invisible{visibility:hidden}.js-enabled{pointer-events:auto;opacity:1}.js-disabled{pointer-events:none;opacity:.6}.js-green{background:#228b22;color:#fff}.js-red{background:#dc3545;color:#fff}.js-gray{background:gray;color:#fff}.btn-success-highlight{background:#00c800;color:#fff}.status-bg-green{background:rgba(0,128,0,.9)}.status-bg-red{background:rgba(255,0,0,.9)}.status-bg-orange{background:rgba(255,140,0,.9)}.status-bg-blue{background:rgba(0,104,33,.9)}.status-bg-default{background:rgba(0,0,0,.8)}#ytomo-status-badge{background:linear-gradient(135deg, rgba(0, 0, 0, 0.9), rgba(40, 40, 40, 0.9));color:#fff;padding:8px 16px;border-radius:20px;font-size:12px;font-weight:bold;white-space:pre-line;box-shadow:0 4px 12px rgba(0,0,0,.3),0 2px 6px rgba(0,0,0,.2);border:2px solid hsla(0,0%,100%,.15);pointer-events:none}#ytomo-status-badge.ytomo-status-waiting{background:linear-gradient(135deg, rgba(0, 0, 0, 0.9), rgba(40, 40, 40, 0.9))}#ytomo-status-badge.ytomo-status-reservation{background:linear-gradient(135deg, rgba(255, 140, 0, 0.9), rgba(255, 165, 0, 0.9))}#ytomo-status-badge.ytomo-status-reservation.ytomo-status-countdown-warning{background:linear-gradient(135deg, rgba(255, 0, 0, 0.9), rgba(220, 53, 69, 0.9))}#ytomo-status-badge.ytomo-status-cooldown{background:linear-gradient(135deg, rgba(255, 107, 53, 0.9), rgba(255, 140, 0, 0.9))}.ytomo-header li.fab-toggle-li{display:inline-block;margin-right:8px}.ytomo-header li.fab-toggle-li button.fab-toggle-button{background:none;border:none;cursor:pointer;padding:0;color:#fff;transition:all .2s ease;display:flex;align-items:center;justify-content:center}.ytomo-header li.fab-toggle-li button.fab-toggle-button:hover{color:#ddd}.ytomo-header li.fab-toggle-li button.fab-toggle-button figure.fab-toggle-figure{width:auto;height:24px;display:flex;align-items:center;justify-content:center;padding:0 4px}.ytomo-pavilion-fab button.ytomo-fab{position:relative}.ytomo-pavilion-fab button.ytomo-fab:hover{transform:scale(1.15);box-shadow:0 8px 25px rgba(0,0,0,.5),0 4px 12px rgba(0,0,0,.3);border-width:4px}.ytomo-pavilion-fab .ytomo-fab-inner-content .pavilion-fab-expand-icon{font-size:8px;line-height:1;margin-bottom:1px;opacity:.8}.ytomo-pavilion-fab .ytomo-fab-inner-content .pavilion-fab-brand-text{font-size:7px;font-weight:normal;line-height:1;margin-bottom:2px;opacity:.7}.ytomo-pavilion-fab .ytomo-fab-inner-content .pavilion-fab-counts-text{font-size:12px;font-weight:bold;line-height:1}.ytomo-pavilion-fab .pavilion-sub-actions-container{display:none;flex-direction:column;gap:8px;align-items:flex-end;margin-bottom:8px}.ytomo-pavilion-fab .pavilion-sub-actions-container.expanded{display:flex}.ytomo-pavilion-fab .pavilion-sub-actions-container button.pavilion-sub-btn.base-style{color:#fff;border:none;border-radius:20px;padding:8px 16px;font-size:12px;white-space:nowrap;box-shadow:0 2px 8px rgba(0,0,0,.3);transition:all .2s ease}.ytomo-companion-dialog{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;z-index:8999;padding:20px;box-sizing:border-box}.ytomo-companion-dialog .dialog-content{background:#fff;border-radius:12px;padding:24px;width:100%;max-width:500px;max-height:90vh;overflow-y:auto;box-shadow:0 10px 40px rgba(0,0,0,.3)}@media(max-width: 768px){.ytomo-companion-dialog .dialog-content{max-width:95vw;max-height:85vh;padding:16px;border-radius:8px}}.ytomo-companion-dialog .dialog-content .input-row{display:flex;gap:8px;margin-bottom:12px}@media(max-width: 480px){.ytomo-companion-dialog .dialog-content .input-row{flex-direction:column;gap:12px}}.ytomo-companion-dialog .dialog-content .input-row input{padding:12px 8px;border:1px solid #ddd;border-radius:4px;font-size:16px}.ytomo-companion-dialog .dialog-content .input-row input:focus{outline:none;border-color:#4caf50;box-shadow:0 0 0 2px rgba(76,175,80,.2)}.ytomo-companion-dialog .dialog-content .input-row button{padding:12px 16px;background:#4caf50;color:#fff;border:none;border-radius:4px;cursor:pointer;font-size:14px;white-space:nowrap;min-width:60px}.ytomo-companion-dialog .dialog-content .input-row button:hover{background:#45a049}.ytomo-companion-dialog .dialog-content .input-row button:active{background:#3d8b40}.ytomo-abort-button{position:fixed;bottom:100px;right:24px;z-index:9001;background:#f44336;color:#fff;border:none;border-radius:50%;width:64px;height:64px;font-size:12px;font-weight:bold;cursor:pointer;box-shadow:0 4px 12px rgba(244,67,54,.4);transition:all .3s ease;display:flex;align-items:center;justify-content:center}.ytomo-abort-button:hover{transform:scale(1.1);box-shadow:0 6px 20px rgba(244,67,54,.6)}.ytomo-abort-button:active{transform:scale(0.95)}.copy-ticket-btn{margin-left:8px;padding:6px;background:#f0f0f0;border:1px solid #ddd;border-radius:4px;cursor:pointer;display:flex;align-items:center;justify-content:center;min-width:32px;height:32px;transition:all .3s ease}.copy-ticket-btn:hover{background:#e0e0e0;border-color:#ccc}.copy-ticket-btn:active{transform:scale(0.95)}.copy-ticket-btn svg{color:#666;transition:all .3s ease}.copy-ticket-btn.copy-success{background:rgba(76,175,80,.1);border-color:#4caf50}.copy-ticket-btn.copy-success svg{color:#4caf50}.dialog-btn{padding:8px 16px;border:none;border-radius:4px;cursor:pointer;font-size:14px;font-weight:bold;transition:all .2s ease}.dialog-btn.btn-cancel{background:#666;color:#fff}.dialog-btn.btn-cancel:hover{background:#555}.dialog-btn.btn-delete{background:#f44336;color:#fff}.dialog-btn.btn-delete:hover{background:#d32f2f}.dialog-btn.btn-execute{background:#2196f3;color:#fff}.dialog-btn.btn-execute:hover{background:#1976d2}.dialog-btn.btn-execute.btn-disabled{background:#ccc;color:#666;cursor:not-allowed}.dialog-btn.btn-execute.btn-disabled:hover{background:#ccc}.ticket-row{display:flex;align-items:center;padding:8px;border-bottom:1px solid #eee;transition:background-color .2s ease;cursor:pointer}.ticket-row:last-child{border-bottom:none}.ticket-row.already-added{position:relative;opacity:.6;background:repeating-linear-gradient(45deg, transparent, transparent 8px, rgba(255, 140, 0, 0.1) 8px, rgba(255, 140, 0, 0.1) 16px)}.ticket-row.already-added::after{content:"追加済み";position:absolute;top:4px;right:40px;background:rgba(255,140,0,.9);color:#fff;font-size:10px;font-weight:bold;padding:2px 6px;border-radius:3px;pointer-events:none}.ticket-row.already-added input[type=checkbox]{opacity:.5;cursor:not-allowed}.ticket-row.already-added .copy-ticket-btn{opacity:1;background:#f8f8f8;border-color:#bbb}.ticket-row.already-added .copy-ticket-btn:hover{background:#e8e8e8;border-color:#999}.ytomo-fab{width:56px;height:56px;border-radius:50%;color:#fff;border:none;box-shadow:0 6px 20px rgba(0,0,0,.4),0 2px 8px rgba(0,0,0,.2);border:3px solid hsla(0,0%,100%,.2);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:bold;transition:all .3s ease;position:relative;overflow:hidden;pointer-events:auto}.ytomo-fab-enabled{background:#ff8c00;opacity:.9;cursor:pointer;pointer-events:auto}.ytomo-fab-disabled{background:gray;opacity:.6;cursor:not-allowed;pointer-events:none}.ytomo-fab-running{background:#dc3545;opacity:.9;cursor:pointer;pointer-events:auto}.ytomo-fab.state-idle{background:gray;opacity:.6;cursor:not-allowed;pointer-events:none}.ytomo-fab.pointer-events-none{pointer-events:none}.ytomo-fab.pointer-events-auto{pointer-events:auto}.ytomo-fab.state-enabled{background:#ff8c00;opacity:.9;cursor:pointer;pointer-events:auto}.ytomo-fab.state-running{background:#dc3545;opacity:.9;cursor:pointer;pointer-events:auto}.ytomo-fab.state-reservation{background:#ff8c00;opacity:.9;cursor:pointer;pointer-events:auto}.ytomo-fab:hover{transform:scale(1.15);box-shadow:0 8px 25px rgba(0,0,0,.5),0 4px 12px rgba(0,0,0,.3)}.ytomo-fab.reservation-enabled{background:#006821;opacity:.9;cursor:pointer}.ytomo-fab.reservation-disabled{background:gray;opacity:.9;cursor:not-allowed}.ytomo-fab.cooldown-warning{background:#ff6b35}.ytomo-fab.cooldown-normal{background:#007bff}.ytomo-fab-container{position:fixed;bottom:100px;right:24px;z-index:9001;display:flex;flex-direction:column;align-items:flex-end;gap:12px;pointer-events:auto}.ytomo-fab-container.z-normal{z-index:1000}.ytomo-fab-container.z-above-overlay{z-index:9001}.ytomo-fab-container.visible{display:flex}.ytomo-fab-container.hidden{display:none}.ytomo-fab-content{position:relative;display:flex;flex-direction:column-reverse;align-items:center;gap:8px;opacity:0;transform:scale(0.8) translateY(10px);transition:all .3s cubic-bezier(0.175, 0.885, 0.32, 1.275);pointer-events:none}.ytomo-fab-content.expanded{opacity:1;transform:scale(1) translateY(0);pointer-events:auto}.ytomo-sub-fab{width:45px;height:32px;border-radius:16px;background:rgba(0,104,33,.9);color:#fff;border:none;font-size:11px;font-weight:bold;cursor:pointer;transition:all .2s ease;box-shadow:0 2px 8px rgba(0,0,0,.3);display:flex;align-items:center;justify-content:center;pointer-events:auto}.ytomo-sub-fab:hover{background:rgba(2,134,43,.9);transform:scale(1.1);box-shadow:0 4px 12px rgba(0,0,0,.4)}.ytomo-sub-fab:active{transform:scale(0.95)}.ytomo-pavilion-fab-container{position:fixed;bottom:100px;right:24px;z-index:9001;display:flex;flex-direction:column;gap:12px;align-items:flex-end;pointer-events:auto}.ytomo-ticket-selection-fab-container{position:fixed;bottom:100px;right:24px;z-index:9001;display:flex;flex-direction:column;gap:12px;align-items:flex-end;pointer-events:auto}.ytomo-ticket-selection-fab-container.z-normal{z-index:1000}.ytomo-ticket-selection-fab-container.z-above-overlay{z-index:9001}.ytomo-ticket-selection-fab-container #ytomo-companion-sub-buttons{display:flex;flex-direction:column;gap:8px;align-items:flex-end;transition:all .3s ease}.ytomo-fab-inner-content{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;pointer-events:none}.ytomo-reservation-target-display{background:linear-gradient(135deg, rgba(0, 123, 255, 0.95), rgba(0, 86, 179, 0.95));color:#fff;padding:8px 12px;border-radius:12px;font-size:12px;font-weight:bold;text-align:center;box-shadow:0 3px 10px rgba(0,0,0,.3);border:2px solid hsla(0,0%,100%,.3);min-width:80px;max-width:120px;white-space:pre-line;overflow:visible;text-overflow:clip;transition:all .3s ease;pointer-events:auto;cursor:pointer}.ytomo-reservation-target-display:hover{transform:scale(1.05);box-shadow:0 4px 14px rgba(0,0,0,.4)}.ytomo-reservation-target-display.hidden{display:none}.ytomo-reservation-target-display.visible{display:block}input.ext-tomo.search{height:50px;min-width:200px;max-width:min(300px,100%);font-family:quicksand;font-size:16px;-webkit-appearance:textfield;-moz-appearance:textfield;appearance:textfield;border:1px solid #222426;border-radius:25px;box-shadow:0 1px 0 0 #ccc;padding:0 0 0 10px;flex:1 1}.day-reservation-info-area{position:relative;min-height:50px}.day-reservation-description{margin:10px 0;color:#666;font-size:14px;line-height:1.5;text-align:center}.day-reservation-description.hidden{display:none}.day-reservation-notification{margin:10px 0}.day-reservation-notification.hidden{display:none}.day-reservation-notification .notification-content{padding:12px 16px;border-radius:8px;font-size:14px;font-weight:500;display:flex;align-items:center;justify-content:space-between;min-height:24px;position:relative}.day-reservation-notification .notification-content .notification-message{flex:1;margin-left:8px;margin-right:8px}.day-reservation-notification .notification-content .notification-close{background:none;border:none;font-size:18px;font-weight:bold;cursor:pointer;padding:0;width:20px;height:20px;display:flex;align-items:center;justify-content:center;opacity:.7;transition:opacity .2s ease}.day-reservation-notification .notification-content .notification-close:hover{opacity:1}.day-reservation-notification .notification-content.success{background-color:#d4edda;color:#155724;border:1px solid #c3e6cb}.day-reservation-notification .notification-content.success .notification-close{color:#155724}.day-reservation-notification .notification-content.error{background-color:#f8d7da;color:#721c24;border:1px solid #f5c6cb}.day-reservation-notification .notification-content.error .notification-close{color:#721c24}.day-reservation-notification .notification-content.warning{background-color:#fff3cd;color:#856404;border:1px solid #ffeaa7}.day-reservation-notification .notification-content.warning .notification-close{color:#856404}.day-reservation-notification .notification-content.info{background-color:#d1ecf1;color:#0c5460;border:1px solid #bee5eb}.day-reservation-notification .notification-content.info .notification-close{color:#0c5460}.ytomo-icon.expand-icon{font-size:8px;line-height:1;color:#fff;font-weight:bold;text-align:center;pointer-events:none}.ytomo-icon.countdown-text{font-size:6px;line-height:1;color:#fff;font-weight:bold;text-align:center;margin-top:1px;pointer-events:none}.ytomo-toggle.toggle-li{position:fixed;bottom:10px;left:10px;z-index:1000;list-style:none;margin:0;padding:0}.ytomo-toggle.toggle-button{width:50px;height:30px;background:rgba(255,140,0,.8);border:none;border-radius:15px;cursor:pointer;transition:all .3s ease;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:bold;position:relative;overflow:hidden}.ytomo-toggle.toggle-button.enabled{color:#fff}.ytomo-toggle.toggle-button.disabled{color:#ddd}.ytomo-toggle.toggle-figure{width:100%;height:100%;margin:0;padding:0;border:none;background:rgba(0,0,0,0);pointer-events:none}.ytomo-dialog.overlay{position:fixed;top:0;left:0;width:100%;height:100%;background-color:rgba(0,0,0,.5);z-index:1000;display:flex;justify-content:center;align-items:center}.ytomo-dialog.container{background:#fff;border-radius:8px;padding:20px;max-width:400px;width:90%;max-height:70vh;overflow-y:auto;box-shadow:0 4px 12px rgba(0,0,0,.3)}.ytomo-dialog.container.day-reservation{max-width:600px;max-height:80vh}.ytomo-dialog.title{margin:0 0 16px 0;color:#333;font-size:18px;font-weight:bold}.ytomo-dialog.button-group{display:flex;justify-content:flex-end;gap:10px;margin-top:20px}.ytomo-dialog.primary-button{background:#006821;color:#fff;border:none;padding:10px 20px;border-radius:4px;cursor:pointer;font-size:14px}.ytomo-dialog.primary-button:hover{background:#02862b}.ytomo-dialog.primary-button:disabled{background:gray;cursor:not-allowed}.ytomo-dialog.secondary-button{background:rgba(0,0,0,0);color:#666;border:1px solid #ccc;padding:10px 20px;border-radius:4px;cursor:pointer;font-size:14px}.ytomo-dialog.secondary-button:hover{background:#f5f5f5}.ytomo-progress.counter{display:inline-block;margin-left:8px;padding:2px 6px;background:rgba(0,0,0,.3);border-radius:10px;font-size:10px;color:#fff;font-weight:bold}.ytomo-dialog.clear-selection-button{background:#dc3545;color:#fff;border:none;border-radius:20px;padding:8px 16px;font-size:14px;font-weight:bold;cursor:pointer;transition:all .2s ease;white-space:nowrap}.ytomo-dialog.clear-selection-button:hover{transform:translateY(-1px);box-shadow:0 4px 8px rgba(0,0,0,.2)}.ytomo-dialog.clear-selection-button:active{transform:translateY(0)}.ytomo-dialog.monitor-button{background:#fd7e14;color:#fff;border:none;border-radius:20px;padding:8px 16px;font-size:14px;font-weight:bold;cursor:pointer;transition:all .2s ease;white-space:nowrap}.ytomo-dialog.monitor-button:hover{transform:translateY(-1px);box-shadow:0 4px 8px rgba(0,0,0,.2)}.ytomo-dialog.monitor-button:active{transform:translateY(0)}.pavilion-name-row{display:flex;align-items:center;gap:8px;margin-bottom:8px}.pavilion-name-row .pavilion-name{flex:1;font-weight:bold;color:#333}.pavilion-select-all-btn{padding:2px 8px;font-size:11px;background-color:#007bff;color:#fff;border:none;border-radius:4px;cursor:pointer;transition:all .2s ease}.pavilion-select-all-btn:hover{background-color:#0056b3;transform:scale(1.05)}.pavilion-select-all-btn:active{transform:scale(0.95)}.ytomo-error-message{position:fixed;top:20px;right:20px;background:#f44;color:#fff;padding:15px;border-radius:5px;box-shadow:0 2px 10px rgba(0,0,0,.3);z-index:1001;max-width:300px;font-size:14px;line-height:1.4}.ytomo-error-message .error-title{font-weight:bold;margin-bottom:5px}.ytomo-error-message .error-close-btn{margin-top:10px;padding:5px 10px;background:hsla(0,0%,100%,.2);border:none;border-radius:3px;color:#fff;cursor:pointer;font-size:12px}.ytomo-error-message .error-close-btn:hover{background:hsla(0,0%,100%,.3)}.ytomo-flex-column-center{display:flex;flex-direction:column;align-items:center}.ytomo-brand-text{font-size:8px;font-weight:bold;margin-top:2px}.ytomo-dialog.overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;z-index:1000;padding:20px;box-sizing:border-box}.ytomo-dialog.container{background:#fff;border-radius:12px;padding:24px;max-width:800px;max-height:80vh;overflow-y:auto;box-shadow:0 10px 40px rgba(0,0,0,.3);width:100%}@media(max-width: 600px){.ytomo-dialog.container{padding-bottom:60px;max-height:85vh}}.ytomo-dialog.header{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;gap:8px}.ytomo-dialog.header .ytomo-dialog.title{flex-grow:1}.ytomo-dialog.title{margin:0;color:#333;font-size:24px;font-weight:bold}.ytomo-dialog.refresh-button{background:#006821;color:#fff;border:none;border-radius:50%;width:40px;height:40px;font-size:16px;cursor:pointer;transition:all .2s ease;display:flex;align-items:center;justify-content:center}.ytomo-dialog.refresh-button:hover{background:#02862b;transform:scale(1.1)}.ytomo-dialog.refresh-button:disabled{background:#ccc;cursor:not-allowed;transform:none}.ytomo-dialog.right-button-group{display:flex;gap:12px;align-items:center}.ytomo-dialog.available-only-toggle{background:#6c757d;color:#fff;border:none;border-radius:20px;padding:8px 16px;font-size:14px;font-weight:bold;cursor:pointer;transition:all .2s ease;white-space:nowrap}.ytomo-dialog.available-only-toggle.active{background:#006821;box-shadow:0 0 0 2px rgba(0,104,33,.3)}.ytomo-dialog.available-only-toggle:hover{transform:translateY(-1px);box-shadow:0 4px 8px rgba(0,0,0,.2)}.ytomo-dialog.available-only-toggle:disabled{background:#ccc;cursor:not-allowed;transform:none;box-shadow:none}.ytomo-dialog.button-group{display:flex;gap:12px;justify-content:space-between;margin-top:24px}.ytomo-dialog.secondary-button{background:#6c757d;color:#fff;border:none;border-radius:20px;padding:8px 16px;font-size:14px;font-weight:bold;cursor:pointer;transition:all .2s ease;white-space:nowrap}.ytomo-dialog.secondary-button:hover{transform:translateY(-1px);box-shadow:0 4px 8px rgba(0,0,0,.2)}.ytomo-dialog.monitor-button{background:#fd7e14;color:#fff;border:none;border-radius:20px;padding:8px 16px;font-size:14px;font-weight:bold;cursor:pointer;transition:all .2s ease;white-space:nowrap}.ytomo-dialog.monitor-button:hover{transform:translateY(-1px);box-shadow:0 4px 8px rgba(0,0,0,.2)}.day-reservation-description{color:#666;line-height:1.6;margin:0 0 20px 0}.pavilion-list{max-height:400px;overflow-y:auto;border:1px solid #ddd;border-radius:4px;margin-bottom:16px}.pavilion-list-empty{padding:20px;text-align:center;color:#666}.pavilion-item{display:flex;justify-content:space-between;align-items:center;padding:12px;border-bottom:1px solid #eee;transition:background-color .2s;cursor:pointer}.pavilion-item:hover{background-color:#f5f5f5}.pavilion-item:last-child{border-bottom:none}.pavilion-item.monitored{background-color:rgba(253,126,20,.1);border-left:4px solid #fd7e14}.pavilion-item.monitored:hover{background-color:rgba(253,126,20,.15)}.pavilion-info{flex:1}.pavilion-info .pavilion-name{font-weight:bold;margin-bottom:4px}.pavilion-info .pavilion-time-slots{font-size:12px;color:#666;display:flex;flex-wrap:wrap;gap:8px;margin-top:8px;max-width:100%}@media(max-width: 600px){.pavilion-info .pavilion-time-slots{gap:6px;margin-top:6px}}.pavilion-info .pavilion-time-slots .pavilion-time-slot{font-size:12px;padding:4px 8px;border-radius:6px;border:1px solid rgba(0,0,0,0);min-width:60px;text-align:center;white-space:nowrap}@media(max-width: 600px){.pavilion-info .pavilion-time-slots .pavilion-time-slot{font-size:11px;padding:3px 6px;min-width:55px}}@media(max-width: 400px){.pavilion-info .pavilion-time-slots .pavilion-time-slot{font-size:10px;padding:2px 4px;min-width:50px}}.pavilion-info .pavilion-time-slots .pavilion-time-slot.clickable{background:rgba(0,0,0,0);border-color:#dee2e6;cursor:pointer;transition:all .2s ease}.pavilion-info .pavilion-time-slots .pavilion-time-slot.clickable:hover:not(.selected){background:#f8f9fa;border-color:#adb5bd;transform:translateY(-1px);box-shadow:0 2px 4px rgba(0,0,0,.1)}.pavilion-info .pavilion-time-slots .pavilion-time-slot.clickable:active{transform:translateY(0);box-shadow:0 1px 2px rgba(0,0,0,.1)}.pavilion-info .pavilion-time-slots .pavilion-time-slot.clickable.selected{background:rgba(0,104,33,.25);border-color:#006821;border-width:2px;color:#006821;font-weight:bold}@media(max-width: 600px){.pavilion-info .pavilion-time-slots .pavilion-time-slot.clickable.selected{background:rgba(0,104,33,.35);border-width:3px}}.pavilion-info .pavilion-time-slots .pavilion-time-slot.clickable.selected:hover{background:rgba(0,104,33,.3)}@media(max-width: 600px){.pavilion-info .pavilion-time-slots .pavilion-time-slot.clickable.selected:hover{background:rgba(0,104,33,.4)}}.pavilion-info .pavilion-time-slots .pavilion-time-slot.clickable.selected:active{background:rgba(0,104,33,.35)}@media(max-width: 600px){.pavilion-info .pavilion-time-slots .pavilion-time-slot.clickable.selected:active{background:rgba(0,104,33,.45)}}.pavilion-info .pavilion-time-slots .pavilion-time-slot.clickable.unavailable{background:rgba(0,0,0,0);border-color:#ffc107;color:#dc6c00}.pavilion-info .pavilion-time-slots .pavilion-time-slot.clickable.unavailable:hover:not(.selected){background:#fff3cd;border-color:#ffb300;transform:translateY(-1px);box-shadow:0 2px 4px rgba(255,193,7,.2)}.pavilion-info .pavilion-time-slots .pavilion-time-slot.clickable.unavailable.selected{background:rgba(255,193,7,.35);border-color:#ffc107;border-width:2px;color:#dc6c00;font-weight:bold}@media(max-width: 600px){.pavilion-info .pavilion-time-slots .pavilion-time-slot.clickable.unavailable.selected{background:rgba(255,193,7,.45);border-width:3px}}.pavilion-info .pavilion-time-slots .pavilion-time-slot.clickable.unavailable.selected:hover{background:rgba(255,193,7,.4)}@media(max-width: 600px){.pavilion-info .pavilion-time-slots .pavilion-time-slot.clickable.unavailable.selected:hover{background:rgba(255,193,7,.5)}}.pavilion-info .pavilion-time-slots .pavilion-time-slot.clickable.unavailable.selected:active{background:rgba(255,193,7,.45)}@media(max-width: 600px){.pavilion-info .pavilion-time-slots .pavilion-time-slot.clickable.unavailable.selected:active{background:rgba(255,193,7,.55)}}.pavilion-button-area{display:flex;gap:8px;align-items:center}.pavilion-button-area .pavilion-reserve-button{padding:8px 16px;background-color:#006821;color:#fff;border:none;border-radius:4px;cursor:pointer;font-size:12px;transition:background-color .2s;white-space:nowrap}.pavilion-button-area .pavilion-reserve-button:hover:not(:disabled){background-color:#02862b}.pavilion-button-area .pavilion-reserve-button:disabled{background:#ccc;color:#666;cursor:not-allowed}.pavilion-button-area .pavilion-monitor-checkbox{margin-right:12px;transform:scale(1.2);accent-color:#fd7e14;flex-shrink:0}.pavilion-button-area .pavilion-no-slots{font-size:12px;color:#999}.ytomo-global-notification-container{position:fixed;top:20px;right:20px;z-index:2000;max-width:400px;width:100%;display:flex;flex-direction:column;gap:10px}@media(max-width: 600px){.ytomo-global-notification-container{top:10px;right:10px;left:10px;max-width:none}}.ytomo-global-notification{background:#fff;border-radius:8px;padding:16px;box-shadow:0 4px 12px rgba(0,0,0,.15);border-left:4px solid #ccc;display:flex;align-items:center;gap:12px;font-size:14px;font-weight:500;transform:translateX(100%);opacity:0;transition:all .3s ease}.ytomo-global-notification.show{transform:translateX(0);opacity:1}.ytomo-global-notification.hide{transform:translateX(100%);opacity:0}.ytomo-global-notification .notification-message{flex:1;line-height:1.4}.ytomo-global-notification .notification-close{background:none;border:none;font-size:18px;font-weight:bold;cursor:pointer;padding:0;width:20px;height:20px;display:flex;align-items:center;justify-content:center;opacity:.7;transition:opacity .2s ease}.ytomo-global-notification .notification-close:hover{opacity:1}.ytomo-global-notification.success{background-color:#d4edda;color:#155724;border-left-color:#28a745}.ytomo-global-notification.success .notification-close{color:#155724}.ytomo-global-notification.error{background-color:#f8d7da;color:#721c24;border-left-color:#dc3545}.ytomo-global-notification.error .notification-close{color:#721c24}.ytomo-global-notification.warning{background-color:#fff3cd;color:#856404;border-left-color:#ffc107}.ytomo-global-notification.warning .notification-close{color:#856404}.ytomo-global-notification.info{background-color:#d1ecf1;color:#0c5460;border-left-color:#17a2b8}.ytomo-global-notification.info .notification-close{color:#0c5460}.ytomo-processing-overlay{position:fixed;top:0;left:0;right:0;bottom:0;width:100vw;height:100vh;background:rgba(0,0,0,.3);z-index:9000;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(1px);transition:all .3s ease;pointer-events:auto}.ytomo-processing-overlay.z-normal{z-index:9000}.ytomo-processing-overlay.z-below-fab{z-index:8999}.ytomo-processing-overlay.hidden{opacity:0;visibility:hidden;pointer-events:none}.ytomo-processing-overlay.visible{opacity:1;visibility:visible;pointer-events:auto}.ytomo-processing-overlay .processing-message-area{background:hsla(0,0%,100%,.95);border-radius:12px;padding:24px 32px;text-align:center;box-shadow:0 8px 32px rgba(0,0,0,.3);border:2px solid rgba(255,140,0,.3);max-width:400px;margin:20px}@media(max-width: 768px){.ytomo-processing-overlay .processing-message-area{padding:20px 24px;margin:16px;max-width:90vw}}.ytomo-processing-overlay .processing-message-text{font-size:20px;font-weight:bold;color:#333;margin-bottom:8px;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}@media(max-width: 768px){.ytomo-processing-overlay .processing-message-text{font-size:18px;margin-bottom:6px}}.ytomo-processing-overlay .processing-target-text{font-size:16px;font-weight:600;color:#333;margin-bottom:12px;white-space:pre-line;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;text-align:center}@media(max-width: 768px){.ytomo-processing-overlay .processing-target-text{font-size:14px;margin-bottom:10px}}.ytomo-processing-overlay .processing-countdown-text{font-size:18px;font-weight:bold;color:#e67e00;margin-bottom:12px;font-family:"SF Mono","Monaco","Consolas",monospace;text-align:center;text-shadow:0 1px 2px rgba(0,0,0,.1)}@media(max-width: 768px){.ytomo-processing-overlay .processing-countdown-text{font-size:16px;margin-bottom:10px}}.ytomo-processing-overlay .processing-countdown-text.countdown-warning{color:#dc3545;animation:countdownPulse 1s ease-in-out infinite;text-shadow:0 0 8px rgba(220,53,69,.4)}.ytomo-processing-overlay .processing-warning-text{font-size:14px;color:#666;margin-bottom:16px;line-height:1.4;transition:all .3s ease}@media(max-width: 768px){.ytomo-processing-overlay .processing-warning-text{font-size:13px;margin-bottom:14px}}.ytomo-processing-overlay .processing-warning-text.warning-flash{color:#dc3545;font-weight:bold;transform:scale(1.05);animation:flash .5s ease-in-out 2}.ytomo-processing-overlay .notification-toggle-btn{display:flex;align-items:center;justify-content:center;width:40px;height:40px;border:none;border-radius:50%;cursor:pointer;transition:all .2s ease;margin-bottom:16px;box-shadow:0 2px 6px rgba(0,0,0,.15);font-size:20px;line-height:1}@media(max-width: 768px){.ytomo-processing-overlay .notification-toggle-btn{width:36px;height:36px;margin-bottom:14px;font-size:18px}}.ytomo-processing-overlay .notification-toggle-btn:hover{transform:scale(1.05);box-shadow:0 4px 10px rgba(0,0,0,.2)}.ytomo-processing-overlay .notification-toggle-btn:active{transform:scale(0.95)}.ytomo-processing-overlay .notification-toggle-btn.enabled{background:#4caf50;color:#fff}.ytomo-processing-overlay .notification-toggle-btn.enabled:hover{background:#45a049}.ytomo-processing-overlay .notification-toggle-btn.muted{background:#f44336;color:#fff}.ytomo-processing-overlay .notification-toggle-btn.muted:hover{background:#e53935}.ytomo-processing-overlay .processing-cancel-area{font-size:12px;color:#888;font-style:italic}@media(max-width: 768px){.ytomo-processing-overlay .processing-cancel-area{font-size:11px}}@keyframes flash{0%,100%{opacity:1}50%{opacity:.7}}@keyframes countdownPulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.8;transform:scale(1.05)}}.ytomo-processing-overlay.efficiency-mode .processing-message-area{border-color:rgba(255,140,0,.5);background:linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(255, 248, 220, 0.95))}.ytomo-processing-overlay.efficiency-mode .processing-message-text{color:#e67e00}.ytomo-processing-overlay.monitoring-mode .processing-message-area{border-color:rgba(0,104,33,.5);background:linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(240, 255, 240, 0.95))}.ytomo-processing-overlay.monitoring-mode .processing-message-text{color:#004d1a}@media(prefers-reduced-motion: reduce){.ytomo-processing-overlay{transition:none}.ytomo-processing-overlay .processing-warning-text.warning-flash{animation:none;transform:none}}.ytomo-dialog.overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.7);z-index:1000;display:flex;align-items:center;justify-content:center;padding:20px;box-sizing:border-box}.ytomo-dialog.container.debug-dialog{background:#fff;border-radius:12px;padding:0;max-width:90%;max-height:85%;min-width:600px;box-shadow:0 8px 32px rgba(0,0,0,.3);display:flex;flex-direction:column;overflow:hidden}@media(max-width: 768px){.ytomo-dialog.container.debug-dialog{min-width:auto;max-width:95%;max-height:90%}}.ytomo-dialog.header{display:flex;align-items:center;justify-content:space-between;padding:20px 24px;border-bottom:1px solid #e0e0e0;background:#f8f9fa;border-radius:12px 12px 0 0}.ytomo-dialog.title{margin:0;font-size:20px;color:#333;font-weight:600}.ytomo-dialog.close-button{background:none;border:none;font-size:24px;cursor:pointer;color:#666;padding:5px;border-radius:4px}.ytomo-dialog.close-button:hover{background:rgba(0,0,0,.1)}.debug-content{padding:24px;overflow-y:auto;flex:1}.debug-section{margin-bottom:32px}.debug-section:last-child{margin-bottom:0}.debug-section h3{margin:0 0 12px 0;font-size:18px;color:#333;font-weight:600}.debug-section p{margin:0 0 16px 0;color:#666;line-height:1.5}.debug-input-group{display:flex;align-items:center;gap:12px;margin-bottom:20px;flex-wrap:wrap}.debug-input-group label{font-weight:500;color:#333;min-width:120px}.debug-input-group input{flex:1;min-width:200px;padding:10px 12px;border:2px solid #e0e0e0;border-radius:6px;font-size:14px;transition:border-color .2s ease}.debug-input-group input:focus{outline:none;border-color:#007bff}.debug-input-group input::placeholder{color:#999}.debug-input-group button{background:#007bff;color:#fff;border:none;padding:10px 20px;border-radius:6px;font-size:14px;font-weight:500;cursor:pointer;transition:background-color .2s ease;white-space:nowrap}.debug-input-group button:hover:not(:disabled){background:#0056b3}.debug-input-group button:disabled{background:#6c757d;cursor:not-allowed}.debug-results-area h4{margin:0 0 12px 0;font-size:16px;color:#333;font-weight:600}.debug-results-display{background:#f8f9fa;border:1px solid #e0e0e0;border-radius:6px;padding:16px;font-family:"Courier New",Monaco,monospace;font-size:12px;line-height:1.4;max-height:300px;overflow-y:auto;white-space:pre-wrap;word-wrap:break-word;color:#333}.debug-results-display .json-key{color:#d73a49;font-weight:bold}.debug-results-display .json-string{color:#032f62}.debug-results-display .json-number{color:#005cc5}.debug-results-display .json-boolean{color:#e36209}.debug-results-display .json-null{color:#6f42c1}@media(max-width: 768px){.debug-input-group{flex-direction:column;align-items:stretch}.debug-input-group label{min-width:auto}.debug-input-group input{min-width:auto}.debug-input-group button{align-self:flex-start}.ytomo-dialog.container.debug-dialog{min-width:auto}.debug-content{padding:16px}}.ytomo-dialog.overlay{animation:fadeIn .2s ease-out}.ytomo-dialog.container.debug-dialog{animation:slideIn .3s ease-out}@keyframes fadeIn{from{opacity:0}to{opacity:1}}@keyframes slideIn{from{opacity:0;transform:translateY(-20px) scale(0.95)}to{opacity:1;transform:translateY(0) scale(1)}}.ytomo-processing-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background-color:rgba(0,0,0,.3);display:flex;align-items:center;justify-content:center;z-index:1001;pointer-events:auto;overflow-y:auto}.ytomo-processing-content{background:hsla(0,0%,100%,.7);border-radius:12px;padding:30px;text-align:center;box-shadow:0 10px 40px rgba(0,0,0,.2);min-width:200px;pointer-events:auto;backdrop-filter:blur(1px)}.ytomo-processing-spinner{width:40px;height:40px;border:3px solid #e2e8f0;border-top-color:#2c5aa0;border-radius:50%;animation:spin 1s linear infinite;margin:0 auto 16px}.ytomo-processing-message{color:#374151;font-size:14px;font-weight:500}@keyframes spin{to{transform:rotate(360deg)}}.ytomo-input{flex:1;padding:8px 12px;border:1px solid #d1d5db;border-radius:6px;font-size:14px;transition:border-color .2s}.ytomo-input:focus{outline:none;border-color:#2c5aa0;box-shadow:0 0 0 3px rgba(44,90,160,.1)}.ytomo-input::placeholder{color:#9ca3af}.ytomo-button{padding:8px 16px;border:none;border-radius:6px;font-size:14px;font-weight:500;cursor:pointer;transition:all .2s;display:inline-flex;align-items:center;justify-content:center;white-space:nowrap}.ytomo-button.primary{background:linear-gradient(135deg, #2c5aa0 0%, #1a365d 100%);color:#fff}.ytomo-button.primary:hover{background:linear-gradient(135deg, #1a365d 0%, #2c5aa0 100%);transform:translateY(-1px);box-shadow:0 4px 12px rgba(44,90,160,.3)}.ytomo-button.primary:active{transform:translateY(0)}.ytomo-button.retry-button{background:linear-gradient(135deg, #f59e0b 0%, #d97706 100%);color:#fff;margin-top:12px}.ytomo-button.retry-button:hover{background:linear-gradient(135deg, #d97706 0%, #f59e0b 100%)}.ytomo-button:focus{outline:2px solid #2c5aa0;outline-offset:2px}.ytomo-button:disabled{opacity:.5;cursor:not-allowed;transform:none !important}@media(prefers-reduced-motion: reduce){.ytomo-button,.ytomo-input{animation:none;transition:none}}@media(prefers-contrast: high){.ytomo-button:focus,.ytomo-input:focus{outline:3px solid #000}}.ytomo-loading-container{width:100%;max-width:800px;margin:20px auto;padding:20px;display:flex;align-items:center;justify-content:center;min-height:400px}.ytomo-loading-content{text-align:center;display:flex;flex-direction:column;align-items:center;gap:20px}.ytomo-loading-spinner{width:40px;height:40px;border:3px solid #f3f4f6;border-top:3px solid #2c5aa0;border-radius:50%;animation:spin 1s linear infinite}.ytomo-loading-text{font-size:16px;color:#6b7280;font-weight:500}@keyframes spin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}#ytomo-page-dialog-container .ytomo-dialog-overlay{position:relative !important;background:rgba(0,0,0,0) !important;width:100% !important;height:auto !important;display:block !important;max-width:800px;margin:20px auto;padding:20px;z-index:auto !important}#ytomo-page-dialog-container .ytomo-main-dialog{position:relative !important;transform:none !important;margin:0 !important;box-shadow:0 10px 40px rgba(0,0,0,.1) !important;border:1px solid #e2e8f0 !important;min-width:auto !important;width:100% !important;max-width:none !important;z-index:auto !important}#ytomo-page-dialog-container *{z-index:auto !important}table[class*=style_main__timetable__] td[data-gray-out] div[role=button][data-disabled=true]{pointer-events:auto !important;cursor:pointer !important}#ot-sdk-btn-floating{display:none !important}header{z-index:10000 !important}.ytomo-main-fab{position:fixed;bottom:80px;right:20px;width:56px;height:56px;border-radius:50%;background-color:#ff6b35;color:#fff;border:none;font-size:16px;font-weight:bold;cursor:pointer;box-shadow:0 2px 10px rgba(0,0,0,.3);transition:all .2s ease;z-index:999}.ytomo-main-fab:hover{transform:scale(1.1);box-shadow:0 4px 15px rgba(0,0,0,.4)}.ytomo-main-fab:disabled{opacity:.5;cursor:not-allowed;transform:none;box-shadow:0 2px 10px rgba(0,0,0,.3)}.ytomo-main-fab:focus{outline:none}.ytomo-dialog-overlay~.ytomo-main-fab{display:none}.ytomo-dialog-overlay *:focus{outline:none !important;box-shadow:none !important}.ytomo-pavilion-search-input:focus{outline:none !important;border:1px solid #2c5aa0 !important;box-shadow:none !important}.ytomo-reservation-result{position:fixed;bottom:80px;right:90px;min-width:180px;padding:12px 16px;border-radius:8px;color:#fff;font-size:12px;font-weight:500;z-index:10003;box-shadow:0 4px 12px rgba(0,0,0,.3);animation:slideIn .3s ease-out}.ytomo-reservation-result.success{background-color:#10b981}.ytomo-reservation-result.failed{background-color:#ef4444}.ytomo-reservation-result .ytomo-result-status{font-weight:700;font-size:14px;margin-bottom:6px;text-shadow:0 1px 2px rgba(0,0,0,.2)}.ytomo-reservation-result .ytomo-result-pavilion{font-weight:500;font-size:11px;margin-bottom:4px;text-shadow:0 1px 1px rgba(0,0,0,.1);opacity:.9}.ytomo-reservation-result .ytomo-result-time{font-size:15px;font-weight:600;opacity:1;text-shadow:0 1px 2px rgba(0,0,0,.15)}@keyframes slideIn{from{opacity:0;transform:translateX(20px)}to{opacity:1;transform:translateX(0)}}`, ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -11831,13 +11565,14 @@ __webpack_require__.d(__webpack_exports__, {
   lH: () => (/* reexport */ vModelCheckbox),
   u1: () => (/* reexport */ vModelSelect),
   Jo: () => (/* reexport */ vModelText),
+  aG: () => (/* reexport */ vShow),
   wB: () => (/* reexport */ runtime_core_esm_bundler_watch),
   bo: () => (/* reexport */ withDirectives),
   jR: () => (/* reexport */ withKeys),
   D$: () => (/* reexport */ withModifiers)
 });
 
-// UNUSED EXPORTS: BaseTransition, BaseTransitionPropsValidators, Comment, DeprecationTypes, EffectScope, ErrorCodes, ErrorTypeStrings, KeepAlive, ReactiveEffect, Static, Suspense, Text, TrackOpTypes, Transition, TransitionGroup, TriggerOpTypes, VueElement, assertNumber, callWithAsyncErrorHandling, callWithErrorHandling, camelize, capitalize, cloneVNode, compatUtils, compile, createHydrationRenderer, createPropsRestProxy, createRenderer, createSSRApp, createSlots, createStaticVNode, customRef, defineAsyncComponent, defineCustomElement, defineEmits, defineExpose, defineModel, defineOptions, defineProps, defineSSRCustomElement, defineSlots, devtools, effect, getCurrentInstance, getCurrentWatcher, getTransitionRawChildren, guardReactiveProps, h, handleError, hydrate, hydrateOnIdle, hydrateOnInteraction, hydrateOnMediaQuery, hydrateOnVisible, initCustomFormatter, initDirectivesForSSR, isMemoSame, isProxy, isReadonly, isRuntimeOnly, isShallow, isVNode, mergeDefaults, mergeModels, mergeProps, normalizeProps, normalizeStyle, onActivated, onBeforeMount, onBeforeUnmount, onBeforeUpdate, onDeactivated, onErrorCaptured, onRenderTracked, onRenderTriggered, onServerPrefetch, onUpdated, onWatcherCleanup, popScopeId, provide, proxyRefs, pushScopeId, queuePostFlushCb, readonly, registerRuntimeCompiler, render, renderSlot, resolveComponent, resolveDirective, resolveDynamicComponent, resolveFilter, resolveTransitionHooks, setBlockTracking, setDevtoolsHook, setTransitionHooks, shallowReactive, shallowReadonly, shallowRef, ssrContextKey, ssrUtils, stop, toHandlerKey, toHandlers, toValue, transformVNodeArgs, triggerRef, useAttrs, useCssModule, useCssVars, useHost, useId, useModel, useSSRContext, useShadowRoot, useSlots, useTemplateRef, useTransitionState, vModelDynamic, vModelRadio, vShow, version, warn, watchEffect, watchPostEffect, watchSyncEffect, withAsyncContext, withCtx, withDefaults, withMemo, withScopeId
+// UNUSED EXPORTS: BaseTransition, BaseTransitionPropsValidators, Comment, DeprecationTypes, EffectScope, ErrorCodes, ErrorTypeStrings, KeepAlive, ReactiveEffect, Static, Suspense, Text, TrackOpTypes, Transition, TransitionGroup, TriggerOpTypes, VueElement, assertNumber, callWithAsyncErrorHandling, callWithErrorHandling, camelize, capitalize, cloneVNode, compatUtils, compile, createHydrationRenderer, createPropsRestProxy, createRenderer, createSSRApp, createSlots, createStaticVNode, customRef, defineAsyncComponent, defineCustomElement, defineEmits, defineExpose, defineModel, defineOptions, defineProps, defineSSRCustomElement, defineSlots, devtools, effect, getCurrentInstance, getCurrentWatcher, getTransitionRawChildren, guardReactiveProps, h, handleError, hydrate, hydrateOnIdle, hydrateOnInteraction, hydrateOnMediaQuery, hydrateOnVisible, initCustomFormatter, initDirectivesForSSR, isMemoSame, isProxy, isReadonly, isRuntimeOnly, isShallow, isVNode, mergeDefaults, mergeModels, mergeProps, normalizeProps, normalizeStyle, onActivated, onBeforeMount, onBeforeUnmount, onBeforeUpdate, onDeactivated, onErrorCaptured, onRenderTracked, onRenderTriggered, onServerPrefetch, onUpdated, onWatcherCleanup, popScopeId, provide, proxyRefs, pushScopeId, queuePostFlushCb, readonly, registerRuntimeCompiler, render, renderSlot, resolveComponent, resolveDirective, resolveDynamicComponent, resolveFilter, resolveTransitionHooks, setBlockTracking, setDevtoolsHook, setTransitionHooks, shallowReactive, shallowReadonly, shallowRef, ssrContextKey, ssrUtils, stop, toHandlerKey, toHandlers, toValue, transformVNodeArgs, triggerRef, useAttrs, useCssModule, useCssVars, useHost, useId, useModel, useSSRContext, useShadowRoot, useSlots, useTemplateRef, useTransitionState, vModelDynamic, vModelRadio, version, warn, watchEffect, watchPostEffect, watchSyncEffect, withAsyncContext, withCtx, withDefaults, withMemo, withScopeId
 
 // NAMESPACE OBJECT: ./node_modules/@vue/runtime-dom/dist/runtime-dom.esm-bundler.js
 var runtime_dom_esm_bundler_namespaceObject = {};
@@ -30619,6 +30354,28 @@ function findNextActiveReservationType(periods, now) {
 
 /***/ }),
 
+/***/ 559:
+/***/ ((module, __webpack_exports__, __webpack_require__) => {
+
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   A: () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _node_modules_css_loader_dist_runtime_noSourceMaps_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(601);
+/* harmony import */ var _node_modules_css_loader_dist_runtime_noSourceMaps_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_css_loader_dist_runtime_noSourceMaps_js__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(314);
+/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1__);
+// Imports
+
+
+var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1___default()((_node_modules_css_loader_dist_runtime_noSourceMaps_js__WEBPACK_IMPORTED_MODULE_0___default()));
+// Module
+___CSS_LOADER_EXPORT___.push([module.id, `.ytomo-sequential-overlay[data-v-87268ea4]{position:fixed;top:0;left:0;width:100%;height:100%;background-color:rgba(0,0,0,.8);display:flex;align-items:center;justify-content:center;z-index:10002;opacity:0;animation:fadeIn-87268ea4 .2s ease-out forwards}.ytomo-sequential-content[data-v-87268ea4]{background:#fff;border-radius:12px;padding:32px;box-shadow:0 20px 60px rgba(0,0,0,.3);text-align:center;min-width:400px;max-width:500px;transform:scale(0.9);animation:dialogAppear-87268ea4 .2s ease-out forwards}.ytomo-sequential-content h3[data-v-87268ea4]{margin:0 0 24px 0;color:#374151;font-size:20px;font-weight:600}.ytomo-sequential-content h3 .countdown-seconds[data-v-87268ea4]{display:inline-block;width:40px;font-size:18px;color:#ef4444;font-weight:500;margin-left:8px;text-align:right;font-family:monospace}.ytomo-sequential-settings-row[data-v-87268ea4]{display:flex;align-items:center;justify-content:center;gap:16px;margin-bottom:24px}.ytomo-sequential-settings-row .ytomo-mode-buttons[data-v-87268ea4]{display:flex;gap:8px}.ytomo-sequential-settings-row .ytomo-mode-button[data-v-87268ea4]{padding:8px 16px;border:1px solid #d1d5db;border-radius:6px;background:#fff;color:#374151;cursor:pointer;transition:all .2s;font-size:14px}.ytomo-sequential-settings-row .ytomo-mode-button[data-v-87268ea4]:hover{background:#f3f4f6;border-color:#9ca3af}.ytomo-sequential-settings-row .ytomo-mode-button.active[data-v-87268ea4]{background:#2c5aa0;border-color:#2c5aa0;color:#fff}.ytomo-sequential-settings-row .ytomo-mode-button[data-v-87268ea4]:focus{outline:none}.ytomo-sequential-settings-row .ytomo-interval-dropdown[data-v-87268ea4]{padding:8px 12px;border:1px solid #d1d5db;border-radius:6px;background:#fff;font-size:14px;min-width:120px}.ytomo-sequential-settings-row .ytomo-interval-dropdown[data-v-87268ea4]:focus{outline:none;border-color:#2c5aa0}.ytomo-sequential-progress[data-v-87268ea4]{margin-bottom:24px;display:flex;align-items:center;justify-content:space-between;gap:16px}.ytomo-sequential-progress .ytomo-sequential-target[data-v-87268ea4]{flex:1;font-size:14px;color:#374151}.ytomo-sequential-progress .ytomo-sequential-target .current-target[data-v-87268ea4]{text-align:left}.ytomo-sequential-progress .ytomo-sequential-target .current-target .pavilion-name[data-v-87268ea4]{font-weight:600;font-size:16px;margin-bottom:8px}.ytomo-sequential-progress .ytomo-sequential-target .current-target .time-slot-button[data-v-87268ea4]{display:inline-block;padding:4px 8px;background:#2c5aa0;color:#fff;border-radius:4px;font-size:12px;font-weight:500;border:1px solid #2c5aa0}.ytomo-sequential-progress .ytomo-sequential-status[data-v-87268ea4]{flex-shrink:0;text-align:right}.ytomo-sequential-progress .ytomo-sequential-status .ytomo-sequential-current[data-v-87268ea4]{font-size:18px;font-weight:600;color:#2c5aa0}@keyframes fadeIn-87268ea4{to{opacity:1}}@keyframes dialogAppear-87268ea4{to{transform:scale(1)}}@media(prefers-reduced-motion: reduce){.ytomo-sequential-overlay[data-v-87268ea4],.ytomo-sequential-content[data-v-87268ea4]{animation:none;transition:none}}`, ""]);
+// Exports
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
+
+
+/***/ }),
+
 /***/ 570:
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
@@ -33186,28 +32943,6 @@ module.exports = insertBySelector;
 
 /***/ }),
 
-/***/ 690:
-/***/ ((module, __webpack_exports__, __webpack_require__) => {
-
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   A: () => (__WEBPACK_DEFAULT_EXPORT__)
-/* harmony export */ });
-/* harmony import */ var _node_modules_css_loader_dist_runtime_noSourceMaps_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(601);
-/* harmony import */ var _node_modules_css_loader_dist_runtime_noSourceMaps_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_css_loader_dist_runtime_noSourceMaps_js__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(314);
-/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1__);
-// Imports
-
-
-var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1___default()((_node_modules_css_loader_dist_runtime_noSourceMaps_js__WEBPACK_IMPORTED_MODULE_0___default()));
-// Module
-___CSS_LOADER_EXPORT___.push([module.id, `.ytomo-sequential-overlay[data-v-7a925275]{position:fixed;top:0;left:0;width:100%;height:100%;background-color:rgba(0,0,0,.8);display:flex;align-items:center;justify-content:center;z-index:10002;opacity:0;animation:fadeIn-7a925275 .2s ease-out forwards}.ytomo-sequential-content[data-v-7a925275]{background:#fff;border-radius:12px;padding:32px;box-shadow:0 20px 60px rgba(0,0,0,.3);text-align:center;min-width:400px;max-width:500px;transform:scale(0.9);animation:dialogAppear-7a925275 .2s ease-out forwards}.ytomo-sequential-content h3[data-v-7a925275]{margin:0 0 24px 0;color:#374151;font-size:20px;font-weight:600}.ytomo-sequential-content h3 .countdown-seconds[data-v-7a925275]{display:inline-block;width:40px;font-size:18px;color:#ef4444;font-weight:500;margin-left:8px;text-align:right;font-family:monospace}.ytomo-sequential-settings-row[data-v-7a925275]{display:flex;align-items:center;justify-content:center;gap:16px;margin-bottom:24px}.ytomo-sequential-settings-row .ytomo-mode-buttons[data-v-7a925275]{display:flex;gap:8px}.ytomo-sequential-settings-row .ytomo-mode-button[data-v-7a925275]{padding:8px 16px;border:1px solid #d1d5db;border-radius:6px;background:#fff;color:#374151;cursor:pointer;transition:all .2s;font-size:14px}.ytomo-sequential-settings-row .ytomo-mode-button[data-v-7a925275]:hover{background:#f3f4f6;border-color:#9ca3af}.ytomo-sequential-settings-row .ytomo-mode-button.active[data-v-7a925275]{background:#2c5aa0;border-color:#2c5aa0;color:#fff}.ytomo-sequential-settings-row .ytomo-mode-button[data-v-7a925275]:focus{outline:none}.ytomo-sequential-settings-row .ytomo-interval-dropdown[data-v-7a925275]{padding:8px 12px;border:1px solid #d1d5db;border-radius:6px;background:#fff;font-size:14px;min-width:120px}.ytomo-sequential-settings-row .ytomo-interval-dropdown[data-v-7a925275]:focus{outline:none;border-color:#2c5aa0}.ytomo-sequential-progress[data-v-7a925275]{margin-bottom:24px;display:flex;align-items:center;justify-content:space-between;gap:16px}.ytomo-sequential-progress .ytomo-sequential-target[data-v-7a925275]{flex:1;font-size:14px;color:#374151}.ytomo-sequential-progress .ytomo-sequential-target .current-target[data-v-7a925275]{text-align:left}.ytomo-sequential-progress .ytomo-sequential-target .current-target .pavilion-name[data-v-7a925275]{font-weight:600;font-size:16px;margin-bottom:8px}.ytomo-sequential-progress .ytomo-sequential-target .current-target .time-slot-button[data-v-7a925275]{display:inline-block;padding:4px 8px;background:#2c5aa0;color:#fff;border-radius:4px;font-size:12px;font-weight:500;border:1px solid #2c5aa0}.ytomo-sequential-progress .ytomo-sequential-status[data-v-7a925275]{flex-shrink:0;text-align:right}.ytomo-sequential-progress .ytomo-sequential-status .ytomo-sequential-current[data-v-7a925275]{font-size:18px;font-weight:600;color:#2c5aa0}@keyframes fadeIn-7a925275{to{opacity:1}}@keyframes dialogAppear-7a925275{to{transform:scale(1)}}@media(prefers-reduced-motion: reduce){.ytomo-sequential-overlay[data-v-7a925275],.ytomo-sequential-content[data-v-7a925275]{animation:none;transition:none}}`, ""]);
-// Exports
-/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
-
-
-/***/ }),
-
 /***/ 735:
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
@@ -33547,6 +33282,7 @@ const useTicketsStore = (0,pinia__WEBPACK_IMPORTED_MODULE_0__/* .defineStore */ 
                 time_start: timeStart,
                 time_end: schedule.time_end,
                 reservation_type: schedule.reservation_type,
+                location_index: schedule.gate_type === 1 ? 0 : 1, // gate_type: 1=東(0), 2=西(1)
                 // 有効フラグを付与: 未使用または当日入場済みは有効
                 isEffective: schedule.use_state === 0 ||
                     (schedule.use_state === 1 && schedule.entrance_date === todayStr.value)
@@ -34485,7 +34221,7 @@ ___CSS_LOADER_EXPORT___.push([module.id, `.ytomo-pavilion-tab[data-v-910d08c4]{p
 
 /***/ }),
 
-/***/ 850:
+/***/ 892:
 /***/ ((module, __webpack_exports__, __webpack_require__) => {
 
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
@@ -34500,7 +34236,295 @@ ___CSS_LOADER_EXPORT___.push([module.id, `.ytomo-pavilion-tab[data-v-910d08c4]{p
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1___default()((_node_modules_css_loader_dist_runtime_noSourceMaps_js__WEBPACK_IMPORTED_MODULE_0___default()));
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, `.ytomo-ticket-tab[data-v-6189b1ab]{padding:0 12px 20px 12px;height:100%;overflow-y:auto;color-scheme:light}@media(max-width: 768px){.ytomo-ticket-tab[data-v-6189b1ab]{padding:0 8px 16px 8px}}.ytomo-quick-select[data-v-6189b1ab]{background:#fff;border-radius:8px;padding:12px;box-shadow:0 1px 3px rgba(0,0,0,.1);border:1px solid #e2e8f0;flex-shrink:0;display:flex;align-items:center;gap:10px;flex-wrap:wrap}.ytomo-quick-select .ytomo-control-left[data-v-6189b1ab]{display:flex;align-items:center;gap:12px;margin-right:auto}.ytomo-refresh-button[data-v-6189b1ab]{display:flex;align-items:center;gap:6px;padding:6px 12px;background:#f8fafc;border:1px solid #cbd5e1;border-radius:6px;color:#475569;font-size:12px;font-weight:500;cursor:pointer;transition:all .2s ease}.ytomo-refresh-button[data-v-6189b1ab]:hover:not(:disabled){background:#e2e8f0;border-color:#94a3b8}.ytomo-refresh-button[data-v-6189b1ab]:disabled{opacity:.6;cursor:not-allowed;background:#f1f5f9}.ytomo-refresh-icon[data-v-6189b1ab]{flex-shrink:0}.ytomo-refresh-icon.rotating[data-v-6189b1ab]{animation:spin-6189b1ab 1s linear infinite}@keyframes spin-6189b1ab{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}.ytomo-toggle-container[data-v-6189b1ab]{display:flex;align-items:center;cursor:pointer;user-select:none}.ytomo-toggle-input[data-v-6189b1ab]{display:none}.ytomo-toggle-slider[data-v-6189b1ab]{position:relative;width:44px;height:24px;background:#cbd5e1;border-radius:12px;transition:background-color .2s;margin-right:8px}.ytomo-toggle-slider[data-v-6189b1ab]::before{content:"";position:absolute;top:2px;left:2px;width:20px;height:20px;background:#fff;border-radius:50%;transition:transform .2s}.ytomo-toggle-input:checked+.ytomo-toggle-slider[data-v-6189b1ab]{background:#2c5aa0}.ytomo-toggle-input:checked+.ytomo-toggle-slider[data-v-6189b1ab]::before{transform:translateX(20px)}.ytomo-toggle-label[data-v-6189b1ab]{font-size:14px;font-weight:500;color:#374151}.ytomo-date-buttons[data-v-6189b1ab]{display:flex;flex-wrap:wrap;gap:8px;flex:1}.ytomo-entrance-date-button[data-v-6189b1ab],.ytomo-date-button[data-v-6189b1ab]{background:#e0f2fe;border:1px solid #0891b2;border-radius:4px;padding:4px 8px;font-size:12px;color:#0c4a6e;cursor:pointer;transition:all .2s;display:flex;flex-direction:column;gap:2px;align-items:center}.ytomo-entrance-date-button[data-v-6189b1ab] *,.ytomo-date-button[data-v-6189b1ab] *{pointer-events:none}.ytomo-entrance-date-button[data-v-6189b1ab]:focus,.ytomo-date-button[data-v-6189b1ab]:focus{outline:none;box-shadow:none}.ytomo-entrance-date-button[data-v-6189b1ab]:hover,.ytomo-date-button[data-v-6189b1ab]:hover{background:#dbeafe;color:#0c4a6e;transform:translateY(-1px);box-shadow:0 2px 4px rgba(186,230,253,.3)}.selected.ytomo-entrance-date-button[data-v-6189b1ab],.selected.ytomo-date-button[data-v-6189b1ab]{background:#0284c7;color:#fff;border-color:#0284c7;outline:2px solid #0284c7;outline-offset:-1px}.ytomo-entrance-date-button[data-v-6189b1ab]:active,.ytomo-date-button[data-v-6189b1ab]:active{transform:translateY(0);box-shadow:none}.disabled.ytomo-entrance-date-button[data-v-6189b1ab],.disabled.ytomo-date-button[data-v-6189b1ab],.ytomo-entrance-date-button[data-v-6189b1ab]:disabled,.ytomo-date-button[data-v-6189b1ab]:disabled{background:#e2e8f0;border-color:#94a3b8;color:#475569;cursor:not-allowed}.disabled.ytomo-entrance-date-button[data-v-6189b1ab]:hover,.disabled.ytomo-date-button[data-v-6189b1ab]:hover,.ytomo-entrance-date-button[data-v-6189b1ab]:disabled:hover,.ytomo-date-button[data-v-6189b1ab]:disabled:hover{background:#e2e8f0;color:#475569;transform:none;box-shadow:none}.ytomo-ticket-tab[data-v-6189b1ab]{padding:0 12px 20px 12px;height:100%;overflow-y:auto;color-scheme:light}@media(max-width: 768px){.ytomo-ticket-tab[data-v-6189b1ab]{padding:0 8px 16px 8px}}.ytomo-quick-select[data-v-6189b1ab]{background:#fff;border-radius:8px;padding:16px;box-shadow:0 1px 3px rgba(0,0,0,.1);border:1px solid #e2e8f0;flex-shrink:0;display:flex;align-items:center;gap:10px;flex-wrap:wrap;min-height:52px}.ytomo-toggle-container[data-v-6189b1ab]{display:flex;align-items:center;cursor:pointer;user-select:none}.ytomo-toggle-input[data-v-6189b1ab]{display:none}.ytomo-toggle-slider[data-v-6189b1ab]{position:relative;width:44px;height:24px;background:#cbd5e1;border-radius:12px;transition:background-color .2s;margin-right:8px}.ytomo-toggle-slider[data-v-6189b1ab]::before{content:"";position:absolute;top:2px;left:2px;width:20px;height:20px;background:#fff;border-radius:50%;transition:transform .2s}.ytomo-toggle-input:checked+.ytomo-toggle-slider[data-v-6189b1ab]{background:#2c5aa0}.ytomo-toggle-input:checked+.ytomo-toggle-slider[data-v-6189b1ab]::before{transform:translateX(20px)}.ytomo-toggle-label[data-v-6189b1ab]{font-size:14px;font-weight:500;color:#374151}.ytomo-date-buttons[data-v-6189b1ab]{display:flex;flex-wrap:wrap;gap:8px;flex:1}.ytomo-ticket-list[data-v-6189b1ab]{display:flex;flex-direction:column;gap:8px;margin-bottom:20px}.ytomo-ticket-item[data-v-6189b1ab]{background:#fff;border-radius:6px;border:1px solid #e2e8f0;overflow:hidden;transition:all .2s}.ytomo-ticket-item[data-v-6189b1ab]:first-of-type{margin-top:12px}.hidden[data-v-6189b1ab]{display:none}.ytomo-ticket-item[data-v-6189b1ab]:hover{border-color:#cbd5e1;box-shadow:0 2px 4px rgba(0,0,0,.1)}.ytomo-ticket-item.selected[data-v-6189b1ab]{border-color:#2c5aa0;box-shadow:0 0 0 2px rgba(44,90,160,.2)}.ytomo-ticket-upper[data-v-6189b1ab]{background:#e2e8f0;padding:8px 12px;display:flex;align-items:center;gap:8px;border-bottom:1px solid #cbd5e1}.ytomo-ticket-id[data-v-6189b1ab]{font-family:"Courier New",monospace;font-size:13px;font-weight:600;color:#374151;background:#e2e8f0;padding:2px 6px;border-radius:3px}.ytomo-me-tip[data-v-6189b1ab]{background:linear-gradient(135deg, #10b981 0%, #059669 100%);color:#fff;padding:2px 6px;border-radius:10px;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.3px}.ytomo-external-tip[data-v-6189b1ab]{background:linear-gradient(135deg, #f59e0b 0%, #d97706 100%);color:#fff;padding:2px 6px;border-radius:10px;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.3px}.ytomo-ticket-delete-button[data-v-6189b1ab]{background:#ef4444;color:#fff;border:none;border-radius:50%;width:20px;height:20px;font-size:14px;font-weight:bold;cursor:pointer;display:flex;align-items:center;justify-content:center;margin-left:auto;transition:all .2s ease}.ytomo-ticket-delete-button[data-v-6189b1ab]:hover{background:#dc2626;transform:scale(1.1)}.ytomo-item-name[data-v-6189b1ab]{background:linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);color:#fff;padding:2px 6px;border-radius:10px;font-size:9px;font-weight:500;max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.ytomo-label-tag[data-v-6189b1ab]{background:linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);color:#fff;padding:2px 6px;border-radius:10px;font-size:10px;font-weight:600}.ytomo-ticket-lower[data-v-6189b1ab]{padding:8px 12px;display:flex;flex-direction:column;gap:8px}.ytomo-entrance-dates[data-v-6189b1ab]{display:flex;flex-wrap:wrap;gap:6px}.ytomo-reservation-types[data-v-6189b1ab]{display:flex;flex-wrap:wrap;gap:6px;align-items:center}.ytomo-reservation-type[data-v-6189b1ab]{padding:4px 8px;border-radius:4px;font-size:12px;font-weight:500}.ytomo-reservation-type.active[data-v-6189b1ab]{background:#dcfce7;color:#166534;border:1px solid #22c55e}.ytomo-reservation-type.inactive[data-v-6189b1ab]{background:#fef2f2;color:#991b1b;border:1px solid #ef4444}.ytomo-no-reservation-types[data-v-6189b1ab]{color:#6b7280;font-size:12px;font-style:italic}.ytomo-add-ticket[data-v-6189b1ab]{background:#fff;border-radius:8px;padding:16px;border:2px dashed #cbd5e1;margin-top:20px}.ytomo-add-ticket h4[data-v-6189b1ab]{margin:0 0 12px 0;color:#374151;font-size:14px;font-weight:600}.ytomo-add-result[data-v-6189b1ab]{margin-top:8px;padding:8px 12px;border-radius:4px;font-size:12px;font-weight:500;text-align:center}.ytomo-add-result.success[data-v-6189b1ab]{background:#dcfce7;color:#166534;border:1px solid #22c55e}.ytomo-add-result.error[data-v-6189b1ab]{background:#fee2e2;color:#dc2626;border:1px solid #ef4444}.ytomo-add-ticket-form[data-v-6189b1ab]{display:flex;gap:8px;align-items:center;flex-wrap:wrap}@media(max-width: 768px){.ytomo-add-ticket-form[data-v-6189b1ab]{flex-direction:column;align-items:stretch;gap:12px}}.ytomo-input-inline[data-v-6189b1ab]{padding:4px 8px;border:1px solid #d1d5db;border-radius:4px;font-size:12px;transition:border-color .2s;background:#fff}.ytomo-input-inline[data-v-6189b1ab]:focus{outline:none;border-color:#2c5aa0;box-shadow:0 0 0 2px rgba(44,90,160,.1)}.ytomo-input-inline[data-v-6189b1ab]::placeholder{color:#9ca3af}.ytomo-input-inline.ytomo-input-ticket-id[data-v-6189b1ab]{width:120px}.ytomo-input-inline.ytomo-input-label[data-v-6189b1ab]{width:60px}.ytomo-select-inline[data-v-6189b1ab]{padding:4px 8px;border:1px solid #d1d5db;border-radius:4px;font-size:12px;background:#fff;cursor:pointer;width:50px}.ytomo-select-inline[data-v-6189b1ab]:focus{outline:none;border-color:#2c5aa0;box-shadow:0 0 0 2px rgba(44,90,160,.1)}.ytomo-ticket-upper[data-v-6189b1ab]{background:#e2e8f0;padding:8px 12px;display:flex;align-items:center;gap:8px;border-bottom:1px solid #cbd5e1}.ytomo-ticket-id[data-v-6189b1ab]{font-family:"Courier New",monospace;font-size:13px;font-weight:600;color:#374151;background:#e2e8f0;padding:2px 6px;border-radius:3px}.ytomo-me-tip[data-v-6189b1ab]{background:linear-gradient(135deg, #10b981 0%, #059669 100%);color:#fff;padding:2px 6px;border-radius:10px;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.3px}.ytomo-external-tip[data-v-6189b1ab]{background:linear-gradient(135deg, #f59e0b 0%, #d97706 100%);color:#fff;padding:2px 6px;border-radius:10px;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.3px}.ytomo-ticket-lower[data-v-6189b1ab]{padding:8px 12px;display:flex;flex-direction:column;gap:8px}.ytomo-entrance-date-button .ytomo-reservation-status[data-v-6189b1ab]{background:hsla(0,0%,100%,.9);color:#0891b2;padding:2px 4px;border-radius:3px;font-size:9px;font-weight:500;line-height:1.1;text-align:center}.ytomo-entrance-date-button .ytomo-reservation-status[data-v-6189b1ab]:empty{background:rgba(0,0,0,0);padding:0}.ytomo-entrance-date-button:hover .ytomo-reservation-status[data-v-6189b1ab]{background:hsla(0,0%,100%,.95);color:#0ea5e9}.ytomo-entrance-date-button:hover .ytomo-reservation-status[data-v-6189b1ab]:empty{background:rgba(0,0,0,0)}.ytomo-reservation-type-indicator[data-v-6189b1ab]{display:inline-block;width:16px;height:13px;font-size:10px;font-weight:400;text-align:center;line-height:13px;border-radius:3px;border:1px solid rgba(0,0,0,0);-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif}.ytomo-reservation-type-indicator.indicator-won[data-v-6189b1ab]{background:#10b981;color:#fff;border-color:#059669}.ytomo-reservation-type-indicator.indicator-active[data-v-6189b1ab]{background:#3b82f6;color:#fff;border-color:#2563eb}.ytomo-reservation-type-indicator.indicator-before[data-v-6189b1ab]{background:#f59e0b;color:#fff;border-color:#d97706}.ytomo-reservation-type-indicator.indicator-none[data-v-6189b1ab]{background:#e5e7eb;color:#6b7280;border-color:#d1d5db}.ytomo-no-reservation[data-v-6189b1ab]{font-style:italic;color:#9ca3af}.ytomo-entrance-date-button.selected .ytomo-reservation-status[data-v-6189b1ab]{background:hsla(0,0%,100%,.95);color:#0891b2}.ytomo-entrance-date-button.selected .ytomo-reservation-status[data-v-6189b1ab]:empty{background:rgba(0,0,0,0)}.ytomo-entrance-date-button.disabled .ytomo-reservation-status[data-v-6189b1ab]{background:hsla(0,0%,100%,.9);color:#475569}.ytomo-entrance-date-button.disabled .ytomo-reservation-status[data-v-6189b1ab]:empty{background:rgba(0,0,0,0)}.ytomo-entrance-date-button .ytomo-schedule-line[data-v-6189b1ab]{padding:2px 0;font-size:11px;line-height:1.2}.ytomo-entrance-date-button .ytomo-schedule-line.ytomo-reservation-line[data-v-6189b1ab]{color:#6b7280;display:flex;align-items:center;gap:4px;font-size:10px}.ytomo-entrance-date-button .ytomo-schedule-divider[data-v-6189b1ab]{height:1px;background:#e5e7eb;margin:2px 0;width:100%}.ytomo-entrance-date-button.selected .ytomo-schedule-line.ytomo-reservation-line[data-v-6189b1ab]{color:hsla(0,0%,100%,.8)}.ytomo-entrance-date-button.selected .ytomo-schedule-divider[data-v-6189b1ab]{background:hsla(0,0%,100%,.3)}.ytomo-entrance-date-group[data-v-6189b1ab]{display:flex;gap:6px;align-items:stretch}.ytomo-expand-button[data-v-6189b1ab]{background:#f8fafc;border:1px solid #cbd5e1;color:#374151;font-size:12px;font-weight:600;padding:3px 8px;cursor:pointer;border-radius:4px;transition:all .2s ease;min-width:24px;height:50%;display:flex;align-items:center;justify-content:center;align-self:flex-end}.ytomo-expand-button[data-v-6189b1ab]:disabled{background:#f3f4f6;border-color:#d1d5db;color:#9ca3af;cursor:not-allowed;opacity:.5}.ytomo-expand-button[data-v-6189b1ab]:hover{background:#e2e8f0;border-color:#94a3b8;transform:translateY(-1px)}.ytomo-expand-button[data-v-6189b1ab]:active{transform:translateY(0)}.ytomo-expand-button[data-v-6189b1ab]:focus{outline:none;box-shadow:0 0 0 2px rgba(44,90,160,.2)}.ytomo-pavilion-details[data-v-6189b1ab]{margin-top:12px;padding:12px;background:#f8fafc;border-radius:6px;border:1px solid #e2e8f0}.ytomo-schedule-detail[data-v-6189b1ab]{margin-bottom:16px}.ytomo-schedule-detail[data-v-6189b1ab]:last-child{margin-bottom:0}.ytomo-schedule-date-header[data-v-6189b1ab]{font-weight:600;color:#334155;margin-bottom:8px;font-size:13px;padding-bottom:4px;border-bottom:1px solid #e2e8f0}.ytomo-pavilion-reservation-group[data-v-6189b1ab]{margin-bottom:12px;padding:8px 0;border-bottom:1px solid #e5e7eb}.ytomo-pavilion-reservation-group[data-v-6189b1ab]:last-child{margin-bottom:0;border-bottom:none}.ytomo-reservation-header[data-v-6189b1ab]{display:flex;align-items:flex-start;gap:12px}.ytomo-reservation-left[data-v-6189b1ab]{display:flex;flex-direction:column;gap:4px;min-width:80px;flex-shrink:0}.ytomo-reservation-right[data-v-6189b1ab]{flex:1;display:flex;flex-direction:column;gap:4px}.ytomo-reservation-type-badge[data-v-6189b1ab]{padding:2px 8px;border-radius:12px;font-size:11px;font-weight:600;white-space:nowrap;text-align:center}.ytomo-reservation-type-badge.badge-won[data-v-6189b1ab]{background:#10b981;color:#fff}.ytomo-reservation-type-badge.badge-expired[data-v-6189b1ab]{background:#ef4444;color:#fff}.ytomo-reservation-type-badge.badge-before[data-v-6189b1ab]{background:#f59e0b;color:#fff}.ytomo-reservation-type-badge.badge-submitted[data-v-6189b1ab]{background:#8b5cf6;color:#fff}.ytomo-reservation-type-badge.badge-none[data-v-6189b1ab]{background:#6b7280;color:#fff}.ytomo-time-slot-badge[data-v-6189b1ab]{background:#f8fafc;color:#475569;padding:2px 8px;border-radius:8px;font-size:11px;font-weight:500;text-align:center;border:1px solid #e2e8f0}.ytomo-time-slot-badge[data-v-6189b1ab]:empty::after{content:"—"}.ytomo-pavilion-name[data-v-6189b1ab]{font-weight:600;color:#334155;font-size:13px;line-height:1.3}.ytomo-pavilion-name.ytomo-status-text[data-v-6189b1ab]{color:#6b7280;font-style:italic;font-weight:500}.ytomo-use-status[data-v-6189b1ab]{color:#475569;font-size:11px;font-weight:500}.ytomo-reservation-type-header[data-v-6189b1ab]{display:flex;flex-direction:column;gap:4px;min-width:80px;flex-shrink:0}.ytomo-reservation-type-badge[data-v-6189b1ab]{background:#3b82f6;color:#fff;padding:4px 8px;border-radius:4px;font-size:10px;font-weight:600;text-align:center;line-height:1.2}.ytomo-time-slot-badge[data-v-6189b1ab]{background:#2c5aa0;color:#fff;padding:3px 6px;border-radius:3px;font-size:10px;font-weight:500;text-align:center;line-height:1.2}.ytomo-pavilion-info[data-v-6189b1ab]{flex:1;color:#374151;font-size:12px;line-height:1.4;display:flex;align-items:center}.ytomo-no-entrance-dates[data-v-6189b1ab]{color:#6b7280;font-size:12px;font-style:italic}.ytomo-input-inline[data-v-6189b1ab]{padding:4px 8px;border:1px solid #d1d5db;border-radius:4px;font-size:12px;transition:border-color .2s;background:#fff}.ytomo-input-inline[data-v-6189b1ab]:focus{outline:none;border-color:#2c5aa0;box-shadow:0 0 0 2px rgba(44,90,160,.1)}.ytomo-input-inline[data-v-6189b1ab]::placeholder{color:#9ca3af}.ytomo-input-inline.ytomo-input-ticket-id[data-v-6189b1ab]{width:120px}.ytomo-input-inline.ytomo-input-label[data-v-6189b1ab]{width:60px}.ytomo-select-inline[data-v-6189b1ab]{padding:4px 8px;border:1px solid #d1d5db;border-radius:4px;font-size:12px;background:#fff;cursor:pointer;width:50px}.ytomo-select-inline[data-v-6189b1ab]:focus{outline:none;border-color:#2c5aa0;box-shadow:0 0 0 2px rgba(44,90,160,.1)}.ytomo-button[data-v-6189b1ab]{padding:8px 16px;border:none;border-radius:6px;font-size:14px;font-weight:500;cursor:pointer;transition:all .2s;display:inline-flex;align-items:center;justify-content:center;white-space:nowrap}.ytomo-button.primary[data-v-6189b1ab]{background:linear-gradient(135deg, #2c5aa0 0%, #1a365d 100%);color:#fff}.ytomo-button.primary[data-v-6189b1ab]:hover{background:linear-gradient(135deg, #1a365d 0%, #2c5aa0 100%);transform:translateY(-1px);box-shadow:0 4px 12px rgba(44,90,160,.3)}.ytomo-button.primary[data-v-6189b1ab]:active{transform:translateY(0)}.ytomo-button.retry-button[data-v-6189b1ab]{background:linear-gradient(135deg, #f59e0b 0%, #d97706 100%);color:#fff;margin-top:12px}.ytomo-button.retry-button[data-v-6189b1ab]:hover{background:linear-gradient(135deg, #d97706 0%, #f59e0b 100%)}.ytomo-button[data-v-6189b1ab]:focus{outline:2px solid #2c5aa0;outline-offset:2px}.ytomo-button[data-v-6189b1ab]:disabled{opacity:.5;cursor:not-allowed;transform:none !important}.ytomo-empty-state[data-v-6189b1ab]{text-align:center;padding:40px 20px;color:#6b7280;font-style:italic}.ytomo-empty-state p[data-v-6189b1ab]{margin:0;font-size:14px}.ytomo-error[data-v-6189b1ab]{text-align:center;padding:40px 20px;color:#dc2626}.ytomo-error h3[data-v-6189b1ab]{margin:0 0 8px 0;font-size:16px;color:#dc2626}.ytomo-error p[data-v-6189b1ab]{margin:0;font-size:14px;color:#6b7280}.ytomo-ticket-tab .ytomo-loading[data-v-6189b1ab]{height:150px}.ytomo-ticket-item[data-v-6189b1ab]{animation:slideIn-6189b1ab .2s ease-out}@keyframes slideIn-6189b1ab{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}@media(prefers-reduced-motion: reduce){.ytomo-ticket-item[data-v-6189b1ab],.ytomo-button[data-v-6189b1ab],.ytomo-date-button[data-v-6189b1ab],.ytomo-entrance-date-button[data-v-6189b1ab],.ytomo-toggle-slider[data-v-6189b1ab],.ytomo-input-inline[data-v-6189b1ab]{animation:none;transition:none}}@media(prefers-contrast: high){.ytomo-ticket-item[data-v-6189b1ab]{border-width:3px}.ytomo-ticket-item.selected[data-v-6189b1ab]{border-width:4px}.ytomo-button[data-v-6189b1ab]:focus,.ytomo-input-inline[data-v-6189b1ab]:focus,.ytomo-date-button[data-v-6189b1ab]:focus,.ytomo-entrance-date-button[data-v-6189b1ab]:focus,.ytomo-input-inline[data-v-6189b1ab]:focus,.ytomo-select-inline[data-v-6189b1ab]:focus{outline:3px solid #000}}.ytomo-empty-state[data-v-6189b1ab]{text-align:center;padding:40px 20px;color:#6b7280;font-style:italic}.ytomo-empty-state p[data-v-6189b1ab]{margin:0;font-size:14px}.ytomo-error[data-v-6189b1ab]{text-align:center;padding:40px 20px;color:#dc2626}.ytomo-error h3[data-v-6189b1ab]{margin:0 0 8px 0;font-size:16px;color:#dc2626}.ytomo-error p[data-v-6189b1ab]{margin:0;font-size:14px;color:#6b7280}.ytomo-ticket-list[data-v-6189b1ab]::-webkit-scrollbar{width:6px}.ytomo-ticket-list[data-v-6189b1ab]::-webkit-scrollbar-track{background:#f1f5f9;border-radius:3px}.ytomo-ticket-list[data-v-6189b1ab]::-webkit-scrollbar-thumb{background:#cbd5e1;border-radius:3px}.ytomo-ticket-list[data-v-6189b1ab]::-webkit-scrollbar-thumb:hover{background:#94a3b8}.ytomo-ticket-item[data-v-6189b1ab]{animation:slideIn-6189b1ab .2s ease-out}@keyframes slideIn-6189b1ab{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}`, ""]);
+___CSS_LOADER_EXPORT___.push([module.id, `
+/* ダイアログオーバーレイ */
+.ytomo-dialog-overlay[data-v-1b566c62] {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10000;
+    opacity: 0;
+    animation: fadeIn-1b566c62 0.2s ease-out forwards;
+    overflow-y: auto;
+}
+@keyframes fadeIn-1b566c62 {
+to {
+        opacity: 1;
+}
+}
+
+/* メインダイアログコンテナ */
+.ytomo-main-dialog[data-v-1b566c62] {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    width: 90vw;
+    max-width: 800px;
+    min-width: 600px;
+    height: 80vh;
+    max-height: 700px;
+    min-height: 500px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    transform: scale(0.9);
+    animation: dialogAppear-1b566c62 0.2s ease-out forwards;
+}
+@media (max-width: 768px) {
+.ytomo-main-dialog[data-v-1b566c62] {
+        width: 95vw;
+        height: 90vh;
+        min-width: 320px;
+        min-height: 400px;
+}
+}
+@keyframes dialogAppear-1b566c62 {
+to {
+        transform: scale(1);
+}
+}
+
+/* ダイアログボディ */
+.ytomo-dialog-body[data-v-1b566c62] {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    background: #f8fafc;
+}
+
+/* タブナビゲーション */
+.ytomo-tab-navigation[data-v-1b566c62] {
+    display: flex;
+    background: white;
+    border-bottom: 1px solid #e2e8f0;
+    flex-shrink: 0;
+    position: relative;
+}
+.ytomo-tab-button[data-v-1b566c62] {
+    flex: 1;
+    background: none;
+    border: none;
+    padding: 16px 12px;
+    font-size: 14px;
+    font-weight: 500;
+    color: #64748b;
+    cursor: pointer;
+    position: relative;
+    transition: all 0.2s;
+    border-bottom: 3px solid transparent;
+}
+.ytomo-tab-button[data-v-1b566c62]:hover {
+    background-color: #f1f5f9;
+    color: #475569;
+}
+.ytomo-tab-button.active[data-v-1b566c62] {
+    color: #2c5aa0;
+    background-color: #f8fafc;
+    border-bottom-color: #2c5aa0;
+}
+.ytomo-tab-button[data-v-1b566c62]:focus {
+    outline: 2px solid #2c5aa0;
+    outline-offset: -2px;
+}
+.ytomo-tab-content[data-v-1b566c62] {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    align-items: center;
+}
+.ytomo-tab-title[data-v-1b566c62] {
+    font-size: 14px;
+    font-weight: 500;
+}
+.ytomo-tab-dates[data-v-1b566c62] {
+    font-size: 12px;
+    color: #6b7280;
+    line-height: 1.2;
+    min-height: 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+}
+.ytomo-latest-time[data-v-1b566c62] {
+    font-size: 11px;
+    color: #059669;
+    font-weight: 500;
+}
+.ytomo-tab-count[data-v-1b566c62] {
+    display: inline-block;
+    margin-left: 8px;
+    font-size: 12px;
+    color: #475569;
+    font-weight: 500;
+    min-width: 18px;
+    text-align: center;
+    transition: all 0.2s;
+    background: #f8fafc;
+    padding: 2px 6px;
+    border-radius: 10px;
+    border: 1px solid #e2e8f0;
+}
+.ytomo-tab-button.active .ytomo-tab-count[data-v-1b566c62] {
+    color: #2c5aa0;
+    background: #dbeafe;
+    border-color: #93c5fd;
+}
+.ytomo-pavilion-reservation-info[data-v-1b566c62] {
+    font-size: 11px;
+    color: #64748b;
+    font-family: 'Courier New', 'Monaco', 'Menlo', monospace;
+    font-weight: 600;
+    margin-top: 1px;
+}
+.ytomo-tab-button.active .ytomo-pavilion-reservation-info[data-v-1b566c62] {
+    color: #2c5aa0;
+}
+.ytomo-dialog-close[data-v-1b566c62] {
+    position: absolute;
+    right: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: black;
+    font-size: 24px;
+    width: 32px;
+    height: 32px;
+    border-radius: 6px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.2s;
+}
+.ytomo-dialog-close[data-v-1b566c62]:hover {
+    background-color: rgba(0, 0, 0, 0.1);
+}
+.ytomo-dialog-close[data-v-1b566c62]:focus {
+    outline: 2px solid rgba(0, 0, 0, 0.5);
+    outline-offset: 2px;
+}
+
+/* タブコンテンツ */
+.ytomo-tab-content[data-v-1b566c62] {
+    flex: 1;
+    overflow: hidden;
+    position: relative;
+}
+.ytomo-tab-pane[data-v-1b566c62] {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    transform: translateX(20px);
+    transition: all 0.2s ease-out;
+    overflow-y: auto;
+    padding: 20px;
+    display: none;
+}
+.ytomo-tab-pane.active[data-v-1b566c62] {
+    opacity: 1;
+    transform: translateX(0);
+    display: block;
+}
+
+/* ローディング表示 */
+.ytomo-loading[data-v-1b566c62] {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 200px;
+    text-align: center;
+}
+.ytomo-loading[data-v-1b566c62]::before {
+    content: "";
+    width: 40px;
+    height: 40px;
+    border: 3px solid #e2e8f0;
+    border-top-color: #2c5aa0;
+    border-radius: 50%;
+    animation: spin-1b566c62 1s linear infinite;
+    margin-bottom: 16px;
+}
+.ytomo-loading p[data-v-1b566c62] {
+    margin: 0;
+    color: #64748b;
+    font-size: 14px;
+}
+@keyframes spin-1b566c62 {
+to {
+        transform: rotate(360deg);
+}
+}
+
+/* アクセシビリティ対応 */
+@media (prefers-reduced-motion: reduce) {
+.ytomo-dialog-overlay[data-v-1b566c62],
+    .ytomo-main-dialog[data-v-1b566c62],
+    .ytomo-tab-pane[data-v-1b566c62],
+    .ytomo-tab-button[data-v-1b566c62],
+    .ytomo-loading[data-v-1b566c62]::before {
+        animation: none;
+        transition: none;
+}
+}
+
+/* ハイコントラストモード対応 */
+@media (prefers-contrast: high) {
+.ytomo-main-dialog[data-v-1b566c62] {
+        border: 2px solid #000;
+}
+.ytomo-tab-button.active[data-v-1b566c62] {
+        border-bottom-width: 4px;
+}
+.ytomo-dialog-close[data-v-1b566c62]:focus,
+    .ytomo-tab-button[data-v-1b566c62]:focus {
+        outline: 3px solid #000;
+}
+}
+
+/* ダークモード対応を無効化（明示的にライトテーマを強制） */
+.ytomo-dialog-overlay[data-v-1b566c62] {
+    color-scheme: light;
+}
+.ytomo-main-dialog[data-v-1b566c62] {
+    color-scheme: light;
+    background: white !important;
+    color: #1f2937 !important;
+}
+`, ""]);
+// Exports
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
+
+
+/***/ }),
+
+/***/ 895:
+/***/ ((module, __webpack_exports__, __webpack_require__) => {
+
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   A: () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _node_modules_css_loader_dist_runtime_noSourceMaps_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(601);
+/* harmony import */ var _node_modules_css_loader_dist_runtime_noSourceMaps_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_css_loader_dist_runtime_noSourceMaps_js__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(314);
+/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1__);
+// Imports
+
+
+var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1___default()((_node_modules_css_loader_dist_runtime_noSourceMaps_js__WEBPACK_IMPORTED_MODULE_0___default()));
+// Module
+___CSS_LOADER_EXPORT___.push([module.id, `.ytomo-entrance-tab[data-v-f13d02e8]{height:100%;display:flex;flex-direction:column;padding:16px;gap:20px}.ytomo-entrance-calendar[data-v-f13d02e8]{flex-shrink:0;border:1px solid #e5e7eb;border-radius:8px}.ytomo-entrance-calendar .ytomo-calendar-header[data-v-f13d02e8]{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:#f9fafb;border-radius:8px 8px 0 0;cursor:pointer;border-bottom:1px solid #e5e7eb}.ytomo-entrance-calendar .ytomo-calendar-header[data-v-f13d02e8]:hover{background:#f3f4f6}.ytomo-entrance-calendar .ytomo-calendar-header h3[data-v-f13d02e8]{margin:0;font-size:14px;font-weight:600;color:#374151}.ytomo-entrance-calendar .ytomo-calendar-header .ytomo-calendar-toggle[data-v-f13d02e8]{font-size:12px;color:#6b7280}.ytomo-entrance-calendar .ytomo-calendar-body[data-v-f13d02e8]{padding:16px}.ytomo-entrance-calendar .ytomo-calendar-controls[data-v-f13d02e8]{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}.ytomo-entrance-calendar .ytomo-calendar-controls .ytomo-month-button[data-v-f13d02e8]{background:none;border:1px solid #d1d5db;border-radius:4px;width:32px;height:32px;cursor:pointer;font-size:16px}.ytomo-entrance-calendar .ytomo-calendar-controls .ytomo-month-button[data-v-f13d02e8]:hover{background:#f3f4f6}.ytomo-entrance-calendar .ytomo-calendar-controls .ytomo-current-month[data-v-f13d02e8]{font-weight:600;color:#374151}.ytomo-entrance-calendar .ytomo-calendar-grid .ytomo-calendar-weekdays[data-v-f13d02e8]{display:grid;grid-template-columns:repeat(7, 1fr);gap:1px;margin-bottom:8px}.ytomo-entrance-calendar .ytomo-calendar-grid .ytomo-calendar-weekdays .ytomo-weekday[data-v-f13d02e8]{text-align:center;font-size:12px;font-weight:600;color:#6b7280;padding:4px}.ytomo-entrance-calendar .ytomo-calendar-grid .ytomo-calendar-days[data-v-f13d02e8]{display:grid;grid-template-columns:repeat(7, 1fr);gap:1px}.ytomo-entrance-calendar .ytomo-calendar-grid .ytomo-calendar-days .ytomo-calendar-day[data-v-f13d02e8]{aspect-ratio:1;display:flex;align-items:center;justify-content:center;font-size:12px;cursor:pointer;border-radius:4px;transition:all .2s}.ytomo-entrance-calendar .ytomo-calendar-grid .ytomo-calendar-days .ytomo-calendar-day[data-v-f13d02e8]:hover:not(.disabled):not(.other-month){background:#f3f4f6}.ytomo-entrance-calendar .ytomo-calendar-grid .ytomo-calendar-days .ytomo-calendar-day.selected[data-v-f13d02e8]{background:#2c5aa0;color:#fff}.ytomo-entrance-calendar .ytomo-calendar-grid .ytomo-calendar-days .ytomo-calendar-day.today[data-v-f13d02e8]{background:#dbeafe;color:#1e40af;font-weight:600}.ytomo-entrance-calendar .ytomo-calendar-grid .ytomo-calendar-days .ytomo-calendar-day.other-month[data-v-f13d02e8]{color:#d1d5db;cursor:default}.ytomo-entrance-calendar .ytomo-calendar-grid .ytomo-calendar-days .ytomo-calendar-day.disabled[data-v-f13d02e8]{color:#d1d5db;cursor:not-allowed}.ytomo-entrance-reservations[data-v-f13d02e8]{flex:1;overflow:hidden;display:flex;flex-direction:column}.ytomo-entrance-reservations .ytomo-reservation-header[data-v-f13d02e8]{margin-bottom:12px}.ytomo-entrance-reservations .ytomo-reservation-header h4[data-v-f13d02e8]{margin:0;font-size:14px;font-weight:600;color:#374151}.ytomo-entrance-reservations .ytomo-reservation-table-container[data-v-f13d02e8]{flex:1;min-height:0}.ytomo-entrance-reservations .ytomo-reservation-table-container .ytomo-no-date-selected[data-v-f13d02e8]{display:flex;align-items:center;justify-content:center;height:150px;color:#9ca3af;font-size:14px}.ytomo-entrance-table[data-v-f13d02e8]{width:100%;border-collapse:collapse}.ytomo-entrance-table th[data-v-f13d02e8]{background:#f9fafb;border:1px solid #e5e7eb;padding:8px 12px;text-align:center;font-weight:600;font-size:14px;color:#374151}.ytomo-entrance-table td[data-v-f13d02e8]{border:1px solid #e5e7eb;padding:4px;vertical-align:middle}.ytomo-entrance-table .ytomo-time-button[data-v-f13d02e8]{width:100%;background:#fff;border:1px solid #d1d5db;border-radius:6px;padding:8px 12px;cursor:pointer;transition:all .2s}.ytomo-entrance-table .ytomo-time-button[data-v-f13d02e8]:hover{background:#f3f4f6;border-color:#9ca3af}.ytomo-entrance-table .ytomo-time-button.selected[data-v-f13d02e8]{background:#2c5aa0;border-color:#2c5aa0;color:#fff}.ytomo-entrance-table .ytomo-time-button .ytomo-time-content[data-v-f13d02e8]{display:flex;align-items:center;justify-content:center;gap:8px}.ytomo-entrance-table .ytomo-time-button .ytomo-time-content .ytomo-status-icon[data-v-f13d02e8]{width:16px;height:16px;flex-shrink:0}.ytomo-entrance-table .ytomo-time-button .ytomo-time-content .ytomo-time-text[data-v-f13d02e8]{font-size:13px;font-weight:500}`, ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -38601,6 +38625,8 @@ const _hoisted_34 = ["disabled"];
 
 
 
+// LocationHelper は location_index プロパティが実装されるまで一時的にコメントアウト
+// import { LocationHelper } from '@/modules/entrance-reservation-state-manager'
 
 
 // Store アクセス
@@ -38986,6 +39012,14 @@ const _hoisted_34 = ["disabled"];
             }
             return dateStr;
         };
+        // 入場日時表示を東・西付きに修正
+        const formatEntranceDateTimeWithLocation = (schedule) => {
+            const date = formatDate(schedule.entrance_date);
+            const time = (schedule.schedule_name || extractTimeFromSchedule(schedule)).replace(/-$/, '');
+            // location_indexから東西を判定 (0:東, 1:西)
+            const locationText = schedule.location_index === 1 ? '西' : '東';
+            return `${date} ${locationText} ${time}`;
+        };
         const getStatusText = (periodStatus, submissionStatus) => {
             const periodText = getPeriodStatusText(periodStatus);
             const submissionText = getSubmissionStatusText(submissionStatus);
@@ -39237,7 +39271,7 @@ const _hoisted_34 = ["disabled"];
                                                                             disabled: getReservationStatus(schedule, ticket).availableTypes.length === 0,
                                                                             onClick: ($event) => (handleEntranceDateSelection(schedule, ticket, $event))
                                                                         }, [
-                                                                            (0,vue_esm_bundler/* createElementVNode */.Lk)("div", _hoisted_20, (0,vue_esm_bundler/* toDisplayString */.v_)(formatDate(schedule.entrance_date)) + " " + (0,vue_esm_bundler/* toDisplayString */.v_)((schedule.schedule_name || extractTimeFromSchedule(schedule)).replace(/-$/, '')), 1 /* TEXT */),
+                                                                            (0,vue_esm_bundler/* createElementVNode */.Lk)("div", _hoisted_20, (0,vue_esm_bundler/* toDisplayString */.v_)(formatEntranceDateTimeWithLocation(schedule)), 1 /* TEXT */),
                                                                             _cache[10] || (_cache[10] = (0,vue_esm_bundler/* createElementVNode */.Lk)("div", { class: "ytomo-schedule-divider" }, null, -1 /* CACHED */)),
                                                                             (0,vue_esm_bundler/* createElementVNode */.Lk)("div", _hoisted_21, [
                                                                                 ((0,vue_esm_bundler/* openBlock */.uX)(true), (0,vue_esm_bundler/* createElementBlock */.CE)(vue_esm_bundler/* Fragment */.FK, null, (0,vue_esm_bundler/* renderList */.pI)(getReservationTypesForSecondLine(schedule), (reservationType) => {
@@ -39365,9 +39399,9 @@ const _hoisted_34 = ["disabled"];
 
 ;// ./ts/components/TicketTab.vue?vue&type=script&setup=true&lang=ts
  
-// EXTERNAL MODULE: ./node_modules/css-loader/dist/cjs.js!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/sass-loader/dist/cjs.js!./node_modules/vue-loader/dist/index.js??ruleSet[1].rules[8].use[0]!./ts/components/TicketTab.vue?vue&type=style&index=0&id=6189b1ab&scoped=true&lang=scss
-var TicketTabvue_type_style_index_0_id_6189b1ab_scoped_true_lang_scss = __webpack_require__(850);
-;// ./node_modules/style-loader/dist/cjs.js!./node_modules/css-loader/dist/cjs.js!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/sass-loader/dist/cjs.js!./node_modules/vue-loader/dist/index.js??ruleSet[1].rules[8].use[0]!./ts/components/TicketTab.vue?vue&type=style&index=0&id=6189b1ab&scoped=true&lang=scss
+// EXTERNAL MODULE: ./node_modules/css-loader/dist/cjs.js!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/sass-loader/dist/cjs.js!./node_modules/vue-loader/dist/index.js??ruleSet[1].rules[8].use[0]!./ts/components/TicketTab.vue?vue&type=style&index=0&id=53e7c5f4&scoped=true&lang=scss
+var TicketTabvue_type_style_index_0_id_53e7c5f4_scoped_true_lang_scss = __webpack_require__(268);
+;// ./node_modules/style-loader/dist/cjs.js!./node_modules/css-loader/dist/cjs.js!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/sass-loader/dist/cjs.js!./node_modules/vue-loader/dist/index.js??ruleSet[1].rules[8].use[0]!./ts/components/TicketTab.vue?vue&type=style&index=0&id=53e7c5f4&scoped=true&lang=scss
 
       
       
@@ -39379,22 +39413,22 @@ var TicketTabvue_type_style_index_0_id_6189b1ab_scoped_true_lang_scss = __webpac
       
       
 
-var TicketTabvue_type_style_index_0_id_6189b1ab_scoped_true_lang_scss_options = {};
+var TicketTabvue_type_style_index_0_id_53e7c5f4_scoped_true_lang_scss_options = {};
 
-TicketTabvue_type_style_index_0_id_6189b1ab_scoped_true_lang_scss_options.styleTagTransform = (styleTagTransform_default());
-TicketTabvue_type_style_index_0_id_6189b1ab_scoped_true_lang_scss_options.setAttributes = (setAttributesWithoutAttributes_default());
-TicketTabvue_type_style_index_0_id_6189b1ab_scoped_true_lang_scss_options.insert = insertBySelector_default().bind(null, "head");
-TicketTabvue_type_style_index_0_id_6189b1ab_scoped_true_lang_scss_options.domAPI = (styleDomAPI_default());
-TicketTabvue_type_style_index_0_id_6189b1ab_scoped_true_lang_scss_options.insertStyleElement = (insertStyleElement_default());
+TicketTabvue_type_style_index_0_id_53e7c5f4_scoped_true_lang_scss_options.styleTagTransform = (styleTagTransform_default());
+TicketTabvue_type_style_index_0_id_53e7c5f4_scoped_true_lang_scss_options.setAttributes = (setAttributesWithoutAttributes_default());
+TicketTabvue_type_style_index_0_id_53e7c5f4_scoped_true_lang_scss_options.insert = insertBySelector_default().bind(null, "head");
+TicketTabvue_type_style_index_0_id_53e7c5f4_scoped_true_lang_scss_options.domAPI = (styleDomAPI_default());
+TicketTabvue_type_style_index_0_id_53e7c5f4_scoped_true_lang_scss_options.insertStyleElement = (insertStyleElement_default());
 
-var TicketTabvue_type_style_index_0_id_6189b1ab_scoped_true_lang_scss_update = injectStylesIntoStyleTag_default()(TicketTabvue_type_style_index_0_id_6189b1ab_scoped_true_lang_scss/* default */.A, TicketTabvue_type_style_index_0_id_6189b1ab_scoped_true_lang_scss_options);
-
-
+var TicketTabvue_type_style_index_0_id_53e7c5f4_scoped_true_lang_scss_update = injectStylesIntoStyleTag_default()(TicketTabvue_type_style_index_0_id_53e7c5f4_scoped_true_lang_scss/* default */.A, TicketTabvue_type_style_index_0_id_53e7c5f4_scoped_true_lang_scss_options);
 
 
-       /* harmony default export */ const components_TicketTabvue_type_style_index_0_id_6189b1ab_scoped_true_lang_scss = (TicketTabvue_type_style_index_0_id_6189b1ab_scoped_true_lang_scss/* default */.A && TicketTabvue_type_style_index_0_id_6189b1ab_scoped_true_lang_scss/* default */.A.locals ? TicketTabvue_type_style_index_0_id_6189b1ab_scoped_true_lang_scss/* default */.A.locals : undefined);
 
-;// ./ts/components/TicketTab.vue?vue&type=style&index=0&id=6189b1ab&scoped=true&lang=scss
+
+       /* harmony default export */ const components_TicketTabvue_type_style_index_0_id_53e7c5f4_scoped_true_lang_scss = (TicketTabvue_type_style_index_0_id_53e7c5f4_scoped_true_lang_scss/* default */.A && TicketTabvue_type_style_index_0_id_53e7c5f4_scoped_true_lang_scss/* default */.A.locals ? TicketTabvue_type_style_index_0_id_53e7c5f4_scoped_true_lang_scss/* default */.A.locals : undefined);
+
+;// ./ts/components/TicketTab.vue?vue&type=style&index=0&id=53e7c5f4&scoped=true&lang=scss
 
 // EXTERNAL MODULE: ./node_modules/vue-loader/dist/exportHelper.js
 var exportHelper = __webpack_require__(262);
@@ -39405,7 +39439,7 @@ var exportHelper = __webpack_require__(262);
 ;
 
 
-const TicketTab_exports_ = /*#__PURE__*/(0,exportHelper/* default */.A)(TicketTabvue_type_script_setup_true_lang_ts, [['__scopeId',"data-v-6189b1ab"]])
+const TicketTab_exports_ = /*#__PURE__*/(0,exportHelper/* default */.A)(TicketTabvue_type_script_setup_true_lang_ts, [['__scopeId',"data-v-53e7c5f4"]])
 
 /* harmony default export */ const TicketTab = (TicketTab_exports_);
 ;// ./ts/stores/overlays.ts
@@ -40501,6 +40535,328 @@ var PavilionTabvue_type_style_index_0_id_910d08c4_scoped_true_lang_scss_update =
 const PavilionTab_exports_ = /*#__PURE__*/(0,exportHelper/* default */.A)(PavilionTabvue_type_script_setup_true_lang_ts, [['__scopeId',"data-v-910d08c4"]])
 
 /* harmony default export */ const PavilionTab = (PavilionTab_exports_);
+;// ./node_modules/ts-loader/index.js??clonedRuleSet-1.use!./node_modules/vue-loader/dist/index.js??ruleSet[1].rules[8].use[0]!./ts/components/EntranceTab.vue?vue&type=script&setup=true&lang=ts
+
+
+const EntranceTabvue_type_script_setup_true_lang_ts_hoisted_1 = { class: "ytomo-entrance-tab" };
+const EntranceTabvue_type_script_setup_true_lang_ts_hoisted_2 = { class: "ytomo-entrance-calendar" };
+const EntranceTabvue_type_script_setup_true_lang_ts_hoisted_3 = { class: "ytomo-calendar-toggle" };
+const EntranceTabvue_type_script_setup_true_lang_ts_hoisted_4 = { class: "ytomo-calendar-body" };
+const EntranceTabvue_type_script_setup_true_lang_ts_hoisted_5 = { class: "ytomo-calendar-controls" };
+const EntranceTabvue_type_script_setup_true_lang_ts_hoisted_6 = { class: "ytomo-current-month" };
+const EntranceTabvue_type_script_setup_true_lang_ts_hoisted_7 = { class: "ytomo-calendar-grid" };
+const EntranceTabvue_type_script_setup_true_lang_ts_hoisted_8 = { class: "ytomo-calendar-weekdays" };
+const EntranceTabvue_type_script_setup_true_lang_ts_hoisted_9 = { class: "ytomo-calendar-days" };
+const EntranceTabvue_type_script_setup_true_lang_ts_hoisted_10 = ["onClick"];
+const EntranceTabvue_type_script_setup_true_lang_ts_hoisted_11 = { class: "ytomo-entrance-reservations" };
+const EntranceTabvue_type_script_setup_true_lang_ts_hoisted_12 = { class: "ytomo-reservation-header" };
+const EntranceTabvue_type_script_setup_true_lang_ts_hoisted_13 = { class: "ytomo-reservation-table-container" };
+const EntranceTabvue_type_script_setup_true_lang_ts_hoisted_14 = {
+    key: 0,
+    class: "ytomo-entrance-table"
+};
+const EntranceTabvue_type_script_setup_true_lang_ts_hoisted_15 = ["onClick"];
+const EntranceTabvue_type_script_setup_true_lang_ts_hoisted_16 = { class: "ytomo-time-content" };
+const EntranceTabvue_type_script_setup_true_lang_ts_hoisted_17 = ["src", "alt"];
+const EntranceTabvue_type_script_setup_true_lang_ts_hoisted_18 = { class: "ytomo-time-text" };
+const EntranceTabvue_type_script_setup_true_lang_ts_hoisted_19 = ["onClick"];
+const EntranceTabvue_type_script_setup_true_lang_ts_hoisted_20 = { class: "ytomo-time-content" };
+const EntranceTabvue_type_script_setup_true_lang_ts_hoisted_21 = ["src", "alt"];
+const EntranceTabvue_type_script_setup_true_lang_ts_hoisted_22 = { class: "ytomo-time-text" };
+const EntranceTabvue_type_script_setup_true_lang_ts_hoisted_23 = {
+    key: 1,
+    class: "ytomo-no-date-selected"
+};
+
+
+/* harmony default export */ const EntranceTabvue_type_script_setup_true_lang_ts = (/*@__PURE__*/(0,vue_esm_bundler/* defineComponent */.pM)({
+    __name: 'EntranceTab',
+    setup(__props) {
+        const logger = utils_logger/* loggers */.C$.ui;
+        // カレンダー状態
+        const isCalendarExpanded = (0,vue_esm_bundler/* ref */.KR)(true);
+        const selectedDate = (0,vue_esm_bundler/* ref */.KR)('');
+        const currentMonth = (0,vue_esm_bundler/* ref */.KR)(new Date(2025, 9)); // 2025年10月
+        // カレンダー表示用データ
+        const weekdays = ['日', '月', '火', '水', '木', '金', '土'];
+        const currentMonthDisplay = (0,vue_esm_bundler/* computed */.EW)(() => {
+            return `${currentMonth.value.getFullYear()}年${currentMonth.value.getMonth() + 1}月`;
+        });
+        const calendarDates = (0,vue_esm_bundler/* computed */.EW)(() => {
+            const year = currentMonth.value.getFullYear();
+            const month = currentMonth.value.getMonth();
+            const firstDay = new Date(year, month, 1);
+            const lastDay = new Date(year, month + 1, 0);
+            const startDate = new Date(firstDay);
+            startDate.setDate(startDate.getDate() - firstDay.getDay());
+            const dates = [];
+            const today = new Date();
+            for (let i = 0; i < 42; i++) {
+                const date = new Date(startDate);
+                date.setDate(startDate.getDate() + i);
+                const isCurrentMonth = date.getMonth() === month;
+                const dateString = date.toISOString().split('T')[0];
+                dates.push({
+                    key: dateString,
+                    day: date.getDate(),
+                    dateString,
+                    isCurrentMonth,
+                    isToday: dateString === today.toISOString().split('T')[0],
+                    disabled: !isCurrentMonth || (year === 2025 && month !== 9) // 2025年10月のみ有効
+                });
+            }
+            return dates;
+        });
+        // 時間帯データ（満員時間帯も選択可能）
+        const timeSlots = (0,vue_esm_bundler/* ref */.KR)([
+            {
+                time: '9:00',
+                east: { status: 'low', selected: false },
+                west: { status: 'full', selected: false }
+            },
+            {
+                time: '10:00',
+                east: { status: 'full', selected: false },
+                west: { status: 'full', selected: false }
+            },
+            {
+                time: '11:00',
+                east: { status: 'full', selected: false },
+                west: { status: 'low', selected: true }
+            },
+            {
+                time: '12:00',
+                east: { status: 'high', selected: false },
+                west: { status: 'high', selected: false }
+            },
+            {
+                time: '17:00',
+                east: { status: 'low', selected: false },
+                west: { status: 'low', selected: false }
+            }
+        ]);
+        // カレンダー操作
+        const toggleCalendar = () => {
+            isCalendarExpanded.value = !isCalendarExpanded.value;
+        };
+        const previousMonth = () => {
+            const newMonth = new Date(currentMonth.value);
+            newMonth.setMonth(newMonth.getMonth() - 1);
+            // 2025年10月のみに制限
+            if (newMonth.getFullYear() === 2025 && newMonth.getMonth() === 9) {
+                currentMonth.value = newMonth;
+            }
+        };
+        const nextMonth = () => {
+            const newMonth = new Date(currentMonth.value);
+            newMonth.setMonth(newMonth.getMonth() + 1);
+            // 2025年10月のみに制限
+            if (newMonth.getFullYear() === 2025 && newMonth.getMonth() === 9) {
+                currentMonth.value = newMonth;
+            }
+        };
+        const selectDate = (date) => {
+            if (!date.disabled && date.isCurrentMonth) {
+                selectedDate.value = date.dateString;
+                logger.info('日付選択', { date: date.dateString });
+            }
+        };
+        // 日付フォーマット
+        const formatDate = (dateString) => {
+            const date = new Date(dateString);
+            return `${date.getMonth() + 1}月${date.getDate()}日`;
+        };
+        // ステータスアイコン取得
+        const getStatusIcon = (status) => {
+            switch (status) {
+                case 'full':
+                    return '/asset/img/calendar_ng.svg';
+                case 'low':
+                    return '/asset/img/ico_scale_low.svg';
+                case 'high':
+                    return '/asset/img/ico_scale_high.svg';
+                default:
+                    return '/asset/img/ico_scale_low.svg';
+            }
+        };
+        // ステータス説明取得
+        const getStatusAlt = (status) => {
+            switch (status) {
+                case 'full':
+                    return '満員です(予約不可)';
+                case 'low':
+                    return '混雑が予想されます';
+                case 'high':
+                    return '空いています';
+                default:
+                    return '混雑が予想されます';
+            }
+        };
+        // 時間帯選択の切り替え（満員時間帯も選択可能）
+        const toggleTimeSlot = (gate, time) => {
+            const slot = timeSlots.value.find(s => s.time === time);
+            if (slot) {
+                slot[gate].selected = !slot[gate].selected;
+                logger.info('時間帯選択切り替え', { gate, time, status: slot[gate].status, selected: slot[gate].selected });
+            }
+        };
+        return (_ctx, _cache) => {
+            return ((0,vue_esm_bundler/* openBlock */.uX)(), (0,vue_esm_bundler/* createElementBlock */.CE)("div", EntranceTabvue_type_script_setup_true_lang_ts_hoisted_1, [
+                (0,vue_esm_bundler/* createCommentVNode */.Q3)(" 上側: カレンダー "),
+                (0,vue_esm_bundler/* createElementVNode */.Lk)("div", EntranceTabvue_type_script_setup_true_lang_ts_hoisted_2, [
+                    (0,vue_esm_bundler/* createElementVNode */.Lk)("div", {
+                        class: "ytomo-calendar-header",
+                        onClick: toggleCalendar
+                    }, [
+                        (0,vue_esm_bundler/* createElementVNode */.Lk)("h3", null, "入場日選択 " + (0,vue_esm_bundler/* toDisplayString */.v_)(selectedDate.value ? `- ${formatDate(selectedDate.value)}` : ''), 1 /* TEXT */),
+                        (0,vue_esm_bundler/* createElementVNode */.Lk)("span", EntranceTabvue_type_script_setup_true_lang_ts_hoisted_3, (0,vue_esm_bundler/* toDisplayString */.v_)(isCalendarExpanded.value ? '▼' : '▶'), 1 /* TEXT */)
+                    ]),
+                    (0,vue_esm_bundler/* withDirectives */.bo)((0,vue_esm_bundler/* createElementVNode */.Lk)("div", EntranceTabvue_type_script_setup_true_lang_ts_hoisted_4, [
+                        (0,vue_esm_bundler/* createElementVNode */.Lk)("div", EntranceTabvue_type_script_setup_true_lang_ts_hoisted_5, [
+                            (0,vue_esm_bundler/* createElementVNode */.Lk)("button", {
+                                onClick: previousMonth,
+                                class: "ytomo-month-button"
+                            }, "‹"),
+                            (0,vue_esm_bundler/* createElementVNode */.Lk)("span", EntranceTabvue_type_script_setup_true_lang_ts_hoisted_6, (0,vue_esm_bundler/* toDisplayString */.v_)(currentMonthDisplay.value), 1 /* TEXT */),
+                            (0,vue_esm_bundler/* createElementVNode */.Lk)("button", {
+                                onClick: nextMonth,
+                                class: "ytomo-month-button"
+                            }, "›")
+                        ]),
+                        (0,vue_esm_bundler/* createElementVNode */.Lk)("div", EntranceTabvue_type_script_setup_true_lang_ts_hoisted_7, [
+                            (0,vue_esm_bundler/* createElementVNode */.Lk)("div", EntranceTabvue_type_script_setup_true_lang_ts_hoisted_8, [
+                                ((0,vue_esm_bundler/* openBlock */.uX)(), (0,vue_esm_bundler/* createElementBlock */.CE)(vue_esm_bundler/* Fragment */.FK, null, (0,vue_esm_bundler/* renderList */.pI)(weekdays, (day) => {
+                                    return (0,vue_esm_bundler/* createElementVNode */.Lk)("div", {
+                                        key: day,
+                                        class: "ytomo-weekday"
+                                    }, (0,vue_esm_bundler/* toDisplayString */.v_)(day), 1 /* TEXT */);
+                                }), 64 /* STABLE_FRAGMENT */))
+                            ]),
+                            (0,vue_esm_bundler/* createElementVNode */.Lk)("div", EntranceTabvue_type_script_setup_true_lang_ts_hoisted_9, [
+                                ((0,vue_esm_bundler/* openBlock */.uX)(true), (0,vue_esm_bundler/* createElementBlock */.CE)(vue_esm_bundler/* Fragment */.FK, null, (0,vue_esm_bundler/* renderList */.pI)(calendarDates.value, (date) => {
+                                    return ((0,vue_esm_bundler/* openBlock */.uX)(), (0,vue_esm_bundler/* createElementBlock */.CE)("div", {
+                                        key: date.key,
+                                        class: (0,vue_esm_bundler/* normalizeClass */.C4)(["ytomo-calendar-day", {
+                                                'other-month': !date.isCurrentMonth,
+                                                'selected': date.dateString === selectedDate.value,
+                                                'today': date.isToday,
+                                                'disabled': date.disabled
+                                            }]),
+                                        onClick: ($event) => (selectDate(date))
+                                    }, (0,vue_esm_bundler/* toDisplayString */.v_)(date.day), 11 /* TEXT, CLASS, PROPS */, EntranceTabvue_type_script_setup_true_lang_ts_hoisted_10));
+                                }), 128 /* KEYED_FRAGMENT */))
+                            ])
+                        ])
+                    ], 512 /* NEED_PATCH */), [
+                        [vue_esm_bundler/* vShow */.aG, isCalendarExpanded.value]
+                    ])
+                ]),
+                (0,vue_esm_bundler/* createCommentVNode */.Q3)(" 下側: 予約状況テーブル "),
+                (0,vue_esm_bundler/* createElementVNode */.Lk)("div", EntranceTabvue_type_script_setup_true_lang_ts_hoisted_11, [
+                    (0,vue_esm_bundler/* createElementVNode */.Lk)("div", EntranceTabvue_type_script_setup_true_lang_ts_hoisted_12, [
+                        (0,vue_esm_bundler/* createElementVNode */.Lk)("h4", null, (0,vue_esm_bundler/* toDisplayString */.v_)(selectedDate.value ? formatDate(selectedDate.value) : '日付を選択してください') + " の予約状況", 1 /* TEXT */)
+                    ]),
+                    (0,vue_esm_bundler/* createElementVNode */.Lk)("div", EntranceTabvue_type_script_setup_true_lang_ts_hoisted_13, [
+                        (selectedDate.value)
+                            ? ((0,vue_esm_bundler/* openBlock */.uX)(), (0,vue_esm_bundler/* createElementBlock */.CE)("table", EntranceTabvue_type_script_setup_true_lang_ts_hoisted_14, [
+                                _cache[0] || (_cache[0] = (0,vue_esm_bundler/* createElementVNode */.Lk)("thead", null, [
+                                    (0,vue_esm_bundler/* createElementVNode */.Lk)("tr", null, [
+                                        (0,vue_esm_bundler/* createElementVNode */.Lk)("th", null, "東"),
+                                        (0,vue_esm_bundler/* createElementVNode */.Lk)("th", null, "西")
+                                    ])
+                                ], -1 /* CACHED */)),
+                                (0,vue_esm_bundler/* createElementVNode */.Lk)("tbody", null, [
+                                    ((0,vue_esm_bundler/* openBlock */.uX)(true), (0,vue_esm_bundler/* createElementBlock */.CE)(vue_esm_bundler/* Fragment */.FK, null, (0,vue_esm_bundler/* renderList */.pI)(timeSlots.value, (timeSlot) => {
+                                        return ((0,vue_esm_bundler/* openBlock */.uX)(), (0,vue_esm_bundler/* createElementBlock */.CE)("tr", {
+                                            key: timeSlot.time
+                                        }, [
+                                            (0,vue_esm_bundler/* createElementVNode */.Lk)("td", null, [
+                                                (0,vue_esm_bundler/* createElementVNode */.Lk)("div", {
+                                                    role: "button",
+                                                    class: (0,vue_esm_bundler/* normalizeClass */.C4)(["ytomo-time-button", { 'selected': timeSlot.east.selected }]),
+                                                    onClick: ($event) => (toggleTimeSlot('east', timeSlot.time))
+                                                }, [
+                                                    (0,vue_esm_bundler/* createElementVNode */.Lk)("div", EntranceTabvue_type_script_setup_true_lang_ts_hoisted_16, [
+                                                        (0,vue_esm_bundler/* createElementVNode */.Lk)("img", {
+                                                            src: getStatusIcon(timeSlot.east.status),
+                                                            alt: getStatusAlt(timeSlot.east.status),
+                                                            class: "ytomo-status-icon"
+                                                        }, null, 8 /* PROPS */, EntranceTabvue_type_script_setup_true_lang_ts_hoisted_17),
+                                                        (0,vue_esm_bundler/* createElementVNode */.Lk)("span", EntranceTabvue_type_script_setup_true_lang_ts_hoisted_18, (0,vue_esm_bundler/* toDisplayString */.v_)(timeSlot.time) + "-", 1 /* TEXT */)
+                                                    ])
+                                                ], 10 /* CLASS, PROPS */, EntranceTabvue_type_script_setup_true_lang_ts_hoisted_15)
+                                            ]),
+                                            (0,vue_esm_bundler/* createElementVNode */.Lk)("td", null, [
+                                                (0,vue_esm_bundler/* createElementVNode */.Lk)("div", {
+                                                    role: "button",
+                                                    class: (0,vue_esm_bundler/* normalizeClass */.C4)(["ytomo-time-button", { 'selected': timeSlot.west.selected }]),
+                                                    onClick: ($event) => (toggleTimeSlot('west', timeSlot.time))
+                                                }, [
+                                                    (0,vue_esm_bundler/* createElementVNode */.Lk)("div", EntranceTabvue_type_script_setup_true_lang_ts_hoisted_20, [
+                                                        (0,vue_esm_bundler/* createElementVNode */.Lk)("img", {
+                                                            src: getStatusIcon(timeSlot.west.status),
+                                                            alt: getStatusAlt(timeSlot.west.status),
+                                                            class: "ytomo-status-icon"
+                                                        }, null, 8 /* PROPS */, EntranceTabvue_type_script_setup_true_lang_ts_hoisted_21),
+                                                        (0,vue_esm_bundler/* createElementVNode */.Lk)("span", EntranceTabvue_type_script_setup_true_lang_ts_hoisted_22, (0,vue_esm_bundler/* toDisplayString */.v_)(timeSlot.time) + "-", 1 /* TEXT */)
+                                                    ])
+                                                ], 10 /* CLASS, PROPS */, EntranceTabvue_type_script_setup_true_lang_ts_hoisted_19)
+                                            ])
+                                        ]));
+                                    }), 128 /* KEYED_FRAGMENT */))
+                                ])
+                            ]))
+                            : ((0,vue_esm_bundler/* openBlock */.uX)(), (0,vue_esm_bundler/* createElementBlock */.CE)("div", EntranceTabvue_type_script_setup_true_lang_ts_hoisted_23, " 日付を選択してください "))
+                    ])
+                ])
+            ]));
+        };
+    }
+}));
+
+;// ./ts/components/EntranceTab.vue?vue&type=script&setup=true&lang=ts
+ 
+// EXTERNAL MODULE: ./node_modules/css-loader/dist/cjs.js!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/sass-loader/dist/cjs.js!./node_modules/vue-loader/dist/index.js??ruleSet[1].rules[8].use[0]!./ts/components/EntranceTab.vue?vue&type=style&index=0&id=f13d02e8&scoped=true&lang=scss
+var EntranceTabvue_type_style_index_0_id_f13d02e8_scoped_true_lang_scss = __webpack_require__(895);
+;// ./node_modules/style-loader/dist/cjs.js!./node_modules/css-loader/dist/cjs.js!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/sass-loader/dist/cjs.js!./node_modules/vue-loader/dist/index.js??ruleSet[1].rules[8].use[0]!./ts/components/EntranceTab.vue?vue&type=style&index=0&id=f13d02e8&scoped=true&lang=scss
+
+      
+      
+      
+      
+      
+      
+      
+      
+      
+
+var EntranceTabvue_type_style_index_0_id_f13d02e8_scoped_true_lang_scss_options = {};
+
+EntranceTabvue_type_style_index_0_id_f13d02e8_scoped_true_lang_scss_options.styleTagTransform = (styleTagTransform_default());
+EntranceTabvue_type_style_index_0_id_f13d02e8_scoped_true_lang_scss_options.setAttributes = (setAttributesWithoutAttributes_default());
+EntranceTabvue_type_style_index_0_id_f13d02e8_scoped_true_lang_scss_options.insert = insertBySelector_default().bind(null, "head");
+EntranceTabvue_type_style_index_0_id_f13d02e8_scoped_true_lang_scss_options.domAPI = (styleDomAPI_default());
+EntranceTabvue_type_style_index_0_id_f13d02e8_scoped_true_lang_scss_options.insertStyleElement = (insertStyleElement_default());
+
+var EntranceTabvue_type_style_index_0_id_f13d02e8_scoped_true_lang_scss_update = injectStylesIntoStyleTag_default()(EntranceTabvue_type_style_index_0_id_f13d02e8_scoped_true_lang_scss/* default */.A, EntranceTabvue_type_style_index_0_id_f13d02e8_scoped_true_lang_scss_options);
+
+
+
+
+       /* harmony default export */ const components_EntranceTabvue_type_style_index_0_id_f13d02e8_scoped_true_lang_scss = (EntranceTabvue_type_style_index_0_id_f13d02e8_scoped_true_lang_scss/* default */.A && EntranceTabvue_type_style_index_0_id_f13d02e8_scoped_true_lang_scss/* default */.A.locals ? EntranceTabvue_type_style_index_0_id_f13d02e8_scoped_true_lang_scss/* default */.A.locals : undefined);
+
+;// ./ts/components/EntranceTab.vue?vue&type=style&index=0&id=f13d02e8&scoped=true&lang=scss
+
+;// ./ts/components/EntranceTab.vue
+
+
+
+;
+
+
+const EntranceTab_exports_ = /*#__PURE__*/(0,exportHelper/* default */.A)(EntranceTabvue_type_script_setup_true_lang_ts, [['__scopeId',"data-v-f13d02e8"]])
+
+/* harmony default export */ const EntranceTab = (EntranceTab_exports_);
 ;// ./node_modules/ts-loader/index.js??clonedRuleSet-1.use!./node_modules/vue-loader/dist/index.js??ruleSet[1].rules[8].use[0]!./ts/components/MainDialog.vue?vue&type=script&setup=true&lang=ts
 
 
@@ -40526,6 +40882,7 @@ const MainDialogvue_type_script_setup_true_lang_ts_hoisted_9 = {
     class: "ytomo-latest-time"
 };
 const MainDialogvue_type_script_setup_true_lang_ts_hoisted_10 = { class: "ytomo-tab-content" };
+
 
 
 
@@ -40670,7 +41027,7 @@ const MainDialogvue_type_script_setup_true_lang_ts_hoisted_10 = { class: "ytomo-
                 }, [
                     (0,vue_esm_bundler/* createElementVNode */.Lk)("div", {
                         class: "ytomo-dialog ytomo-main-dialog",
-                        onClick: _cache[3] || (_cache[3] = (0,vue_esm_bundler/* withModifiers */.D$)(() => { }, ["stop"]))
+                        onClick: _cache[4] || (_cache[4] = (0,vue_esm_bundler/* withModifiers */.D$)(() => { }, ["stop"]))
                     }, [
                         (0,vue_esm_bundler/* createElementVNode */.Lk)("div", MainDialogvue_type_script_setup_true_lang_ts_hoisted_1, [
                             (0,vue_esm_bundler/* createElementVNode */.Lk)("div", MainDialogvue_type_script_setup_true_lang_ts_hoisted_2, [
@@ -40681,7 +41038,7 @@ const MainDialogvue_type_script_setup_true_lang_ts_hoisted_10 = { class: "ytomo-
                                 }, [
                                     (0,vue_esm_bundler/* createElementVNode */.Lk)("div", MainDialogvue_type_script_setup_true_lang_ts_hoisted_3, [
                                         (0,vue_esm_bundler/* createElementVNode */.Lk)("div", MainDialogvue_type_script_setup_true_lang_ts_hoisted_4, [
-                                            _cache[4] || (_cache[4] = (0,vue_esm_bundler/* createTextVNode */.eW)("チケット", -1 /* CACHED */)),
+                                            _cache[5] || (_cache[5] = (0,vue_esm_bundler/* createTextVNode */.eW)("チケット", -1 /* CACHED */)),
                                             (0,vue_esm_bundler/* createElementVNode */.Lk)("span", MainDialogvue_type_script_setup_true_lang_ts_hoisted_5, (0,vue_esm_bundler/* toDisplayString */.v_)(selectedTicketCount.value), 1 /* TEXT */)
                                         ]),
                                         (pavilionReservationInfo.value)
@@ -40695,7 +41052,7 @@ const MainDialogvue_type_script_setup_true_lang_ts_hoisted_10 = { class: "ytomo-
                                     "data-tab": "pavilion"
                                 }, [
                                     (0,vue_esm_bundler/* createElementVNode */.Lk)("div", MainDialogvue_type_script_setup_true_lang_ts_hoisted_7, [
-                                        _cache[5] || (_cache[5] = (0,vue_esm_bundler/* createElementVNode */.Lk)("div", { class: "ytomo-tab-title" }, "パビリオン", -1 /* CACHED */)),
+                                        _cache[6] || (_cache[6] = (0,vue_esm_bundler/* createElementVNode */.Lk)("div", { class: "ytomo-tab-title" }, "パビリオン", -1 /* CACHED */)),
                                         (0,vue_esm_bundler/* createElementVNode */.Lk)("div", MainDialogvue_type_script_setup_true_lang_ts_hoisted_8, [
                                             (latestEntranceDateTime.value)
                                                 ? ((0,vue_esm_bundler/* openBlock */.uX)(), (0,vue_esm_bundler/* createElementBlock */.CE)("div", MainDialogvue_type_script_setup_true_lang_ts_hoisted_9, (0,vue_esm_bundler/* toDisplayString */.v_)(latestEntranceDateTime.value), 1 /* TEXT */))
@@ -40703,14 +41060,19 @@ const MainDialogvue_type_script_setup_true_lang_ts_hoisted_10 = { class: "ytomo-
                                         ])
                                     ])
                                 ], 2 /* CLASS */),
-                                _cache[6] || (_cache[6] = (0,vue_esm_bundler/* createElementVNode */.Lk)("button", {
-                                    class: "ytomo-tab-button",
-                                    "data-tab": "third"
-                                }, null, -1 /* CACHED */)),
+                                (0,vue_esm_bundler/* createElementVNode */.Lk)("button", {
+                                    class: (0,vue_esm_bundler/* normalizeClass */.C4)(["ytomo-tab-button", { active: (0,vue_esm_bundler/* unref */.R1)(activeTab) === 'entrance' }]),
+                                    onClick: _cache[2] || (_cache[2] = ($event) => ((0,vue_esm_bundler/* unref */.R1)(setActiveTab)('entrance'))),
+                                    "data-tab": "entrance"
+                                }, [...(_cache[7] || (_cache[7] = [
+                                        (0,vue_esm_bundler/* createElementVNode */.Lk)("div", { class: "ytomo-tab-content" }, [
+                                            (0,vue_esm_bundler/* createElementVNode */.Lk)("div", { class: "ytomo-tab-title" }, "入場")
+                                        ], -1 /* CACHED */)
+                                    ]))], 2 /* CLASS */),
                                 (0,vue_esm_bundler/* createElementVNode */.Lk)("button", {
                                     class: "ytomo-dialog-close",
                                     "aria-label": "閉じる",
-                                    onClick: _cache[2] || (_cache[2] =
+                                    onClick: _cache[3] || (_cache[3] =
                                         //@ts-ignore
                                         (...args) => ((0,vue_esm_bundler/* unref */.R1)(hideDialog) && (0,vue_esm_bundler/* unref */.R1)(hideDialog)(...args)))
                                 }, " × ")
@@ -40728,10 +41090,12 @@ const MainDialogvue_type_script_setup_true_lang_ts_hoisted_10 = { class: "ytomo-
                                 }, [
                                     (0,vue_esm_bundler/* createVNode */.bF)(PavilionTab)
                                 ], 2 /* CLASS */),
-                                _cache[7] || (_cache[7] = (0,vue_esm_bundler/* createElementVNode */.Lk)("div", {
-                                    class: "ytomo-tab-pane",
-                                    id: "third-tab"
-                                }, null, -1 /* CACHED */))
+                                (0,vue_esm_bundler/* createElementVNode */.Lk)("div", {
+                                    class: (0,vue_esm_bundler/* normalizeClass */.C4)(["ytomo-tab-pane", { active: (0,vue_esm_bundler/* unref */.R1)(activeTab) === 'entrance' }]),
+                                    id: "entrance-tab"
+                                }, [
+                                    (0,vue_esm_bundler/* createVNode */.bF)(EntranceTab)
+                                ], 2 /* CLASS */)
                             ])
                         ])
                     ])
@@ -40743,9 +41107,9 @@ const MainDialogvue_type_script_setup_true_lang_ts_hoisted_10 = { class: "ytomo-
 
 ;// ./ts/components/MainDialog.vue?vue&type=script&setup=true&lang=ts
  
-// EXTERNAL MODULE: ./node_modules/css-loader/dist/cjs.js!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/vue-loader/dist/index.js??ruleSet[1].rules[8].use[0]!./ts/components/MainDialog.vue?vue&type=style&index=0&id=10411f86&scoped=true&lang=css
-var MainDialogvue_type_style_index_0_id_10411f86_scoped_true_lang_css = __webpack_require__(236);
-;// ./node_modules/style-loader/dist/cjs.js!./node_modules/css-loader/dist/cjs.js!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/vue-loader/dist/index.js??ruleSet[1].rules[8].use[0]!./ts/components/MainDialog.vue?vue&type=style&index=0&id=10411f86&scoped=true&lang=css
+// EXTERNAL MODULE: ./node_modules/css-loader/dist/cjs.js!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/vue-loader/dist/index.js??ruleSet[1].rules[8].use[0]!./ts/components/MainDialog.vue?vue&type=style&index=0&id=1b566c62&scoped=true&lang=css
+var MainDialogvue_type_style_index_0_id_1b566c62_scoped_true_lang_css = __webpack_require__(892);
+;// ./node_modules/style-loader/dist/cjs.js!./node_modules/css-loader/dist/cjs.js!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/vue-loader/dist/index.js??ruleSet[1].rules[8].use[0]!./ts/components/MainDialog.vue?vue&type=style&index=0&id=1b566c62&scoped=true&lang=css
 
       
       
@@ -40757,22 +41121,22 @@ var MainDialogvue_type_style_index_0_id_10411f86_scoped_true_lang_css = __webpac
       
       
 
-var MainDialogvue_type_style_index_0_id_10411f86_scoped_true_lang_css_options = {};
+var MainDialogvue_type_style_index_0_id_1b566c62_scoped_true_lang_css_options = {};
 
-MainDialogvue_type_style_index_0_id_10411f86_scoped_true_lang_css_options.styleTagTransform = (styleTagTransform_default());
-MainDialogvue_type_style_index_0_id_10411f86_scoped_true_lang_css_options.setAttributes = (setAttributesWithoutAttributes_default());
-MainDialogvue_type_style_index_0_id_10411f86_scoped_true_lang_css_options.insert = insertBySelector_default().bind(null, "head");
-MainDialogvue_type_style_index_0_id_10411f86_scoped_true_lang_css_options.domAPI = (styleDomAPI_default());
-MainDialogvue_type_style_index_0_id_10411f86_scoped_true_lang_css_options.insertStyleElement = (insertStyleElement_default());
+MainDialogvue_type_style_index_0_id_1b566c62_scoped_true_lang_css_options.styleTagTransform = (styleTagTransform_default());
+MainDialogvue_type_style_index_0_id_1b566c62_scoped_true_lang_css_options.setAttributes = (setAttributesWithoutAttributes_default());
+MainDialogvue_type_style_index_0_id_1b566c62_scoped_true_lang_css_options.insert = insertBySelector_default().bind(null, "head");
+MainDialogvue_type_style_index_0_id_1b566c62_scoped_true_lang_css_options.domAPI = (styleDomAPI_default());
+MainDialogvue_type_style_index_0_id_1b566c62_scoped_true_lang_css_options.insertStyleElement = (insertStyleElement_default());
 
-var MainDialogvue_type_style_index_0_id_10411f86_scoped_true_lang_css_update = injectStylesIntoStyleTag_default()(MainDialogvue_type_style_index_0_id_10411f86_scoped_true_lang_css/* default */.A, MainDialogvue_type_style_index_0_id_10411f86_scoped_true_lang_css_options);
-
-
+var MainDialogvue_type_style_index_0_id_1b566c62_scoped_true_lang_css_update = injectStylesIntoStyleTag_default()(MainDialogvue_type_style_index_0_id_1b566c62_scoped_true_lang_css/* default */.A, MainDialogvue_type_style_index_0_id_1b566c62_scoped_true_lang_css_options);
 
 
-       /* harmony default export */ const components_MainDialogvue_type_style_index_0_id_10411f86_scoped_true_lang_css = (MainDialogvue_type_style_index_0_id_10411f86_scoped_true_lang_css/* default */.A && MainDialogvue_type_style_index_0_id_10411f86_scoped_true_lang_css/* default */.A.locals ? MainDialogvue_type_style_index_0_id_10411f86_scoped_true_lang_css/* default */.A.locals : undefined);
 
-;// ./ts/components/MainDialog.vue?vue&type=style&index=0&id=10411f86&scoped=true&lang=css
+
+       /* harmony default export */ const components_MainDialogvue_type_style_index_0_id_1b566c62_scoped_true_lang_css = (MainDialogvue_type_style_index_0_id_1b566c62_scoped_true_lang_css/* default */.A && MainDialogvue_type_style_index_0_id_1b566c62_scoped_true_lang_css/* default */.A.locals ? MainDialogvue_type_style_index_0_id_1b566c62_scoped_true_lang_css/* default */.A.locals : undefined);
+
+;// ./ts/components/MainDialog.vue?vue&type=style&index=0&id=1b566c62&scoped=true&lang=css
 
 ;// ./ts/components/MainDialog.vue
 
@@ -40781,7 +41145,7 @@ var MainDialogvue_type_style_index_0_id_10411f86_scoped_true_lang_css_update = i
 ;
 
 
-const MainDialog_exports_ = /*#__PURE__*/(0,exportHelper/* default */.A)(MainDialogvue_type_script_setup_true_lang_ts, [['__scopeId',"data-v-10411f86"]])
+const MainDialog_exports_ = /*#__PURE__*/(0,exportHelper/* default */.A)(MainDialogvue_type_script_setup_true_lang_ts, [['__scopeId',"data-v-1b566c62"]])
 
 /* harmony default export */ const MainDialog = (MainDialog_exports_);
 ;// ./node_modules/ts-loader/index.js??clonedRuleSet-1.use!./node_modules/vue-loader/dist/index.js??ruleSet[1].rules[8].use[0]!./ts/components/ProcessingOverlay.vue?vue&type=script&setup=true&lang=ts
@@ -40881,8 +41245,6 @@ const SequentialReservationOverlayvue_type_script_setup_true_lang_ts_hoisted_9 =
 };
 const SequentialReservationOverlayvue_type_script_setup_true_lang_ts_hoisted_10 = { class: "pavilion-name" };
 const SequentialReservationOverlayvue_type_script_setup_true_lang_ts_hoisted_11 = { class: "time-slot-button" };
-const SequentialReservationOverlayvue_type_script_setup_true_lang_ts_hoisted_12 = { class: "ytomo-sequential-status" };
-const SequentialReservationOverlayvue_type_script_setup_true_lang_ts_hoisted_13 = { class: "ytomo-sequential-current" };
 
 
 
@@ -40970,9 +41332,7 @@ const SequentialReservationOverlayvue_type_script_setup_true_lang_ts_hoisted_13 
                                         ]))
                                         : (0,vue_esm_bundler/* createCommentVNode */.Q3)("v-if", true)
                                 ]),
-                                (0,vue_esm_bundler/* createElementVNode */.Lk)("div", SequentialReservationOverlayvue_type_script_setup_true_lang_ts_hoisted_12, [
-                                    (0,vue_esm_bundler/* createElementVNode */.Lk)("div", SequentialReservationOverlayvue_type_script_setup_true_lang_ts_hoisted_13, (0,vue_esm_bundler/* toDisplayString */.v_)((0,vue_esm_bundler/* unref */.R1)(sequentialReservationStore).state.currentTargetIndex + 1) + "/" + (0,vue_esm_bundler/* toDisplayString */.v_)((0,vue_esm_bundler/* unref */.R1)(sequentialReservationStore).state.reservationTargets.length), 1 /* TEXT */)
-                                ])
+                                (0,vue_esm_bundler/* createCommentVNode */.Q3)(" パビリオン名横の「1/1」表示を削除 ")
                             ])
                         ])
                     ]))
@@ -40984,9 +41344,9 @@ const SequentialReservationOverlayvue_type_script_setup_true_lang_ts_hoisted_13 
 
 ;// ./ts/components/SequentialReservationOverlay.vue?vue&type=script&setup=true&lang=ts
  
-// EXTERNAL MODULE: ./node_modules/css-loader/dist/cjs.js!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/sass-loader/dist/cjs.js!./node_modules/vue-loader/dist/index.js??ruleSet[1].rules[8].use[0]!./ts/components/SequentialReservationOverlay.vue?vue&type=style&index=0&id=7a925275&scoped=true&lang=scss
-var SequentialReservationOverlayvue_type_style_index_0_id_7a925275_scoped_true_lang_scss = __webpack_require__(690);
-;// ./node_modules/style-loader/dist/cjs.js!./node_modules/css-loader/dist/cjs.js!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/sass-loader/dist/cjs.js!./node_modules/vue-loader/dist/index.js??ruleSet[1].rules[8].use[0]!./ts/components/SequentialReservationOverlay.vue?vue&type=style&index=0&id=7a925275&scoped=true&lang=scss
+// EXTERNAL MODULE: ./node_modules/css-loader/dist/cjs.js!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/sass-loader/dist/cjs.js!./node_modules/vue-loader/dist/index.js??ruleSet[1].rules[8].use[0]!./ts/components/SequentialReservationOverlay.vue?vue&type=style&index=0&id=87268ea4&scoped=true&lang=scss
+var SequentialReservationOverlayvue_type_style_index_0_id_87268ea4_scoped_true_lang_scss = __webpack_require__(559);
+;// ./node_modules/style-loader/dist/cjs.js!./node_modules/css-loader/dist/cjs.js!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/sass-loader/dist/cjs.js!./node_modules/vue-loader/dist/index.js??ruleSet[1].rules[8].use[0]!./ts/components/SequentialReservationOverlay.vue?vue&type=style&index=0&id=87268ea4&scoped=true&lang=scss
 
       
       
@@ -40998,22 +41358,22 @@ var SequentialReservationOverlayvue_type_style_index_0_id_7a925275_scoped_true_l
       
       
 
-var SequentialReservationOverlayvue_type_style_index_0_id_7a925275_scoped_true_lang_scss_options = {};
+var SequentialReservationOverlayvue_type_style_index_0_id_87268ea4_scoped_true_lang_scss_options = {};
 
-SequentialReservationOverlayvue_type_style_index_0_id_7a925275_scoped_true_lang_scss_options.styleTagTransform = (styleTagTransform_default());
-SequentialReservationOverlayvue_type_style_index_0_id_7a925275_scoped_true_lang_scss_options.setAttributes = (setAttributesWithoutAttributes_default());
-SequentialReservationOverlayvue_type_style_index_0_id_7a925275_scoped_true_lang_scss_options.insert = insertBySelector_default().bind(null, "head");
-SequentialReservationOverlayvue_type_style_index_0_id_7a925275_scoped_true_lang_scss_options.domAPI = (styleDomAPI_default());
-SequentialReservationOverlayvue_type_style_index_0_id_7a925275_scoped_true_lang_scss_options.insertStyleElement = (insertStyleElement_default());
+SequentialReservationOverlayvue_type_style_index_0_id_87268ea4_scoped_true_lang_scss_options.styleTagTransform = (styleTagTransform_default());
+SequentialReservationOverlayvue_type_style_index_0_id_87268ea4_scoped_true_lang_scss_options.setAttributes = (setAttributesWithoutAttributes_default());
+SequentialReservationOverlayvue_type_style_index_0_id_87268ea4_scoped_true_lang_scss_options.insert = insertBySelector_default().bind(null, "head");
+SequentialReservationOverlayvue_type_style_index_0_id_87268ea4_scoped_true_lang_scss_options.domAPI = (styleDomAPI_default());
+SequentialReservationOverlayvue_type_style_index_0_id_87268ea4_scoped_true_lang_scss_options.insertStyleElement = (insertStyleElement_default());
 
-var SequentialReservationOverlayvue_type_style_index_0_id_7a925275_scoped_true_lang_scss_update = injectStylesIntoStyleTag_default()(SequentialReservationOverlayvue_type_style_index_0_id_7a925275_scoped_true_lang_scss/* default */.A, SequentialReservationOverlayvue_type_style_index_0_id_7a925275_scoped_true_lang_scss_options);
-
-
+var SequentialReservationOverlayvue_type_style_index_0_id_87268ea4_scoped_true_lang_scss_update = injectStylesIntoStyleTag_default()(SequentialReservationOverlayvue_type_style_index_0_id_87268ea4_scoped_true_lang_scss/* default */.A, SequentialReservationOverlayvue_type_style_index_0_id_87268ea4_scoped_true_lang_scss_options);
 
 
-       /* harmony default export */ const components_SequentialReservationOverlayvue_type_style_index_0_id_7a925275_scoped_true_lang_scss = (SequentialReservationOverlayvue_type_style_index_0_id_7a925275_scoped_true_lang_scss/* default */.A && SequentialReservationOverlayvue_type_style_index_0_id_7a925275_scoped_true_lang_scss/* default */.A.locals ? SequentialReservationOverlayvue_type_style_index_0_id_7a925275_scoped_true_lang_scss/* default */.A.locals : undefined);
 
-;// ./ts/components/SequentialReservationOverlay.vue?vue&type=style&index=0&id=7a925275&scoped=true&lang=scss
+
+       /* harmony default export */ const components_SequentialReservationOverlayvue_type_style_index_0_id_87268ea4_scoped_true_lang_scss = (SequentialReservationOverlayvue_type_style_index_0_id_87268ea4_scoped_true_lang_scss/* default */.A && SequentialReservationOverlayvue_type_style_index_0_id_87268ea4_scoped_true_lang_scss/* default */.A.locals ? SequentialReservationOverlayvue_type_style_index_0_id_87268ea4_scoped_true_lang_scss/* default */.A.locals : undefined);
+
+;// ./ts/components/SequentialReservationOverlay.vue?vue&type=style&index=0&id=87268ea4&scoped=true&lang=scss
 
 ;// ./ts/components/SequentialReservationOverlay.vue
 
@@ -41022,7 +41382,7 @@ var SequentialReservationOverlayvue_type_style_index_0_id_7a925275_scoped_true_l
 ;
 
 
-const SequentialReservationOverlay_exports_ = /*#__PURE__*/(0,exportHelper/* default */.A)(SequentialReservationOverlayvue_type_script_setup_true_lang_ts, [['__scopeId',"data-v-7a925275"]])
+const SequentialReservationOverlay_exports_ = /*#__PURE__*/(0,exportHelper/* default */.A)(SequentialReservationOverlayvue_type_script_setup_true_lang_ts, [['__scopeId',"data-v-87268ea4"]])
 
 /* harmony default export */ const SequentialReservationOverlay = (SequentialReservationOverlay_exports_);
 ;// ./node_modules/ts-loader/index.js??clonedRuleSet-1.use!./node_modules/vue-loader/dist/index.js??ruleSet[1].rules[8].use[0]!./ts/components/YtomoPageContent.vue?vue&type=script&setup=true&lang=ts

@@ -34,7 +34,15 @@
               </div>
             </div>
           </button>
-          <button class="ytomo-tab-button" data-tab="third">
+          <button 
+            class="ytomo-tab-button"
+            :class="{ active: activeTab === 'entrance' }"
+            @click="setActiveTab('entrance')"
+            data-tab="entrance"
+          >
+            <div class="ytomo-tab-content">
+              <div class="ytomo-tab-title">入場</div>
+            </div>
           </button>
           <button 
             class="ytomo-dialog-close" 
@@ -59,7 +67,12 @@
           >
             <PavilionTab />
           </div>
-          <div class="ytomo-tab-pane" id="third-tab">
+          <div 
+            class="ytomo-tab-pane"
+            :class="{ active: activeTab === 'entrance' }"
+            id="entrance-tab"
+          >
+            <EntranceTab />
           </div>
         </div>
       </div>
@@ -79,6 +92,7 @@ import { getLongNameFromShortName } from '@/utils/pavilionReservationMapping'
 import { loggers } from '@/utils/logger'
 import TicketTab from './TicketTab.vue'
 import PavilionTab from './PavilionTab.vue'
+import EntranceTab from './EntranceTab.vue'
 
 const logger = loggers.ui
 

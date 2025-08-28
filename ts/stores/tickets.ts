@@ -130,6 +130,7 @@ export const useTicketsStore = defineStore('tickets', () => {
         time_start: timeStart,
         time_end: schedule.time_end,
         reservation_type: schedule.reservation_type,
+        location_index: schedule.gate_type === 1 ? 0 : 1, // gate_type: 1=東(0), 2=西(1)
         // 有効フラグを付与: 未使用または当日入場済みは有効
         isEffective: schedule.use_state === 0 || 
                      (schedule.use_state === 1 && schedule.entrance_date === todayStr.value)

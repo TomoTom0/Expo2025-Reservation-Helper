@@ -426,3 +426,39 @@ const LOG_LEVEL = process.env.NODE_ENV === 'production' ? 'WARN' : 'DEBUG'
 1. **TicketTab.vue専用スタイルの移行** ✅
 2. **PavilionTab.vue専用スタイルの移行** ✅  
 3. **共通スタイルの整理** ✅
+
+## 最新の完了作業：チケットタブ入場日時ボタンの東西表示機能実装
+
+### 🎯 実装内容 ✅
+**課題**: チケットタブの入場日時ボタンで間の罫線が見づらく、東西情報が表示されていない
+
+#### 完了した修正項目
+1. **APIデータでの東西情報取得・保存** ✅
+   - `ts/stores/tickets.ts:133`: `processSchedules()`関数を修正
+   - `schedule.gate_type`から`location_index`を生成
+   - `gate_type: 1` → `location_index: 0` (東)
+   - `gate_type: 2` → `location_index: 1` (西)
+
+2. **型定義の拡張** ✅
+   - `ts/types/api.ts:15`: `ScheduleData`に`location_index?: number`プロパティを追加
+   - 0: 東エリア, 1: 西エリア の仕様を明確化
+
+3. **TicketTab.vueでの東西表示機能実装** ✅
+   - `ts/components/TicketTab.vue:703`: `formatEntranceDateTimeWithLocation()`を修正
+   - `schedule.location_index`から東西を正しく判定
+   - 表示形式: "10月13日 東 9:00" のように東西情報を表示
+
+4. **スケジュール間の罫線視認性改善** ✅
+   - `.ytomo-schedule-divider`の色を`#e5e7eb` → `#d1d5db`に変更
+   - マージンを微調整して罫線をより見やすく改善
+
+### 🔧 技術実装詳細
+- **データフロー**: API `gate_type` → Store処理 → Component表示
+- **型安全性**: TypeScript型定義による適切な型チェック
+- **表示ロジック**: 三項演算子による簡潔な東西判定
+- **UI改善**: 視認性向上のためのCSS微調整
+
+### ✅ 動作確認
+- ビルド成功 (`mise run build-rsync`)
+- TypeScript型チェック通過
+- Windows環境への拡張機能同期完了

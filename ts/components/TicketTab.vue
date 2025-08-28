@@ -132,7 +132,7 @@
                 @click="handleEntranceDateSelection(schedule, ticket, $event)"
               >
                 <div class="ytomo-schedule-line">
-                  {{ formatDate(schedule.entrance_date) }} {{ (schedule.schedule_name || extractTimeFromSchedule(schedule)).replace(/-$/, '') }}
+                  {{ formatEntranceDateTimeWithLocation(schedule) }}
                 </div>
                 <div class="ytomo-schedule-divider"></div>
                 <div class="ytomo-schedule-line ytomo-reservation-line">
@@ -249,6 +249,8 @@ import { useTicketsStore } from '@/stores/tickets'
 import { useMainDialogStore } from '@/stores/mainDialog'
 import { useTickets } from '@/composables/useTickets'
 import { loggers } from '@/utils/logger'
+// LocationHelper は location_index プロパティが実装されるまで一時的にコメントアウト
+// import { LocationHelper } from '@/modules/entrance-reservation-state-manager'
 import { getLongNameFromShortName, getShortNameFromChannel, getAllPavilionReservationTypes } from '@/utils/pavilionReservationMapping'
 import { determinePavilionReservationType, getAllPavilionReservationStatus } from '@/utils/pavilionReservationTypes'
 import type { ScheduleData, TicketData, LotteryCalendarData, ReservationResult } from '@/types/api'
@@ -690,6 +692,17 @@ const formatEntranceDate = (dateStr: string): string => {
     return `${year}/${month}/${day}`
   }
   return dateStr
+}
+
+// 入場日時表示を東・西付きに修正
+const formatEntranceDateTimeWithLocation = (schedule: ScheduleData): string => {
+  const date = formatDate(schedule.entrance_date)
+  const time = (schedule.schedule_name || extractTimeFromSchedule(schedule)).replace(/-$/, '')
+  
+  // location_indexから東西を判定 (0:東, 1:西)
+  const locationText = schedule.location_index === 1 ? '西' : '東'
+  
+  return `${date} ${locationText} ${time}`
 }
 
 const getStatusText = (periodStatus: string, submissionStatus: string): string => {
@@ -1468,15 +1481,15 @@ onUnmounted(() => {
     }
     
     &.indicator-active {
-        background: #3b82f6;
+        background: #10b981;
         color: white;
-        border-color: #2563eb;
+        border-color: #059669;
     }
     
     &.indicator-before {
-        background: #f59e0b;
+        background: #6b7280;
         color: white;
-        border-color: #d97706;
+        border-color: #4b5563;
     }
     
     &.indicator-none {
@@ -1530,9 +1543,10 @@ onUnmounted(() => {
     
     .ytomo-schedule-divider {
         height: 1px;
-        background: #e5e7eb;
-        margin: 2px 0;
+        background: #d1d5db;
+        margin: 3px 0;
         width: 100%;
+        opacity: 0.8;
     }
     
     &.selected {
@@ -1541,7 +1555,7 @@ onUnmounted(() => {
         }
         
         .ytomo-schedule-divider {
-            background: rgba(255, 255, 255, 0.3);
+            background: rgba(255, 255, 255, 0.4);
         }
     }
 }

@@ -12,6 +12,7 @@ export interface ScheduleData {
     time_end?: string;          // 終了時間
     reservation_type?: string;  // 予約種別
     selected?: boolean;         // UI選択状態フラグ
+    location_index?: number;    // 東西情報（0:東, 1:西）
     
     // パビリオン予約種類情報（入場予約種類ごとに決定）
     pavilionReservationType?: string;  // channel値 (5,4,3,2 -> 1,3,週,月)
