@@ -7,6 +7,11 @@ import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import type { TicketData, ScheduleData } from '@/types/api'
 import { loggers } from '@/utils/logger'
+import { 
+  getEntranceSchedules, 
+  getUserReservations, 
+  type EntranceScheduleData 
+} from '@/services/entranceReservationService'
 
 const logger = loggers.tickets
 import { determinePavilionReservationType, getAllPavilionReservationStatus } from '@/utils/pavilionReservationTypes'
@@ -21,6 +26,10 @@ export const useTicketsStore = defineStore('tickets', () => {
   const availableDates = ref<string[]>([])
   const todayStr = ref<string>(getTodayString())
   const lastUpdateTime = ref<number>(0) // 最後の更新時刻（Unix時間）
+  
+  // 入場予約スケジュールキャッシュ
+  const entranceSchedules = ref<Map<string, EntranceScheduleData>>(new Map()) // key: "YYYY-MM"
+  const entranceSchedulesUpdateTime = ref<Map<string, number>>(new Map()) // key: "YYYY-MM", value: timestamp
   
   // Getters (computed)
   const ticketsArray = computed(() => Array.from(tickets.value.values()))
@@ -584,10 +593,87 @@ export const useTicketsStore = defineStore('tickets', () => {
     }
   }
 
+  /**
+   * 入場予約スケジュール取得（キャッシュ機能付き）
+   */
+  const getEntranceScheduleData = async (year: number, month: number, forceUpdate: boolean = false): Promise<EntranceScheduleData | null> => {
+    const key = `${year}-${String(month).padStart(2, '0')}`
+    const now = Date.now()
+    const oneHour = 60 * 60 * 1000
+    
+    // キャッシュチェック（1時間制限）
+    const lastUpdate = entranceSchedulesUpdateTime.value.get(key) || 0
+    const hasValidCache = entranceSchedules.value.has(key) && now - lastUpdate < oneHour
+    
+    if (!forceUpdate && hasValidCache) {
+      logger.info(`入場スケジュール キャッシュ利用`, { key, age: Math.round((now - lastUpdate) / (1000 * 60)) })
+      return entranceSchedules.value.get(key)!
+    }
+    
+    try {
+      logger.info('入場スケジュール API取得開始', { year, month, forceUpdate })
+      
+      // チケットIDを取得（API仕様通り）
+      const ticketIds = Array.from(tickets.value.keys())
+      const scheduleData = await getEntranceSchedules(year, month, ticketIds)
+      
+      // キャッシュに保存
+      entranceSchedules.value.set(key, scheduleData)
+      entranceSchedulesUpdateTime.value.set(key, now)
+      
+      logger.info('入場スケジュール取得・キャッシュ完了', { 
+        key, 
+        datesCount: Object.keys(scheduleData.states).length 
+      })
+      
+      return scheduleData
+    } catch (error) {
+      logger.error('入場スケジュール取得エラー', { year, month, error })
+      return null
+    }
+  }
+  
+  /**
+   * 当月から10月までの入場スケジュールを一括取得
+   */
+  const loadEntranceSchedulesRange = async (forceUpdate: boolean = false): Promise<void> => {
+    const today = new Date()
+    const currentYear = today.getFullYear()
+    const currentMonth = today.getMonth() + 1
+    const endYear = 2025
+    const endMonth = 10
+    
+    logger.info('入場スケジュール一括取得開始', { 
+      from: `${currentYear}-${currentMonth}`, 
+      to: `${endYear}-${endMonth}`,
+      forceUpdate 
+    })
+    
+    const promises = []
+    
+    // 当月から2025年10月まで
+    let year = currentYear
+    let month = currentMonth
+    
+    while (year < endYear || (year === endYear && month <= endMonth)) {
+      promises.push(getEntranceScheduleData(year, month, forceUpdate))
+      
+      month++
+      if (month > 12) {
+        month = 1
+        year++
+      }
+    }
+    
+    await Promise.all(promises)
+    logger.info('入場スケジュール一括取得完了', { count: promises.length })
+  }
+
   // 初期化メソッド
   const init = async (): Promise<void> => {
     logger.info('チケットストア初期化開始')
     await loadAllTickets()
+    await loadEntranceSchedulesRange() // 入場スケジュール一括取得
     restoreSelectedEntranceDates()
     isInitialized.value = true
     logger.info('チケットストア初期化完了')
@@ -601,6 +687,7 @@ export const useTicketsStore = defineStore('tickets', () => {
     isLoading,
     isInitialized,
     availableDates,
+    entranceSchedules,
     
     // Getters
     ticketsArray,
@@ -615,6 +702,8 @@ export const useTicketsStore = defineStore('tickets', () => {
     loadAllTickets,
     loadOwnTickets,
     fetchPavilionWinningInfo,
+    getEntranceScheduleData,
+    loadEntranceSchedulesRange,
     setTickets,
     addTicket,
     removeTicket,
@@ -631,7 +720,7 @@ export const useTicketsStore = defineStore('tickets', () => {
 }, {
   persist: {
     key: 'ytomo-tickets-store',
-    pick: ['selectedEntranceDates', 'tickets', 'lastUpdateTime'], // 入場日時選択、チケットデータ、更新時刻を永続化
+    pick: ['selectedEntranceDates', 'tickets', 'lastUpdateTime', 'entranceSchedules', 'entranceSchedulesUpdateTime'], // キャッシュも永続化
     serializer: {
       serialize: (data: any) => {
         // MapをObjectに変換してシリアライズ
@@ -641,6 +730,12 @@ export const useTicketsStore = defineStore('tickets', () => {
         }
         if (serialized['tickets'] instanceof Map) {
           serialized['tickets'] = Object.fromEntries(serialized['tickets'])
+        }
+        if (serialized['entranceSchedules'] instanceof Map) {
+          serialized['entranceSchedules'] = Object.fromEntries(serialized['entranceSchedules'])
+        }
+        if (serialized['entranceSchedulesUpdateTime'] instanceof Map) {
+          serialized['entranceSchedulesUpdateTime'] = Object.fromEntries(serialized['entranceSchedulesUpdateTime'])
         }
         return JSON.stringify(serialized)
       },
@@ -652,6 +747,12 @@ export const useTicketsStore = defineStore('tickets', () => {
         }
         if (parsed['tickets'] && typeof parsed['tickets'] === 'object') {
           parsed['tickets'] = new Map(Object.entries(parsed['tickets']))
+        }
+        if (parsed['entranceSchedules'] && typeof parsed['entranceSchedules'] === 'object') {
+          parsed['entranceSchedules'] = new Map(Object.entries(parsed['entranceSchedules']))
+        }
+        if (parsed['entranceSchedulesUpdateTime'] && typeof parsed['entranceSchedulesUpdateTime'] === 'object') {
+          parsed['entranceSchedulesUpdateTime'] = new Map(Object.entries(parsed['entranceSchedulesUpdateTime']))
         }
         return parsed
       }

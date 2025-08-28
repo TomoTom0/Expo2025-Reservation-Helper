@@ -440,3 +440,90 @@ import { CalendarManager } from './components/calendar';
 **実装時期**: v2.0.0以降の主要機能として位置づけ
 **実装工数**: 大規模（3-6ヶ月の開発期間を想定）
 **リスク**: 高（万博サイト変更、技術的制約への対応が必要）
+
+---
+
+## 待機室ページでのボタン追加機能 - 2025-08-28
+
+### 概要
+万博チケット待機室ページにアクセスした際に、画面内にカスタムボタンを動的に追加する機能。
+
+### 対象URL
+- **URLパターン**: `https://tktwaitingroom.expo2025.or.jp/*`
+- **サンプルURL**: `https://tktwaitingroom.expo2025.or.jp/?c=expo2025&e=ticket0001a&t=https%3A%2F%2Fticket.expo2025.or.jp%2Fmyticket%2F&cid=ja-JP&l=ticket-0001`
+- **クエリパラメータ**: 詳細は問わない（パターンマッチングで対応）
+
+### 要件
+- 待機室ページの読み込み完了後に自動でボタン要素を追加
+- 既存のページ構造に影響を与えないよう配慮した実装
+- ボタンの具体的な機能・配置・デザインは後ほど詳細指定予定
+
+### 実装方針
+#### 1. URL検知とページ認識
+```javascript
+// URLパターンマッチング
+if (window.location.href.includes('tktwaitingroom.expo2025.or.jp')) {
+    // 待機室ページと認識
+    initWaitingRoomEnhancements();
+}
+```
+
+#### 2. ボタン挿入ポイントの特定
+- ページDOM構造の分析が必要
+- 適切な挿入位置の特定
+- レスポンシブ対応の考慮
+
+#### 3. 動的ボタン生成
+```javascript
+function addCustomButton() {
+    const button = document.createElement('button');
+    button.className = 'expo-helper-waiting-room-btn';
+    button.textContent = 'カスタム機能'; // 仮
+    
+    // 挿入位置に追加
+    const targetElement = document.querySelector('[適切なセレクタ]');
+    targetElement.appendChild(button);
+}
+```
+
+### 技術的検討事項
+#### 対象ブラウザ
+- Chrome拡張機能としての動作
+- UserScript形式での動作も検討
+
+#### ページ読み込みタイミング
+- DOMContentLoaded vs window.onload
+- 動的コンテンツの読み込み完了待機
+- Mutation Observer による動的変更検知
+
+#### スタイリング
+- 既存デザインとの調和
+- アクセシビリティ配慮
+- レスポンシブ対応
+
+### 実装段階
+#### Phase 1: 基礎実装
+- [ ] URLパターンマッチング機能
+- [ ] 基本的なボタン追加機能
+- [ ] ページ構造分析
+
+#### Phase 2: 詳細仕様実装
+- [ ] 具体的なボタン機能の実装（仕様決定後）
+- [ ] UI/UXの最適化
+- [ ] エラーハンドリング
+
+#### Phase 3: 最適化・テスト
+- [ ] クロスブラウザ対応
+- [ ] パフォーマンス最適化
+- [ ] 動作テスト・検証
+
+### 優先度
+**中** - 詳細仕様の確定次第、優先度が変動する可能性あり
+
+### 注意事項
+- 待機室サイトの利用規約遵守
+- 他利用者への影響を最小限に抑制
+- 万博運営への配慮
+
+### ステータス
+**要件整理中** - ボタンの具体的な機能・配置について追加仕様待ち

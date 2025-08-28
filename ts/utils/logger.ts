@@ -214,6 +214,7 @@ export const createLogger = (module: string, level: LogLevel = BUILD_LOG_LEVEL):
 export const loggers = {
   tickets: createLogger('TICKETS'),
   pavilions: createLogger('PAVILIONS'), 
+  entranceReservation: createLogger('ENTRANCE'),
   automation: createLogger('AUTOMATION'),
   monitoring: createLogger('MONITORING'),
   ui: createLogger('UI')

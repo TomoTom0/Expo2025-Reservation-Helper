@@ -234,9 +234,12 @@ export const usePavilionsStore = defineStore('pavilions', () => {
       const pavilionResults = parseSearchResults(data)
       logger.info('パビリオン一覧取得完了', { count: pavilionResults.length })
       
-      // Step 2: 各パビリオンの時間帯情報を取得
+      // Step 2: 満員でないパビリオンのみ時間帯情報を取得
       logger.debug('時間帯情報取得開始')
-      const pavilionIds = pavilionResults.map(p => p.id)
+      const availablePavilions = pavilionResults.filter(p => p.dateStatus !== 2) // 満員を除外
+      const pavilionIds = availablePavilions.map(p => p.id)
+      logger.info(`時間帯取得対象: ${pavilionIds.length}/${pavilionResults.length}件（満員除外）`)
+      
       const timeSlotsMap = await getTimeSlotsForPavilions(pavilionIds, ticketIds, entranceDate)
       applyTimeSlotsToData(pavilionResults, timeSlotsMap)
       
