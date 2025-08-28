@@ -139,14 +139,41 @@
         
         <!-- パビリオン予約詳細表示 -->
         <div v-if="hasExpandedSchedules(ticket)" class="ytomo-pavilion-details">
-          <div class="ytomo-pavilion-reservation-group" v-for="reservationType in ['2か月前', '3日前', '1日前', '当日']" :key="reservationType">
-            <div class="ytomo-reservation-type-header">
-              <div class="ytomo-reservation-type-badge">{{ reservationType }}</div>
-              <div class="ytomo-time-slot-badge">11:25</div>
-            </div>
-            <div class="ytomo-pavilion-info">
-              イタリアパビリオン also hosting the Holy See ～15:00
-            </div>
+          <div v-for="schedule in getExpandedSchedules(ticket)" :key="`${ticket.ticket_id}-${schedule.entrance_date}`" class="ytomo-schedule-detail">
+            <div class="ytomo-schedule-date-header">{{ formatEntranceDate(schedule.entrance_date) }}</div>
+            
+            <!-- 予約種類ごとの詳細表示 -->
+            <template v-for="(reservationStatus, reservationType) in schedule.pavilionReservationStatus" :key="`${ticket.ticket_id}-${schedule.entrance_date}-${reservationType}`">
+              <div v-if="reservationStatus" class="ytomo-pavilion-reservation-group">
+                <div class="ytomo-reservation-type-header">
+                  <div class="ytomo-reservation-type-badge">{{ getReservationTypeName(String(reservationType)) }}</div>
+                  <div class="ytomo-period-status" :class="`status-${(reservationStatus as any).periodStatus || 'none'}`">
+                    {{ getPeriodStatusText((reservationStatus as any).periodStatus || 'none') }}
+                  </div>
+                  <div class="ytomo-submission-status" :class="`status-${(reservationStatus as any).submissionStatus || 'none'}`">
+                    {{ getSubmissionStatusText((reservationStatus as any).submissionStatus || 'none') }}
+                  </div>
+                </div>
+                
+                <!-- 当選情報表示 -->
+                <div v-if="(reservationStatus as any).winningInfo" class="ytomo-pavilion-info">
+                  <div class="ytomo-pavilion-name">
+                    {{ (reservationStatus as any).winningInfo.eventName || 'パビリオン名取得中' }}
+                  </div>
+                  <div class="ytomo-pavilion-time">
+                    {{ formatTimeRange((reservationStatus as any).winningInfo.startTime, (reservationStatus as any).winningInfo.endTime) || (reservationStatus as any).winningInfo.scheduleName || '時間取得中' }}
+                  </div>
+                  <div v-if="(reservationStatus as any).winningInfo.useState !== undefined" class="ytomo-pavilion-status">
+                    状態: {{ getUseStateText((reservationStatus as any).winningInfo.useState) }}
+                  </div>
+                </div>
+                
+                <!-- 当選情報がない場合 -->
+                <div v-else-if="(reservationStatus as any).submissionStatus === 'none'" class="ytomo-pavilion-info ytomo-no-info">
+                  {{ (reservationStatus as any).periodStatus === 'before' ? '受付前' : (reservationStatus as any).periodStatus === 'active' ? '受付中・未申請' : '受付終了・申請なし' }}
+                </div>
+              </div>
+            </template>
           </div>
         </div>
       </div>
@@ -558,6 +585,69 @@ const isDateSelected = (date: string): boolean => {
   
   // スケジュールが存在し、すべて選択されている場合に true
   return dateSchedules.length > 0 && dateSchedules.every(schedule => schedule.selected)
+}
+
+// 展開されたスケジュールを取得
+const getExpandedSchedules = (ticket: TicketData): ScheduleData[] => {
+  if (!ticket.schedules) return []
+  return ticket.schedules.filter(schedule => {
+    const key = getScheduleKey(ticket.ticket_id, schedule)
+    return expandedSchedules.value.has(key)
+  })
+}
+
+// パビリオン予約関連ヘルパーメソッド
+const getReservationTypeName = (type: string): string => {
+  switch (type) {
+    case '月': return '2か月前抽選'
+    case '週': return '7日前抽選'
+    case '3': return '3日前予約'
+    case '1': return '当日予約'
+    default: return type
+  }
+}
+
+const getPeriodStatusText = (status: string): string => {
+  switch (status) {
+    case 'before': return '受付前'
+    case 'active': return '受付中'
+    case 'expired': return '期限切れ'
+    default: return status
+  }
+}
+
+const getSubmissionStatusText = (status: string): string => {
+  switch (status) {
+    case 'none': return '未申請'
+    case 'submitted': return '申請済み'
+    case 'won': return '当選'
+    default: return status
+  }
+}
+
+const getUseStateText = (useState: number): string => {
+  switch (useState) {
+    case 0: return '未使用'
+    case 1: return '使用済み'
+    case 2: return '期限切れ'
+    default: return `状態${useState}`
+  }
+}
+
+const formatTimeRange = (startTime?: string, endTime?: string): string => {
+  if (!startTime) return ''
+  if (!endTime) return startTime
+  return `${startTime}～${endTime}`
+}
+
+const formatEntranceDate = (dateStr: string): string => {
+  if (dateStr && dateStr.length === 8) {
+    const year = dateStr.slice(0, 4)
+    const month = dateStr.slice(4, 6)
+    const day = dateStr.slice(6, 8)
+    return `${year}/${month}/${day}`
+  }
+  return dateStr
 }
 
 // ライフサイクル
@@ -1255,15 +1345,117 @@ onUnmounted(() => {
     border: 1px solid #e2e8f0;
 }
 
+.ytomo-schedule-detail {
+    margin-bottom: 16px;
+    
+    &:last-child {
+        margin-bottom: 0;
+    }
+}
+
+.ytomo-schedule-date-header {
+    font-weight: 600;
+    color: #334155;
+    margin-bottom: 8px;
+    font-size: 13px;
+    padding-bottom: 4px;
+    border-bottom: 1px solid #e2e8f0;
+}
+
 .ytomo-pavilion-reservation-group {
-    display: flex;
-    gap: 12px;
+    margin-bottom: 12px;
     padding: 8px 0;
     border-bottom: 1px solid #e5e7eb;
     
     &:last-child {
+        margin-bottom: 0;
         border-bottom: none;
     }
+}
+
+.ytomo-reservation-type-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+}
+
+.ytomo-reservation-type-badge {
+    background: #3b82f6;
+    color: white;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.ytomo-period-status, .ytomo-submission-status {
+    padding: 1px 6px;
+    border-radius: 8px;
+    font-size: 10px;
+    font-weight: 500;
+    
+    &.status-before {
+        background: #f3f4f6;
+        color: #6b7280;
+    }
+    
+    &.status-active {
+        background: #dcfce7;
+        color: #166534;
+    }
+    
+    &.status-expired {
+        background: #fef2f2;
+        color: #dc2626;
+    }
+    
+    &.status-none {
+        background: #f3f4f6;
+        color: #6b7280;
+    }
+    
+    &.status-submitted {
+        background: #fef3c7;
+        color: #d97706;
+    }
+    
+    &.status-won {
+        background: #d1fae5;
+        color: #065f46;
+    }
+}
+
+.ytomo-pavilion-info {
+    margin-left: 16px;
+    padding: 8px;
+    background: white;
+    border-radius: 4px;
+    border: 1px solid #e5e7eb;
+    
+    &.ytomo-no-info {
+        color: #6b7280;
+        font-size: 12px;
+        font-style: italic;
+    }
+}
+
+.ytomo-pavilion-name {
+    font-weight: 600;
+    color: #334155;
+    margin-bottom: 4px;
+}
+
+.ytomo-pavilion-time {
+    color: #64748b;
+    font-size: 12px;
+    margin-bottom: 2px;
+}
+
+.ytomo-pavilion-status {
+    color: #475569;
+    font-size: 11px;
 }
 
 .ytomo-reservation-type-header {

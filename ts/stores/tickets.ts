@@ -161,6 +161,9 @@ export const useTicketsStore = defineStore('tickets', () => {
       }
 
 
+      // パビリオン予約当選情報を取得
+      await fetchPavilionWinningInfo()
+
       logger.info(`チケット統合管理完了: ${tickets.value.size}個のチケット読み込み完了`)
     
     // デバッグ: チケットデータの詳細を出力
@@ -277,6 +280,96 @@ export const useTicketsStore = defineStore('tickets', () => {
   /**
    * 外部チケットの詳細データを取得
    */
+  /**
+   * パビリオン予約当選情報を取得・更新
+   */
+  const fetchPavilionWinningInfo = async (): Promise<void> => {
+    logger.info('🏛️ パビリオン予約当選情報取得開始')
+    
+    try {
+      // 全チケットについて、event_schedulesとlotteries情報を更新
+      for (const [ticketId, ticket] of tickets.value) {
+        if (ticket.schedules) {
+          for (const schedule of ticket.schedules) {
+            // 抽選カレンダー情報を取得
+            try {
+              const calendarResponse = await fetch(`/api/d/lottery_calendars?entrance_date=${schedule.entrance_date}`, {
+                method: 'GET',
+                headers: {
+                  'Accept': 'application/json',
+                  'X-Api-Lang': 'ja'
+                },
+                credentials: 'same-origin'
+              })
+              
+              if (calendarResponse.ok) {
+                const calendarData = await calendarResponse.json()
+                logger.debug(`${schedule.entrance_date}の抽選カレンダー情報取得成功`)
+                
+                // パビリオン予約状況を更新
+                if (schedule.pavilionReservationStatus) {
+                  // 実際の抽選状況でsubmissionStatusを更新する処理はここに追加
+                  // 現在は期間判定のみ実装済み
+                }
+              }
+            } catch (error) {
+              logger.warn(`${schedule.entrance_date}の抽選カレンダー取得エラー:`, error)
+            }
+          }
+        }
+        
+        // チケット自体のevent_schedulesを確認（既に予約済みのパビリオン情報）
+        // 実際のAPIからevent_schedulesデータを取得する処理が必要
+        // 現在のticketデータにevent_schedulesが含まれているかチェック
+        if ((ticket as any).event_schedules) {
+          const eventSchedules = (ticket as any).event_schedules
+          logger.info(`${ticketId}: 予約済みパビリオン ${eventSchedules.length}件`)
+          
+          // event_schedulesの情報をpersistentなwinningInfoに変換
+          for (const eventSchedule of eventSchedules) {
+            if (ticket.schedules) {
+              const matchingSchedule = ticket.schedules.find(s => s.entrance_date === eventSchedule.entrance_date)
+              if (matchingSchedule?.pavilionReservationStatus) {
+                // winning情報を設定（event_scheduleがあるということは当選済み）
+                const reservationType = eventSchedule.lottery_type || '1' // デフォルトは当日予約
+                const typeKey = getReservationTypeKey(reservationType)
+                
+                if (matchingSchedule.pavilionReservationStatus[typeKey]) {
+                  matchingSchedule.pavilionReservationStatus[typeKey].submissionStatus = 'won'
+                  matchingSchedule.pavilionReservationStatus[typeKey].winningInfo = {
+                    eventName: eventSchedule.event_name,
+                    scheduleName: eventSchedule.schedule_name,
+                    startTime: eventSchedule.start_time,
+                    endTime: eventSchedule.end_time,
+                    useState: eventSchedule.use_state
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+      
+      logger.info('✅ パビリオン予約当選情報取得完了')
+      
+    } catch (error) {
+      logger.error('❌ パビリオン予約当選情報取得エラー:', error)
+    }
+  }
+
+  /**
+   * 予約種別からキーを取得
+   */
+  const getReservationTypeKey = (lotteryType: string): string => {
+    switch (lotteryType) {
+      case '2': return '月'    // 2ヶ月前抽選
+      case '3': return '週'    // 7日前抽選  
+      case '4': return '3'     // 3日前予約
+      case '5': return '1'     // 当日予約
+      default: return '1'
+    }
+  }
+
   const loadExternalTicketData = async (ticketId: string, label: string, channel?: string): Promise<TicketData | null> => {
     try {
       const channels = channel ? [channel] : ['5', '4', '3', '2']
@@ -481,6 +574,7 @@ export const useTicketsStore = defineStore('tickets', () => {
     init,
     loadAllTickets,
     loadOwnTickets,
+    fetchPavilionWinningInfo,
     setTickets,
     addTicket,
     removeTicket,
