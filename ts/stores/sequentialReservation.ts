@@ -163,12 +163,6 @@ export const useSequentialReservationStore = defineStore('sequentialReservation'
     const currentIndex = state.value.currentTargetIndex
     const targets = state.value.reservationTargets
     
-    // ENDLESSモード: 最後まで行ったら最初に戻る
-    if (currentIndex >= targets.length && state.value.endlessMode) {
-      state.value.currentTargetIndex = 0
-      loggerInstance.info('ENDLESSモード: 最初から継続')
-    }
-    
 
     const target = targets[state.value.currentTargetIndex]
     
@@ -194,7 +188,7 @@ export const useSequentialReservationStore = defineStore('sequentialReservation'
             }
             
             const remaining = Math.max(0, Math.ceil((targetTime.getTime() - Date.now()) / 1000))
-            updateCountdown(`${remaining}秒後に実行`)
+            updateCountdown(`${remaining}秒`)
             
             if (remaining <= 0) {
               updateCountdown('')
@@ -257,19 +251,21 @@ export const useSequentialReservationStore = defineStore('sequentialReservation'
       })
     }
     
-    // 次の予約へ進む
-    state.value.currentTargetIndex++
+    // 次の予約へ進む（インクリメント前に上限チェック）
+    if (state.value.currentTargetIndex + 1 >= targets.length && state.value.endlessMode) {
+      state.value.currentTargetIndex = 0
+      loggerInstance.info('ENDLESSモード: 最初から継続')
+    } else if (state.value.currentTargetIndex + 1 >= targets.length && !state.value.endlessMode) {
+      loggerInstance.info('継続予約完了（通常モード）')
+      state.value.isRunning = false
+      return
+    } else {
+      state.value.currentTargetIndex++
+    }
     
     // 予約成功時は継続を停止
     if (isSuccess) {
       loggerInstance.info('予約成功により継続予約を終了')
-      state.value.isRunning = false
-      return
-    }
-    
-    // 通常モード: 最後まで行ったら終了
-    if (state.value.currentTargetIndex >= targets.length && !state.value.endlessMode) {
-      loggerInstance.info('継続予約完了（通常モード）')
       state.value.isRunning = false
       return
     }

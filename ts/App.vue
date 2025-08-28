@@ -1,7 +1,7 @@
 <template>
   <div id="app">
-    <!-- /ytomoページでない場合はFABボタンを表示 -->
-    <MainFab v-if="!isYtomoPage" />
+    <!-- 特定ページでのみFABボタンを表示 -->
+    <MainFab v-if="shouldShowFab" />
     
     <!-- /ytomoページでない場合はダイアログを表示 -->
     <MainDialog v-if="!isYtomoPage" />
@@ -28,8 +28,16 @@ const isYtomoPage = ref(false)
 
 // URLチェック関数
 const checkUrl = () => {
-  isYtomoPage.value = window.location.pathname === '/ytomo'
+  const pathname = window.location.pathname.toLowerCase()
+  isYtomoPage.value = pathname === '/ytomo' || pathname === '/ytomo/'
 }
+
+// YTFABボタンを表示すべきページかどうか判定
+const shouldShowFab = computed(() => {
+  const pathname = window.location.pathname.toLowerCase()
+  const allowedPages = ['/', '/invalid', '/ytomo', '/ytomo/']
+  return allowedPages.includes(pathname) || pathname.startsWith('/ytomo/')
+})
 
 // マウント時とURL変更時にチェック
 onMounted(() => {

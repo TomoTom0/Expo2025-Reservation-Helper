@@ -1,4 +1,5 @@
 import { PageChecker } from './page-utils';
+import { RouterUtils } from './router-utils';
 import { createApp, type App } from 'vue'
 import { pinia } from '../stores'
 import RootApp from '../App.vue'
@@ -42,6 +43,9 @@ export class MainDialogFabImpl implements MainDialogFab {
 
         // VueでFABボタンとダイアログを作成
         this.initializeVueComponents();
+        
+        // ドロワーメニューにytomoページボタンを追加
+        this.addYtomoNavigationButton();
         
         this.logger.info('メインダイアログFAB初期化完了（Vue/Piniaのみ）');
     }
@@ -135,6 +139,78 @@ export class MainDialogFabImpl implements MainDialogFab {
         };
         
         waitForMainAndClear();
+    }
+    
+    /**
+     * ドロワーメニューにytomoページ移動ボタンを追加
+     * https://ticket.expo2025.or.jp/ から始まるすべてのページで追加
+     */
+    private addYtomoNavigationButton(): void {
+        // ticket.expo2025.or.jpドメインのみで実行
+        if (!window.location.hostname.includes('ticket.expo2025.or.jp')) {
+            return;
+        }
+        
+        this.logger.info('ドロワーメニューにytomoページボタン追加処理開始');
+        
+        const waitForDrawerAndAddButton = () => {
+            // ドロワーメニューのul要素を検索
+            const drawerUl = document.querySelector('#drawer ul[class*="style_gnav__"]');
+            
+            if (drawerUl) {
+                // 既存のytomoボタンが存在するかチェック
+                const existingYtomoButton = drawerUl.querySelector('[data-href="/ytomo"]');
+                if (existingYtomoButton) {
+                    this.logger.debug('ytomoナビゲーションボタンは既に存在します');
+                    return;
+                }
+                
+                // ytomoページへの遷移が現在のページと同じかチェック
+                const isCurrentPage = PageChecker.isYtomoPage();
+                
+                // 公式スタイルに合わせたytomoページ移動ボタンのli要素を作成
+                const ytomoLi = document.createElement('li');
+                
+                // ボタン要素を作成（公式構造に合わせる）
+                const ytomoButton = document.createElement('button');
+                ytomoButton.type = 'button';
+                ytomoButton.tabIndex = 0;
+                if (isCurrentPage) {
+                    ytomoButton.disabled = true;
+                }
+                
+                ytomoButton.innerHTML = `
+                    <span class="style_renderer__ip0Pm">
+                        <span data-target="_blank" data-href="/ytomo" data-display-type="accentfg" data-margin-type="navigation">
+                            YTomo<img data-icon="new_window" alt="新規ウィンドウで開く" src="/asset/img/ico_newwin.svg">
+                        </span>
+                    </span>
+                `;
+                
+                if (!isCurrentPage) {
+                    ytomoButton.addEventListener('click', () => {
+                        this.logger.info('ytomoページへ移動');
+                        const success = RouterUtils.push('/ytomo');
+                        if (!success) {
+                            this.logger.warn('Router.push失敗、location.hrefにフォールバック');
+                            window.location.href = '/ytomo';
+                        }
+                    });
+                }
+                
+                ytomoLi.appendChild(ytomoButton);
+                
+                // ul要素の最初の子要素として追加
+                drawerUl.insertBefore(ytomoLi, drawerUl.firstChild);
+                
+                this.logger.info('ytomoナビゲーションボタン追加完了');
+            } else {
+                // ドロワーメニューが見つからない場合は100ms後に再試行
+                setTimeout(waitForDrawerAndAddButton, 100);
+            }
+        };
+        
+        waitForDrawerAndAddButton();
     }
     
     

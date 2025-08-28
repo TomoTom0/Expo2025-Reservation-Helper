@@ -160,18 +160,6 @@ export const useTicketsStore = defineStore('tickets', () => {
         logger.error('自分のチケット取得エラー', error)
       }
 
-      // 外部チケットを取得（エラーがあっても自分のチケットには影響しない）
-      try {
-        const cachedTickets = await loadCachedExternalTickets()
-        logger.info(`外部チケット取得完了: ${cachedTickets.length}個`)
-        
-        // キャッシュされた外部チケットを追加
-        for (const ticket of cachedTickets) {
-          tickets.value.set(ticket.ticket_id, ticket)
-        }
-      } catch (error) {
-        logger.error('外部チケット取得エラー（自分のチケットは正常）', error)
-      }
 
       logger.info(`チケット統合管理完了: ${tickets.value.size}個のチケット読み込み完了`)
     
@@ -241,22 +229,6 @@ export const useTicketsStore = defineStore('tickets', () => {
     }
   }
 
-  /**
-   * キャッシュされた外部チケット読み込み
-   */
-  const loadCachedExternalTickets = async (): Promise<TicketData[]> => {
-    const externalTicketIds = await getCachedExternalTicketIds()
-    const externalTickets: TicketData[] = []
-    
-    for (const {ticketId, label} of externalTicketIds) {
-      const ticketData = await loadExternalTicketData(ticketId, label)
-      if (ticketData) {
-        externalTickets.push(ticketData)
-      }
-    }
-    
-    return externalTickets
-  }
 
   /**
    * キャッシュから外部チケットIDを収集
@@ -391,6 +363,11 @@ export const useTicketsStore = defineStore('tickets', () => {
     tickets.value.set(ticket.ticket_id, ticket)
   }
 
+  const removeTicket = (ticketId: string) => {
+    tickets.value.delete(ticketId)
+    logger.info('チケットを削除しました', { ticketId })
+  }
+
   const selectTicket = (ticketId: string, selected: boolean) => {
     if (selected) {
       selectedTicketIds.value.add(ticketId)
@@ -504,9 +481,9 @@ export const useTicketsStore = defineStore('tickets', () => {
     init,
     loadAllTickets,
     loadOwnTickets,
-    loadCachedExternalTickets,
     setTickets,
     addTicket,
+    removeTicket,
     selectTicket,
     selectAllTickets,
     deselectAllTickets,
@@ -520,13 +497,16 @@ export const useTicketsStore = defineStore('tickets', () => {
 }, {
   persist: {
     key: 'ytomo-tickets-store',
-    pick: ['selectedEntranceDates'], // 入場日時選択のみ永続化
+    pick: ['selectedEntranceDates', 'tickets'], // 入場日時選択とチケットデータを永続化
     serializer: {
       serialize: (data: any) => {
         // MapをObjectに変換してシリアライズ
         const serialized = { ...data }
         if (serialized['selectedEntranceDates'] instanceof Map) {
           serialized['selectedEntranceDates'] = Object.fromEntries(serialized['selectedEntranceDates'])
+        }
+        if (serialized['tickets'] instanceof Map) {
+          serialized['tickets'] = Object.fromEntries(serialized['tickets'])
         }
         return JSON.stringify(serialized)
       },
@@ -535,6 +515,9 @@ export const useTicketsStore = defineStore('tickets', () => {
         // ObjectをMapに復元
         if (parsed['selectedEntranceDates'] && typeof parsed['selectedEntranceDates'] === 'object') {
           parsed['selectedEntranceDates'] = new Map(Object.entries(parsed['selectedEntranceDates']))
+        }
+        if (parsed['tickets'] && typeof parsed['tickets'] === 'object') {
+          parsed['tickets'] = new Map(Object.entries(parsed['tickets']))
         }
         return parsed
       }

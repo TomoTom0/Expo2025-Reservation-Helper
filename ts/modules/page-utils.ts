@@ -44,6 +44,14 @@ export class PageChecker {
     static isAgentTicketPage(): boolean {
         return window.location.pathname === '/agent_ticket/';
     }
+
+    /**
+     * ytomoページかどうかをチェック
+     */
+    static isYtomoPage(): boolean {
+        const pathname = window.location.pathname.toLowerCase();
+        return pathname === '/ytomo' || pathname === '/ytomo/';
+    }
 }
 
 // URL判定とページタイプ識別

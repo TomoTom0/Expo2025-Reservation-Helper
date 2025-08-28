@@ -23,6 +23,11 @@ table[class*='style_main__timetable__'] {
   display: none !important;
 }
 
+// 公式headerのz-indexを強化
+header {
+  z-index: 10000 !important;
+}
+
 // YTFABボタン
 .ytomo-main-fab {
   position: fixed;

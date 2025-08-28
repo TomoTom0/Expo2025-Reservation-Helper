@@ -50,6 +50,7 @@
   max-width: 800px;
   margin: 20px auto;
   padding: 20px;
+  z-index: auto !important;
 }
 
 #ytomo-page-dialog-container .ytomo-main-dialog {
@@ -61,4 +62,10 @@
   min-width: auto !important;
   width: 100% !important;
   max-width: none !important;
+  z-index: auto !important;
+}
+
+// ytomoページ内のダイアログ内要素のz-indexを通常レベルに調整
+#ytomo-page-dialog-container * {
+  z-index: auto !important;
 }

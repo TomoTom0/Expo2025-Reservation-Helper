@@ -8,7 +8,7 @@
   width: 100vw;
   height: 100vh;
   background: rgba(0, 0, 0, 0.3); // 薄い黒のオーバーレイ
-  z-index: 100000;
+  z-index: 9000;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -17,8 +17,8 @@
   pointer-events: auto; // クリックをキャッチする
   
   // z-index状態管理
-  &.z-normal { z-index: 100000; }
-  &.z-below-fab { z-index: 99999; }
+  &.z-normal { z-index: 9000; }
+  &.z-below-fab { z-index: 8999; }
   
   // 初期状態（非表示）
   &.hidden {

@@ -124,6 +124,7 @@
     <!-- ENDLESSトグルボタン -->
     <Teleport to="body">
       <button 
+        v-if="isPavilionTabActive"
         id="endless-toggle-button"
         class="ytomo-endless-toggle"
         :class="{ active: sequentialReservationStore.state.endlessMode }"
@@ -139,6 +140,7 @@
     <!-- 予約実行/中断FABボタン -->
     <Teleport to="body">
       <button 
+        v-if="isPavilionTabActive"
         id="reservation-button" 
         class="ytomo-reservation-fab" 
         :class="{ 'abort-mode': sequentialReservationStore.state.isRunning }"
@@ -225,6 +227,7 @@ const mainDialogStore = useMainDialogStore()
 const overlaysStore = useOverlaysStore()
 const sequentialReservationStore = useSequentialReservationStore()
 const { allPavilions, filteredPavilions, isLoading, isAvailableOnlyFilter, availablePavilionsCount } = storeToRefs(pavilionsStore)
+const { activeTab } = storeToRefs(mainDialogStore)
 
 // Composable使用
 const { 
@@ -246,6 +249,9 @@ const statusFabVisible = ref(false)
 const resultDisplayVisible = ref(false)
 
 // 計算プロパティ
+// パビリオンタブがアクティブかどうか
+const isPavilionTabActive = computed(() => activeTab.value === 'pavilion')
+
 // 現在表示されているパビリオンの選択時間帯数のみを計算
 const selectedSlotsCount = computed(() => {
   const filteredPavilionIds = new Set(pavilionsStore.filteredPavilions.map(p => p.id))

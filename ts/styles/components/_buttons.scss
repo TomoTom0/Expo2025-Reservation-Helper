@@ -416,7 +416,7 @@ div.div-flex {
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 99999;
+  z-index: 8999;
   padding: 20px;
   box-sizing: border-box;
 
@@ -490,7 +490,7 @@ div.div-flex {
   position: fixed;
   bottom: 100px;
   right: 24px;
-  z-index: 100001;
+  z-index: 9001;
   background: #f44336;
   color: white;
   border: none;

@@ -188,7 +188,7 @@
     width: 100%;
     height: 100%;
     background-color: rgba(0, 0, 0, 0.5);
-    z-index: 10000;
+    z-index: 1000;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -366,7 +366,7 @@
   padding: 15px;
   border-radius: 5px;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
-  z-index: 10001;
+  z-index: 1001;
   max-width: 300px;
   font-size: 14px;
   line-height: 1.4;
@@ -417,7 +417,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    z-index: 10000;
+    z-index: 1000;
     padding: 20px;
     box-sizing: border-box;
   }
@@ -797,7 +797,7 @@
   position: fixed;
   top: 20px;
   right: 20px;
-  z-index: 20000; // ダイアログより上に表示
+  z-index: 2000; // ダイアログより上に表示
   max-width: 400px;
   width: 100%;
   display: flex;

@@ -7,7 +7,12 @@
       @click="handleOverlayClick"
     >
       <div class="ytomo-sequential-content">
-        <h3>順次予約実行中 {{ sequentialReservationStore.state.currentTargetIndex + 1 }}/{{ sequentialReservationStore.state.reservationTargets.length }}</h3>
+        <h3>
+          順次予約実行中 {{ sequentialReservationStore.state.currentTargetIndex + 1 }}/{{ sequentialReservationStore.state.reservationTargets.length }}
+          <span class="countdown-seconds">
+            {{ sequentialReservationStore.state.countdownText }}
+          </span>
+        </h3>
         <div class="ytomo-sequential-settings-row">
           <div class="ytomo-mode-buttons">
             <button 
@@ -50,9 +55,7 @@
           <div class="ytomo-sequential-status">
             <div class="ytomo-sequential-current">
               {{ sequentialReservationStore.state.currentTargetIndex + 1 }}/{{ sequentialReservationStore.state.reservationTargets.length }}
-              <span v-if="sequentialReservationStore.state.endlessMode" class="endless-indicator">♾️</span>
             </div>
-            <div class="ytomo-sequential-countdown">{{ sequentialReservationStore.state.countdownText }}</div>
           </div>
         </div>
       </div>
@@ -135,6 +138,17 @@ const cancelSequentialReservation = () => {
     color: #374151;
     font-size: 20px;
     font-weight: 600;
+    
+    .countdown-seconds {
+      display: inline-block;
+      width: 40px;
+      font-size: 18px;
+      color: #ef4444;
+      font-weight: 500;
+      margin-left: 8px;
+      text-align: right;
+      font-family: monospace;
+    }
   }
 }
 
@@ -233,18 +247,6 @@ const cancelSequentialReservation = () => {
       font-size: 18px;
       font-weight: 600;
       color: #2c5aa0;
-      margin-bottom: 4px;
-      
-      .endless-indicator {
-        margin-left: 8px;
-        font-size: 16px;
-      }
-    }
-    
-    .ytomo-sequential-countdown {
-      font-size: 16px;
-      font-weight: 500;
-      color: #ef4444;
     }
   }
 }

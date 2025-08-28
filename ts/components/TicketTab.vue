@@ -68,6 +68,15 @@
           >
             {{ ticket.isOwn === false ? (ticket.label || 'External') : 'Me' }}
           </span>
+          <!-- 削除ボタン（自分以外のチケットのみ） -->
+          <button 
+            v-if="ticket.isOwn === false"
+            class="ytomo-ticket-delete-button"
+            @click.stop="handleTicketDelete(ticket)"
+            title="このチケットを削除"
+          >
+            ×
+          </button>
         </div>
         
         <!-- 下半分: 入場日時ボタン（予約種類も含む） -->
@@ -78,7 +87,7 @@
               v-if="!ticket.schedules || ticket.schedules.length === 0"
               class="ytomo-no-entrance-dates"
             >
-              入場予約なし
+              入場予約取得なし
             </span>
             
             <!-- 利用可能な入場予約がない場合 -->
@@ -86,32 +95,58 @@
               v-else-if="getVisibleSchedules(ticket).length === 0"
               class="ytomo-no-entrance-dates"
             >
-              利用可能な入場予約なし
+              利用可能な入場予約取得なし
             </span>
             
-            <!-- 入場日時ボタン -->
-            <button
+            <!-- 入場日時ボタンとプラスボタン -->
+            <div
               v-else
               v-for="schedule in getVisibleSchedules(ticket)"
               :key="`${schedule.entrance_date}-${schedule.schedule_name}`"
-              class="ytomo-entrance-date-button"
-              :class="{ 
-                disabled: getReservationStatus(schedule, ticket).availableTypes.length === 0,
-                selected: isScheduleSelected(schedule, ticket)
-              }"
-              :data-date="schedule.entrance_date"
-              :data-use-state="schedule.use_state"
-              :data-available-types="getReservationStatus(schedule, ticket).availableTypes.join(',')"
-              :disabled="getReservationStatus(schedule, ticket).availableTypes.length === 0"
-              @click="handleEntranceDateSelection(schedule, ticket, $event)"
+              class="ytomo-entrance-date-group"
             >
-              <span class="ytomo-date-text">
-                {{ formatDate(schedule.entrance_date) }} {{ (schedule.schedule_name || extractTimeFromSchedule(schedule)).replace(/-$/, '') }}
-              </span>
-              <div class="ytomo-reservation-status">
-                {{ getReservationStatus(schedule, ticket).statusText }}
-              </div>
-            </button>
+              <button
+                class="ytomo-entrance-date-button"
+                :class="{ 
+                  disabled: getReservationStatus(schedule, ticket).availableTypes.length === 0,
+                  selected: isScheduleSelected(schedule, ticket)
+                }"
+                :data-date="schedule.entrance_date"
+                :data-use-state="schedule.use_state"
+                :data-available-types="getReservationStatus(schedule, ticket).availableTypes.join(',')"
+                :disabled="getReservationStatus(schedule, ticket).availableTypes.length === 0"
+                @click="handleEntranceDateSelection(schedule, ticket, $event)"
+              >
+                <div class="ytomo-schedule-line">
+                  {{ formatDate(schedule.entrance_date) }} {{ (schedule.schedule_name || extractTimeFromSchedule(schedule)).replace(/-$/, '') }}
+                </div>
+                <div class="ytomo-schedule-divider"></div>
+                <div class="ytomo-schedule-line ytomo-reservation-line">
+                  予約なし
+                </div>
+              </button>
+              
+              <button 
+                class="ytomo-expand-button"
+                @click="toggleScheduleExpansion(ticket.ticket_id, schedule)"
+                :title="isScheduleExpanded(ticket.ticket_id, schedule) ? '詳細を閉じる' : '詳細を表示'"
+              >
+                {{ isScheduleExpanded(ticket.ticket_id, schedule) ? '−' : '+' }}
+              </button>
+            </div>
+          </div>
+        </div>
+        
+        <!-- パビリオン予約詳細表示 -->
+        <div v-if="hasExpandedSchedules(ticket)" class="ytomo-pavilion-details">
+          <div class="ytomo-pavilion-reservation-group" v-for="reservationType in ['2か月前', '3日前', '1日前', '当日']" :key="reservationType">
+            <div class="ytomo-reservation-type-header">
+              <div class="ytomo-reservation-type-badge">{{ reservationType }}</div>
+              <div class="ytomo-time-slot-badge">11:25</div>
+            </div>
+            <div class="ytomo-pavilion-info">
+              イタリアパビリオン also hosting the Holy See ～15:00
+            </div>
           </div>
         </div>
       </div>
@@ -153,6 +188,11 @@
           Add
         </button>
       </div>
+      
+      <!-- 結果表示エリア -->
+      <div v-if="addResult" class="ytomo-add-result" :class="{ success: addResult.success, error: !addResult.success }">
+        {{ addResult.message }}
+      </div>
     </div>
   </div>
 </template>
@@ -187,6 +227,8 @@ const selectedDateFilter = ref<string | null>(null) // 日付フィルター用�
 const newTicketId = ref('')
 const newTicketLabel = ref('')
 const selectedChannel = ref('5')
+const addResult = ref<{ success: boolean, message: string } | null>(null)
+const expandedSchedules = ref<Set<string>>(new Set())
 
 // 計算プロパティ
 const availableDates = computed(() => {
@@ -235,9 +277,14 @@ const filteredTickets = computed(() => {
       return false
     }
     
-    // 有効な入場予約があるチケットのみ
-    const validSchedules = ticket.schedules?.filter((schedule: ScheduleData) => schedule.isEffective === true) || []
-    return validSchedules.length > 0
+    // 自分のチケット: 有効な入場予約があるもののみ
+    if (ticket.isOwn === true) {
+      const validSchedules = ticket.schedules?.filter((schedule: ScheduleData) => schedule.isEffective === true) || []
+      return validSchedules.length > 0
+    }
+    
+    // 自分以外のチケット: 入場予約がない場合も空白で表示
+    return true
   })
 })
 
@@ -302,6 +349,17 @@ const handleTicketSelection = (ticket: TicketData) => {
   logger.info('チケット選択', { ticketId: ticket.ticket_id })
 }
 
+const handleTicketDelete = (ticket: TicketData) => {
+  logger.info('チケット削除', { ticketId: ticket.ticket_id })
+  ticketsStore.removeTicket(ticket.ticket_id)
+  addResult.value = { success: true, message: `チケット ${ticket.ticket_id} を削除しました` }
+  
+  // 結果表示を3秒後にクリア
+  setTimeout(() => {
+    addResult.value = null
+  }, 3000)
+}
+
 const handleEntranceDateSelection = (schedule: ScheduleData, ticket: TicketData, event: Event) => {
   event.stopPropagation()
   const target = event.target as HTMLButtonElement
@@ -345,21 +403,96 @@ const handleEntranceDateSelection = (schedule: ScheduleData, ticket: TicketData,
 const handleAddTicket = async () => {
   if (!newTicketId.value.trim()) return
   
-  logger.info('チケット追加', {
-    id: newTicketId.value,
-    label: newTicketLabel.value,
-    channel: selectedChannel.value
-  })
+  const ticketId = newTicketId.value.trim()
+  const label = newTicketLabel.value.trim() || '外部チケット'
+  const channel = selectedChannel.value
   
-  // 既存のチケット追加処理を実装
+  logger.info('チケット追加', { id: ticketId, label, channel })
+  
+  // 成否に関わらず外部チケットをstoreに追加
+  const externalTicket: TicketData = {
+    ticket_id: ticketId,
+    schedules: [],
+    isOwn: false,
+    label: label
+  }
+  
+  ticketsStore.addTicket(externalTicket)
+  
+  // API呼び出しを試行（成否は結果表示のみに使用）
+  try {
+    const response = await fetch(`/api/d/proxy_tickets/${ticketId}/add_check?registered_channel=${channel}`, {
+      credentials: 'include'
+    })
+    
+    if (response.ok) {
+      const data = await response.json()
+      // API成功時は入場予約データで更新
+      if (data.schedules && data.schedules.length > 0) {
+        const updatedTicket: TicketData = {
+          ...externalTicket,
+          schedules: data.schedules.map((s: any) => ({
+            ...s,
+            isEffective: true,
+            selected: false
+          }))
+        }
+        ticketsStore.addTicket(updatedTicket)
+      }
+      addResult.value = { success: true, message: `チケット ${ticketId} を追加しました` }
+    } else {
+      addResult.value = { success: false, message: `API呼び出し失敗 (${response.status})` }
+    }
+  } catch (error) {
+    addResult.value = { success: false, message: `API接続エラー: ${error}` }
+  }
+  
   // 入力値をクリア
   newTicketId.value = ''
   newTicketLabel.value = ''
   selectedChannel.value = '5'
+  
+  // 結果表示を3秒後にクリア
+  setTimeout(() => {
+    addResult.value = null
+  }, 3000)
 }
 
 const retryLoad = async () => {
   await loadAllTickets()
+}
+
+const getScheduleKey = (ticketId: string, schedule: ScheduleData): string => {
+  return `${ticketId}-${schedule.entrance_date}-${schedule.schedule_name || schedule.time_start || ''}`
+}
+
+const toggleScheduleExpansion = (ticketId: string, schedule: ScheduleData) => {
+  const key = getScheduleKey(ticketId, schedule)
+  
+  // 同じチケット内の他の展開された入場予約を閉じる
+  const keysToRemove = Array.from(expandedSchedules.value).filter(existingKey => 
+    existingKey.startsWith(`${ticketId}-`) && existingKey !== key
+  )
+  keysToRemove.forEach(keyToRemove => expandedSchedules.value.delete(keyToRemove))
+  
+  // 現在のスケジュールの展開状態を切り替え
+  if (expandedSchedules.value.has(key)) {
+    expandedSchedules.value.delete(key)
+  } else {
+    expandedSchedules.value.add(key)
+  }
+  
+  logger.info('入場予約詳細表示切り替え', { ticketId, schedule: schedule.entrance_date, expanded: expandedSchedules.value.has(key) })
+}
+
+const isScheduleExpanded = (ticketId: string, schedule: ScheduleData): boolean => {
+  const key = getScheduleKey(ticketId, schedule)
+  return expandedSchedules.value.has(key)
+}
+
+const hasExpandedSchedules = (ticket: TicketData): boolean => {
+  const schedules = getVisibleSchedules(ticket)
+  return schedules.some(schedule => isScheduleExpanded(ticket.ticket_id, schedule))
 }
 
 // ヘルパーメソッド
@@ -377,7 +510,20 @@ const formatDate = (dateStr: string): string => {
 
 const getVisibleSchedules = (ticket: TicketData): ScheduleData[] => {
   if (!Array.isArray(ticket.schedules)) return []
-  return ticket.schedules.filter(schedule => schedule.isEffective === true)
+  return ticket.schedules
+    .filter(schedule => schedule.isEffective === true)
+    .sort((a, b) => {
+      // 日付順でソート
+      const dateA = a.entrance_date
+      const dateB = b.entrance_date
+      if (dateA !== dateB) {
+        return dateA.localeCompare(dateB)
+      }
+      // 同じ日付の場合は時間順
+      const timeA = a.time_start || a.schedule_name || ''
+      const timeB = b.time_start || b.schedule_name || ''
+      return timeA.localeCompare(timeB)
+    })
 }
 
 const extractTimeFromSchedule = (schedule: ScheduleData): string => {
@@ -677,11 +823,17 @@ onUnmounted(() => {
     border: 1px solid #e2e8f0;
     overflow: hidden;
     transition: all 0.2s;
+}
 
-    &.hidden {
-        display: none;
-    }
+.ytomo-ticket-item:first-of-type {
+    margin-top: 12px;
+}
 
+.hidden {
+    display: none;
+}
+
+.ytomo-ticket-item {
     &:hover {
         border-color: #cbd5e1;
         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
@@ -733,6 +885,28 @@ onUnmounted(() => {
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.3px;
+}
+
+.ytomo-ticket-delete-button {
+    background: #ef4444;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-left: auto;
+    transition: all 0.2s ease;
+}
+
+.ytomo-ticket-delete-button:hover {
+    background: #dc2626;
+    transform: scale(1.1);
 }
 
 .ytomo-item-name {
@@ -821,6 +995,28 @@ onUnmounted(() => {
     }
 }
 
+/* 追加結果表示 */
+.ytomo-add-result {
+    margin-top: 8px;
+    padding: 8px 12px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 500;
+    text-align: center;
+    
+    &.success {
+        background: #dcfce7;
+        color: #166534;
+        border: 1px solid #22c55e;
+    }
+    
+    &.error {
+        background: #fee2e2;
+        color: #dc2626;
+        border: 1px solid #ef4444;
+    }
+}
+
 .ytomo-add-ticket-form {
     display: flex;
     gap: 8px;
@@ -879,15 +1075,6 @@ onUnmounted(() => {
     }
 }
 
-.ytomo-ticket-item:hover {
-    border-color: #cbd5e1;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.ytomo-ticket-item.selected {
-    border-color: #2c5aa0;
-    box-shadow: 0 0 0 2px rgba(44, 90, 160, 0.2);
-}
 
 /* 上半分: チケットID、Me Tip、Label */
 .ytomo-ticket-upper {
@@ -985,6 +1172,137 @@ onUnmounted(() => {
             background: transparent;
         }
     }
+}
+
+/* 2行表示スタイル */
+.ytomo-entrance-date-button {
+    .ytomo-schedule-line {
+        padding: 2px 0;
+        font-size: 11px;
+        line-height: 1.2;
+        
+        &.ytomo-reservation-line {
+            color: #6b7280;
+            font-size: 10px;
+        }
+    }
+    
+    .ytomo-schedule-divider {
+        height: 1px;
+        background: #e5e7eb;
+        margin: 2px 0;
+        width: 100%;
+    }
+    
+    &.selected {
+        .ytomo-schedule-line.ytomo-reservation-line {
+            color: rgba(255, 255, 255, 0.8);
+        }
+        
+        .ytomo-schedule-divider {
+            background: rgba(255, 255, 255, 0.3);
+        }
+    }
+}
+
+/* 入場日時ボタンとプラスボタンのグループ */
+.ytomo-entrance-date-group {
+    display: flex;
+    gap: 6px;
+    align-items: stretch;
+}
+
+/* プラスボタン */
+.ytomo-expand-button {
+    background: #f8fafc;
+    border: 1px solid #cbd5e1;
+    color: #374151;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 3px 8px;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+    min-width: 24px;
+    height: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    align-self: flex-end;
+    
+    &:hover {
+        background: #e2e8f0;
+        border-color: #94a3b8;
+        transform: translateY(-1px);
+    }
+    
+    &:active {
+        transform: translateY(0);
+    }
+    
+    &:focus {
+        outline: none;
+        box-shadow: 0 0 0 2px rgba(44, 90, 160, 0.2);
+    }
+}
+
+/* パビリオン予約詳細 */
+.ytomo-pavilion-details {
+    margin-top: 12px;
+    padding: 12px;
+    background: #f8fafc;
+    border-radius: 6px;
+    border: 1px solid #e2e8f0;
+}
+
+.ytomo-pavilion-reservation-group {
+    display: flex;
+    gap: 12px;
+    padding: 8px 0;
+    border-bottom: 1px solid #e5e7eb;
+    
+    &:last-child {
+        border-bottom: none;
+    }
+}
+
+.ytomo-reservation-type-header {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 80px;
+    flex-shrink: 0;
+}
+
+.ytomo-reservation-type-badge {
+    background: #3b82f6;
+    color: white;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 10px;
+    font-weight: 600;
+    text-align: center;
+    line-height: 1.2;
+}
+
+.ytomo-time-slot-badge {
+    background: #2c5aa0;
+    color: white;
+    padding: 3px 6px;
+    border-radius: 3px;
+    font-size: 10px;
+    font-weight: 500;
+    text-align: center;
+    line-height: 1.2;
+}
+
+.ytomo-pavilion-info {
+    flex: 1;
+    color: #374151;
+    font-size: 12px;
+    line-height: 1.4;
+    display: flex;
+    align-items: center;
 }
 
 .ytomo-no-entrance-dates {
