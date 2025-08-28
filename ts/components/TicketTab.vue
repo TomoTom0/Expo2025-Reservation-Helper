@@ -128,8 +128,9 @@
               
               <button 
                 class="ytomo-expand-button"
+                :disabled="!ticket.isOwn"
                 @click="toggleScheduleExpansion(ticket.ticket_id, schedule)"
-                :title="isScheduleExpanded(ticket.ticket_id, schedule) ? '詳細を閉じる' : '詳細を表示'"
+                :title="!ticket.isOwn ? 'パビリオン予約詳細は自分のチケットのみ表示可能' : (isScheduleExpanded(ticket.ticket_id, schedule) ? '詳細を閉じる' : '詳細を表示')"
               >
                 {{ isScheduleExpanded(ticket.ticket_id, schedule) ? '−' : '+' }}
               </button>
@@ -1322,6 +1323,14 @@ onUnmounted(() => {
     border-radius: 4px;
     transition: all 0.2s ease;
     min-width: 24px;
+    
+    &:disabled {
+        background: #f3f4f6;
+        border-color: #d1d5db;
+        color: #9ca3af;
+        cursor: not-allowed;
+        opacity: 0.5;
+    }
     height: 50%;
     display: flex;
     align-items: center;
