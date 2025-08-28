@@ -158,22 +158,17 @@
                   </div>
                 </div>
                 
-                <!-- 当選情報表示 -->
-                <div v-if="(reservationStatus as any).winningInfo" class="ytomo-pavilion-info">
+                <!-- パビリオン情報表示（統一DOM構造） -->
+                <div class="ytomo-pavilion-info" :class="{ 'ytomo-no-info': !(reservationStatus as any).winningInfo }">
                   <div class="ytomo-pavilion-name">
-                    {{ (reservationStatus as any).winningInfo.eventName || 'パビリオン名取得中' }}
+                    {{ (reservationStatus as any).winningInfo?.eventName || getStatusText((reservationStatus as any).periodStatus, (reservationStatus as any).submissionStatus) }}
                   </div>
-                  <div class="ytomo-pavilion-time">
+                  <div v-if="(reservationStatus as any).winningInfo" class="ytomo-pavilion-time">
                     {{ formatTimeRange((reservationStatus as any).winningInfo.startTime, (reservationStatus as any).winningInfo.endTime) || (reservationStatus as any).winningInfo.scheduleName || '時間取得中' }}
                   </div>
-                  <div v-if="(reservationStatus as any).winningInfo.useState !== undefined" class="ytomo-pavilion-status">
+                  <div v-if="(reservationStatus as any).winningInfo?.useState !== undefined" class="ytomo-pavilion-status">
                     状態: {{ getUseStateText((reservationStatus as any).winningInfo.useState) }}
                   </div>
-                </div>
-                
-                <!-- 当選情報がない場合 -->
-                <div v-else-if="(reservationStatus as any).submissionStatus === 'none'" class="ytomo-pavilion-info ytomo-no-info">
-                  {{ getStatusText((reservationStatus as any).periodStatus, (reservationStatus as any).submissionStatus) }}
                 </div>
               </div>
             </template>
