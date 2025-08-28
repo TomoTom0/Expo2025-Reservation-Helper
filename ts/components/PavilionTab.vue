@@ -131,9 +131,7 @@
         title="ENDLESSモード切替"
         @click="handleEndlessToggle"
       >
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-          <path d="M18.6 6.62c-1.44 0-2.8.56-3.77 1.53L12 10.66 10.48 9.14c-.64-.64-1.49-.99-2.4-.99-1.87 0-3.39 1.51-3.39 3.38s1.52 3.38 3.39 3.38c.91 0 1.76-.35 2.4-.99L12 12.4l1.52 1.52c.64.64 1.49.99 2.4.99 1.87 0 3.39-1.51 3.39-3.38s-1.52-3.38-3.39-3.38c-.9 0-1.76.35-2.4.99l-.96.96-.96-.96c-.64-.64-1.5-.99-2.4-.99z"/>
-        </svg>
+        ∞
       </button>
     </Teleport>
 
@@ -1469,6 +1467,8 @@ onUnmounted(() => {
     display: flex;
     align-items: center;
     justify-content: center;
+    font-size: 18px;
+    font-weight: bold;
 
     &.active {
         background: #ff8c00;

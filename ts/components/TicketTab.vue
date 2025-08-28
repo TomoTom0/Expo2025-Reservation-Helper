@@ -2,17 +2,31 @@
   <div class="ytomo-ticket-tab">
     <!-- チケット簡易選択エリア -->
     <div class="ytomo-quick-select">
-      <label class="ytomo-toggle-container">
-        <input 
-          type="checkbox" 
-          id="own-only-toggle" 
-          class="ytomo-toggle-input"
-          v-model="isOwnOnlyToggle"
-          @change="handleOwnOnlyToggle"
+      <div class="ytomo-control-left">
+        <label class="ytomo-toggle-container">
+          <input 
+            type="checkbox" 
+            id="own-only-toggle" 
+            class="ytomo-toggle-input"
+            v-model="isOwnOnlyToggle"
+            @change="handleOwnOnlyToggle"
+          >
+          <span class="ytomo-toggle-slider"></span>
+          <span class="ytomo-toggle-label">自分</span>
+        </label>
+        
+        <button 
+          class="ytomo-refresh-button"
+          @click="handleRefreshTickets"
+          :disabled="isRefreshing"
+          title="チケット情報を更新"
         >
-        <span class="ytomo-toggle-slider"></span>
-        <span class="ytomo-toggle-label">自分</span>
-      </label>
+          <svg class="ytomo-refresh-icon" :class="{ 'rotating': isRefreshing }" viewBox="0 0 24 24" width="16" height="16">
+            <path d="M4 4v5h.582m15.356 2A8.001 8.001 0 0 0 4.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 0 1-15.357-2m15.357 2H15" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+      </div>
+      
       <div class="ytomo-date-buttons">
         <button 
           v-for="date in availableDates"
@@ -122,7 +136,14 @@
                 </div>
                 <div class="ytomo-schedule-divider"></div>
                 <div class="ytomo-schedule-line ytomo-reservation-line">
-                  予約なし
+                  <span v-for="reservationType in getReservationTypesForSecondLine(schedule)" :key="reservationType.type" 
+                        class="ytomo-reservation-type-indicator" 
+                        :class="reservationType.statusClass">
+                    {{ reservationType.shortName }}
+                  </span>
+                  <span v-if="getReservationTypesForSecondLine(schedule).length === 0" class="ytomo-no-reservation">
+                    予約なし
+                  </span>
                 </div>
               </button>
               
@@ -143,27 +164,29 @@
           <div v-for="schedule in getExpandedSchedules(ticket)" :key="`${ticket.ticket_id}-${schedule.entrance_date}`" class="ytomo-schedule-detail">
             <div class="ytomo-schedule-date-header">{{ formatEntranceDate(schedule.entrance_date) }}</div>
             
-            <!-- 予約種類ごとの詳細表示 -->
-            <template v-for="(reservationStatus, reservationType) in schedule.pavilionReservationStatus" :key="`${ticket.ticket_id}-${schedule.entrance_date}-${reservationType}`">
-              <div v-if="reservationStatus" class="ytomo-pavilion-reservation-group">
+            <!-- 予約種類ごとの詳細表示（5,4,3,2の順） -->
+            <template v-for="reservationType in getSortedReservationTypes(schedule)" :key="`${ticket.ticket_id}-${schedule.entrance_date}-${reservationType}`">
+              <div v-if="schedule.pavilionReservationStatus?.[reservationType]" class="ytomo-pavilion-reservation-group">
                 <div class="ytomo-reservation-header">
                   <!-- 左側：予約種類と時間帯 -->
                   <div class="ytomo-reservation-left">
-                    <div class="ytomo-reservation-type-badge">{{ getReservationTypeName(String(reservationType)) }}</div>
+                    <div class="ytomo-reservation-type-badge" :class="getReservationTypeBadgeClass(schedule.pavilionReservationStatus[reservationType])">
+                      {{ getReservationTypeName(String(reservationType)) }}
+                    </div>
                     <div class="ytomo-time-slot-badge">
-                      {{ (reservationStatus as any).winningInfo ? 
-                          (formatTimeRange((reservationStatus as any).winningInfo.startTime, (reservationStatus as any).winningInfo.endTime) || (reservationStatus as any).winningInfo.scheduleName || '時間取得中') : 
+                      {{ schedule.pavilionReservationStatus[reservationType]?.winningInfo ? 
+                          (formatTimeRange(schedule.pavilionReservationStatus[reservationType].winningInfo.startTime, schedule.pavilionReservationStatus[reservationType].winningInfo.endTime) || schedule.pavilionReservationStatus[reservationType].winningInfo.scheduleName || '時間取得中') : 
                           '—' }}
                     </div>
                   </div>
                   
                   <!-- 右側：パビリオン名または状況 -->
                   <div class="ytomo-reservation-right">
-                    <div class="ytomo-pavilion-name" :class="{ 'ytomo-status-text': !(reservationStatus as any).winningInfo }">
-                      {{ (reservationStatus as any).winningInfo?.eventName || getStatusText((reservationStatus as any).periodStatus, (reservationStatus as any).submissionStatus) }}
+                    <div class="ytomo-pavilion-name" :class="{ 'ytomo-status-text': !schedule.pavilionReservationStatus[reservationType]?.winningInfo }">
+                      {{ schedule.pavilionReservationStatus[reservationType]?.winningInfo?.eventName || getStatusText(schedule.pavilionReservationStatus[reservationType]?.periodStatus || 'none', schedule.pavilionReservationStatus[reservationType]?.submissionStatus || 'none') }}
                     </div>
-                    <div v-if="(reservationStatus as any).winningInfo?.useState !== undefined" class="ytomo-use-status">
-                      {{ getUseStateText((reservationStatus as any).winningInfo.useState) }}
+                    <div v-if="schedule.pavilionReservationStatus[reservationType]?.winningInfo?.useState !== undefined" class="ytomo-use-status">
+                      {{ getUseStateText(schedule.pavilionReservationStatus[reservationType].winningInfo.useState) }}
                     </div>
                   </div>
                 </div>
@@ -226,6 +249,8 @@ import { useTicketsStore } from '@/stores/tickets'
 import { useMainDialogStore } from '@/stores/mainDialog'
 import { useTickets } from '@/composables/useTickets'
 import { loggers } from '@/utils/logger'
+import { getLongNameFromShortName, getShortNameFromChannel, getAllPavilionReservationTypes } from '@/utils/pavilionReservationMapping'
+import { determinePavilionReservationType, getAllPavilionReservationStatus } from '@/utils/pavilionReservationTypes'
 import type { ScheduleData, TicketData, LotteryCalendarData, ReservationResult } from '@/types/api'
 
 const logger = loggers.ui
@@ -251,6 +276,7 @@ const newTicketLabel = ref('')
 const selectedChannel = ref('5')
 const addResult = ref<{ success: boolean, message: string } | null>(null)
 const expandedSchedules = ref<Set<string>>(new Set())
+const isRefreshing = ref(false)
 
 // 計算プロパティ
 const availableDates = computed(() => {
@@ -325,6 +351,22 @@ const handleOwnOnlyToggle = () => {
   logger.debug('自分のみ表示', { isOwnOnlyToggle: isOwnOnlyToggle.value })
 }
 
+const handleRefreshTickets = async () => {
+  if (isRefreshing.value) return
+  
+  isRefreshing.value = true
+  logger.info('チケット情報手動更新開始')
+  
+  try {
+    await ticketsStore.loadAllTickets(true) // 強制更新
+    logger.info('チケット情報手動更新完了')
+  } catch (error) {
+    logger.error('チケット情報更新エラー:', error)
+  } finally {
+    isRefreshing.value = false
+  }
+}
+
 const handleDateSelection = (date: string) => {
   logger.debug('日付ボタン選択', { date })
   
@@ -347,6 +389,17 @@ const handleDateSelection = (date: string) => {
   // 分散状態更新: その日付のすべてのスケジュールの選択状態を更新
   ticketsArray.value.forEach((ticket: TicketData) => {
     if (ticket.schedules) {
+      // まず他の日付の選択を解除（新しく選択する場合のみ）
+      if (newSelectedState) {
+        ticket.schedules.forEach((schedule: ScheduleData) => {
+          if (schedule.entrance_date !== date && schedule.selected) {
+            schedule.selected = false
+            ticketsStore.removeSelectedEntranceDate(ticket.ticket_id)
+          }
+        })
+      }
+      
+      // 指定日付のスケジュールを更新
       ticket.schedules.forEach((schedule: ScheduleData) => {
         if (schedule.entrance_date === date && schedule.isEffective === true) {
           schedule.selected = newSelectedState
@@ -591,15 +644,9 @@ const getExpandedSchedules = (ticket: TicketData): ScheduleData[] => {
   })
 }
 
-// パビリオン予約関連ヘルパーメソッド
+// パビリオン予約関連ヘルパーメソッド（共通関数使用）
 const getReservationTypeName = (type: string): string => {
-  switch (type) {
-    case '月': return '2か月前抽選'
-    case '週': return '7日前抽選'
-    case '3': return '3日前予約'
-    case '1': return '当日予約'
-    default: return type
-  }
+  return getLongNameFromShortName(type)
 }
 
 const getPeriodStatusText = (status: string): string => {
@@ -651,6 +698,112 @@ const getStatusText = (periodStatus: string, submissionStatus: string): string =
   return `${periodText}・${submissionText}`
 }
 
+// 予約種類を5,4,3,2の順（チャネル順）で並び替え（共通関数使用）
+const getSortedReservationTypes = (schedule: ScheduleData): string[] => {
+  if (!schedule.pavilionReservationStatus) return []
+  
+  // チャネル順（5,4,3,2）に対応するshortNameを取得
+  const allTypes = getAllPavilionReservationTypes()
+  const sortedTypes = allTypes
+    .sort((a, b) => parseInt(b.channel) - parseInt(a.channel)) // 5,4,3,2の順
+    .map(type => type.shortName)
+  
+  return sortedTypes.filter(type => schedule.pavilionReservationStatus?.[type])
+}
+
+// 予約種類バッジのクラス（優先度順：当選>期限切れ>開始前>提出>未提出）
+const getReservationTypeBadgeClass = (reservationStatus: any): string => {
+  if (!reservationStatus) return 'badge-none'
+  
+  if (reservationStatus.submissionStatus === 'won') return 'badge-won'
+  if (reservationStatus.periodStatus === 'expired') return 'badge-expired'
+  if (reservationStatus.periodStatus === 'before') return 'badge-before'
+  if (reservationStatus.submissionStatus === 'submitted') return 'badge-submitted'
+  return 'badge-none'
+}
+
+// 入場予約2行目用の予約種類一覧（共通関数使用）
+const getReservationTypesForSecondLine = (schedule: ScheduleData) => {
+  // pavilionReservationStatusがない場合は入場日付から計算
+  if (!schedule.pavilionReservationStatus && schedule.entrance_date) {
+    const allTypes = getAllPavilionReservationTypes()
+    const sortedTypes = allTypes
+      .sort((a, b) => parseInt(b.channel) - parseInt(a.channel)) // 5,4,3,2の順
+      .map(type => type.shortName)
+    
+    // パビリオン予約期間判定を実行
+    const allStatus = getAllPavilionReservationStatus(schedule.entrance_date)
+    
+    // 当選・受付中・開始前を判定
+    const wonOrActive = sortedTypes.filter(type => {
+      const status = allStatus[type]
+      return status && (status.submissionStatus === 'won' || status.periodStatus === 'active')
+    })
+    
+    const result = wonOrActive.length > 0 ? wonOrActive : 
+      sortedTypes.filter(type => {
+        const status = allStatus[type]
+        return status && status.periodStatus === 'before'
+      }).slice(-1)
+    
+    const displayNames = { '1': '当', '3': '3', '週': '週', '月': '月' }
+    return result.map(type => ({
+      type,
+      shortName: displayNames[type as keyof typeof displayNames] || type,
+      statusClass: getSecondLineStatusClassFromPeriod(allStatus[type]?.periodStatus || 'none', allStatus[type]?.submissionStatus || 'none')
+    }))
+  }
+  
+  if (!schedule.pavilionReservationStatus) return []
+  
+  // チャネル順（5,4,3,2）に対応するshortNameを取得
+  const allTypes = getAllPavilionReservationTypes()
+  const sortedTypes = allTypes
+    .sort((a, b) => parseInt(b.channel) - parseInt(a.channel)) // 5,4,3,2の順
+    .map(type => type.shortName)
+  
+  // 2行目表示用の短縮名マッピング
+  const displayNames = { '1': '当', '3': '3', '週': '週', '月': '月' }
+  
+  // まず当選と受付中を抽出
+  const wonOrActive = sortedTypes.filter(type => {
+    const status = schedule.pavilionReservationStatus?.[type]
+    return status && (status.submissionStatus === 'won' || status.periodStatus === 'active')
+  })
+  
+  // 当選・受付中がない場合のみ、開始前の最後の1つを表示
+  const result = wonOrActive.length > 0 ? wonOrActive : 
+    sortedTypes.filter(type => {
+      const status = schedule.pavilionReservationStatus?.[type]
+      return status && status.periodStatus === 'before'
+    }).slice(-1) // 開始前は最後の1つだけ
+    
+  return result
+    .map(type => ({
+      type,
+      shortName: displayNames[type as keyof typeof displayNames] || type,
+      statusClass: getSecondLineStatusClass(schedule.pavilionReservationStatus![type])
+    }))
+}
+
+// 2行目の予約種類表示用スタイルクラス
+const getSecondLineStatusClass = (reservationStatus: any): string => {
+  if (!reservationStatus) return 'indicator-none'
+  
+  if (reservationStatus.submissionStatus === 'won') return 'indicator-won'
+  if (reservationStatus.periodStatus === 'active') return 'indicator-active'
+  if (reservationStatus.periodStatus === 'before') return 'indicator-before'
+  return 'indicator-none'
+}
+
+// 期間と提出状況から2行目スタイルクラスを取得（外部チケット用）
+const getSecondLineStatusClassFromPeriod = (periodStatus: string, submissionStatus: string): string => {
+  if (submissionStatus === 'won') return 'indicator-won'
+  if (periodStatus === 'active') return 'indicator-active'
+  if (periodStatus === 'before') return 'indicator-before'
+  return 'indicator-none'
+}
+
 // ライフサイクル
 onMounted(() => {
   logger.info('TicketTab mounted', {
@@ -692,9 +845,55 @@ onUnmounted(() => {
     border: 1px solid #e2e8f0;
     flex-shrink: 0;
     display: flex;
+    
+    .ytomo-control-left {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-right: auto;
+    }
     align-items: center;
     gap: 10px;
     flex-wrap: wrap;
+}
+
+.ytomo-refresh-button {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    background: #f8fafc;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    color: #475569;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    
+    &:hover:not(:disabled) {
+        background: #e2e8f0;
+        border-color: #94a3b8;
+    }
+    
+    &:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+        background: #f1f5f9;
+    }
+}
+
+.ytomo-refresh-icon {
+    flex-shrink: 0;
+    
+    &.rotating {
+        animation: spin 1s linear infinite;
+    }
+}
+
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
 }
 
 /* トグルスイッチ */
@@ -1245,6 +1444,54 @@ onUnmounted(() => {
             background: transparent;
         }
     }
+}
+
+// 予約種類インジケーター（入場予約2行目）
+.ytomo-reservation-type-indicator {
+    display: inline-block;
+    width: 16px;
+    height: 13px;
+    font-size: 10px;
+    font-weight: 400;
+    text-align: center;
+    line-height: 13px;
+    border-radius: 3px;
+    border: 1px solid transparent;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+    
+    &.indicator-won {
+        background: #10b981;
+        color: white;
+        border-color: #059669;
+    }
+    
+    &.indicator-active {
+        background: #3b82f6;
+        color: white;
+        border-color: #2563eb;
+    }
+    
+    &.indicator-before {
+        background: #f59e0b;
+        color: white;
+        border-color: #d97706;
+    }
+    
+    &.indicator-none {
+        background: #e5e7eb;
+        color: #6b7280;
+        border-color: #d1d5db;
+    }
+}
+
+.ytomo-no-reservation {
+    font-style: italic;
+    color: #9ca3af;
+}
+
+.ytomo-entrance-date-button {
     
     &.selected .ytomo-reservation-status {
         background: rgba(255, 255, 255, 0.95);
@@ -1274,6 +1521,9 @@ onUnmounted(() => {
         
         &.ytomo-reservation-line {
             color: #6b7280;
+            display: flex;
+            align-items: center;
+            gap: 4px;
             font-size: 10px;
         }
     }
@@ -1392,7 +1642,7 @@ onUnmounted(() => {
     display: flex;
     flex-direction: column;
     gap: 4px;
-    min-width: 120px;
+    min-width: 80px;
     flex-shrink: 0;
 }
 
@@ -1404,14 +1654,38 @@ onUnmounted(() => {
 }
 
 .ytomo-reservation-type-badge {
-    background: #3b82f6;
-    color: white;
     padding: 2px 8px;
     border-radius: 12px;
     font-size: 11px;
     font-weight: 600;
     white-space: nowrap;
     text-align: center;
+    
+    // 優先度順の背景色
+    &.badge-won {
+        background: #10b981;
+        color: white;
+    }
+    
+    &.badge-expired {
+        background: #ef4444;
+        color: white;
+    }
+    
+    &.badge-before {
+        background: #f59e0b;
+        color: white;
+    }
+    
+    &.badge-submitted {
+        background: #8b5cf6;
+        color: white;
+    }
+    
+    &.badge-none {
+        background: #6b7280;
+        color: white;
+    }
 }
 
 .ytomo-time-slot-badge {

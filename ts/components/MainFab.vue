@@ -55,14 +55,39 @@ const handleClick = () => {
   }
 }
 
+// 時刻を「11:14」形式にフォーマット
+const formatTime = (timeStr: string): string => {
+  // 「1114」形式を「11:14」に変換
+  const match = timeStr.match(/(\d{2})(\d{2})/)
+  if (match) {
+    return `${match[1]}:${match[2]}`
+  }
+  return timeStr
+}
+
+// エラーメッセージを日本語に変換
+const translateErrorMessage = (reason: string): string => {
+  if (reason.includes('select ticket valid error')) {
+    return '無効'
+  }
+  return reason
+}
+
 // 予約結果を表示する関数
 const showReservationResult = (result: ReservationResult) => {
-  reservationResult.value = result
+  // 時刻フォーマットを修正
+  const formattedResult = {
+    ...result,
+    datetime: result.datetime.replace(/(\d{4})$/, (match) => formatTime(match)),
+    reason: result.reason ? translateErrorMessage(result.reason) : undefined
+  }
   
-  // 5秒後に自動で非表示
+  reservationResult.value = formattedResult
+  
+  // 10秒後に自動で非表示（表示時間を延長）
   setTimeout(() => {
     reservationResult.value = null
-  }, 5000)
+  }, 10000)
 }
 
 // 予約結果イベントリスナー

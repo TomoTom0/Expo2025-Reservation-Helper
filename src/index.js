@@ -8,7 +8,7 @@
 // @run-at       document-end
 // ==/UserScript==
 
-// Built: 2025/08/28 11:39:44
+// Built: 2025/08/28 19:07:46
 
 
 (function webpackUniversalModuleDefinition(root, factory) {
@@ -1169,754 +1169,6 @@ exports.A = (sfc, props) => {
 
 /***/ }),
 
-/***/ 302:
-/***/ ((module, __webpack_exports__, __webpack_require__) => {
-
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   A: () => (__WEBPACK_DEFAULT_EXPORT__)
-/* harmony export */ });
-/* harmony import */ var _node_modules_css_loader_dist_runtime_noSourceMaps_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(601);
-/* harmony import */ var _node_modules_css_loader_dist_runtime_noSourceMaps_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_css_loader_dist_runtime_noSourceMaps_js__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(314);
-/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1__);
-// Imports
-
-
-var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1___default()((_node_modules_css_loader_dist_runtime_noSourceMaps_js__WEBPACK_IMPORTED_MODULE_0___default()));
-// Module
-___CSS_LOADER_EXPORT___.push([module.id, `.ytomo-ticket-tab[data-v-4533d894]{padding:0 12px 20px 12px;height:100%;overflow-y:auto;color-scheme:light}@media(max-width: 768px){.ytomo-ticket-tab[data-v-4533d894]{padding:0 8px 16px 8px}}.ytomo-quick-select[data-v-4533d894]{background:#fff;border-radius:8px;padding:12px;box-shadow:0 1px 3px rgba(0,0,0,.1);border:1px solid #e2e8f0;flex-shrink:0;display:flex;align-items:center;gap:10px;flex-wrap:wrap}.ytomo-toggle-container[data-v-4533d894]{display:flex;align-items:center;cursor:pointer;user-select:none}.ytomo-toggle-input[data-v-4533d894]{display:none}.ytomo-toggle-slider[data-v-4533d894]{position:relative;width:44px;height:24px;background:#cbd5e1;border-radius:12px;transition:background-color .2s;margin-right:8px}.ytomo-toggle-slider[data-v-4533d894]::before{content:"";position:absolute;top:2px;left:2px;width:20px;height:20px;background:#fff;border-radius:50%;transition:transform .2s}.ytomo-toggle-input:checked+.ytomo-toggle-slider[data-v-4533d894]{background:#2c5aa0}.ytomo-toggle-input:checked+.ytomo-toggle-slider[data-v-4533d894]::before{transform:translateX(20px)}.ytomo-toggle-label[data-v-4533d894]{font-size:14px;font-weight:500;color:#374151}.ytomo-date-buttons[data-v-4533d894]{display:flex;flex-wrap:wrap;gap:8px;flex:1}.ytomo-entrance-date-button[data-v-4533d894],.ytomo-date-button[data-v-4533d894]{background:#e0f2fe;border:1px solid #0891b2;border-radius:4px;padding:4px 8px;font-size:12px;color:#0c4a6e;cursor:pointer;transition:all .2s;display:flex;flex-direction:column;gap:2px;align-items:center}.ytomo-entrance-date-button[data-v-4533d894] *,.ytomo-date-button[data-v-4533d894] *{pointer-events:none}.ytomo-entrance-date-button[data-v-4533d894]:focus,.ytomo-date-button[data-v-4533d894]:focus{outline:none;box-shadow:none}.ytomo-entrance-date-button[data-v-4533d894]:hover,.ytomo-date-button[data-v-4533d894]:hover{background:#dbeafe;color:#0c4a6e;transform:translateY(-1px);box-shadow:0 2px 4px rgba(186,230,253,.3)}.selected.ytomo-entrance-date-button[data-v-4533d894],.selected.ytomo-date-button[data-v-4533d894]{background:#0284c7;color:#fff;border-color:#0284c7;outline:2px solid #0284c7;outline-offset:-1px}.ytomo-entrance-date-button[data-v-4533d894]:active,.ytomo-date-button[data-v-4533d894]:active{transform:translateY(0);box-shadow:none}.disabled.ytomo-entrance-date-button[data-v-4533d894],.disabled.ytomo-date-button[data-v-4533d894],.ytomo-entrance-date-button[data-v-4533d894]:disabled,.ytomo-date-button[data-v-4533d894]:disabled{background:#e2e8f0;border-color:#94a3b8;color:#475569;cursor:not-allowed}.disabled.ytomo-entrance-date-button[data-v-4533d894]:hover,.disabled.ytomo-date-button[data-v-4533d894]:hover,.ytomo-entrance-date-button[data-v-4533d894]:disabled:hover,.ytomo-date-button[data-v-4533d894]:disabled:hover{background:#e2e8f0;color:#475569;transform:none;box-shadow:none}.ytomo-ticket-tab[data-v-4533d894]{padding:0 12px 20px 12px;height:100%;overflow-y:auto;color-scheme:light}@media(max-width: 768px){.ytomo-ticket-tab[data-v-4533d894]{padding:0 8px 16px 8px}}.ytomo-quick-select[data-v-4533d894]{background:#fff;border-radius:8px;padding:16px;box-shadow:0 1px 3px rgba(0,0,0,.1);border:1px solid #e2e8f0;flex-shrink:0;display:flex;align-items:center;gap:10px;flex-wrap:wrap;min-height:52px}.ytomo-toggle-container[data-v-4533d894]{display:flex;align-items:center;cursor:pointer;user-select:none}.ytomo-toggle-input[data-v-4533d894]{display:none}.ytomo-toggle-slider[data-v-4533d894]{position:relative;width:44px;height:24px;background:#cbd5e1;border-radius:12px;transition:background-color .2s;margin-right:8px}.ytomo-toggle-slider[data-v-4533d894]::before{content:"";position:absolute;top:2px;left:2px;width:20px;height:20px;background:#fff;border-radius:50%;transition:transform .2s}.ytomo-toggle-input:checked+.ytomo-toggle-slider[data-v-4533d894]{background:#2c5aa0}.ytomo-toggle-input:checked+.ytomo-toggle-slider[data-v-4533d894]::before{transform:translateX(20px)}.ytomo-toggle-label[data-v-4533d894]{font-size:14px;font-weight:500;color:#374151}.ytomo-date-buttons[data-v-4533d894]{display:flex;flex-wrap:wrap;gap:8px;flex:1}.ytomo-ticket-list[data-v-4533d894]{display:flex;flex-direction:column;gap:8px;margin-bottom:20px}.ytomo-ticket-item[data-v-4533d894]{background:#fff;border-radius:6px;border:1px solid #e2e8f0;overflow:hidden;transition:all .2s}.ytomo-ticket-item[data-v-4533d894]:first-of-type{margin-top:12px}.hidden[data-v-4533d894]{display:none}.ytomo-ticket-item[data-v-4533d894]:hover{border-color:#cbd5e1;box-shadow:0 2px 4px rgba(0,0,0,.1)}.ytomo-ticket-item.selected[data-v-4533d894]{border-color:#2c5aa0;box-shadow:0 0 0 2px rgba(44,90,160,.2)}.ytomo-ticket-upper[data-v-4533d894]{background:#e2e8f0;padding:8px 12px;display:flex;align-items:center;gap:8px;border-bottom:1px solid #cbd5e1}.ytomo-ticket-id[data-v-4533d894]{font-family:"Courier New",monospace;font-size:13px;font-weight:600;color:#374151;background:#e2e8f0;padding:2px 6px;border-radius:3px}.ytomo-me-tip[data-v-4533d894]{background:linear-gradient(135deg, #10b981 0%, #059669 100%);color:#fff;padding:2px 6px;border-radius:10px;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.3px}.ytomo-external-tip[data-v-4533d894]{background:linear-gradient(135deg, #f59e0b 0%, #d97706 100%);color:#fff;padding:2px 6px;border-radius:10px;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.3px}.ytomo-ticket-delete-button[data-v-4533d894]{background:#ef4444;color:#fff;border:none;border-radius:50%;width:20px;height:20px;font-size:14px;font-weight:bold;cursor:pointer;display:flex;align-items:center;justify-content:center;margin-left:auto;transition:all .2s ease}.ytomo-ticket-delete-button[data-v-4533d894]:hover{background:#dc2626;transform:scale(1.1)}.ytomo-item-name[data-v-4533d894]{background:linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);color:#fff;padding:2px 6px;border-radius:10px;font-size:9px;font-weight:500;max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.ytomo-label-tag[data-v-4533d894]{background:linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);color:#fff;padding:2px 6px;border-radius:10px;font-size:10px;font-weight:600}.ytomo-ticket-lower[data-v-4533d894]{padding:8px 12px;display:flex;flex-direction:column;gap:8px}.ytomo-entrance-dates[data-v-4533d894]{display:flex;flex-wrap:wrap;gap:6px}.ytomo-reservation-types[data-v-4533d894]{display:flex;flex-wrap:wrap;gap:6px;align-items:center}.ytomo-reservation-type[data-v-4533d894]{padding:4px 8px;border-radius:4px;font-size:12px;font-weight:500}.ytomo-reservation-type.active[data-v-4533d894]{background:#dcfce7;color:#166534;border:1px solid #22c55e}.ytomo-reservation-type.inactive[data-v-4533d894]{background:#fef2f2;color:#991b1b;border:1px solid #ef4444}.ytomo-no-reservation-types[data-v-4533d894]{color:#6b7280;font-size:12px;font-style:italic}.ytomo-add-ticket[data-v-4533d894]{background:#fff;border-radius:8px;padding:16px;border:2px dashed #cbd5e1;margin-top:20px}.ytomo-add-ticket h4[data-v-4533d894]{margin:0 0 12px 0;color:#374151;font-size:14px;font-weight:600}.ytomo-add-result[data-v-4533d894]{margin-top:8px;padding:8px 12px;border-radius:4px;font-size:12px;font-weight:500;text-align:center}.ytomo-add-result.success[data-v-4533d894]{background:#dcfce7;color:#166534;border:1px solid #22c55e}.ytomo-add-result.error[data-v-4533d894]{background:#fee2e2;color:#dc2626;border:1px solid #ef4444}.ytomo-add-ticket-form[data-v-4533d894]{display:flex;gap:8px;align-items:center;flex-wrap:wrap}@media(max-width: 768px){.ytomo-add-ticket-form[data-v-4533d894]{flex-direction:column;align-items:stretch;gap:12px}}.ytomo-input-inline[data-v-4533d894]{padding:4px 8px;border:1px solid #d1d5db;border-radius:4px;font-size:12px;transition:border-color .2s;background:#fff}.ytomo-input-inline[data-v-4533d894]:focus{outline:none;border-color:#2c5aa0;box-shadow:0 0 0 2px rgba(44,90,160,.1)}.ytomo-input-inline[data-v-4533d894]::placeholder{color:#9ca3af}.ytomo-input-inline.ytomo-input-ticket-id[data-v-4533d894]{width:120px}.ytomo-input-inline.ytomo-input-label[data-v-4533d894]{width:60px}.ytomo-select-inline[data-v-4533d894]{padding:4px 8px;border:1px solid #d1d5db;border-radius:4px;font-size:12px;background:#fff;cursor:pointer;width:50px}.ytomo-select-inline[data-v-4533d894]:focus{outline:none;border-color:#2c5aa0;box-shadow:0 0 0 2px rgba(44,90,160,.1)}.ytomo-ticket-upper[data-v-4533d894]{background:#e2e8f0;padding:8px 12px;display:flex;align-items:center;gap:8px;border-bottom:1px solid #cbd5e1}.ytomo-ticket-id[data-v-4533d894]{font-family:"Courier New",monospace;font-size:13px;font-weight:600;color:#374151;background:#e2e8f0;padding:2px 6px;border-radius:3px}.ytomo-me-tip[data-v-4533d894]{background:linear-gradient(135deg, #10b981 0%, #059669 100%);color:#fff;padding:2px 6px;border-radius:10px;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.3px}.ytomo-external-tip[data-v-4533d894]{background:linear-gradient(135deg, #f59e0b 0%, #d97706 100%);color:#fff;padding:2px 6px;border-radius:10px;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.3px}.ytomo-ticket-lower[data-v-4533d894]{padding:8px 12px;display:flex;flex-direction:column;gap:8px}.ytomo-entrance-date-button .ytomo-reservation-status[data-v-4533d894]{background:hsla(0,0%,100%,.9);color:#0891b2;padding:2px 4px;border-radius:3px;font-size:9px;font-weight:500;line-height:1.1;text-align:center}.ytomo-entrance-date-button .ytomo-reservation-status[data-v-4533d894]:empty{background:rgba(0,0,0,0);padding:0}.ytomo-entrance-date-button:hover .ytomo-reservation-status[data-v-4533d894]{background:hsla(0,0%,100%,.95);color:#0ea5e9}.ytomo-entrance-date-button:hover .ytomo-reservation-status[data-v-4533d894]:empty{background:rgba(0,0,0,0)}.ytomo-entrance-date-button.selected .ytomo-reservation-status[data-v-4533d894]{background:hsla(0,0%,100%,.95);color:#0891b2}.ytomo-entrance-date-button.selected .ytomo-reservation-status[data-v-4533d894]:empty{background:rgba(0,0,0,0)}.ytomo-entrance-date-button.disabled .ytomo-reservation-status[data-v-4533d894]{background:hsla(0,0%,100%,.9);color:#475569}.ytomo-entrance-date-button.disabled .ytomo-reservation-status[data-v-4533d894]:empty{background:rgba(0,0,0,0)}.ytomo-entrance-date-button .ytomo-schedule-line[data-v-4533d894]{padding:2px 0;font-size:11px;line-height:1.2}.ytomo-entrance-date-button .ytomo-schedule-line.ytomo-reservation-line[data-v-4533d894]{color:#6b7280;font-size:10px}.ytomo-entrance-date-button .ytomo-schedule-divider[data-v-4533d894]{height:1px;background:#e5e7eb;margin:2px 0;width:100%}.ytomo-entrance-date-button.selected .ytomo-schedule-line.ytomo-reservation-line[data-v-4533d894]{color:hsla(0,0%,100%,.8)}.ytomo-entrance-date-button.selected .ytomo-schedule-divider[data-v-4533d894]{background:hsla(0,0%,100%,.3)}.ytomo-entrance-date-group[data-v-4533d894]{display:flex;gap:6px;align-items:stretch}.ytomo-expand-button[data-v-4533d894]{background:#f8fafc;border:1px solid #cbd5e1;color:#374151;font-size:12px;font-weight:600;padding:3px 8px;cursor:pointer;border-radius:4px;transition:all .2s ease;min-width:24px;height:50%;display:flex;align-items:center;justify-content:center;align-self:flex-end}.ytomo-expand-button[data-v-4533d894]:disabled{background:#f3f4f6;border-color:#d1d5db;color:#9ca3af;cursor:not-allowed;opacity:.5}.ytomo-expand-button[data-v-4533d894]:hover{background:#e2e8f0;border-color:#94a3b8;transform:translateY(-1px)}.ytomo-expand-button[data-v-4533d894]:active{transform:translateY(0)}.ytomo-expand-button[data-v-4533d894]:focus{outline:none;box-shadow:0 0 0 2px rgba(44,90,160,.2)}.ytomo-pavilion-details[data-v-4533d894]{margin-top:12px;padding:12px;background:#f8fafc;border-radius:6px;border:1px solid #e2e8f0}.ytomo-schedule-detail[data-v-4533d894]{margin-bottom:16px}.ytomo-schedule-detail[data-v-4533d894]:last-child{margin-bottom:0}.ytomo-schedule-date-header[data-v-4533d894]{font-weight:600;color:#334155;margin-bottom:8px;font-size:13px;padding-bottom:4px;border-bottom:1px solid #e2e8f0}.ytomo-pavilion-reservation-group[data-v-4533d894]{margin-bottom:12px;padding:8px 0;border-bottom:1px solid #e5e7eb}.ytomo-pavilion-reservation-group[data-v-4533d894]:last-child{margin-bottom:0;border-bottom:none}.ytomo-reservation-header[data-v-4533d894]{display:flex;align-items:flex-start;gap:12px}.ytomo-reservation-left[data-v-4533d894]{display:flex;flex-direction:column;gap:4px;min-width:120px;flex-shrink:0}.ytomo-reservation-right[data-v-4533d894]{flex:1;display:flex;flex-direction:column;gap:4px}.ytomo-reservation-type-badge[data-v-4533d894]{background:#3b82f6;color:#fff;padding:2px 8px;border-radius:12px;font-size:11px;font-weight:600;white-space:nowrap;text-align:center}.ytomo-time-slot-badge[data-v-4533d894]{background:#f8fafc;color:#475569;padding:2px 8px;border-radius:8px;font-size:11px;font-weight:500;text-align:center;border:1px solid #e2e8f0}.ytomo-time-slot-badge[data-v-4533d894]:empty::after{content:"—"}.ytomo-pavilion-name[data-v-4533d894]{font-weight:600;color:#334155;font-size:13px;line-height:1.3}.ytomo-pavilion-name.ytomo-status-text[data-v-4533d894]{color:#6b7280;font-style:italic;font-weight:500}.ytomo-use-status[data-v-4533d894]{color:#475569;font-size:11px;font-weight:500}.ytomo-reservation-type-header[data-v-4533d894]{display:flex;flex-direction:column;gap:4px;min-width:80px;flex-shrink:0}.ytomo-reservation-type-badge[data-v-4533d894]{background:#3b82f6;color:#fff;padding:4px 8px;border-radius:4px;font-size:10px;font-weight:600;text-align:center;line-height:1.2}.ytomo-time-slot-badge[data-v-4533d894]{background:#2c5aa0;color:#fff;padding:3px 6px;border-radius:3px;font-size:10px;font-weight:500;text-align:center;line-height:1.2}.ytomo-pavilion-info[data-v-4533d894]{flex:1;color:#374151;font-size:12px;line-height:1.4;display:flex;align-items:center}.ytomo-no-entrance-dates[data-v-4533d894]{color:#6b7280;font-size:12px;font-style:italic}.ytomo-input-inline[data-v-4533d894]{padding:4px 8px;border:1px solid #d1d5db;border-radius:4px;font-size:12px;transition:border-color .2s;background:#fff}.ytomo-input-inline[data-v-4533d894]:focus{outline:none;border-color:#2c5aa0;box-shadow:0 0 0 2px rgba(44,90,160,.1)}.ytomo-input-inline[data-v-4533d894]::placeholder{color:#9ca3af}.ytomo-input-inline.ytomo-input-ticket-id[data-v-4533d894]{width:120px}.ytomo-input-inline.ytomo-input-label[data-v-4533d894]{width:60px}.ytomo-select-inline[data-v-4533d894]{padding:4px 8px;border:1px solid #d1d5db;border-radius:4px;font-size:12px;background:#fff;cursor:pointer;width:50px}.ytomo-select-inline[data-v-4533d894]:focus{outline:none;border-color:#2c5aa0;box-shadow:0 0 0 2px rgba(44,90,160,.1)}.ytomo-button[data-v-4533d894]{padding:8px 16px;border:none;border-radius:6px;font-size:14px;font-weight:500;cursor:pointer;transition:all .2s;display:inline-flex;align-items:center;justify-content:center;white-space:nowrap}.ytomo-button.primary[data-v-4533d894]{background:linear-gradient(135deg, #2c5aa0 0%, #1a365d 100%);color:#fff}.ytomo-button.primary[data-v-4533d894]:hover{background:linear-gradient(135deg, #1a365d 0%, #2c5aa0 100%);transform:translateY(-1px);box-shadow:0 4px 12px rgba(44,90,160,.3)}.ytomo-button.primary[data-v-4533d894]:active{transform:translateY(0)}.ytomo-button.retry-button[data-v-4533d894]{background:linear-gradient(135deg, #f59e0b 0%, #d97706 100%);color:#fff;margin-top:12px}.ytomo-button.retry-button[data-v-4533d894]:hover{background:linear-gradient(135deg, #d97706 0%, #f59e0b 100%)}.ytomo-button[data-v-4533d894]:focus{outline:2px solid #2c5aa0;outline-offset:2px}.ytomo-button[data-v-4533d894]:disabled{opacity:.5;cursor:not-allowed;transform:none !important}.ytomo-empty-state[data-v-4533d894]{text-align:center;padding:40px 20px;color:#6b7280;font-style:italic}.ytomo-empty-state p[data-v-4533d894]{margin:0;font-size:14px}.ytomo-error[data-v-4533d894]{text-align:center;padding:40px 20px;color:#dc2626}.ytomo-error h3[data-v-4533d894]{margin:0 0 8px 0;font-size:16px;color:#dc2626}.ytomo-error p[data-v-4533d894]{margin:0;font-size:14px;color:#6b7280}.ytomo-ticket-tab .ytomo-loading[data-v-4533d894]{height:150px}.ytomo-ticket-item[data-v-4533d894]{animation:slideIn-4533d894 .2s ease-out}@keyframes slideIn-4533d894{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}@media(prefers-reduced-motion: reduce){.ytomo-ticket-item[data-v-4533d894],.ytomo-button[data-v-4533d894],.ytomo-date-button[data-v-4533d894],.ytomo-entrance-date-button[data-v-4533d894],.ytomo-toggle-slider[data-v-4533d894],.ytomo-input-inline[data-v-4533d894]{animation:none;transition:none}}@media(prefers-contrast: high){.ytomo-ticket-item[data-v-4533d894]{border-width:3px}.ytomo-ticket-item.selected[data-v-4533d894]{border-width:4px}.ytomo-button[data-v-4533d894]:focus,.ytomo-input-inline[data-v-4533d894]:focus,.ytomo-date-button[data-v-4533d894]:focus,.ytomo-entrance-date-button[data-v-4533d894]:focus,.ytomo-input-inline[data-v-4533d894]:focus,.ytomo-select-inline[data-v-4533d894]:focus{outline:3px solid #000}}.ytomo-empty-state[data-v-4533d894]{text-align:center;padding:40px 20px;color:#6b7280;font-style:italic}.ytomo-empty-state p[data-v-4533d894]{margin:0;font-size:14px}.ytomo-error[data-v-4533d894]{text-align:center;padding:40px 20px;color:#dc2626}.ytomo-error h3[data-v-4533d894]{margin:0 0 8px 0;font-size:16px;color:#dc2626}.ytomo-error p[data-v-4533d894]{margin:0;font-size:14px;color:#6b7280}.ytomo-ticket-list[data-v-4533d894]::-webkit-scrollbar{width:6px}.ytomo-ticket-list[data-v-4533d894]::-webkit-scrollbar-track{background:#f1f5f9;border-radius:3px}.ytomo-ticket-list[data-v-4533d894]::-webkit-scrollbar-thumb{background:#cbd5e1;border-radius:3px}.ytomo-ticket-list[data-v-4533d894]::-webkit-scrollbar-thumb:hover{background:#94a3b8}.ytomo-ticket-item[data-v-4533d894]{animation:slideIn-4533d894 .2s ease-out}@keyframes slideIn-4533d894{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}`, ""]);
-// Exports
-/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
-
-
-/***/ }),
-
-/***/ 305:
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-
-// EXPORTS
-__webpack_require__.d(__webpack_exports__, {
-  useTicketsStore: () => (/* binding */ useTicketsStore)
-});
-
-// EXTERNAL MODULE: ./node_modules/pinia/dist/pinia.mjs + 4 modules
-var pinia = __webpack_require__(408);
-// EXTERNAL MODULE: ./node_modules/vue/dist/vue.esm-bundler.js + 6 modules
-var vue_esm_bundler = __webpack_require__(425);
-// EXTERNAL MODULE: ./ts/utils/logger.ts
-var logger = __webpack_require__(911);
-// EXTERNAL MODULE: ./ts/utils/pavilionReservationMapping.ts
-var pavilionReservationMapping = __webpack_require__(579);
-;// ./ts/utils/pavilionReservationTypes.ts
-/**
- * パビリオン予約種類・有効期間判定ユーティリティ
- */
-
-/**
- * 入場日付に基づいてパビリオン予約種類を判定
- * doc/design/main-dialog.mdの情報に基づく
- *
- * 2か月前予約 (月): 3か月前 - 2か月と1日前23:59
- * 7日前予約 (週): 1か月前 - 8日前23:59
- * 3日前予約 (3): 3日前0時 - 1日前9時
- * 当日予約 (1): 当日
- */
-function determinePavilionReservationType(entranceDate) {
-    const now = new Date();
-    const entrance = parseEntranceDate(entranceDate);
-    // 現在時刻から各予約期間の開始・終了時刻を計算
-    const reservationPeriods = calculateReservationPeriods(entrance, now);
-    // 現在有効な予約種類を判定
-    const activeType = findActiveReservationType(reservationPeriods, now);
-    if (activeType) {
-        return activeType;
-    }
-    // 有効な予約種類がない場合、直後に有効となる種類を取得
-    const nextActiveType = findNextActiveReservationType(reservationPeriods, now);
-    return nextActiveType || {
-        type: '1',
-        channel: '5',
-        isActive: false
-    };
-}
-/**
- * 入場日付に基づいて全ての予約区分の状況を取得
- */
-function getAllPavilionReservationStatus(entranceDate) {
-    const now = new Date();
-    const entrance = parseEntranceDate(entranceDate);
-    // 現在時刻から各予約期間の開始・終了時刻を計算
-    const reservationPeriods = calculateReservationPeriods(entrance, now);
-    const allStatus = {};
-    for (const period of reservationPeriods) {
-        let periodStatus;
-        if (now < period.start) {
-            periodStatus = 'before';
-        }
-        else if (now >= period.start && now <= period.end) {
-            periodStatus = 'active';
-        }
-        else {
-            periodStatus = 'expired';
-        }
-        allStatus[period.type] = {
-            type: period.type,
-            channel: period.channel,
-            periodStatus,
-            submissionStatus: 'none', // 後でAPI取得により更新
-            winningInfo: undefined
-        };
-    }
-    return allStatus;
-}
-/**
- * 入場日付文字列をDateオブジェクトに変換
- */
-function parseEntranceDate(entranceDate) {
-    // YYYYMMDD形式を想定
-    if (/^\d{8}$/.test(entranceDate)) {
-        const year = parseInt(entranceDate.substring(0, 4));
-        const month = parseInt(entranceDate.substring(4, 6)) - 1; // monthは0ベース
-        const day = parseInt(entranceDate.substring(6, 8));
-        return new Date(year, month, day);
-    }
-    // その他の形式もサポート
-    return new Date(entranceDate);
-}
-/**
- * 各予約種類の有効期間を計算
- */
-function calculateReservationPeriods(entrance, now) {
-    const periods = [];
-    // 2か月前予約 (月): 3か月前 - 2か月と1日前23:59
-    const monthStart = new Date(entrance);
-    monthStart.setMonth(monthStart.getMonth() - 3);
-    const monthEnd = new Date(entrance);
-    monthEnd.setMonth(monthEnd.getMonth() - 2);
-    monthEnd.setDate(monthEnd.getDate() - 1);
-    monthEnd.setHours(23, 59, 59, 999);
-    periods.push({
-        type: (0,pavilionReservationMapping/* getShortNameFromChannel */.dJ)('2'), // '月'
-        channel: '2',
-        start: monthStart,
-        end: monthEnd,
-        isActive: now >= monthStart && now <= monthEnd
-    });
-    // 7日前予約 (週): 1か月前 - 8日前23:59
-    const weekStart = new Date(entrance);
-    weekStart.setMonth(weekStart.getMonth() - 1);
-    const weekEnd = new Date(entrance);
-    weekEnd.setDate(weekEnd.getDate() - 8);
-    weekEnd.setHours(23, 59, 59, 999);
-    periods.push({
-        type: (0,pavilionReservationMapping/* getShortNameFromChannel */.dJ)('3'), // '週'
-        channel: '3',
-        start: weekStart,
-        end: weekEnd,
-        isActive: now >= weekStart && now <= weekEnd
-    });
-    // 3日前予約 (3): 3日前0時 - 1日前9時
-    const threeDayStart = new Date(entrance);
-    threeDayStart.setDate(threeDayStart.getDate() - 3);
-    threeDayStart.setHours(0, 0, 0, 0);
-    const threeDayEnd = new Date(entrance);
-    threeDayEnd.setDate(threeDayEnd.getDate() - 1);
-    threeDayEnd.setHours(9, 0, 0, 0);
-    periods.push({
-        type: (0,pavilionReservationMapping/* getShortNameFromChannel */.dJ)('4'), // '3'
-        channel: '4',
-        start: threeDayStart,
-        end: threeDayEnd,
-        isActive: now >= threeDayStart && now <= threeDayEnd
-    });
-    // 当日予約 (1): 当日
-    const todayStart = new Date(entrance);
-    todayStart.setHours(0, 0, 0, 0);
-    const todayEnd = new Date(entrance);
-    todayEnd.setHours(23, 59, 59, 999);
-    periods.push({
-        type: (0,pavilionReservationMapping/* getShortNameFromChannel */.dJ)('5'), // '1'
-        channel: '5',
-        start: todayStart,
-        end: todayEnd,
-        isActive: now >= todayStart && now <= todayEnd
-    });
-    return periods;
-}
-/**
- * 現在有効な予約種類を探す
- */
-function findActiveReservationType(periods, now) {
-    for (const period of periods) {
-        if (period.isActive) {
-            return {
-                type: period.type,
-                channel: period.channel,
-                isActive: true
-            };
-        }
-    }
-    return null;
-}
-/**
- * 直後に有効となる予約種類を探す
- */
-function findNextActiveReservationType(periods, now) {
-    // 現在時刻以降に開始する期間を探す
-    const futurePeriods = periods
-        .filter(period => period.start > now)
-        .sort((a, b) => a.start.getTime() - b.start.getTime());
-    if (futurePeriods.length > 0) {
-        const next = futurePeriods[0];
-        return {
-            type: next.type,
-            channel: next.channel,
-            isActive: false
-        };
-    }
-    return null;
-}
-
-;// ./ts/stores/tickets.ts
-/**
- * チケット統合管理ストア
- * 既存TicketManagerの全機能を移植
- */
-
-
-
-const tickets_logger = logger/* loggers */.C$.tickets;
-
-const useTicketsStore = (0,pinia/* defineStore */.nY)('tickets', () => {
-    // State
-    const tickets = (0,vue_esm_bundler/* ref */.KR)(new Map());
-    const selectedTicketIds = (0,vue_esm_bundler/* ref */.KR)(new Set());
-    const selectedEntranceDates = (0,vue_esm_bundler/* ref */.KR)(new Map()); // ticketId -> scheduleId mapping for persistence
-    const isLoading = (0,vue_esm_bundler/* ref */.KR)(false);
-    const isInitialized = (0,vue_esm_bundler/* ref */.KR)(false);
-    const availableDates = (0,vue_esm_bundler/* ref */.KR)([]);
-    const todayStr = (0,vue_esm_bundler/* ref */.KR)(getTodayString());
-    // Getters (computed)
-    const ticketsArray = (0,vue_esm_bundler/* computed */.EW)(() => Array.from(tickets.value.values()));
-    const selectedTickets = (0,vue_esm_bundler/* computed */.EW)(() => ticketsArray.value.filter(ticket => ticket.schedules?.some(schedule => schedule.selected)));
-    const selectedTicketCount = (0,vue_esm_bundler/* computed */.EW)(() => {
-        // 入場予約が選択されているチケットの数
-        return ticketsArray.value.filter(ticket => ticket.schedules?.some(schedule => schedule.selected)).length;
-    });
-    const ownTickets = (0,vue_esm_bundler/* computed */.EW)(() => ticketsArray.value.filter(ticket => ticket.isOwn));
-    const externalTickets = (0,vue_esm_bundler/* computed */.EW)(() => ticketsArray.value.filter(ticket => !ticket.isOwn));
-    // 選択済み入場予約からパビリオン予約情報を取得
-    const selectedPavilionReservationInfo = (0,vue_esm_bundler/* computed */.EW)(() => {
-        const selectedSchedules = ticketsArray.value.flatMap(ticket => ticket.schedules?.filter(schedule => schedule.selected) || []);
-        if (selectedSchedules.length === 0) {
-            return null;
-        }
-        // 最初の選択済みスケジュールの予約情報を取得（同じになるはず）
-        const firstSelected = selectedSchedules[0];
-        if (!firstSelected.pavilionReservationType || !firstSelected.pavilionReservationStatus) {
-            return null;
-        }
-        // 現在有効な予約種類を特定
-        const activeReservationType = Object.entries(firstSelected.pavilionReservationStatus)
-            .find(([type, status]) => status.periodStatus === 'active');
-        return {
-            activeType: activeReservationType?.[0] || null,
-            activeChannel: firstSelected.pavilionReservationType,
-            isActive: firstSelected.pavilionReservationActive || false,
-            allStatus: firstSelected.pavilionReservationStatus
-        };
-    });
-    // Helper function for date
-    function getTodayString() {
-        const today = new Date();
-        return `${today.getFullYear()}${String(today.getMonth() + 1).padStart(2, '0')}${String(today.getDate()).padStart(2, '0')}`;
-    }
-    // Actions - TicketManagerから完全移行
-    /**
-     * スケジュールデータに有効フラグとパビリオン予約種類情報を付与
-     */
-    const processSchedules = (schedules) => {
-        if (!Array.isArray(schedules))
-            return [];
-        return schedules.map(schedule => {
-            // schedule_nameから時刻情報を抽出（例: "9:00-" → "9:00"）
-            let timeStart = undefined;
-            if (schedule.schedule_name) {
-                const timeMatch = schedule.schedule_name.match(/(\d{1,2}:\d{2})/);
-                if (timeMatch) {
-                    timeStart = timeMatch[1];
-                }
-            }
-            const scheduleData = {
-                entrance_date: schedule.entrance_date || '',
-                use_state: schedule.use_state || 0,
-                schedule_name: schedule.schedule_name,
-                time_start: timeStart,
-                time_end: schedule.time_end,
-                reservation_type: schedule.reservation_type,
-                // 有効フラグを付与: 未使用または当日入場済みは有効
-                isEffective: schedule.use_state === 0 ||
-                    (schedule.use_state === 1 && schedule.entrance_date === todayStr.value)
-            };
-            // パビリオン予約種類情報を付与
-            if (scheduleData.entrance_date) {
-                const pavilionReservation = determinePavilionReservationType(scheduleData.entrance_date);
-                scheduleData.pavilionReservationType = pavilionReservation.channel;
-                scheduleData.pavilionReservationActive = pavilionReservation.isActive;
-                // 全ての予約区分の状況も付与
-                const allStatus = getAllPavilionReservationStatus(scheduleData.entrance_date);
-                scheduleData.pavilionReservationStatus = {};
-                for (const [type, status] of Object.entries(allStatus)) {
-                    scheduleData.pavilionReservationStatus[type] = {
-                        periodStatus: status.periodStatus,
-                        submissionStatus: status.submissionStatus,
-                        winningInfo: status.winningInfo
-                    };
-                }
-            }
-            return scheduleData;
-        }).sort((a, b) => {
-            // 入場日時順でソート
-            const dateTimeA = `${a.entrance_date}${a.time_start || '0000'}`;
-            const dateTimeB = `${b.entrance_date}${b.time_start || '0000'}`;
-            return dateTimeA.localeCompare(dateTimeB);
-        });
-    };
-    /**
-     * 全チケット情報を初期化・取得
-     */
-    const loadAllTickets = async () => {
-        tickets_logger.info('全チケット情報取得開始');
-        setLoading(true);
-        try {
-            // 自分のチケットを最優先で読み込み
-            let ownTickets = [];
-            try {
-                ownTickets = await loadOwnTickets();
-                tickets_logger.info(`自分のチケット取得完了: ${ownTickets.length}個`);
-                // 自分のチケットを追加
-                for (const ticket of ownTickets) {
-                    tickets.value.set(ticket.ticket_id, ticket);
-                }
-            }
-            catch (error) {
-                tickets_logger.error('自分のチケット取得エラー', error);
-            }
-            // パビリオン予約当選情報を取得
-            await fetchPavilionWinningInfo();
-            tickets_logger.info(`チケット統合管理完了: ${tickets.value.size}個のチケット読み込み完了`);
-            // デバッグ: チケットデータの詳細を出力
-            tickets_logger.debug('チケットデータ詳細', {
-                todayStr: todayStr.value,
-                tickets: Array.from(tickets.value.values()).map(ticket => ({
-                    ticket_id: ticket.ticket_id,
-                    isOwn: ticket.isOwn,
-                    schedulesCount: ticket.schedules?.length || 0,
-                    schedules: ticket.schedules?.map(schedule => ({
-                        entrance_date: schedule.entrance_date,
-                        use_state: schedule.use_state,
-                        isEffective: schedule.isEffective,
-                        schedule_name: schedule.schedule_name
-                    }))
-                }))
-            });
-            // 利用可能日付を抽出
-            const dates = await extractAvailableDates();
-            availableDates.value = dates;
-            return Array.from(tickets.value.values());
-        }
-        finally {
-            setLoading(false);
-        }
-    };
-    /**
-     * 自分のチケット取得
-     */
-    const loadOwnTickets = async () => {
-        try {
-            const response = await fetch('/api/d/my/tickets/?count=1', {
-                method: 'GET',
-                headers: {
-                    'Accept': 'application/json',
-                    'Accept-Language': 'ja,en-US;q=0.9,en;q=0.8,zh-TW;q=0.7,zh;q=0.6',
-                    'X-Api-Lang': 'ja'
-                },
-                credentials: 'same-origin'
-            });
-            if (!response.ok) {
-                throw new Error(`API応答エラー: ${response.status}`);
-            }
-            const data = await response.json();
-            if (!data.list || !Array.isArray(data.list)) {
-                tickets_logger.warn('チケットデータが期待する形式ではありません', data);
-                return [];
-            }
-            return data.list.map((ticket) => ({
-                ticket_id: ticket.ticket_id || ticket.simple_ticket_id || '',
-                isOwn: true,
-                label: ticket.item_name || 'チケット',
-                schedules: processSchedules(ticket.schedules || [])
-            }));
-        }
-        catch (error) {
-            tickets_logger.error('自分のチケット取得API エラー', error);
-            return [];
-        }
-    };
-    /**
-     * キャッシュから外部チケットIDを収集
-     */
-    const getCachedExternalTicketIds = async () => {
-        const externalTickets = [];
-        try {
-            // 監視キャッシュから取得
-            const monitoringCache = localStorage.getItem('expo_monitoring_cache');
-            if (monitoringCache) {
-                const data = JSON.parse(monitoringCache);
-                if (data.externalTickets) {
-                    for (const [ticketId, info] of Object.entries(data.externalTickets)) {
-                        externalTickets.push({
-                            ticketId,
-                            label: info.label || '外部チケット'
-                        });
-                    }
-                }
-            }
-            // パビリオン予約キャッシュから取得
-            const pavilionCache = localStorage.getItem('expo_pavilion_reservation_cache');
-            if (pavilionCache) {
-                const data = JSON.parse(pavilionCache);
-                if (data.externalTickets) {
-                    for (const [ticketId, info] of Object.entries(data.externalTickets)) {
-                        // 重複チェック
-                        if (!externalTickets.find(t => t.ticketId === ticketId)) {
-                            externalTickets.push({
-                                ticketId,
-                                label: info.label || '外部チケット'
-                            });
-                        }
-                    }
-                }
-            }
-        }
-        catch (error) {
-            tickets_logger.error('キャッシュからの外部チケットID取得エラー', error);
-        }
-        return externalTickets;
-    };
-    /**
-     * 外部チケットの詳細データを取得
-     */
-    /**
-     * パビリオン予約当選情報を取得・更新
-     */
-    const fetchPavilionWinningInfo = async () => {
-        tickets_logger.info('🏛️ パビリオン予約当選情報取得開始');
-        try {
-            // 全チケットについて、event_schedulesとlotteries情報を更新
-            for (const [ticketId, ticket] of tickets.value) {
-                if (ticket.schedules) {
-                    for (const schedule of ticket.schedules) {
-                        // 抽選カレンダー情報を取得
-                        try {
-                            const calendarResponse = await fetch(`/api/d/lottery_calendars?entrance_date=${schedule.entrance_date}`, {
-                                method: 'GET',
-                                headers: {
-                                    'Accept': 'application/json',
-                                    'X-Api-Lang': 'ja'
-                                },
-                                credentials: 'same-origin'
-                            });
-                            if (calendarResponse.ok) {
-                                const calendarData = await calendarResponse.json();
-                                tickets_logger.debug(`${schedule.entrance_date}の抽選カレンダー情報取得成功`);
-                                // パビリオン予約状況を更新
-                                if (schedule.pavilionReservationStatus) {
-                                    // 実際の抽選状況でsubmissionStatusを更新する処理はここに追加
-                                    // 現在は期間判定のみ実装済み
-                                }
-                            }
-                        }
-                        catch (error) {
-                            tickets_logger.warn(`${schedule.entrance_date}の抽選カレンダー取得エラー:`, error);
-                        }
-                    }
-                }
-                // チケット自体のevent_schedulesを確認（既に予約済みのパビリオン情報）
-                // 実際のAPIからevent_schedulesデータを取得する処理が必要
-                // 現在のticketデータにevent_schedulesが含まれているかチェック
-                if (ticket.event_schedules) {
-                    const eventSchedules = ticket.event_schedules;
-                    tickets_logger.info(`${ticketId}: 予約済みパビリオン ${eventSchedules.length}件`);
-                    // event_schedulesの情報をpersistentなwinningInfoに変換
-                    for (const eventSchedule of eventSchedules) {
-                        if (ticket.schedules) {
-                            const matchingSchedule = ticket.schedules.find(s => s.entrance_date === eventSchedule.entrance_date);
-                            if (matchingSchedule?.pavilionReservationStatus) {
-                                // winning情報を設定（event_scheduleがあるということは当選済み）
-                                const reservationType = eventSchedule.lottery_type || '1'; // デフォルトは当日予約
-                                const typeKey = getReservationTypeKey(reservationType);
-                                if (matchingSchedule.pavilionReservationStatus[typeKey]) {
-                                    matchingSchedule.pavilionReservationStatus[typeKey].submissionStatus = 'won';
-                                    matchingSchedule.pavilionReservationStatus[typeKey].winningInfo = {
-                                        eventName: eventSchedule.event_name,
-                                        scheduleName: eventSchedule.schedule_name,
-                                        startTime: eventSchedule.start_time,
-                                        endTime: eventSchedule.end_time,
-                                        useState: eventSchedule.use_state
-                                    };
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-            tickets_logger.info('✅ パビリオン予約当選情報取得完了');
-        }
-        catch (error) {
-            tickets_logger.error('❌ パビリオン予約当選情報取得エラー:', error);
-        }
-    };
-    /**
-     * 予約種別からキーを取得
-     */
-    const getReservationTypeKey = (lotteryType) => {
-        switch (lotteryType) {
-            case '2': return '月'; // 2ヶ月前抽選
-            case '3': return '週'; // 7日前抽選  
-            case '4': return '3'; // 3日前予約
-            case '5': return '1'; // 当日予約
-            default: return '1';
-        }
-    };
-    const loadExternalTicketData = async (ticketId, label, channel) => {
-        try {
-            const channels = channel ? [channel] : ['5', '4', '3', '2'];
-            for (const testChannel of channels) {
-                try {
-                    const response = await fetch(`/api/d/proxy_tickets/${ticketId}/add_check?registered_channel=${testChannel}`, {
-                        credentials: 'include'
-                    });
-                    if (response.ok) {
-                        const data = await response.json();
-                        const ticketData = {
-                            ticket_id: data.ticket_id,
-                            isOwn: false,
-                            label: label,
-                            schedules: processSchedules(data.schedules || [])
-                        };
-                        tickets_logger.info('外部チケット取得成功', { ticketId, testChannel });
-                        return ticketData;
-                    }
-                }
-                catch (error) {
-                    tickets_logger.warn('外部チケット取得失敗', { ticketId, testChannel, error });
-                }
-            }
-            // どのchannelでも取得できない場合は最小限のデータを作成
-            tickets_logger.warn('外部チケット詳細取得失敗、最小限データで作成', { ticketId });
-            return {
-                ticket_id: ticketId,
-                isOwn: false,
-                label: label,
-                schedules: []
-            };
-        }
-        catch (error) {
-            tickets_logger.error('外部チケット取得エラー', { ticketId, error });
-            return null;
-        }
-    };
-    /**
-     * 利用可能日付を抽出
-     */
-    const extractAvailableDates = async () => {
-        const dates = new Set();
-        for (const ticket of ticketsArray.value) {
-            if (ticket.schedules && Array.isArray(ticket.schedules)) {
-                const effectiveSchedules = ticket.schedules.filter(schedule => schedule.isEffective);
-                for (const schedule of effectiveSchedules) {
-                    if (schedule.entrance_date) {
-                        dates.add(schedule.entrance_date);
-                    }
-                }
-            }
-        }
-        const sortedDates = Array.from(dates).sort((a, b) => {
-            if (/^\d{8}$/.test(a) && /^\d{8}$/.test(b)) {
-                return a.localeCompare(b);
-            }
-            else {
-                const dateA = new Date(a);
-                const dateB = new Date(b);
-                return dateA.getTime() - dateB.getTime();
-            }
-        });
-        return sortedDates;
-    };
-    // Legacy actions for compatibility
-    const setTickets = (newTickets) => {
-        tickets.value.clear();
-        newTickets.forEach(ticket => {
-            tickets.value.set(ticket.ticket_id, ticket);
-        });
-    };
-    const addTicket = (ticket) => {
-        tickets.value.set(ticket.ticket_id, ticket);
-    };
-    const removeTicket = (ticketId) => {
-        tickets.value.delete(ticketId);
-        tickets_logger.info('チケットを削除しました', { ticketId });
-    };
-    const selectTicket = (ticketId, selected) => {
-        if (selected) {
-            selectedTicketIds.value.add(ticketId);
-        }
-        else {
-            selectedTicketIds.value.delete(ticketId);
-        }
-    };
-    const selectAllTickets = () => {
-        ticketsArray.value.forEach(ticket => {
-            selectedTicketIds.value.add(ticket.ticket_id);
-        });
-    };
-    const deselectAllTickets = () => {
-        selectedTicketIds.value.clear();
-    };
-    const setAvailableDates = (dates) => {
-        availableDates.value = dates;
-    };
-    const setLoading = (loading) => {
-        isLoading.value = loading;
-    };
-    // 入場日時選択の永続化機能
-    const saveSelectedEntranceDate = (ticketId, scheduleId) => {
-        selectedEntranceDates.value.set(ticketId, scheduleId);
-        tickets_logger.debug('入場日時選択を保存', { ticketId, scheduleId });
-    };
-    const removeSelectedEntranceDate = (ticketId) => {
-        selectedEntranceDates.value.delete(ticketId);
-        tickets_logger.debug('入場日時選択を削除', { ticketId });
-    };
-    const restoreSelectedEntranceDates = () => {
-        let restoredCount = 0;
-        // selectedEntranceDatesがMapでない場合はMapに変換  
-        if (!(selectedEntranceDates.value instanceof Map)) {
-            selectedEntranceDates.value = new Map();
-        }
-        try {
-            // 復元前にtickets.valueが空でないことを確認
-            if (tickets.value.size === 0) {
-                tickets_logger.warn('チケットデータが未ロードのため復元をスキップ');
-                return;
-            }
-            for (const [ticketId, scheduleId] of selectedEntranceDates.value.entries()) {
-                const ticket = tickets.value.get(ticketId);
-                if (ticket && ticket.schedules) {
-                    const schedule = ticket.schedules.find(s => s.entrance_date + (s.time_start || '') === scheduleId);
-                    if (schedule) {
-                        schedule.selected = true;
-                        restoredCount++;
-                        tickets_logger.debug('復元', { ticketId, scheduleId });
-                    }
-                    else {
-                        // 見つからないスケジュールIDは削除
-                        selectedEntranceDates.value.delete(ticketId);
-                        tickets_logger.debug('無効な選択を削除', { ticketId, scheduleId });
-                    }
-                }
-                else {
-                    // 存在しないチケットの選択は削除
-                    selectedEntranceDates.value.delete(ticketId);
-                    tickets_logger.debug('存在しないチケットの選択を削除', { ticketId });
-                }
-            }
-            if (restoredCount > 0) {
-                tickets_logger.info('入場日時選択状態復元完了', { restoredCount });
-            }
-        }
-        catch (error) {
-            tickets_logger.error('入場日時復元エラー', error);
-            selectedEntranceDates.value = new Map();
-        }
-    };
-    // 初期化メソッド
-    const init = async () => {
-        tickets_logger.info('チケットストア初期化開始');
-        await loadAllTickets();
-        restoreSelectedEntranceDates();
-        isInitialized.value = true;
-        tickets_logger.info('チケットストア初期化完了');
-    };
-    return {
-        // State
-        tickets,
-        selectedTicketIds,
-        selectedEntranceDates,
-        isLoading,
-        isInitialized,
-        availableDates,
-        // Getters
-        ticketsArray,
-        selectedTickets,
-        selectedTicketCount,
-        ownTickets,
-        externalTickets,
-        selectedPavilionReservationInfo,
-        // Actions
-        init,
-        loadAllTickets,
-        loadOwnTickets,
-        fetchPavilionWinningInfo,
-        setTickets,
-        addTicket,
-        removeTicket,
-        selectTicket,
-        selectAllTickets,
-        deselectAllTickets,
-        setAvailableDates,
-        setLoading,
-        extractAvailableDates,
-        saveSelectedEntranceDate,
-        removeSelectedEntranceDate,
-        restoreSelectedEntranceDates
-    };
-}, {
-    persist: {
-        key: 'ytomo-tickets-store',
-        pick: ['selectedEntranceDates', 'tickets'], // 入場日時選択とチケットデータを永続化
-        serializer: {
-            serialize: (data) => {
-                // MapをObjectに変換してシリアライズ
-                const serialized = { ...data };
-                if (serialized['selectedEntranceDates'] instanceof Map) {
-                    serialized['selectedEntranceDates'] = Object.fromEntries(serialized['selectedEntranceDates']);
-                }
-                if (serialized['tickets'] instanceof Map) {
-                    serialized['tickets'] = Object.fromEntries(serialized['tickets']);
-                }
-                return JSON.stringify(serialized);
-            },
-            deserialize: (data) => {
-                const parsed = JSON.parse(data);
-                // ObjectをMapに復元
-                if (parsed['selectedEntranceDates'] && typeof parsed['selectedEntranceDates'] === 'object') {
-                    parsed['selectedEntranceDates'] = new Map(Object.entries(parsed['selectedEntranceDates']));
-                }
-                if (parsed['tickets'] && typeof parsed['tickets'] === 'object') {
-                    parsed['tickets'] = new Map(Object.entries(parsed['tickets']));
-                }
-                return parsed;
-            }
-        }
-    }
-});
-
-
-/***/ }),
-
 /***/ 314:
 /***/ ((module) => {
 
@@ -2666,7 +1918,7 @@ const usePavilionsStore = (0,pinia__WEBPACK_IMPORTED_MODULE_0__/* .defineStore *
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1___default()((_node_modules_css_loader_dist_runtime_noSourceMaps_js__WEBPACK_IMPORTED_MODULE_0___default()));
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, `#ytomo-status-badge.countdown-warning{background:rgba(255,0,0,.9)}.ytomo-efficiency-toggle{width:45px;height:32px;border-radius:16px;color:#fff;border:none;font-size:10px;font-weight:bold;cursor:pointer;transition:all .2s ease;box-shadow:0 2px 8px rgba(0,0,0,.3);display:flex;align-items:center;justify-content:center;pointer-events:auto;margin-bottom:8px}.ytomo-efficiency-toggle.efficiency-enabled{background:rgba(255,140,0,.9)}.ytomo-efficiency-toggle.efficiency-disabled{background:rgba(128,128,128,.9)}.ytomo-efficiency-toggle:hover{transform:scale(1.1);box-shadow:0 4px 12px rgba(0,0,0,.4)}.ytomo-efficiency-toggle:active{transform:scale(0.95)}button.ext-ytomo{height:40px;width:auto;min-width:60px;padding:0px 8px;background:#006821;color:#fff}button.ext-ytomo.no-after:after{background:rgba(0,0,0,0) none repeat 0 0/auto auto padding-box border-box scroll}button.ext-ytomo.btn-done{background:#4a4c4a}button.ext-ytomo:hover{background:#02862b}.fab-sub-btn{color:#fff;border:none;border-radius:20px;padding:8px 16px;font-size:12px;white-space:nowrap;transition:all .2s ease}.fab-sub-btn.btn-enabled{background:#006821;cursor:pointer;opacity:1}.fab-sub-btn.btn-enabled:hover{background:#02862b;transform:scale(1.05)}.fab-sub-btn.btn-enabled.btn-done{background:#4a4c4a}.fab-sub-btn.btn-enabled.btn-done:hover{background:#606260}.fab-sub-btn.btn-disabled,.fab-sub-btn.btn-loading{background:gray;cursor:not-allowed;opacity:.6}.fab-sub-btn.btn-disabled:hover,.fab-sub-btn.btn-loading:hover{background:gray;transform:scale(1)}.fab-sub-btn:disabled{background:gray !important;cursor:not-allowed !important;opacity:.6 !important}.fab-sub-btn:disabled:hover{background:gray !important;transform:scale(1) !important}button.ext-ytomo.pavilion-sub-btn.btn-disabled,button.ext-ytomo.pavilion-sub-btn.btn-loading{background:gray;cursor:not-allowed;opacity:.6}button.ext-ytomo.pavilion-sub-btn.btn-disabled:hover,button.ext-ytomo.pavilion-sub-btn.btn-loading:hover{background:gray;transform:scale(1)}.safe-none,.ytomo-none,.filter-none{display:none}.fab-sub-btn span.button-count{font-family:"Courier New","Monaco",monospace;font-weight:bold;color:#ffeb3b;vertical-align:baseline}button.ext-ytomo.pavilion-sub-btn.ytomo-date-button.date-selected{border:2px solid #4caf50;box-shadow:0 0 8px rgba(76,175,80,.6)}div.div-flex{display:flex;justify-content:center;margin:5px}div.div-flex input.ext-tomo.search{flex:1;padding:8px 12px;border:1px solid #ddd;border-radius:4px;font-size:14px;margin-right:8px}div.div-flex input.ext-tomo.search:focus{outline:none;border-color:#006821;box-shadow:0 0 0 2px rgba(0,104,33,.2)}div.div-flex button.btn-filter-without-load{height:auto;min-height:40px;width:auto;min-width:60px;padding:0px 8px;color:#fff;margin:5px;background:#006821;border:none;border-radius:4px;cursor:pointer;font-size:14px}div.div-flex button.btn-filter-without-load:hover{background:#02862b}div.div-flex button.btn-filter-without-load:active{background:#005417}div.div-flex button.btn-filter-without-load:disabled{background:gray;cursor:not-allowed}.js-show{display:block}.js-hide{display:none}.js-visible{visibility:visible}.js-invisible{visibility:hidden}.js-enabled{pointer-events:auto;opacity:1}.js-disabled{pointer-events:none;opacity:.6}.js-green{background:#228b22;color:#fff}.js-red{background:#dc3545;color:#fff}.js-gray{background:gray;color:#fff}.btn-success-highlight{background:#00c800;color:#fff}.status-bg-green{background:rgba(0,128,0,.9)}.status-bg-red{background:rgba(255,0,0,.9)}.status-bg-orange{background:rgba(255,140,0,.9)}.status-bg-blue{background:rgba(0,104,33,.9)}.status-bg-default{background:rgba(0,0,0,.8)}#ytomo-status-badge{background:linear-gradient(135deg, rgba(0, 0, 0, 0.9), rgba(40, 40, 40, 0.9));color:#fff;padding:8px 16px;border-radius:20px;font-size:12px;font-weight:bold;white-space:pre-line;box-shadow:0 4px 12px rgba(0,0,0,.3),0 2px 6px rgba(0,0,0,.2);border:2px solid hsla(0,0%,100%,.15);pointer-events:none}#ytomo-status-badge.ytomo-status-waiting{background:linear-gradient(135deg, rgba(0, 0, 0, 0.9), rgba(40, 40, 40, 0.9))}#ytomo-status-badge.ytomo-status-reservation{background:linear-gradient(135deg, rgba(255, 140, 0, 0.9), rgba(255, 165, 0, 0.9))}#ytomo-status-badge.ytomo-status-reservation.ytomo-status-countdown-warning{background:linear-gradient(135deg, rgba(255, 0, 0, 0.9), rgba(220, 53, 69, 0.9))}#ytomo-status-badge.ytomo-status-cooldown{background:linear-gradient(135deg, rgba(255, 107, 53, 0.9), rgba(255, 140, 0, 0.9))}.ytomo-header li.fab-toggle-li{display:inline-block;margin-right:8px}.ytomo-header li.fab-toggle-li button.fab-toggle-button{background:none;border:none;cursor:pointer;padding:0;color:#fff;transition:all .2s ease;display:flex;align-items:center;justify-content:center}.ytomo-header li.fab-toggle-li button.fab-toggle-button:hover{color:#ddd}.ytomo-header li.fab-toggle-li button.fab-toggle-button figure.fab-toggle-figure{width:auto;height:24px;display:flex;align-items:center;justify-content:center;padding:0 4px}.ytomo-pavilion-fab button.ytomo-fab{position:relative}.ytomo-pavilion-fab button.ytomo-fab:hover{transform:scale(1.15);box-shadow:0 8px 25px rgba(0,0,0,.5),0 4px 12px rgba(0,0,0,.3);border-width:4px}.ytomo-pavilion-fab .ytomo-fab-inner-content .pavilion-fab-expand-icon{font-size:8px;line-height:1;margin-bottom:1px;opacity:.8}.ytomo-pavilion-fab .ytomo-fab-inner-content .pavilion-fab-brand-text{font-size:7px;font-weight:normal;line-height:1;margin-bottom:2px;opacity:.7}.ytomo-pavilion-fab .ytomo-fab-inner-content .pavilion-fab-counts-text{font-size:12px;font-weight:bold;line-height:1}.ytomo-pavilion-fab .pavilion-sub-actions-container{display:none;flex-direction:column;gap:8px;align-items:flex-end;margin-bottom:8px}.ytomo-pavilion-fab .pavilion-sub-actions-container.expanded{display:flex}.ytomo-pavilion-fab .pavilion-sub-actions-container button.pavilion-sub-btn.base-style{color:#fff;border:none;border-radius:20px;padding:8px 16px;font-size:12px;white-space:nowrap;box-shadow:0 2px 8px rgba(0,0,0,.3);transition:all .2s ease}.ytomo-companion-dialog{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;z-index:8999;padding:20px;box-sizing:border-box}.ytomo-companion-dialog .dialog-content{background:#fff;border-radius:12px;padding:24px;width:100%;max-width:500px;max-height:90vh;overflow-y:auto;box-shadow:0 10px 40px rgba(0,0,0,.3)}@media(max-width: 768px){.ytomo-companion-dialog .dialog-content{max-width:95vw;max-height:85vh;padding:16px;border-radius:8px}}.ytomo-companion-dialog .dialog-content .input-row{display:flex;gap:8px;margin-bottom:12px}@media(max-width: 480px){.ytomo-companion-dialog .dialog-content .input-row{flex-direction:column;gap:12px}}.ytomo-companion-dialog .dialog-content .input-row input{padding:12px 8px;border:1px solid #ddd;border-radius:4px;font-size:16px}.ytomo-companion-dialog .dialog-content .input-row input:focus{outline:none;border-color:#4caf50;box-shadow:0 0 0 2px rgba(76,175,80,.2)}.ytomo-companion-dialog .dialog-content .input-row button{padding:12px 16px;background:#4caf50;color:#fff;border:none;border-radius:4px;cursor:pointer;font-size:14px;white-space:nowrap;min-width:60px}.ytomo-companion-dialog .dialog-content .input-row button:hover{background:#45a049}.ytomo-companion-dialog .dialog-content .input-row button:active{background:#3d8b40}.ytomo-abort-button{position:fixed;bottom:100px;right:24px;z-index:9001;background:#f44336;color:#fff;border:none;border-radius:50%;width:64px;height:64px;font-size:12px;font-weight:bold;cursor:pointer;box-shadow:0 4px 12px rgba(244,67,54,.4);transition:all .3s ease;display:flex;align-items:center;justify-content:center}.ytomo-abort-button:hover{transform:scale(1.1);box-shadow:0 6px 20px rgba(244,67,54,.6)}.ytomo-abort-button:active{transform:scale(0.95)}.copy-ticket-btn{margin-left:8px;padding:6px;background:#f0f0f0;border:1px solid #ddd;border-radius:4px;cursor:pointer;display:flex;align-items:center;justify-content:center;min-width:32px;height:32px;transition:all .3s ease}.copy-ticket-btn:hover{background:#e0e0e0;border-color:#ccc}.copy-ticket-btn:active{transform:scale(0.95)}.copy-ticket-btn svg{color:#666;transition:all .3s ease}.copy-ticket-btn.copy-success{background:rgba(76,175,80,.1);border-color:#4caf50}.copy-ticket-btn.copy-success svg{color:#4caf50}.dialog-btn{padding:8px 16px;border:none;border-radius:4px;cursor:pointer;font-size:14px;font-weight:bold;transition:all .2s ease}.dialog-btn.btn-cancel{background:#666;color:#fff}.dialog-btn.btn-cancel:hover{background:#555}.dialog-btn.btn-delete{background:#f44336;color:#fff}.dialog-btn.btn-delete:hover{background:#d32f2f}.dialog-btn.btn-execute{background:#2196f3;color:#fff}.dialog-btn.btn-execute:hover{background:#1976d2}.dialog-btn.btn-execute.btn-disabled{background:#ccc;color:#666;cursor:not-allowed}.dialog-btn.btn-execute.btn-disabled:hover{background:#ccc}.ticket-row{display:flex;align-items:center;padding:8px;border-bottom:1px solid #eee;transition:background-color .2s ease;cursor:pointer}.ticket-row:last-child{border-bottom:none}.ticket-row.already-added{position:relative;opacity:.6;background:repeating-linear-gradient(45deg, transparent, transparent 8px, rgba(255, 140, 0, 0.1) 8px, rgba(255, 140, 0, 0.1) 16px)}.ticket-row.already-added::after{content:"追加済み";position:absolute;top:4px;right:40px;background:rgba(255,140,0,.9);color:#fff;font-size:10px;font-weight:bold;padding:2px 6px;border-radius:3px;pointer-events:none}.ticket-row.already-added input[type=checkbox]{opacity:.5;cursor:not-allowed}.ticket-row.already-added .copy-ticket-btn{opacity:1;background:#f8f8f8;border-color:#bbb}.ticket-row.already-added .copy-ticket-btn:hover{background:#e8e8e8;border-color:#999}.ytomo-fab{width:56px;height:56px;border-radius:50%;color:#fff;border:none;box-shadow:0 6px 20px rgba(0,0,0,.4),0 2px 8px rgba(0,0,0,.2);border:3px solid hsla(0,0%,100%,.2);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:bold;transition:all .3s ease;position:relative;overflow:hidden;pointer-events:auto}.ytomo-fab-enabled{background:#ff8c00;opacity:.9;cursor:pointer;pointer-events:auto}.ytomo-fab-disabled{background:gray;opacity:.6;cursor:not-allowed;pointer-events:none}.ytomo-fab-running{background:#dc3545;opacity:.9;cursor:pointer;pointer-events:auto}.ytomo-fab.state-idle{background:gray;opacity:.6;cursor:not-allowed;pointer-events:none}.ytomo-fab.pointer-events-none{pointer-events:none}.ytomo-fab.pointer-events-auto{pointer-events:auto}.ytomo-fab.state-enabled{background:#ff8c00;opacity:.9;cursor:pointer;pointer-events:auto}.ytomo-fab.state-running{background:#dc3545;opacity:.9;cursor:pointer;pointer-events:auto}.ytomo-fab.state-reservation{background:#ff8c00;opacity:.9;cursor:pointer;pointer-events:auto}.ytomo-fab:hover{transform:scale(1.15);box-shadow:0 8px 25px rgba(0,0,0,.5),0 4px 12px rgba(0,0,0,.3)}.ytomo-fab.reservation-enabled{background:#006821;opacity:.9;cursor:pointer}.ytomo-fab.reservation-disabled{background:gray;opacity:.9;cursor:not-allowed}.ytomo-fab.cooldown-warning{background:#ff6b35}.ytomo-fab.cooldown-normal{background:#007bff}.ytomo-fab-container{position:fixed;bottom:100px;right:24px;z-index:1000;display:flex;flex-direction:column;align-items:flex-end;gap:12px;pointer-events:auto}.ytomo-fab-container.z-normal{z-index:1000}.ytomo-fab-container.z-above-overlay{z-index:9001}.ytomo-fab-container.visible{display:flex}.ytomo-fab-container.hidden{display:none}.ytomo-fab-content{position:relative;display:flex;flex-direction:column-reverse;align-items:center;gap:8px;opacity:0;transform:scale(0.8) translateY(10px);transition:all .3s cubic-bezier(0.175, 0.885, 0.32, 1.275);pointer-events:none}.ytomo-fab-content.expanded{opacity:1;transform:scale(1) translateY(0);pointer-events:auto}.ytomo-sub-fab{width:45px;height:32px;border-radius:16px;background:rgba(0,104,33,.9);color:#fff;border:none;font-size:11px;font-weight:bold;cursor:pointer;transition:all .2s ease;box-shadow:0 2px 8px rgba(0,0,0,.3);display:flex;align-items:center;justify-content:center;pointer-events:auto}.ytomo-sub-fab:hover{background:rgba(2,134,43,.9);transform:scale(1.1);box-shadow:0 4px 12px rgba(0,0,0,.4)}.ytomo-sub-fab:active{transform:scale(0.95)}.ytomo-pavilion-fab-container{position:fixed;bottom:100px;right:24px;z-index:1000;display:flex;flex-direction:column;gap:12px;align-items:flex-end;pointer-events:auto}.ytomo-ticket-selection-fab-container{position:fixed;bottom:100px;right:24px;z-index:1000;display:flex;flex-direction:column;gap:12px;align-items:flex-end;pointer-events:auto}.ytomo-ticket-selection-fab-container.z-normal{z-index:1000}.ytomo-ticket-selection-fab-container.z-above-overlay{z-index:9001}.ytomo-ticket-selection-fab-container #ytomo-companion-sub-buttons{display:flex;flex-direction:column;gap:8px;align-items:flex-end;transition:all .3s ease}.ytomo-fab-inner-content{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;pointer-events:none}.ytomo-reservation-target-display{background:linear-gradient(135deg, rgba(0, 123, 255, 0.95), rgba(0, 86, 179, 0.95));color:#fff;padding:8px 12px;border-radius:12px;font-size:12px;font-weight:bold;text-align:center;box-shadow:0 3px 10px rgba(0,0,0,.3);border:2px solid hsla(0,0%,100%,.3);min-width:80px;max-width:120px;white-space:pre-line;overflow:visible;text-overflow:clip;transition:all .3s ease;pointer-events:auto;cursor:pointer}.ytomo-reservation-target-display:hover{transform:scale(1.05);box-shadow:0 4px 14px rgba(0,0,0,.4)}.ytomo-reservation-target-display.hidden{display:none}.ytomo-reservation-target-display.visible{display:block}input.ext-tomo.search{height:50px;min-width:200px;max-width:min(300px,100%);font-family:quicksand;font-size:16px;-webkit-appearance:textfield;-moz-appearance:textfield;appearance:textfield;border:1px solid #222426;border-radius:25px;box-shadow:0 1px 0 0 #ccc;padding:0 0 0 10px;flex:1 1}.day-reservation-info-area{position:relative;min-height:50px}.day-reservation-description{margin:10px 0;color:#666;font-size:14px;line-height:1.5;text-align:center}.day-reservation-description.hidden{display:none}.day-reservation-notification{margin:10px 0}.day-reservation-notification.hidden{display:none}.day-reservation-notification .notification-content{padding:12px 16px;border-radius:8px;font-size:14px;font-weight:500;display:flex;align-items:center;justify-content:space-between;min-height:24px;position:relative}.day-reservation-notification .notification-content .notification-message{flex:1;margin-left:8px;margin-right:8px}.day-reservation-notification .notification-content .notification-close{background:none;border:none;font-size:18px;font-weight:bold;cursor:pointer;padding:0;width:20px;height:20px;display:flex;align-items:center;justify-content:center;opacity:.7;transition:opacity .2s ease}.day-reservation-notification .notification-content .notification-close:hover{opacity:1}.day-reservation-notification .notification-content.success{background-color:#d4edda;color:#155724;border:1px solid #c3e6cb}.day-reservation-notification .notification-content.success .notification-close{color:#155724}.day-reservation-notification .notification-content.error{background-color:#f8d7da;color:#721c24;border:1px solid #f5c6cb}.day-reservation-notification .notification-content.error .notification-close{color:#721c24}.day-reservation-notification .notification-content.warning{background-color:#fff3cd;color:#856404;border:1px solid #ffeaa7}.day-reservation-notification .notification-content.warning .notification-close{color:#856404}.day-reservation-notification .notification-content.info{background-color:#d1ecf1;color:#0c5460;border:1px solid #bee5eb}.day-reservation-notification .notification-content.info .notification-close{color:#0c5460}.ytomo-icon.expand-icon{font-size:8px;line-height:1;color:#fff;font-weight:bold;text-align:center;pointer-events:none}.ytomo-icon.countdown-text{font-size:6px;line-height:1;color:#fff;font-weight:bold;text-align:center;margin-top:1px;pointer-events:none}.ytomo-toggle.toggle-li{position:fixed;bottom:10px;left:10px;z-index:1000;list-style:none;margin:0;padding:0}.ytomo-toggle.toggle-button{width:50px;height:30px;background:rgba(255,140,0,.8);border:none;border-radius:15px;cursor:pointer;transition:all .3s ease;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:bold;position:relative;overflow:hidden}.ytomo-toggle.toggle-button.enabled{color:#fff}.ytomo-toggle.toggle-button.disabled{color:#ddd}.ytomo-toggle.toggle-figure{width:100%;height:100%;margin:0;padding:0;border:none;background:rgba(0,0,0,0);pointer-events:none}.ytomo-dialog.overlay{position:fixed;top:0;left:0;width:100%;height:100%;background-color:rgba(0,0,0,.5);z-index:1000;display:flex;justify-content:center;align-items:center}.ytomo-dialog.container{background:#fff;border-radius:8px;padding:20px;max-width:400px;width:90%;max-height:70vh;overflow-y:auto;box-shadow:0 4px 12px rgba(0,0,0,.3)}.ytomo-dialog.container.day-reservation{max-width:600px;max-height:80vh}.ytomo-dialog.title{margin:0 0 16px 0;color:#333;font-size:18px;font-weight:bold}.ytomo-dialog.button-group{display:flex;justify-content:flex-end;gap:10px;margin-top:20px}.ytomo-dialog.primary-button{background:#006821;color:#fff;border:none;padding:10px 20px;border-radius:4px;cursor:pointer;font-size:14px}.ytomo-dialog.primary-button:hover{background:#02862b}.ytomo-dialog.primary-button:disabled{background:gray;cursor:not-allowed}.ytomo-dialog.secondary-button{background:rgba(0,0,0,0);color:#666;border:1px solid #ccc;padding:10px 20px;border-radius:4px;cursor:pointer;font-size:14px}.ytomo-dialog.secondary-button:hover{background:#f5f5f5}.ytomo-progress.counter{display:inline-block;margin-left:8px;padding:2px 6px;background:rgba(0,0,0,.3);border-radius:10px;font-size:10px;color:#fff;font-weight:bold}.ytomo-dialog.clear-selection-button{background:#dc3545;color:#fff;border:none;border-radius:20px;padding:8px 16px;font-size:14px;font-weight:bold;cursor:pointer;transition:all .2s ease;white-space:nowrap}.ytomo-dialog.clear-selection-button:hover{transform:translateY(-1px);box-shadow:0 4px 8px rgba(0,0,0,.2)}.ytomo-dialog.clear-selection-button:active{transform:translateY(0)}.ytomo-dialog.monitor-button{background:#fd7e14;color:#fff;border:none;border-radius:20px;padding:8px 16px;font-size:14px;font-weight:bold;cursor:pointer;transition:all .2s ease;white-space:nowrap}.ytomo-dialog.monitor-button:hover{transform:translateY(-1px);box-shadow:0 4px 8px rgba(0,0,0,.2)}.ytomo-dialog.monitor-button:active{transform:translateY(0)}.pavilion-name-row{display:flex;align-items:center;gap:8px;margin-bottom:8px}.pavilion-name-row .pavilion-name{flex:1;font-weight:bold;color:#333}.pavilion-select-all-btn{padding:2px 8px;font-size:11px;background-color:#007bff;color:#fff;border:none;border-radius:4px;cursor:pointer;transition:all .2s ease}.pavilion-select-all-btn:hover{background-color:#0056b3;transform:scale(1.05)}.pavilion-select-all-btn:active{transform:scale(0.95)}.ytomo-error-message{position:fixed;top:20px;right:20px;background:#f44;color:#fff;padding:15px;border-radius:5px;box-shadow:0 2px 10px rgba(0,0,0,.3);z-index:1001;max-width:300px;font-size:14px;line-height:1.4}.ytomo-error-message .error-title{font-weight:bold;margin-bottom:5px}.ytomo-error-message .error-close-btn{margin-top:10px;padding:5px 10px;background:hsla(0,0%,100%,.2);border:none;border-radius:3px;color:#fff;cursor:pointer;font-size:12px}.ytomo-error-message .error-close-btn:hover{background:hsla(0,0%,100%,.3)}.ytomo-flex-column-center{display:flex;flex-direction:column;align-items:center}.ytomo-brand-text{font-size:8px;font-weight:bold;margin-top:2px}.ytomo-dialog.overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;z-index:1000;padding:20px;box-sizing:border-box}.ytomo-dialog.container{background:#fff;border-radius:12px;padding:24px;max-width:800px;max-height:80vh;overflow-y:auto;box-shadow:0 10px 40px rgba(0,0,0,.3);width:100%}@media(max-width: 600px){.ytomo-dialog.container{padding-bottom:60px;max-height:85vh}}.ytomo-dialog.header{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;gap:8px}.ytomo-dialog.header .ytomo-dialog.title{flex-grow:1}.ytomo-dialog.title{margin:0;color:#333;font-size:24px;font-weight:bold}.ytomo-dialog.refresh-button{background:#006821;color:#fff;border:none;border-radius:50%;width:40px;height:40px;font-size:16px;cursor:pointer;transition:all .2s ease;display:flex;align-items:center;justify-content:center}.ytomo-dialog.refresh-button:hover{background:#02862b;transform:scale(1.1)}.ytomo-dialog.refresh-button:disabled{background:#ccc;cursor:not-allowed;transform:none}.ytomo-dialog.right-button-group{display:flex;gap:12px;align-items:center}.ytomo-dialog.available-only-toggle{background:#6c757d;color:#fff;border:none;border-radius:20px;padding:8px 16px;font-size:14px;font-weight:bold;cursor:pointer;transition:all .2s ease;white-space:nowrap}.ytomo-dialog.available-only-toggle.active{background:#006821;box-shadow:0 0 0 2px rgba(0,104,33,.3)}.ytomo-dialog.available-only-toggle:hover{transform:translateY(-1px);box-shadow:0 4px 8px rgba(0,0,0,.2)}.ytomo-dialog.available-only-toggle:disabled{background:#ccc;cursor:not-allowed;transform:none;box-shadow:none}.ytomo-dialog.button-group{display:flex;gap:12px;justify-content:space-between;margin-top:24px}.ytomo-dialog.secondary-button{background:#6c757d;color:#fff;border:none;border-radius:20px;padding:8px 16px;font-size:14px;font-weight:bold;cursor:pointer;transition:all .2s ease;white-space:nowrap}.ytomo-dialog.secondary-button:hover{transform:translateY(-1px);box-shadow:0 4px 8px rgba(0,0,0,.2)}.ytomo-dialog.monitor-button{background:#fd7e14;color:#fff;border:none;border-radius:20px;padding:8px 16px;font-size:14px;font-weight:bold;cursor:pointer;transition:all .2s ease;white-space:nowrap}.ytomo-dialog.monitor-button:hover{transform:translateY(-1px);box-shadow:0 4px 8px rgba(0,0,0,.2)}.day-reservation-description{color:#666;line-height:1.6;margin:0 0 20px 0}.pavilion-list{max-height:400px;overflow-y:auto;border:1px solid #ddd;border-radius:4px;margin-bottom:16px}.pavilion-list-empty{padding:20px;text-align:center;color:#666}.pavilion-item{display:flex;justify-content:space-between;align-items:center;padding:12px;border-bottom:1px solid #eee;transition:background-color .2s;cursor:pointer}.pavilion-item:hover{background-color:#f5f5f5}.pavilion-item:last-child{border-bottom:none}.pavilion-item.monitored{background-color:rgba(253,126,20,.1);border-left:4px solid #fd7e14}.pavilion-item.monitored:hover{background-color:rgba(253,126,20,.15)}.pavilion-info{flex:1}.pavilion-info .pavilion-name{font-weight:bold;margin-bottom:4px}.pavilion-info .pavilion-time-slots{font-size:12px;color:#666;display:flex;flex-wrap:wrap;gap:8px;margin-top:8px;max-width:100%}@media(max-width: 600px){.pavilion-info .pavilion-time-slots{gap:6px;margin-top:6px}}.pavilion-info .pavilion-time-slots .pavilion-time-slot{font-size:12px;padding:4px 8px;border-radius:6px;border:1px solid rgba(0,0,0,0);min-width:60px;text-align:center;white-space:nowrap}@media(max-width: 600px){.pavilion-info .pavilion-time-slots .pavilion-time-slot{font-size:11px;padding:3px 6px;min-width:55px}}@media(max-width: 400px){.pavilion-info .pavilion-time-slots .pavilion-time-slot{font-size:10px;padding:2px 4px;min-width:50px}}.pavilion-info .pavilion-time-slots .pavilion-time-slot.clickable{background:rgba(0,0,0,0);border-color:#dee2e6;cursor:pointer;transition:all .2s ease}.pavilion-info .pavilion-time-slots .pavilion-time-slot.clickable:hover:not(.selected){background:#f8f9fa;border-color:#adb5bd;transform:translateY(-1px);box-shadow:0 2px 4px rgba(0,0,0,.1)}.pavilion-info .pavilion-time-slots .pavilion-time-slot.clickable:active{transform:translateY(0);box-shadow:0 1px 2px rgba(0,0,0,.1)}.pavilion-info .pavilion-time-slots .pavilion-time-slot.clickable.selected{background:rgba(0,104,33,.25);border-color:#006821;border-width:2px;color:#006821;font-weight:bold}@media(max-width: 600px){.pavilion-info .pavilion-time-slots .pavilion-time-slot.clickable.selected{background:rgba(0,104,33,.35);border-width:3px}}.pavilion-info .pavilion-time-slots .pavilion-time-slot.clickable.selected:hover{background:rgba(0,104,33,.3)}@media(max-width: 600px){.pavilion-info .pavilion-time-slots .pavilion-time-slot.clickable.selected:hover{background:rgba(0,104,33,.4)}}.pavilion-info .pavilion-time-slots .pavilion-time-slot.clickable.selected:active{background:rgba(0,104,33,.35)}@media(max-width: 600px){.pavilion-info .pavilion-time-slots .pavilion-time-slot.clickable.selected:active{background:rgba(0,104,33,.45)}}.pavilion-info .pavilion-time-slots .pavilion-time-slot.clickable.unavailable{background:rgba(0,0,0,0);border-color:#ffc107;color:#dc6c00}.pavilion-info .pavilion-time-slots .pavilion-time-slot.clickable.unavailable:hover:not(.selected){background:#fff3cd;border-color:#ffb300;transform:translateY(-1px);box-shadow:0 2px 4px rgba(255,193,7,.2)}.pavilion-info .pavilion-time-slots .pavilion-time-slot.clickable.unavailable.selected{background:rgba(255,193,7,.35);border-color:#ffc107;border-width:2px;color:#dc6c00;font-weight:bold}@media(max-width: 600px){.pavilion-info .pavilion-time-slots .pavilion-time-slot.clickable.unavailable.selected{background:rgba(255,193,7,.45);border-width:3px}}.pavilion-info .pavilion-time-slots .pavilion-time-slot.clickable.unavailable.selected:hover{background:rgba(255,193,7,.4)}@media(max-width: 600px){.pavilion-info .pavilion-time-slots .pavilion-time-slot.clickable.unavailable.selected:hover{background:rgba(255,193,7,.5)}}.pavilion-info .pavilion-time-slots .pavilion-time-slot.clickable.unavailable.selected:active{background:rgba(255,193,7,.45)}@media(max-width: 600px){.pavilion-info .pavilion-time-slots .pavilion-time-slot.clickable.unavailable.selected:active{background:rgba(255,193,7,.55)}}.pavilion-button-area{display:flex;gap:8px;align-items:center}.pavilion-button-area .pavilion-reserve-button{padding:8px 16px;background-color:#006821;color:#fff;border:none;border-radius:4px;cursor:pointer;font-size:12px;transition:background-color .2s;white-space:nowrap}.pavilion-button-area .pavilion-reserve-button:hover:not(:disabled){background-color:#02862b}.pavilion-button-area .pavilion-reserve-button:disabled{background:#ccc;color:#666;cursor:not-allowed}.pavilion-button-area .pavilion-monitor-checkbox{margin-right:12px;transform:scale(1.2);accent-color:#fd7e14;flex-shrink:0}.pavilion-button-area .pavilion-no-slots{font-size:12px;color:#999}.ytomo-global-notification-container{position:fixed;top:20px;right:20px;z-index:2000;max-width:400px;width:100%;display:flex;flex-direction:column;gap:10px}@media(max-width: 600px){.ytomo-global-notification-container{top:10px;right:10px;left:10px;max-width:none}}.ytomo-global-notification{background:#fff;border-radius:8px;padding:16px;box-shadow:0 4px 12px rgba(0,0,0,.15);border-left:4px solid #ccc;display:flex;align-items:center;gap:12px;font-size:14px;font-weight:500;transform:translateX(100%);opacity:0;transition:all .3s ease}.ytomo-global-notification.show{transform:translateX(0);opacity:1}.ytomo-global-notification.hide{transform:translateX(100%);opacity:0}.ytomo-global-notification .notification-message{flex:1;line-height:1.4}.ytomo-global-notification .notification-close{background:none;border:none;font-size:18px;font-weight:bold;cursor:pointer;padding:0;width:20px;height:20px;display:flex;align-items:center;justify-content:center;opacity:.7;transition:opacity .2s ease}.ytomo-global-notification .notification-close:hover{opacity:1}.ytomo-global-notification.success{background-color:#d4edda;color:#155724;border-left-color:#28a745}.ytomo-global-notification.success .notification-close{color:#155724}.ytomo-global-notification.error{background-color:#f8d7da;color:#721c24;border-left-color:#dc3545}.ytomo-global-notification.error .notification-close{color:#721c24}.ytomo-global-notification.warning{background-color:#fff3cd;color:#856404;border-left-color:#ffc107}.ytomo-global-notification.warning .notification-close{color:#856404}.ytomo-global-notification.info{background-color:#d1ecf1;color:#0c5460;border-left-color:#17a2b8}.ytomo-global-notification.info .notification-close{color:#0c5460}.ytomo-processing-overlay{position:fixed;top:0;left:0;right:0;bottom:0;width:100vw;height:100vh;background:rgba(0,0,0,.3);z-index:9000;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(1px);transition:all .3s ease;pointer-events:auto}.ytomo-processing-overlay.z-normal{z-index:9000}.ytomo-processing-overlay.z-below-fab{z-index:8999}.ytomo-processing-overlay.hidden{opacity:0;visibility:hidden;pointer-events:none}.ytomo-processing-overlay.visible{opacity:1;visibility:visible;pointer-events:auto}.ytomo-processing-overlay .processing-message-area{background:hsla(0,0%,100%,.95);border-radius:12px;padding:24px 32px;text-align:center;box-shadow:0 8px 32px rgba(0,0,0,.3);border:2px solid rgba(255,140,0,.3);max-width:400px;margin:20px}@media(max-width: 768px){.ytomo-processing-overlay .processing-message-area{padding:20px 24px;margin:16px;max-width:90vw}}.ytomo-processing-overlay .processing-message-text{font-size:20px;font-weight:bold;color:#333;margin-bottom:8px;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}@media(max-width: 768px){.ytomo-processing-overlay .processing-message-text{font-size:18px;margin-bottom:6px}}.ytomo-processing-overlay .processing-target-text{font-size:16px;font-weight:600;color:#333;margin-bottom:12px;white-space:pre-line;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;text-align:center}@media(max-width: 768px){.ytomo-processing-overlay .processing-target-text{font-size:14px;margin-bottom:10px}}.ytomo-processing-overlay .processing-countdown-text{font-size:18px;font-weight:bold;color:#e67e00;margin-bottom:12px;font-family:"SF Mono","Monaco","Consolas",monospace;text-align:center;text-shadow:0 1px 2px rgba(0,0,0,.1)}@media(max-width: 768px){.ytomo-processing-overlay .processing-countdown-text{font-size:16px;margin-bottom:10px}}.ytomo-processing-overlay .processing-countdown-text.countdown-warning{color:#dc3545;animation:countdownPulse 1s ease-in-out infinite;text-shadow:0 0 8px rgba(220,53,69,.4)}.ytomo-processing-overlay .processing-warning-text{font-size:14px;color:#666;margin-bottom:16px;line-height:1.4;transition:all .3s ease}@media(max-width: 768px){.ytomo-processing-overlay .processing-warning-text{font-size:13px;margin-bottom:14px}}.ytomo-processing-overlay .processing-warning-text.warning-flash{color:#dc3545;font-weight:bold;transform:scale(1.05);animation:flash .5s ease-in-out 2}.ytomo-processing-overlay .notification-toggle-btn{display:flex;align-items:center;justify-content:center;width:40px;height:40px;border:none;border-radius:50%;cursor:pointer;transition:all .2s ease;margin-bottom:16px;box-shadow:0 2px 6px rgba(0,0,0,.15);font-size:20px;line-height:1}@media(max-width: 768px){.ytomo-processing-overlay .notification-toggle-btn{width:36px;height:36px;margin-bottom:14px;font-size:18px}}.ytomo-processing-overlay .notification-toggle-btn:hover{transform:scale(1.05);box-shadow:0 4px 10px rgba(0,0,0,.2)}.ytomo-processing-overlay .notification-toggle-btn:active{transform:scale(0.95)}.ytomo-processing-overlay .notification-toggle-btn.enabled{background:#4caf50;color:#fff}.ytomo-processing-overlay .notification-toggle-btn.enabled:hover{background:#45a049}.ytomo-processing-overlay .notification-toggle-btn.muted{background:#f44336;color:#fff}.ytomo-processing-overlay .notification-toggle-btn.muted:hover{background:#e53935}.ytomo-processing-overlay .processing-cancel-area{font-size:12px;color:#888;font-style:italic}@media(max-width: 768px){.ytomo-processing-overlay .processing-cancel-area{font-size:11px}}@keyframes flash{0%,100%{opacity:1}50%{opacity:.7}}@keyframes countdownPulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.8;transform:scale(1.05)}}.ytomo-processing-overlay.efficiency-mode .processing-message-area{border-color:rgba(255,140,0,.5);background:linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(255, 248, 220, 0.95))}.ytomo-processing-overlay.efficiency-mode .processing-message-text{color:#e67e00}.ytomo-processing-overlay.monitoring-mode .processing-message-area{border-color:rgba(0,104,33,.5);background:linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(240, 255, 240, 0.95))}.ytomo-processing-overlay.monitoring-mode .processing-message-text{color:#004d1a}@media(prefers-reduced-motion: reduce){.ytomo-processing-overlay{transition:none}.ytomo-processing-overlay .processing-warning-text.warning-flash{animation:none;transform:none}}.ytomo-dialog.overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.7);z-index:1000;display:flex;align-items:center;justify-content:center;padding:20px;box-sizing:border-box}.ytomo-dialog.container.debug-dialog{background:#fff;border-radius:12px;padding:0;max-width:90%;max-height:85%;min-width:600px;box-shadow:0 8px 32px rgba(0,0,0,.3);display:flex;flex-direction:column;overflow:hidden}@media(max-width: 768px){.ytomo-dialog.container.debug-dialog{min-width:auto;max-width:95%;max-height:90%}}.ytomo-dialog.header{display:flex;align-items:center;justify-content:space-between;padding:20px 24px;border-bottom:1px solid #e0e0e0;background:#f8f9fa;border-radius:12px 12px 0 0}.ytomo-dialog.title{margin:0;font-size:20px;color:#333;font-weight:600}.ytomo-dialog.close-button{background:none;border:none;font-size:24px;cursor:pointer;color:#666;padding:5px;border-radius:4px}.ytomo-dialog.close-button:hover{background:rgba(0,0,0,.1)}.debug-content{padding:24px;overflow-y:auto;flex:1}.debug-section{margin-bottom:32px}.debug-section:last-child{margin-bottom:0}.debug-section h3{margin:0 0 12px 0;font-size:18px;color:#333;font-weight:600}.debug-section p{margin:0 0 16px 0;color:#666;line-height:1.5}.debug-input-group{display:flex;align-items:center;gap:12px;margin-bottom:20px;flex-wrap:wrap}.debug-input-group label{font-weight:500;color:#333;min-width:120px}.debug-input-group input{flex:1;min-width:200px;padding:10px 12px;border:2px solid #e0e0e0;border-radius:6px;font-size:14px;transition:border-color .2s ease}.debug-input-group input:focus{outline:none;border-color:#007bff}.debug-input-group input::placeholder{color:#999}.debug-input-group button{background:#007bff;color:#fff;border:none;padding:10px 20px;border-radius:6px;font-size:14px;font-weight:500;cursor:pointer;transition:background-color .2s ease;white-space:nowrap}.debug-input-group button:hover:not(:disabled){background:#0056b3}.debug-input-group button:disabled{background:#6c757d;cursor:not-allowed}.debug-results-area h4{margin:0 0 12px 0;font-size:16px;color:#333;font-weight:600}.debug-results-display{background:#f8f9fa;border:1px solid #e0e0e0;border-radius:6px;padding:16px;font-family:"Courier New",Monaco,monospace;font-size:12px;line-height:1.4;max-height:300px;overflow-y:auto;white-space:pre-wrap;word-wrap:break-word;color:#333}.debug-results-display .json-key{color:#d73a49;font-weight:bold}.debug-results-display .json-string{color:#032f62}.debug-results-display .json-number{color:#005cc5}.debug-results-display .json-boolean{color:#e36209}.debug-results-display .json-null{color:#6f42c1}@media(max-width: 768px){.debug-input-group{flex-direction:column;align-items:stretch}.debug-input-group label{min-width:auto}.debug-input-group input{min-width:auto}.debug-input-group button{align-self:flex-start}.ytomo-dialog.container.debug-dialog{min-width:auto}.debug-content{padding:16px}}.ytomo-dialog.overlay{animation:fadeIn .2s ease-out}.ytomo-dialog.container.debug-dialog{animation:slideIn .3s ease-out}@keyframes fadeIn{from{opacity:0}to{opacity:1}}@keyframes slideIn{from{opacity:0;transform:translateY(-20px) scale(0.95)}to{opacity:1;transform:translateY(0) scale(1)}}.ytomo-processing-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background-color:rgba(0,0,0,.3);display:flex;align-items:center;justify-content:center;z-index:1001;pointer-events:auto;overflow-y:auto}.ytomo-processing-content{background:hsla(0,0%,100%,.7);border-radius:12px;padding:30px;text-align:center;box-shadow:0 10px 40px rgba(0,0,0,.2);min-width:200px;pointer-events:auto;backdrop-filter:blur(1px)}.ytomo-processing-spinner{width:40px;height:40px;border:3px solid #e2e8f0;border-top-color:#2c5aa0;border-radius:50%;animation:spin 1s linear infinite;margin:0 auto 16px}.ytomo-processing-message{color:#374151;font-size:14px;font-weight:500}@keyframes spin{to{transform:rotate(360deg)}}.ytomo-input{flex:1;padding:8px 12px;border:1px solid #d1d5db;border-radius:6px;font-size:14px;transition:border-color .2s}.ytomo-input:focus{outline:none;border-color:#2c5aa0;box-shadow:0 0 0 3px rgba(44,90,160,.1)}.ytomo-input::placeholder{color:#9ca3af}.ytomo-button{padding:8px 16px;border:none;border-radius:6px;font-size:14px;font-weight:500;cursor:pointer;transition:all .2s;display:inline-flex;align-items:center;justify-content:center;white-space:nowrap}.ytomo-button.primary{background:linear-gradient(135deg, #2c5aa0 0%, #1a365d 100%);color:#fff}.ytomo-button.primary:hover{background:linear-gradient(135deg, #1a365d 0%, #2c5aa0 100%);transform:translateY(-1px);box-shadow:0 4px 12px rgba(44,90,160,.3)}.ytomo-button.primary:active{transform:translateY(0)}.ytomo-button.retry-button{background:linear-gradient(135deg, #f59e0b 0%, #d97706 100%);color:#fff;margin-top:12px}.ytomo-button.retry-button:hover{background:linear-gradient(135deg, #d97706 0%, #f59e0b 100%)}.ytomo-button:focus{outline:2px solid #2c5aa0;outline-offset:2px}.ytomo-button:disabled{opacity:.5;cursor:not-allowed;transform:none !important}@media(prefers-reduced-motion: reduce){.ytomo-button,.ytomo-input{animation:none;transition:none}}@media(prefers-contrast: high){.ytomo-button:focus,.ytomo-input:focus{outline:3px solid #000}}.ytomo-loading-container{width:100%;max-width:800px;margin:20px auto;padding:20px;display:flex;align-items:center;justify-content:center;min-height:400px}.ytomo-loading-content{text-align:center;display:flex;flex-direction:column;align-items:center;gap:20px}.ytomo-loading-spinner{width:40px;height:40px;border:3px solid #f3f4f6;border-top:3px solid #2c5aa0;border-radius:50%;animation:spin 1s linear infinite}.ytomo-loading-text{font-size:16px;color:#6b7280;font-weight:500}@keyframes spin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}#ytomo-page-dialog-container .ytomo-dialog-overlay{position:relative !important;background:rgba(0,0,0,0) !important;width:100% !important;height:auto !important;display:block !important;max-width:800px;margin:20px auto;padding:20px;z-index:auto !important}#ytomo-page-dialog-container .ytomo-main-dialog{position:relative !important;transform:none !important;margin:0 !important;box-shadow:0 10px 40px rgba(0,0,0,.1) !important;border:1px solid #e2e8f0 !important;min-width:auto !important;width:100% !important;max-width:none !important;z-index:auto !important}#ytomo-page-dialog-container *{z-index:auto !important}table[class*=style_main__timetable__] td[data-gray-out] div[role=button][data-disabled=true]{pointer-events:auto !important;cursor:pointer !important}#ot-sdk-btn-floating{display:none !important}header{z-index:10000 !important}.ytomo-main-fab{position:fixed;bottom:80px;right:20px;width:56px;height:56px;border-radius:50%;background-color:#ff6b35;color:#fff;border:none;font-size:16px;font-weight:bold;cursor:pointer;box-shadow:0 2px 10px rgba(0,0,0,.3);transition:all .2s ease;z-index:999}.ytomo-main-fab:hover{transform:scale(1.1);box-shadow:0 4px 15px rgba(0,0,0,.4)}.ytomo-main-fab:disabled{opacity:.5;cursor:not-allowed;transform:none;box-shadow:0 2px 10px rgba(0,0,0,.3)}.ytomo-main-fab:focus{outline:none}.ytomo-dialog-overlay~.ytomo-main-fab{display:none}.ytomo-dialog-overlay *:focus{outline:none !important;box-shadow:none !important}.ytomo-pavilion-search-input:focus{outline:none !important;border:1px solid #2c5aa0 !important;box-shadow:none !important}.ytomo-reservation-result{position:fixed;bottom:80px;right:90px;min-width:180px;padding:12px 16px;border-radius:8px;color:#fff;font-size:12px;font-weight:500;z-index:998;box-shadow:0 4px 12px rgba(0,0,0,.3);animation:slideIn .3s ease-out}.ytomo-reservation-result.success{background-color:#10b981}.ytomo-reservation-result.failed{background-color:#ef4444}.ytomo-reservation-result .ytomo-result-status{font-weight:600;margin-bottom:4px}.ytomo-reservation-result .ytomo-result-pavilion{margin-bottom:2px}.ytomo-reservation-result .ytomo-result-time{font-size:11px;opacity:.9}@keyframes slideIn{from{opacity:0;transform:translateX(20px)}to{opacity:1;transform:translateX(0)}}`, ""]);
+___CSS_LOADER_EXPORT___.push([module.id, `#ytomo-status-badge.countdown-warning{background:rgba(255,0,0,.9)}.ytomo-efficiency-toggle{width:45px;height:32px;border-radius:16px;color:#fff;border:none;font-size:10px;font-weight:bold;cursor:pointer;transition:all .2s ease;box-shadow:0 2px 8px rgba(0,0,0,.3);display:flex;align-items:center;justify-content:center;pointer-events:auto;margin-bottom:8px}.ytomo-efficiency-toggle.efficiency-enabled{background:rgba(255,140,0,.9)}.ytomo-efficiency-toggle.efficiency-disabled{background:rgba(128,128,128,.9)}.ytomo-efficiency-toggle:hover{transform:scale(1.1);box-shadow:0 4px 12px rgba(0,0,0,.4)}.ytomo-efficiency-toggle:active{transform:scale(0.95)}button.ext-ytomo{height:40px;width:auto;min-width:60px;padding:0px 8px;background:#006821;color:#fff}button.ext-ytomo.no-after:after{background:rgba(0,0,0,0) none repeat 0 0/auto auto padding-box border-box scroll}button.ext-ytomo.btn-done{background:#4a4c4a}button.ext-ytomo:hover{background:#02862b}.fab-sub-btn{color:#fff;border:none;border-radius:20px;padding:8px 16px;font-size:12px;white-space:nowrap;transition:all .2s ease}.fab-sub-btn.btn-enabled{background:#006821;cursor:pointer;opacity:1}.fab-sub-btn.btn-enabled:hover{background:#02862b;transform:scale(1.05)}.fab-sub-btn.btn-enabled.btn-done{background:#4a4c4a}.fab-sub-btn.btn-enabled.btn-done:hover{background:#606260}.fab-sub-btn.btn-disabled,.fab-sub-btn.btn-loading{background:gray;cursor:not-allowed;opacity:.6}.fab-sub-btn.btn-disabled:hover,.fab-sub-btn.btn-loading:hover{background:gray;transform:scale(1)}.fab-sub-btn:disabled{background:gray !important;cursor:not-allowed !important;opacity:.6 !important}.fab-sub-btn:disabled:hover{background:gray !important;transform:scale(1) !important}button.ext-ytomo.pavilion-sub-btn.btn-disabled,button.ext-ytomo.pavilion-sub-btn.btn-loading{background:gray;cursor:not-allowed;opacity:.6}button.ext-ytomo.pavilion-sub-btn.btn-disabled:hover,button.ext-ytomo.pavilion-sub-btn.btn-loading:hover{background:gray;transform:scale(1)}.safe-none,.ytomo-none,.filter-none{display:none}.fab-sub-btn span.button-count{font-family:"Courier New","Monaco",monospace;font-weight:bold;color:#ffeb3b;vertical-align:baseline}button.ext-ytomo.pavilion-sub-btn.ytomo-date-button.date-selected{border:2px solid #4caf50;box-shadow:0 0 8px rgba(76,175,80,.6)}div.div-flex{display:flex;justify-content:center;margin:5px}div.div-flex input.ext-tomo.search{flex:1;padding:8px 12px;border:1px solid #ddd;border-radius:4px;font-size:14px;margin-right:8px}div.div-flex input.ext-tomo.search:focus{outline:none;border-color:#006821;box-shadow:0 0 0 2px rgba(0,104,33,.2)}div.div-flex button.btn-filter-without-load{height:auto;min-height:40px;width:auto;min-width:60px;padding:0px 8px;color:#fff;margin:5px;background:#006821;border:none;border-radius:4px;cursor:pointer;font-size:14px}div.div-flex button.btn-filter-without-load:hover{background:#02862b}div.div-flex button.btn-filter-without-load:active{background:#005417}div.div-flex button.btn-filter-without-load:disabled{background:gray;cursor:not-allowed}.js-show{display:block}.js-hide{display:none}.js-visible{visibility:visible}.js-invisible{visibility:hidden}.js-enabled{pointer-events:auto;opacity:1}.js-disabled{pointer-events:none;opacity:.6}.js-green{background:#228b22;color:#fff}.js-red{background:#dc3545;color:#fff}.js-gray{background:gray;color:#fff}.btn-success-highlight{background:#00c800;color:#fff}.status-bg-green{background:rgba(0,128,0,.9)}.status-bg-red{background:rgba(255,0,0,.9)}.status-bg-orange{background:rgba(255,140,0,.9)}.status-bg-blue{background:rgba(0,104,33,.9)}.status-bg-default{background:rgba(0,0,0,.8)}#ytomo-status-badge{background:linear-gradient(135deg, rgba(0, 0, 0, 0.9), rgba(40, 40, 40, 0.9));color:#fff;padding:8px 16px;border-radius:20px;font-size:12px;font-weight:bold;white-space:pre-line;box-shadow:0 4px 12px rgba(0,0,0,.3),0 2px 6px rgba(0,0,0,.2);border:2px solid hsla(0,0%,100%,.15);pointer-events:none}#ytomo-status-badge.ytomo-status-waiting{background:linear-gradient(135deg, rgba(0, 0, 0, 0.9), rgba(40, 40, 40, 0.9))}#ytomo-status-badge.ytomo-status-reservation{background:linear-gradient(135deg, rgba(255, 140, 0, 0.9), rgba(255, 165, 0, 0.9))}#ytomo-status-badge.ytomo-status-reservation.ytomo-status-countdown-warning{background:linear-gradient(135deg, rgba(255, 0, 0, 0.9), rgba(220, 53, 69, 0.9))}#ytomo-status-badge.ytomo-status-cooldown{background:linear-gradient(135deg, rgba(255, 107, 53, 0.9), rgba(255, 140, 0, 0.9))}.ytomo-header li.fab-toggle-li{display:inline-block;margin-right:8px}.ytomo-header li.fab-toggle-li button.fab-toggle-button{background:none;border:none;cursor:pointer;padding:0;color:#fff;transition:all .2s ease;display:flex;align-items:center;justify-content:center}.ytomo-header li.fab-toggle-li button.fab-toggle-button:hover{color:#ddd}.ytomo-header li.fab-toggle-li button.fab-toggle-button figure.fab-toggle-figure{width:auto;height:24px;display:flex;align-items:center;justify-content:center;padding:0 4px}.ytomo-pavilion-fab button.ytomo-fab{position:relative}.ytomo-pavilion-fab button.ytomo-fab:hover{transform:scale(1.15);box-shadow:0 8px 25px rgba(0,0,0,.5),0 4px 12px rgba(0,0,0,.3);border-width:4px}.ytomo-pavilion-fab .ytomo-fab-inner-content .pavilion-fab-expand-icon{font-size:8px;line-height:1;margin-bottom:1px;opacity:.8}.ytomo-pavilion-fab .ytomo-fab-inner-content .pavilion-fab-brand-text{font-size:7px;font-weight:normal;line-height:1;margin-bottom:2px;opacity:.7}.ytomo-pavilion-fab .ytomo-fab-inner-content .pavilion-fab-counts-text{font-size:12px;font-weight:bold;line-height:1}.ytomo-pavilion-fab .pavilion-sub-actions-container{display:none;flex-direction:column;gap:8px;align-items:flex-end;margin-bottom:8px}.ytomo-pavilion-fab .pavilion-sub-actions-container.expanded{display:flex}.ytomo-pavilion-fab .pavilion-sub-actions-container button.pavilion-sub-btn.base-style{color:#fff;border:none;border-radius:20px;padding:8px 16px;font-size:12px;white-space:nowrap;box-shadow:0 2px 8px rgba(0,0,0,.3);transition:all .2s ease}.ytomo-companion-dialog{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;z-index:8999;padding:20px;box-sizing:border-box}.ytomo-companion-dialog .dialog-content{background:#fff;border-radius:12px;padding:24px;width:100%;max-width:500px;max-height:90vh;overflow-y:auto;box-shadow:0 10px 40px rgba(0,0,0,.3)}@media(max-width: 768px){.ytomo-companion-dialog .dialog-content{max-width:95vw;max-height:85vh;padding:16px;border-radius:8px}}.ytomo-companion-dialog .dialog-content .input-row{display:flex;gap:8px;margin-bottom:12px}@media(max-width: 480px){.ytomo-companion-dialog .dialog-content .input-row{flex-direction:column;gap:12px}}.ytomo-companion-dialog .dialog-content .input-row input{padding:12px 8px;border:1px solid #ddd;border-radius:4px;font-size:16px}.ytomo-companion-dialog .dialog-content .input-row input:focus{outline:none;border-color:#4caf50;box-shadow:0 0 0 2px rgba(76,175,80,.2)}.ytomo-companion-dialog .dialog-content .input-row button{padding:12px 16px;background:#4caf50;color:#fff;border:none;border-radius:4px;cursor:pointer;font-size:14px;white-space:nowrap;min-width:60px}.ytomo-companion-dialog .dialog-content .input-row button:hover{background:#45a049}.ytomo-companion-dialog .dialog-content .input-row button:active{background:#3d8b40}.ytomo-abort-button{position:fixed;bottom:100px;right:24px;z-index:9001;background:#f44336;color:#fff;border:none;border-radius:50%;width:64px;height:64px;font-size:12px;font-weight:bold;cursor:pointer;box-shadow:0 4px 12px rgba(244,67,54,.4);transition:all .3s ease;display:flex;align-items:center;justify-content:center}.ytomo-abort-button:hover{transform:scale(1.1);box-shadow:0 6px 20px rgba(244,67,54,.6)}.ytomo-abort-button:active{transform:scale(0.95)}.copy-ticket-btn{margin-left:8px;padding:6px;background:#f0f0f0;border:1px solid #ddd;border-radius:4px;cursor:pointer;display:flex;align-items:center;justify-content:center;min-width:32px;height:32px;transition:all .3s ease}.copy-ticket-btn:hover{background:#e0e0e0;border-color:#ccc}.copy-ticket-btn:active{transform:scale(0.95)}.copy-ticket-btn svg{color:#666;transition:all .3s ease}.copy-ticket-btn.copy-success{background:rgba(76,175,80,.1);border-color:#4caf50}.copy-ticket-btn.copy-success svg{color:#4caf50}.dialog-btn{padding:8px 16px;border:none;border-radius:4px;cursor:pointer;font-size:14px;font-weight:bold;transition:all .2s ease}.dialog-btn.btn-cancel{background:#666;color:#fff}.dialog-btn.btn-cancel:hover{background:#555}.dialog-btn.btn-delete{background:#f44336;color:#fff}.dialog-btn.btn-delete:hover{background:#d32f2f}.dialog-btn.btn-execute{background:#2196f3;color:#fff}.dialog-btn.btn-execute:hover{background:#1976d2}.dialog-btn.btn-execute.btn-disabled{background:#ccc;color:#666;cursor:not-allowed}.dialog-btn.btn-execute.btn-disabled:hover{background:#ccc}.ticket-row{display:flex;align-items:center;padding:8px;border-bottom:1px solid #eee;transition:background-color .2s ease;cursor:pointer}.ticket-row:last-child{border-bottom:none}.ticket-row.already-added{position:relative;opacity:.6;background:repeating-linear-gradient(45deg, transparent, transparent 8px, rgba(255, 140, 0, 0.1) 8px, rgba(255, 140, 0, 0.1) 16px)}.ticket-row.already-added::after{content:"追加済み";position:absolute;top:4px;right:40px;background:rgba(255,140,0,.9);color:#fff;font-size:10px;font-weight:bold;padding:2px 6px;border-radius:3px;pointer-events:none}.ticket-row.already-added input[type=checkbox]{opacity:.5;cursor:not-allowed}.ticket-row.already-added .copy-ticket-btn{opacity:1;background:#f8f8f8;border-color:#bbb}.ticket-row.already-added .copy-ticket-btn:hover{background:#e8e8e8;border-color:#999}.ytomo-fab{width:56px;height:56px;border-radius:50%;color:#fff;border:none;box-shadow:0 6px 20px rgba(0,0,0,.4),0 2px 8px rgba(0,0,0,.2);border:3px solid hsla(0,0%,100%,.2);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:bold;transition:all .3s ease;position:relative;overflow:hidden;pointer-events:auto}.ytomo-fab-enabled{background:#ff8c00;opacity:.9;cursor:pointer;pointer-events:auto}.ytomo-fab-disabled{background:gray;opacity:.6;cursor:not-allowed;pointer-events:none}.ytomo-fab-running{background:#dc3545;opacity:.9;cursor:pointer;pointer-events:auto}.ytomo-fab.state-idle{background:gray;opacity:.6;cursor:not-allowed;pointer-events:none}.ytomo-fab.pointer-events-none{pointer-events:none}.ytomo-fab.pointer-events-auto{pointer-events:auto}.ytomo-fab.state-enabled{background:#ff8c00;opacity:.9;cursor:pointer;pointer-events:auto}.ytomo-fab.state-running{background:#dc3545;opacity:.9;cursor:pointer;pointer-events:auto}.ytomo-fab.state-reservation{background:#ff8c00;opacity:.9;cursor:pointer;pointer-events:auto}.ytomo-fab:hover{transform:scale(1.15);box-shadow:0 8px 25px rgba(0,0,0,.5),0 4px 12px rgba(0,0,0,.3)}.ytomo-fab.reservation-enabled{background:#006821;opacity:.9;cursor:pointer}.ytomo-fab.reservation-disabled{background:gray;opacity:.9;cursor:not-allowed}.ytomo-fab.cooldown-warning{background:#ff6b35}.ytomo-fab.cooldown-normal{background:#007bff}.ytomo-fab-container{position:fixed;bottom:100px;right:24px;z-index:9001;display:flex;flex-direction:column;align-items:flex-end;gap:12px;pointer-events:auto}.ytomo-fab-container.z-normal{z-index:1000}.ytomo-fab-container.z-above-overlay{z-index:9001}.ytomo-fab-container.visible{display:flex}.ytomo-fab-container.hidden{display:none}.ytomo-fab-content{position:relative;display:flex;flex-direction:column-reverse;align-items:center;gap:8px;opacity:0;transform:scale(0.8) translateY(10px);transition:all .3s cubic-bezier(0.175, 0.885, 0.32, 1.275);pointer-events:none}.ytomo-fab-content.expanded{opacity:1;transform:scale(1) translateY(0);pointer-events:auto}.ytomo-sub-fab{width:45px;height:32px;border-radius:16px;background:rgba(0,104,33,.9);color:#fff;border:none;font-size:11px;font-weight:bold;cursor:pointer;transition:all .2s ease;box-shadow:0 2px 8px rgba(0,0,0,.3);display:flex;align-items:center;justify-content:center;pointer-events:auto}.ytomo-sub-fab:hover{background:rgba(2,134,43,.9);transform:scale(1.1);box-shadow:0 4px 12px rgba(0,0,0,.4)}.ytomo-sub-fab:active{transform:scale(0.95)}.ytomo-pavilion-fab-container{position:fixed;bottom:100px;right:24px;z-index:9001;display:flex;flex-direction:column;gap:12px;align-items:flex-end;pointer-events:auto}.ytomo-ticket-selection-fab-container{position:fixed;bottom:100px;right:24px;z-index:9001;display:flex;flex-direction:column;gap:12px;align-items:flex-end;pointer-events:auto}.ytomo-ticket-selection-fab-container.z-normal{z-index:1000}.ytomo-ticket-selection-fab-container.z-above-overlay{z-index:9001}.ytomo-ticket-selection-fab-container #ytomo-companion-sub-buttons{display:flex;flex-direction:column;gap:8px;align-items:flex-end;transition:all .3s ease}.ytomo-fab-inner-content{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;pointer-events:none}.ytomo-reservation-target-display{background:linear-gradient(135deg, rgba(0, 123, 255, 0.95), rgba(0, 86, 179, 0.95));color:#fff;padding:8px 12px;border-radius:12px;font-size:12px;font-weight:bold;text-align:center;box-shadow:0 3px 10px rgba(0,0,0,.3);border:2px solid hsla(0,0%,100%,.3);min-width:80px;max-width:120px;white-space:pre-line;overflow:visible;text-overflow:clip;transition:all .3s ease;pointer-events:auto;cursor:pointer}.ytomo-reservation-target-display:hover{transform:scale(1.05);box-shadow:0 4px 14px rgba(0,0,0,.4)}.ytomo-reservation-target-display.hidden{display:none}.ytomo-reservation-target-display.visible{display:block}input.ext-tomo.search{height:50px;min-width:200px;max-width:min(300px,100%);font-family:quicksand;font-size:16px;-webkit-appearance:textfield;-moz-appearance:textfield;appearance:textfield;border:1px solid #222426;border-radius:25px;box-shadow:0 1px 0 0 #ccc;padding:0 0 0 10px;flex:1 1}.day-reservation-info-area{position:relative;min-height:50px}.day-reservation-description{margin:10px 0;color:#666;font-size:14px;line-height:1.5;text-align:center}.day-reservation-description.hidden{display:none}.day-reservation-notification{margin:10px 0}.day-reservation-notification.hidden{display:none}.day-reservation-notification .notification-content{padding:12px 16px;border-radius:8px;font-size:14px;font-weight:500;display:flex;align-items:center;justify-content:space-between;min-height:24px;position:relative}.day-reservation-notification .notification-content .notification-message{flex:1;margin-left:8px;margin-right:8px}.day-reservation-notification .notification-content .notification-close{background:none;border:none;font-size:18px;font-weight:bold;cursor:pointer;padding:0;width:20px;height:20px;display:flex;align-items:center;justify-content:center;opacity:.7;transition:opacity .2s ease}.day-reservation-notification .notification-content .notification-close:hover{opacity:1}.day-reservation-notification .notification-content.success{background-color:#d4edda;color:#155724;border:1px solid #c3e6cb}.day-reservation-notification .notification-content.success .notification-close{color:#155724}.day-reservation-notification .notification-content.error{background-color:#f8d7da;color:#721c24;border:1px solid #f5c6cb}.day-reservation-notification .notification-content.error .notification-close{color:#721c24}.day-reservation-notification .notification-content.warning{background-color:#fff3cd;color:#856404;border:1px solid #ffeaa7}.day-reservation-notification .notification-content.warning .notification-close{color:#856404}.day-reservation-notification .notification-content.info{background-color:#d1ecf1;color:#0c5460;border:1px solid #bee5eb}.day-reservation-notification .notification-content.info .notification-close{color:#0c5460}.ytomo-icon.expand-icon{font-size:8px;line-height:1;color:#fff;font-weight:bold;text-align:center;pointer-events:none}.ytomo-icon.countdown-text{font-size:6px;line-height:1;color:#fff;font-weight:bold;text-align:center;margin-top:1px;pointer-events:none}.ytomo-toggle.toggle-li{position:fixed;bottom:10px;left:10px;z-index:1000;list-style:none;margin:0;padding:0}.ytomo-toggle.toggle-button{width:50px;height:30px;background:rgba(255,140,0,.8);border:none;border-radius:15px;cursor:pointer;transition:all .3s ease;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:bold;position:relative;overflow:hidden}.ytomo-toggle.toggle-button.enabled{color:#fff}.ytomo-toggle.toggle-button.disabled{color:#ddd}.ytomo-toggle.toggle-figure{width:100%;height:100%;margin:0;padding:0;border:none;background:rgba(0,0,0,0);pointer-events:none}.ytomo-dialog.overlay{position:fixed;top:0;left:0;width:100%;height:100%;background-color:rgba(0,0,0,.5);z-index:1000;display:flex;justify-content:center;align-items:center}.ytomo-dialog.container{background:#fff;border-radius:8px;padding:20px;max-width:400px;width:90%;max-height:70vh;overflow-y:auto;box-shadow:0 4px 12px rgba(0,0,0,.3)}.ytomo-dialog.container.day-reservation{max-width:600px;max-height:80vh}.ytomo-dialog.title{margin:0 0 16px 0;color:#333;font-size:18px;font-weight:bold}.ytomo-dialog.button-group{display:flex;justify-content:flex-end;gap:10px;margin-top:20px}.ytomo-dialog.primary-button{background:#006821;color:#fff;border:none;padding:10px 20px;border-radius:4px;cursor:pointer;font-size:14px}.ytomo-dialog.primary-button:hover{background:#02862b}.ytomo-dialog.primary-button:disabled{background:gray;cursor:not-allowed}.ytomo-dialog.secondary-button{background:rgba(0,0,0,0);color:#666;border:1px solid #ccc;padding:10px 20px;border-radius:4px;cursor:pointer;font-size:14px}.ytomo-dialog.secondary-button:hover{background:#f5f5f5}.ytomo-progress.counter{display:inline-block;margin-left:8px;padding:2px 6px;background:rgba(0,0,0,.3);border-radius:10px;font-size:10px;color:#fff;font-weight:bold}.ytomo-dialog.clear-selection-button{background:#dc3545;color:#fff;border:none;border-radius:20px;padding:8px 16px;font-size:14px;font-weight:bold;cursor:pointer;transition:all .2s ease;white-space:nowrap}.ytomo-dialog.clear-selection-button:hover{transform:translateY(-1px);box-shadow:0 4px 8px rgba(0,0,0,.2)}.ytomo-dialog.clear-selection-button:active{transform:translateY(0)}.ytomo-dialog.monitor-button{background:#fd7e14;color:#fff;border:none;border-radius:20px;padding:8px 16px;font-size:14px;font-weight:bold;cursor:pointer;transition:all .2s ease;white-space:nowrap}.ytomo-dialog.monitor-button:hover{transform:translateY(-1px);box-shadow:0 4px 8px rgba(0,0,0,.2)}.ytomo-dialog.monitor-button:active{transform:translateY(0)}.pavilion-name-row{display:flex;align-items:center;gap:8px;margin-bottom:8px}.pavilion-name-row .pavilion-name{flex:1;font-weight:bold;color:#333}.pavilion-select-all-btn{padding:2px 8px;font-size:11px;background-color:#007bff;color:#fff;border:none;border-radius:4px;cursor:pointer;transition:all .2s ease}.pavilion-select-all-btn:hover{background-color:#0056b3;transform:scale(1.05)}.pavilion-select-all-btn:active{transform:scale(0.95)}.ytomo-error-message{position:fixed;top:20px;right:20px;background:#f44;color:#fff;padding:15px;border-radius:5px;box-shadow:0 2px 10px rgba(0,0,0,.3);z-index:1001;max-width:300px;font-size:14px;line-height:1.4}.ytomo-error-message .error-title{font-weight:bold;margin-bottom:5px}.ytomo-error-message .error-close-btn{margin-top:10px;padding:5px 10px;background:hsla(0,0%,100%,.2);border:none;border-radius:3px;color:#fff;cursor:pointer;font-size:12px}.ytomo-error-message .error-close-btn:hover{background:hsla(0,0%,100%,.3)}.ytomo-flex-column-center{display:flex;flex-direction:column;align-items:center}.ytomo-brand-text{font-size:8px;font-weight:bold;margin-top:2px}.ytomo-dialog.overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;z-index:1000;padding:20px;box-sizing:border-box}.ytomo-dialog.container{background:#fff;border-radius:12px;padding:24px;max-width:800px;max-height:80vh;overflow-y:auto;box-shadow:0 10px 40px rgba(0,0,0,.3);width:100%}@media(max-width: 600px){.ytomo-dialog.container{padding-bottom:60px;max-height:85vh}}.ytomo-dialog.header{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;gap:8px}.ytomo-dialog.header .ytomo-dialog.title{flex-grow:1}.ytomo-dialog.title{margin:0;color:#333;font-size:24px;font-weight:bold}.ytomo-dialog.refresh-button{background:#006821;color:#fff;border:none;border-radius:50%;width:40px;height:40px;font-size:16px;cursor:pointer;transition:all .2s ease;display:flex;align-items:center;justify-content:center}.ytomo-dialog.refresh-button:hover{background:#02862b;transform:scale(1.1)}.ytomo-dialog.refresh-button:disabled{background:#ccc;cursor:not-allowed;transform:none}.ytomo-dialog.right-button-group{display:flex;gap:12px;align-items:center}.ytomo-dialog.available-only-toggle{background:#6c757d;color:#fff;border:none;border-radius:20px;padding:8px 16px;font-size:14px;font-weight:bold;cursor:pointer;transition:all .2s ease;white-space:nowrap}.ytomo-dialog.available-only-toggle.active{background:#006821;box-shadow:0 0 0 2px rgba(0,104,33,.3)}.ytomo-dialog.available-only-toggle:hover{transform:translateY(-1px);box-shadow:0 4px 8px rgba(0,0,0,.2)}.ytomo-dialog.available-only-toggle:disabled{background:#ccc;cursor:not-allowed;transform:none;box-shadow:none}.ytomo-dialog.button-group{display:flex;gap:12px;justify-content:space-between;margin-top:24px}.ytomo-dialog.secondary-button{background:#6c757d;color:#fff;border:none;border-radius:20px;padding:8px 16px;font-size:14px;font-weight:bold;cursor:pointer;transition:all .2s ease;white-space:nowrap}.ytomo-dialog.secondary-button:hover{transform:translateY(-1px);box-shadow:0 4px 8px rgba(0,0,0,.2)}.ytomo-dialog.monitor-button{background:#fd7e14;color:#fff;border:none;border-radius:20px;padding:8px 16px;font-size:14px;font-weight:bold;cursor:pointer;transition:all .2s ease;white-space:nowrap}.ytomo-dialog.monitor-button:hover{transform:translateY(-1px);box-shadow:0 4px 8px rgba(0,0,0,.2)}.day-reservation-description{color:#666;line-height:1.6;margin:0 0 20px 0}.pavilion-list{max-height:400px;overflow-y:auto;border:1px solid #ddd;border-radius:4px;margin-bottom:16px}.pavilion-list-empty{padding:20px;text-align:center;color:#666}.pavilion-item{display:flex;justify-content:space-between;align-items:center;padding:12px;border-bottom:1px solid #eee;transition:background-color .2s;cursor:pointer}.pavilion-item:hover{background-color:#f5f5f5}.pavilion-item:last-child{border-bottom:none}.pavilion-item.monitored{background-color:rgba(253,126,20,.1);border-left:4px solid #fd7e14}.pavilion-item.monitored:hover{background-color:rgba(253,126,20,.15)}.pavilion-info{flex:1}.pavilion-info .pavilion-name{font-weight:bold;margin-bottom:4px}.pavilion-info .pavilion-time-slots{font-size:12px;color:#666;display:flex;flex-wrap:wrap;gap:8px;margin-top:8px;max-width:100%}@media(max-width: 600px){.pavilion-info .pavilion-time-slots{gap:6px;margin-top:6px}}.pavilion-info .pavilion-time-slots .pavilion-time-slot{font-size:12px;padding:4px 8px;border-radius:6px;border:1px solid rgba(0,0,0,0);min-width:60px;text-align:center;white-space:nowrap}@media(max-width: 600px){.pavilion-info .pavilion-time-slots .pavilion-time-slot{font-size:11px;padding:3px 6px;min-width:55px}}@media(max-width: 400px){.pavilion-info .pavilion-time-slots .pavilion-time-slot{font-size:10px;padding:2px 4px;min-width:50px}}.pavilion-info .pavilion-time-slots .pavilion-time-slot.clickable{background:rgba(0,0,0,0);border-color:#dee2e6;cursor:pointer;transition:all .2s ease}.pavilion-info .pavilion-time-slots .pavilion-time-slot.clickable:hover:not(.selected){background:#f8f9fa;border-color:#adb5bd;transform:translateY(-1px);box-shadow:0 2px 4px rgba(0,0,0,.1)}.pavilion-info .pavilion-time-slots .pavilion-time-slot.clickable:active{transform:translateY(0);box-shadow:0 1px 2px rgba(0,0,0,.1)}.pavilion-info .pavilion-time-slots .pavilion-time-slot.clickable.selected{background:rgba(0,104,33,.25);border-color:#006821;border-width:2px;color:#006821;font-weight:bold}@media(max-width: 600px){.pavilion-info .pavilion-time-slots .pavilion-time-slot.clickable.selected{background:rgba(0,104,33,.35);border-width:3px}}.pavilion-info .pavilion-time-slots .pavilion-time-slot.clickable.selected:hover{background:rgba(0,104,33,.3)}@media(max-width: 600px){.pavilion-info .pavilion-time-slots .pavilion-time-slot.clickable.selected:hover{background:rgba(0,104,33,.4)}}.pavilion-info .pavilion-time-slots .pavilion-time-slot.clickable.selected:active{background:rgba(0,104,33,.35)}@media(max-width: 600px){.pavilion-info .pavilion-time-slots .pavilion-time-slot.clickable.selected:active{background:rgba(0,104,33,.45)}}.pavilion-info .pavilion-time-slots .pavilion-time-slot.clickable.unavailable{background:rgba(0,0,0,0);border-color:#ffc107;color:#dc6c00}.pavilion-info .pavilion-time-slots .pavilion-time-slot.clickable.unavailable:hover:not(.selected){background:#fff3cd;border-color:#ffb300;transform:translateY(-1px);box-shadow:0 2px 4px rgba(255,193,7,.2)}.pavilion-info .pavilion-time-slots .pavilion-time-slot.clickable.unavailable.selected{background:rgba(255,193,7,.35);border-color:#ffc107;border-width:2px;color:#dc6c00;font-weight:bold}@media(max-width: 600px){.pavilion-info .pavilion-time-slots .pavilion-time-slot.clickable.unavailable.selected{background:rgba(255,193,7,.45);border-width:3px}}.pavilion-info .pavilion-time-slots .pavilion-time-slot.clickable.unavailable.selected:hover{background:rgba(255,193,7,.4)}@media(max-width: 600px){.pavilion-info .pavilion-time-slots .pavilion-time-slot.clickable.unavailable.selected:hover{background:rgba(255,193,7,.5)}}.pavilion-info .pavilion-time-slots .pavilion-time-slot.clickable.unavailable.selected:active{background:rgba(255,193,7,.45)}@media(max-width: 600px){.pavilion-info .pavilion-time-slots .pavilion-time-slot.clickable.unavailable.selected:active{background:rgba(255,193,7,.55)}}.pavilion-button-area{display:flex;gap:8px;align-items:center}.pavilion-button-area .pavilion-reserve-button{padding:8px 16px;background-color:#006821;color:#fff;border:none;border-radius:4px;cursor:pointer;font-size:12px;transition:background-color .2s;white-space:nowrap}.pavilion-button-area .pavilion-reserve-button:hover:not(:disabled){background-color:#02862b}.pavilion-button-area .pavilion-reserve-button:disabled{background:#ccc;color:#666;cursor:not-allowed}.pavilion-button-area .pavilion-monitor-checkbox{margin-right:12px;transform:scale(1.2);accent-color:#fd7e14;flex-shrink:0}.pavilion-button-area .pavilion-no-slots{font-size:12px;color:#999}.ytomo-global-notification-container{position:fixed;top:20px;right:20px;z-index:2000;max-width:400px;width:100%;display:flex;flex-direction:column;gap:10px}@media(max-width: 600px){.ytomo-global-notification-container{top:10px;right:10px;left:10px;max-width:none}}.ytomo-global-notification{background:#fff;border-radius:8px;padding:16px;box-shadow:0 4px 12px rgba(0,0,0,.15);border-left:4px solid #ccc;display:flex;align-items:center;gap:12px;font-size:14px;font-weight:500;transform:translateX(100%);opacity:0;transition:all .3s ease}.ytomo-global-notification.show{transform:translateX(0);opacity:1}.ytomo-global-notification.hide{transform:translateX(100%);opacity:0}.ytomo-global-notification .notification-message{flex:1;line-height:1.4}.ytomo-global-notification .notification-close{background:none;border:none;font-size:18px;font-weight:bold;cursor:pointer;padding:0;width:20px;height:20px;display:flex;align-items:center;justify-content:center;opacity:.7;transition:opacity .2s ease}.ytomo-global-notification .notification-close:hover{opacity:1}.ytomo-global-notification.success{background-color:#d4edda;color:#155724;border-left-color:#28a745}.ytomo-global-notification.success .notification-close{color:#155724}.ytomo-global-notification.error{background-color:#f8d7da;color:#721c24;border-left-color:#dc3545}.ytomo-global-notification.error .notification-close{color:#721c24}.ytomo-global-notification.warning{background-color:#fff3cd;color:#856404;border-left-color:#ffc107}.ytomo-global-notification.warning .notification-close{color:#856404}.ytomo-global-notification.info{background-color:#d1ecf1;color:#0c5460;border-left-color:#17a2b8}.ytomo-global-notification.info .notification-close{color:#0c5460}.ytomo-processing-overlay{position:fixed;top:0;left:0;right:0;bottom:0;width:100vw;height:100vh;background:rgba(0,0,0,.3);z-index:9000;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(1px);transition:all .3s ease;pointer-events:auto}.ytomo-processing-overlay.z-normal{z-index:9000}.ytomo-processing-overlay.z-below-fab{z-index:8999}.ytomo-processing-overlay.hidden{opacity:0;visibility:hidden;pointer-events:none}.ytomo-processing-overlay.visible{opacity:1;visibility:visible;pointer-events:auto}.ytomo-processing-overlay .processing-message-area{background:hsla(0,0%,100%,.95);border-radius:12px;padding:24px 32px;text-align:center;box-shadow:0 8px 32px rgba(0,0,0,.3);border:2px solid rgba(255,140,0,.3);max-width:400px;margin:20px}@media(max-width: 768px){.ytomo-processing-overlay .processing-message-area{padding:20px 24px;margin:16px;max-width:90vw}}.ytomo-processing-overlay .processing-message-text{font-size:20px;font-weight:bold;color:#333;margin-bottom:8px;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}@media(max-width: 768px){.ytomo-processing-overlay .processing-message-text{font-size:18px;margin-bottom:6px}}.ytomo-processing-overlay .processing-target-text{font-size:16px;font-weight:600;color:#333;margin-bottom:12px;white-space:pre-line;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;text-align:center}@media(max-width: 768px){.ytomo-processing-overlay .processing-target-text{font-size:14px;margin-bottom:10px}}.ytomo-processing-overlay .processing-countdown-text{font-size:18px;font-weight:bold;color:#e67e00;margin-bottom:12px;font-family:"SF Mono","Monaco","Consolas",monospace;text-align:center;text-shadow:0 1px 2px rgba(0,0,0,.1)}@media(max-width: 768px){.ytomo-processing-overlay .processing-countdown-text{font-size:16px;margin-bottom:10px}}.ytomo-processing-overlay .processing-countdown-text.countdown-warning{color:#dc3545;animation:countdownPulse 1s ease-in-out infinite;text-shadow:0 0 8px rgba(220,53,69,.4)}.ytomo-processing-overlay .processing-warning-text{font-size:14px;color:#666;margin-bottom:16px;line-height:1.4;transition:all .3s ease}@media(max-width: 768px){.ytomo-processing-overlay .processing-warning-text{font-size:13px;margin-bottom:14px}}.ytomo-processing-overlay .processing-warning-text.warning-flash{color:#dc3545;font-weight:bold;transform:scale(1.05);animation:flash .5s ease-in-out 2}.ytomo-processing-overlay .notification-toggle-btn{display:flex;align-items:center;justify-content:center;width:40px;height:40px;border:none;border-radius:50%;cursor:pointer;transition:all .2s ease;margin-bottom:16px;box-shadow:0 2px 6px rgba(0,0,0,.15);font-size:20px;line-height:1}@media(max-width: 768px){.ytomo-processing-overlay .notification-toggle-btn{width:36px;height:36px;margin-bottom:14px;font-size:18px}}.ytomo-processing-overlay .notification-toggle-btn:hover{transform:scale(1.05);box-shadow:0 4px 10px rgba(0,0,0,.2)}.ytomo-processing-overlay .notification-toggle-btn:active{transform:scale(0.95)}.ytomo-processing-overlay .notification-toggle-btn.enabled{background:#4caf50;color:#fff}.ytomo-processing-overlay .notification-toggle-btn.enabled:hover{background:#45a049}.ytomo-processing-overlay .notification-toggle-btn.muted{background:#f44336;color:#fff}.ytomo-processing-overlay .notification-toggle-btn.muted:hover{background:#e53935}.ytomo-processing-overlay .processing-cancel-area{font-size:12px;color:#888;font-style:italic}@media(max-width: 768px){.ytomo-processing-overlay .processing-cancel-area{font-size:11px}}@keyframes flash{0%,100%{opacity:1}50%{opacity:.7}}@keyframes countdownPulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.8;transform:scale(1.05)}}.ytomo-processing-overlay.efficiency-mode .processing-message-area{border-color:rgba(255,140,0,.5);background:linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(255, 248, 220, 0.95))}.ytomo-processing-overlay.efficiency-mode .processing-message-text{color:#e67e00}.ytomo-processing-overlay.monitoring-mode .processing-message-area{border-color:rgba(0,104,33,.5);background:linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(240, 255, 240, 0.95))}.ytomo-processing-overlay.monitoring-mode .processing-message-text{color:#004d1a}@media(prefers-reduced-motion: reduce){.ytomo-processing-overlay{transition:none}.ytomo-processing-overlay .processing-warning-text.warning-flash{animation:none;transform:none}}.ytomo-dialog.overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.7);z-index:1000;display:flex;align-items:center;justify-content:center;padding:20px;box-sizing:border-box}.ytomo-dialog.container.debug-dialog{background:#fff;border-radius:12px;padding:0;max-width:90%;max-height:85%;min-width:600px;box-shadow:0 8px 32px rgba(0,0,0,.3);display:flex;flex-direction:column;overflow:hidden}@media(max-width: 768px){.ytomo-dialog.container.debug-dialog{min-width:auto;max-width:95%;max-height:90%}}.ytomo-dialog.header{display:flex;align-items:center;justify-content:space-between;padding:20px 24px;border-bottom:1px solid #e0e0e0;background:#f8f9fa;border-radius:12px 12px 0 0}.ytomo-dialog.title{margin:0;font-size:20px;color:#333;font-weight:600}.ytomo-dialog.close-button{background:none;border:none;font-size:24px;cursor:pointer;color:#666;padding:5px;border-radius:4px}.ytomo-dialog.close-button:hover{background:rgba(0,0,0,.1)}.debug-content{padding:24px;overflow-y:auto;flex:1}.debug-section{margin-bottom:32px}.debug-section:last-child{margin-bottom:0}.debug-section h3{margin:0 0 12px 0;font-size:18px;color:#333;font-weight:600}.debug-section p{margin:0 0 16px 0;color:#666;line-height:1.5}.debug-input-group{display:flex;align-items:center;gap:12px;margin-bottom:20px;flex-wrap:wrap}.debug-input-group label{font-weight:500;color:#333;min-width:120px}.debug-input-group input{flex:1;min-width:200px;padding:10px 12px;border:2px solid #e0e0e0;border-radius:6px;font-size:14px;transition:border-color .2s ease}.debug-input-group input:focus{outline:none;border-color:#007bff}.debug-input-group input::placeholder{color:#999}.debug-input-group button{background:#007bff;color:#fff;border:none;padding:10px 20px;border-radius:6px;font-size:14px;font-weight:500;cursor:pointer;transition:background-color .2s ease;white-space:nowrap}.debug-input-group button:hover:not(:disabled){background:#0056b3}.debug-input-group button:disabled{background:#6c757d;cursor:not-allowed}.debug-results-area h4{margin:0 0 12px 0;font-size:16px;color:#333;font-weight:600}.debug-results-display{background:#f8f9fa;border:1px solid #e0e0e0;border-radius:6px;padding:16px;font-family:"Courier New",Monaco,monospace;font-size:12px;line-height:1.4;max-height:300px;overflow-y:auto;white-space:pre-wrap;word-wrap:break-word;color:#333}.debug-results-display .json-key{color:#d73a49;font-weight:bold}.debug-results-display .json-string{color:#032f62}.debug-results-display .json-number{color:#005cc5}.debug-results-display .json-boolean{color:#e36209}.debug-results-display .json-null{color:#6f42c1}@media(max-width: 768px){.debug-input-group{flex-direction:column;align-items:stretch}.debug-input-group label{min-width:auto}.debug-input-group input{min-width:auto}.debug-input-group button{align-self:flex-start}.ytomo-dialog.container.debug-dialog{min-width:auto}.debug-content{padding:16px}}.ytomo-dialog.overlay{animation:fadeIn .2s ease-out}.ytomo-dialog.container.debug-dialog{animation:slideIn .3s ease-out}@keyframes fadeIn{from{opacity:0}to{opacity:1}}@keyframes slideIn{from{opacity:0;transform:translateY(-20px) scale(0.95)}to{opacity:1;transform:translateY(0) scale(1)}}.ytomo-processing-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background-color:rgba(0,0,0,.3);display:flex;align-items:center;justify-content:center;z-index:1001;pointer-events:auto;overflow-y:auto}.ytomo-processing-content{background:hsla(0,0%,100%,.7);border-radius:12px;padding:30px;text-align:center;box-shadow:0 10px 40px rgba(0,0,0,.2);min-width:200px;pointer-events:auto;backdrop-filter:blur(1px)}.ytomo-processing-spinner{width:40px;height:40px;border:3px solid #e2e8f0;border-top-color:#2c5aa0;border-radius:50%;animation:spin 1s linear infinite;margin:0 auto 16px}.ytomo-processing-message{color:#374151;font-size:14px;font-weight:500}@keyframes spin{to{transform:rotate(360deg)}}.ytomo-input{flex:1;padding:8px 12px;border:1px solid #d1d5db;border-radius:6px;font-size:14px;transition:border-color .2s}.ytomo-input:focus{outline:none;border-color:#2c5aa0;box-shadow:0 0 0 3px rgba(44,90,160,.1)}.ytomo-input::placeholder{color:#9ca3af}.ytomo-button{padding:8px 16px;border:none;border-radius:6px;font-size:14px;font-weight:500;cursor:pointer;transition:all .2s;display:inline-flex;align-items:center;justify-content:center;white-space:nowrap}.ytomo-button.primary{background:linear-gradient(135deg, #2c5aa0 0%, #1a365d 100%);color:#fff}.ytomo-button.primary:hover{background:linear-gradient(135deg, #1a365d 0%, #2c5aa0 100%);transform:translateY(-1px);box-shadow:0 4px 12px rgba(44,90,160,.3)}.ytomo-button.primary:active{transform:translateY(0)}.ytomo-button.retry-button{background:linear-gradient(135deg, #f59e0b 0%, #d97706 100%);color:#fff;margin-top:12px}.ytomo-button.retry-button:hover{background:linear-gradient(135deg, #d97706 0%, #f59e0b 100%)}.ytomo-button:focus{outline:2px solid #2c5aa0;outline-offset:2px}.ytomo-button:disabled{opacity:.5;cursor:not-allowed;transform:none !important}@media(prefers-reduced-motion: reduce){.ytomo-button,.ytomo-input{animation:none;transition:none}}@media(prefers-contrast: high){.ytomo-button:focus,.ytomo-input:focus{outline:3px solid #000}}.ytomo-loading-container{width:100%;max-width:800px;margin:20px auto;padding:20px;display:flex;align-items:center;justify-content:center;min-height:400px}.ytomo-loading-content{text-align:center;display:flex;flex-direction:column;align-items:center;gap:20px}.ytomo-loading-spinner{width:40px;height:40px;border:3px solid #f3f4f6;border-top:3px solid #2c5aa0;border-radius:50%;animation:spin 1s linear infinite}.ytomo-loading-text{font-size:16px;color:#6b7280;font-weight:500}@keyframes spin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}#ytomo-page-dialog-container .ytomo-dialog-overlay{position:relative !important;background:rgba(0,0,0,0) !important;width:100% !important;height:auto !important;display:block !important;max-width:800px;margin:20px auto;padding:20px;z-index:auto !important}#ytomo-page-dialog-container .ytomo-main-dialog{position:relative !important;transform:none !important;margin:0 !important;box-shadow:0 10px 40px rgba(0,0,0,.1) !important;border:1px solid #e2e8f0 !important;min-width:auto !important;width:100% !important;max-width:none !important;z-index:auto !important}#ytomo-page-dialog-container *{z-index:auto !important}table[class*=style_main__timetable__] td[data-gray-out] div[role=button][data-disabled=true]{pointer-events:auto !important;cursor:pointer !important}#ot-sdk-btn-floating{display:none !important}header{z-index:10000 !important}.ytomo-main-fab{position:fixed;bottom:80px;right:20px;width:56px;height:56px;border-radius:50%;background-color:#ff6b35;color:#fff;border:none;font-size:16px;font-weight:bold;cursor:pointer;box-shadow:0 2px 10px rgba(0,0,0,.3);transition:all .2s ease;z-index:999}.ytomo-main-fab:hover{transform:scale(1.1);box-shadow:0 4px 15px rgba(0,0,0,.4)}.ytomo-main-fab:disabled{opacity:.5;cursor:not-allowed;transform:none;box-shadow:0 2px 10px rgba(0,0,0,.3)}.ytomo-main-fab:focus{outline:none}.ytomo-dialog-overlay~.ytomo-main-fab{display:none}.ytomo-dialog-overlay *:focus{outline:none !important;box-shadow:none !important}.ytomo-pavilion-search-input:focus{outline:none !important;border:1px solid #2c5aa0 !important;box-shadow:none !important}.ytomo-reservation-result{position:fixed;bottom:80px;right:90px;min-width:180px;padding:12px 16px;border-radius:8px;color:#fff;font-size:12px;font-weight:500;z-index:9001;box-shadow:0 4px 12px rgba(0,0,0,.3);animation:slideIn .3s ease-out}.ytomo-reservation-result.success{background-color:#10b981}.ytomo-reservation-result.failed{background-color:#ef4444}.ytomo-reservation-result .ytomo-result-status{font-weight:700;font-size:14px;margin-bottom:6px;text-shadow:0 1px 2px rgba(0,0,0,.2)}.ytomo-reservation-result .ytomo-result-pavilion{font-weight:500;font-size:11px;margin-bottom:4px;text-shadow:0 1px 1px rgba(0,0,0,.1);opacity:.9}.ytomo-reservation-result .ytomo-result-time{font-size:15px;font-weight:600;opacity:1;text-shadow:0 1px 2px rgba(0,0,0,.15)}@keyframes slideIn{from{opacity:0;transform:translateX(20px)}to{opacity:1;transform:translateX(0)}}`, ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -31171,28 +30423,6 @@ registerRuntimeCompiler(compileToFunction);
 
 /***/ }),
 
-/***/ 438:
-/***/ ((module, __webpack_exports__, __webpack_require__) => {
-
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   A: () => (__WEBPACK_DEFAULT_EXPORT__)
-/* harmony export */ });
-/* harmony import */ var _node_modules_css_loader_dist_runtime_noSourceMaps_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(601);
-/* harmony import */ var _node_modules_css_loader_dist_runtime_noSourceMaps_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_css_loader_dist_runtime_noSourceMaps_js__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(314);
-/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1__);
-// Imports
-
-
-var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1___default()((_node_modules_css_loader_dist_runtime_noSourceMaps_js__WEBPACK_IMPORTED_MODULE_0___default()));
-// Module
-___CSS_LOADER_EXPORT___.push([module.id, `.ytomo-pavilion-tab[data-v-2d755553]{padding:0 8px 20px 8px;height:100%;display:flex;flex-direction:column;gap:16px;overflow-y:auto;color-scheme:light}.ytomo-search-controls[data-v-2d755553]{background:#fff;border-radius:8px;padding:12px;box-shadow:0 1px 3px rgba(0,0,0,.1);border:1px solid #e2e8f0;flex-shrink:0;display:flex;gap:12px;align-items:center}@media(max-width: 600px){.ytomo-search-controls[data-v-2d755553]{flex-direction:column;align-items:stretch;gap:12px}}.ytomo-search-input-container[data-v-2d755553]{flex:1}.ytomo-search-input[data-v-2d755553]{width:100%;padding:10px 16px;border:1px solid #d1d5db;border-radius:8px;font-size:14px;transition:all .2s}.ytomo-search-input[data-v-2d755553]:focus{outline:none;border-color:#2c5aa0}.ytomo-search-input[data-v-2d755553]::placeholder{color:#9ca3af}.ytomo-control-buttons[data-v-2d755553]{display:flex;gap:8px;flex-shrink:0}@media(max-width: 600px){.ytomo-control-buttons[data-v-2d755553]{justify-content:center}}.ytomo-icon-button[data-v-2d755553]{width:40px;height:40px;border:1px solid #d1d5db;border-radius:8px;background:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s;font-size:16px;position:relative}.ytomo-icon-button[data-v-2d755553]:hover{background:#f3f4f6;border-color:#9ca3af;transform:translateY(-1px)}.ytomo-icon-button[data-v-2d755553]:active{transform:translateY(0)}.ytomo-icon-button.active[data-v-2d755553]{background:#2c5aa0;border-color:#2c5aa0;color:#fff}.ytomo-icon-button.active[data-v-2d755553]:hover{background:#1a365d}.ytomo-icon-button .ytomo-count-badge[data-v-2d755553]{position:absolute;top:-8px;right:-8px;background:#f44;color:#fff;border-radius:10px;padding:2px 6px;font-size:10px;font-weight:bold;min-width:16px;text-align:center;line-height:1.2;pointer-events:none;z-index:10}.ytomo-icon-button[data-v-2d755553]:focus{outline:none}.ytomo-icon-button span[data-v-2d755553]{display:block;line-height:1}.ytomo-pavilion-list[data-v-2d755553]{flex:1;background:#fff;border-radius:8px;border:1px solid #e2e8f0}.ytomo-pavilion-item[data-v-2d755553]{background:#fff;border-bottom:1px solid #f1f5f9;transition:all .2s;color:#374151}.ytomo-pavilion-item[data-v-2d755553]:last-child{border-bottom:none}.ytomo-pavilion-item[data-v-2d755553]:hover{background:#f8fafc}.ytomo-pavilion-item.hidden[data-v-2d755553]{display:none}.ytomo-pavilion-header[data-v-2d755553]{display:flex;align-items:center;gap:12px;padding:16px;cursor:pointer}.ytomo-star-button[data-v-2d755553]{background:none;border:none;font-size:18px;cursor:pointer;transition:background-color .2s;padding:4px;border-radius:4px;width:26px;height:26px;display:flex;align-items:center;justify-content:center;flex-shrink:0}.ytomo-star-button[data-v-2d755553]:hover{background:rgba(255,193,7,.1)}.ytomo-star-button.favorite[data-v-2d755553]{color:#ffc107}.ytomo-star-button[data-v-2d755553]:focus{outline:none}.ytomo-pavilion-checkbox-container[data-v-2d755553]{display:flex;align-items:center;cursor:pointer}.ytomo-pavilion-checkbox[data-v-2d755553]{width:16px;height:16px;cursor:pointer}.ytomo-pavilion-name[data-v-2d755553]{flex:1;font-size:15px;font-weight:500;color:#374151;line-height:1.4}.ytomo-pavilion-status[data-v-2d755553]{display:flex;align-items:center;gap:8px}.ytomo-status-available[data-v-2d755553]{background:#dcfce7;color:#166534;padding:4px 8px;border-radius:12px;font-size:12px;font-weight:600}.ytomo-status-full[data-v-2d755553]{background:#fef2f2;color:#991b1b;padding:4px 8px;border-radius:12px;font-size:12px;font-weight:600}.ytomo-expand-button[data-v-2d755553]{background:none;border:none;font-size:12px;color:#6b7280;cursor:pointer;padding:4px 8px;border-radius:4px;transition:all .2s}.ytomo-expand-button[data-v-2d755553]:hover{background:#f3f4f6;color:#374151}.ytomo-expand-button.expanded[data-v-2d755553]{background:#e2e8f0;color:#374151}.ytomo-expand-button[data-v-2d755553]:focus{outline:none}.ytomo-time-slots[data-v-2d755553]{padding:0 16px 16px 16px;display:flex;flex-wrap:wrap;gap:8px;transition:all .3s ease}.ytomo-time-slots.hidden[data-v-2d755553]{display:none}.ytomo-time-slot-button[data-v-2d755553]{padding:6px 10px;border-radius:6px;font-size:12px;font-weight:500;cursor:pointer;transition:all .2s;border:1px solid;min-width:70px;text-align:center;display:inline-block}.ytomo-time-slot-button[data-v-2d755553] *{pointer-events:none}.ytomo-time-slot-button.available[data-v-2d755553]{background:#dcfce7;border-color:#22c55e;color:#166534}.ytomo-time-slot-button.available[data-v-2d755553]:hover{background:#bbf7d0;color:#166534;transform:translateY(-1px);box-shadow:0 2px 8px rgba(34,197,94,.3)}.ytomo-time-slot-button.available.selected[data-v-2d755553]{background:#22c55e;color:#fff;box-shadow:0 2px 8px rgba(34,197,94,.3)}.ytomo-time-slot-button.unavailable[data-v-2d755553]{background:#fef2f2;border-color:#ef4444;color:#991b1b;cursor:pointer;opacity:1}.ytomo-time-slot-button.unavailable[data-v-2d755553]:hover{background:#fecaca;color:#991b1b;transform:translateY(-1px);box-shadow:0 2px 8px rgba(239,68,68,.3)}.ytomo-time-slot-button.unavailable.selected[data-v-2d755553]{background:#ef4444;color:#fff;box-shadow:0 2px 8px rgba(239,68,68,.3)}.ytomo-time-slot-button.rate-limited[data-v-2d755553]{background:#f3f4f6;border-color:#9ca3af;color:#6b7280;cursor:not-allowed;opacity:.6}.ytomo-time-slot-button.rate-limited[data-v-2d755553]:hover{background:#f3f4f6;color:#6b7280;transform:none;box-shadow:none}.ytomo-time-slot-button.rate-limited[data-v-2d755553]:disabled{cursor:not-allowed;pointer-events:none}.ytomo-time-slot-button[data-v-2d755553]:focus{outline:none}.ytomo-time-slot-button[data-v-2d755553]:disabled{background:#f3f4f6;border-color:#d1d5db;color:#9ca3af;cursor:not-allowed;opacity:.6;pointer-events:none}.ytomo-time-slot-button[data-v-2d755553]:disabled:hover{background:#f3f4f6;color:#9ca3af;transform:none;box-shadow:none}.ytomo-time-slot-button.hidden[data-v-2d755553]{display:none}.ytomo-reservation-controls[data-v-2d755553]{background:#fff;border-radius:8px;padding:16px;box-shadow:0 1px 3px rgba(0,0,0,.1);border:1px solid #e2e8f0;flex-shrink:0;display:flex;align-items:center;gap:16px;position:relative}@media(max-width: 600px){.ytomo-reservation-controls[data-v-2d755553]{flex-direction:column;align-items:stretch;gap:12px}}.ytomo-selected-info[data-v-2d755553]{flex:1;font-size:14px;color:#374151;font-weight:500}@media(max-width: 600px){.ytomo-selected-info[data-v-2d755553]{text-align:center}}.ytomo-reservation-controls .ytomo-button[data-v-2d755553]{padding:10px 20px;font-weight:600;white-space:nowrap}@media(max-width: 600px){.ytomo-reservation-controls .ytomo-button[data-v-2d755553]{width:100%}}#ot-sdk-btn-floating[data-v-2d755553]{display:none !important}.ytomo-result-display[data-v-2d755553]{position:fixed;top:20px;right:20px;padding:8px 12px;border-radius:6px;font-size:13px;font-weight:500;opacity:0;transform:translateY(-10px);transition:all .3s;pointer-events:none;max-width:300px;z-index:10001;display:none}.ytomo-result-display.ytomo-visible[data-v-2d755553]{display:block}.ytomo-result-display.show[data-v-2d755553]{opacity:1;transform:translateY(0)}.ytomo-result-display.success[data-v-2d755553]{background:#22c55e;color:#fff}.ytomo-result-display.error[data-v-2d755553]{background:#ef4444;color:#fff}.ytomo-result-display.info[data-v-2d755553]{background:#3b82f6;color:#fff}@media(max-width: 600px){.ytomo-result-display[data-v-2d755553]{position:static;transform:none;margin:8px 0 0 0;text-align:center}}.ytomo-pavilion-tab .ytomo-empty-state[data-v-2d755553],.ytomo-pavilion-tab .ytomo-error[data-v-2d755553]{padding:40px 20px;text-align:center}.ytomo-pavilion-tab .ytomo-empty-state p[data-v-2d755553]{margin:0;color:#6b7280;font-size:14px}.ytomo-pavilion-tab .ytomo-error p[data-v-2d755553]{margin:0;color:#dc2626;font-size:14px}.ytomo-pavilion-tab .ytomo-loading[data-v-2d755553]{height:150px}.ytomo-pavilion-list[data-v-2d755553]::-webkit-scrollbar{width:6px}.ytomo-pavilion-list[data-v-2d755553]::-webkit-scrollbar-track{background:#f1f5f9;border-radius:3px}.ytomo-pavilion-list[data-v-2d755553]::-webkit-scrollbar-thumb{background:#cbd5e1;border-radius:3px}.ytomo-pavilion-list[data-v-2d755553]::-webkit-scrollbar-thumb:hover{background:#94a3b8}.ytomo-selected-dates-display[data-v-2d755553]{background:#fff;border-radius:8px;padding:10px 16px;box-shadow:0 1px 3px rgba(0,0,0,.1);border:1px solid #e2e8f0;flex-shrink:0;min-height:36px;display:flex;align-items:center}.ytomo-selected-dates-content[data-v-2d755553]{display:flex;align-items:center;gap:8px;width:100%}.ytomo-dates-label[data-v-2d755553]{font-size:14px;font-weight:600;color:#374151;flex-shrink:0}.ytomo-dates-text[data-v-2d755553]{font-size:14px;color:#2c5aa0;font-weight:500}.ytomo-dates-text[data-v-2d755553]:empty::before{content:"なし";color:#9ca3af;font-style:italic}.ytomo-status-fab[data-v-2d755553]{position:fixed;bottom:86px;right:20px;min-width:120px;min-height:50px;border:none;border-radius:6px;color:#fff;font-size:11px;font-weight:500;cursor:pointer;box-shadow:0 4px 12px rgba(0,0,0,.3);transition:all .3s ease;z-index:1001;display:none;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:8px 12px;line-height:1.2}.ytomo-status-fab.ytomo-visible[data-v-2d755553]{display:flex}.ytomo-status-fab.success[data-v-2d755553]{background:linear-gradient(135deg, #22c55e 0%, #16a34a 100%);box-shadow:0 4px 12px rgba(34,197,94,.4)}.ytomo-status-fab.error[data-v-2d755553]{background:linear-gradient(135deg, #ef4444 0%, #dc2626 100%);box-shadow:0 4px 12px rgba(239,68,68,.4)}.ytomo-status-fab.info[data-v-2d755553]{background:linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);box-shadow:0 4px 12px rgba(59,130,246,.4)}.ytomo-status-fab[data-v-2d755553]:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 6px 16px rgba(0,0,0,.4)}.ytomo-status-fab[data-v-2d755553]:active:not(:disabled){transform:translateY(0)}.ytomo-status-fab[data-v-2d755553]:focus{outline:none}.ytomo-reservation-fab[data-v-2d755553]{position:fixed;bottom:80px;right:20px;width:56px;height:56px;background:linear-gradient(135deg, #2c5aa0 0%, #1a365d 100%);border:none;border-radius:28px;color:#fff;font-size:24px;cursor:pointer;box-shadow:0 4px 16px rgba(44,90,160,.3);transition:all .3s ease;z-index:10003;display:flex;align-items:center;justify-content:center}.ytomo-reservation-fab .ytomo-count-badge[data-v-2d755553]{position:absolute;top:-8px;right:-8px;background:#f44;color:#fff;border-radius:10px;padding:2px 6px;font-size:10px;font-weight:bold;min-width:16px;text-align:center;line-height:1.2;pointer-events:none;z-index:10}.ytomo-reservation-fab[data-v-2d755553]:hover:not(:disabled){background:linear-gradient(135deg, #1a365d 0%, #2c5aa0 100%);transform:translateY(-2px);box-shadow:0 6px 20px rgba(44,90,160,.4)}.ytomo-reservation-fab[data-v-2d755553]:active:not(:disabled){transform:translateY(0);box-shadow:0 2px 8px rgba(44,90,160,.3)}.ytomo-reservation-fab[data-v-2d755553]:disabled{background:#94a3b8;cursor:not-allowed;box-shadow:0 2px 8px rgba(148,163,184,.3);opacity:.8;display:flex}.ytomo-reservation-fab[data-v-2d755553]:focus{outline:none}.ytomo-reservation-fab.abort-mode[data-v-2d755553]{background:linear-gradient(135deg, #dc2626 0%, #991b1b 100%);font-size:14px;font-weight:bold}.ytomo-reservation-fab.abort-mode[data-v-2d755553]:hover:not(:disabled){background:linear-gradient(135deg, #991b1b 0%, #7f1d1d 100%)}.ytomo-endless-toggle[data-v-2d755553]{position:fixed;bottom:156px;right:20px;width:40px;height:32px;background:#6b7280;border:none;border-radius:16px;color:#fff;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.3);transition:all .2s ease;z-index:10003;display:flex;align-items:center;justify-content:center}.ytomo-endless-toggle.active[data-v-2d755553]{background:#ff8c00;box-shadow:0 2px 8px rgba(255,140,0,.4)}.ytomo-endless-toggle[data-v-2d755553]:hover{transform:translateY(-1px);box-shadow:0 4px 12px rgba(0,0,0,.4)}.ytomo-endless-toggle[data-v-2d755553]:active{transform:translateY(0)}.ytomo-endless-toggle[data-v-2d755553]:focus{outline:none}.ytomo-button-separator[data-v-2d755553]{width:1px;height:32px;background:#d1d5db;margin:0 6px;align-self:center}.ytomo-pavilion-item[data-v-2d755553]{animation:slideIn-2d755553 .2s ease-out}@keyframes slideIn-2d755553{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}.ytomo-time-slot-button.available[data-v-2d755553]:hover{animation:pulse-2d755553 .6s ease-in-out}@keyframes pulse-2d755553{0%{transform:translateY(-1px)}50%{transform:translateY(-2px)}100%{transform:translateY(-1px)}}.ytomo-pavilion-tab input[data-v-2d755553]:focus{outline:none;border-color:#2c5aa0}.ytomo-pavilion-tab button[data-v-2d755553]:focus{outline:none}@media(prefers-reduced-motion: reduce){.ytomo-pavilion-item[data-v-2d755553],.ytomo-time-slot-button[data-v-2d755553],.ytomo-icon-button[data-v-2d755553],.ytomo-result-display[data-v-2d755553],.ytomo-time-slots[data-v-2d755553]{animation:none;transition:none}.ytomo-time-slot-button.available[data-v-2d755553]:hover{animation:none;transform:none}}@media(prefers-contrast: high){.ytomo-pavilion-item[data-v-2d755553]{border-bottom-width:2px}.ytomo-time-slot-button[data-v-2d755553]{border-width:2px}.ytomo-icon-button.active[data-v-2d755553]{border-width:3px}.ytomo-pavilion-tab input[data-v-2d755553]:focus,.ytomo-pavilion-tab button[data-v-2d755553]:focus{outline:3px solid #000}}.ytomo-processing-overlay[data-v-2d755553]{position:fixed;top:0;left:0;width:100%;height:100%;background-color:rgba(0,0,0,.7);display:flex;align-items:center;justify-content:center;z-index:10001;opacity:0;animation:fadeIn .2s ease-out forwards}.ytomo-processing-content[data-v-2d755553]{background:#fff;border-radius:12px;padding:32px;box-shadow:0 20px 60px rgba(0,0,0,.3);text-align:center;min-width:300px;transform:scale(0.9);animation:dialogAppear .2s ease-out forwards}.ytomo-processing-spinner[data-v-2d755553]{width:40px;height:40px;border:3px solid #e2e8f0;border-top-color:#2c5aa0;border-radius:50%;animation:spin-2d755553 1s linear infinite;margin:0 auto 16px}.ytomo-processing-message[data-v-2d755553]{margin:0 0 24px;color:#374151;font-size:16px;font-weight:500}.ytomo-cancel-button[data-v-2d755553]{background:#6b7280;color:#fff;border:none;padding:12px 24px;border-radius:6px;font-size:14px;cursor:pointer;transition:background-color .2s}.ytomo-cancel-button[data-v-2d755553]:hover{background:#4b5563}.ytomo-cancel-button[data-v-2d755553]:focus{outline:2px solid #2c5aa0;outline-offset:2px}@keyframes spin-2d755553{to{transform:rotate(360deg)}}@media(prefers-reduced-motion: reduce){.ytomo-processing-overlay[data-v-2d755553],.ytomo-processing-content[data-v-2d755553],.ytomo-processing-spinner[data-v-2d755553]{animation:none;transition:none}}`, ""]);
-// Exports
-/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
-
-
-/***/ }),
-
 /***/ 540:
 /***/ ((module) => {
 
@@ -31206,6 +30436,186 @@ function insertStyleElement(options) {
   return element;
 }
 module.exports = insertStyleElement;
+
+/***/ }),
+
+/***/ 556:
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   o: () => (/* binding */ determinePavilionReservationType),
+/* harmony export */   s: () => (/* binding */ getAllPavilionReservationStatus)
+/* harmony export */ });
+/* harmony import */ var _pavilionReservationMapping__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(579);
+/**
+ * パビリオン予約種類・有効期間判定ユーティリティ
+ */
+
+/**
+ * 入場日付に基づいてパビリオン予約種類を判定
+ * doc/design/main-dialog.mdの情報に基づく
+ *
+ * 2か月前予約 (月): 3か月前 - 2か月と1日前23:59
+ * 7日前予約 (週): 1か月前 - 8日前23:59
+ * 3日前予約 (3): 3日前0時 - 1日前9時
+ * 当日予約 (1): 当日
+ */
+function determinePavilionReservationType(entranceDate) {
+    const now = new Date();
+    const entrance = parseEntranceDate(entranceDate);
+    // 現在時刻から各予約期間の開始・終了時刻を計算
+    const reservationPeriods = calculateReservationPeriods(entrance, now);
+    // 現在有効な予約種類を判定
+    const activeType = findActiveReservationType(reservationPeriods, now);
+    if (activeType) {
+        return activeType;
+    }
+    // 有効な予約種類がない場合、直後に有効となる種類を取得
+    const nextActiveType = findNextActiveReservationType(reservationPeriods, now);
+    return nextActiveType || {
+        type: '1',
+        channel: '5',
+        isActive: false
+    };
+}
+/**
+ * 入場日付に基づいて全ての予約区分の状況を取得
+ */
+function getAllPavilionReservationStatus(entranceDate) {
+    const now = new Date();
+    const entrance = parseEntranceDate(entranceDate);
+    // 現在時刻から各予約期間の開始・終了時刻を計算
+    const reservationPeriods = calculateReservationPeriods(entrance, now);
+    const allStatus = {};
+    for (const period of reservationPeriods) {
+        let periodStatus;
+        if (now < period.start) {
+            periodStatus = 'before';
+        }
+        else if (now >= period.start && now <= period.end) {
+            periodStatus = 'active';
+        }
+        else {
+            periodStatus = 'expired';
+        }
+        allStatus[period.type] = {
+            type: period.type,
+            channel: period.channel,
+            periodStatus,
+            submissionStatus: 'none', // 後でAPI取得により更新
+            winningInfo: undefined
+        };
+    }
+    return allStatus;
+}
+/**
+ * 入場日付文字列をDateオブジェクトに変換
+ */
+function parseEntranceDate(entranceDate) {
+    // YYYYMMDD形式を想定
+    if (/^\d{8}$/.test(entranceDate)) {
+        const year = parseInt(entranceDate.substring(0, 4));
+        const month = parseInt(entranceDate.substring(4, 6)) - 1; // monthは0ベース
+        const day = parseInt(entranceDate.substring(6, 8));
+        return new Date(year, month, day);
+    }
+    // その他の形式もサポート
+    return new Date(entranceDate);
+}
+/**
+ * 各予約種類の有効期間を計算
+ */
+function calculateReservationPeriods(entrance, now) {
+    const periods = [];
+    // 2か月前予約 (月): 3か月前 - 2か月と1日前23:59
+    const monthStart = new Date(entrance);
+    monthStart.setMonth(monthStart.getMonth() - 3);
+    const monthEnd = new Date(entrance);
+    monthEnd.setMonth(monthEnd.getMonth() - 2);
+    monthEnd.setDate(monthEnd.getDate() - 1);
+    monthEnd.setHours(23, 59, 59, 999);
+    periods.push({
+        type: (0,_pavilionReservationMapping__WEBPACK_IMPORTED_MODULE_0__/* .getShortNameFromChannel */ .dJ)('2'), // '月'
+        channel: '2',
+        start: monthStart,
+        end: monthEnd,
+        isActive: now >= monthStart && now <= monthEnd
+    });
+    // 7日前予約 (週): 1か月前 - 8日前23:59
+    const weekStart = new Date(entrance);
+    weekStart.setMonth(weekStart.getMonth() - 1);
+    const weekEnd = new Date(entrance);
+    weekEnd.setDate(weekEnd.getDate() - 8);
+    weekEnd.setHours(23, 59, 59, 999);
+    periods.push({
+        type: (0,_pavilionReservationMapping__WEBPACK_IMPORTED_MODULE_0__/* .getShortNameFromChannel */ .dJ)('3'), // '週'
+        channel: '3',
+        start: weekStart,
+        end: weekEnd,
+        isActive: now >= weekStart && now <= weekEnd
+    });
+    // 3日前予約 (3): 3日前0時 - 1日前9時
+    const threeDayStart = new Date(entrance);
+    threeDayStart.setDate(threeDayStart.getDate() - 3);
+    threeDayStart.setHours(0, 0, 0, 0);
+    const threeDayEnd = new Date(entrance);
+    threeDayEnd.setDate(threeDayEnd.getDate() - 1);
+    threeDayEnd.setHours(9, 0, 0, 0);
+    periods.push({
+        type: (0,_pavilionReservationMapping__WEBPACK_IMPORTED_MODULE_0__/* .getShortNameFromChannel */ .dJ)('4'), // '3'
+        channel: '4',
+        start: threeDayStart,
+        end: threeDayEnd,
+        isActive: now >= threeDayStart && now <= threeDayEnd
+    });
+    // 当日予約 (1): 当日
+    const todayStart = new Date(entrance);
+    todayStart.setHours(0, 0, 0, 0);
+    const todayEnd = new Date(entrance);
+    todayEnd.setHours(23, 59, 59, 999);
+    periods.push({
+        type: (0,_pavilionReservationMapping__WEBPACK_IMPORTED_MODULE_0__/* .getShortNameFromChannel */ .dJ)('5'), // '1'
+        channel: '5',
+        start: todayStart,
+        end: todayEnd,
+        isActive: now >= todayStart && now <= todayEnd
+    });
+    return periods;
+}
+/**
+ * 現在有効な予約種類を探す
+ */
+function findActiveReservationType(periods, now) {
+    for (const period of periods) {
+        if (period.isActive) {
+            return {
+                type: period.type,
+                channel: period.channel,
+                isActive: true
+            };
+        }
+    }
+    return null;
+}
+/**
+ * 直後に有効となる予約種類を探す
+ */
+function findNextActiveReservationType(periods, now) {
+    // 現在時刻以降に開始する期間を探す
+    const futurePeriods = periods
+        .filter(period => period.start > now)
+        .sort((a, b) => a.start.getTime() - b.start.getTime());
+    if (futurePeriods.length > 0) {
+        const next = futurePeriods[0];
+        return {
+            type: next.type,
+            channel: next.channel,
+            isActive: false
+        };
+    }
+    return null;
+}
+
 
 /***/ }),
 
@@ -32021,9 +31431,10 @@ async function entranceReservationHelper(config) {
 
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   dJ: () => (/* binding */ getShortNameFromChannel),
-/* harmony export */   je: () => (/* binding */ getLongNameFromShortName)
+/* harmony export */   je: () => (/* binding */ getLongNameFromShortName),
+/* harmony export */   lk: () => (/* binding */ getAllPavilionReservationTypes)
 /* harmony export */ });
-/* unused harmony exports PAVILION_RESERVATION_TYPES, SHORT_NAME_TO_CHANNEL, getLongNameFromChannel, getChannelFromShortName, getPavilionReservationTypeInfo, getAllPavilionReservationTypes */
+/* unused harmony exports PAVILION_RESERVATION_TYPES, SHORT_NAME_TO_CHANNEL, getLongNameFromChannel, getChannelFromShortName, getPavilionReservationTypeInfo */
 /**
  * パビリオン予約種類のマッピング定義
  */
@@ -34030,6 +33441,585 @@ ___CSS_LOADER_EXPORT___.push([module.id, `
 
 /***/ }),
 
+/***/ 757:
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   useTicketsStore: () => (/* binding */ useTicketsStore)
+/* harmony export */ });
+/* harmony import */ var pinia__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(408);
+/* harmony import */ var vue__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(425);
+/* harmony import */ var _utils_logger__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(911);
+/* harmony import */ var _utils_pavilionReservationTypes__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(556);
+/**
+ * チケット統合管理ストア
+ * 既存TicketManagerの全機能を移植
+ */
+
+
+
+const logger = _utils_logger__WEBPACK_IMPORTED_MODULE_2__/* .loggers */ .C$.tickets;
+
+const useTicketsStore = (0,pinia__WEBPACK_IMPORTED_MODULE_0__/* .defineStore */ .nY)('tickets', () => {
+    // State
+    const tickets = (0,vue__WEBPACK_IMPORTED_MODULE_1__/* .ref */ .KR)(new Map());
+    const selectedTicketIds = (0,vue__WEBPACK_IMPORTED_MODULE_1__/* .ref */ .KR)(new Set());
+    const selectedEntranceDates = (0,vue__WEBPACK_IMPORTED_MODULE_1__/* .ref */ .KR)(new Map()); // ticketId -> scheduleId mapping for persistence
+    const isLoading = (0,vue__WEBPACK_IMPORTED_MODULE_1__/* .ref */ .KR)(false);
+    const isInitialized = (0,vue__WEBPACK_IMPORTED_MODULE_1__/* .ref */ .KR)(false);
+    const availableDates = (0,vue__WEBPACK_IMPORTED_MODULE_1__/* .ref */ .KR)([]);
+    const todayStr = (0,vue__WEBPACK_IMPORTED_MODULE_1__/* .ref */ .KR)(getTodayString());
+    const lastUpdateTime = (0,vue__WEBPACK_IMPORTED_MODULE_1__/* .ref */ .KR)(0); // 最後の更新時刻（Unix時間）
+    // Getters (computed)
+    const ticketsArray = (0,vue__WEBPACK_IMPORTED_MODULE_1__/* .computed */ .EW)(() => Array.from(tickets.value.values()));
+    const selectedTickets = (0,vue__WEBPACK_IMPORTED_MODULE_1__/* .computed */ .EW)(() => ticketsArray.value.filter(ticket => ticket.schedules?.some(schedule => schedule.selected)));
+    const selectedTicketCount = (0,vue__WEBPACK_IMPORTED_MODULE_1__/* .computed */ .EW)(() => {
+        // 入場予約が選択されているチケットの数
+        return ticketsArray.value.filter(ticket => ticket.schedules?.some(schedule => schedule.selected)).length;
+    });
+    const ownTickets = (0,vue__WEBPACK_IMPORTED_MODULE_1__/* .computed */ .EW)(() => ticketsArray.value.filter(ticket => ticket.isOwn));
+    const externalTickets = (0,vue__WEBPACK_IMPORTED_MODULE_1__/* .computed */ .EW)(() => ticketsArray.value.filter(ticket => !ticket.isOwn));
+    // 選択済み入場予約からパビリオン予約情報を取得
+    const selectedPavilionReservationInfo = (0,vue__WEBPACK_IMPORTED_MODULE_1__/* .computed */ .EW)(() => {
+        const selectedSchedules = ticketsArray.value.flatMap(ticket => ticket.schedules?.filter(schedule => schedule.selected) || []);
+        if (selectedSchedules.length === 0) {
+            return null;
+        }
+        // 最初の選択済みスケジュールの予約情報を取得（同じになるはず）
+        const firstSelected = selectedSchedules[0];
+        // pavilionReservationStatusがない場合は入場日付から生成
+        let pavilionReservationStatus = firstSelected.pavilionReservationStatus;
+        let pavilionReservationType = firstSelected.pavilionReservationType;
+        let pavilionReservationActive = firstSelected.pavilionReservationActive;
+        if (!pavilionReservationStatus && firstSelected.entrance_date) {
+            // 動的に生成
+            const pavilionReservation = (0,_utils_pavilionReservationTypes__WEBPACK_IMPORTED_MODULE_3__/* .determinePavilionReservationType */ .o)(firstSelected.entrance_date);
+            pavilionReservationType = pavilionReservation.channel;
+            pavilionReservationActive = pavilionReservation.isActive;
+            const allStatus = (0,_utils_pavilionReservationTypes__WEBPACK_IMPORTED_MODULE_3__/* .getAllPavilionReservationStatus */ .s)(firstSelected.entrance_date);
+            pavilionReservationStatus = {};
+            for (const [type, status] of Object.entries(allStatus)) {
+                pavilionReservationStatus[type] = {
+                    periodStatus: status.periodStatus,
+                    submissionStatus: status.submissionStatus,
+                    winningInfo: status.winningInfo
+                };
+            }
+        }
+        if (!pavilionReservationStatus) {
+            return null;
+        }
+        // 現在有効な予約種類を特定
+        const activeReservationType = Object.entries(pavilionReservationStatus)
+            .find(([type, status]) => status.periodStatus === 'active');
+        return {
+            activeType: activeReservationType?.[0] || null,
+            activeChannel: pavilionReservationType,
+            isActive: pavilionReservationActive || false,
+            allStatus: pavilionReservationStatus
+        };
+    });
+    // Helper function for date
+    function getTodayString() {
+        const today = new Date();
+        return `${today.getFullYear()}${String(today.getMonth() + 1).padStart(2, '0')}${String(today.getDate()).padStart(2, '0')}`;
+    }
+    // Actions - TicketManagerから完全移行
+    /**
+     * スケジュールデータに有効フラグとパビリオン予約種類情報を付与
+     */
+    const processSchedules = (schedules) => {
+        if (!Array.isArray(schedules))
+            return [];
+        return schedules.map(schedule => {
+            // schedule_nameから時刻情報を抽出（例: "9:00-" → "9:00"）
+            let timeStart = undefined;
+            if (schedule.schedule_name) {
+                const timeMatch = schedule.schedule_name.match(/(\d{1,2}:\d{2})/);
+                if (timeMatch) {
+                    timeStart = timeMatch[1];
+                }
+            }
+            const scheduleData = {
+                entrance_date: schedule.entrance_date || '',
+                use_state: schedule.use_state || 0,
+                schedule_name: schedule.schedule_name,
+                time_start: timeStart,
+                time_end: schedule.time_end,
+                reservation_type: schedule.reservation_type,
+                // 有効フラグを付与: 未使用または当日入場済みは有効
+                isEffective: schedule.use_state === 0 ||
+                    (schedule.use_state === 1 && schedule.entrance_date === todayStr.value)
+            };
+            // パビリオン予約種類情報を付与
+            if (scheduleData.entrance_date) {
+                const pavilionReservation = (0,_utils_pavilionReservationTypes__WEBPACK_IMPORTED_MODULE_3__/* .determinePavilionReservationType */ .o)(scheduleData.entrance_date);
+                scheduleData.pavilionReservationType = pavilionReservation.channel;
+                scheduleData.pavilionReservationActive = pavilionReservation.isActive;
+                // 全ての予約区分の状況も付与
+                const allStatus = (0,_utils_pavilionReservationTypes__WEBPACK_IMPORTED_MODULE_3__/* .getAllPavilionReservationStatus */ .s)(scheduleData.entrance_date);
+                scheduleData.pavilionReservationStatus = {};
+                for (const [type, status] of Object.entries(allStatus)) {
+                    scheduleData.pavilionReservationStatus[type] = {
+                        periodStatus: status.periodStatus,
+                        submissionStatus: status.submissionStatus,
+                        winningInfo: status.winningInfo
+                    };
+                }
+            }
+            return scheduleData;
+        }).sort((a, b) => {
+            // 入場日時順でソート
+            const dateTimeA = `${a.entrance_date}${a.time_start || '0000'}`;
+            const dateTimeB = `${b.entrance_date}${b.time_start || '0000'}`;
+            return dateTimeA.localeCompare(dateTimeB);
+        });
+    };
+    /**
+     * 全チケット情報を初期化・取得
+     */
+    const loadAllTickets = async (forceUpdate = false) => {
+        // 1時間制限チェック（強制更新でない場合）
+        if (!forceUpdate) {
+            const now = Date.now();
+            const oneHour = 60 * 60 * 1000; // 1時間をミリ秒で
+            if (lastUpdateTime.value > 0 && now - lastUpdateTime.value < oneHour) {
+                logger.info(`前回更新から1時間未満のため更新をスキップ（${Math.round((now - lastUpdateTime.value) / (1000 * 60))}分経過）`);
+                return ticketsArray.value;
+            }
+        }
+        logger.info('全チケット情報取得開始');
+        setLoading(true);
+        try {
+            // 自分のチケットを最優先で読み込み
+            let ownTickets = [];
+            try {
+                ownTickets = await loadOwnTickets();
+                logger.info(`自分のチケット取得完了: ${ownTickets.length}個`);
+                // 自分のチケットを追加
+                for (const ticket of ownTickets) {
+                    tickets.value.set(ticket.ticket_id, ticket);
+                }
+            }
+            catch (error) {
+                logger.error('自分のチケット取得エラー', error);
+            }
+            // パビリオン予約当選情報を取得
+            await fetchPavilionWinningInfo();
+            // 更新時刻を記録
+            lastUpdateTime.value = Date.now();
+            logger.info(`チケット統合管理完了: ${tickets.value.size}個のチケット読み込み完了`);
+            // デバッグ: チケットデータの詳細を出力
+            logger.debug('チケットデータ詳細', {
+                todayStr: todayStr.value,
+                tickets: Array.from(tickets.value.values()).map(ticket => ({
+                    ticket_id: ticket.ticket_id,
+                    isOwn: ticket.isOwn,
+                    schedulesCount: ticket.schedules?.length || 0,
+                    schedules: ticket.schedules?.map(schedule => ({
+                        entrance_date: schedule.entrance_date,
+                        use_state: schedule.use_state,
+                        isEffective: schedule.isEffective,
+                        schedule_name: schedule.schedule_name
+                    }))
+                }))
+            });
+            // 利用可能日付を抽出
+            const dates = await extractAvailableDates();
+            availableDates.value = dates;
+            return Array.from(tickets.value.values());
+        }
+        finally {
+            setLoading(false);
+        }
+    };
+    /**
+     * 自分のチケット取得
+     */
+    const loadOwnTickets = async () => {
+        try {
+            const response = await fetch('/api/d/my/tickets/?count=1', {
+                method: 'GET',
+                headers: {
+                    'Accept': 'application/json',
+                    'Accept-Language': 'ja,en-US;q=0.9,en;q=0.8,zh-TW;q=0.7,zh;q=0.6',
+                    'X-Api-Lang': 'ja'
+                },
+                credentials: 'same-origin'
+            });
+            if (!response.ok) {
+                throw new Error(`API応答エラー: ${response.status}`);
+            }
+            const data = await response.json();
+            if (!data.list || !Array.isArray(data.list)) {
+                logger.warn('チケットデータが期待する形式ではありません', data);
+                return [];
+            }
+            return data.list.map((ticket) => ({
+                ticket_id: ticket.ticket_id || ticket.simple_ticket_id || '',
+                isOwn: true,
+                label: ticket.item_name || 'チケット',
+                schedules: processSchedules(ticket.schedules || [])
+            }));
+        }
+        catch (error) {
+            logger.error('自分のチケット取得API エラー', error);
+            return [];
+        }
+    };
+    /**
+     * キャッシュから外部チケットIDを収集
+     */
+    const getCachedExternalTicketIds = async () => {
+        const externalTickets = [];
+        try {
+            // 監視キャッシュから取得
+            const monitoringCache = localStorage.getItem('expo_monitoring_cache');
+            if (monitoringCache) {
+                const data = JSON.parse(monitoringCache);
+                if (data.externalTickets) {
+                    for (const [ticketId, info] of Object.entries(data.externalTickets)) {
+                        externalTickets.push({
+                            ticketId,
+                            label: info.label || '外部チケット'
+                        });
+                    }
+                }
+            }
+            // パビリオン予約キャッシュから取得
+            const pavilionCache = localStorage.getItem('expo_pavilion_reservation_cache');
+            if (pavilionCache) {
+                const data = JSON.parse(pavilionCache);
+                if (data.externalTickets) {
+                    for (const [ticketId, info] of Object.entries(data.externalTickets)) {
+                        // 重複チェック
+                        if (!externalTickets.find(t => t.ticketId === ticketId)) {
+                            externalTickets.push({
+                                ticketId,
+                                label: info.label || '外部チケット'
+                            });
+                        }
+                    }
+                }
+            }
+        }
+        catch (error) {
+            logger.error('キャッシュからの外部チケットID取得エラー', error);
+        }
+        return externalTickets;
+    };
+    /**
+     * 外部チケットの詳細データを取得
+     */
+    /**
+     * パビリオン予約当選情報を取得・更新
+     */
+    const fetchPavilionWinningInfo = async () => {
+        logger.info('🏛️ パビリオン予約当選情報取得開始');
+        try {
+            // 全チケットについて、event_schedulesとlotteries情報を更新
+            for (const [ticketId, ticket] of tickets.value) {
+                if (ticket.schedules) {
+                    for (const schedule of ticket.schedules) {
+                        // 抽選カレンダー情報を取得
+                        try {
+                            const calendarResponse = await fetch(`/api/d/lottery_calendars?entrance_date=${schedule.entrance_date}`, {
+                                method: 'GET',
+                                headers: {
+                                    'Accept': 'application/json',
+                                    'X-Api-Lang': 'ja'
+                                },
+                                credentials: 'same-origin'
+                            });
+                            if (calendarResponse.ok) {
+                                const calendarData = await calendarResponse.json();
+                                logger.debug(`${schedule.entrance_date}の抽選カレンダー情報取得成功`);
+                                // パビリオン予約状況を更新
+                                if (schedule.pavilionReservationStatus) {
+                                    // 実際の抽選状況でsubmissionStatusを更新する処理はここに追加
+                                    // 現在は期間判定のみ実装済み
+                                }
+                            }
+                        }
+                        catch (error) {
+                            logger.warn(`${schedule.entrance_date}の抽選カレンダー取得エラー:`, error);
+                        }
+                    }
+                }
+                // チケット自体のevent_schedulesを確認（既に予約済みのパビリオン情報）
+                // 実際のAPIからevent_schedulesデータを取得する処理が必要
+                // 現在のticketデータにevent_schedulesが含まれているかチェック
+                if (ticket.event_schedules) {
+                    const eventSchedules = ticket.event_schedules;
+                    logger.info(`${ticketId}: 予約済みパビリオン ${eventSchedules.length}件`);
+                    // event_schedulesの情報をpersistentなwinningInfoに変換
+                    for (const eventSchedule of eventSchedules) {
+                        if (ticket.schedules) {
+                            const matchingSchedule = ticket.schedules.find(s => s.entrance_date === eventSchedule.entrance_date);
+                            if (matchingSchedule?.pavilionReservationStatus) {
+                                // winning情報を設定（event_scheduleがあるということは当選済み）
+                                const reservationType = eventSchedule.lottery_type || '1'; // デフォルトは当日予約
+                                const typeKey = getReservationTypeKey(reservationType);
+                                if (matchingSchedule.pavilionReservationStatus[typeKey]) {
+                                    matchingSchedule.pavilionReservationStatus[typeKey].submissionStatus = 'won';
+                                    matchingSchedule.pavilionReservationStatus[typeKey].winningInfo = {
+                                        eventName: eventSchedule.event_name,
+                                        scheduleName: eventSchedule.schedule_name,
+                                        startTime: eventSchedule.start_time,
+                                        endTime: eventSchedule.end_time,
+                                        useState: eventSchedule.use_state
+                                    };
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            logger.info('✅ パビリオン予約当選情報取得完了');
+        }
+        catch (error) {
+            logger.error('❌ パビリオン予約当選情報取得エラー:', error);
+        }
+    };
+    /**
+     * 予約種別からキーを取得
+     */
+    const getReservationTypeKey = (lotteryType) => {
+        switch (lotteryType) {
+            case '2': return '月'; // 2ヶ月前抽選
+            case '3': return '週'; // 7日前抽選  
+            case '4': return '3'; // 3日前予約
+            case '5': return '1'; // 当日予約
+            default: return '1';
+        }
+    };
+    const loadExternalTicketData = async (ticketId, label, channel) => {
+        try {
+            const channels = channel ? [channel] : ['5', '4', '3', '2'];
+            for (const testChannel of channels) {
+                try {
+                    const response = await fetch(`/api/d/proxy_tickets/${ticketId}/add_check?registered_channel=${testChannel}`, {
+                        credentials: 'include'
+                    });
+                    if (response.ok) {
+                        const data = await response.json();
+                        const ticketData = {
+                            ticket_id: data.ticket_id,
+                            isOwn: false,
+                            label: label,
+                            schedules: processSchedules(data.schedules || [])
+                        };
+                        logger.info('外部チケット取得成功', { ticketId, testChannel });
+                        return ticketData;
+                    }
+                }
+                catch (error) {
+                    logger.warn('外部チケット取得失敗', { ticketId, testChannel, error });
+                }
+            }
+            // どのchannelでも取得できない場合は最小限のデータを作成
+            logger.warn('外部チケット詳細取得失敗、最小限データで作成', { ticketId });
+            return {
+                ticket_id: ticketId,
+                isOwn: false,
+                label: label,
+                schedules: []
+            };
+        }
+        catch (error) {
+            logger.error('外部チケット取得エラー', { ticketId, error });
+            return null;
+        }
+    };
+    /**
+     * 利用可能日付を抽出
+     */
+    const extractAvailableDates = async () => {
+        const dates = new Set();
+        for (const ticket of ticketsArray.value) {
+            if (ticket.schedules && Array.isArray(ticket.schedules)) {
+                const effectiveSchedules = ticket.schedules.filter(schedule => schedule.isEffective);
+                for (const schedule of effectiveSchedules) {
+                    if (schedule.entrance_date) {
+                        dates.add(schedule.entrance_date);
+                    }
+                }
+            }
+        }
+        const sortedDates = Array.from(dates).sort((a, b) => {
+            if (/^\d{8}$/.test(a) && /^\d{8}$/.test(b)) {
+                return a.localeCompare(b);
+            }
+            else {
+                const dateA = new Date(a);
+                const dateB = new Date(b);
+                return dateA.getTime() - dateB.getTime();
+            }
+        });
+        return sortedDates;
+    };
+    // Legacy actions for compatibility
+    const setTickets = (newTickets) => {
+        tickets.value.clear();
+        newTickets.forEach(ticket => {
+            tickets.value.set(ticket.ticket_id, ticket);
+        });
+    };
+    const addTicket = (ticket) => {
+        tickets.value.set(ticket.ticket_id, ticket);
+    };
+    const removeTicket = (ticketId) => {
+        tickets.value.delete(ticketId);
+        logger.info('チケットを削除しました', { ticketId });
+    };
+    const selectTicket = (ticketId, selected) => {
+        if (selected) {
+            selectedTicketIds.value.add(ticketId);
+        }
+        else {
+            selectedTicketIds.value.delete(ticketId);
+        }
+    };
+    const selectAllTickets = () => {
+        ticketsArray.value.forEach(ticket => {
+            selectedTicketIds.value.add(ticket.ticket_id);
+        });
+    };
+    const deselectAllTickets = () => {
+        selectedTicketIds.value.clear();
+    };
+    const setAvailableDates = (dates) => {
+        availableDates.value = dates;
+    };
+    const setLoading = (loading) => {
+        isLoading.value = loading;
+    };
+    // 入場日時選択の永続化機能
+    const saveSelectedEntranceDate = (ticketId, scheduleId) => {
+        selectedEntranceDates.value.set(ticketId, scheduleId);
+        logger.debug('入場日時選択を保存', { ticketId, scheduleId });
+    };
+    const removeSelectedEntranceDate = (ticketId) => {
+        selectedEntranceDates.value.delete(ticketId);
+        logger.debug('入場日時選択を削除', { ticketId });
+    };
+    const restoreSelectedEntranceDates = () => {
+        let restoredCount = 0;
+        // selectedEntranceDatesがMapでない場合はMapに変換  
+        if (!(selectedEntranceDates.value instanceof Map)) {
+            selectedEntranceDates.value = new Map();
+        }
+        try {
+            // 復元前にtickets.valueが空でないことを確認
+            if (tickets.value.size === 0) {
+                logger.warn('チケットデータが未ロードのため復元をスキップ');
+                return;
+            }
+            for (const [ticketId, scheduleId] of selectedEntranceDates.value.entries()) {
+                const ticket = tickets.value.get(ticketId);
+                if (ticket && ticket.schedules) {
+                    const schedule = ticket.schedules.find(s => s.entrance_date + (s.time_start || '') === scheduleId);
+                    if (schedule) {
+                        schedule.selected = true;
+                        restoredCount++;
+                        logger.debug('復元', { ticketId, scheduleId });
+                    }
+                    else {
+                        // 見つからないスケジュールIDは削除
+                        selectedEntranceDates.value.delete(ticketId);
+                        logger.debug('無効な選択を削除', { ticketId, scheduleId });
+                    }
+                }
+                else {
+                    // 存在しないチケットの選択は削除
+                    selectedEntranceDates.value.delete(ticketId);
+                    logger.debug('存在しないチケットの選択を削除', { ticketId });
+                }
+            }
+            if (restoredCount > 0) {
+                logger.info('入場日時選択状態復元完了', { restoredCount });
+            }
+        }
+        catch (error) {
+            logger.error('入場日時復元エラー', error);
+            selectedEntranceDates.value = new Map();
+        }
+    };
+    // 初期化メソッド
+    const init = async () => {
+        logger.info('チケットストア初期化開始');
+        await loadAllTickets();
+        restoreSelectedEntranceDates();
+        isInitialized.value = true;
+        logger.info('チケットストア初期化完了');
+    };
+    return {
+        // State
+        tickets,
+        selectedTicketIds,
+        selectedEntranceDates,
+        isLoading,
+        isInitialized,
+        availableDates,
+        // Getters
+        ticketsArray,
+        selectedTickets,
+        selectedTicketCount,
+        ownTickets,
+        externalTickets,
+        selectedPavilionReservationInfo,
+        // Actions
+        init,
+        loadAllTickets,
+        loadOwnTickets,
+        fetchPavilionWinningInfo,
+        setTickets,
+        addTicket,
+        removeTicket,
+        selectTicket,
+        selectAllTickets,
+        deselectAllTickets,
+        setAvailableDates,
+        setLoading,
+        extractAvailableDates,
+        saveSelectedEntranceDate,
+        removeSelectedEntranceDate,
+        restoreSelectedEntranceDates
+    };
+}, {
+    persist: {
+        key: 'ytomo-tickets-store',
+        pick: ['selectedEntranceDates', 'tickets', 'lastUpdateTime'], // 入場日時選択、チケットデータ、更新時刻を永続化
+        serializer: {
+            serialize: (data) => {
+                // MapをObjectに変換してシリアライズ
+                const serialized = { ...data };
+                if (serialized['selectedEntranceDates'] instanceof Map) {
+                    serialized['selectedEntranceDates'] = Object.fromEntries(serialized['selectedEntranceDates']);
+                }
+                if (serialized['tickets'] instanceof Map) {
+                    serialized['tickets'] = Object.fromEntries(serialized['tickets']);
+                }
+                return JSON.stringify(serialized);
+            },
+            deserialize: (data) => {
+                const parsed = JSON.parse(data);
+                // ObjectをMapに復元
+                if (parsed['selectedEntranceDates'] && typeof parsed['selectedEntranceDates'] === 'object') {
+                    parsed['selectedEntranceDates'] = new Map(Object.entries(parsed['selectedEntranceDates']));
+                }
+                if (parsed['tickets'] && typeof parsed['tickets'] === 'object') {
+                    parsed['tickets'] = new Map(Object.entries(parsed['tickets']));
+                }
+                return parsed;
+            }
+        }
+    }
+});
+
+
+/***/ }),
+
 /***/ 790:
 /***/ ((module, __webpack_exports__, __webpack_require__) => {
 
@@ -34470,6 +34460,50 @@ function domAPI(options) {
   };
 }
 module.exports = domAPI;
+
+/***/ }),
+
+/***/ 849:
+/***/ ((module, __webpack_exports__, __webpack_require__) => {
+
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   A: () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _node_modules_css_loader_dist_runtime_noSourceMaps_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(601);
+/* harmony import */ var _node_modules_css_loader_dist_runtime_noSourceMaps_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_css_loader_dist_runtime_noSourceMaps_js__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(314);
+/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1__);
+// Imports
+
+
+var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1___default()((_node_modules_css_loader_dist_runtime_noSourceMaps_js__WEBPACK_IMPORTED_MODULE_0___default()));
+// Module
+___CSS_LOADER_EXPORT___.push([module.id, `.ytomo-pavilion-tab[data-v-910d08c4]{padding:0 8px 20px 8px;height:100%;display:flex;flex-direction:column;gap:16px;overflow-y:auto;color-scheme:light}.ytomo-search-controls[data-v-910d08c4]{background:#fff;border-radius:8px;padding:12px;box-shadow:0 1px 3px rgba(0,0,0,.1);border:1px solid #e2e8f0;flex-shrink:0;display:flex;gap:12px;align-items:center}@media(max-width: 600px){.ytomo-search-controls[data-v-910d08c4]{flex-direction:column;align-items:stretch;gap:12px}}.ytomo-search-input-container[data-v-910d08c4]{flex:1}.ytomo-search-input[data-v-910d08c4]{width:100%;padding:10px 16px;border:1px solid #d1d5db;border-radius:8px;font-size:14px;transition:all .2s}.ytomo-search-input[data-v-910d08c4]:focus{outline:none;border-color:#2c5aa0}.ytomo-search-input[data-v-910d08c4]::placeholder{color:#9ca3af}.ytomo-control-buttons[data-v-910d08c4]{display:flex;gap:8px;flex-shrink:0}@media(max-width: 600px){.ytomo-control-buttons[data-v-910d08c4]{justify-content:center}}.ytomo-icon-button[data-v-910d08c4]{width:40px;height:40px;border:1px solid #d1d5db;border-radius:8px;background:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s;font-size:16px;position:relative}.ytomo-icon-button[data-v-910d08c4]:hover{background:#f3f4f6;border-color:#9ca3af;transform:translateY(-1px)}.ytomo-icon-button[data-v-910d08c4]:active{transform:translateY(0)}.ytomo-icon-button.active[data-v-910d08c4]{background:#2c5aa0;border-color:#2c5aa0;color:#fff}.ytomo-icon-button.active[data-v-910d08c4]:hover{background:#1a365d}.ytomo-icon-button .ytomo-count-badge[data-v-910d08c4]{position:absolute;top:-8px;right:-8px;background:#f44;color:#fff;border-radius:10px;padding:2px 6px;font-size:10px;font-weight:bold;min-width:16px;text-align:center;line-height:1.2;pointer-events:none;z-index:10}.ytomo-icon-button[data-v-910d08c4]:focus{outline:none}.ytomo-icon-button span[data-v-910d08c4]{display:block;line-height:1}.ytomo-pavilion-list[data-v-910d08c4]{flex:1;background:#fff;border-radius:8px;border:1px solid #e2e8f0}.ytomo-pavilion-item[data-v-910d08c4]{background:#fff;border-bottom:1px solid #f1f5f9;transition:all .2s;color:#374151}.ytomo-pavilion-item[data-v-910d08c4]:last-child{border-bottom:none}.ytomo-pavilion-item[data-v-910d08c4]:hover{background:#f8fafc}.ytomo-pavilion-item.hidden[data-v-910d08c4]{display:none}.ytomo-pavilion-header[data-v-910d08c4]{display:flex;align-items:center;gap:12px;padding:16px;cursor:pointer}.ytomo-star-button[data-v-910d08c4]{background:none;border:none;font-size:18px;cursor:pointer;transition:background-color .2s;padding:4px;border-radius:4px;width:26px;height:26px;display:flex;align-items:center;justify-content:center;flex-shrink:0}.ytomo-star-button[data-v-910d08c4]:hover{background:rgba(255,193,7,.1)}.ytomo-star-button.favorite[data-v-910d08c4]{color:#ffc107}.ytomo-star-button[data-v-910d08c4]:focus{outline:none}.ytomo-pavilion-checkbox-container[data-v-910d08c4]{display:flex;align-items:center;cursor:pointer}.ytomo-pavilion-checkbox[data-v-910d08c4]{width:16px;height:16px;cursor:pointer}.ytomo-pavilion-name[data-v-910d08c4]{flex:1;font-size:15px;font-weight:500;color:#374151;line-height:1.4}.ytomo-pavilion-status[data-v-910d08c4]{display:flex;align-items:center;gap:8px}.ytomo-status-available[data-v-910d08c4]{background:#dcfce7;color:#166534;padding:4px 8px;border-radius:12px;font-size:12px;font-weight:600}.ytomo-status-full[data-v-910d08c4]{background:#fef2f2;color:#991b1b;padding:4px 8px;border-radius:12px;font-size:12px;font-weight:600}.ytomo-expand-button[data-v-910d08c4]{background:none;border:none;font-size:12px;color:#6b7280;cursor:pointer;padding:4px 8px;border-radius:4px;transition:all .2s}.ytomo-expand-button[data-v-910d08c4]:hover{background:#f3f4f6;color:#374151}.ytomo-expand-button.expanded[data-v-910d08c4]{background:#e2e8f0;color:#374151}.ytomo-expand-button[data-v-910d08c4]:focus{outline:none}.ytomo-time-slots[data-v-910d08c4]{padding:0 16px 16px 16px;display:flex;flex-wrap:wrap;gap:8px;transition:all .3s ease}.ytomo-time-slots.hidden[data-v-910d08c4]{display:none}.ytomo-time-slot-button[data-v-910d08c4]{padding:6px 10px;border-radius:6px;font-size:12px;font-weight:500;cursor:pointer;transition:all .2s;border:1px solid;min-width:70px;text-align:center;display:inline-block}.ytomo-time-slot-button[data-v-910d08c4] *{pointer-events:none}.ytomo-time-slot-button.available[data-v-910d08c4]{background:#dcfce7;border-color:#22c55e;color:#166534}.ytomo-time-slot-button.available[data-v-910d08c4]:hover{background:#bbf7d0;color:#166534;transform:translateY(-1px);box-shadow:0 2px 8px rgba(34,197,94,.3)}.ytomo-time-slot-button.available.selected[data-v-910d08c4]{background:#22c55e;color:#fff;box-shadow:0 2px 8px rgba(34,197,94,.3)}.ytomo-time-slot-button.unavailable[data-v-910d08c4]{background:#fef2f2;border-color:#ef4444;color:#991b1b;cursor:pointer;opacity:1}.ytomo-time-slot-button.unavailable[data-v-910d08c4]:hover{background:#fecaca;color:#991b1b;transform:translateY(-1px);box-shadow:0 2px 8px rgba(239,68,68,.3)}.ytomo-time-slot-button.unavailable.selected[data-v-910d08c4]{background:#ef4444;color:#fff;box-shadow:0 2px 8px rgba(239,68,68,.3)}.ytomo-time-slot-button.rate-limited[data-v-910d08c4]{background:#f3f4f6;border-color:#9ca3af;color:#6b7280;cursor:not-allowed;opacity:.6}.ytomo-time-slot-button.rate-limited[data-v-910d08c4]:hover{background:#f3f4f6;color:#6b7280;transform:none;box-shadow:none}.ytomo-time-slot-button.rate-limited[data-v-910d08c4]:disabled{cursor:not-allowed;pointer-events:none}.ytomo-time-slot-button[data-v-910d08c4]:focus{outline:none}.ytomo-time-slot-button[data-v-910d08c4]:disabled{background:#f3f4f6;border-color:#d1d5db;color:#9ca3af;cursor:not-allowed;opacity:.6;pointer-events:none}.ytomo-time-slot-button[data-v-910d08c4]:disabled:hover{background:#f3f4f6;color:#9ca3af;transform:none;box-shadow:none}.ytomo-time-slot-button.hidden[data-v-910d08c4]{display:none}.ytomo-reservation-controls[data-v-910d08c4]{background:#fff;border-radius:8px;padding:16px;box-shadow:0 1px 3px rgba(0,0,0,.1);border:1px solid #e2e8f0;flex-shrink:0;display:flex;align-items:center;gap:16px;position:relative}@media(max-width: 600px){.ytomo-reservation-controls[data-v-910d08c4]{flex-direction:column;align-items:stretch;gap:12px}}.ytomo-selected-info[data-v-910d08c4]{flex:1;font-size:14px;color:#374151;font-weight:500}@media(max-width: 600px){.ytomo-selected-info[data-v-910d08c4]{text-align:center}}.ytomo-reservation-controls .ytomo-button[data-v-910d08c4]{padding:10px 20px;font-weight:600;white-space:nowrap}@media(max-width: 600px){.ytomo-reservation-controls .ytomo-button[data-v-910d08c4]{width:100%}}#ot-sdk-btn-floating[data-v-910d08c4]{display:none !important}.ytomo-result-display[data-v-910d08c4]{position:fixed;top:20px;right:20px;padding:8px 12px;border-radius:6px;font-size:13px;font-weight:500;opacity:0;transform:translateY(-10px);transition:all .3s;pointer-events:none;max-width:300px;z-index:10001;display:none}.ytomo-result-display.ytomo-visible[data-v-910d08c4]{display:block}.ytomo-result-display.show[data-v-910d08c4]{opacity:1;transform:translateY(0)}.ytomo-result-display.success[data-v-910d08c4]{background:#22c55e;color:#fff}.ytomo-result-display.error[data-v-910d08c4]{background:#ef4444;color:#fff}.ytomo-result-display.info[data-v-910d08c4]{background:#3b82f6;color:#fff}@media(max-width: 600px){.ytomo-result-display[data-v-910d08c4]{position:static;transform:none;margin:8px 0 0 0;text-align:center}}.ytomo-pavilion-tab .ytomo-empty-state[data-v-910d08c4],.ytomo-pavilion-tab .ytomo-error[data-v-910d08c4]{padding:40px 20px;text-align:center}.ytomo-pavilion-tab .ytomo-empty-state p[data-v-910d08c4]{margin:0;color:#6b7280;font-size:14px}.ytomo-pavilion-tab .ytomo-error p[data-v-910d08c4]{margin:0;color:#dc2626;font-size:14px}.ytomo-pavilion-tab .ytomo-loading[data-v-910d08c4]{height:150px}.ytomo-pavilion-list[data-v-910d08c4]::-webkit-scrollbar{width:6px}.ytomo-pavilion-list[data-v-910d08c4]::-webkit-scrollbar-track{background:#f1f5f9;border-radius:3px}.ytomo-pavilion-list[data-v-910d08c4]::-webkit-scrollbar-thumb{background:#cbd5e1;border-radius:3px}.ytomo-pavilion-list[data-v-910d08c4]::-webkit-scrollbar-thumb:hover{background:#94a3b8}.ytomo-selected-dates-display[data-v-910d08c4]{background:#fff;border-radius:8px;padding:10px 16px;box-shadow:0 1px 3px rgba(0,0,0,.1);border:1px solid #e2e8f0;flex-shrink:0;min-height:36px;display:flex;align-items:center}.ytomo-selected-dates-content[data-v-910d08c4]{display:flex;align-items:center;gap:8px;width:100%}.ytomo-dates-label[data-v-910d08c4]{font-size:14px;font-weight:600;color:#374151;flex-shrink:0}.ytomo-dates-text[data-v-910d08c4]{font-size:14px;color:#2c5aa0;font-weight:500}.ytomo-dates-text[data-v-910d08c4]:empty::before{content:"なし";color:#9ca3af;font-style:italic}.ytomo-status-fab[data-v-910d08c4]{position:fixed;bottom:86px;right:20px;min-width:120px;min-height:50px;border:none;border-radius:6px;color:#fff;font-size:11px;font-weight:500;cursor:pointer;box-shadow:0 4px 12px rgba(0,0,0,.3);transition:all .3s ease;z-index:1001;display:none;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:8px 12px;line-height:1.2}.ytomo-status-fab.ytomo-visible[data-v-910d08c4]{display:flex}.ytomo-status-fab.success[data-v-910d08c4]{background:linear-gradient(135deg, #22c55e 0%, #16a34a 100%);box-shadow:0 4px 12px rgba(34,197,94,.4)}.ytomo-status-fab.error[data-v-910d08c4]{background:linear-gradient(135deg, #ef4444 0%, #dc2626 100%);box-shadow:0 4px 12px rgba(239,68,68,.4)}.ytomo-status-fab.info[data-v-910d08c4]{background:linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);box-shadow:0 4px 12px rgba(59,130,246,.4)}.ytomo-status-fab[data-v-910d08c4]:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 6px 16px rgba(0,0,0,.4)}.ytomo-status-fab[data-v-910d08c4]:active:not(:disabled){transform:translateY(0)}.ytomo-status-fab[data-v-910d08c4]:focus{outline:none}.ytomo-reservation-fab[data-v-910d08c4]{position:fixed;bottom:80px;right:20px;width:56px;height:56px;background:linear-gradient(135deg, #2c5aa0 0%, #1a365d 100%);border:none;border-radius:28px;color:#fff;font-size:24px;cursor:pointer;box-shadow:0 4px 16px rgba(44,90,160,.3);transition:all .3s ease;z-index:10003;display:flex;align-items:center;justify-content:center}.ytomo-reservation-fab .ytomo-count-badge[data-v-910d08c4]{position:absolute;top:-8px;right:-8px;background:#f44;color:#fff;border-radius:10px;padding:2px 6px;font-size:10px;font-weight:bold;min-width:16px;text-align:center;line-height:1.2;pointer-events:none;z-index:10}.ytomo-reservation-fab[data-v-910d08c4]:hover:not(:disabled){background:linear-gradient(135deg, #1a365d 0%, #2c5aa0 100%);transform:translateY(-2px);box-shadow:0 6px 20px rgba(44,90,160,.4)}.ytomo-reservation-fab[data-v-910d08c4]:active:not(:disabled){transform:translateY(0);box-shadow:0 2px 8px rgba(44,90,160,.3)}.ytomo-reservation-fab[data-v-910d08c4]:disabled{background:#94a3b8;cursor:not-allowed;box-shadow:0 2px 8px rgba(148,163,184,.3);opacity:.8;display:flex}.ytomo-reservation-fab[data-v-910d08c4]:focus{outline:none}.ytomo-reservation-fab.abort-mode[data-v-910d08c4]{background:linear-gradient(135deg, #dc2626 0%, #991b1b 100%);font-size:14px;font-weight:bold}.ytomo-reservation-fab.abort-mode[data-v-910d08c4]:hover:not(:disabled){background:linear-gradient(135deg, #991b1b 0%, #7f1d1d 100%)}.ytomo-endless-toggle[data-v-910d08c4]{position:fixed;bottom:156px;right:20px;width:40px;height:32px;background:#6b7280;border:none;border-radius:16px;color:#fff;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.3);transition:all .2s ease;z-index:10003;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:bold}.ytomo-endless-toggle.active[data-v-910d08c4]{background:#ff8c00;box-shadow:0 2px 8px rgba(255,140,0,.4)}.ytomo-endless-toggle[data-v-910d08c4]:hover{transform:translateY(-1px);box-shadow:0 4px 12px rgba(0,0,0,.4)}.ytomo-endless-toggle[data-v-910d08c4]:active{transform:translateY(0)}.ytomo-endless-toggle[data-v-910d08c4]:focus{outline:none}.ytomo-button-separator[data-v-910d08c4]{width:1px;height:32px;background:#d1d5db;margin:0 6px;align-self:center}.ytomo-pavilion-item[data-v-910d08c4]{animation:slideIn-910d08c4 .2s ease-out}@keyframes slideIn-910d08c4{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}.ytomo-time-slot-button.available[data-v-910d08c4]:hover{animation:pulse-910d08c4 .6s ease-in-out}@keyframes pulse-910d08c4{0%{transform:translateY(-1px)}50%{transform:translateY(-2px)}100%{transform:translateY(-1px)}}.ytomo-pavilion-tab input[data-v-910d08c4]:focus{outline:none;border-color:#2c5aa0}.ytomo-pavilion-tab button[data-v-910d08c4]:focus{outline:none}@media(prefers-reduced-motion: reduce){.ytomo-pavilion-item[data-v-910d08c4],.ytomo-time-slot-button[data-v-910d08c4],.ytomo-icon-button[data-v-910d08c4],.ytomo-result-display[data-v-910d08c4],.ytomo-time-slots[data-v-910d08c4]{animation:none;transition:none}.ytomo-time-slot-button.available[data-v-910d08c4]:hover{animation:none;transform:none}}@media(prefers-contrast: high){.ytomo-pavilion-item[data-v-910d08c4]{border-bottom-width:2px}.ytomo-time-slot-button[data-v-910d08c4]{border-width:2px}.ytomo-icon-button.active[data-v-910d08c4]{border-width:3px}.ytomo-pavilion-tab input[data-v-910d08c4]:focus,.ytomo-pavilion-tab button[data-v-910d08c4]:focus{outline:3px solid #000}}.ytomo-processing-overlay[data-v-910d08c4]{position:fixed;top:0;left:0;width:100%;height:100%;background-color:rgba(0,0,0,.7);display:flex;align-items:center;justify-content:center;z-index:10001;opacity:0;animation:fadeIn .2s ease-out forwards}.ytomo-processing-content[data-v-910d08c4]{background:#fff;border-radius:12px;padding:32px;box-shadow:0 20px 60px rgba(0,0,0,.3);text-align:center;min-width:300px;transform:scale(0.9);animation:dialogAppear .2s ease-out forwards}.ytomo-processing-spinner[data-v-910d08c4]{width:40px;height:40px;border:3px solid #e2e8f0;border-top-color:#2c5aa0;border-radius:50%;animation:spin-910d08c4 1s linear infinite;margin:0 auto 16px}.ytomo-processing-message[data-v-910d08c4]{margin:0 0 24px;color:#374151;font-size:16px;font-weight:500}.ytomo-cancel-button[data-v-910d08c4]{background:#6b7280;color:#fff;border:none;padding:12px 24px;border-radius:6px;font-size:14px;cursor:pointer;transition:background-color .2s}.ytomo-cancel-button[data-v-910d08c4]:hover{background:#4b5563}.ytomo-cancel-button[data-v-910d08c4]:focus{outline:2px solid #2c5aa0;outline-offset:2px}@keyframes spin-910d08c4{to{transform:rotate(360deg)}}@media(prefers-reduced-motion: reduce){.ytomo-processing-overlay[data-v-910d08c4],.ytomo-processing-content[data-v-910d08c4],.ytomo-processing-spinner[data-v-910d08c4]{animation:none;transition:none}}`, ""]);
+// Exports
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
+
+
+/***/ }),
+
+/***/ 850:
+/***/ ((module, __webpack_exports__, __webpack_require__) => {
+
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   A: () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _node_modules_css_loader_dist_runtime_noSourceMaps_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(601);
+/* harmony import */ var _node_modules_css_loader_dist_runtime_noSourceMaps_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_css_loader_dist_runtime_noSourceMaps_js__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(314);
+/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1__);
+// Imports
+
+
+var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1___default()((_node_modules_css_loader_dist_runtime_noSourceMaps_js__WEBPACK_IMPORTED_MODULE_0___default()));
+// Module
+___CSS_LOADER_EXPORT___.push([module.id, `.ytomo-ticket-tab[data-v-6189b1ab]{padding:0 12px 20px 12px;height:100%;overflow-y:auto;color-scheme:light}@media(max-width: 768px){.ytomo-ticket-tab[data-v-6189b1ab]{padding:0 8px 16px 8px}}.ytomo-quick-select[data-v-6189b1ab]{background:#fff;border-radius:8px;padding:12px;box-shadow:0 1px 3px rgba(0,0,0,.1);border:1px solid #e2e8f0;flex-shrink:0;display:flex;align-items:center;gap:10px;flex-wrap:wrap}.ytomo-quick-select .ytomo-control-left[data-v-6189b1ab]{display:flex;align-items:center;gap:12px;margin-right:auto}.ytomo-refresh-button[data-v-6189b1ab]{display:flex;align-items:center;gap:6px;padding:6px 12px;background:#f8fafc;border:1px solid #cbd5e1;border-radius:6px;color:#475569;font-size:12px;font-weight:500;cursor:pointer;transition:all .2s ease}.ytomo-refresh-button[data-v-6189b1ab]:hover:not(:disabled){background:#e2e8f0;border-color:#94a3b8}.ytomo-refresh-button[data-v-6189b1ab]:disabled{opacity:.6;cursor:not-allowed;background:#f1f5f9}.ytomo-refresh-icon[data-v-6189b1ab]{flex-shrink:0}.ytomo-refresh-icon.rotating[data-v-6189b1ab]{animation:spin-6189b1ab 1s linear infinite}@keyframes spin-6189b1ab{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}.ytomo-toggle-container[data-v-6189b1ab]{display:flex;align-items:center;cursor:pointer;user-select:none}.ytomo-toggle-input[data-v-6189b1ab]{display:none}.ytomo-toggle-slider[data-v-6189b1ab]{position:relative;width:44px;height:24px;background:#cbd5e1;border-radius:12px;transition:background-color .2s;margin-right:8px}.ytomo-toggle-slider[data-v-6189b1ab]::before{content:"";position:absolute;top:2px;left:2px;width:20px;height:20px;background:#fff;border-radius:50%;transition:transform .2s}.ytomo-toggle-input:checked+.ytomo-toggle-slider[data-v-6189b1ab]{background:#2c5aa0}.ytomo-toggle-input:checked+.ytomo-toggle-slider[data-v-6189b1ab]::before{transform:translateX(20px)}.ytomo-toggle-label[data-v-6189b1ab]{font-size:14px;font-weight:500;color:#374151}.ytomo-date-buttons[data-v-6189b1ab]{display:flex;flex-wrap:wrap;gap:8px;flex:1}.ytomo-entrance-date-button[data-v-6189b1ab],.ytomo-date-button[data-v-6189b1ab]{background:#e0f2fe;border:1px solid #0891b2;border-radius:4px;padding:4px 8px;font-size:12px;color:#0c4a6e;cursor:pointer;transition:all .2s;display:flex;flex-direction:column;gap:2px;align-items:center}.ytomo-entrance-date-button[data-v-6189b1ab] *,.ytomo-date-button[data-v-6189b1ab] *{pointer-events:none}.ytomo-entrance-date-button[data-v-6189b1ab]:focus,.ytomo-date-button[data-v-6189b1ab]:focus{outline:none;box-shadow:none}.ytomo-entrance-date-button[data-v-6189b1ab]:hover,.ytomo-date-button[data-v-6189b1ab]:hover{background:#dbeafe;color:#0c4a6e;transform:translateY(-1px);box-shadow:0 2px 4px rgba(186,230,253,.3)}.selected.ytomo-entrance-date-button[data-v-6189b1ab],.selected.ytomo-date-button[data-v-6189b1ab]{background:#0284c7;color:#fff;border-color:#0284c7;outline:2px solid #0284c7;outline-offset:-1px}.ytomo-entrance-date-button[data-v-6189b1ab]:active,.ytomo-date-button[data-v-6189b1ab]:active{transform:translateY(0);box-shadow:none}.disabled.ytomo-entrance-date-button[data-v-6189b1ab],.disabled.ytomo-date-button[data-v-6189b1ab],.ytomo-entrance-date-button[data-v-6189b1ab]:disabled,.ytomo-date-button[data-v-6189b1ab]:disabled{background:#e2e8f0;border-color:#94a3b8;color:#475569;cursor:not-allowed}.disabled.ytomo-entrance-date-button[data-v-6189b1ab]:hover,.disabled.ytomo-date-button[data-v-6189b1ab]:hover,.ytomo-entrance-date-button[data-v-6189b1ab]:disabled:hover,.ytomo-date-button[data-v-6189b1ab]:disabled:hover{background:#e2e8f0;color:#475569;transform:none;box-shadow:none}.ytomo-ticket-tab[data-v-6189b1ab]{padding:0 12px 20px 12px;height:100%;overflow-y:auto;color-scheme:light}@media(max-width: 768px){.ytomo-ticket-tab[data-v-6189b1ab]{padding:0 8px 16px 8px}}.ytomo-quick-select[data-v-6189b1ab]{background:#fff;border-radius:8px;padding:16px;box-shadow:0 1px 3px rgba(0,0,0,.1);border:1px solid #e2e8f0;flex-shrink:0;display:flex;align-items:center;gap:10px;flex-wrap:wrap;min-height:52px}.ytomo-toggle-container[data-v-6189b1ab]{display:flex;align-items:center;cursor:pointer;user-select:none}.ytomo-toggle-input[data-v-6189b1ab]{display:none}.ytomo-toggle-slider[data-v-6189b1ab]{position:relative;width:44px;height:24px;background:#cbd5e1;border-radius:12px;transition:background-color .2s;margin-right:8px}.ytomo-toggle-slider[data-v-6189b1ab]::before{content:"";position:absolute;top:2px;left:2px;width:20px;height:20px;background:#fff;border-radius:50%;transition:transform .2s}.ytomo-toggle-input:checked+.ytomo-toggle-slider[data-v-6189b1ab]{background:#2c5aa0}.ytomo-toggle-input:checked+.ytomo-toggle-slider[data-v-6189b1ab]::before{transform:translateX(20px)}.ytomo-toggle-label[data-v-6189b1ab]{font-size:14px;font-weight:500;color:#374151}.ytomo-date-buttons[data-v-6189b1ab]{display:flex;flex-wrap:wrap;gap:8px;flex:1}.ytomo-ticket-list[data-v-6189b1ab]{display:flex;flex-direction:column;gap:8px;margin-bottom:20px}.ytomo-ticket-item[data-v-6189b1ab]{background:#fff;border-radius:6px;border:1px solid #e2e8f0;overflow:hidden;transition:all .2s}.ytomo-ticket-item[data-v-6189b1ab]:first-of-type{margin-top:12px}.hidden[data-v-6189b1ab]{display:none}.ytomo-ticket-item[data-v-6189b1ab]:hover{border-color:#cbd5e1;box-shadow:0 2px 4px rgba(0,0,0,.1)}.ytomo-ticket-item.selected[data-v-6189b1ab]{border-color:#2c5aa0;box-shadow:0 0 0 2px rgba(44,90,160,.2)}.ytomo-ticket-upper[data-v-6189b1ab]{background:#e2e8f0;padding:8px 12px;display:flex;align-items:center;gap:8px;border-bottom:1px solid #cbd5e1}.ytomo-ticket-id[data-v-6189b1ab]{font-family:"Courier New",monospace;font-size:13px;font-weight:600;color:#374151;background:#e2e8f0;padding:2px 6px;border-radius:3px}.ytomo-me-tip[data-v-6189b1ab]{background:linear-gradient(135deg, #10b981 0%, #059669 100%);color:#fff;padding:2px 6px;border-radius:10px;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.3px}.ytomo-external-tip[data-v-6189b1ab]{background:linear-gradient(135deg, #f59e0b 0%, #d97706 100%);color:#fff;padding:2px 6px;border-radius:10px;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.3px}.ytomo-ticket-delete-button[data-v-6189b1ab]{background:#ef4444;color:#fff;border:none;border-radius:50%;width:20px;height:20px;font-size:14px;font-weight:bold;cursor:pointer;display:flex;align-items:center;justify-content:center;margin-left:auto;transition:all .2s ease}.ytomo-ticket-delete-button[data-v-6189b1ab]:hover{background:#dc2626;transform:scale(1.1)}.ytomo-item-name[data-v-6189b1ab]{background:linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);color:#fff;padding:2px 6px;border-radius:10px;font-size:9px;font-weight:500;max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.ytomo-label-tag[data-v-6189b1ab]{background:linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);color:#fff;padding:2px 6px;border-radius:10px;font-size:10px;font-weight:600}.ytomo-ticket-lower[data-v-6189b1ab]{padding:8px 12px;display:flex;flex-direction:column;gap:8px}.ytomo-entrance-dates[data-v-6189b1ab]{display:flex;flex-wrap:wrap;gap:6px}.ytomo-reservation-types[data-v-6189b1ab]{display:flex;flex-wrap:wrap;gap:6px;align-items:center}.ytomo-reservation-type[data-v-6189b1ab]{padding:4px 8px;border-radius:4px;font-size:12px;font-weight:500}.ytomo-reservation-type.active[data-v-6189b1ab]{background:#dcfce7;color:#166534;border:1px solid #22c55e}.ytomo-reservation-type.inactive[data-v-6189b1ab]{background:#fef2f2;color:#991b1b;border:1px solid #ef4444}.ytomo-no-reservation-types[data-v-6189b1ab]{color:#6b7280;font-size:12px;font-style:italic}.ytomo-add-ticket[data-v-6189b1ab]{background:#fff;border-radius:8px;padding:16px;border:2px dashed #cbd5e1;margin-top:20px}.ytomo-add-ticket h4[data-v-6189b1ab]{margin:0 0 12px 0;color:#374151;font-size:14px;font-weight:600}.ytomo-add-result[data-v-6189b1ab]{margin-top:8px;padding:8px 12px;border-radius:4px;font-size:12px;font-weight:500;text-align:center}.ytomo-add-result.success[data-v-6189b1ab]{background:#dcfce7;color:#166534;border:1px solid #22c55e}.ytomo-add-result.error[data-v-6189b1ab]{background:#fee2e2;color:#dc2626;border:1px solid #ef4444}.ytomo-add-ticket-form[data-v-6189b1ab]{display:flex;gap:8px;align-items:center;flex-wrap:wrap}@media(max-width: 768px){.ytomo-add-ticket-form[data-v-6189b1ab]{flex-direction:column;align-items:stretch;gap:12px}}.ytomo-input-inline[data-v-6189b1ab]{padding:4px 8px;border:1px solid #d1d5db;border-radius:4px;font-size:12px;transition:border-color .2s;background:#fff}.ytomo-input-inline[data-v-6189b1ab]:focus{outline:none;border-color:#2c5aa0;box-shadow:0 0 0 2px rgba(44,90,160,.1)}.ytomo-input-inline[data-v-6189b1ab]::placeholder{color:#9ca3af}.ytomo-input-inline.ytomo-input-ticket-id[data-v-6189b1ab]{width:120px}.ytomo-input-inline.ytomo-input-label[data-v-6189b1ab]{width:60px}.ytomo-select-inline[data-v-6189b1ab]{padding:4px 8px;border:1px solid #d1d5db;border-radius:4px;font-size:12px;background:#fff;cursor:pointer;width:50px}.ytomo-select-inline[data-v-6189b1ab]:focus{outline:none;border-color:#2c5aa0;box-shadow:0 0 0 2px rgba(44,90,160,.1)}.ytomo-ticket-upper[data-v-6189b1ab]{background:#e2e8f0;padding:8px 12px;display:flex;align-items:center;gap:8px;border-bottom:1px solid #cbd5e1}.ytomo-ticket-id[data-v-6189b1ab]{font-family:"Courier New",monospace;font-size:13px;font-weight:600;color:#374151;background:#e2e8f0;padding:2px 6px;border-radius:3px}.ytomo-me-tip[data-v-6189b1ab]{background:linear-gradient(135deg, #10b981 0%, #059669 100%);color:#fff;padding:2px 6px;border-radius:10px;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.3px}.ytomo-external-tip[data-v-6189b1ab]{background:linear-gradient(135deg, #f59e0b 0%, #d97706 100%);color:#fff;padding:2px 6px;border-radius:10px;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.3px}.ytomo-ticket-lower[data-v-6189b1ab]{padding:8px 12px;display:flex;flex-direction:column;gap:8px}.ytomo-entrance-date-button .ytomo-reservation-status[data-v-6189b1ab]{background:hsla(0,0%,100%,.9);color:#0891b2;padding:2px 4px;border-radius:3px;font-size:9px;font-weight:500;line-height:1.1;text-align:center}.ytomo-entrance-date-button .ytomo-reservation-status[data-v-6189b1ab]:empty{background:rgba(0,0,0,0);padding:0}.ytomo-entrance-date-button:hover .ytomo-reservation-status[data-v-6189b1ab]{background:hsla(0,0%,100%,.95);color:#0ea5e9}.ytomo-entrance-date-button:hover .ytomo-reservation-status[data-v-6189b1ab]:empty{background:rgba(0,0,0,0)}.ytomo-reservation-type-indicator[data-v-6189b1ab]{display:inline-block;width:16px;height:13px;font-size:10px;font-weight:400;text-align:center;line-height:13px;border-radius:3px;border:1px solid rgba(0,0,0,0);-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif}.ytomo-reservation-type-indicator.indicator-won[data-v-6189b1ab]{background:#10b981;color:#fff;border-color:#059669}.ytomo-reservation-type-indicator.indicator-active[data-v-6189b1ab]{background:#3b82f6;color:#fff;border-color:#2563eb}.ytomo-reservation-type-indicator.indicator-before[data-v-6189b1ab]{background:#f59e0b;color:#fff;border-color:#d97706}.ytomo-reservation-type-indicator.indicator-none[data-v-6189b1ab]{background:#e5e7eb;color:#6b7280;border-color:#d1d5db}.ytomo-no-reservation[data-v-6189b1ab]{font-style:italic;color:#9ca3af}.ytomo-entrance-date-button.selected .ytomo-reservation-status[data-v-6189b1ab]{background:hsla(0,0%,100%,.95);color:#0891b2}.ytomo-entrance-date-button.selected .ytomo-reservation-status[data-v-6189b1ab]:empty{background:rgba(0,0,0,0)}.ytomo-entrance-date-button.disabled .ytomo-reservation-status[data-v-6189b1ab]{background:hsla(0,0%,100%,.9);color:#475569}.ytomo-entrance-date-button.disabled .ytomo-reservation-status[data-v-6189b1ab]:empty{background:rgba(0,0,0,0)}.ytomo-entrance-date-button .ytomo-schedule-line[data-v-6189b1ab]{padding:2px 0;font-size:11px;line-height:1.2}.ytomo-entrance-date-button .ytomo-schedule-line.ytomo-reservation-line[data-v-6189b1ab]{color:#6b7280;display:flex;align-items:center;gap:4px;font-size:10px}.ytomo-entrance-date-button .ytomo-schedule-divider[data-v-6189b1ab]{height:1px;background:#e5e7eb;margin:2px 0;width:100%}.ytomo-entrance-date-button.selected .ytomo-schedule-line.ytomo-reservation-line[data-v-6189b1ab]{color:hsla(0,0%,100%,.8)}.ytomo-entrance-date-button.selected .ytomo-schedule-divider[data-v-6189b1ab]{background:hsla(0,0%,100%,.3)}.ytomo-entrance-date-group[data-v-6189b1ab]{display:flex;gap:6px;align-items:stretch}.ytomo-expand-button[data-v-6189b1ab]{background:#f8fafc;border:1px solid #cbd5e1;color:#374151;font-size:12px;font-weight:600;padding:3px 8px;cursor:pointer;border-radius:4px;transition:all .2s ease;min-width:24px;height:50%;display:flex;align-items:center;justify-content:center;align-self:flex-end}.ytomo-expand-button[data-v-6189b1ab]:disabled{background:#f3f4f6;border-color:#d1d5db;color:#9ca3af;cursor:not-allowed;opacity:.5}.ytomo-expand-button[data-v-6189b1ab]:hover{background:#e2e8f0;border-color:#94a3b8;transform:translateY(-1px)}.ytomo-expand-button[data-v-6189b1ab]:active{transform:translateY(0)}.ytomo-expand-button[data-v-6189b1ab]:focus{outline:none;box-shadow:0 0 0 2px rgba(44,90,160,.2)}.ytomo-pavilion-details[data-v-6189b1ab]{margin-top:12px;padding:12px;background:#f8fafc;border-radius:6px;border:1px solid #e2e8f0}.ytomo-schedule-detail[data-v-6189b1ab]{margin-bottom:16px}.ytomo-schedule-detail[data-v-6189b1ab]:last-child{margin-bottom:0}.ytomo-schedule-date-header[data-v-6189b1ab]{font-weight:600;color:#334155;margin-bottom:8px;font-size:13px;padding-bottom:4px;border-bottom:1px solid #e2e8f0}.ytomo-pavilion-reservation-group[data-v-6189b1ab]{margin-bottom:12px;padding:8px 0;border-bottom:1px solid #e5e7eb}.ytomo-pavilion-reservation-group[data-v-6189b1ab]:last-child{margin-bottom:0;border-bottom:none}.ytomo-reservation-header[data-v-6189b1ab]{display:flex;align-items:flex-start;gap:12px}.ytomo-reservation-left[data-v-6189b1ab]{display:flex;flex-direction:column;gap:4px;min-width:80px;flex-shrink:0}.ytomo-reservation-right[data-v-6189b1ab]{flex:1;display:flex;flex-direction:column;gap:4px}.ytomo-reservation-type-badge[data-v-6189b1ab]{padding:2px 8px;border-radius:12px;font-size:11px;font-weight:600;white-space:nowrap;text-align:center}.ytomo-reservation-type-badge.badge-won[data-v-6189b1ab]{background:#10b981;color:#fff}.ytomo-reservation-type-badge.badge-expired[data-v-6189b1ab]{background:#ef4444;color:#fff}.ytomo-reservation-type-badge.badge-before[data-v-6189b1ab]{background:#f59e0b;color:#fff}.ytomo-reservation-type-badge.badge-submitted[data-v-6189b1ab]{background:#8b5cf6;color:#fff}.ytomo-reservation-type-badge.badge-none[data-v-6189b1ab]{background:#6b7280;color:#fff}.ytomo-time-slot-badge[data-v-6189b1ab]{background:#f8fafc;color:#475569;padding:2px 8px;border-radius:8px;font-size:11px;font-weight:500;text-align:center;border:1px solid #e2e8f0}.ytomo-time-slot-badge[data-v-6189b1ab]:empty::after{content:"—"}.ytomo-pavilion-name[data-v-6189b1ab]{font-weight:600;color:#334155;font-size:13px;line-height:1.3}.ytomo-pavilion-name.ytomo-status-text[data-v-6189b1ab]{color:#6b7280;font-style:italic;font-weight:500}.ytomo-use-status[data-v-6189b1ab]{color:#475569;font-size:11px;font-weight:500}.ytomo-reservation-type-header[data-v-6189b1ab]{display:flex;flex-direction:column;gap:4px;min-width:80px;flex-shrink:0}.ytomo-reservation-type-badge[data-v-6189b1ab]{background:#3b82f6;color:#fff;padding:4px 8px;border-radius:4px;font-size:10px;font-weight:600;text-align:center;line-height:1.2}.ytomo-time-slot-badge[data-v-6189b1ab]{background:#2c5aa0;color:#fff;padding:3px 6px;border-radius:3px;font-size:10px;font-weight:500;text-align:center;line-height:1.2}.ytomo-pavilion-info[data-v-6189b1ab]{flex:1;color:#374151;font-size:12px;line-height:1.4;display:flex;align-items:center}.ytomo-no-entrance-dates[data-v-6189b1ab]{color:#6b7280;font-size:12px;font-style:italic}.ytomo-input-inline[data-v-6189b1ab]{padding:4px 8px;border:1px solid #d1d5db;border-radius:4px;font-size:12px;transition:border-color .2s;background:#fff}.ytomo-input-inline[data-v-6189b1ab]:focus{outline:none;border-color:#2c5aa0;box-shadow:0 0 0 2px rgba(44,90,160,.1)}.ytomo-input-inline[data-v-6189b1ab]::placeholder{color:#9ca3af}.ytomo-input-inline.ytomo-input-ticket-id[data-v-6189b1ab]{width:120px}.ytomo-input-inline.ytomo-input-label[data-v-6189b1ab]{width:60px}.ytomo-select-inline[data-v-6189b1ab]{padding:4px 8px;border:1px solid #d1d5db;border-radius:4px;font-size:12px;background:#fff;cursor:pointer;width:50px}.ytomo-select-inline[data-v-6189b1ab]:focus{outline:none;border-color:#2c5aa0;box-shadow:0 0 0 2px rgba(44,90,160,.1)}.ytomo-button[data-v-6189b1ab]{padding:8px 16px;border:none;border-radius:6px;font-size:14px;font-weight:500;cursor:pointer;transition:all .2s;display:inline-flex;align-items:center;justify-content:center;white-space:nowrap}.ytomo-button.primary[data-v-6189b1ab]{background:linear-gradient(135deg, #2c5aa0 0%, #1a365d 100%);color:#fff}.ytomo-button.primary[data-v-6189b1ab]:hover{background:linear-gradient(135deg, #1a365d 0%, #2c5aa0 100%);transform:translateY(-1px);box-shadow:0 4px 12px rgba(44,90,160,.3)}.ytomo-button.primary[data-v-6189b1ab]:active{transform:translateY(0)}.ytomo-button.retry-button[data-v-6189b1ab]{background:linear-gradient(135deg, #f59e0b 0%, #d97706 100%);color:#fff;margin-top:12px}.ytomo-button.retry-button[data-v-6189b1ab]:hover{background:linear-gradient(135deg, #d97706 0%, #f59e0b 100%)}.ytomo-button[data-v-6189b1ab]:focus{outline:2px solid #2c5aa0;outline-offset:2px}.ytomo-button[data-v-6189b1ab]:disabled{opacity:.5;cursor:not-allowed;transform:none !important}.ytomo-empty-state[data-v-6189b1ab]{text-align:center;padding:40px 20px;color:#6b7280;font-style:italic}.ytomo-empty-state p[data-v-6189b1ab]{margin:0;font-size:14px}.ytomo-error[data-v-6189b1ab]{text-align:center;padding:40px 20px;color:#dc2626}.ytomo-error h3[data-v-6189b1ab]{margin:0 0 8px 0;font-size:16px;color:#dc2626}.ytomo-error p[data-v-6189b1ab]{margin:0;font-size:14px;color:#6b7280}.ytomo-ticket-tab .ytomo-loading[data-v-6189b1ab]{height:150px}.ytomo-ticket-item[data-v-6189b1ab]{animation:slideIn-6189b1ab .2s ease-out}@keyframes slideIn-6189b1ab{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}@media(prefers-reduced-motion: reduce){.ytomo-ticket-item[data-v-6189b1ab],.ytomo-button[data-v-6189b1ab],.ytomo-date-button[data-v-6189b1ab],.ytomo-entrance-date-button[data-v-6189b1ab],.ytomo-toggle-slider[data-v-6189b1ab],.ytomo-input-inline[data-v-6189b1ab]{animation:none;transition:none}}@media(prefers-contrast: high){.ytomo-ticket-item[data-v-6189b1ab]{border-width:3px}.ytomo-ticket-item.selected[data-v-6189b1ab]{border-width:4px}.ytomo-button[data-v-6189b1ab]:focus,.ytomo-input-inline[data-v-6189b1ab]:focus,.ytomo-date-button[data-v-6189b1ab]:focus,.ytomo-entrance-date-button[data-v-6189b1ab]:focus,.ytomo-input-inline[data-v-6189b1ab]:focus,.ytomo-select-inline[data-v-6189b1ab]:focus{outline:3px solid #000}}.ytomo-empty-state[data-v-6189b1ab]{text-align:center;padding:40px 20px;color:#6b7280;font-style:italic}.ytomo-empty-state p[data-v-6189b1ab]{margin:0;font-size:14px}.ytomo-error[data-v-6189b1ab]{text-align:center;padding:40px 20px;color:#dc2626}.ytomo-error h3[data-v-6189b1ab]{margin:0 0 8px 0;font-size:16px;color:#dc2626}.ytomo-error p[data-v-6189b1ab]{margin:0;font-size:14px;color:#6b7280}.ytomo-ticket-list[data-v-6189b1ab]::-webkit-scrollbar{width:6px}.ytomo-ticket-list[data-v-6189b1ab]::-webkit-scrollbar-track{background:#f1f5f9;border-radius:3px}.ytomo-ticket-list[data-v-6189b1ab]::-webkit-scrollbar-thumb{background:#cbd5e1;border-radius:3px}.ytomo-ticket-list[data-v-6189b1ab]::-webkit-scrollbar-thumb:hover{background:#94a3b8}.ytomo-ticket-item[data-v-6189b1ab]{animation:slideIn-6189b1ab .2s ease-out}@keyframes slideIn-6189b1ab{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}`, ""]);
+// Exports
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
+
 
 /***/ }),
 
@@ -38302,8 +38336,8 @@ const useMainDialogStore = (0,pinia/* defineStore */.nY)('mainDialog', () => {
     }
 });
 
-// EXTERNAL MODULE: ./ts/stores/tickets.ts + 1 modules
-var tickets = __webpack_require__(305);
+// EXTERNAL MODULE: ./ts/stores/tickets.ts
+var tickets = __webpack_require__(757);
 // EXTERNAL MODULE: ./ts/stores/pavilions.ts
 var pavilions = __webpack_require__(325);
 ;// ./node_modules/ts-loader/index.js??clonedRuleSet-1.use!./node_modules/vue-loader/dist/index.js??ruleSet[1].rules[8].use[0]!./ts/components/MainFab.vue?vue&type=script&setup=true&lang=ts
@@ -38337,13 +38371,35 @@ const _hoisted_4 = ["disabled", "title"];
                 logger.warn('初期化中のため待機中');
             }
         };
+        // 時刻を「11:14」形式にフォーマット
+        const formatTime = (timeStr) => {
+            // 「1114」形式を「11:14」に変換
+            const match = timeStr.match(/(\d{2})(\d{2})/);
+            if (match) {
+                return `${match[1]}:${match[2]}`;
+            }
+            return timeStr;
+        };
+        // エラーメッセージを日本語に変換
+        const translateErrorMessage = (reason) => {
+            if (reason.includes('select ticket valid error')) {
+                return '無効';
+            }
+            return reason;
+        };
         // 予約結果を表示する関数
         const showReservationResult = (result) => {
-            reservationResult.value = result;
-            // 5秒後に自動で非表示
+            // 時刻フォーマットを修正
+            const formattedResult = {
+                ...result,
+                datetime: result.datetime.replace(/(\d{4})$/, (match) => formatTime(match)),
+                reason: result.reason ? translateErrorMessage(result.reason) : undefined
+            };
+            reservationResult.value = formattedResult;
+            // 10秒後に自動で非表示（表示時間を延長）
             setTimeout(() => {
                 reservationResult.value = null;
-            }, 5000);
+            }, 10000);
         };
         // 予約結果イベントリスナー
         const handleReservationResult = (event) => {
@@ -38479,58 +38535,68 @@ const useTickets = () => {
     };
 };
 
+// EXTERNAL MODULE: ./ts/utils/pavilionReservationTypes.ts
+var pavilionReservationTypes = __webpack_require__(556);
 ;// ./node_modules/ts-loader/index.js??clonedRuleSet-1.use!./node_modules/vue-loader/dist/index.js??ruleSet[1].rules[8].use[0]!./ts/components/TicketTab.vue?vue&type=script&setup=true&lang=ts
 
 
 const TicketTabvue_type_script_setup_true_lang_ts_hoisted_1 = { class: "ytomo-ticket-tab" };
 const TicketTabvue_type_script_setup_true_lang_ts_hoisted_2 = { class: "ytomo-quick-select" };
-const TicketTabvue_type_script_setup_true_lang_ts_hoisted_3 = { class: "ytomo-toggle-container" };
-const TicketTabvue_type_script_setup_true_lang_ts_hoisted_4 = { class: "ytomo-date-buttons" };
-const _hoisted_5 = ["data-date", "onClick"];
-const _hoisted_6 = {
+const TicketTabvue_type_script_setup_true_lang_ts_hoisted_3 = { class: "ytomo-control-left" };
+const TicketTabvue_type_script_setup_true_lang_ts_hoisted_4 = { class: "ytomo-toggle-container" };
+const _hoisted_5 = ["disabled"];
+const _hoisted_6 = { class: "ytomo-date-buttons" };
+const _hoisted_7 = ["data-date", "onClick"];
+const _hoisted_8 = {
     class: "ytomo-ticket-list",
     id: "ticket-list-container"
 };
-const _hoisted_7 = {
+const _hoisted_9 = {
     key: 0,
     class: "ytomo-loading"
 };
-const _hoisted_8 = { class: "ytomo-error" };
-const _hoisted_9 = { class: "ytomo-empty-state" };
-const _hoisted_10 = ["data-ticket-id", "onClick"];
-const _hoisted_11 = { class: "ytomo-ticket-upper" };
-const _hoisted_12 = { class: "ytomo-ticket-id" };
-const _hoisted_13 = ["onClick"];
-const _hoisted_14 = { class: "ytomo-ticket-lower" };
-const _hoisted_15 = { class: "ytomo-entrance-dates" };
-const _hoisted_16 = {
+const _hoisted_10 = { class: "ytomo-error" };
+const _hoisted_11 = { class: "ytomo-empty-state" };
+const _hoisted_12 = ["data-ticket-id", "onClick"];
+const _hoisted_13 = { class: "ytomo-ticket-upper" };
+const _hoisted_14 = { class: "ytomo-ticket-id" };
+const _hoisted_15 = ["onClick"];
+const _hoisted_16 = { class: "ytomo-ticket-lower" };
+const _hoisted_17 = { class: "ytomo-entrance-dates" };
+const _hoisted_18 = {
     key: 0,
     class: "ytomo-no-entrance-dates"
 };
-const _hoisted_17 = ["data-date", "data-use-state", "data-available-types", "disabled", "onClick"];
-const _hoisted_18 = { class: "ytomo-schedule-line" };
-const _hoisted_19 = ["disabled", "onClick", "title"];
-const _hoisted_20 = {
+const _hoisted_19 = ["data-date", "data-use-state", "data-available-types", "disabled", "onClick"];
+const _hoisted_20 = { class: "ytomo-schedule-line" };
+const _hoisted_21 = { class: "ytomo-schedule-line ytomo-reservation-line" };
+const _hoisted_22 = {
+    key: 0,
+    class: "ytomo-no-reservation"
+};
+const _hoisted_23 = ["disabled", "onClick", "title"];
+const _hoisted_24 = {
     key: 0,
     class: "ytomo-pavilion-details"
 };
-const _hoisted_21 = { class: "ytomo-schedule-date-header" };
-const _hoisted_22 = {
+const _hoisted_25 = { class: "ytomo-schedule-date-header" };
+const _hoisted_26 = {
     key: 0,
     class: "ytomo-pavilion-reservation-group"
 };
-const _hoisted_23 = { class: "ytomo-reservation-header" };
-const _hoisted_24 = { class: "ytomo-reservation-left" };
-const _hoisted_25 = { class: "ytomo-reservation-type-badge" };
-const _hoisted_26 = { class: "ytomo-time-slot-badge" };
-const _hoisted_27 = { class: "ytomo-reservation-right" };
-const _hoisted_28 = {
+const _hoisted_27 = { class: "ytomo-reservation-header" };
+const _hoisted_28 = { class: "ytomo-reservation-left" };
+const _hoisted_29 = { class: "ytomo-time-slot-badge" };
+const _hoisted_30 = { class: "ytomo-reservation-right" };
+const _hoisted_31 = {
     key: 0,
     class: "ytomo-use-status"
 };
-const _hoisted_29 = { class: "ytomo-ticket-item ytomo-add-ticket-item" };
-const _hoisted_30 = { class: "ytomo-ticket-upper" };
-const _hoisted_31 = ["disabled"];
+const _hoisted_32 = { class: "ytomo-ticket-item ytomo-add-ticket-item" };
+const _hoisted_33 = { class: "ytomo-ticket-upper" };
+const _hoisted_34 = ["disabled"];
+
+
 
 
 
@@ -38555,6 +38621,7 @@ const _hoisted_31 = ["disabled"];
         const selectedChannel = (0,vue_esm_bundler/* ref */.KR)('5');
         const addResult = (0,vue_esm_bundler/* ref */.KR)(null);
         const expandedSchedules = (0,vue_esm_bundler/* ref */.KR)(new Set());
+        const isRefreshing = (0,vue_esm_bundler/* ref */.KR)(false);
         // 計算プロパティ
         const availableDates = (0,vue_esm_bundler/* computed */.EW)(() => {
             const dates = new Set();
@@ -38617,6 +38684,22 @@ const _hoisted_31 = ["disabled"];
         const handleOwnOnlyToggle = () => {
             logger.debug('自分のみ表示', { isOwnOnlyToggle: isOwnOnlyToggle.value });
         };
+        const handleRefreshTickets = async () => {
+            if (isRefreshing.value)
+                return;
+            isRefreshing.value = true;
+            logger.info('チケット情報手動更新開始');
+            try {
+                await ticketsStore.loadAllTickets(true); // 強制更新
+                logger.info('チケット情報手動更新完了');
+            }
+            catch (error) {
+                logger.error('チケット情報更新エラー:', error);
+            }
+            finally {
+                isRefreshing.value = false;
+            }
+        };
         const handleDateSelection = (date) => {
             logger.debug('日付ボタン選択', { date });
             // その日付のすべての有効なスケジュールを選択/選択解除
@@ -38636,6 +38719,16 @@ const _hoisted_31 = ["disabled"];
             // 分散状態更新: その日付のすべてのスケジュールの選択状態を更新
             ticketsArray.value.forEach((ticket) => {
                 if (ticket.schedules) {
+                    // まず他の日付の選択を解除（新しく選択する場合のみ）
+                    if (newSelectedState) {
+                        ticket.schedules.forEach((schedule) => {
+                            if (schedule.entrance_date !== date && schedule.selected) {
+                                schedule.selected = false;
+                                ticketsStore.removeSelectedEntranceDate(ticket.ticket_id);
+                            }
+                        });
+                    }
+                    // 指定日付のスケジュールを更新
                     ticket.schedules.forEach((schedule) => {
                         if (schedule.entrance_date === date && schedule.isEffective === true) {
                             schedule.selected = newSelectedState;
@@ -38849,15 +38942,9 @@ const _hoisted_31 = ["disabled"];
                 return expandedSchedules.value.has(key);
             });
         };
-        // パビリオン予約関連ヘルパーメソッド
+        // パビリオン予約関連ヘルパーメソッド（共通関数使用）
         const getReservationTypeName = (type) => {
-            switch (type) {
-                case '月': return '2か月前抽選';
-                case '週': return '7日前抽選';
-                case '3': return '3日前予約';
-                case '1': return '当日予約';
-                default: return type;
-            }
+            return (0,pavilionReservationMapping/* getLongNameFromShortName */.je)(type);
         };
         const getPeriodStatusText = (status) => {
             switch (status) {
@@ -38904,6 +38991,107 @@ const _hoisted_31 = ["disabled"];
             const submissionText = getSubmissionStatusText(submissionStatus);
             return `${periodText}・${submissionText}`;
         };
+        // 予約種類を5,4,3,2の順（チャネル順）で並び替え（共通関数使用）
+        const getSortedReservationTypes = (schedule) => {
+            if (!schedule.pavilionReservationStatus)
+                return [];
+            // チャネル順（5,4,3,2）に対応するshortNameを取得
+            const allTypes = (0,pavilionReservationMapping/* getAllPavilionReservationTypes */.lk)();
+            const sortedTypes = allTypes
+                .sort((a, b) => parseInt(b.channel) - parseInt(a.channel)) // 5,4,3,2の順
+                .map(type => type.shortName);
+            return sortedTypes.filter(type => schedule.pavilionReservationStatus?.[type]);
+        };
+        // 予約種類バッジのクラス（優先度順：当選>期限切れ>開始前>提出>未提出）
+        const getReservationTypeBadgeClass = (reservationStatus) => {
+            if (!reservationStatus)
+                return 'badge-none';
+            if (reservationStatus.submissionStatus === 'won')
+                return 'badge-won';
+            if (reservationStatus.periodStatus === 'expired')
+                return 'badge-expired';
+            if (reservationStatus.periodStatus === 'before')
+                return 'badge-before';
+            if (reservationStatus.submissionStatus === 'submitted')
+                return 'badge-submitted';
+            return 'badge-none';
+        };
+        // 入場予約2行目用の予約種類一覧（共通関数使用）
+        const getReservationTypesForSecondLine = (schedule) => {
+            // pavilionReservationStatusがない場合は入場日付から計算
+            if (!schedule.pavilionReservationStatus && schedule.entrance_date) {
+                const allTypes = (0,pavilionReservationMapping/* getAllPavilionReservationTypes */.lk)();
+                const sortedTypes = allTypes
+                    .sort((a, b) => parseInt(b.channel) - parseInt(a.channel)) // 5,4,3,2の順
+                    .map(type => type.shortName);
+                // パビリオン予約期間判定を実行
+                const allStatus = (0,pavilionReservationTypes/* getAllPavilionReservationStatus */.s)(schedule.entrance_date);
+                // 当選・受付中・開始前を判定
+                const wonOrActive = sortedTypes.filter(type => {
+                    const status = allStatus[type];
+                    return status && (status.submissionStatus === 'won' || status.periodStatus === 'active');
+                });
+                const result = wonOrActive.length > 0 ? wonOrActive :
+                    sortedTypes.filter(type => {
+                        const status = allStatus[type];
+                        return status && status.periodStatus === 'before';
+                    }).slice(-1);
+                const displayNames = { '1': '当', '3': '3', '週': '週', '月': '月' };
+                return result.map(type => ({
+                    type,
+                    shortName: displayNames[type] || type,
+                    statusClass: getSecondLineStatusClassFromPeriod(allStatus[type]?.periodStatus || 'none', allStatus[type]?.submissionStatus || 'none')
+                }));
+            }
+            if (!schedule.pavilionReservationStatus)
+                return [];
+            // チャネル順（5,4,3,2）に対応するshortNameを取得
+            const allTypes = (0,pavilionReservationMapping/* getAllPavilionReservationTypes */.lk)();
+            const sortedTypes = allTypes
+                .sort((a, b) => parseInt(b.channel) - parseInt(a.channel)) // 5,4,3,2の順
+                .map(type => type.shortName);
+            // 2行目表示用の短縮名マッピング
+            const displayNames = { '1': '当', '3': '3', '週': '週', '月': '月' };
+            // まず当選と受付中を抽出
+            const wonOrActive = sortedTypes.filter(type => {
+                const status = schedule.pavilionReservationStatus?.[type];
+                return status && (status.submissionStatus === 'won' || status.periodStatus === 'active');
+            });
+            // 当選・受付中がない場合のみ、開始前の最後の1つを表示
+            const result = wonOrActive.length > 0 ? wonOrActive :
+                sortedTypes.filter(type => {
+                    const status = schedule.pavilionReservationStatus?.[type];
+                    return status && status.periodStatus === 'before';
+                }).slice(-1); // 開始前は最後の1つだけ
+            return result
+                .map(type => ({
+                type,
+                shortName: displayNames[type] || type,
+                statusClass: getSecondLineStatusClass(schedule.pavilionReservationStatus[type])
+            }));
+        };
+        // 2行目の予約種類表示用スタイルクラス
+        const getSecondLineStatusClass = (reservationStatus) => {
+            if (!reservationStatus)
+                return 'indicator-none';
+            if (reservationStatus.submissionStatus === 'won')
+                return 'indicator-won';
+            if (reservationStatus.periodStatus === 'active')
+                return 'indicator-active';
+            if (reservationStatus.periodStatus === 'before')
+                return 'indicator-before';
+            return 'indicator-none';
+        };
+        // 期間と提出状況から2行目スタイルクラスを取得（外部チケット用）
+        const getSecondLineStatusClassFromPeriod = (periodStatus, submissionStatus) => {
+            if (submissionStatus === 'won')
+                return 'indicator-won';
+            if (periodStatus === 'active')
+                return 'indicator-active';
+            if (periodStatus === 'before')
+                return 'indicator-before';
+            return 'indicator-none';
+        };
         // ライフサイクル
         (0,vue_esm_bundler/* onMounted */.sV)(() => {
             logger.info('TicketTab mounted', {
@@ -38919,42 +39107,66 @@ const _hoisted_31 = ["disabled"];
             return ((0,vue_esm_bundler/* openBlock */.uX)(), (0,vue_esm_bundler/* createElementBlock */.CE)("div", TicketTabvue_type_script_setup_true_lang_ts_hoisted_1, [
                 (0,vue_esm_bundler/* createCommentVNode */.Q3)(" チケット簡易選択エリア "),
                 (0,vue_esm_bundler/* createElementVNode */.Lk)("div", TicketTabvue_type_script_setup_true_lang_ts_hoisted_2, [
-                    (0,vue_esm_bundler/* createElementVNode */.Lk)("label", TicketTabvue_type_script_setup_true_lang_ts_hoisted_3, [
-                        (0,vue_esm_bundler/* withDirectives */.bo)((0,vue_esm_bundler/* createElementVNode */.Lk)("input", {
-                            type: "checkbox",
-                            id: "own-only-toggle",
-                            class: "ytomo-toggle-input",
-                            "onUpdate:modelValue": _cache[0] || (_cache[0] = ($event) => ((isOwnOnlyToggle).value = $event)),
-                            onChange: handleOwnOnlyToggle
-                        }, null, 544 /* NEED_HYDRATION, NEED_PATCH */), [
-                            [vue_esm_bundler/* vModelCheckbox */.lH, isOwnOnlyToggle.value]
+                    (0,vue_esm_bundler/* createElementVNode */.Lk)("div", TicketTabvue_type_script_setup_true_lang_ts_hoisted_3, [
+                        (0,vue_esm_bundler/* createElementVNode */.Lk)("label", TicketTabvue_type_script_setup_true_lang_ts_hoisted_4, [
+                            (0,vue_esm_bundler/* withDirectives */.bo)((0,vue_esm_bundler/* createElementVNode */.Lk)("input", {
+                                type: "checkbox",
+                                id: "own-only-toggle",
+                                class: "ytomo-toggle-input",
+                                "onUpdate:modelValue": _cache[0] || (_cache[0] = ($event) => ((isOwnOnlyToggle).value = $event)),
+                                onChange: handleOwnOnlyToggle
+                            }, null, 544 /* NEED_HYDRATION, NEED_PATCH */), [
+                                [vue_esm_bundler/* vModelCheckbox */.lH, isOwnOnlyToggle.value]
+                            ]),
+                            _cache[4] || (_cache[4] = (0,vue_esm_bundler/* createElementVNode */.Lk)("span", { class: "ytomo-toggle-slider" }, null, -1 /* CACHED */)),
+                            _cache[5] || (_cache[5] = (0,vue_esm_bundler/* createElementVNode */.Lk)("span", { class: "ytomo-toggle-label" }, "自分", -1 /* CACHED */))
                         ]),
-                        _cache[4] || (_cache[4] = (0,vue_esm_bundler/* createElementVNode */.Lk)("span", { class: "ytomo-toggle-slider" }, null, -1 /* CACHED */)),
-                        _cache[5] || (_cache[5] = (0,vue_esm_bundler/* createElementVNode */.Lk)("span", { class: "ytomo-toggle-label" }, "自分", -1 /* CACHED */))
+                        (0,vue_esm_bundler/* createElementVNode */.Lk)("button", {
+                            class: "ytomo-refresh-button",
+                            onClick: handleRefreshTickets,
+                            disabled: isRefreshing.value,
+                            title: "チケット情報を更新"
+                        }, [
+                            ((0,vue_esm_bundler/* openBlock */.uX)(), (0,vue_esm_bundler/* createElementBlock */.CE)("svg", {
+                                class: (0,vue_esm_bundler/* normalizeClass */.C4)(["ytomo-refresh-icon", { 'rotating': isRefreshing.value }]),
+                                viewBox: "0 0 24 24",
+                                width: "16",
+                                height: "16"
+                            }, [...(_cache[6] || (_cache[6] = [
+                                    (0,vue_esm_bundler/* createElementVNode */.Lk)("path", {
+                                        d: "M4 4v5h.582m15.356 2A8.001 8.001 0 0 0 4.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 0 1-15.357-2m15.357 2H15",
+                                        stroke: "currentColor",
+                                        "stroke-width": "2",
+                                        fill: "none",
+                                        "stroke-linecap": "round",
+                                        "stroke-linejoin": "round"
+                                    }, null, -1 /* CACHED */)
+                                ]))], 2 /* CLASS */))
+                        ], 8 /* PROPS */, _hoisted_5)
                     ]),
-                    (0,vue_esm_bundler/* createElementVNode */.Lk)("div", TicketTabvue_type_script_setup_true_lang_ts_hoisted_4, [
+                    (0,vue_esm_bundler/* createElementVNode */.Lk)("div", _hoisted_6, [
                         ((0,vue_esm_bundler/* openBlock */.uX)(true), (0,vue_esm_bundler/* createElementBlock */.CE)(vue_esm_bundler/* Fragment */.FK, null, (0,vue_esm_bundler/* renderList */.pI)(availableDates.value, (date) => {
                             return ((0,vue_esm_bundler/* openBlock */.uX)(), (0,vue_esm_bundler/* createElementBlock */.CE)("button", {
                                 key: date,
                                 class: (0,vue_esm_bundler/* normalizeClass */.C4)(["ytomo-date-button", { selected: isDateSelected(date) }]),
                                 "data-date": date,
                                 onClick: ($event) => (handleDateSelection(date))
-                            }, (0,vue_esm_bundler/* toDisplayString */.v_)(formatDate(date)), 11 /* TEXT, CLASS, PROPS */, _hoisted_5));
+                            }, (0,vue_esm_bundler/* toDisplayString */.v_)(formatDate(date)), 11 /* TEXT, CLASS, PROPS */, _hoisted_7));
                         }), 128 /* KEYED_FRAGMENT */))
                     ])
                 ]),
                 (0,vue_esm_bundler/* createCommentVNode */.Q3)(" チケット一覧エリア "),
-                (0,vue_esm_bundler/* createElementVNode */.Lk)("div", _hoisted_6, [
+                (0,vue_esm_bundler/* createElementVNode */.Lk)("div", _hoisted_8, [
                     (0,vue_esm_bundler/* createCommentVNode */.Q3)(" ローディング状態 "),
                     ((0,vue_esm_bundler/* unref */.R1)(isLoading))
-                        ? ((0,vue_esm_bundler/* openBlock */.uX)(), (0,vue_esm_bundler/* createElementBlock */.CE)("div", _hoisted_7, [...(_cache[6] || (_cache[6] = [
+                        ? ((0,vue_esm_bundler/* openBlock */.uX)(), (0,vue_esm_bundler/* createElementBlock */.CE)("div", _hoisted_9, [...(_cache[7] || (_cache[7] = [
                                 (0,vue_esm_bundler/* createElementVNode */.Lk)("p", null, "チケット情報を読み込み中...", -1 /* CACHED */)
                             ]))]))
                         : (_ctx.errorMessage)
                             ? ((0,vue_esm_bundler/* openBlock */.uX)(), (0,vue_esm_bundler/* createElementBlock */.CE)(vue_esm_bundler/* Fragment */.FK, { key: 1 }, [
                                 (0,vue_esm_bundler/* createCommentVNode */.Q3)(" エラー状態 "),
-                                (0,vue_esm_bundler/* createElementVNode */.Lk)("div", _hoisted_8, [
-                                    _cache[7] || (_cache[7] = (0,vue_esm_bundler/* createElementVNode */.Lk)("h3", null, "エラー", -1 /* CACHED */)),
+                                (0,vue_esm_bundler/* createElementVNode */.Lk)("div", _hoisted_10, [
+                                    _cache[8] || (_cache[8] = (0,vue_esm_bundler/* createElementVNode */.Lk)("h3", null, "エラー", -1 /* CACHED */)),
                                     (0,vue_esm_bundler/* createElementVNode */.Lk)("p", null, (0,vue_esm_bundler/* toDisplayString */.v_)(_ctx.errorMessage), 1 /* TEXT */),
                                     (0,vue_esm_bundler/* createElementVNode */.Lk)("button", {
                                         class: "ytomo-button retry-button",
@@ -38965,7 +39177,7 @@ const _hoisted_31 = ["disabled"];
                             : (filteredTickets.value.length === 0)
                                 ? ((0,vue_esm_bundler/* openBlock */.uX)(), (0,vue_esm_bundler/* createElementBlock */.CE)(vue_esm_bundler/* Fragment */.FK, { key: 2 }, [
                                     (0,vue_esm_bundler/* createCommentVNode */.Q3)(" チケットが存在しない場合 "),
-                                    (0,vue_esm_bundler/* createElementVNode */.Lk)("div", _hoisted_9, [
+                                    (0,vue_esm_bundler/* createElementVNode */.Lk)("div", _hoisted_11, [
                                         (0,vue_esm_bundler/* createElementVNode */.Lk)("p", null, (0,vue_esm_bundler/* toDisplayString */.v_)(emptyMessage.value), 1 /* TEXT */)
                                     ])
                                 ], 2112 /* STABLE_FRAGMENT, DEV_ROOT_FRAGMENT */))
@@ -38981,8 +39193,8 @@ const _hoisted_31 = ["disabled"];
                                             onClick: ($event) => (handleTicketSelection(ticket))
                                         }, [
                                             (0,vue_esm_bundler/* createCommentVNode */.Q3)(" 上半分: チケットID、Tip "),
-                                            (0,vue_esm_bundler/* createElementVNode */.Lk)("div", _hoisted_11, [
-                                                (0,vue_esm_bundler/* createElementVNode */.Lk)("span", _hoisted_12, (0,vue_esm_bundler/* toDisplayString */.v_)(ticket.ticket_id), 1 /* TEXT */),
+                                            (0,vue_esm_bundler/* createElementVNode */.Lk)("div", _hoisted_13, [
+                                                (0,vue_esm_bundler/* createElementVNode */.Lk)("span", _hoisted_14, (0,vue_esm_bundler/* toDisplayString */.v_)(ticket.ticket_id), 1 /* TEXT */),
                                                 (0,vue_esm_bundler/* createElementVNode */.Lk)("span", {
                                                     class: (0,vue_esm_bundler/* normalizeClass */.C4)(ticket.isOwn === false ? 'ytomo-external-tip' : 'ytomo-me-tip')
                                                 }, (0,vue_esm_bundler/* toDisplayString */.v_)(ticket.isOwn === false ? (ticket.label || 'External') : 'Me'), 3 /* TEXT, CLASS */),
@@ -38993,19 +39205,19 @@ const _hoisted_31 = ["disabled"];
                                                         class: "ytomo-ticket-delete-button",
                                                         onClick: (0,vue_esm_bundler/* withModifiers */.D$)(($event) => (handleTicketDelete(ticket)), ["stop"]),
                                                         title: "このチケットを削除"
-                                                    }, " × ", 8 /* PROPS */, _hoisted_13))
+                                                    }, " × ", 8 /* PROPS */, _hoisted_15))
                                                     : (0,vue_esm_bundler/* createCommentVNode */.Q3)("v-if", true)
                                             ]),
                                             (0,vue_esm_bundler/* createCommentVNode */.Q3)(" 下半分: 入場日時ボタン（予約種類も含む） "),
-                                            (0,vue_esm_bundler/* createElementVNode */.Lk)("div", _hoisted_14, [
-                                                (0,vue_esm_bundler/* createElementVNode */.Lk)("div", _hoisted_15, [
+                                            (0,vue_esm_bundler/* createElementVNode */.Lk)("div", _hoisted_16, [
+                                                (0,vue_esm_bundler/* createElementVNode */.Lk)("div", _hoisted_17, [
                                                     (0,vue_esm_bundler/* createCommentVNode */.Q3)(" 入場予約がない場合 "),
                                                     (!ticket.schedules || ticket.schedules.length === 0)
-                                                        ? ((0,vue_esm_bundler/* openBlock */.uX)(), (0,vue_esm_bundler/* createElementBlock */.CE)("span", _hoisted_16, " 入場予約取得なし "))
+                                                        ? ((0,vue_esm_bundler/* openBlock */.uX)(), (0,vue_esm_bundler/* createElementBlock */.CE)("span", _hoisted_18, " 入場予約取得なし "))
                                                         : (getVisibleSchedules(ticket).length === 0)
                                                             ? ((0,vue_esm_bundler/* openBlock */.uX)(), (0,vue_esm_bundler/* createElementBlock */.CE)(vue_esm_bundler/* Fragment */.FK, { key: 1 }, [
                                                                 (0,vue_esm_bundler/* createCommentVNode */.Q3)(" 利用可能な入場予約がない場合 "),
-                                                                _cache[8] || (_cache[8] = (0,vue_esm_bundler/* createElementVNode */.Lk)("span", { class: "ytomo-no-entrance-dates" }, " 利用可能な入場予約取得なし ", -1 /* CACHED */))
+                                                                _cache[9] || (_cache[9] = (0,vue_esm_bundler/* createElementVNode */.Lk)("span", { class: "ytomo-no-entrance-dates" }, " 利用可能な入場予約取得なし ", -1 /* CACHED */))
                                                             ], 2112 /* STABLE_FRAGMENT, DEV_ROOT_FRAGMENT */))
                                                             : ((0,vue_esm_bundler/* openBlock */.uX)(), (0,vue_esm_bundler/* createElementBlock */.CE)(vue_esm_bundler/* Fragment */.FK, { key: 2 }, [
                                                                 (0,vue_esm_bundler/* createCommentVNode */.Q3)(" 入場日時ボタンとプラスボタン "),
@@ -39025,16 +39237,26 @@ const _hoisted_31 = ["disabled"];
                                                                             disabled: getReservationStatus(schedule, ticket).availableTypes.length === 0,
                                                                             onClick: ($event) => (handleEntranceDateSelection(schedule, ticket, $event))
                                                                         }, [
-                                                                            (0,vue_esm_bundler/* createElementVNode */.Lk)("div", _hoisted_18, (0,vue_esm_bundler/* toDisplayString */.v_)(formatDate(schedule.entrance_date)) + " " + (0,vue_esm_bundler/* toDisplayString */.v_)((schedule.schedule_name || extractTimeFromSchedule(schedule)).replace(/-$/, '')), 1 /* TEXT */),
-                                                                            _cache[9] || (_cache[9] = (0,vue_esm_bundler/* createElementVNode */.Lk)("div", { class: "ytomo-schedule-divider" }, null, -1 /* CACHED */)),
-                                                                            _cache[10] || (_cache[10] = (0,vue_esm_bundler/* createElementVNode */.Lk)("div", { class: "ytomo-schedule-line ytomo-reservation-line" }, " 予約なし ", -1 /* CACHED */))
-                                                                        ], 10 /* CLASS, PROPS */, _hoisted_17),
+                                                                            (0,vue_esm_bundler/* createElementVNode */.Lk)("div", _hoisted_20, (0,vue_esm_bundler/* toDisplayString */.v_)(formatDate(schedule.entrance_date)) + " " + (0,vue_esm_bundler/* toDisplayString */.v_)((schedule.schedule_name || extractTimeFromSchedule(schedule)).replace(/-$/, '')), 1 /* TEXT */),
+                                                                            _cache[10] || (_cache[10] = (0,vue_esm_bundler/* createElementVNode */.Lk)("div", { class: "ytomo-schedule-divider" }, null, -1 /* CACHED */)),
+                                                                            (0,vue_esm_bundler/* createElementVNode */.Lk)("div", _hoisted_21, [
+                                                                                ((0,vue_esm_bundler/* openBlock */.uX)(true), (0,vue_esm_bundler/* createElementBlock */.CE)(vue_esm_bundler/* Fragment */.FK, null, (0,vue_esm_bundler/* renderList */.pI)(getReservationTypesForSecondLine(schedule), (reservationType) => {
+                                                                                    return ((0,vue_esm_bundler/* openBlock */.uX)(), (0,vue_esm_bundler/* createElementBlock */.CE)("span", {
+                                                                                        key: reservationType.type,
+                                                                                        class: (0,vue_esm_bundler/* normalizeClass */.C4)(["ytomo-reservation-type-indicator", reservationType.statusClass])
+                                                                                    }, (0,vue_esm_bundler/* toDisplayString */.v_)(reservationType.shortName), 3 /* TEXT, CLASS */));
+                                                                                }), 128 /* KEYED_FRAGMENT */)),
+                                                                                (getReservationTypesForSecondLine(schedule).length === 0)
+                                                                                    ? ((0,vue_esm_bundler/* openBlock */.uX)(), (0,vue_esm_bundler/* createElementBlock */.CE)("span", _hoisted_22, " 予約なし "))
+                                                                                    : (0,vue_esm_bundler/* createCommentVNode */.Q3)("v-if", true)
+                                                                            ])
+                                                                        ], 10 /* CLASS, PROPS */, _hoisted_19),
                                                                         (0,vue_esm_bundler/* createElementVNode */.Lk)("button", {
                                                                             class: "ytomo-expand-button",
                                                                             disabled: !ticket.isOwn,
                                                                             onClick: ($event) => (toggleScheduleExpansion(ticket.ticket_id, schedule)),
                                                                             title: !ticket.isOwn ? 'パビリオン予約詳細は自分のチケットのみ表示可能' : (isScheduleExpanded(ticket.ticket_id, schedule) ? '詳細を閉じる' : '詳細を表示')
-                                                                        }, (0,vue_esm_bundler/* toDisplayString */.v_)(isScheduleExpanded(ticket.ticket_id, schedule) ? '−' : '+'), 9 /* TEXT, PROPS */, _hoisted_19)
+                                                                        }, (0,vue_esm_bundler/* toDisplayString */.v_)(isScheduleExpanded(ticket.ticket_id, schedule) ? '−' : '+'), 9 /* TEXT, PROPS */, _hoisted_23)
                                                                     ]));
                                                                 }), 128 /* KEYED_FRAGMENT */))
                                                             ], 2112 /* STABLE_FRAGMENT, DEV_ROOT_FRAGMENT */))
@@ -39042,35 +39264,37 @@ const _hoisted_31 = ["disabled"];
                                             ]),
                                             (0,vue_esm_bundler/* createCommentVNode */.Q3)(" パビリオン予約詳細表示 "),
                                             (hasExpandedSchedules(ticket))
-                                                ? ((0,vue_esm_bundler/* openBlock */.uX)(), (0,vue_esm_bundler/* createElementBlock */.CE)("div", _hoisted_20, [
+                                                ? ((0,vue_esm_bundler/* openBlock */.uX)(), (0,vue_esm_bundler/* createElementBlock */.CE)("div", _hoisted_24, [
                                                     ((0,vue_esm_bundler/* openBlock */.uX)(true), (0,vue_esm_bundler/* createElementBlock */.CE)(vue_esm_bundler/* Fragment */.FK, null, (0,vue_esm_bundler/* renderList */.pI)(getExpandedSchedules(ticket), (schedule) => {
                                                         return ((0,vue_esm_bundler/* openBlock */.uX)(), (0,vue_esm_bundler/* createElementBlock */.CE)("div", {
                                                             key: `${ticket.ticket_id}-${schedule.entrance_date}`,
                                                             class: "ytomo-schedule-detail"
                                                         }, [
-                                                            (0,vue_esm_bundler/* createElementVNode */.Lk)("div", _hoisted_21, (0,vue_esm_bundler/* toDisplayString */.v_)(formatEntranceDate(schedule.entrance_date)), 1 /* TEXT */),
-                                                            (0,vue_esm_bundler/* createCommentVNode */.Q3)(" 予約種類ごとの詳細表示 "),
-                                                            ((0,vue_esm_bundler/* openBlock */.uX)(true), (0,vue_esm_bundler/* createElementBlock */.CE)(vue_esm_bundler/* Fragment */.FK, null, (0,vue_esm_bundler/* renderList */.pI)(schedule.pavilionReservationStatus, (reservationStatus, reservationType) => {
+                                                            (0,vue_esm_bundler/* createElementVNode */.Lk)("div", _hoisted_25, (0,vue_esm_bundler/* toDisplayString */.v_)(formatEntranceDate(schedule.entrance_date)), 1 /* TEXT */),
+                                                            (0,vue_esm_bundler/* createCommentVNode */.Q3)(" 予約種類ごとの詳細表示（5,4,3,2の順） "),
+                                                            ((0,vue_esm_bundler/* openBlock */.uX)(true), (0,vue_esm_bundler/* createElementBlock */.CE)(vue_esm_bundler/* Fragment */.FK, null, (0,vue_esm_bundler/* renderList */.pI)(getSortedReservationTypes(schedule), (reservationType) => {
                                                                 return ((0,vue_esm_bundler/* openBlock */.uX)(), (0,vue_esm_bundler/* createElementBlock */.CE)(vue_esm_bundler/* Fragment */.FK, {
                                                                     key: `${ticket.ticket_id}-${schedule.entrance_date}-${reservationType}`
                                                                 }, [
-                                                                    reservationStatus
-                                                                        ? ((0,vue_esm_bundler/* openBlock */.uX)(), (0,vue_esm_bundler/* createElementBlock */.CE)("div", _hoisted_22, [
-                                                                            (0,vue_esm_bundler/* createElementVNode */.Lk)("div", _hoisted_23, [
+                                                                    (schedule.pavilionReservationStatus?.[reservationType])
+                                                                        ? ((0,vue_esm_bundler/* openBlock */.uX)(), (0,vue_esm_bundler/* createElementBlock */.CE)("div", _hoisted_26, [
+                                                                            (0,vue_esm_bundler/* createElementVNode */.Lk)("div", _hoisted_27, [
                                                                                 (0,vue_esm_bundler/* createCommentVNode */.Q3)(" 左側：予約種類と時間帯 "),
-                                                                                (0,vue_esm_bundler/* createElementVNode */.Lk)("div", _hoisted_24, [
-                                                                                    (0,vue_esm_bundler/* createElementVNode */.Lk)("div", _hoisted_25, (0,vue_esm_bundler/* toDisplayString */.v_)(getReservationTypeName(String(reservationType))), 1 /* TEXT */),
-                                                                                    (0,vue_esm_bundler/* createElementVNode */.Lk)("div", _hoisted_26, (0,vue_esm_bundler/* toDisplayString */.v_)(reservationStatus.winningInfo ?
-                                                                                        (formatTimeRange(reservationStatus.winningInfo.startTime, reservationStatus.winningInfo.endTime) || reservationStatus.winningInfo.scheduleName || '時間取得中') :
+                                                                                (0,vue_esm_bundler/* createElementVNode */.Lk)("div", _hoisted_28, [
+                                                                                    (0,vue_esm_bundler/* createElementVNode */.Lk)("div", {
+                                                                                        class: (0,vue_esm_bundler/* normalizeClass */.C4)(["ytomo-reservation-type-badge", getReservationTypeBadgeClass(schedule.pavilionReservationStatus[reservationType])])
+                                                                                    }, (0,vue_esm_bundler/* toDisplayString */.v_)(getReservationTypeName(String(reservationType))), 3 /* TEXT, CLASS */),
+                                                                                    (0,vue_esm_bundler/* createElementVNode */.Lk)("div", _hoisted_29, (0,vue_esm_bundler/* toDisplayString */.v_)(schedule.pavilionReservationStatus[reservationType]?.winningInfo ?
+                                                                                        (formatTimeRange(schedule.pavilionReservationStatus[reservationType].winningInfo.startTime, schedule.pavilionReservationStatus[reservationType].winningInfo.endTime) || schedule.pavilionReservationStatus[reservationType].winningInfo.scheduleName || '時間取得中') :
                                                                                         '—'), 1 /* TEXT */)
                                                                                 ]),
                                                                                 (0,vue_esm_bundler/* createCommentVNode */.Q3)(" 右側：パビリオン名または状況 "),
-                                                                                (0,vue_esm_bundler/* createElementVNode */.Lk)("div", _hoisted_27, [
+                                                                                (0,vue_esm_bundler/* createElementVNode */.Lk)("div", _hoisted_30, [
                                                                                     (0,vue_esm_bundler/* createElementVNode */.Lk)("div", {
-                                                                                        class: (0,vue_esm_bundler/* normalizeClass */.C4)(["ytomo-pavilion-name", { 'ytomo-status-text': !reservationStatus.winningInfo }])
-                                                                                    }, (0,vue_esm_bundler/* toDisplayString */.v_)(reservationStatus.winningInfo?.eventName || getStatusText(reservationStatus.periodStatus, reservationStatus.submissionStatus)), 3 /* TEXT, CLASS */),
-                                                                                    (reservationStatus.winningInfo?.useState !== undefined)
-                                                                                        ? ((0,vue_esm_bundler/* openBlock */.uX)(), (0,vue_esm_bundler/* createElementBlock */.CE)("div", _hoisted_28, (0,vue_esm_bundler/* toDisplayString */.v_)(getUseStateText(reservationStatus.winningInfo.useState)), 1 /* TEXT */))
+                                                                                        class: (0,vue_esm_bundler/* normalizeClass */.C4)(["ytomo-pavilion-name", { 'ytomo-status-text': !schedule.pavilionReservationStatus[reservationType]?.winningInfo }])
+                                                                                    }, (0,vue_esm_bundler/* toDisplayString */.v_)(schedule.pavilionReservationStatus[reservationType]?.winningInfo?.eventName || getStatusText(schedule.pavilionReservationStatus[reservationType]?.periodStatus || 'none', schedule.pavilionReservationStatus[reservationType]?.submissionStatus || 'none')), 3 /* TEXT, CLASS */),
+                                                                                    (schedule.pavilionReservationStatus[reservationType]?.winningInfo?.useState !== undefined)
+                                                                                        ? ((0,vue_esm_bundler/* openBlock */.uX)(), (0,vue_esm_bundler/* createElementBlock */.CE)("div", _hoisted_31, (0,vue_esm_bundler/* toDisplayString */.v_)(getUseStateText(schedule.pavilionReservationStatus[reservationType].winningInfo.useState)), 1 /* TEXT */))
                                                                                         : (0,vue_esm_bundler/* createCommentVNode */.Q3)("v-if", true)
                                                                                 ])
                                                                             ])
@@ -39082,13 +39306,13 @@ const _hoisted_31 = ["disabled"];
                                                     }), 128 /* KEYED_FRAGMENT */))
                                                 ]))
                                                 : (0,vue_esm_bundler/* createCommentVNode */.Q3)("v-if", true)
-                                        ], 8 /* PROPS */, _hoisted_10));
+                                        ], 8 /* PROPS */, _hoisted_12));
                                     }), 128 /* KEYED_FRAGMENT */))
                                 ], 2112 /* STABLE_FRAGMENT, DEV_ROOT_FRAGMENT */))
                 ]),
                 (0,vue_esm_bundler/* createCommentVNode */.Q3)(" チケットID追加（同様のレイアウト） "),
-                (0,vue_esm_bundler/* createElementVNode */.Lk)("div", _hoisted_29, [
-                    (0,vue_esm_bundler/* createElementVNode */.Lk)("div", _hoisted_30, [
+                (0,vue_esm_bundler/* createElementVNode */.Lk)("div", _hoisted_32, [
+                    (0,vue_esm_bundler/* createElementVNode */.Lk)("div", _hoisted_33, [
                         (0,vue_esm_bundler/* withDirectives */.bo)((0,vue_esm_bundler/* createElementVNode */.Lk)("input", {
                             type: "text",
                             id: "ticket-id-input",
@@ -39124,7 +39348,7 @@ const _hoisted_31 = ["disabled"];
                             class: "ytomo-button primary",
                             onClick: handleAddTicket,
                             disabled: !newTicketId.value.trim()
-                        }, " Add ", 8 /* PROPS */, _hoisted_31)
+                        }, " Add ", 8 /* PROPS */, _hoisted_34)
                     ]),
                     (0,vue_esm_bundler/* createCommentVNode */.Q3)(" 結果表示エリア "),
                     (addResult.value)
@@ -39141,9 +39365,9 @@ const _hoisted_31 = ["disabled"];
 
 ;// ./ts/components/TicketTab.vue?vue&type=script&setup=true&lang=ts
  
-// EXTERNAL MODULE: ./node_modules/css-loader/dist/cjs.js!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/sass-loader/dist/cjs.js!./node_modules/vue-loader/dist/index.js??ruleSet[1].rules[8].use[0]!./ts/components/TicketTab.vue?vue&type=style&index=0&id=4533d894&scoped=true&lang=scss
-var TicketTabvue_type_style_index_0_id_4533d894_scoped_true_lang_scss = __webpack_require__(302);
-;// ./node_modules/style-loader/dist/cjs.js!./node_modules/css-loader/dist/cjs.js!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/sass-loader/dist/cjs.js!./node_modules/vue-loader/dist/index.js??ruleSet[1].rules[8].use[0]!./ts/components/TicketTab.vue?vue&type=style&index=0&id=4533d894&scoped=true&lang=scss
+// EXTERNAL MODULE: ./node_modules/css-loader/dist/cjs.js!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/sass-loader/dist/cjs.js!./node_modules/vue-loader/dist/index.js??ruleSet[1].rules[8].use[0]!./ts/components/TicketTab.vue?vue&type=style&index=0&id=6189b1ab&scoped=true&lang=scss
+var TicketTabvue_type_style_index_0_id_6189b1ab_scoped_true_lang_scss = __webpack_require__(850);
+;// ./node_modules/style-loader/dist/cjs.js!./node_modules/css-loader/dist/cjs.js!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/sass-loader/dist/cjs.js!./node_modules/vue-loader/dist/index.js??ruleSet[1].rules[8].use[0]!./ts/components/TicketTab.vue?vue&type=style&index=0&id=6189b1ab&scoped=true&lang=scss
 
       
       
@@ -39155,22 +39379,22 @@ var TicketTabvue_type_style_index_0_id_4533d894_scoped_true_lang_scss = __webpac
       
       
 
-var TicketTabvue_type_style_index_0_id_4533d894_scoped_true_lang_scss_options = {};
+var TicketTabvue_type_style_index_0_id_6189b1ab_scoped_true_lang_scss_options = {};
 
-TicketTabvue_type_style_index_0_id_4533d894_scoped_true_lang_scss_options.styleTagTransform = (styleTagTransform_default());
-TicketTabvue_type_style_index_0_id_4533d894_scoped_true_lang_scss_options.setAttributes = (setAttributesWithoutAttributes_default());
-TicketTabvue_type_style_index_0_id_4533d894_scoped_true_lang_scss_options.insert = insertBySelector_default().bind(null, "head");
-TicketTabvue_type_style_index_0_id_4533d894_scoped_true_lang_scss_options.domAPI = (styleDomAPI_default());
-TicketTabvue_type_style_index_0_id_4533d894_scoped_true_lang_scss_options.insertStyleElement = (insertStyleElement_default());
+TicketTabvue_type_style_index_0_id_6189b1ab_scoped_true_lang_scss_options.styleTagTransform = (styleTagTransform_default());
+TicketTabvue_type_style_index_0_id_6189b1ab_scoped_true_lang_scss_options.setAttributes = (setAttributesWithoutAttributes_default());
+TicketTabvue_type_style_index_0_id_6189b1ab_scoped_true_lang_scss_options.insert = insertBySelector_default().bind(null, "head");
+TicketTabvue_type_style_index_0_id_6189b1ab_scoped_true_lang_scss_options.domAPI = (styleDomAPI_default());
+TicketTabvue_type_style_index_0_id_6189b1ab_scoped_true_lang_scss_options.insertStyleElement = (insertStyleElement_default());
 
-var TicketTabvue_type_style_index_0_id_4533d894_scoped_true_lang_scss_update = injectStylesIntoStyleTag_default()(TicketTabvue_type_style_index_0_id_4533d894_scoped_true_lang_scss/* default */.A, TicketTabvue_type_style_index_0_id_4533d894_scoped_true_lang_scss_options);
-
-
+var TicketTabvue_type_style_index_0_id_6189b1ab_scoped_true_lang_scss_update = injectStylesIntoStyleTag_default()(TicketTabvue_type_style_index_0_id_6189b1ab_scoped_true_lang_scss/* default */.A, TicketTabvue_type_style_index_0_id_6189b1ab_scoped_true_lang_scss_options);
 
 
-       /* harmony default export */ const components_TicketTabvue_type_style_index_0_id_4533d894_scoped_true_lang_scss = (TicketTabvue_type_style_index_0_id_4533d894_scoped_true_lang_scss/* default */.A && TicketTabvue_type_style_index_0_id_4533d894_scoped_true_lang_scss/* default */.A.locals ? TicketTabvue_type_style_index_0_id_4533d894_scoped_true_lang_scss/* default */.A.locals : undefined);
 
-;// ./ts/components/TicketTab.vue?vue&type=style&index=0&id=4533d894&scoped=true&lang=scss
+
+       /* harmony default export */ const components_TicketTabvue_type_style_index_0_id_6189b1ab_scoped_true_lang_scss = (TicketTabvue_type_style_index_0_id_6189b1ab_scoped_true_lang_scss/* default */.A && TicketTabvue_type_style_index_0_id_6189b1ab_scoped_true_lang_scss/* default */.A.locals ? TicketTabvue_type_style_index_0_id_6189b1ab_scoped_true_lang_scss/* default */.A.locals : undefined);
+
+;// ./ts/components/TicketTab.vue?vue&type=style&index=0&id=6189b1ab&scoped=true&lang=scss
 
 // EXTERNAL MODULE: ./node_modules/vue-loader/dist/exportHelper.js
 var exportHelper = __webpack_require__(262);
@@ -39181,7 +39405,7 @@ var exportHelper = __webpack_require__(262);
 ;
 
 
-const TicketTab_exports_ = /*#__PURE__*/(0,exportHelper/* default */.A)(TicketTabvue_type_script_setup_true_lang_ts, [['__scopeId',"data-v-4533d894"]])
+const TicketTab_exports_ = /*#__PURE__*/(0,exportHelper/* default */.A)(TicketTabvue_type_script_setup_true_lang_ts, [['__scopeId',"data-v-6189b1ab"]])
 
 /* harmony default export */ const TicketTab = (TicketTab_exports_);
 ;// ./ts/stores/overlays.ts
@@ -40192,16 +40416,7 @@ const PavilionTabvue_type_script_setup_true_lang_ts_hoisted_26 = {
                             class: (0,vue_esm_bundler/* normalizeClass */.C4)(["ytomo-endless-toggle", { active: (0,vue_esm_bundler/* unref */.R1)(sequentialReservationStore).state.endlessMode }]),
                             title: "ENDLESSモード切替",
                             onClick: handleEndlessToggle
-                        }, [...(_cache[9] || (_cache[9] = [
-                                (0,vue_esm_bundler/* createElementVNode */.Lk)("svg", {
-                                    width: "20",
-                                    height: "20",
-                                    viewBox: "0 0 24 24",
-                                    fill: "currentColor"
-                                }, [
-                                    (0,vue_esm_bundler/* createElementVNode */.Lk)("path", { d: "M18.6 6.62c-1.44 0-2.8.56-3.77 1.53L12 10.66 10.48 9.14c-.64-.64-1.49-.99-2.4-.99-1.87 0-3.39 1.51-3.39 3.38s1.52 3.38 3.39 3.38c.91 0 1.76-.35 2.4-.99L12 12.4l1.52 1.52c.64.64 1.49.99 2.4.99 1.87 0 3.39-1.51 3.39-3.38s-1.52-3.38-3.39-3.38c-.9 0-1.76.35-2.4.99l-.96.96-.96-.96c-.64-.64-1.5-.99-2.4-.99z" })
-                                ], -1 /* CACHED */)
-                            ]))], 2 /* CLASS */))
+                        }, " ∞ ", 2 /* CLASS */))
                         : (0,vue_esm_bundler/* createCommentVNode */.Q3)("v-if", true)
                 ])),
                 (0,vue_esm_bundler/* createCommentVNode */.Q3)(" 予約実行/中断FABボタン "),
@@ -40245,9 +40460,9 @@ const PavilionTabvue_type_script_setup_true_lang_ts_hoisted_26 = {
 
 ;// ./ts/components/PavilionTab.vue?vue&type=script&setup=true&lang=ts
  
-// EXTERNAL MODULE: ./node_modules/css-loader/dist/cjs.js!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/sass-loader/dist/cjs.js!./node_modules/vue-loader/dist/index.js??ruleSet[1].rules[8].use[0]!./ts/components/PavilionTab.vue?vue&type=style&index=0&id=2d755553&scoped=true&lang=scss
-var PavilionTabvue_type_style_index_0_id_2d755553_scoped_true_lang_scss = __webpack_require__(438);
-;// ./node_modules/style-loader/dist/cjs.js!./node_modules/css-loader/dist/cjs.js!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/sass-loader/dist/cjs.js!./node_modules/vue-loader/dist/index.js??ruleSet[1].rules[8].use[0]!./ts/components/PavilionTab.vue?vue&type=style&index=0&id=2d755553&scoped=true&lang=scss
+// EXTERNAL MODULE: ./node_modules/css-loader/dist/cjs.js!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/sass-loader/dist/cjs.js!./node_modules/vue-loader/dist/index.js??ruleSet[1].rules[8].use[0]!./ts/components/PavilionTab.vue?vue&type=style&index=0&id=910d08c4&scoped=true&lang=scss
+var PavilionTabvue_type_style_index_0_id_910d08c4_scoped_true_lang_scss = __webpack_require__(849);
+;// ./node_modules/style-loader/dist/cjs.js!./node_modules/css-loader/dist/cjs.js!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/sass-loader/dist/cjs.js!./node_modules/vue-loader/dist/index.js??ruleSet[1].rules[8].use[0]!./ts/components/PavilionTab.vue?vue&type=style&index=0&id=910d08c4&scoped=true&lang=scss
 
       
       
@@ -40259,22 +40474,22 @@ var PavilionTabvue_type_style_index_0_id_2d755553_scoped_true_lang_scss = __webp
       
       
 
-var PavilionTabvue_type_style_index_0_id_2d755553_scoped_true_lang_scss_options = {};
+var PavilionTabvue_type_style_index_0_id_910d08c4_scoped_true_lang_scss_options = {};
 
-PavilionTabvue_type_style_index_0_id_2d755553_scoped_true_lang_scss_options.styleTagTransform = (styleTagTransform_default());
-PavilionTabvue_type_style_index_0_id_2d755553_scoped_true_lang_scss_options.setAttributes = (setAttributesWithoutAttributes_default());
-PavilionTabvue_type_style_index_0_id_2d755553_scoped_true_lang_scss_options.insert = insertBySelector_default().bind(null, "head");
-PavilionTabvue_type_style_index_0_id_2d755553_scoped_true_lang_scss_options.domAPI = (styleDomAPI_default());
-PavilionTabvue_type_style_index_0_id_2d755553_scoped_true_lang_scss_options.insertStyleElement = (insertStyleElement_default());
+PavilionTabvue_type_style_index_0_id_910d08c4_scoped_true_lang_scss_options.styleTagTransform = (styleTagTransform_default());
+PavilionTabvue_type_style_index_0_id_910d08c4_scoped_true_lang_scss_options.setAttributes = (setAttributesWithoutAttributes_default());
+PavilionTabvue_type_style_index_0_id_910d08c4_scoped_true_lang_scss_options.insert = insertBySelector_default().bind(null, "head");
+PavilionTabvue_type_style_index_0_id_910d08c4_scoped_true_lang_scss_options.domAPI = (styleDomAPI_default());
+PavilionTabvue_type_style_index_0_id_910d08c4_scoped_true_lang_scss_options.insertStyleElement = (insertStyleElement_default());
 
-var PavilionTabvue_type_style_index_0_id_2d755553_scoped_true_lang_scss_update = injectStylesIntoStyleTag_default()(PavilionTabvue_type_style_index_0_id_2d755553_scoped_true_lang_scss/* default */.A, PavilionTabvue_type_style_index_0_id_2d755553_scoped_true_lang_scss_options);
-
-
+var PavilionTabvue_type_style_index_0_id_910d08c4_scoped_true_lang_scss_update = injectStylesIntoStyleTag_default()(PavilionTabvue_type_style_index_0_id_910d08c4_scoped_true_lang_scss/* default */.A, PavilionTabvue_type_style_index_0_id_910d08c4_scoped_true_lang_scss_options);
 
 
-       /* harmony default export */ const components_PavilionTabvue_type_style_index_0_id_2d755553_scoped_true_lang_scss = (PavilionTabvue_type_style_index_0_id_2d755553_scoped_true_lang_scss/* default */.A && PavilionTabvue_type_style_index_0_id_2d755553_scoped_true_lang_scss/* default */.A.locals ? PavilionTabvue_type_style_index_0_id_2d755553_scoped_true_lang_scss/* default */.A.locals : undefined);
 
-;// ./ts/components/PavilionTab.vue?vue&type=style&index=0&id=2d755553&scoped=true&lang=scss
+
+       /* harmony default export */ const components_PavilionTabvue_type_style_index_0_id_910d08c4_scoped_true_lang_scss = (PavilionTabvue_type_style_index_0_id_910d08c4_scoped_true_lang_scss/* default */.A && PavilionTabvue_type_style_index_0_id_910d08c4_scoped_true_lang_scss/* default */.A.locals ? PavilionTabvue_type_style_index_0_id_910d08c4_scoped_true_lang_scss/* default */.A.locals : undefined);
+
+;// ./ts/components/PavilionTab.vue?vue&type=style&index=0&id=910d08c4&scoped=true&lang=scss
 
 ;// ./ts/components/PavilionTab.vue
 
@@ -40283,7 +40498,7 @@ var PavilionTabvue_type_style_index_0_id_2d755553_scoped_true_lang_scss_update =
 ;
 
 
-const PavilionTab_exports_ = /*#__PURE__*/(0,exportHelper/* default */.A)(PavilionTabvue_type_script_setup_true_lang_ts, [['__scopeId',"data-v-2d755553"]])
+const PavilionTab_exports_ = /*#__PURE__*/(0,exportHelper/* default */.A)(PavilionTabvue_type_script_setup_true_lang_ts, [['__scopeId',"data-v-910d08c4"]])
 
 /* harmony default export */ const PavilionTab = (PavilionTab_exports_);
 ;// ./node_modules/ts-loader/index.js??clonedRuleSet-1.use!./node_modules/vue-loader/dist/index.js??ruleSet[1].rules[8].use[0]!./ts/components/MainDialog.vue?vue&type=script&setup=true&lang=ts
@@ -41018,7 +41233,7 @@ class MainDialogFabImpl {
         this.logger.info('Vue統合システム事前初期化開始');
         // ストア初期化をページ読み込み時に1回だけ行う
         try {
-            const { useTicketsStore } = await Promise.resolve(/* import() */).then(__webpack_require__.bind(__webpack_require__, 305));
+            const { useTicketsStore } = await Promise.resolve(/* import() */).then(__webpack_require__.bind(__webpack_require__, 757));
             const { usePavilionsStore } = await Promise.resolve(/* import() */).then(__webpack_require__.bind(__webpack_require__, 325));
             const ticketsStore = useTicketsStore();
             const pavilionsStore = usePavilionsStore();

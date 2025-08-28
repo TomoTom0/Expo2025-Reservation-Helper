@@ -20,6 +20,7 @@ export const useTicketsStore = defineStore('tickets', () => {
   const isInitialized = ref(false)
   const availableDates = ref<string[]>([])
   const todayStr = ref<string>(getTodayString())
+  const lastUpdateTime = ref<number>(0) // 最後の更新時刻（Unix時間）
   
   // Getters (computed)
   const ticketsArray = computed(() => Array.from(tickets.value.values()))
@@ -57,19 +58,43 @@ export const useTicketsStore = defineStore('tickets', () => {
     
     // 最初の選択済みスケジュールの予約情報を取得（同じになるはず）
     const firstSelected = selectedSchedules[0]
-    if (!firstSelected.pavilionReservationType || !firstSelected.pavilionReservationStatus) {
+    
+    // pavilionReservationStatusがない場合は入場日付から生成
+    let pavilionReservationStatus = firstSelected.pavilionReservationStatus
+    let pavilionReservationType = firstSelected.pavilionReservationType
+    let pavilionReservationActive = firstSelected.pavilionReservationActive
+    
+    if (!pavilionReservationStatus && firstSelected.entrance_date) {
+      // 動的に生成
+      const pavilionReservation = determinePavilionReservationType(firstSelected.entrance_date)
+      pavilionReservationType = pavilionReservation.channel
+      pavilionReservationActive = pavilionReservation.isActive
+      
+      const allStatus = getAllPavilionReservationStatus(firstSelected.entrance_date)
+      pavilionReservationStatus = {}
+      
+      for (const [type, status] of Object.entries(allStatus)) {
+        pavilionReservationStatus[type] = {
+          periodStatus: status.periodStatus,
+          submissionStatus: status.submissionStatus,
+          winningInfo: status.winningInfo
+        }
+      }
+    }
+    
+    if (!pavilionReservationStatus) {
       return null
     }
     
     // 現在有効な予約種類を特定
-    const activeReservationType = Object.entries(firstSelected.pavilionReservationStatus)
+    const activeReservationType = Object.entries(pavilionReservationStatus)
       .find(([type, status]) => status.periodStatus === 'active')
     
     return {
       activeType: activeReservationType?.[0] || null,
-      activeChannel: firstSelected.pavilionReservationType,
-      isActive: firstSelected.pavilionReservationActive || false,
-      allStatus: firstSelected.pavilionReservationStatus
+      activeChannel: pavilionReservationType,
+      isActive: pavilionReservationActive || false,
+      allStatus: pavilionReservationStatus
     }
   })
   
@@ -141,7 +166,18 @@ export const useTicketsStore = defineStore('tickets', () => {
   /**
    * 全チケット情報を初期化・取得
    */
-  const loadAllTickets = async (): Promise<TicketData[]> => {
+  const loadAllTickets = async (forceUpdate: boolean = false): Promise<TicketData[]> => {
+    // 1時間制限チェック（強制更新でない場合）
+    if (!forceUpdate) {
+      const now = Date.now()
+      const oneHour = 60 * 60 * 1000 // 1時間をミリ秒で
+      
+      if (lastUpdateTime.value > 0 && now - lastUpdateTime.value < oneHour) {
+        logger.info(`前回更新から1時間未満のため更新をスキップ（${Math.round((now - lastUpdateTime.value) / (1000 * 60))}分経過）`)
+        return ticketsArray.value
+      }
+    }
+    
     logger.info('全チケット情報取得開始')
     setLoading(true)
     
@@ -163,6 +199,9 @@ export const useTicketsStore = defineStore('tickets', () => {
 
       // パビリオン予約当選情報を取得
       await fetchPavilionWinningInfo()
+
+      // 更新時刻を記録
+      lastUpdateTime.value = Date.now()
 
       logger.info(`チケット統合管理完了: ${tickets.value.size}個のチケット読み込み完了`)
     
@@ -591,7 +630,7 @@ export const useTicketsStore = defineStore('tickets', () => {
 }, {
   persist: {
     key: 'ytomo-tickets-store',
-    pick: ['selectedEntranceDates', 'tickets'], // 入場日時選択とチケットデータを永続化
+    pick: ['selectedEntranceDates', 'tickets', 'lastUpdateTime'], // 入場日時選択、チケットデータ、更新時刻を永続化
     serializer: {
       serialize: (data: any) => {
         // MapをObjectに変換してシリアライズ
