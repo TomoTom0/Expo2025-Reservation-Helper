@@ -21,9 +21,6 @@
     "storage",
     "activeTab"
   ],
-  "background": {
-    "service_worker": "background.js"
-  },
   "host_permissions": [
     "https://ticket.expo2025.or.jp/*",
     "https://expo.ebii.net/*"

@@ -39,7 +39,8 @@
                   'today': date.isToday,
                   'disabled': date.disabled
                 }"
-                @click="selectDate(date)"
+                :data-date="date.dateString"
+                @click="selectDate"
               >
                 {{ date.day }}
               </div>
@@ -70,7 +71,14 @@
                     ]"
                     @click="toggleTimeSlot('east', timeSlot.time)"
                   >
+                    <span class="ytomo-status-icon" :class="`status-${timeSlot.east.status}`">
+                      <span v-if="timeSlot.east.status === 'low'">●</span>
+                      <span v-else-if="timeSlot.east.status === 'high'">▲</span>
+                      <span v-else-if="timeSlot.east.status === 'full'">×</span>
+                      <span v-else>－</span>
+                    </span>
                     <span class="ytomo-time-text">{{ timeSlot.time }}-</span>
+                    <span v-if="timeSlot.east.selected" class="ytomo-check-mark">✓</span>
                   </div>
                 </td>
                 <td>
@@ -83,7 +91,14 @@
                     ]"
                     @click="toggleTimeSlot('west', timeSlot.time)"
                   >
+                    <span class="ytomo-status-icon" :class="`status-${timeSlot.west.status}`">
+                      <span v-if="timeSlot.west.status === 'low'">●</span>
+                      <span v-else-if="timeSlot.west.status === 'high'">▲</span>
+                      <span v-else-if="timeSlot.west.status === 'full'">×</span>
+                      <span v-else>－</span>
+                    </span>
                     <span class="ytomo-time-text">{{ timeSlot.time }}-</span>
+                    <span v-if="timeSlot.west.selected" class="ytomo-check-mark">✓</span>
                   </div>
                 </td>
               </tr>
@@ -94,10 +109,22 @@
           </div>
         </div>
         
-        <!-- 予約操作ボタン -->
+        <!-- 予約操作ボタン（テーブルのすぐ下に配置） -->
         <div v-if="selectedDate" class="ytomo-reservation-actions">
-          <button class="ytomo-reserve-button" @click="executeReservation">予約</button>
-          <button class="ytomo-clear-button" @click="clearSelection">削除</button>
+        <!-- 日時変更表示 -->
+        <div v-if="dateTimeChangeText" class="ytomo-datetime-change">
+          {{ dateTimeChangeText }}
+        </div>
+        
+        <button 
+          class="ytomo-reserve-button" 
+          :class="{ 'disabled': !isReservationButtonEnabled }"
+          :disabled="!isReservationButtonEnabled"
+          @click="executeReservation"
+        >
+          {{ reservationButtonText }}
+        </button>
+        <!-- <button class="ytomo-clear-button" @click="clearSelection">削除</button> -->
         </div>
       </div>
     </div>
@@ -105,15 +132,99 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { loggers } from '@/utils/logger'
+import { useTicketsStore } from '@/stores/tickets'
+import type { ScheduleData } from '@/types/api'
 
 const logger = loggers.ui
+const ticketsStore = useTicketsStore()
 
 // カレンダー状態
 const isCalendarExpanded = ref(true)
 const selectedDate = ref<string>('')
-const currentMonth = ref(new Date(2025, 9)) // 2025年10月
+const currentMonth = ref(new Date()) // 現在の年月
+
+// 現在選択されているスケジュール（入場予約）
+const selectedSchedule = ref<ScheduleData | null>(null)
+
+// 選択されている時間帯の数を計算
+const selectedTimeSlotCount = computed(() => {
+  return timeSlots.value.reduce((count, slot) => {
+    return count + (slot.east.selected ? 1 : 0) + (slot.west.selected ? 1 : 0)
+  }, 0)
+})
+
+// 予約ボタンの有効性判定
+const isReservationButtonEnabled = computed(() => {
+  // 条件: 選択中の入場予約が1つかつ、それが自分の予約かつ、時間帯が選択されている
+  return selectedSchedule.value && 
+         selectedSchedule.value.isOwn === true && 
+         selectedTimeSlotCount.value === 1
+})
+
+// 予約ボタンテキストの動的決定
+const reservationButtonText = computed(() => {
+  if (!selectedSchedule.value) {
+    return '新規予約'
+  }
+  // 既存の入場日時があるかチェック
+  const hasExistingDateTime = selectedSchedule.value.entrance_date && 
+                              selectedSchedule.value.time_start
+  return hasExistingDateTime ? '変更予約' : '新規予約'
+})
+
+// 既存日時→新日時の表示テキスト
+const dateTimeChangeText = computed(() => {
+  if (!selectedSchedule.value || selectedTimeSlotCount.value !== 1) {
+    return ''
+  }
+  
+  const hasExistingDateTime = selectedSchedule.value.entrance_date && 
+                              selectedSchedule.value.time_start
+  
+  if (!hasExistingDateTime) {
+    return '' // 新規予約の場合は矢印表示なし
+  }
+  
+  // 選択された新しい時間帯情報を取得
+  const newTimeSlot = getSelectedTimeSlotInfo()
+  if (!newTimeSlot) return ''
+  
+  const existingDate = formatDateFromDateString(selectedSchedule.value.entrance_date!)
+  const existingTime = selectedSchedule.value.time_start
+  const existingGate = selectedSchedule.value.gate_type === 1 ? '東' : '西'
+  
+  const newDate = formatDate(selectedDate.value)
+  const newGate = newTimeSlot.gate
+  const newTime = newTimeSlot.time
+  
+  return `${existingDate} ${existingTime} (${existingGate}) → ${newDate} ${newTime} (${newGate})`
+})
+
+// 選択された時間帯情報を取得
+const getSelectedTimeSlotInfo = () => {
+  for (const slot of timeSlots.value) {
+    if (slot.east.selected) {
+      return { time: slot.time, gate: '東', gateType: 1 }
+    }
+    if (slot.west.selected) {
+      return { time: slot.time, gate: '西', gateType: 2 }
+    }
+  }
+  return null
+}
+
+// YYYYMMDD形式の日付をフォーマット
+const formatDateFromDateString = (dateString: string): string => {
+  if (dateString.length === 8) {
+    const year = dateString.substring(0, 4)
+    const month = dateString.substring(4, 6)
+    const day = dateString.substring(6, 8)
+    return `${month}月${day}日`
+  }
+  return dateString
+}
 
 // カレンダー表示用データ
 const weekdays = ['日', '月', '火', '水', '木', '金', '土']
@@ -138,49 +249,37 @@ const calendarDates = computed(() => {
     date.setDate(startDate.getDate() + i)
     
     const isCurrentMonth = date.getMonth() === month
-    const dateString = date.toISOString().split('T')[0]
+    // ローカル時間での日付文字列を生成（UTCではなく）
+    const year = date.getFullYear()
+    const month_str = String(date.getMonth() + 1).padStart(2, '0')
+    const day_str = String(date.getDate()).padStart(2, '0')
+    const dateString = `${year}-${month_str}-${day_str}`
+    
+    // 今日の日付もローカル時間で生成
+    const todayYear = today.getFullYear()
+    const todayMonth = String(today.getMonth() + 1).padStart(2, '0')
+    const todayDay = String(today.getDate()).padStart(2, '0')
+    const todayString = `${todayYear}-${todayMonth}-${todayDay}`
     
     dates.push({
       key: dateString,
       day: date.getDate(),
       dateString,
       isCurrentMonth,
-      isToday: dateString === today.toISOString().split('T')[0],
-      disabled: !isCurrentMonth || isDateDisabled(date) // 当月〜2025年10月のみ有効
+      isToday: dateString === todayString,
+      disabled: !isCurrentMonth || isDateDisabled(date) // 今日〜2025年10月のみ有効
     })
   }
   
   return dates
 })
 
-// 時間帯データ（満員時間帯も選択可能）
-const timeSlots = ref([
-  {
-    time: '9:00',
-    east: { status: 'low', selected: false },
-    west: { status: 'full', selected: false }
-  },
-  {
-    time: '10:00',
-    east: { status: 'full', selected: false },
-    west: { status: 'full', selected: false }
-  },
-  {
-    time: '11:00',
-    east: { status: 'full', selected: false },
-    west: { status: 'low', selected: true }
-  },
-  {
-    time: '12:00',
-    east: { status: 'high', selected: false },
-    west: { status: 'high', selected: false }
-  },
-  {
-    time: '17:00',
-    east: { status: 'low', selected: false },
-    west: { status: 'low', selected: false }
-  }
-])
+// 時間帯データ（実際のAPIから動的に取得）
+const timeSlots = ref<Array<{
+  time: string;
+  east: { status: string; selected: boolean };
+  west: { status: string; selected: boolean };
+}>>([])
 
 // カレンダー操作
 const toggleCalendar = () => {
@@ -202,7 +301,7 @@ const previousMonth = () => {
 const nextMonth = () => {
   const newMonth = new Date(currentMonth.value)
   newMonth.setMonth(newMonth.getMonth() + 1)
-  const maxDate = new Date(2025, 9, 31) // 2025年10月31日
+  const maxDate = new Date(2025, 9, 13) // 2025年10月13日（万博最終日）
   
   // 2025年10月以前の制限
   if (newMonth <= maxDate) {
@@ -210,16 +309,156 @@ const nextMonth = () => {
   }
 }
 
-const selectDate = (date: any) => {
-  if (!date.disabled && date.isCurrentMonth) {
-    selectedDate.value = date.dateString
-    logger.info('日付選択', { date: date.dateString })
+const selectDate = async (event: Event) => {
+  const target = event.target as HTMLElement
+  const dateString = target.getAttribute('data-date')
+  const isDisabled = target.classList.contains('disabled')
+  const isOtherMonth = target.classList.contains('other-month')
+  
+  if (!dateString || isDisabled || isOtherMonth) {
+    return
+  }
+  
+  // デバッグ用ログ
+  logger.info('カレンダー日付選択詳細', {
+    data_date属性: dateString,
+    無効: isDisabled,
+    他の月: isOtherMonth
+  })
+  
+  selectedDate.value = dateString
+  
+  // カレンダーの月を選択日付に連動させる
+  const selectedDateObj = new Date(dateString + 'T00:00:00')
+  const currentCalendarMonth = currentMonth.value.getMonth()
+  const currentCalendarYear = currentMonth.value.getFullYear()
+  
+  if (selectedDateObj.getMonth() !== currentCalendarMonth || selectedDateObj.getFullYear() !== currentCalendarYear) {
+    currentMonth.value = new Date(selectedDateObj.getFullYear(), selectedDateObj.getMonth(), 1)
+    logger.info('カレンダー月を選択日付に同期', { 
+      selectedDate: dateString,
+      newMonth: `${selectedDateObj.getFullYear()}年${selectedDateObj.getMonth() + 1}月`
+    })
+  }
+  
+  // 日付変更時は時間帯選択をクリア
+  clearTimeSlotSelection()
+  logger.info('日付選択', { date: dateString })
+  
+  // 選択された日付の時間帯データを取得
+  await loadTimeSlotsForDate(dateString)
+}
+
+// 時間帯選択のみをクリア（予約選択は保持）
+const clearTimeSlotSelection = () => {
+  timeSlots.value.forEach(slot => {
+    slot.east.selected = false
+    slot.west.selected = false
+  })
+}
+
+// 指定日の時間帯データを読み込み
+const loadTimeSlotsForDate = async (date: string) => {
+  logger.info('指定日の時間帯データ読み込み', { date, stack: new Error().stack?.split('\n')[2]?.trim() })
+  
+  try {
+    // 日付をYYYYMMDD形式に変換
+    const formattedDate = date.replace(/-/g, '')
+    
+    // 入場予約スケジュールを取得
+    const year = parseInt(date.substring(0, 4))
+    const month = parseInt(date.substring(5, 7))
+    
+    logger.info('API呼び出し開始', { date, year, month, formattedDate })
+    const scheduleData = await ticketsStore.getEntranceScheduleData(year, month)
+    
+    // 指定日のスケジュールを検索（ドキュメント通り日のみ使用）
+    const dayOfMonth = date.substring(8, 10).replace(/^0/, '') // "29"
+    const dayData = scheduleData?.states?.[dayOfMonth]
+    
+    // デバッグ用ログ
+    logger.info('スケジュールデータ検索', { 
+      date,
+      dayOfMonth,
+      hasScheduleData: !!scheduleData,
+      scheduleData: scheduleData ? JSON.stringify(scheduleData).substring(0, 200) + '...' : null,
+      availableDates: scheduleData?.states ? Object.keys(scheduleData.states) : [],
+      hasDayData: !!dayData,
+      dayDataKeys: dayData ? Object.keys(dayData) : null
+    })
+    
+    if (dayData) {
+      // 時間帯データを構築
+      const slots: Array<{
+        time: string;
+        east: { status: string; selected: boolean };
+        west: { status: string; selected: boolean };
+      }> = []
+      
+      // 東西ゲートの時間帯データを処理
+      const eastGate = dayData['1'] // 1:東ゲート
+      const westGate = dayData['2'] // 2:西ゲート
+      
+      // 利用可能な時間帯を収集（東西ゲート両方から）
+      const timeSet = new Set<string>()
+      if (eastGate) {
+        Object.keys(eastGate).forEach(time => timeSet.add(time))
+      }
+      if (westGate) {
+        Object.keys(westGate).forEach(time => timeSet.add(time))
+      }
+      
+      // 時間帯データを構築
+      for (const time of Array.from(timeSet).sort()) {
+        const eastTimeData = eastGate?.[time]
+        const westTimeData = westGate?.[time]
+        
+        // schedule_nameから表示時間を取得（例: "11:00-" -> "11:00"）
+        const displayTime = eastTimeData?.schedule_name || westTimeData?.schedule_name || time
+        const cleanTime = displayTime.replace('-', '')
+        
+        slots.push({
+          time: cleanTime,
+          east: {
+            status: getStatusFromTimeState(eastTimeData?.time_state),
+            selected: false
+          },
+          west: {
+            status: getStatusFromTimeState(westTimeData?.time_state),
+            selected: false
+          }
+        })
+      }
+      
+      timeSlots.value = slots
+      logger.info('時間帯データ読み込み完了', { date, slotsCount: slots.length })
+    } else {
+      // データがない場合は空配列
+      timeSlots.value = []
+      logger.warn('指定日の時間帯データが見つかりません', { date, dayOfMonth })
+    }
+  } catch (error) {
+    logger.error('時間帯データ読み込みエラー', error)
+    // エラー時は空配列
+    timeSlots.value = []
+  }
+}
+
+// time_stateから混雑状況を判定
+const getStatusFromTimeState = (timeState?: number): string => {
+  // 0:空き, 1:残り少ない, 2:満席, 4:利用不可
+  switch (timeState) {
+    case 0: return 'low'   // 空き
+    case 1: return 'high'  // 残り少ない
+    case 2: return 'full'  // 満席
+    case 4: return 'full'  // 利用不可（満席として扱う）
+    default: return 'full' // 不明な場合は満席として扱う
   }
 }
 
 // 日付フォーマット
 const formatDate = (dateString: string): string => {
-  const date = new Date(dateString)
+  const date = new Date(dateString + 'T00:00:00') // UTC時刻で正確に解析
   return `${date.getMonth() + 1}月${date.getDate()}日`
 }
 
@@ -251,24 +490,100 @@ const getStatusAlt = (status: string): string => {
   }
 }
 
-// 日付の有効性チェック（当月〜2025年10月）
+// 日付の有効性チェック（今日〜2025年10月）
 const isDateDisabled = (date: Date): boolean => {
   const today = new Date()
-  const minDate = new Date(today.getFullYear(), today.getMonth(), 1) // 当月1日
-  const maxDate = new Date(2025, 9, 31) // 2025年10月31日
+  today.setHours(0, 0, 0, 0) // 時刻をリセットして日付のみで比較
+  const targetDate = new Date(date)
+  targetDate.setHours(0, 0, 0, 0)
   
-  return date < minDate || date > maxDate
+  const maxDate = new Date(2025, 9, 13) // 2025年10月13日（万博最終日）
+  
+  return targetDate < today || targetDate > maxDate
 }
 
 // 入場予約データの更新
-const refreshEntranceData = () => {
+const refreshEntranceData = async () => {
   logger.info('入場予約データ更新開始')
-  // TODO: 実際のデータ取得処理を実装
+  await ticketsStore.init()
+  initializeDefaultSelection()
+  logger.info('入場予約データ更新完了')
+}
+
+// デフォルト選択の初期化
+const initializeDefaultSelection = () => {
+  // 選択済みの入場予約から日付を取得
+  const selectedTickets = ticketsStore.selectedTickets
+  
+  for (const ticket of selectedTickets) {
+    if (ticket.schedules) {
+      for (const schedule of ticket.schedules) {
+        if (schedule.selected && schedule.isOwn) {
+          // 選択済みの入場予約がある場合、その日付をデフォルト選択
+          if (schedule.entrance_date) {
+            const formattedDate = formatScheduleDate(schedule.entrance_date)
+            selectedDate.value = formattedDate
+            selectedSchedule.value = schedule
+            
+            // カレンダー月も連動
+            const selectedDateObj = new Date(formattedDate + 'T00:00:00')
+            currentMonth.value = new Date(selectedDateObj.getFullYear(), selectedDateObj.getMonth(), 1)
+            
+            logger.info('選択済み入場予約の日付をデフォルト選択', { date: formattedDate, schedule })
+            return
+          }
+        }
+      }
+    }
+  }
+  
+  // 選択済み入場予約がない場合は今日の日付をデフォルト選択
+  const today = new Date()
+  const todayYear = today.getFullYear()
+  const todayMonth = String(today.getMonth() + 1).padStart(2, '0')
+  const todayDay = String(today.getDate()).padStart(2, '0')
+  
+  const todayString = `${todayYear}-${todayMonth}-${todayDay}`
+  selectedDate.value = todayString
+  selectedSchedule.value = null
+  logger.info('今日の日付をデフォルト選択', { 
+    date: todayString, 
+    todayObject: today.toString(),
+    year: todayYear,
+    month: todayMonth, 
+    day: todayDay 
+  })
+}
+
+// スケジュールの日付をISO形式に変換
+const formatScheduleDate = (dateString: string): string => {
+  if (dateString.length === 8) {
+    const year = dateString.substring(0, 4)
+    const month = dateString.substring(4, 6)
+    const day = dateString.substring(6, 8)
+    return `${year}-${month}-${day}`
+  }
+  return dateString
 }
 
 // 予約実行
 const executeReservation = () => {
-  logger.info('予約実行', { selectedDate: selectedDate.value })
+  if (!isReservationButtonEnabled.value) {
+    logger.warn('予約ボタンが無効な状態で実行されました')
+    return
+  }
+  
+  const timeSlotInfo = getSelectedTimeSlotInfo()
+  if (!timeSlotInfo || !selectedSchedule.value) {
+    logger.warn('必要な情報が不足しています', { timeSlotInfo, selectedSchedule: selectedSchedule.value })
+    return
+  }
+  
+  logger.info('予約実行', { 
+    selectedDate: selectedDate.value, 
+    timeSlot: timeSlotInfo,
+    schedule: selectedSchedule.value 
+  })
   // TODO: 実際の予約処理を実装
 }
 
@@ -281,14 +596,31 @@ const clearSelection = () => {
   logger.info('選択をクリア', { selectedDate: selectedDate.value })
 }
 
-// 時間帯選択の切り替え（満員時間帯も選択可能）
+// 時間帯選択の切り替え（満員時間帯も選択可能、複数選択可）
 const toggleTimeSlot = (gate: 'east' | 'west', time: string) => {
   const slot = timeSlots.value.find(s => s.time === time)
-  if (slot) {
-    slot[gate].selected = !slot[gate].selected
-    logger.info('時間帯選択切り替え', { gate, time, status: slot[gate].status, selected: slot[gate].selected })
+  if (!slot) return
+  
+  // 無効な時間帯は選択不可
+  if (slot[gate].status === 'disabled') {
+    logger.warn('無効な時間帯の選択を試行', { gate, time })
+    return
   }
+  
+  // 選択状態を切り替え
+  slot[gate].selected = !slot[gate].selected
+  logger.info('時間帯選択切り替え', { gate, time, status: slot[gate].status, selected: slot[gate].selected })
 }
+
+// コンポーネントマウント時の初期化
+onMounted(async () => {
+  initializeDefaultSelection()
+  
+  // 初期日付の時間帯データを読み込み
+  if (selectedDate.value) {
+    await loadTimeSlotsForDate(selectedDate.value)
+  }
+})
 </script>
 
 <style scoped lang="scss">
@@ -305,6 +637,14 @@ const toggleTimeSlot = (gate: 'east' | 'west', time: string) => {
   gap: 16px;
   height: 100%;
   overflow: hidden;
+}
+
+/* レスポンシブ対応: 狭いスマホのみ縦積み */
+@media (max-width: 520px) {
+  .ytomo-entrance-layout {
+    flex-direction: column;
+    gap: 12px;
+  }
 }
 
 .ytomo-entrance-calendar {
@@ -513,8 +853,21 @@ const toggleTimeSlot = (gate: 'east' | 'west', time: string) => {
   
   .ytomo-reservation-actions {
     display: flex;
+    flex-direction: column;
     gap: 8px;
-    margin-top: 12px;
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 1px solid #e5e7eb;
+    
+    .ytomo-datetime-change {
+      font-size: 11px;
+      color: #374151;
+      background: #f9fafb;
+      padding: 6px 8px;
+      border-radius: 4px;
+      border: 1px solid #e5e7eb;
+      text-align: center;
+    }
     
     button {
       flex: 1;
@@ -527,11 +880,29 @@ const toggleTimeSlot = (gate: 'east' | 'west', time: string) => {
       transition: all 0.2s;
       
       &.ytomo-reserve-button {
+        flex: 1;
         background: #2c5aa0;
         color: white;
+        padding: 8px 12px;
+        border: none;
+        border-radius: 4px;
+        font-size: 12px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s;
         
-        &:hover {
+        &:hover:not(.disabled) {
           background: #1e3d72;
+        }
+        
+        &.disabled {
+          background: #9ca3af;
+          color: #d1d5db;
+          cursor: not-allowed;
+          
+          &:hover {
+            background: #9ca3af;
+          }
         }
       }
       
@@ -588,48 +959,187 @@ const toggleTimeSlot = (gate: 'east' | 'west', time: string) => {
       border-color: #9ca3af;
     }
     
-    // 状態別背景色
-    &.status-low {
-      background: #dbeafe; // 薄い青
+    // 背景色はデフォルトの白のまま（disabledの場合のみグレー）
+    &.status-disabled {
+      background: #f3f4f6; // グレー
+      color: #9ca3af;
+      cursor: not-allowed;
+      opacity: 0.6;
+      
+      &:hover {
+        border-color: #d1d5db;
+        background: #f3f4f6;
+      }
     }
     
-    &.status-high {
-      background: #fed7aa; // 橙
-    }
-    
-    &.status-full {
-      background: #fecaca; // 赤
-    }
-    
-    // 選択時は元の背景色を濃くする
-    &.selected.status-low {
-      background: #93c5fd; // 濃い青
-      border-color: #3b82f6;
-      color: #1e40af;
-    }
-    
-    &.selected.status-high {
-      background: #fb923c; // 濃い橙
-      border-color: #ea580c;
-      color: #c2410c;
-    }
-    
-    &.selected.status-full {
-      background: #f87171; // 濃い赤
-      border-color: #dc2626;
-      color: #991b1b;
-    }
-    
-    // デフォルト選択（状態なし）
+    // 選択時はボーダーを太くして目立たせる（背景色は変更しない）
     &.selected {
-      background: #2c5aa0;
+      border-width: 2px;
       border-color: #2c5aa0;
-      color: white;
+      border-style: solid;
+    }
+    
+    .ytomo-status-icon {
+      margin-right: 6px;
+      font-size: 12px;
+      font-weight: 700;
+      min-width: 14px;
+      display: inline-block;
+      text-align: center;
+      
+      &.status-low {
+        color: #3b82f6; // 青い丸
+      }
+      
+      &.status-high {
+        color: #f97316; // 橙の三角
+      }
+      
+      &.status-full {
+        color: #dc2626; // 赤いバツ
+      }
+      
+      &.status-disabled {
+        color: #9ca3af; // グレーの線
+      }
+    }
+    
+    .ytomo-check-mark {
+      font-size: 10px;
+      margin-left: 4px;
+      color: #059669;
+      font-weight: 700;
     }
     
     .ytomo-time-text {
       font-size: 11px;
       font-weight: 500;
+    }
+    
+  }
+}
+
+/* スマホ対応のメディアクエリ */
+@media (max-width: 520px) {
+  .ytomo-entrance-calendar {
+    flex: 1 1 auto;
+    height: 250px; /* スマホでは高さを縮小 */
+    
+    .ytomo-calendar-header {
+      padding: 8px 12px;
+      
+      .ytomo-calendar-title h3 {
+        font-size: 12px;
+      }
+      
+      .ytomo-selected-date {
+        font-size: 11px;
+      }
+    }
+    
+    .ytomo-calendar-body {
+      padding: 12px;
+    }
+    
+    .ytomo-calendar-grid .ytomo-calendar-days .ytomo-calendar-day {
+      font-size: 10px;
+      min-height: 20px;
+    }
+  }
+  
+  .ytomo-entrance-reservations {
+    flex: 1 1 auto;
+    min-height: 200px;
+  }
+  
+  .ytomo-entrance-table {
+    max-width: 100%; /* スマホでは最大幅を拡張 */
+    
+    th, td {
+      padding: 4px 6px;
+    }
+    
+    th {
+      font-size: 11px;
+    }
+    
+    .ytomo-time-button {
+      padding: 4px 6px;
+      
+      .ytomo-time-text {
+        font-size: 10px;
+      }
+    }
+  }
+  
+  .ytomo-reservation-actions {
+    button {
+      padding: 6px 8px;
+      font-size: 11px;
+    }
+  }
+}
+
+/* 非常に小さいスマホ画面対応 */
+@media (max-width: 400px) {
+  .ytomo-entrance-tab {
+    padding: 8px;
+  }
+  
+  .ytomo-entrance-layout {
+    gap: 8px;
+  }
+  
+  .ytomo-entrance-calendar {
+    height: 200px;
+    
+    .ytomo-calendar-header {
+      padding: 6px 8px;
+      
+      .ytomo-calendar-title h3 {
+        font-size: 11px;
+      }
+      
+      .ytomo-selected-date {
+        font-size: 10px;
+      }
+    }
+    
+    .ytomo-calendar-body {
+      padding: 8px;
+    }
+    
+    .ytomo-calendar-grid .ytomo-calendar-days .ytomo-calendar-day {
+      font-size: 9px;
+      min-height: 18px;
+    }
+  }
+  
+  .ytomo-entrance-table {
+    th, td {
+      padding: 3px 4px;
+    }
+    
+    th {
+      font-size: 10px;
+    }
+    
+    .ytomo-time-button {
+      padding: 3px 4px;
+      
+      .ytomo-time-text {
+        font-size: 9px;
+      }
+    }
+  }
+  
+  .ytomo-reservation-actions {
+    flex-direction: column;
+    gap: 6px;
+    
+    button {
+      padding: 8px 12px;
+      font-size: 12px;
     }
   }
 }

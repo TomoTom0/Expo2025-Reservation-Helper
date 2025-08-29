@@ -259,3 +259,55 @@ states
 - **One-Day Ticket (AGR8JEJ65S)**: ❌ 新規予約不可 - 未使用予約1件で上限達成
 
 **確認必須**: バリデーションAPI成功後も、実際の予約作成時に満席等で失敗する可能性がある
+
+### 7. ログイン状態確認とリダイレクト処理
+**ログイン状態確認方法**: 既存APIの401エラーレスポンスを利用
+
+**確認用API**: `GET /api/d/my/tickets/?count=1`
+- **200 OK**: ログイン済み
+- **401 Unauthorized**: 未ログイン
+
+**ログインページリダイレクト**: `/api/d/expo_login`
+- **基本形**: `window.location.replace("/api/d/expo_login")`
+- **戻り先指定**: `window.location.replace("/api/d/expo_login?return_path=" + encodeURIComponent(currentPath))`
+
+**実証された動作確認結果**:
+- **ログイン済み確認**: APIが200 OKを返し、チケット情報が正常に取得される
+- **未ログイン時リダイレクト**: 401エラー検出時に自動的にログインページに遷移
+- **戻り先URL**: 現在のパス（pathname + search + hash）が適切にエンコードされてリダイレクト
+- **リダイレクト方式**: `window.location.replace()` を使用（履歴に残らない）
+
+**JavaScript実装パターン**:
+```javascript
+// ログイン状態確認
+const checkLoginStatus = async () => {
+    try {
+        const response = await fetch('/api/d/my/tickets/?count=1', {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json, text/plain, */*',
+                'Accept-Language': 'ja,en-US;q=0.9,en;q=0.8'
+            }
+        });
+        
+        if (response.status === 401) {
+            // 未ログイン -> リダイレクト
+            const currentPath = window.location.pathname + window.location.search + window.location.hash;
+            const encodedReturnPath = encodeURIComponent(currentPath);
+            const loginUrl = `/api/d/expo_login?return_path=${encodedReturnPath}`;
+            window.location.replace(loginUrl);
+            return false;
+        }
+        
+        return response.status === 200; // ログイン済み
+    } catch (error) {
+        return false; // エラー時は未ログインとして扱う
+    }
+};
+```
+
+**動作確認済みの完全なワークフロー**:
+1. ログイン状態チェック実行
+2. 401エラーの場合、現在URL取得・エンコード
+3. ログインページにリダイレクト（戻り先URL付き）
+4. ログイン完了後、元のページに自動復帰

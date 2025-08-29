@@ -45,6 +45,7 @@
             </div>
           </button>
           <button 
+            v-if="!isYtomoPage"
             class="ytomo-dialog-close" 
             aria-label="閉じる"
             @click="hideDialog"
@@ -89,6 +90,7 @@ import { usePavilionsStore } from '@/stores/pavilions'
 import { useTickets } from '@/composables/useTickets'
 import type { ScheduleData, TicketData } from '@/types/api'
 import { getLongNameFromShortName } from '@/utils/pavilionReservationMapping'
+import { PageChecker } from '@/modules/page-utils'
 import { loggers } from '@/utils/logger'
 import TicketTab from './TicketTab.vue'
 import PavilionTab from './PavilionTab.vue'
@@ -99,6 +101,9 @@ const logger = loggers.ui
 const mainDialogStore = useMainDialogStore()
 const ticketsStore = useTicketsStore()
 const pavilionsStore = usePavilionsStore()
+
+// ytomoページ判定
+const isYtomoPage = PageChecker.isYtomoPage()
 
 // ストアの状態を取得（リアクティビティ保持）
 const { isVisible, activeTab, version } = storeToRefs(mainDialogStore)

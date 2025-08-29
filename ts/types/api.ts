@@ -4,9 +4,12 @@
 
 // 現行システムから継承
 export interface ScheduleData {
+    user_visiting_reservation_id?: number; // 予約ID（新規予約時は-1）
     entrance_date: string;      // 入場日（YYYYMMDD形式）
     use_state: number;          // 利用状態（0:未使用, 1:入場済み, 2:使用済み等）
+    gate_type?: number;         // ゲート種別（1:東, 2:西）
     schedule_name?: string;     // スケジュール名
+    isOwn?: boolean;            // 自分の予約かどうか
     isEffective?: boolean;      // 有効フラグ（処理時に付与）
     time_start?: string;        // 開始時間
     time_end?: string;          // 終了時間
@@ -26,6 +29,9 @@ export interface ScheduleData {
             winningInfo?: any;  // 当選情報（詳細は後ほど）
         }
     }
+    
+    // パビリオン予約情報
+    pavilionReservationInfo?: any;
 }
 
 export interface LotteryCalendarData {
@@ -40,6 +46,7 @@ export interface LotteryCalendarData {
 
 export interface TicketData {
     ticket_id: string;          // 公式チケットID
+    item_name?: string;         // チケット名（Season Pass等）
     isOwn: boolean;             // 自分のチケットかどうか
     label?: string;             // チケットラベル
     schedules?: ScheduleData[]; // 入場予約情報

@@ -32,11 +32,12 @@ const checkUrl = () => {
   isYtomoPage.value = pathname === '/ytomo' || pathname === '/ytomo/'
 }
 
-// YTFABボタンを表示すべきページかどうか判定
+// YTFABボタンを表示すべきページかどうか判定（ytomoページでは非表示）
 const shouldShowFab = computed(() => {
   const pathname = window.location.pathname.toLowerCase()
-  const allowedPages = ['/', '/invalid', '/ytomo', '/ytomo/']
-  return allowedPages.includes(pathname) || pathname.startsWith('/ytomo/')
+  const allowedPages = ['/', '/invalid']
+  // ytomoページでは FABボタンを表示しない
+  return allowedPages.includes(pathname) && !isYtomoPage.value
 })
 
 // マウント時とURL変更時にチェック

@@ -4,6 +4,9 @@ import { createApp, type App } from 'vue'
 import { pinia } from '../stores'
 import RootApp from '../App.vue'
 import { loggers } from '../utils/logger'
+import { useTicketsStore } from '../stores/tickets'
+import { usePavilionsStore } from '../stores/pavilions'
+import { checkLoginStatus, checkLoginAndRedirect } from '../utils/auth'
 
 /**
  * 簡素化されたメインダイアログFAB実装
@@ -56,11 +59,32 @@ export class MainDialogFabImpl implements MainDialogFab {
     async preInitializeVueSystem(): Promise<void> {
         this.logger.info('Vue統合システム事前初期化開始');
         
+        // ログイン状態確認
+        try {
+            // ytomoページの場合は、未ログイン時に自動リダイレクト
+            const isYtomoPage = PageChecker.isYtomoPage()
+            let isLoggedIn: boolean
+            
+            if (isYtomoPage) {
+                this.logger.info('ytomoページ検出 - 未ログイン時は自動リダイレクト実行')
+                isLoggedIn = await checkLoginAndRedirect()
+            } else {
+                isLoggedIn = await checkLoginStatus()
+            }
+            
+            if (!isLoggedIn) {
+                this.logger.warn('未ログイン状態のため初期化をスキップします')
+                return
+            }
+            
+            this.logger.info('ログイン済み確認 - ストア初期化を開始')
+        } catch (error) {
+            this.logger.error('ログイン状態確認エラー - 初期化をスキップします', error)
+            return
+        }
+        
         // ストア初期化をページ読み込み時に1回だけ行う
         try {
-            const { useTicketsStore } = await import('@/stores/tickets')
-            const { usePavilionsStore } = await import('@/stores/pavilions')
-            
             const ticketsStore = useTicketsStore()
             const pavilionsStore = usePavilionsStore()
             
@@ -280,27 +304,21 @@ export const initializeMainDialogFab = (): void => {
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', async () => {
         const logger = loggers.ui;
-        logger.debug('DOM読み込み完了 - ストア事前初期化');
+        logger.debug('DOM読み込み完了 - 統合初期化');
         
-        // ストア初期化を先に実行
-        const tempInstance = new MainDialogFabImpl()
-        await tempInstance.preInitializeVueSystem()
-        
-        setTimeout(() => {
-            initializeMainDialogFab();
-        }, 100);
+        // ストア事前初期化とFAB初期化を一度に実行
+        mainDialogFabInstance = new MainDialogFabImpl();
+        await mainDialogFabInstance.preInitializeVueSystem();
+        mainDialogFabInstance.initialize();
     });
 } else {
     const logger = loggers.ui;
-    logger.debug('DOM既読み込み済み - ストア事前初理化');
+    logger.debug('DOM既読み込み済み - 統合初期化');
     
-    // ストア初期化を先に実行
+    // ストア事前初期化とFAB初期化を一度に実行
     (async () => {
-        const tempInstance = new MainDialogFabImpl()
-        await tempInstance.preInitializeVueSystem()
-        
-        setTimeout(() => {
-            initializeMainDialogFab();
-        }, 100);
+        mainDialogFabInstance = new MainDialogFabImpl();
+        await mainDialogFabInstance.preInitializeVueSystem();
+        mainDialogFabInstance.initialize();
     })()
 }

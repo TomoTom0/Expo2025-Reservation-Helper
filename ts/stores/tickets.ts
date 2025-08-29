@@ -198,8 +198,39 @@ export const useTicketsStore = defineStore('tickets', () => {
         ownTickets = await loadOwnTickets()
         logger.info(`自分のチケット取得完了: ${ownTickets.length}個`)
         
-        // 自分のチケットを追加
+        // 自分のチケットを追加（通期パス用の空欄入場予約データも追加）
         for (const ticket of ownTickets) {
+          // 通期パス（Season Pass）の場合は追加予約可能性をチェック
+          if (ticket.item_name?.includes('Season Pass')) {
+            // 現在の予約数をチェック（最大3件）
+            const currentReservationCount = ticket.schedules?.length || 0
+            if (currentReservationCount < 3) {
+              // 日付空欄の入場予約データを追加
+              const emptyReservation: ScheduleData = {
+                user_visiting_reservation_id: -1, // 仮のID
+                use_state: 0,
+                entrance_date: '', // 空欄
+                gate_type: 0,
+                location_index: 0,
+                schedule_name: '新規予約',
+                time_start: '',
+                isOwn: true,
+                selected: false,
+                isEffective: false, // 新規予約なので無効
+                pavilionReservationInfo: undefined
+              }
+              
+              // schedulesが未初期化の場合は初期化
+              if (!ticket.schedules) {
+                ticket.schedules = []
+              }
+              
+              // 空欄の入場予約データを追加
+              ticket.schedules.push(emptyReservation)
+              logger.info(`通期パス ${ticket.ticket_id} に新規予約枠を追加`)
+            }
+          }
+          
           tickets.value.set(ticket.ticket_id, ticket)
         }
       } catch (error) {
@@ -613,8 +644,11 @@ export const useTicketsStore = defineStore('tickets', () => {
     try {
       logger.info('入場スケジュール API取得開始', { year, month, forceUpdate })
       
-      // チケットIDを取得（API仕様通り）
+      // チケットIDを取得（実証結果: ticket_idsパラメータの有無によらず同一レスポンス）
       const ticketIds = Array.from(tickets.value.keys())
+      logger.info('入場スケジュール取得', { ticketIds, ticketCount: ticketIds.length })
+      
+      // ticket_idsは空でも同じレスポンスが返されるため、そのまま呼び出し
       const scheduleData = await getEntranceSchedules(year, month, ticketIds)
       
       // キャッシュに保存

@@ -18,6 +18,7 @@ export interface EntranceScheduleData {
           time_state: number  // 0:空き, 1:残り少ない, 2:満席, 4:利用不可
         }
       }
+    } & {
       date_state: number  // 1:通常営業, 2:特別状態
     }
   }
@@ -50,12 +51,20 @@ export async function getEntranceSchedules(
   
   let url = `/api/d/schedules/${year}/${month}`
   
-  // ticket_ids[]パラメータ追加（実証結果では効果なしだが、仕様通り実装）
-  if (ticketIds && ticketIds.length > 0) {
-    const params = new URLSearchParams()
-    ticketIds.forEach(id => params.append('ticket_ids[]', id))
-    url += `?${params.toString()}`
-  }
+  // テスト用: ticket_ids無しで試行（verified-api-analysis.mdの通り）
+  // if (ticketIds && ticketIds.length > 0) {
+  //   const params = new URLSearchParams()
+  //   ticketIds.forEach(id => params.append('ticket_ids[]', id))
+  //   url += `?${params.toString()}`
+  // }
+  
+  logger.info('API リクエスト詳細', { 
+    url, 
+    fullUrl: `${window.location.origin}${url}`,
+    year, 
+    month, 
+    ticketIdsProvided: !!ticketIds && ticketIds.length > 0 
+  })
   
   try {
     const response = await fetch(url, {
@@ -77,7 +86,11 @@ export async function getEntranceSchedules(
       year, 
       month, 
       dataSize: JSON.stringify(data).length,
-      datesCount: Object.keys(data.states || {}).length 
+      datesCount: Object.keys(data.states || {}).length,
+      hasStates: !!data.states,
+      dataKeys: Object.keys(data),
+      statesKeys: data.states ? Object.keys(data.states) : [],
+      sampleData: JSON.stringify(data).substring(0, 300) + '...'
     })
     
     return data

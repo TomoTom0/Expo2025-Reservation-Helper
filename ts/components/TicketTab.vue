@@ -119,42 +119,50 @@
               :key="`${schedule.entrance_date}-${schedule.schedule_name}`"
               class="ytomo-entrance-date-group"
             >
-              <button
-                class="ytomo-entrance-date-button"
-                :class="{ 
-                  disabled: getReservationStatus(schedule, ticket).availableTypes.length === 0,
-                  selected: isScheduleSelected(schedule, ticket)
-                }"
-                :data-date="schedule.entrance_date"
-                :data-use-state="schedule.use_state"
-                :data-available-types="getReservationStatus(schedule, ticket).availableTypes.join(',')"
-                :disabled="getReservationStatus(schedule, ticket).availableTypes.length === 0"
-                @click="handleEntranceDateSelection(schedule, ticket, $event)"
-              >
-                <div class="ytomo-schedule-line">
-                  {{ formatEntranceDateTimeWithLocation(schedule) }}
-                </div>
-                <div class="ytomo-schedule-divider"></div>
-                <div class="ytomo-schedule-line ytomo-reservation-line">
-                  <span v-for="reservationType in getReservationTypesForSecondLine(schedule)" :key="reservationType.type" 
-                        class="ytomo-reservation-type-indicator" 
-                        :class="reservationType.statusClass">
-                    {{ reservationType.shortName }}
-                  </span>
-                  <span v-if="getReservationTypesForSecondLine(schedule).length === 0" class="ytomo-no-reservation">
-                    予約なし
-                  </span>
-                </div>
-              </button>
-              
-              <button 
-                class="ytomo-expand-button"
-                :disabled="!ticket.isOwn"
-                @click="toggleScheduleExpansion(ticket.ticket_id, schedule)"
-                :title="!ticket.isOwn ? 'パビリオン予約詳細は自分のチケットのみ表示可能' : (isScheduleExpanded(ticket.ticket_id, schedule) ? '詳細を閉じる' : '詳細を表示')"
-              >
-                {{ isScheduleExpanded(ticket.ticket_id, schedule) ? '−' : '+' }}
-              </button>
+              <div class="ytomo-entrance-button-container">
+                <!-- 上部: 入場日時表示 -->
+                <button
+                  class="ytomo-entrance-date-button ytomo-entrance-date-part"
+                  :class="{ 
+                    disabled: getReservationStatus(schedule, ticket).availableTypes.length === 0,
+                    selected: isScheduleSelected(schedule, ticket),
+                    'new-reservation': schedule.entrance_date === ''
+                  }"
+                  :data-date="schedule.entrance_date"
+                  :data-use-state="schedule.use_state"
+                  :data-available-types="getReservationStatus(schedule, ticket).availableTypes.join(',')"
+                  :disabled="getReservationStatus(schedule, ticket).availableTypes.length === 0"
+                  @click="handleEntranceDateSelection(schedule, ticket, $event)"
+                >
+                  <div class="ytomo-schedule-line">
+                    {{ schedule.entrance_date === '' ? '+ 新規入場予約' : formatEntranceDateTimeWithLocation(schedule) }}
+                  </div>
+                </button>
+                
+                <!-- 下部: パビリオン予約情報 + プラスボタン機能 -->
+                <button 
+                  v-if="schedule.entrance_date !== ''"
+                  class="ytomo-entrance-date-button ytomo-pavilion-part"
+                  :class="{
+                    disabled: !ticket.isOwn,
+                    expanded: isScheduleExpanded(ticket.ticket_id, schedule)
+                  }"
+                  :disabled="!ticket.isOwn"
+                  @click="handlePavilionReservationAction(schedule, ticket, $event)"
+                  :title="!ticket.isOwn ? 'パビリオン予約は自分のチケットのみ操作可能' : 'パビリオン予約詳細・追加'"
+                >
+                  <div class="ytomo-schedule-line ytomo-reservation-line">
+                    <span v-for="reservationType in getReservationTypesForSecondLine(schedule)" :key="reservationType.type" 
+                          class="ytomo-reservation-type-indicator" 
+                          :class="reservationType.statusClass">
+                      {{ reservationType.shortName }}
+                    </span>
+                    <span v-if="getReservationTypesForSecondLine(schedule).length === 0" class="ytomo-no-reservation">
+                      + パビリオン予約
+                    </span>
+                  </div>
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -437,6 +445,26 @@ const handleTicketDelete = (ticket: TicketData) => {
   }, 3000)
 }
 
+// パビリオン予約アクション処理
+const handlePavilionReservationAction = (schedule: ScheduleData, ticket: TicketData, event: Event) => {
+  event.stopPropagation()
+  
+  logger.info('パビリオン予約アクション', {
+    ticketId: ticket.ticket_id,
+    entranceDate: schedule.entrance_date,
+    hasReservations: getReservationTypesForSecondLine(schedule).length > 0
+  })
+  
+  // パビリオン予約がない場合は詳細画面を開く（プラスボタンの役割）
+  if (getReservationTypesForSecondLine(schedule).length === 0) {
+    // パビリオン詳細を展開する
+    toggleScheduleExpansion(ticket.ticket_id, schedule)
+  } else {
+    // 既存予約がある場合も詳細を表示
+    toggleScheduleExpansion(ticket.ticket_id, schedule)
+  }
+}
+
 const handleEntranceDateSelection = (schedule: ScheduleData, ticket: TicketData, event: Event) => {
   event.stopPropagation()
   const target = event.target as HTMLButtonElement
@@ -708,6 +736,12 @@ const formatEntranceDateTimeWithLocation = (schedule: ScheduleData): string => {
 const getStatusText = (periodStatus: string, submissionStatus: string): string => {
   const periodText = getPeriodStatusText(periodStatus)
   const submissionText = getSubmissionStatusText(submissionStatus)
+  
+  // 「未申請」の場合は期間ステータスのみを表示
+  if (submissionStatus === 'none') {
+    return periodText
+  }
+  
   return `${periodText}・${submissionText}`
 }
 
@@ -1457,6 +1491,64 @@ onUnmounted(() => {
             background: transparent;
         }
     }
+}
+
+// 入場ボタンコンテナ（上下分割）
+.ytomo-entrance-button-container {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  overflow: hidden;
+  background: white;
+}
+
+.ytomo-entrance-date-part {
+  border-radius: 0 !important;
+  border: none !important;
+  border-bottom: 1px solid #e5e7eb !important;
+  margin: 0 !important;
+  
+  &.new-reservation {
+    background: #f0f9ff;
+    color: #0369a1;
+    font-weight: 600;
+    
+    &:hover {
+      background: #e0f2fe;
+    }
+  }
+}
+
+.ytomo-pavilion-part {
+  border-radius: 0 !important;
+  border: none !important;
+  margin: 0 !important;
+  background: #fafafa;
+  transition: background-color 0.2s ease;
+  
+  &:hover {
+    background: #f5f5f5;
+  }
+  
+  &:disabled {
+    background: #f9fafb;
+    color: #9ca3af;
+  }
+  
+  // 展開状態での色変化
+  &.expanded {
+    background: #e5e7eb; // 濃いグレー
+    
+    &:hover {
+      background: #d1d5db; // ホバー時のより濃いグレー
+    }
+  }
+  
+  .ytomo-no-reservation {
+    color: #059669;
+    font-weight: 500;
+  }
 }
 
 // 予約種類インジケーター（入場予約2行目）
