@@ -24,6 +24,7 @@
             <button @click="previousMonth" id="ytomo-previous-month-button" class="ytomo-month-button ytomo-month-button--prev">‹</button>
             <div class="ytomo-month-display">
               <span class="ytomo-current-month">{{ currentMonthDisplay }}</span>
+              <span v-if="availabilityDisplayTime" class="ytomo-availability-time">{{ availabilityDisplayTime }}時点</span>
               <button id="ytomo-calendar-refresh-button" class="ytomo-calendar-refresh-button" @click="refreshEntranceData" title="入場予約データを更新">
                 <svg viewBox="0 0 24 24" width="12" height="12">
                   <path d="M4 4v5h.582m15.356 2A8.001 8.001 0 0 0 4.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 0 1-15.357-2m15.357 2H15" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
@@ -78,8 +79,8 @@
       <div class="ytomo-entrance-reservations">
         <!-- 日付表示エリア（既存日時と選択日付を横並び） -->
         <div v-if="selectedDate" class="ytomo-date-display-container">
-          <!-- 既存入場日時表示（左側） -->
-          <div v-if="getFromDateTimeText()" class="ytomo-existing-datetime-display">
+          <!-- 既存入場日時表示（左側）灰色 -->
+          <div v-if="getFromDateTimeText()" class="ytomo-existing-datetime-display existing">
             {{ getFromDateTimeText() }}
           </div>
           
@@ -90,8 +91,8 @@
             </svg>
           </div>
           
-          <!-- 入場日表示（右側） -->
-          <div class="ytomo-selected-date-display">
+          <!-- 入場日表示（右側）青色 -->
+          <div class="ytomo-selected-date-display selected">
             {{ formatDate(selectedDate) }}
           </div>
         </div>
@@ -111,9 +112,10 @@
                     class="ytomo-time-button"
                     :class="[
                       { 'selected': timeSlot.east.selected },
+                      { 'disabled': isTimeSlotDisabled('east', timeSlot.time) },
                       `status-${timeSlot.east.status}`
                     ]"
-                    @click="toggleTimeSlot('east', timeSlot.time)"
+                    @click="!isTimeSlotDisabled('east', timeSlot.time) && toggleTimeSlot('east', timeSlot.time)"
                   >
                     <span class="ytomo-status-icon" :class="`status-${timeSlot.east.status}`">
                       <span v-if="timeSlot.east.status === 'low'">●</span>
@@ -133,9 +135,10 @@
                     class="ytomo-time-button"
                     :class="[
                       { 'selected': timeSlot.west.selected },
+                      { 'disabled': isTimeSlotDisabled('west', timeSlot.time) },
                       `status-${timeSlot.west.status}`
                     ]"
-                    @click="toggleTimeSlot('west', timeSlot.time)"
+                    @click="!isTimeSlotDisabled('west', timeSlot.time) && toggleTimeSlot('west', timeSlot.time)"
                   >
                     <span class="ytomo-status-icon" :class="`status-${timeSlot.west.status}`">
                       <span v-if="timeSlot.west.status === 'low'">●</span>
@@ -235,10 +238,46 @@ const ticketsStore = useTicketsStore()
 // 予約管理インスタンス
 const reservationManager = new EntranceReservationApiManager()
 
+// 選択解除関数
+const clearTimeSlotSelection = () => {
+  selectionOrder.value = []
+  timeSlots.value.forEach(slot => {
+    slot.east.selected = false
+    slot.west.selected = false
+  })
+  logger.info('予約成功により時間帯選択を解除しました')
+}
+
+// 選択解除コールバックを設定
+reservationManager.setClearSelectionCallback(clearTimeSlotSelection)
+
 // カレンダー状態
 const isCalendarExpanded = ref(true)
 const selectedDate = ref<string>('')
 const currentMonth = ref(new Date()) // 現在の年月
+
+// 既存の入場日時と重複する時間帯を判定
+const isTimeSlotDisabled = (gate: string, time: string) => {
+  if (!selectedDate.value) return false
+  
+  const selectedDateStr = selectedDate.value
+  const gateType = gate === 'east' ? 1 : 2
+  
+  // 同じ日付の既存予約があるかチェック
+  for (const ticket of ticketsStore.tickets.values()) {
+    if (ticket.schedules) {
+      for (const schedule of ticket.schedules) {
+        if (schedule.selected && 
+            schedule.entrance_date === selectedDateStr &&
+            schedule.gate_type === gateType &&
+            schedule.time_start === time) {
+          return true
+        }
+      }
+    }
+  }
+  return false
+}
 
 // 現在選択されているスケジュール（ticket.schedulesから検索）
 const selectedSchedule = computed(() => {
@@ -520,6 +559,17 @@ const currentMonthDisplay = computed(() => {
   return `${currentMonth.value.getFullYear()}年${currentMonth.value.getMonth() + 1}月`
 })
 
+// 空き情報を表示している時間を取得
+const availabilityDisplayTime = computed(() => {
+  // 現在の時刻を表示（リアルタイム更新の代替）
+  const now = new Date()
+  return now.toLocaleTimeString('ja-JP', { 
+    hour: '2-digit', 
+    minute: '2-digit',
+    hour12: false
+  })
+})
+
 const calendarDates = computed(() => {
   if (!currentMonth.value) {
     return []
@@ -693,13 +743,7 @@ const selectDate = async (event: Event) => {
   await loadTimeSlotsForDateWithSelection(dateString)
 }
 
-// 時間帯選択のみをクリア（予約選択は保持）
-const clearTimeSlotSelection = () => {
-  timeSlots.value.forEach(slot => {
-    slot.east.selected = false
-    slot.west.selected = false
-  })
-}
+// 時間帯選択のみをクリア（予約選択は保持）- 統合済み
 
 // 指定日の時間帯データを読み込み（選択状態を保持）
 const loadTimeSlotsForDateWithSelection = async (date: string) => {
@@ -1965,6 +2009,13 @@ onMounted(async () => {
       text-align: center;
     }
     
+    .ytomo-availability-time {
+      font-size: 11px;
+      color: #6b7280;
+      margin-left: 8px;
+      white-space: nowrap;
+    }
+    
     .ytomo-calendar-refresh-button {
       background: none;
       border: 1px solid #d1d5db;
@@ -2160,6 +2211,12 @@ onMounted(async () => {
     padding: 4px 6px;
     border-radius: 4px;
     border: 1px solid rgba(239, 68, 68, 0.3);
+    
+    &.existing {
+      background: rgba(156, 163, 175, 0.1);
+      color: #6b7280;
+      border: 1px solid rgba(156, 163, 175, 0.3);
+    }
     white-space: nowrap;
     flex-shrink: 0;
   }
@@ -2170,6 +2227,11 @@ onMounted(async () => {
     font-weight: 700;
     font-size: 14px;
     text-align: center;
+    
+    &.selected {
+      background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+      border: 1px solid rgba(59, 130, 246, 0.3);
+    }
     padding: 8px 12px;
     border-radius: 6px;
     box-shadow: 0 2px 4px rgba(5, 150, 105, 0.2);
@@ -2538,6 +2600,18 @@ onMounted(async () => {
     border: 1px solid #d1d5db;
     border-radius: 4px;
     padding: 6px 8px;
+    
+    &.disabled {
+      background: #f3f4f6;
+      color: #9ca3af;
+      cursor: not-allowed;
+      opacity: 0.5;
+      
+      &:hover {
+        background: #f3f4f6;
+        border-color: #d1d5db;
+      }
+    }
     cursor: pointer;
     transition: all 0.2s;
     display: flex;

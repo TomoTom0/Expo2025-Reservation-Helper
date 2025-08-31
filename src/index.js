@@ -8,7 +8,7 @@
 // @run-at       document-end
 // ==/UserScript==
 
-// Built: 2025/08/31 10:07:29
+// Built: 2025/08/31 10:24:18
 
 
 (function webpackUniversalModuleDefinition(root, factory) {
@@ -2079,6 +2079,28 @@ class ProcessingOverlay {
 }
 // グローバルインスタンス
 const processingOverlay = new ProcessingOverlay();
+
+
+/***/ }),
+
+/***/ 416:
+/***/ ((module, __webpack_exports__, __webpack_require__) => {
+
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   A: () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _node_modules_css_loader_dist_runtime_noSourceMaps_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(601);
+/* harmony import */ var _node_modules_css_loader_dist_runtime_noSourceMaps_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_css_loader_dist_runtime_noSourceMaps_js__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(314);
+/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1__);
+// Imports
+
+
+var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1___default()((_node_modules_css_loader_dist_runtime_noSourceMaps_js__WEBPACK_IMPORTED_MODULE_0___default()));
+// Module
+___CSS_LOADER_EXPORT___.push([module.id, `.ytomo-entrance-tab[data-v-58e83aca]{height:100%;display:flex;flex-direction:column;padding:12px;overflow:hidden}.ytomo-entrance-layout[data-v-58e83aca]{display:flex;gap:16px;height:100%;overflow:hidden;justify-content:center;align-items:flex-start;margin-bottom:16px}.ytomo-execution-info[data-v-58e83aca]{width:100%;min-height:0;overflow:hidden;display:flex;flex-direction:row;gap:16px;justify-content:center}.ytomo-execution-info .ytomo-reservation-info[data-v-58e83aca],.ytomo-execution-info .ytomo-reservation-status[data-v-58e83aca]{flex:1 1 0;max-width:300px}.ytomo-execution-info .ytomo-reservation-info[data-v-58e83aca]{margin-top:0}.ytomo-execution-info .ytomo-reservation-info.completed[data-v-58e83aca]{opacity:.6}.ytomo-execution-info .ytomo-reservation-info.completed .ytomo-reservation-box[data-v-58e83aca]{background:linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);border-color:#6c757d}.ytomo-execution-info .ytomo-reservation-info.completed .ytomo-reservation-date[data-v-58e83aca]{color:#6c757d;border-color:#6c757d}.ytomo-execution-info .ytomo-reservation-info .ytomo-reservation-box[data-v-58e83aca]{background:linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);border:1px solid #0891b2;border-radius:8px;padding:16px;position:relative}.ytomo-execution-info .ytomo-reservation-info .ytomo-reservation-box .ytomo-reservation-date[data-v-58e83aca]{position:absolute;top:-8px;left:12px;font-weight:600;font-size:12px;color:#0c4a6e;background:#fff;padding:4px 8px;border-radius:4px;border:1px solid #0891b2;box-shadow:0 1px 3px rgba(0,0,0,.1)}.ytomo-execution-info .ytomo-reservation-info .ytomo-reservation-box .ytomo-reservation-timeslots[data-v-58e83aca]{margin-top:8px;display:flex;flex-wrap:wrap;gap:8px}.ytomo-execution-info .ytomo-reservation-info .ytomo-reservation-box .ytomo-reservation-timeslots .ytomo-timeslot[data-v-58e83aca]{background:rgba(8,145,178,.1);border:1px solid #0891b2;border-radius:6px;padding:4px 8px;font-size:10px;font-weight:500;color:#0c4a6e}.ytomo-execution-info .ytomo-reservation-status[data-v-58e83aca]{background:linear-gradient(135deg, #fef3c7 0%, #fed7aa 100%);border:1px solid #f59e0b;border-radius:8px;padding:12px;margin-top:0}.ytomo-execution-info .ytomo-reservation-status.success[data-v-58e83aca]{background:linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);border-color:#059669}.ytomo-execution-info .ytomo-reservation-status.cancelled[data-v-58e83aca]{background:linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);border-color:#6b7280}.ytomo-execution-info .ytomo-reservation-status .ytomo-status-content[data-v-58e83aca]{display:flex;align-items:flex-start;gap:12px}.ytomo-execution-info .ytomo-reservation-status .ytomo-status-content .ytomo-status-icon[data-v-58e83aca]{width:20px;height:20px;flex-shrink:0;margin-top:2px}.ytomo-execution-info .ytomo-reservation-status .ytomo-status-content .ytomo-status-icon svg[data-v-58e83aca]{width:100%;height:100%;fill:#d97706}.ytomo-execution-info .ytomo-reservation-status .ytomo-status-content .ytomo-status-icon.spinning svg[data-v-58e83aca]{animation:spin 1s linear infinite}.ytomo-execution-info .ytomo-reservation-status .ytomo-status-content .ytomo-status-details .ytomo-status-current[data-v-58e83aca]{font-size:12px;color:#92400e;margin-bottom:8px;font-weight:500}.ytomo-execution-info .ytomo-reservation-status .ytomo-status-content .ytomo-status-details .ytomo-datetime-change[data-v-58e83aca]{font-size:11px;color:#059669;font-weight:bold;margin-bottom:8px}.ytomo-execution-info .ytomo-reservation-status .ytomo-status-content .ytomo-status-details .ytomo-status-progress .ytomo-progress-bar[data-v-58e83aca]{width:200px;height:6px;background:rgba(217,119,6,.2);border-radius:3px;overflow:hidden;margin-bottom:4px}.ytomo-execution-info .ytomo-reservation-status .ytomo-status-content .ytomo-status-details .ytomo-status-progress .ytomo-progress-bar .ytomo-progress-fill[data-v-58e83aca]{height:100%;background:linear-gradient(90deg, #f59e0b 0%, #d97706 100%);transition:width .3s ease}.ytomo-execution-info .ytomo-reservation-status .ytomo-status-content .ytomo-status-details .ytomo-status-progress .ytomo-progress-text[data-v-58e83aca]{font-size:11px;color:#78716c;text-align:right;display:block}.ytomo-execution-info .ytomo-reservation-status .ytomo-status-content .ytomo-status-details .ytomo-status-progress .ytomo-reservation-history[data-v-58e83aca]{position:absolute;bottom:0;right:0;font-size:10px;max-width:120px}.ytomo-execution-info .ytomo-reservation-status .ytomo-status-content .ytomo-status-details .ytomo-status-progress .ytomo-reservation-history .ytomo-history-item[data-v-58e83aca]{display:flex;align-items:center;gap:4px;margin-bottom:2px}.ytomo-execution-info .ytomo-reservation-status .ytomo-status-content .ytomo-status-details .ytomo-status-progress .ytomo-reservation-history .ytomo-history-item .ytomo-history-time[data-v-58e83aca]{color:#6b7280;font-size:9px}.ytomo-execution-info .ytomo-reservation-status .ytomo-status-content .ytomo-status-details .ytomo-status-progress .ytomo-reservation-history .ytomo-history-item .ytomo-history-result[data-v-58e83aca]{font-weight:bold;font-size:10px}.ytomo-execution-info .ytomo-reservation-status .ytomo-status-content .ytomo-status-details .ytomo-status-progress .ytomo-reservation-history .ytomo-history-item .ytomo-history-result.success[data-v-58e83aca]{color:#059669}.ytomo-execution-info .ytomo-reservation-status .ytomo-status-content .ytomo-status-details .ytomo-status-progress .ytomo-reservation-history .ytomo-history-item .ytomo-history-result.failure[data-v-58e83aca]{color:#dc2626}.ytomo-execution-info .ytomo-reservation-status .ytomo-status-content .ytomo-status-details .ytomo-status-progress .ytomo-reservation-history .ytomo-history-item .ytomo-history-slot[data-v-58e83aca]{color:#374151;font-size:9px}@media(max-width: 520px){.ytomo-entrance-layout[data-v-58e83aca]{flex-direction:column;gap:12px}}.ytomo-entrance-calendar[data-v-58e83aca]{flex:0 0 220px;height:300px;border:1px solid #e5e7eb;border-radius:8px;display:flex;flex-direction:column;overflow:hidden}.ytomo-entrance-calendar .ytomo-calendar-header[data-v-58e83aca]{display:flex;align-items:center;justify-content:space-between;padding:6px 8px;background:#f9fafb;border-radius:8px 8px 0 0;border-bottom:1px solid #e5e7eb}.ytomo-entrance-calendar .ytomo-calendar-header .ytomo-calendar-title[data-v-58e83aca]{flex:1;display:flex;align-items:center;gap:6px;cursor:pointer}.ytomo-entrance-calendar .ytomo-calendar-header .ytomo-calendar-title[data-v-58e83aca]:hover{background:#f3f4f6;border-radius:3px;padding:3px;margin:-3px}.ytomo-entrance-calendar .ytomo-calendar-header .ytomo-calendar-title h3[data-v-58e83aca]{margin:0;font-size:11px;font-weight:600;color:#374151}.ytomo-entrance-calendar .ytomo-calendar-header .ytomo-calendar-title .ytomo-selected-date[data-v-58e83aca]{font-size:14px;color:#059669;font-weight:700;background:#ecfdf5;padding:2px 6px;border-radius:4px;border:1px solid #a7f3d0}.ytomo-entrance-calendar .ytomo-calendar-header .ytomo-header-buttons[data-v-58e83aca]{display:flex;align-items:center;gap:4px}.ytomo-entrance-calendar .ytomo-calendar-header .ytomo-header-buttons .ytomo-refresh-button[data-v-58e83aca]{background:none;border:1px solid #d1d5db;border-radius:3px;width:20px;height:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#6b7280}.ytomo-entrance-calendar .ytomo-calendar-header .ytomo-header-buttons .ytomo-refresh-button[data-v-58e83aca]:hover{background:#f3f4f6;border-color:#9ca3af}.ytomo-entrance-calendar .ytomo-calendar-header .ytomo-header-buttons .ytomo-calendar-toggle[data-v-58e83aca]{font-size:11px;color:#6b7280;cursor:pointer;padding:3px 6px;border-radius:3px}.ytomo-entrance-calendar .ytomo-calendar-header .ytomo-header-buttons .ytomo-calendar-toggle[data-v-58e83aca]:hover{background:#f3f4f6}.ytomo-entrance-calendar .ytomo-calendar-body[data-v-58e83aca]{flex:1;padding:8px;overflow:auto}.ytomo-entrance-calendar .ytomo-calendar-controls[data-v-58e83aca]{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}.ytomo-entrance-calendar .ytomo-calendar-controls .ytomo-month-display[data-v-58e83aca]{display:flex;align-items:center;gap:8px}.ytomo-entrance-calendar .ytomo-calendar-controls .ytomo-month-button[data-v-58e83aca]{background:none;border:1px solid #d1d5db;border-radius:3px;width:22px;height:22px;cursor:pointer;font-size:12px;display:flex;align-items:center;justify-content:center}.ytomo-entrance-calendar .ytomo-calendar-controls .ytomo-month-button[data-v-58e83aca]:hover{background:#f3f4f6}.ytomo-entrance-calendar .ytomo-calendar-controls .ytomo-current-month[data-v-58e83aca]{font-weight:600;color:#374151;flex:1;text-align:center}.ytomo-entrance-calendar .ytomo-calendar-controls .ytomo-availability-time[data-v-58e83aca]{font-size:11px;color:#6b7280;margin-left:8px;white-space:nowrap}.ytomo-entrance-calendar .ytomo-calendar-controls .ytomo-calendar-refresh-button[data-v-58e83aca]{background:none;border:1px solid #d1d5db;border-radius:3px;width:20px;height:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#6b7280;margin-left:8px}.ytomo-entrance-calendar .ytomo-calendar-controls .ytomo-calendar-refresh-button[data-v-58e83aca]:hover{background:#f3f4f6;border-color:#9ca3af}.ytomo-entrance-calendar .ytomo-calendar-grid .ytomo-calendar-weekdays[data-v-58e83aca]{display:grid;grid-template-columns:repeat(7, 1fr);gap:1px;margin-bottom:4px}.ytomo-entrance-calendar .ytomo-calendar-grid .ytomo-calendar-weekdays .ytomo-weekday[data-v-58e83aca]{text-align:center;font-size:12px;font-weight:600;color:#6b7280;padding:4px}.ytomo-entrance-calendar .ytomo-calendar-grid .ytomo-calendar-days[data-v-58e83aca]{display:grid;grid-template-columns:repeat(7, 1fr);gap:1px}.ytomo-entrance-calendar .ytomo-calendar-grid .ytomo-calendar-days .ytomo-calendar-day[data-v-58e83aca]{aspect-ratio:1;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:11px;cursor:pointer;border-radius:3px;transition:all .2s;min-height:24px}.ytomo-entrance-calendar .ytomo-calendar-grid .ytomo-calendar-days .ytomo-calendar-day[data-v-58e83aca] *{pointer-events:none}.ytomo-entrance-calendar .ytomo-calendar-grid .ytomo-calendar-days .ytomo-calendar-day[data-v-58e83aca]:hover:not(.disabled):not(.other-month){background:#f3f4f6}.ytomo-entrance-calendar .ytomo-calendar-grid .ytomo-calendar-days .ytomo-calendar-day.selected[data-v-58e83aca]{background:#fff;color:#0c4a6e;border:2px solid #0891b2;font-weight:600}.ytomo-entrance-calendar .ytomo-calendar-grid .ytomo-calendar-days .ytomo-calendar-day.today[data-v-58e83aca]{background:#dbeafe;color:#1e40af;font-weight:600}.ytomo-entrance-calendar .ytomo-calendar-grid .ytomo-calendar-days .ytomo-calendar-day.has-reservation[data-v-58e83aca]{background:#f0fdf4;color:#166534}.ytomo-entrance-calendar .ytomo-calendar-grid .ytomo-calendar-days .ytomo-calendar-day.has-reservation.selected[data-v-58e83aca]{background:#fff;color:#0c4a6e;border:2px solid #0891b2;font-weight:600}.ytomo-entrance-calendar .ytomo-calendar-grid .ytomo-calendar-days .ytomo-calendar-day.other-month[data-v-58e83aca]{color:#d1d5db;cursor:default}.ytomo-entrance-calendar .ytomo-calendar-grid .ytomo-calendar-days .ytomo-calendar-day.disabled[data-v-58e83aca]{color:#d1d5db;cursor:not-allowed}.ytomo-entrance-calendar .ytomo-calendar-grid .ytomo-calendar-days .ytomo-calendar-day .ytomo-day-number[data-v-58e83aca]{margin-bottom:2px}.ytomo-entrance-calendar .ytomo-calendar-grid .ytomo-calendar-days .ytomo-calendar-day .ytomo-availability-indicator[data-v-58e83aca]{display:flex;gap:2px;height:8px}.ytomo-entrance-calendar .ytomo-calendar-grid .ytomo-calendar-days .ytomo-calendar-day .ytomo-availability-indicator .ytomo-gate-availability[data-v-58e83aca]{display:flex;align-items:center}.ytomo-entrance-calendar .ytomo-calendar-grid .ytomo-calendar-days .ytomo-calendar-day .ytomo-availability-indicator .ytomo-gate-availability .ytomo-status-dot[data-v-58e83aca]{width:6px;height:6px;border-radius:50%;border:1px solid #d1d5db}.ytomo-entrance-calendar .ytomo-calendar-grid .ytomo-calendar-days .ytomo-calendar-day .ytomo-availability-indicator .ytomo-gate-availability .ytomo-status-dot.available[data-v-58e83aca]{background-color:#10b981;border-color:#10b981}.ytomo-entrance-calendar .ytomo-calendar-grid .ytomo-calendar-days .ytomo-calendar-day .ytomo-availability-indicator .ytomo-gate-availability .ytomo-status-dot.few-left[data-v-58e83aca]{background-color:#f59e0b;border-color:#f59e0b}.ytomo-entrance-calendar .ytomo-calendar-grid .ytomo-calendar-days .ytomo-calendar-day .ytomo-availability-indicator .ytomo-gate-availability .ytomo-status-dot.full[data-v-58e83aca]{background-color:#ef4444;border-color:#ef4444}.ytomo-entrance-calendar .ytomo-calendar-grid .ytomo-calendar-days .ytomo-calendar-day .ytomo-availability-indicator .ytomo-gate-availability .ytomo-status-dot.unavailable[data-v-58e83aca]{background-color:#9ca3af;border-color:#9ca3af}.ytomo-entrance-calendar .ytomo-calendar-grid .ytomo-calendar-days .ytomo-calendar-day .ytomo-availability-indicator .ytomo-gate-availability .ytomo-status-dot.unknown[data-v-58e83aca]{background-color:#d1d5db;border-color:#d1d5db}.ytomo-entrance-reservations[data-v-58e83aca]{flex:1;min-width:0;overflow:hidden;display:flex;flex-direction:column}.ytomo-entrance-reservations .ytomo-date-display-container[data-v-58e83aca]{display:flex;align-items:center;gap:8px;margin-bottom:8px;max-width:300px;margin-left:auto;margin-right:auto}.ytomo-entrance-reservations .ytomo-change-arrow[data-v-58e83aca]{display:flex;align-items:center;justify-content:center;flex-shrink:0}.ytomo-entrance-reservations .ytomo-change-arrow .ytomo-arrow-icon[data-v-58e83aca]{width:20px;height:20px;fill:#059669;opacity:.8;transition:all .3s ease;filter:drop-shadow(0 1px 2px rgba(5, 150, 105, 0.2))}.ytomo-entrance-reservations .ytomo-change-arrow .ytomo-arrow-icon[data-v-58e83aca]:hover{opacity:1;transform:translateX(2px)}.ytomo-entrance-reservations .ytomo-existing-datetime-display[data-v-58e83aca]{background:rgba(239,68,68,.1);color:#dc2626;font-weight:600;font-size:10px;text-align:center;padding:4px 6px;border-radius:4px;border:1px solid rgba(239,68,68,.3);white-space:nowrap;flex-shrink:0}.ytomo-entrance-reservations .ytomo-existing-datetime-display.existing[data-v-58e83aca]{background:rgba(156,163,175,.1);color:#6b7280;border:1px solid rgba(156,163,175,.3)}.ytomo-entrance-reservations .ytomo-selected-date-display[data-v-58e83aca]{background:linear-gradient(135deg, #059669 0%, #047857 100%);color:#fff;font-weight:700;font-size:14px;text-align:center;padding:8px 12px;border-radius:6px;box-shadow:0 2px 4px rgba(5,150,105,.2);flex:1}.ytomo-entrance-reservations .ytomo-selected-date-display.selected[data-v-58e83aca]{background:linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);border:1px solid rgba(59,130,246,.3)}.ytomo-entrance-reservations .ytomo-reservation-table-container[data-v-58e83aca]{flex:1;min-height:0;max-width:600px}.ytomo-entrance-reservations .ytomo-reservation-table-container .ytomo-no-date-selected[data-v-58e83aca]{display:flex;align-items:center;justify-content:center;height:150px;color:#9ca3af;font-size:12px}.ytomo-entrance-reservations .ytomo-reservation-actions[data-v-58e83aca]{display:flex;flex-direction:column;align-items:center;gap:8px;margin-top:8px;padding-top:8px;border-top:1px solid #e5e7eb;max-width:300px;margin-left:auto;margin-right:auto}.ytomo-entrance-reservations .ytomo-reservation-actions .ytomo-datetime-change[data-v-58e83aca]{min-height:40px;margin-bottom:8px;display:flex;align-items:center;justify-content:center}.ytomo-entrance-reservations .ytomo-reservation-actions .ytomo-datetime-change .ytomo-change-buttons[data-v-58e83aca]{display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap}.ytomo-entrance-reservations .ytomo-reservation-actions .ytomo-datetime-change .ytomo-datetime-button[data-v-58e83aca]{background:#e0f2fe;border:1px solid #0891b2;border-radius:4px;padding:4px 8px;font-size:11px;color:#0c4a6e;font-weight:500;transition:all .2s;min-width:80px;text-align:center;display:flex;align-items:center;justify-content:center}.ytomo-entrance-reservations .ytomo-reservation-actions .ytomo-datetime-change .ytomo-datetime-button.ytomo-from-datetime[data-v-58e83aca]{opacity:.8}.ytomo-entrance-reservations .ytomo-reservation-actions .ytomo-datetime-change .ytomo-datetime-button.ytomo-to-datetime[data-v-58e83aca]{background:#0891b2;color:#fff;border-color:#0891b2}.ytomo-entrance-reservations .ytomo-reservation-actions .ytomo-datetime-change .ytomo-arrow[data-v-58e83aca]{font-size:14px;font-weight:bold;color:#6b7280;padding:0 4px}.ytomo-entrance-reservations .ytomo-reservation-actions button[data-v-58e83aca]{flex:1;padding:8px 12px;border:none;border-radius:4px;font-size:12px;font-weight:500;cursor:pointer;transition:all .2s}.ytomo-entrance-reservations .ytomo-reservation-actions button.ytomo-reserve-button[data-v-58e83aca]{width:120px;background:#2c5aa0;color:#fff;padding:8px 12px;border:none;border-radius:4px;font-size:12px;font-weight:500;cursor:pointer;transition:all .2s}.ytomo-entrance-reservations .ytomo-reservation-actions button.ytomo-reserve-button[data-v-58e83aca]:hover:not(.disabled){background:#1e3d72}.ytomo-entrance-reservations .ytomo-reservation-actions button.ytomo-reserve-button.disabled[data-v-58e83aca]{background:#9ca3af;color:#d1d5db;cursor:not-allowed}.ytomo-entrance-reservations .ytomo-reservation-actions button.ytomo-reserve-button.disabled[data-v-58e83aca]:hover{background:#9ca3af}.ytomo-entrance-reservations .ytomo-reservation-actions button.ytomo-reserve-button.cancel-mode[data-v-58e83aca]{background:#dc2626;color:#fff}.ytomo-entrance-reservations .ytomo-reservation-actions button.ytomo-reserve-button.cancel-mode[data-v-58e83aca]:hover{background:#b91c1c}.ytomo-entrance-reservations .ytomo-reservation-actions button.ytomo-clear-button[data-v-58e83aca]{background:#f3f4f6;color:#374151;border:1px solid #d1d5db}.ytomo-entrance-reservations .ytomo-reservation-actions button.ytomo-clear-button[data-v-58e83aca]:hover{background:#e5e7eb}.ytomo-entrance-reservations .ytomo-reservation-actions button.ytomo-clear-button.cancel-mode[data-v-58e83aca]{background:#dc2626;border-color:#dc2626}.ytomo-entrance-reservations .ytomo-reservation-actions button.ytomo-clear-button.cancel-mode[data-v-58e83aca]:hover{background:#b91c1c;border-color:#b91c1c}.ytomo-entrance-reservations .ytomo-reservation-actions .ytomo-reservation-info[data-v-58e83aca]{width:100%;margin-top:12px}.ytomo-entrance-reservations .ytomo-reservation-actions .ytomo-reservation-info.completed[data-v-58e83aca]{opacity:.6}.ytomo-entrance-reservations .ytomo-reservation-actions .ytomo-reservation-info.completed .ytomo-reservation-box[data-v-58e83aca]{background:linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);border-color:#6c757d}.ytomo-entrance-reservations .ytomo-reservation-actions .ytomo-reservation-info.completed .ytomo-reservation-date[data-v-58e83aca]{color:#6c757d;border-color:#6c757d}.ytomo-entrance-reservations .ytomo-reservation-actions .ytomo-reservation-info .ytomo-reservation-box[data-v-58e83aca]{background:linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);border:1px solid #0891b2;border-radius:8px;padding:16px;position:relative}.ytomo-entrance-reservations .ytomo-reservation-actions .ytomo-reservation-info .ytomo-reservation-box .ytomo-reservation-date[data-v-58e83aca]{position:absolute;top:-8px;left:12px;font-weight:600;font-size:12px;color:#0c4a6e;background:#fff;padding:4px 8px;border-radius:4px;border:1px solid #0891b2;box-shadow:0 1px 3px rgba(0,0,0,.1)}.ytomo-entrance-reservations .ytomo-reservation-actions .ytomo-reservation-info .ytomo-reservation-box .ytomo-reservation-timeslots[data-v-58e83aca]{margin-top:8px;display:flex;flex-wrap:wrap;gap:8px}.ytomo-entrance-reservations .ytomo-reservation-actions .ytomo-reservation-info .ytomo-reservation-box .ytomo-reservation-timeslots .ytomo-timeslot[data-v-58e83aca]{background:rgba(8,145,178,.1);border:1px solid #0891b2;border-radius:6px;padding:4px 8px;font-size:10px;font-weight:500;color:#0c4a6e}.ytomo-entrance-reservations .ytomo-reservation-actions .ytomo-reservation-status[data-v-58e83aca]{width:100%;background:linear-gradient(135deg, #fef3c7 0%, #fed7aa 100%);border:1px solid #f59e0b;border-radius:8px;padding:12px;margin-top:8px}.ytomo-entrance-reservations .ytomo-reservation-actions .ytomo-reservation-status.success[data-v-58e83aca]{background:linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);border-color:#059669}.ytomo-entrance-reservations .ytomo-reservation-actions .ytomo-reservation-status.cancelled[data-v-58e83aca]{background:linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);border-color:#6b7280}.ytomo-entrance-reservations .ytomo-reservation-actions .ytomo-reservation-status .ytomo-status-content[data-v-58e83aca]{display:flex;align-items:flex-start;gap:12px}.ytomo-entrance-reservations .ytomo-reservation-actions .ytomo-reservation-status .ytomo-status-content .ytomo-status-icon[data-v-58e83aca]{width:20px;height:20px;flex-shrink:0;margin-top:2px}.ytomo-entrance-reservations .ytomo-reservation-actions .ytomo-reservation-status .ytomo-status-content .ytomo-status-icon svg[data-v-58e83aca]{width:100%;height:100%;fill:#d97706}.ytomo-entrance-reservations .ytomo-reservation-actions .ytomo-reservation-status .ytomo-status-content .ytomo-status-icon.spinning svg[data-v-58e83aca]{animation:spin 1s linear infinite}.ytomo-entrance-reservations .ytomo-reservation-actions .ytomo-reservation-status .ytomo-status-content .ytomo-status-details[data-v-58e83aca]{position:relative}.ytomo-entrance-reservations .ytomo-reservation-actions .ytomo-reservation-status .ytomo-status-content .ytomo-status-details .ytomo-status-current[data-v-58e83aca]{font-size:12px;color:#92400e;margin-bottom:8px;font-weight:500}.ytomo-entrance-reservations .ytomo-reservation-actions .ytomo-reservation-status .ytomo-status-content .ytomo-status-details .ytomo-datetime-change[data-v-58e83aca]{font-size:11px;color:#059669;font-weight:bold;margin-bottom:8px}.ytomo-entrance-reservations .ytomo-reservation-actions .ytomo-reservation-status .ytomo-status-content .ytomo-status-details .ytomo-status-progress .ytomo-progress-bar[data-v-58e83aca]{width:200px;height:6px;background:rgba(217,119,6,.2);border-radius:3px;overflow:hidden;margin-bottom:4px}.ytomo-entrance-reservations .ytomo-reservation-actions .ytomo-reservation-status .ytomo-status-content .ytomo-status-details .ytomo-status-progress .ytomo-progress-bar .ytomo-progress-fill[data-v-58e83aca]{height:100%;background:linear-gradient(90deg, #f59e0b 0%, #d97706 100%);transition:width .3s ease}.ytomo-entrance-reservations .ytomo-reservation-actions .ytomo-reservation-status .ytomo-status-content .ytomo-status-details .ytomo-status-progress .ytomo-progress-text[data-v-58e83aca]{font-size:11px;color:#78716c;text-align:right;display:block}.ytomo-entrance-reservations .ytomo-reservation-actions .ytomo-reservation-status .ytomo-status-content .ytomo-status-details .ytomo-status-progress .ytomo-reservation-history[data-v-58e83aca]{position:absolute;bottom:0;right:0;font-size:10px;max-width:120px}.ytomo-entrance-reservations .ytomo-reservation-actions .ytomo-reservation-status .ytomo-status-content .ytomo-status-details .ytomo-status-progress .ytomo-reservation-history .ytomo-history-item[data-v-58e83aca]{display:flex;align-items:center;gap:4px;margin-bottom:2px}.ytomo-entrance-reservations .ytomo-reservation-actions .ytomo-reservation-status .ytomo-status-content .ytomo-status-details .ytomo-status-progress .ytomo-reservation-history .ytomo-history-item .ytomo-history-time[data-v-58e83aca]{color:#6b7280;font-size:9px}.ytomo-entrance-reservations .ytomo-reservation-actions .ytomo-reservation-status .ytomo-status-content .ytomo-status-details .ytomo-status-progress .ytomo-reservation-history .ytomo-history-item .ytomo-history-result[data-v-58e83aca]{font-weight:bold;font-size:10px}.ytomo-entrance-reservations .ytomo-reservation-actions .ytomo-reservation-status .ytomo-status-content .ytomo-status-details .ytomo-status-progress .ytomo-reservation-history .ytomo-history-item .ytomo-history-result.success[data-v-58e83aca]{color:#059669}.ytomo-entrance-reservations .ytomo-reservation-actions .ytomo-reservation-status .ytomo-status-content .ytomo-status-details .ytomo-status-progress .ytomo-reservation-history .ytomo-history-item .ytomo-history-result.failure[data-v-58e83aca]{color:#dc2626}.ytomo-entrance-reservations .ytomo-reservation-actions .ytomo-reservation-status .ytomo-status-content .ytomo-status-details .ytomo-status-progress .ytomo-reservation-history .ytomo-history-item .ytomo-history-slot[data-v-58e83aca]{color:#374151;font-size:9px}.ytomo-entrance-table[data-v-58e83aca]{width:100%;max-width:300px;border-collapse:collapse;margin:0 auto}.ytomo-entrance-table th[data-v-58e83aca]{background:#f9fafb;border:1px solid #e5e7eb;padding:6px 8px;text-align:center;font-weight:600;font-size:12px;color:#374151;width:50%}.ytomo-entrance-table td[data-v-58e83aca]{border:1px solid #e5e7eb;padding:2px;vertical-align:middle;width:50%}.ytomo-entrance-table .ytomo-time-button[data-v-58e83aca]{width:100%;background:#fff;border:1px solid #d1d5db;border-radius:4px;padding:6px 8px;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center}.ytomo-entrance-table .ytomo-time-button.disabled[data-v-58e83aca]{background:#f3f4f6;color:#9ca3af;cursor:not-allowed;opacity:.5}.ytomo-entrance-table .ytomo-time-button.disabled[data-v-58e83aca]:hover{background:#f3f4f6;border-color:#d1d5db}.ytomo-entrance-table .ytomo-time-button[data-v-58e83aca]:hover{border-color:#9ca3af}.ytomo-entrance-table .ytomo-time-button.status-disabled[data-v-58e83aca]{background:#f3f4f6;color:#9ca3af;cursor:not-allowed;opacity:.6}.ytomo-entrance-table .ytomo-time-button.status-disabled[data-v-58e83aca]:hover{border-color:#d1d5db;background:#f3f4f6}.ytomo-entrance-table .ytomo-time-button.selected[data-v-58e83aca]{border-color:#2c5aa0;border-style:solid;box-shadow:inset 0 0 0 1px #2c5aa0}.ytomo-entrance-table .ytomo-time-button .ytomo-status-icon[data-v-58e83aca]{margin-right:6px;font-size:12px;font-weight:700;min-width:14px;display:inline-block;text-align:center}.ytomo-entrance-table .ytomo-time-button .ytomo-status-icon.status-low[data-v-58e83aca]{color:#3b82f6}.ytomo-entrance-table .ytomo-time-button .ytomo-status-icon.status-high[data-v-58e83aca]{color:#f97316}.ytomo-entrance-table .ytomo-time-button .ytomo-status-icon.status-full[data-v-58e83aca]{color:#dc2626}.ytomo-entrance-table .ytomo-time-button .ytomo-status-icon.status-disabled[data-v-58e83aca]{color:#9ca3af}.ytomo-entrance-table .ytomo-time-button .ytomo-selection-area[data-v-58e83aca]{width:22px;height:18px;display:inline-flex;align-items:center;justify-content:center;margin-left:4px}.ytomo-entrance-table .ytomo-time-button .ytomo-selection-number[data-v-58e83aca]{font-size:12px;font-weight:900;color:#059669;background:rgba(5,150,105,.1);border-radius:50%;width:18px;height:18px;display:inline-flex;align-items:center;justify-content:center;border:1px solid #059669}.ytomo-entrance-table .ytomo-time-button .ytomo-time-text[data-v-58e83aca]{font-size:11px;font-weight:500}@media(min-width: 768px)and (max-width: 1199px){.ytomo-entrance-calendar[data-v-58e83aca]{flex:0 0 260px;height:320px}.ytomo-entrance-calendar .ytomo-calendar-body[data-v-58e83aca]{padding:14px}.ytomo-entrance-calendar .ytomo-calendar-grid .ytomo-calendar-days .ytomo-calendar-day[data-v-58e83aca]{font-size:12px;min-height:26px}.ytomo-selected-date-display[data-v-58e83aca]{font-size:15px;max-width:220px}.ytomo-reservation-table-container[data-v-58e83aca]{font-size:13px}}@media(min-width: 1200px){.ytomo-entrance-layout[data-v-58e83aca]{gap:24px}.ytomo-entrance-calendar[data-v-58e83aca]{flex:0 0 320px;height:400px}.ytomo-entrance-calendar .ytomo-calendar-body[data-v-58e83aca]{padding:20px}.ytomo-entrance-calendar .ytomo-calendar-grid .ytomo-calendar-days .ytomo-calendar-day[data-v-58e83aca]{font-size:13px;min-height:32px}.ytomo-selected-date-display[data-v-58e83aca]{font-size:16px;padding:10px 16px;max-width:250px}.ytomo-reservation-table-container[data-v-58e83aca]{font-size:14px}}@media(max-width: 520px){.ytomo-entrance-calendar[data-v-58e83aca]{flex:0 0 200px;height:240px}.ytomo-entrance-calendar .ytomo-calendar-header[data-v-58e83aca]{padding:8px 12px}.ytomo-entrance-calendar .ytomo-calendar-header .ytomo-calendar-title h3[data-v-58e83aca]{font-size:12px}.ytomo-entrance-calendar .ytomo-calendar-header .ytomo-selected-date[data-v-58e83aca]{font-size:11px}.ytomo-entrance-calendar .ytomo-calendar-body[data-v-58e83aca]{padding:12px}.ytomo-entrance-calendar .ytomo-calendar-grid .ytomo-calendar-days .ytomo-calendar-day[data-v-58e83aca]{font-size:10px;min-height:20px}.ytomo-entrance-reservations[data-v-58e83aca]{flex:1 1 auto;min-height:200px}.ytomo-entrance-table[data-v-58e83aca]{max-width:100%}.ytomo-entrance-table th[data-v-58e83aca],.ytomo-entrance-table td[data-v-58e83aca]{padding:4px 6px}.ytomo-entrance-table th[data-v-58e83aca]{font-size:11px}.ytomo-entrance-table .ytomo-time-button[data-v-58e83aca]{padding:4px 6px}.ytomo-entrance-table .ytomo-time-button .ytomo-time-text[data-v-58e83aca]{font-size:10px}.ytomo-reservation-actions button[data-v-58e83aca]{padding:6px 8px;font-size:11px}}@media(max-width: 400px){.ytomo-entrance-tab[data-v-58e83aca]{padding:8px}.ytomo-entrance-layout[data-v-58e83aca]{gap:8px}.ytomo-entrance-calendar[data-v-58e83aca]{height:180px}.ytomo-entrance-calendar .ytomo-calendar-header[data-v-58e83aca]{padding:6px 8px}.ytomo-entrance-calendar .ytomo-calendar-header .ytomo-calendar-title h3[data-v-58e83aca]{font-size:11px}.ytomo-entrance-calendar .ytomo-calendar-header .ytomo-selected-date[data-v-58e83aca]{font-size:10px}.ytomo-entrance-calendar .ytomo-calendar-body[data-v-58e83aca]{padding:8px}.ytomo-entrance-calendar .ytomo-calendar-grid .ytomo-calendar-days .ytomo-calendar-day[data-v-58e83aca]{font-size:9px;min-height:18px}.ytomo-entrance-table th[data-v-58e83aca],.ytomo-entrance-table td[data-v-58e83aca]{padding:3px 4px}.ytomo-entrance-table th[data-v-58e83aca]{font-size:10px}.ytomo-entrance-table .ytomo-time-button[data-v-58e83aca]{padding:3px 4px}.ytomo-entrance-table .ytomo-time-button .ytomo-time-text[data-v-58e83aca]{font-size:9px}.ytomo-reservation-actions[data-v-58e83aca]{flex-direction:column;gap:6px}.ytomo-reservation-actions button[data-v-58e83aca]{padding:8px 12px;font-size:12px}}`, ""]);
+// Exports
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
 
 /***/ }),
@@ -4827,28 +4849,6 @@ async function waitForCalendar(timeout = 10000) {
     });
     return false;
 }
-
-
-/***/ }),
-
-/***/ 753:
-/***/ ((module, __webpack_exports__, __webpack_require__) => {
-
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   A: () => (__WEBPACK_DEFAULT_EXPORT__)
-/* harmony export */ });
-/* harmony import */ var _node_modules_css_loader_dist_runtime_noSourceMaps_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(601);
-/* harmony import */ var _node_modules_css_loader_dist_runtime_noSourceMaps_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_css_loader_dist_runtime_noSourceMaps_js__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(314);
-/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1__);
-// Imports
-
-
-var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1___default()((_node_modules_css_loader_dist_runtime_noSourceMaps_js__WEBPACK_IMPORTED_MODULE_0___default()));
-// Module
-___CSS_LOADER_EXPORT___.push([module.id, `.ytomo-entrance-tab[data-v-328e00e4]{height:100%;display:flex;flex-direction:column;padding:12px;overflow:hidden}.ytomo-entrance-layout[data-v-328e00e4]{display:flex;gap:16px;height:100%;overflow:hidden;justify-content:center;align-items:flex-start;margin-bottom:16px}.ytomo-execution-info[data-v-328e00e4]{width:100%;min-height:0;overflow:hidden;display:flex;flex-direction:row;gap:16px;justify-content:center}.ytomo-execution-info .ytomo-reservation-info[data-v-328e00e4],.ytomo-execution-info .ytomo-reservation-status[data-v-328e00e4]{flex:1 1 0;max-width:300px}.ytomo-execution-info .ytomo-reservation-info[data-v-328e00e4]{margin-top:0}.ytomo-execution-info .ytomo-reservation-info.completed[data-v-328e00e4]{opacity:.6}.ytomo-execution-info .ytomo-reservation-info.completed .ytomo-reservation-box[data-v-328e00e4]{background:linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);border-color:#6c757d}.ytomo-execution-info .ytomo-reservation-info.completed .ytomo-reservation-date[data-v-328e00e4]{color:#6c757d;border-color:#6c757d}.ytomo-execution-info .ytomo-reservation-info .ytomo-reservation-box[data-v-328e00e4]{background:linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);border:1px solid #0891b2;border-radius:8px;padding:16px;position:relative}.ytomo-execution-info .ytomo-reservation-info .ytomo-reservation-box .ytomo-reservation-date[data-v-328e00e4]{position:absolute;top:-8px;left:12px;font-weight:600;font-size:12px;color:#0c4a6e;background:#fff;padding:4px 8px;border-radius:4px;border:1px solid #0891b2;box-shadow:0 1px 3px rgba(0,0,0,.1)}.ytomo-execution-info .ytomo-reservation-info .ytomo-reservation-box .ytomo-reservation-timeslots[data-v-328e00e4]{margin-top:8px;display:flex;flex-wrap:wrap;gap:8px}.ytomo-execution-info .ytomo-reservation-info .ytomo-reservation-box .ytomo-reservation-timeslots .ytomo-timeslot[data-v-328e00e4]{background:rgba(8,145,178,.1);border:1px solid #0891b2;border-radius:6px;padding:4px 8px;font-size:10px;font-weight:500;color:#0c4a6e}.ytomo-execution-info .ytomo-reservation-status[data-v-328e00e4]{background:linear-gradient(135deg, #fef3c7 0%, #fed7aa 100%);border:1px solid #f59e0b;border-radius:8px;padding:12px;margin-top:0}.ytomo-execution-info .ytomo-reservation-status.success[data-v-328e00e4]{background:linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);border-color:#059669}.ytomo-execution-info .ytomo-reservation-status.cancelled[data-v-328e00e4]{background:linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);border-color:#6b7280}.ytomo-execution-info .ytomo-reservation-status .ytomo-status-content[data-v-328e00e4]{display:flex;align-items:flex-start;gap:12px}.ytomo-execution-info .ytomo-reservation-status .ytomo-status-content .ytomo-status-icon[data-v-328e00e4]{width:20px;height:20px;flex-shrink:0;margin-top:2px}.ytomo-execution-info .ytomo-reservation-status .ytomo-status-content .ytomo-status-icon svg[data-v-328e00e4]{width:100%;height:100%;fill:#d97706}.ytomo-execution-info .ytomo-reservation-status .ytomo-status-content .ytomo-status-icon.spinning svg[data-v-328e00e4]{animation:spin 1s linear infinite}.ytomo-execution-info .ytomo-reservation-status .ytomo-status-content .ytomo-status-details .ytomo-status-current[data-v-328e00e4]{font-size:12px;color:#92400e;margin-bottom:8px;font-weight:500}.ytomo-execution-info .ytomo-reservation-status .ytomo-status-content .ytomo-status-details .ytomo-datetime-change[data-v-328e00e4]{font-size:11px;color:#059669;font-weight:bold;margin-bottom:8px}.ytomo-execution-info .ytomo-reservation-status .ytomo-status-content .ytomo-status-details .ytomo-status-progress .ytomo-progress-bar[data-v-328e00e4]{width:200px;height:6px;background:rgba(217,119,6,.2);border-radius:3px;overflow:hidden;margin-bottom:4px}.ytomo-execution-info .ytomo-reservation-status .ytomo-status-content .ytomo-status-details .ytomo-status-progress .ytomo-progress-bar .ytomo-progress-fill[data-v-328e00e4]{height:100%;background:linear-gradient(90deg, #f59e0b 0%, #d97706 100%);transition:width .3s ease}.ytomo-execution-info .ytomo-reservation-status .ytomo-status-content .ytomo-status-details .ytomo-status-progress .ytomo-progress-text[data-v-328e00e4]{font-size:11px;color:#78716c;text-align:right;display:block}.ytomo-execution-info .ytomo-reservation-status .ytomo-status-content .ytomo-status-details .ytomo-status-progress .ytomo-reservation-history[data-v-328e00e4]{position:absolute;bottom:0;right:0;font-size:10px;max-width:120px}.ytomo-execution-info .ytomo-reservation-status .ytomo-status-content .ytomo-status-details .ytomo-status-progress .ytomo-reservation-history .ytomo-history-item[data-v-328e00e4]{display:flex;align-items:center;gap:4px;margin-bottom:2px}.ytomo-execution-info .ytomo-reservation-status .ytomo-status-content .ytomo-status-details .ytomo-status-progress .ytomo-reservation-history .ytomo-history-item .ytomo-history-time[data-v-328e00e4]{color:#6b7280;font-size:9px}.ytomo-execution-info .ytomo-reservation-status .ytomo-status-content .ytomo-status-details .ytomo-status-progress .ytomo-reservation-history .ytomo-history-item .ytomo-history-result[data-v-328e00e4]{font-weight:bold;font-size:10px}.ytomo-execution-info .ytomo-reservation-status .ytomo-status-content .ytomo-status-details .ytomo-status-progress .ytomo-reservation-history .ytomo-history-item .ytomo-history-result.success[data-v-328e00e4]{color:#059669}.ytomo-execution-info .ytomo-reservation-status .ytomo-status-content .ytomo-status-details .ytomo-status-progress .ytomo-reservation-history .ytomo-history-item .ytomo-history-result.failure[data-v-328e00e4]{color:#dc2626}.ytomo-execution-info .ytomo-reservation-status .ytomo-status-content .ytomo-status-details .ytomo-status-progress .ytomo-reservation-history .ytomo-history-item .ytomo-history-slot[data-v-328e00e4]{color:#374151;font-size:9px}@media(max-width: 520px){.ytomo-entrance-layout[data-v-328e00e4]{flex-direction:column;gap:12px}}.ytomo-entrance-calendar[data-v-328e00e4]{flex:0 0 220px;height:300px;border:1px solid #e5e7eb;border-radius:8px;display:flex;flex-direction:column;overflow:hidden}.ytomo-entrance-calendar .ytomo-calendar-header[data-v-328e00e4]{display:flex;align-items:center;justify-content:space-between;padding:6px 8px;background:#f9fafb;border-radius:8px 8px 0 0;border-bottom:1px solid #e5e7eb}.ytomo-entrance-calendar .ytomo-calendar-header .ytomo-calendar-title[data-v-328e00e4]{flex:1;display:flex;align-items:center;gap:6px;cursor:pointer}.ytomo-entrance-calendar .ytomo-calendar-header .ytomo-calendar-title[data-v-328e00e4]:hover{background:#f3f4f6;border-radius:3px;padding:3px;margin:-3px}.ytomo-entrance-calendar .ytomo-calendar-header .ytomo-calendar-title h3[data-v-328e00e4]{margin:0;font-size:11px;font-weight:600;color:#374151}.ytomo-entrance-calendar .ytomo-calendar-header .ytomo-calendar-title .ytomo-selected-date[data-v-328e00e4]{font-size:14px;color:#059669;font-weight:700;background:#ecfdf5;padding:2px 6px;border-radius:4px;border:1px solid #a7f3d0}.ytomo-entrance-calendar .ytomo-calendar-header .ytomo-header-buttons[data-v-328e00e4]{display:flex;align-items:center;gap:4px}.ytomo-entrance-calendar .ytomo-calendar-header .ytomo-header-buttons .ytomo-refresh-button[data-v-328e00e4]{background:none;border:1px solid #d1d5db;border-radius:3px;width:20px;height:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#6b7280}.ytomo-entrance-calendar .ytomo-calendar-header .ytomo-header-buttons .ytomo-refresh-button[data-v-328e00e4]:hover{background:#f3f4f6;border-color:#9ca3af}.ytomo-entrance-calendar .ytomo-calendar-header .ytomo-header-buttons .ytomo-calendar-toggle[data-v-328e00e4]{font-size:11px;color:#6b7280;cursor:pointer;padding:3px 6px;border-radius:3px}.ytomo-entrance-calendar .ytomo-calendar-header .ytomo-header-buttons .ytomo-calendar-toggle[data-v-328e00e4]:hover{background:#f3f4f6}.ytomo-entrance-calendar .ytomo-calendar-body[data-v-328e00e4]{flex:1;padding:8px;overflow:auto}.ytomo-entrance-calendar .ytomo-calendar-controls[data-v-328e00e4]{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}.ytomo-entrance-calendar .ytomo-calendar-controls .ytomo-month-display[data-v-328e00e4]{display:flex;align-items:center;gap:8px}.ytomo-entrance-calendar .ytomo-calendar-controls .ytomo-month-button[data-v-328e00e4]{background:none;border:1px solid #d1d5db;border-radius:3px;width:22px;height:22px;cursor:pointer;font-size:12px;display:flex;align-items:center;justify-content:center}.ytomo-entrance-calendar .ytomo-calendar-controls .ytomo-month-button[data-v-328e00e4]:hover{background:#f3f4f6}.ytomo-entrance-calendar .ytomo-calendar-controls .ytomo-current-month[data-v-328e00e4]{font-weight:600;color:#374151;flex:1;text-align:center}.ytomo-entrance-calendar .ytomo-calendar-controls .ytomo-calendar-refresh-button[data-v-328e00e4]{background:none;border:1px solid #d1d5db;border-radius:3px;width:20px;height:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#6b7280;margin-left:8px}.ytomo-entrance-calendar .ytomo-calendar-controls .ytomo-calendar-refresh-button[data-v-328e00e4]:hover{background:#f3f4f6;border-color:#9ca3af}.ytomo-entrance-calendar .ytomo-calendar-grid .ytomo-calendar-weekdays[data-v-328e00e4]{display:grid;grid-template-columns:repeat(7, 1fr);gap:1px;margin-bottom:4px}.ytomo-entrance-calendar .ytomo-calendar-grid .ytomo-calendar-weekdays .ytomo-weekday[data-v-328e00e4]{text-align:center;font-size:12px;font-weight:600;color:#6b7280;padding:4px}.ytomo-entrance-calendar .ytomo-calendar-grid .ytomo-calendar-days[data-v-328e00e4]{display:grid;grid-template-columns:repeat(7, 1fr);gap:1px}.ytomo-entrance-calendar .ytomo-calendar-grid .ytomo-calendar-days .ytomo-calendar-day[data-v-328e00e4]{aspect-ratio:1;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:11px;cursor:pointer;border-radius:3px;transition:all .2s;min-height:24px}.ytomo-entrance-calendar .ytomo-calendar-grid .ytomo-calendar-days .ytomo-calendar-day[data-v-328e00e4] *{pointer-events:none}.ytomo-entrance-calendar .ytomo-calendar-grid .ytomo-calendar-days .ytomo-calendar-day[data-v-328e00e4]:hover:not(.disabled):not(.other-month){background:#f3f4f6}.ytomo-entrance-calendar .ytomo-calendar-grid .ytomo-calendar-days .ytomo-calendar-day.selected[data-v-328e00e4]{background:#fff;color:#0c4a6e;border:2px solid #0891b2;font-weight:600}.ytomo-entrance-calendar .ytomo-calendar-grid .ytomo-calendar-days .ytomo-calendar-day.today[data-v-328e00e4]{background:#dbeafe;color:#1e40af;font-weight:600}.ytomo-entrance-calendar .ytomo-calendar-grid .ytomo-calendar-days .ytomo-calendar-day.has-reservation[data-v-328e00e4]{background:#f0fdf4;color:#166534}.ytomo-entrance-calendar .ytomo-calendar-grid .ytomo-calendar-days .ytomo-calendar-day.has-reservation.selected[data-v-328e00e4]{background:#fff;color:#0c4a6e;border:2px solid #0891b2;font-weight:600}.ytomo-entrance-calendar .ytomo-calendar-grid .ytomo-calendar-days .ytomo-calendar-day.other-month[data-v-328e00e4]{color:#d1d5db;cursor:default}.ytomo-entrance-calendar .ytomo-calendar-grid .ytomo-calendar-days .ytomo-calendar-day.disabled[data-v-328e00e4]{color:#d1d5db;cursor:not-allowed}.ytomo-entrance-calendar .ytomo-calendar-grid .ytomo-calendar-days .ytomo-calendar-day .ytomo-day-number[data-v-328e00e4]{margin-bottom:2px}.ytomo-entrance-calendar .ytomo-calendar-grid .ytomo-calendar-days .ytomo-calendar-day .ytomo-availability-indicator[data-v-328e00e4]{display:flex;gap:2px;height:8px}.ytomo-entrance-calendar .ytomo-calendar-grid .ytomo-calendar-days .ytomo-calendar-day .ytomo-availability-indicator .ytomo-gate-availability[data-v-328e00e4]{display:flex;align-items:center}.ytomo-entrance-calendar .ytomo-calendar-grid .ytomo-calendar-days .ytomo-calendar-day .ytomo-availability-indicator .ytomo-gate-availability .ytomo-status-dot[data-v-328e00e4]{width:6px;height:6px;border-radius:50%;border:1px solid #d1d5db}.ytomo-entrance-calendar .ytomo-calendar-grid .ytomo-calendar-days .ytomo-calendar-day .ytomo-availability-indicator .ytomo-gate-availability .ytomo-status-dot.available[data-v-328e00e4]{background-color:#10b981;border-color:#10b981}.ytomo-entrance-calendar .ytomo-calendar-grid .ytomo-calendar-days .ytomo-calendar-day .ytomo-availability-indicator .ytomo-gate-availability .ytomo-status-dot.few-left[data-v-328e00e4]{background-color:#f59e0b;border-color:#f59e0b}.ytomo-entrance-calendar .ytomo-calendar-grid .ytomo-calendar-days .ytomo-calendar-day .ytomo-availability-indicator .ytomo-gate-availability .ytomo-status-dot.full[data-v-328e00e4]{background-color:#ef4444;border-color:#ef4444}.ytomo-entrance-calendar .ytomo-calendar-grid .ytomo-calendar-days .ytomo-calendar-day .ytomo-availability-indicator .ytomo-gate-availability .ytomo-status-dot.unavailable[data-v-328e00e4]{background-color:#9ca3af;border-color:#9ca3af}.ytomo-entrance-calendar .ytomo-calendar-grid .ytomo-calendar-days .ytomo-calendar-day .ytomo-availability-indicator .ytomo-gate-availability .ytomo-status-dot.unknown[data-v-328e00e4]{background-color:#d1d5db;border-color:#d1d5db}.ytomo-entrance-reservations[data-v-328e00e4]{flex:1;min-width:0;overflow:hidden;display:flex;flex-direction:column}.ytomo-entrance-reservations .ytomo-date-display-container[data-v-328e00e4]{display:flex;align-items:center;gap:8px;margin-bottom:8px;max-width:300px;margin-left:auto;margin-right:auto}.ytomo-entrance-reservations .ytomo-change-arrow[data-v-328e00e4]{display:flex;align-items:center;justify-content:center;flex-shrink:0}.ytomo-entrance-reservations .ytomo-change-arrow .ytomo-arrow-icon[data-v-328e00e4]{width:20px;height:20px;fill:#059669;opacity:.8;transition:all .3s ease;filter:drop-shadow(0 1px 2px rgba(5, 150, 105, 0.2))}.ytomo-entrance-reservations .ytomo-change-arrow .ytomo-arrow-icon[data-v-328e00e4]:hover{opacity:1;transform:translateX(2px)}.ytomo-entrance-reservations .ytomo-existing-datetime-display[data-v-328e00e4]{background:rgba(239,68,68,.1);color:#dc2626;font-weight:600;font-size:10px;text-align:center;padding:4px 6px;border-radius:4px;border:1px solid rgba(239,68,68,.3);white-space:nowrap;flex-shrink:0}.ytomo-entrance-reservations .ytomo-selected-date-display[data-v-328e00e4]{background:linear-gradient(135deg, #059669 0%, #047857 100%);color:#fff;font-weight:700;font-size:14px;text-align:center;padding:8px 12px;border-radius:6px;box-shadow:0 2px 4px rgba(5,150,105,.2);flex:1}.ytomo-entrance-reservations .ytomo-reservation-table-container[data-v-328e00e4]{flex:1;min-height:0;max-width:600px}.ytomo-entrance-reservations .ytomo-reservation-table-container .ytomo-no-date-selected[data-v-328e00e4]{display:flex;align-items:center;justify-content:center;height:150px;color:#9ca3af;font-size:12px}.ytomo-entrance-reservations .ytomo-reservation-actions[data-v-328e00e4]{display:flex;flex-direction:column;align-items:center;gap:8px;margin-top:8px;padding-top:8px;border-top:1px solid #e5e7eb;max-width:300px;margin-left:auto;margin-right:auto}.ytomo-entrance-reservations .ytomo-reservation-actions .ytomo-datetime-change[data-v-328e00e4]{min-height:40px;margin-bottom:8px;display:flex;align-items:center;justify-content:center}.ytomo-entrance-reservations .ytomo-reservation-actions .ytomo-datetime-change .ytomo-change-buttons[data-v-328e00e4]{display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap}.ytomo-entrance-reservations .ytomo-reservation-actions .ytomo-datetime-change .ytomo-datetime-button[data-v-328e00e4]{background:#e0f2fe;border:1px solid #0891b2;border-radius:4px;padding:4px 8px;font-size:11px;color:#0c4a6e;font-weight:500;transition:all .2s;min-width:80px;text-align:center;display:flex;align-items:center;justify-content:center}.ytomo-entrance-reservations .ytomo-reservation-actions .ytomo-datetime-change .ytomo-datetime-button.ytomo-from-datetime[data-v-328e00e4]{opacity:.8}.ytomo-entrance-reservations .ytomo-reservation-actions .ytomo-datetime-change .ytomo-datetime-button.ytomo-to-datetime[data-v-328e00e4]{background:#0891b2;color:#fff;border-color:#0891b2}.ytomo-entrance-reservations .ytomo-reservation-actions .ytomo-datetime-change .ytomo-arrow[data-v-328e00e4]{font-size:14px;font-weight:bold;color:#6b7280;padding:0 4px}.ytomo-entrance-reservations .ytomo-reservation-actions button[data-v-328e00e4]{flex:1;padding:8px 12px;border:none;border-radius:4px;font-size:12px;font-weight:500;cursor:pointer;transition:all .2s}.ytomo-entrance-reservations .ytomo-reservation-actions button.ytomo-reserve-button[data-v-328e00e4]{width:120px;background:#2c5aa0;color:#fff;padding:8px 12px;border:none;border-radius:4px;font-size:12px;font-weight:500;cursor:pointer;transition:all .2s}.ytomo-entrance-reservations .ytomo-reservation-actions button.ytomo-reserve-button[data-v-328e00e4]:hover:not(.disabled){background:#1e3d72}.ytomo-entrance-reservations .ytomo-reservation-actions button.ytomo-reserve-button.disabled[data-v-328e00e4]{background:#9ca3af;color:#d1d5db;cursor:not-allowed}.ytomo-entrance-reservations .ytomo-reservation-actions button.ytomo-reserve-button.disabled[data-v-328e00e4]:hover{background:#9ca3af}.ytomo-entrance-reservations .ytomo-reservation-actions button.ytomo-reserve-button.cancel-mode[data-v-328e00e4]{background:#dc2626;color:#fff}.ytomo-entrance-reservations .ytomo-reservation-actions button.ytomo-reserve-button.cancel-mode[data-v-328e00e4]:hover{background:#b91c1c}.ytomo-entrance-reservations .ytomo-reservation-actions button.ytomo-clear-button[data-v-328e00e4]{background:#f3f4f6;color:#374151;border:1px solid #d1d5db}.ytomo-entrance-reservations .ytomo-reservation-actions button.ytomo-clear-button[data-v-328e00e4]:hover{background:#e5e7eb}.ytomo-entrance-reservations .ytomo-reservation-actions button.ytomo-clear-button.cancel-mode[data-v-328e00e4]{background:#dc2626;border-color:#dc2626}.ytomo-entrance-reservations .ytomo-reservation-actions button.ytomo-clear-button.cancel-mode[data-v-328e00e4]:hover{background:#b91c1c;border-color:#b91c1c}.ytomo-entrance-reservations .ytomo-reservation-actions .ytomo-reservation-info[data-v-328e00e4]{width:100%;margin-top:12px}.ytomo-entrance-reservations .ytomo-reservation-actions .ytomo-reservation-info.completed[data-v-328e00e4]{opacity:.6}.ytomo-entrance-reservations .ytomo-reservation-actions .ytomo-reservation-info.completed .ytomo-reservation-box[data-v-328e00e4]{background:linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);border-color:#6c757d}.ytomo-entrance-reservations .ytomo-reservation-actions .ytomo-reservation-info.completed .ytomo-reservation-date[data-v-328e00e4]{color:#6c757d;border-color:#6c757d}.ytomo-entrance-reservations .ytomo-reservation-actions .ytomo-reservation-info .ytomo-reservation-box[data-v-328e00e4]{background:linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);border:1px solid #0891b2;border-radius:8px;padding:16px;position:relative}.ytomo-entrance-reservations .ytomo-reservation-actions .ytomo-reservation-info .ytomo-reservation-box .ytomo-reservation-date[data-v-328e00e4]{position:absolute;top:-8px;left:12px;font-weight:600;font-size:12px;color:#0c4a6e;background:#fff;padding:4px 8px;border-radius:4px;border:1px solid #0891b2;box-shadow:0 1px 3px rgba(0,0,0,.1)}.ytomo-entrance-reservations .ytomo-reservation-actions .ytomo-reservation-info .ytomo-reservation-box .ytomo-reservation-timeslots[data-v-328e00e4]{margin-top:8px;display:flex;flex-wrap:wrap;gap:8px}.ytomo-entrance-reservations .ytomo-reservation-actions .ytomo-reservation-info .ytomo-reservation-box .ytomo-reservation-timeslots .ytomo-timeslot[data-v-328e00e4]{background:rgba(8,145,178,.1);border:1px solid #0891b2;border-radius:6px;padding:4px 8px;font-size:10px;font-weight:500;color:#0c4a6e}.ytomo-entrance-reservations .ytomo-reservation-actions .ytomo-reservation-status[data-v-328e00e4]{width:100%;background:linear-gradient(135deg, #fef3c7 0%, #fed7aa 100%);border:1px solid #f59e0b;border-radius:8px;padding:12px;margin-top:8px}.ytomo-entrance-reservations .ytomo-reservation-actions .ytomo-reservation-status.success[data-v-328e00e4]{background:linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);border-color:#059669}.ytomo-entrance-reservations .ytomo-reservation-actions .ytomo-reservation-status.cancelled[data-v-328e00e4]{background:linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);border-color:#6b7280}.ytomo-entrance-reservations .ytomo-reservation-actions .ytomo-reservation-status .ytomo-status-content[data-v-328e00e4]{display:flex;align-items:flex-start;gap:12px}.ytomo-entrance-reservations .ytomo-reservation-actions .ytomo-reservation-status .ytomo-status-content .ytomo-status-icon[data-v-328e00e4]{width:20px;height:20px;flex-shrink:0;margin-top:2px}.ytomo-entrance-reservations .ytomo-reservation-actions .ytomo-reservation-status .ytomo-status-content .ytomo-status-icon svg[data-v-328e00e4]{width:100%;height:100%;fill:#d97706}.ytomo-entrance-reservations .ytomo-reservation-actions .ytomo-reservation-status .ytomo-status-content .ytomo-status-icon.spinning svg[data-v-328e00e4]{animation:spin 1s linear infinite}.ytomo-entrance-reservations .ytomo-reservation-actions .ytomo-reservation-status .ytomo-status-content .ytomo-status-details[data-v-328e00e4]{position:relative}.ytomo-entrance-reservations .ytomo-reservation-actions .ytomo-reservation-status .ytomo-status-content .ytomo-status-details .ytomo-status-current[data-v-328e00e4]{font-size:12px;color:#92400e;margin-bottom:8px;font-weight:500}.ytomo-entrance-reservations .ytomo-reservation-actions .ytomo-reservation-status .ytomo-status-content .ytomo-status-details .ytomo-datetime-change[data-v-328e00e4]{font-size:11px;color:#059669;font-weight:bold;margin-bottom:8px}.ytomo-entrance-reservations .ytomo-reservation-actions .ytomo-reservation-status .ytomo-status-content .ytomo-status-details .ytomo-status-progress .ytomo-progress-bar[data-v-328e00e4]{width:200px;height:6px;background:rgba(217,119,6,.2);border-radius:3px;overflow:hidden;margin-bottom:4px}.ytomo-entrance-reservations .ytomo-reservation-actions .ytomo-reservation-status .ytomo-status-content .ytomo-status-details .ytomo-status-progress .ytomo-progress-bar .ytomo-progress-fill[data-v-328e00e4]{height:100%;background:linear-gradient(90deg, #f59e0b 0%, #d97706 100%);transition:width .3s ease}.ytomo-entrance-reservations .ytomo-reservation-actions .ytomo-reservation-status .ytomo-status-content .ytomo-status-details .ytomo-status-progress .ytomo-progress-text[data-v-328e00e4]{font-size:11px;color:#78716c;text-align:right;display:block}.ytomo-entrance-reservations .ytomo-reservation-actions .ytomo-reservation-status .ytomo-status-content .ytomo-status-details .ytomo-status-progress .ytomo-reservation-history[data-v-328e00e4]{position:absolute;bottom:0;right:0;font-size:10px;max-width:120px}.ytomo-entrance-reservations .ytomo-reservation-actions .ytomo-reservation-status .ytomo-status-content .ytomo-status-details .ytomo-status-progress .ytomo-reservation-history .ytomo-history-item[data-v-328e00e4]{display:flex;align-items:center;gap:4px;margin-bottom:2px}.ytomo-entrance-reservations .ytomo-reservation-actions .ytomo-reservation-status .ytomo-status-content .ytomo-status-details .ytomo-status-progress .ytomo-reservation-history .ytomo-history-item .ytomo-history-time[data-v-328e00e4]{color:#6b7280;font-size:9px}.ytomo-entrance-reservations .ytomo-reservation-actions .ytomo-reservation-status .ytomo-status-content .ytomo-status-details .ytomo-status-progress .ytomo-reservation-history .ytomo-history-item .ytomo-history-result[data-v-328e00e4]{font-weight:bold;font-size:10px}.ytomo-entrance-reservations .ytomo-reservation-actions .ytomo-reservation-status .ytomo-status-content .ytomo-status-details .ytomo-status-progress .ytomo-reservation-history .ytomo-history-item .ytomo-history-result.success[data-v-328e00e4]{color:#059669}.ytomo-entrance-reservations .ytomo-reservation-actions .ytomo-reservation-status .ytomo-status-content .ytomo-status-details .ytomo-status-progress .ytomo-reservation-history .ytomo-history-item .ytomo-history-result.failure[data-v-328e00e4]{color:#dc2626}.ytomo-entrance-reservations .ytomo-reservation-actions .ytomo-reservation-status .ytomo-status-content .ytomo-status-details .ytomo-status-progress .ytomo-reservation-history .ytomo-history-item .ytomo-history-slot[data-v-328e00e4]{color:#374151;font-size:9px}.ytomo-entrance-table[data-v-328e00e4]{width:100%;max-width:300px;border-collapse:collapse;margin:0 auto}.ytomo-entrance-table th[data-v-328e00e4]{background:#f9fafb;border:1px solid #e5e7eb;padding:6px 8px;text-align:center;font-weight:600;font-size:12px;color:#374151;width:50%}.ytomo-entrance-table td[data-v-328e00e4]{border:1px solid #e5e7eb;padding:2px;vertical-align:middle;width:50%}.ytomo-entrance-table .ytomo-time-button[data-v-328e00e4]{width:100%;background:#fff;border:1px solid #d1d5db;border-radius:4px;padding:6px 8px;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center}.ytomo-entrance-table .ytomo-time-button[data-v-328e00e4]:hover{border-color:#9ca3af}.ytomo-entrance-table .ytomo-time-button.status-disabled[data-v-328e00e4]{background:#f3f4f6;color:#9ca3af;cursor:not-allowed;opacity:.6}.ytomo-entrance-table .ytomo-time-button.status-disabled[data-v-328e00e4]:hover{border-color:#d1d5db;background:#f3f4f6}.ytomo-entrance-table .ytomo-time-button.selected[data-v-328e00e4]{border-color:#2c5aa0;border-style:solid;box-shadow:inset 0 0 0 1px #2c5aa0}.ytomo-entrance-table .ytomo-time-button .ytomo-status-icon[data-v-328e00e4]{margin-right:6px;font-size:12px;font-weight:700;min-width:14px;display:inline-block;text-align:center}.ytomo-entrance-table .ytomo-time-button .ytomo-status-icon.status-low[data-v-328e00e4]{color:#3b82f6}.ytomo-entrance-table .ytomo-time-button .ytomo-status-icon.status-high[data-v-328e00e4]{color:#f97316}.ytomo-entrance-table .ytomo-time-button .ytomo-status-icon.status-full[data-v-328e00e4]{color:#dc2626}.ytomo-entrance-table .ytomo-time-button .ytomo-status-icon.status-disabled[data-v-328e00e4]{color:#9ca3af}.ytomo-entrance-table .ytomo-time-button .ytomo-selection-area[data-v-328e00e4]{width:22px;height:18px;display:inline-flex;align-items:center;justify-content:center;margin-left:4px}.ytomo-entrance-table .ytomo-time-button .ytomo-selection-number[data-v-328e00e4]{font-size:12px;font-weight:900;color:#059669;background:rgba(5,150,105,.1);border-radius:50%;width:18px;height:18px;display:inline-flex;align-items:center;justify-content:center;border:1px solid #059669}.ytomo-entrance-table .ytomo-time-button .ytomo-time-text[data-v-328e00e4]{font-size:11px;font-weight:500}@media(min-width: 768px)and (max-width: 1199px){.ytomo-entrance-calendar[data-v-328e00e4]{flex:0 0 260px;height:320px}.ytomo-entrance-calendar .ytomo-calendar-body[data-v-328e00e4]{padding:14px}.ytomo-entrance-calendar .ytomo-calendar-grid .ytomo-calendar-days .ytomo-calendar-day[data-v-328e00e4]{font-size:12px;min-height:26px}.ytomo-selected-date-display[data-v-328e00e4]{font-size:15px;max-width:220px}.ytomo-reservation-table-container[data-v-328e00e4]{font-size:13px}}@media(min-width: 1200px){.ytomo-entrance-layout[data-v-328e00e4]{gap:24px}.ytomo-entrance-calendar[data-v-328e00e4]{flex:0 0 320px;height:400px}.ytomo-entrance-calendar .ytomo-calendar-body[data-v-328e00e4]{padding:20px}.ytomo-entrance-calendar .ytomo-calendar-grid .ytomo-calendar-days .ytomo-calendar-day[data-v-328e00e4]{font-size:13px;min-height:32px}.ytomo-selected-date-display[data-v-328e00e4]{font-size:16px;padding:10px 16px;max-width:250px}.ytomo-reservation-table-container[data-v-328e00e4]{font-size:14px}}@media(max-width: 520px){.ytomo-entrance-calendar[data-v-328e00e4]{flex:0 0 200px;height:240px}.ytomo-entrance-calendar .ytomo-calendar-header[data-v-328e00e4]{padding:8px 12px}.ytomo-entrance-calendar .ytomo-calendar-header .ytomo-calendar-title h3[data-v-328e00e4]{font-size:12px}.ytomo-entrance-calendar .ytomo-calendar-header .ytomo-selected-date[data-v-328e00e4]{font-size:11px}.ytomo-entrance-calendar .ytomo-calendar-body[data-v-328e00e4]{padding:12px}.ytomo-entrance-calendar .ytomo-calendar-grid .ytomo-calendar-days .ytomo-calendar-day[data-v-328e00e4]{font-size:10px;min-height:20px}.ytomo-entrance-reservations[data-v-328e00e4]{flex:1 1 auto;min-height:200px}.ytomo-entrance-table[data-v-328e00e4]{max-width:100%}.ytomo-entrance-table th[data-v-328e00e4],.ytomo-entrance-table td[data-v-328e00e4]{padding:4px 6px}.ytomo-entrance-table th[data-v-328e00e4]{font-size:11px}.ytomo-entrance-table .ytomo-time-button[data-v-328e00e4]{padding:4px 6px}.ytomo-entrance-table .ytomo-time-button .ytomo-time-text[data-v-328e00e4]{font-size:10px}.ytomo-reservation-actions button[data-v-328e00e4]{padding:6px 8px;font-size:11px}}@media(max-width: 400px){.ytomo-entrance-tab[data-v-328e00e4]{padding:8px}.ytomo-entrance-layout[data-v-328e00e4]{gap:8px}.ytomo-entrance-calendar[data-v-328e00e4]{height:180px}.ytomo-entrance-calendar .ytomo-calendar-header[data-v-328e00e4]{padding:6px 8px}.ytomo-entrance-calendar .ytomo-calendar-header .ytomo-calendar-title h3[data-v-328e00e4]{font-size:11px}.ytomo-entrance-calendar .ytomo-calendar-header .ytomo-selected-date[data-v-328e00e4]{font-size:10px}.ytomo-entrance-calendar .ytomo-calendar-body[data-v-328e00e4]{padding:8px}.ytomo-entrance-calendar .ytomo-calendar-grid .ytomo-calendar-days .ytomo-calendar-day[data-v-328e00e4]{font-size:9px;min-height:18px}.ytomo-entrance-table th[data-v-328e00e4],.ytomo-entrance-table td[data-v-328e00e4]{padding:3px 4px}.ytomo-entrance-table th[data-v-328e00e4]{font-size:10px}.ytomo-entrance-table .ytomo-time-button[data-v-328e00e4]{padding:3px 4px}.ytomo-entrance-table .ytomo-time-button .ytomo-time-text[data-v-328e00e4]{font-size:9px}.ytomo-reservation-actions[data-v-328e00e4]{flex-direction:column;gap:6px}.ytomo-reservation-actions button[data-v-328e00e4]{padding:8px 12px;font-size:12px}}`, ""]);
-// Exports
-/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
 
 /***/ }),
@@ -40919,6 +40919,8 @@ const PavilionTab_exports_ = /*#__PURE__*/(0,exportHelper/* default */.A)(Pavili
 const entrance_reservation_api_manager_logger = utils_logger/* loggers */.C$.entranceReservation;
 class EntranceReservationApiManager {
     constructor() {
+        // 選択解除用のコールバック
+        this.clearSelectionCallback = null;
         // タイマー管理
         this.reservationTimer = null;
         this.waitingProgressTimer = null;
@@ -41067,6 +41069,10 @@ class EntranceReservationApiManager {
                     dateChange: dateTimeChange
                 };
                 // 実行時情報は変更しない（元の情報を保持）
+                // 予約成功時は時間帯選択を解除
+                if (this.clearSelectionCallback) {
+                    this.clearSelectionCallback();
+                }
                 // 条件付き追加実行の判定
                 await this.executeAdditionalReservations(selectedTimeSlots);
             }
@@ -41170,6 +41176,10 @@ class EntranceReservationApiManager {
                         statusClass: 'success',
                         dateChange: dateTimeChange
                     };
+                    // 予約成功時は時間帯選択を解除
+                    if (this.clearSelectionCallback) {
+                        this.clearSelectionCallback();
+                    }
                     // 最初の成功で終了
                     break;
                 }
@@ -41338,6 +41348,10 @@ class EntranceReservationApiManager {
         this.executedReservations.clear();
         this.reservationHistory.value = [];
     }
+    // 選択解除用コールバックを設定
+    setClearSelectionCallback(callback) {
+        this.clearSelectionCallback = callback;
+    }
 }
 
 ;// ./node_modules/ts-loader/index.js??clonedRuleSet-1.use!./node_modules/vue-loader/dist/index.js??ruleSet[1].rules[8].use[0]!./ts/components/EntranceTab.vue?vue&type=script&setup=true&lang=ts
@@ -41350,91 +41364,95 @@ const EntranceTabvue_type_script_setup_true_lang_ts_hoisted_4 = { class: "ytomo-
 const EntranceTabvue_type_script_setup_true_lang_ts_hoisted_5 = { class: "ytomo-calendar-controls" };
 const EntranceTabvue_type_script_setup_true_lang_ts_hoisted_6 = { class: "ytomo-month-display" };
 const EntranceTabvue_type_script_setup_true_lang_ts_hoisted_7 = { class: "ytomo-current-month" };
-const EntranceTabvue_type_script_setup_true_lang_ts_hoisted_8 = { class: "ytomo-calendar-grid" };
-const EntranceTabvue_type_script_setup_true_lang_ts_hoisted_9 = { class: "ytomo-calendar-weekdays" };
-const EntranceTabvue_type_script_setup_true_lang_ts_hoisted_10 = { class: "ytomo-calendar-days" };
-const EntranceTabvue_type_script_setup_true_lang_ts_hoisted_11 = ["data-date"];
-const EntranceTabvue_type_script_setup_true_lang_ts_hoisted_12 = { class: "ytomo-day-number" };
-const EntranceTabvue_type_script_setup_true_lang_ts_hoisted_13 = { class: "ytomo-availability-indicator" };
-const EntranceTabvue_type_script_setup_true_lang_ts_hoisted_14 = { class: "ytomo-gate-availability" };
+const EntranceTabvue_type_script_setup_true_lang_ts_hoisted_8 = {
+    key: 0,
+    class: "ytomo-availability-time"
+};
+const EntranceTabvue_type_script_setup_true_lang_ts_hoisted_9 = { class: "ytomo-calendar-grid" };
+const EntranceTabvue_type_script_setup_true_lang_ts_hoisted_10 = { class: "ytomo-calendar-weekdays" };
+const EntranceTabvue_type_script_setup_true_lang_ts_hoisted_11 = { class: "ytomo-calendar-days" };
+const EntranceTabvue_type_script_setup_true_lang_ts_hoisted_12 = ["data-date"];
+const EntranceTabvue_type_script_setup_true_lang_ts_hoisted_13 = { class: "ytomo-day-number" };
+const EntranceTabvue_type_script_setup_true_lang_ts_hoisted_14 = { class: "ytomo-availability-indicator" };
 const EntranceTabvue_type_script_setup_true_lang_ts_hoisted_15 = { class: "ytomo-gate-availability" };
-const EntranceTabvue_type_script_setup_true_lang_ts_hoisted_16 = { class: "ytomo-entrance-reservations" };
-const EntranceTabvue_type_script_setup_true_lang_ts_hoisted_17 = {
+const EntranceTabvue_type_script_setup_true_lang_ts_hoisted_16 = { class: "ytomo-gate-availability" };
+const EntranceTabvue_type_script_setup_true_lang_ts_hoisted_17 = { class: "ytomo-entrance-reservations" };
+const EntranceTabvue_type_script_setup_true_lang_ts_hoisted_18 = {
     key: 0,
     class: "ytomo-date-display-container"
 };
-const EntranceTabvue_type_script_setup_true_lang_ts_hoisted_18 = {
-    key: 0,
-    class: "ytomo-existing-datetime-display"
-};
 const EntranceTabvue_type_script_setup_true_lang_ts_hoisted_19 = {
+    key: 0,
+    class: "ytomo-existing-datetime-display existing"
+};
+const EntranceTabvue_type_script_setup_true_lang_ts_hoisted_20 = {
     key: 1,
     class: "ytomo-change-arrow"
 };
-const EntranceTabvue_type_script_setup_true_lang_ts_hoisted_20 = { class: "ytomo-selected-date-display" };
-const EntranceTabvue_type_script_setup_true_lang_ts_hoisted_21 = { class: "ytomo-reservation-table-container" };
-const EntranceTabvue_type_script_setup_true_lang_ts_hoisted_22 = {
+const EntranceTabvue_type_script_setup_true_lang_ts_hoisted_21 = { class: "ytomo-selected-date-display selected" };
+const EntranceTabvue_type_script_setup_true_lang_ts_hoisted_22 = { class: "ytomo-reservation-table-container" };
+const EntranceTabvue_type_script_setup_true_lang_ts_hoisted_23 = {
     key: 0,
     class: "ytomo-entrance-table"
 };
-const EntranceTabvue_type_script_setup_true_lang_ts_hoisted_23 = ["onClick"];
-const EntranceTabvue_type_script_setup_true_lang_ts_hoisted_24 = { key: 0 };
-const EntranceTabvue_type_script_setup_true_lang_ts_hoisted_25 = { key: 1 };
-const EntranceTabvue_type_script_setup_true_lang_ts_hoisted_26 = { key: 2 };
-const EntranceTabvue_type_script_setup_true_lang_ts_hoisted_27 = { key: 3 };
-const EntranceTabvue_type_script_setup_true_lang_ts_hoisted_28 = { class: "ytomo-time-text" };
-const EntranceTabvue_type_script_setup_true_lang_ts_hoisted_29 = { class: "ytomo-selection-area" };
-const EntranceTabvue_type_script_setup_true_lang_ts_hoisted_30 = {
+const EntranceTabvue_type_script_setup_true_lang_ts_hoisted_24 = ["onClick"];
+const EntranceTabvue_type_script_setup_true_lang_ts_hoisted_25 = { key: 0 };
+const EntranceTabvue_type_script_setup_true_lang_ts_hoisted_26 = { key: 1 };
+const EntranceTabvue_type_script_setup_true_lang_ts_hoisted_27 = { key: 2 };
+const EntranceTabvue_type_script_setup_true_lang_ts_hoisted_28 = { key: 3 };
+const EntranceTabvue_type_script_setup_true_lang_ts_hoisted_29 = { class: "ytomo-time-text" };
+const EntranceTabvue_type_script_setup_true_lang_ts_hoisted_30 = { class: "ytomo-selection-area" };
+const EntranceTabvue_type_script_setup_true_lang_ts_hoisted_31 = {
     key: 0,
     class: "ytomo-selection-number"
 };
-const EntranceTabvue_type_script_setup_true_lang_ts_hoisted_31 = ["onClick"];
-const EntranceTabvue_type_script_setup_true_lang_ts_hoisted_32 = { key: 0 };
-const EntranceTabvue_type_script_setup_true_lang_ts_hoisted_33 = { key: 1 };
-const EntranceTabvue_type_script_setup_true_lang_ts_hoisted_34 = { key: 2 };
-const EntranceTabvue_type_script_setup_true_lang_ts_hoisted_35 = { key: 3 };
-const _hoisted_36 = { class: "ytomo-time-text" };
-const _hoisted_37 = { class: "ytomo-selection-area" };
-const _hoisted_38 = {
-    key: 0,
-    class: "ytomo-selection-number"
-};
+const EntranceTabvue_type_script_setup_true_lang_ts_hoisted_32 = ["onClick"];
+const EntranceTabvue_type_script_setup_true_lang_ts_hoisted_33 = { key: 0 };
+const EntranceTabvue_type_script_setup_true_lang_ts_hoisted_34 = { key: 1 };
+const EntranceTabvue_type_script_setup_true_lang_ts_hoisted_35 = { key: 2 };
+const _hoisted_36 = { key: 3 };
+const _hoisted_37 = { class: "ytomo-time-text" };
+const _hoisted_38 = { class: "ytomo-selection-area" };
 const _hoisted_39 = {
-    key: 1,
-    class: "ytomo-no-date-selected"
+    key: 0,
+    class: "ytomo-selection-number"
 };
 const _hoisted_40 = {
     key: 1,
+    class: "ytomo-no-date-selected"
+};
+const _hoisted_41 = {
+    key: 1,
     class: "ytomo-reservation-actions"
 };
-const _hoisted_41 = ["disabled"];
-const _hoisted_42 = { class: "ytomo-execution-info" };
-const _hoisted_43 = { class: "ytomo-reservation-box" };
-const _hoisted_44 = { class: "ytomo-reservation-date" };
-const _hoisted_45 = { class: "ytomo-reservation-timeslots" };
-const _hoisted_46 = { class: "ytomo-status-content" };
-const _hoisted_47 = {
+const _hoisted_42 = ["disabled"];
+const _hoisted_43 = { class: "ytomo-execution-info" };
+const _hoisted_44 = { class: "ytomo-reservation-box" };
+const _hoisted_45 = { class: "ytomo-reservation-date" };
+const _hoisted_46 = { class: "ytomo-reservation-timeslots" };
+const _hoisted_47 = { class: "ytomo-status-content" };
+const _hoisted_48 = {
     key: 0,
     class: "ytomo-status-icon spinning"
 };
-const _hoisted_48 = { class: "ytomo-status-details" };
-const _hoisted_49 = { class: "ytomo-status-current" };
-const _hoisted_50 = {
+const _hoisted_49 = { class: "ytomo-status-details" };
+const _hoisted_50 = { class: "ytomo-status-current" };
+const _hoisted_51 = {
     key: 0,
     class: "ytomo-datetime-change"
 };
-const _hoisted_51 = {
+const _hoisted_52 = {
     key: 1,
     class: "ytomo-status-progress"
 };
-const _hoisted_52 = { class: "ytomo-progress-bar" };
-const _hoisted_53 = { class: "ytomo-progress-text" };
-const _hoisted_54 = {
+const _hoisted_53 = { class: "ytomo-progress-bar" };
+const _hoisted_54 = { class: "ytomo-progress-text" };
+const _hoisted_55 = {
     key: 2,
     class: "ytomo-reservation-history"
 };
-const _hoisted_55 = { class: "ytomo-history-time" };
-const _hoisted_56 = { class: "ytomo-history-slot" };
+const _hoisted_56 = { class: "ytomo-history-time" };
+const _hoisted_57 = { class: "ytomo-history-slot" };
 
 
 
@@ -41446,10 +41464,42 @@ const _hoisted_56 = { class: "ytomo-history-slot" };
         const ticketsStore = useTicketsStore();
         // 予約管理インスタンス
         const reservationManager = new EntranceReservationApiManager();
+        // 選択解除関数
+        const clearTimeSlotSelection = () => {
+            selectionOrder.value = [];
+            timeSlots.value.forEach(slot => {
+                slot.east.selected = false;
+                slot.west.selected = false;
+            });
+            logger.info('予約成功により時間帯選択を解除しました');
+        };
+        // 選択解除コールバックを設定
+        reservationManager.setClearSelectionCallback(clearTimeSlotSelection);
         // カレンダー状態
         const isCalendarExpanded = ref(true);
         const selectedDate = ref('');
         const currentMonth = ref(new Date()); // 現在の年月
+        // 既存の入場日時と重複する時間帯を判定
+        const isTimeSlotDisabled = (gate, time) => {
+            if (!selectedDate.value)
+                return false;
+            const selectedDateStr = selectedDate.value;
+            const gateType = gate === 'east' ? 1 : 2;
+            // 同じ日付の既存予約があるかチェック
+            for (const ticket of ticketsStore.tickets.values()) {
+                if (ticket.schedules) {
+                    for (const schedule of ticket.schedules) {
+                        if (schedule.selected &&
+                            schedule.entrance_date === selectedDateStr &&
+                            schedule.gate_type === gateType &&
+                            schedule.time_start === time) {
+                            return true;
+                        }
+                    }
+                }
+            }
+            return false;
+        };
         // 現在選択されているスケジュール（ticket.schedulesから検索）
         const selectedSchedule = runtime_core_esm_bundler_computed(() => {
             for (const ticket of ticketsStore.tickets.values()) {
@@ -41681,6 +41731,16 @@ const _hoisted_56 = { class: "ytomo-history-slot" };
         const currentMonthDisplay = runtime_core_esm_bundler_computed(() => {
             return `${currentMonth.value.getFullYear()}年${currentMonth.value.getMonth() + 1}月`;
         });
+        // 空き情報を表示している時間を取得
+        const availabilityDisplayTime = runtime_core_esm_bundler_computed(() => {
+            // 現在の時刻を表示（リアルタイム更新の代替）
+            const now = new Date();
+            return now.toLocaleTimeString('ja-JP', {
+                hour: '2-digit',
+                minute: '2-digit',
+                hour12: false
+            });
+        });
         const calendarDates = runtime_core_esm_bundler_computed(() => {
             if (!currentMonth.value) {
                 return [];
@@ -41820,13 +41880,7 @@ const _hoisted_56 = { class: "ytomo-history-slot" };
             // 選択された日付の時間帯データを取得（選択状態を保持）
             await loadTimeSlotsForDateWithSelection(dateString);
         };
-        // 時間帯選択のみをクリア（予約選択は保持）
-        const clearTimeSlotSelection = () => {
-            timeSlots.value.forEach(slot => {
-                slot.east.selected = false;
-                slot.west.selected = false;
-            });
-        };
+        // 時間帯選択のみをクリア（予約選択は保持）- 統合済み
         // 指定日の時間帯データを読み込み（選択状態を保持）
         const loadTimeSlotsForDateWithSelection = async (date) => {
             // 既存の選択状態を保存
@@ -42622,6 +42676,9 @@ const _hoisted_56 = { class: "ytomo-history-slot" };
                                 }, "‹"),
                                 createBaseVNode("div", EntranceTabvue_type_script_setup_true_lang_ts_hoisted_6, [
                                     createBaseVNode("span", EntranceTabvue_type_script_setup_true_lang_ts_hoisted_7, toDisplayString(currentMonthDisplay.value), 1 /* TEXT */),
+                                    (availabilityDisplayTime.value)
+                                        ? (openBlock(), createElementBlock("span", EntranceTabvue_type_script_setup_true_lang_ts_hoisted_8, toDisplayString(availabilityDisplayTime.value) + "時点", 1 /* TEXT */))
+                                        : createCommentVNode("v-if", true),
                                     createBaseVNode("button", {
                                         id: "ytomo-calendar-refresh-button",
                                         class: "ytomo-calendar-refresh-button",
@@ -42650,8 +42707,8 @@ const _hoisted_56 = { class: "ytomo-history-slot" };
                                     class: "ytomo-month-button ytomo-month-button--next"
                                 }, "›")
                             ]),
-                            createBaseVNode("div", EntranceTabvue_type_script_setup_true_lang_ts_hoisted_8, [
-                                createBaseVNode("div", EntranceTabvue_type_script_setup_true_lang_ts_hoisted_9, [
+                            createBaseVNode("div", EntranceTabvue_type_script_setup_true_lang_ts_hoisted_9, [
+                                createBaseVNode("div", EntranceTabvue_type_script_setup_true_lang_ts_hoisted_10, [
                                     (openBlock(), createElementBlock(Fragment, null, renderList(weekdays, (day) => {
                                         return createBaseVNode("div", {
                                             key: day,
@@ -42659,7 +42716,7 @@ const _hoisted_56 = { class: "ytomo-history-slot" };
                                         }, toDisplayString(day), 1 /* TEXT */);
                                     }), 64 /* STABLE_FRAGMENT */))
                                 ]),
-                                createBaseVNode("div", EntranceTabvue_type_script_setup_true_lang_ts_hoisted_10, [
+                                createBaseVNode("div", EntranceTabvue_type_script_setup_true_lang_ts_hoisted_11, [
                                     (openBlock(true), createElementBlock(Fragment, null, renderList(calendarDates.value, (date, index) => {
                                         return (openBlock(), createElementBlock("div", {
                                             key: date.key,
@@ -42675,14 +42732,14 @@ const _hoisted_56 = { class: "ytomo-history-slot" };
                                         }, [
                                             (date.isCurrentMonth)
                                                 ? (openBlock(), createElementBlock(Fragment, { key: 0 }, [
-                                                    createBaseVNode("div", EntranceTabvue_type_script_setup_true_lang_ts_hoisted_12, toDisplayString(date.day), 1 /* TEXT */),
-                                                    createBaseVNode("div", EntranceTabvue_type_script_setup_true_lang_ts_hoisted_13, [
-                                                        createBaseVNode("div", EntranceTabvue_type_script_setup_true_lang_ts_hoisted_14, [
+                                                    createBaseVNode("div", EntranceTabvue_type_script_setup_true_lang_ts_hoisted_13, toDisplayString(date.day), 1 /* TEXT */),
+                                                    createBaseVNode("div", EntranceTabvue_type_script_setup_true_lang_ts_hoisted_14, [
+                                                        createBaseVNode("div", EntranceTabvue_type_script_setup_true_lang_ts_hoisted_15, [
                                                             createBaseVNode("span", {
                                                                 class: normalizeClass(["ytomo-status-dot", date.availability?.east.class])
                                                             }, null, 2 /* CLASS */)
                                                         ]),
-                                                        createBaseVNode("div", EntranceTabvue_type_script_setup_true_lang_ts_hoisted_15, [
+                                                        createBaseVNode("div", EntranceTabvue_type_script_setup_true_lang_ts_hoisted_16, [
                                                             createBaseVNode("span", {
                                                                 class: normalizeClass(["ytomo-status-dot", date.availability?.west.class])
                                                             }, null, 2 /* CLASS */)
@@ -42690,7 +42747,7 @@ const _hoisted_56 = { class: "ytomo-history-slot" };
                                                     ])
                                                 ], 64 /* STABLE_FRAGMENT */))
                                                 : createCommentVNode("v-if", true)
-                                        ], 10 /* CLASS, PROPS */, EntranceTabvue_type_script_setup_true_lang_ts_hoisted_11));
+                                        ], 10 /* CLASS, PROPS */, EntranceTabvue_type_script_setup_true_lang_ts_hoisted_12));
                                     }), 128 /* KEYED_FRAGMENT */))
                                 ])
                             ])
@@ -42699,17 +42756,17 @@ const _hoisted_56 = { class: "ytomo-history-slot" };
                         ])
                     ]),
                     createCommentVNode(" 右側: 予約状況テーブル "),
-                    createBaseVNode("div", EntranceTabvue_type_script_setup_true_lang_ts_hoisted_16, [
+                    createBaseVNode("div", EntranceTabvue_type_script_setup_true_lang_ts_hoisted_17, [
                         createCommentVNode(" 日付表示エリア（既存日時と選択日付を横並び） "),
                         (selectedDate.value)
-                            ? (openBlock(), createElementBlock("div", EntranceTabvue_type_script_setup_true_lang_ts_hoisted_17, [
-                                createCommentVNode(" 既存入場日時表示（左側） "),
+                            ? (openBlock(), createElementBlock("div", EntranceTabvue_type_script_setup_true_lang_ts_hoisted_18, [
+                                createCommentVNode(" 既存入場日時表示（左側）灰色 "),
                                 (getFromDateTimeText())
-                                    ? (openBlock(), createElementBlock("div", EntranceTabvue_type_script_setup_true_lang_ts_hoisted_18, toDisplayString(getFromDateTimeText()), 1 /* TEXT */))
+                                    ? (openBlock(), createElementBlock("div", EntranceTabvue_type_script_setup_true_lang_ts_hoisted_19, toDisplayString(getFromDateTimeText()), 1 /* TEXT */))
                                     : createCommentVNode("v-if", true),
                                 createCommentVNode(" 変更矢印アイコン "),
                                 (getFromDateTimeText())
-                                    ? (openBlock(), createElementBlock("div", EntranceTabvue_type_script_setup_true_lang_ts_hoisted_19, [...(_cache[1] || (_cache[1] = [
+                                    ? (openBlock(), createElementBlock("div", EntranceTabvue_type_script_setup_true_lang_ts_hoisted_20, [...(_cache[1] || (_cache[1] = [
                                             createBaseVNode("svg", {
                                                 viewBox: "0 0 24 24",
                                                 class: "ytomo-arrow-icon"
@@ -42718,13 +42775,13 @@ const _hoisted_56 = { class: "ytomo-history-slot" };
                                             ], -1 /* CACHED */)
                                         ]))]))
                                     : createCommentVNode("v-if", true),
-                                createCommentVNode(" 入場日表示（右側） "),
-                                createBaseVNode("div", EntranceTabvue_type_script_setup_true_lang_ts_hoisted_20, toDisplayString(formatDate(selectedDate.value)), 1 /* TEXT */)
+                                createCommentVNode(" 入場日表示（右側）青色 "),
+                                createBaseVNode("div", EntranceTabvue_type_script_setup_true_lang_ts_hoisted_21, toDisplayString(formatDate(selectedDate.value)), 1 /* TEXT */)
                             ]))
                             : createCommentVNode("v-if", true),
-                        createBaseVNode("div", EntranceTabvue_type_script_setup_true_lang_ts_hoisted_21, [
+                        createBaseVNode("div", EntranceTabvue_type_script_setup_true_lang_ts_hoisted_22, [
                             (selectedDate.value)
-                                ? (openBlock(), createElementBlock("table", EntranceTabvue_type_script_setup_true_lang_ts_hoisted_22, [
+                                ? (openBlock(), createElementBlock("table", EntranceTabvue_type_script_setup_true_lang_ts_hoisted_23, [
                                     _cache[2] || (_cache[2] = createBaseVNode("thead", null, [
                                         createBaseVNode("tr", null, [
                                             createBaseVNode("th", null, "東"),
@@ -42741,86 +42798,88 @@ const _hoisted_56 = { class: "ytomo-history-slot" };
                                                         role: "button",
                                                         class: normalizeClass(["ytomo-time-button", [
                                                                 { 'selected': timeSlot.east.selected },
+                                                                { 'disabled': isTimeSlotDisabled('east', timeSlot.time) },
                                                                 `status-${timeSlot.east.status}`
                                                             ]]),
-                                                        onClick: ($event) => (toggleTimeSlot('east', timeSlot.time))
+                                                        onClick: ($event) => (!isTimeSlotDisabled('east', timeSlot.time) && toggleTimeSlot('east', timeSlot.time))
                                                     }, [
                                                         createBaseVNode("span", {
                                                             class: normalizeClass(["ytomo-status-icon", `status-${timeSlot.east.status}`])
                                                         }, [
                                                             (timeSlot.east.status === 'low')
-                                                                ? (openBlock(), createElementBlock("span", EntranceTabvue_type_script_setup_true_lang_ts_hoisted_24, "●"))
+                                                                ? (openBlock(), createElementBlock("span", EntranceTabvue_type_script_setup_true_lang_ts_hoisted_25, "●"))
                                                                 : (timeSlot.east.status === 'high')
-                                                                    ? (openBlock(), createElementBlock("span", EntranceTabvue_type_script_setup_true_lang_ts_hoisted_25, "▲"))
+                                                                    ? (openBlock(), createElementBlock("span", EntranceTabvue_type_script_setup_true_lang_ts_hoisted_26, "▲"))
                                                                     : (timeSlot.east.status === 'full')
-                                                                        ? (openBlock(), createElementBlock("span", EntranceTabvue_type_script_setup_true_lang_ts_hoisted_26, "×"))
-                                                                        : (openBlock(), createElementBlock("span", EntranceTabvue_type_script_setup_true_lang_ts_hoisted_27, "－"))
+                                                                        ? (openBlock(), createElementBlock("span", EntranceTabvue_type_script_setup_true_lang_ts_hoisted_27, "×"))
+                                                                        : (openBlock(), createElementBlock("span", EntranceTabvue_type_script_setup_true_lang_ts_hoisted_28, "－"))
                                                         ], 2 /* CLASS */),
-                                                        createBaseVNode("span", EntranceTabvue_type_script_setup_true_lang_ts_hoisted_28, toDisplayString(timeSlot.time) + "-", 1 /* TEXT */),
-                                                        createBaseVNode("span", EntranceTabvue_type_script_setup_true_lang_ts_hoisted_29, [
+                                                        createBaseVNode("span", EntranceTabvue_type_script_setup_true_lang_ts_hoisted_29, toDisplayString(timeSlot.time) + "-", 1 /* TEXT */),
+                                                        createBaseVNode("span", EntranceTabvue_type_script_setup_true_lang_ts_hoisted_30, [
                                                             (timeSlot.east.selected)
-                                                                ? (openBlock(), createElementBlock("span", EntranceTabvue_type_script_setup_true_lang_ts_hoisted_30, toDisplayString(getSelectionNumber(timeSlot.time, 'east')), 1 /* TEXT */))
+                                                                ? (openBlock(), createElementBlock("span", EntranceTabvue_type_script_setup_true_lang_ts_hoisted_31, toDisplayString(getSelectionNumber(timeSlot.time, 'east')), 1 /* TEXT */))
                                                                 : createCommentVNode("v-if", true)
                                                         ])
-                                                    ], 10 /* CLASS, PROPS */, EntranceTabvue_type_script_setup_true_lang_ts_hoisted_23)
+                                                    ], 10 /* CLASS, PROPS */, EntranceTabvue_type_script_setup_true_lang_ts_hoisted_24)
                                                 ]),
                                                 createBaseVNode("td", null, [
                                                     createBaseVNode("div", {
                                                         role: "button",
                                                         class: normalizeClass(["ytomo-time-button", [
                                                                 { 'selected': timeSlot.west.selected },
+                                                                { 'disabled': isTimeSlotDisabled('west', timeSlot.time) },
                                                                 `status-${timeSlot.west.status}`
                                                             ]]),
-                                                        onClick: ($event) => (toggleTimeSlot('west', timeSlot.time))
+                                                        onClick: ($event) => (!isTimeSlotDisabled('west', timeSlot.time) && toggleTimeSlot('west', timeSlot.time))
                                                     }, [
                                                         createBaseVNode("span", {
                                                             class: normalizeClass(["ytomo-status-icon", `status-${timeSlot.west.status}`])
                                                         }, [
                                                             (timeSlot.west.status === 'low')
-                                                                ? (openBlock(), createElementBlock("span", EntranceTabvue_type_script_setup_true_lang_ts_hoisted_32, "●"))
+                                                                ? (openBlock(), createElementBlock("span", EntranceTabvue_type_script_setup_true_lang_ts_hoisted_33, "●"))
                                                                 : (timeSlot.west.status === 'high')
-                                                                    ? (openBlock(), createElementBlock("span", EntranceTabvue_type_script_setup_true_lang_ts_hoisted_33, "▲"))
+                                                                    ? (openBlock(), createElementBlock("span", EntranceTabvue_type_script_setup_true_lang_ts_hoisted_34, "▲"))
                                                                     : (timeSlot.west.status === 'full')
-                                                                        ? (openBlock(), createElementBlock("span", EntranceTabvue_type_script_setup_true_lang_ts_hoisted_34, "×"))
-                                                                        : (openBlock(), createElementBlock("span", EntranceTabvue_type_script_setup_true_lang_ts_hoisted_35, "－"))
+                                                                        ? (openBlock(), createElementBlock("span", EntranceTabvue_type_script_setup_true_lang_ts_hoisted_35, "×"))
+                                                                        : (openBlock(), createElementBlock("span", _hoisted_36, "－"))
                                                         ], 2 /* CLASS */),
-                                                        createBaseVNode("span", _hoisted_36, toDisplayString(timeSlot.time) + "-", 1 /* TEXT */),
-                                                        createBaseVNode("span", _hoisted_37, [
+                                                        createBaseVNode("span", _hoisted_37, toDisplayString(timeSlot.time) + "-", 1 /* TEXT */),
+                                                        createBaseVNode("span", _hoisted_38, [
                                                             (timeSlot.west.selected)
-                                                                ? (openBlock(), createElementBlock("span", _hoisted_38, toDisplayString(getSelectionNumber(timeSlot.time, 'west')), 1 /* TEXT */))
+                                                                ? (openBlock(), createElementBlock("span", _hoisted_39, toDisplayString(getSelectionNumber(timeSlot.time, 'west')), 1 /* TEXT */))
                                                                 : createCommentVNode("v-if", true)
                                                         ])
-                                                    ], 10 /* CLASS, PROPS */, EntranceTabvue_type_script_setup_true_lang_ts_hoisted_31)
+                                                    ], 10 /* CLASS, PROPS */, EntranceTabvue_type_script_setup_true_lang_ts_hoisted_32)
                                                 ])
                                             ]));
                                         }), 128 /* KEYED_FRAGMENT */))
                                     ])
                                 ]))
-                                : (openBlock(), createElementBlock("div", _hoisted_39, " 日付を選択してください "))
+                                : (openBlock(), createElementBlock("div", _hoisted_40, " 日付を選択してください "))
                         ]),
                         createCommentVNode(" 予約操作ボタン "),
                         (selectedDate.value)
-                            ? (openBlock(), createElementBlock("div", _hoisted_40, [
+                            ? (openBlock(), createElementBlock("div", _hoisted_41, [
                                 createBaseVNode("button", {
                                     class: normalizeClass(["ytomo-reserve-button", { 'disabled': !isReservationButtonEnabled.value, 'cancel-mode': unref(isReservationRunning) }]),
                                     disabled: !isReservationButtonEnabled.value,
                                     onClick: executeReservation
-                                }, toDisplayString(unref(isReservationRunning) ? '予約中断' : reservationButtonText.value), 11 /* TEXT, CLASS, PROPS */, _hoisted_41)
+                                }, toDisplayString(unref(isReservationRunning) ? '予約中断' : reservationButtonText.value), 11 /* TEXT, CLASS, PROPS */, _hoisted_42)
                             ]))
                             : createCommentVNode("v-if", true)
                     ])
                 ]),
                 createCommentVNode(" 下段: 実行情報ブロック "),
-                createBaseVNode("div", _hoisted_42, [
+                createBaseVNode("div", _hoisted_43, [
                     createCommentVNode(" 予約情報表示エリア "),
                     (unref(reservationInfo).visible)
                         ? (openBlock(), createElementBlock("div", {
                             key: 0,
                             class: normalizeClass(["ytomo-reservation-info", { 'completed': unref(reservationInfo).completed }])
                         }, [
-                            createBaseVNode("div", _hoisted_43, [
-                                createBaseVNode("div", _hoisted_44, toDisplayString(unref(reservationInfo).date), 1 /* TEXT */),
-                                createBaseVNode("div", _hoisted_45, [
+                            createBaseVNode("div", _hoisted_44, [
+                                createBaseVNode("div", _hoisted_45, toDisplayString(unref(reservationInfo).date), 1 /* TEXT */),
+                                createBaseVNode("div", _hoisted_46, [
                                     (openBlock(true), createElementBlock(Fragment, null, renderList(unref(reservationInfo).timeSlots, (slot) => {
                                         return (openBlock(), createElementBlock("div", {
                                             key: slot.id,
@@ -42837,43 +42896,43 @@ const _hoisted_56 = { class: "ytomo-history-slot" };
                             key: 1,
                             class: normalizeClass(["ytomo-reservation-status", unref(reservationStatus).statusClass])
                         }, [
-                            createBaseVNode("div", _hoisted_46, [
+                            createBaseVNode("div", _hoisted_47, [
                                 (unref(reservationStatus).isActive)
-                                    ? (openBlock(), createElementBlock("div", _hoisted_47, [...(_cache[3] || (_cache[3] = [
+                                    ? (openBlock(), createElementBlock("div", _hoisted_48, [...(_cache[3] || (_cache[3] = [
                                             createBaseVNode("svg", { viewBox: "0 0 24 24" }, [
                                                 createBaseVNode("path", { d: "M12,4V2A10,10 0 0,0 2,12H4A8,8 0 0,1 12,4Z" })
                                             ], -1 /* CACHED */)
                                         ]))]))
                                     : createCommentVNode("v-if", true),
-                                createBaseVNode("div", _hoisted_48, [
-                                    createBaseVNode("div", _hoisted_49, toDisplayString(unref(reservationStatus).currentAction), 1 /* TEXT */),
+                                createBaseVNode("div", _hoisted_49, [
+                                    createBaseVNode("div", _hoisted_50, toDisplayString(unref(reservationStatus).currentAction), 1 /* TEXT */),
                                     (unref(reservationStatus).statusClass === 'success' && unref(reservationStatus).dateChange)
-                                        ? (openBlock(), createElementBlock("div", _hoisted_50, toDisplayString(unref(reservationStatus).dateChange), 1 /* TEXT */))
+                                        ? (openBlock(), createElementBlock("div", _hoisted_51, toDisplayString(unref(reservationStatus).dateChange), 1 /* TEXT */))
                                         : createCommentVNode("v-if", true),
                                     (unref(reservationStatus).isActive)
-                                        ? (openBlock(), createElementBlock("div", _hoisted_51, [
-                                            createBaseVNode("div", _hoisted_52, [
+                                        ? (openBlock(), createElementBlock("div", _hoisted_52, [
+                                            createBaseVNode("div", _hoisted_53, [
                                                 createBaseVNode("div", {
                                                     class: "ytomo-progress-fill",
                                                     style: normalizeStyle({ width: unref(reservationStatus).progress + '%' })
                                                 }, null, 4 /* STYLE */)
                                             ]),
-                                            createBaseVNode("span", _hoisted_53, toDisplayString(unref(reservationStatus).progressText), 1 /* TEXT */)
+                                            createBaseVNode("span", _hoisted_54, toDisplayString(unref(reservationStatus).progressText), 1 /* TEXT */)
                                         ]))
                                         : createCommentVNode("v-if", true),
                                     createCommentVNode(" 予約履歴表示（右下に表示） "),
                                     (_ctx.apiManager.reservationHistory.value.length > 0)
-                                        ? (openBlock(), createElementBlock("div", _hoisted_54, [
+                                        ? (openBlock(), createElementBlock("div", _hoisted_55, [
                                             (openBlock(true), createElementBlock(Fragment, null, renderList(_ctx.apiManager.reservationHistory.value, (result, index) => {
                                                 return (openBlock(), createElementBlock("div", {
                                                     key: index,
                                                     class: "ytomo-history-item"
                                                 }, [
-                                                    createBaseVNode("span", _hoisted_55, toDisplayString(result.timestamp), 1 /* TEXT */),
+                                                    createBaseVNode("span", _hoisted_56, toDisplayString(result.timestamp), 1 /* TEXT */),
                                                     createBaseVNode("span", {
                                                         class: normalizeClass(["ytomo-history-result", result.success ? 'success' : 'failure'])
                                                     }, toDisplayString(result.success ? '成功' : '失敗'), 3 /* TEXT, CLASS */),
-                                                    createBaseVNode("span", _hoisted_56, toDisplayString(result.gate) + toDisplayString(result.time), 1 /* TEXT */)
+                                                    createBaseVNode("span", _hoisted_57, toDisplayString(result.gate) + toDisplayString(result.time), 1 /* TEXT */)
                                                 ]));
                                             }), 128 /* KEYED_FRAGMENT */))
                                         ]))
@@ -42890,9 +42949,9 @@ const _hoisted_56 = { class: "ytomo-history-slot" };
 
 ;// ./ts/components/EntranceTab.vue?vue&type=script&setup=true&lang=ts
  
-// EXTERNAL MODULE: ./node_modules/css-loader/dist/cjs.js!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/sass-loader/dist/cjs.js!./node_modules/vue-loader/dist/index.js??ruleSet[1].rules[8].use[0]!./ts/components/EntranceTab.vue?vue&type=style&index=0&id=328e00e4&scoped=true&lang=scss
-var EntranceTabvue_type_style_index_0_id_328e00e4_scoped_true_lang_scss = __webpack_require__(753);
-;// ./node_modules/style-loader/dist/cjs.js!./node_modules/css-loader/dist/cjs.js!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/sass-loader/dist/cjs.js!./node_modules/vue-loader/dist/index.js??ruleSet[1].rules[8].use[0]!./ts/components/EntranceTab.vue?vue&type=style&index=0&id=328e00e4&scoped=true&lang=scss
+// EXTERNAL MODULE: ./node_modules/css-loader/dist/cjs.js!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/sass-loader/dist/cjs.js!./node_modules/vue-loader/dist/index.js??ruleSet[1].rules[8].use[0]!./ts/components/EntranceTab.vue?vue&type=style&index=0&id=58e83aca&scoped=true&lang=scss
+var EntranceTabvue_type_style_index_0_id_58e83aca_scoped_true_lang_scss = __webpack_require__(416);
+;// ./node_modules/style-loader/dist/cjs.js!./node_modules/css-loader/dist/cjs.js!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/sass-loader/dist/cjs.js!./node_modules/vue-loader/dist/index.js??ruleSet[1].rules[8].use[0]!./ts/components/EntranceTab.vue?vue&type=style&index=0&id=58e83aca&scoped=true&lang=scss
 
       
       
@@ -42904,22 +42963,22 @@ var EntranceTabvue_type_style_index_0_id_328e00e4_scoped_true_lang_scss = __webp
       
       
 
-var EntranceTabvue_type_style_index_0_id_328e00e4_scoped_true_lang_scss_options = {};
+var EntranceTabvue_type_style_index_0_id_58e83aca_scoped_true_lang_scss_options = {};
 
-EntranceTabvue_type_style_index_0_id_328e00e4_scoped_true_lang_scss_options.styleTagTransform = (styleTagTransform_default());
-EntranceTabvue_type_style_index_0_id_328e00e4_scoped_true_lang_scss_options.setAttributes = (setAttributesWithoutAttributes_default());
-EntranceTabvue_type_style_index_0_id_328e00e4_scoped_true_lang_scss_options.insert = insertBySelector_default().bind(null, "head");
-EntranceTabvue_type_style_index_0_id_328e00e4_scoped_true_lang_scss_options.domAPI = (styleDomAPI_default());
-EntranceTabvue_type_style_index_0_id_328e00e4_scoped_true_lang_scss_options.insertStyleElement = (insertStyleElement_default());
+EntranceTabvue_type_style_index_0_id_58e83aca_scoped_true_lang_scss_options.styleTagTransform = (styleTagTransform_default());
+EntranceTabvue_type_style_index_0_id_58e83aca_scoped_true_lang_scss_options.setAttributes = (setAttributesWithoutAttributes_default());
+EntranceTabvue_type_style_index_0_id_58e83aca_scoped_true_lang_scss_options.insert = insertBySelector_default().bind(null, "head");
+EntranceTabvue_type_style_index_0_id_58e83aca_scoped_true_lang_scss_options.domAPI = (styleDomAPI_default());
+EntranceTabvue_type_style_index_0_id_58e83aca_scoped_true_lang_scss_options.insertStyleElement = (insertStyleElement_default());
 
-var EntranceTabvue_type_style_index_0_id_328e00e4_scoped_true_lang_scss_update = injectStylesIntoStyleTag_default()(EntranceTabvue_type_style_index_0_id_328e00e4_scoped_true_lang_scss/* default */.A, EntranceTabvue_type_style_index_0_id_328e00e4_scoped_true_lang_scss_options);
-
-
+var EntranceTabvue_type_style_index_0_id_58e83aca_scoped_true_lang_scss_update = injectStylesIntoStyleTag_default()(EntranceTabvue_type_style_index_0_id_58e83aca_scoped_true_lang_scss/* default */.A, EntranceTabvue_type_style_index_0_id_58e83aca_scoped_true_lang_scss_options);
 
 
-       /* harmony default export */ const components_EntranceTabvue_type_style_index_0_id_328e00e4_scoped_true_lang_scss = (EntranceTabvue_type_style_index_0_id_328e00e4_scoped_true_lang_scss/* default */.A && EntranceTabvue_type_style_index_0_id_328e00e4_scoped_true_lang_scss/* default */.A.locals ? EntranceTabvue_type_style_index_0_id_328e00e4_scoped_true_lang_scss/* default */.A.locals : undefined);
 
-;// ./ts/components/EntranceTab.vue?vue&type=style&index=0&id=328e00e4&scoped=true&lang=scss
+
+       /* harmony default export */ const components_EntranceTabvue_type_style_index_0_id_58e83aca_scoped_true_lang_scss = (EntranceTabvue_type_style_index_0_id_58e83aca_scoped_true_lang_scss/* default */.A && EntranceTabvue_type_style_index_0_id_58e83aca_scoped_true_lang_scss/* default */.A.locals ? EntranceTabvue_type_style_index_0_id_58e83aca_scoped_true_lang_scss/* default */.A.locals : undefined);
+
+;// ./ts/components/EntranceTab.vue?vue&type=style&index=0&id=58e83aca&scoped=true&lang=scss
 
 ;// ./ts/components/EntranceTab.vue
 
@@ -42928,7 +42987,7 @@ var EntranceTabvue_type_style_index_0_id_328e00e4_scoped_true_lang_scss_update =
 ;
 
 
-const EntranceTab_exports_ = /*#__PURE__*/(0,exportHelper/* default */.A)(EntranceTabvue_type_script_setup_true_lang_ts, [['__scopeId',"data-v-328e00e4"]])
+const EntranceTab_exports_ = /*#__PURE__*/(0,exportHelper/* default */.A)(EntranceTabvue_type_script_setup_true_lang_ts, [['__scopeId',"data-v-58e83aca"]])
 
 /* harmony default export */ const EntranceTab = (EntranceTab_exports_);
 ;// ./node_modules/ts-loader/index.js??clonedRuleSet-1.use!./node_modules/vue-loader/dist/index.js??ruleSet[1].rules[8].use[0]!./ts/components/MainDialog.vue?vue&type=script&setup=true&lang=ts

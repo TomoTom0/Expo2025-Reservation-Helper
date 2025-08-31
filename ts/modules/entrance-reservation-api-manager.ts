@@ -34,6 +34,9 @@ export class EntranceReservationApiManager {
   public reservationInfo: Ref<ReservationInfo>
   public isReservationRunning: Ref<boolean>
   public reservationHistory: Ref<ReservationResult[]>
+  
+  // 選択解除用のコールバック
+  private clearSelectionCallback: (() => void) | null = null
 
   // タイマー管理
   private reservationTimer: NodeJS.Timeout | null = null
@@ -218,6 +221,11 @@ export class EntranceReservationApiManager {
         
         // 実行時情報は変更しない（元の情報を保持）
         
+        // 予約成功時は時間帯選択を解除
+        if (this.clearSelectionCallback) {
+          this.clearSelectionCallback()
+        }
+        
         // 条件付き追加実行の判定
         await this.executeAdditionalReservations(selectedTimeSlots)
       } else {
@@ -340,6 +348,11 @@ export class EntranceReservationApiManager {
             progressText: '完了',
             statusClass: 'success',
             dateChange: dateTimeChange
+          }
+          
+          // 予約成功時は時間帯選択を解除
+          if (this.clearSelectionCallback) {
+            this.clearSelectionCallback()
           }
           
           // 最初の成功で終了
@@ -522,5 +535,10 @@ export class EntranceReservationApiManager {
     }
     this.executedReservations.clear()
     this.reservationHistory.value = []
+  }
+
+  // 選択解除用コールバックを設定
+  public setClearSelectionCallback(callback: () => void) {
+    this.clearSelectionCallback = callback
   }
 }
