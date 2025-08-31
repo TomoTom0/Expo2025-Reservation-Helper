@@ -7,6 +7,7 @@ import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import type { TicketData, ScheduleData } from '@/types/api'
 import { loggers } from '@/utils/logger'
+import { authenticatedFetch } from '@/utils/authManager'
 import { 
   getEntranceSchedules, 
   getUserReservations, 
@@ -308,14 +309,13 @@ export const useTicketsStore = defineStore('tickets', () => {
    */
   const loadOwnTickets = async (): Promise<TicketData[]> => {
     try {
-      const response = await fetch('/api/d/my/tickets/?count=1', {
+      const response = await authenticatedFetch('/api/d/my/tickets/?count=1', {
         method: 'GET',
         headers: {
           'Accept': 'application/json',
           'Accept-Language': 'ja,en-US;q=0.9,en;q=0.8,zh-TW;q=0.7,zh;q=0.6',
           'X-Api-Lang': 'ja'
-        },
-        credentials: 'same-origin'
+        }
       })
 
       if (!response.ok) {
@@ -403,13 +403,12 @@ export const useTicketsStore = defineStore('tickets', () => {
           for (const schedule of ticket.schedules) {
             // 抽選カレンダー情報を取得
             try {
-              const calendarResponse = await fetch(`/api/d/lottery_calendars?entrance_date=${schedule.entrance_date}`, {
+              const calendarResponse = await authenticatedFetch(`/api/d/lottery_calendars?entrance_date=${schedule.entrance_date}`, {
                 method: 'GET',
                 headers: {
                   'Accept': 'application/json',
                   'X-Api-Lang': 'ja'
-                },
-                credentials: 'same-origin'
+                }
               })
               
               if (calendarResponse.ok) {
@@ -486,9 +485,7 @@ export const useTicketsStore = defineStore('tickets', () => {
       
       for (const testChannel of channels) {
         try {
-          const response = await fetch(`/api/d/proxy_tickets/${ticketId}/add_check?registered_channel=${testChannel}`, {
-            credentials: 'include'
-          })
+          const response = await authenticatedFetch(`/api/d/proxy_tickets/${ticketId}/add_check?registered_channel=${testChannel}`)
           
           if (response.ok) {
             const data = await response.json()

@@ -247,6 +247,45 @@
         {{ addResult.message }}
       </div>
     </div>
+
+    <!-- 拡張機能設定エリア -->
+    <div class="ytomo-extension-settings">
+      <div class="ytomo-settings-header">
+        <h3>拡張機能設定</h3>
+      </div>
+      
+      <div class="ytomo-settings-content">
+        <div class="ytomo-setting-item">
+          <label class="ytomo-setting-label">
+            <input 
+              type="checkbox" 
+              class="ytomo-setting-checkbox"
+              v-model="mainDialogEnabled"
+              @change="handleMainDialogToggle"
+            >
+            <span class="ytomo-setting-text">他のページでも機能を使う</span>
+          </label>
+          <div class="ytomo-setting-description">
+            予約ページ以外でも予約管理ボタンを表示します
+          </div>
+        </div>
+        
+        <div class="ytomo-setting-item">
+          <label class="ytomo-setting-label">
+            <input 
+              type="checkbox" 
+              class="ytomo-setting-checkbox"
+              v-model="preloadEnabled"
+              @change="handlePreloadToggle"
+            >
+            <span class="ytomo-setting-text">素早く機能を読み込む</span>
+          </label>
+          <div class="ytomo-setting-description">
+            ページを開いたときに予め機能を用意して、すぐに使えるようにします
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -257,6 +296,7 @@ import { useTicketsStore } from '@/stores/tickets'
 import { useMainDialogStore } from '@/stores/mainDialog'
 import { useTickets } from '@/composables/useTickets'
 import { loggers } from '@/utils/logger'
+import { authenticatedFetch } from '@/utils/authManager'
 // LocationHelper は location_index プロパティが実装されるまで一時的にコメントアウト
 // import { LocationHelper } from '@/modules/entrance-reservation-state-manager'
 import { getLongNameFromShortName, getShortNameFromChannel, getAllPavilionReservationTypes } from '@/utils/pavilionReservationMapping'
@@ -287,6 +327,10 @@ const selectedChannel = ref('5')
 const addResult = ref<{ success: boolean, message: string } | null>(null)
 const expandedSchedules = ref<Set<string>>(new Set())
 const isRefreshing = ref(false)
+
+// 拡張機能設定
+const mainDialogEnabled = ref(true)
+const preloadEnabled = ref(true)
 
 // 計算プロパティ
 const availableDates = computed(() => {
@@ -526,9 +570,7 @@ const handleAddTicket = async () => {
   
   // API呼び出しを試行（成否は結果表示のみに使用）
   try {
-    const response = await fetch(`/api/d/proxy_tickets/${ticketId}/add_check?registered_channel=${channel}`, {
-      credentials: 'include'
-    })
+    const response = await authenticatedFetch(`/api/d/proxy_tickets/${ticketId}/add_check?registered_channel=${channel}`)
     
     if (response.ok) {
       const data = await response.json()
@@ -561,6 +603,21 @@ const handleAddTicket = async () => {
   setTimeout(() => {
     addResult.value = null
   }, 3000)
+}
+
+// 拡張機能設定ハンドラー
+const handleMainDialogToggle = () => {
+  logger.info('Main Dialog機能トグル', { enabled: mainDialogEnabled.value })
+  // 設定をローカルストレージに保存
+  localStorage.setItem('ytomo-main-dialog-enabled', String(mainDialogEnabled.value))
+  // 実際の機能制御はApp.vueやMainFab.vueで実装予定
+}
+
+const handlePreloadToggle = () => {
+  logger.info('事前読み込み機能トグル', { enabled: preloadEnabled.value })
+  // 設定をローカルストレージに保存
+  localStorage.setItem('ytomo-preload-enabled', String(preloadEnabled.value))
+  // 実際の事前読み込み制御は該当コンポーネントで実装予定
 }
 
 const retryLoad = async () => {
@@ -854,10 +911,26 @@ const getSecondLineStatusClassFromPeriod = (periodStatus: string, submissionStat
 
 // ライフサイクル
 onMounted(() => {
+  // 拡張機能設定をローカルストレージから読み込み
+  const storedMainDialogEnabled = localStorage.getItem('ytomo-main-dialog-enabled')
+  const storedPreloadEnabled = localStorage.getItem('ytomo-preload-enabled')
+  
+  if (storedMainDialogEnabled !== null) {
+    mainDialogEnabled.value = storedMainDialogEnabled === 'true'
+  }
+  
+  if (storedPreloadEnabled !== null) {
+    preloadEnabled.value = storedPreloadEnabled === 'true'
+  }
+  
   logger.info('TicketTab mounted', {
     現在のチケット数: ticketsArray.value.length,
     ticketsArrayサイズ: ticketsArray.value.length,
-    filteredTicketsサイズ: filteredTickets.value.length
+    filteredTicketsサイズ: filteredTickets.value.length,
+    設定: {
+      mainDialogEnabled: mainDialogEnabled.value,
+      preloadEnabled: preloadEnabled.value
+    }
   })
 })
 
@@ -2025,6 +2098,67 @@ onUnmounted(() => {
     to {
         opacity: 1;
         transform: translateY(0);
+    }
+}
+
+/* 拡張機能設定エリア */
+.ytomo-extension-settings {
+    margin-top: 24px;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    background: #fafafa;
+    overflow: hidden;
+
+    .ytomo-settings-header {
+        background: #f3f4f6;
+        padding: 12px 16px;
+        border-bottom: 1px solid #e5e7eb;
+
+        h3 {
+            margin: 0;
+            font-size: 14px;
+            font-weight: 600;
+            color: #374151;
+        }
+    }
+
+    .ytomo-settings-content {
+        padding: 16px;
+
+        .ytomo-setting-item {
+            margin-bottom: 16px;
+
+            &:last-child {
+                margin-bottom: 0;
+            }
+
+            .ytomo-setting-label {
+                display: flex;
+                align-items: center;
+                gap: 12px;
+                cursor: pointer;
+                margin-bottom: 4px;
+
+                .ytomo-setting-checkbox {
+                    width: 16px;
+                    height: 16px;
+                    cursor: pointer;
+                }
+
+                .ytomo-setting-text {
+                    font-size: 14px;
+                    font-weight: 500;
+                    color: #374151;
+                }
+            }
+
+            .ytomo-setting-description {
+                font-size: 12px;
+                color: #6b7280;
+                margin-left: 28px;
+                line-height: 1.4;
+            }
+        }
     }
 }
 

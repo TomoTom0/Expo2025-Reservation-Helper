@@ -215,7 +215,7 @@
                 <div v-for="(result, index) in reservationManager.reservationHistory.value" :key="index" 
                      class="ytomo-history-item" :class="result.success ? 'success' : 'failure'">
                   <span class="ytomo-history-result">{{ result.success ? '成功' : '失敗' }}</span>
-                  <span class="ytomo-history-detail">{{ result.gate }}{{ result.time }} {{ result.timestamp }}</span>
+                  <span class="ytomo-history-detail">{{ result.gate }}{{ result.time }}</span>
                 </div>
               </div>
             </div>
@@ -1920,7 +1920,7 @@ onMounted(async () => {
 
 .ytomo-entrance-calendar {
   flex: 0 0 220px; /* 固定幅220pxに縮小 */
-  height: 300px; /* 明示的に高さを制限 */
+  height: 320px; /* 高さを最適化 */
   border: 1px solid #e5e7eb;
   border-radius: 8px;
   display: flex;
@@ -2007,7 +2007,7 @@ onMounted(async () => {
   
   .ytomo-calendar-body {
     flex: 1;
-    padding: 8px;
+    padding: 4px;
     overflow: auto;
   }
   
@@ -2015,7 +2015,7 @@ onMounted(async () => {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-bottom: 8px;
+    margin-bottom: 4px;
     
     .ytomo-month-display {
       display: flex;
@@ -2091,14 +2091,14 @@ onMounted(async () => {
       display: grid;
       grid-template-columns: repeat(7, 1fr);
       gap: 1px;
-      margin-bottom: 4px;
+      margin-bottom: 2px;
       
       .ytomo-weekday {
         text-align: center;
         font-size: 12px;
         font-weight: 600;
         color: #6b7280;
-        padding: 4px;
+        padding: 2px;
       }
     }
     
@@ -2117,7 +2117,7 @@ onMounted(async () => {
         cursor: pointer;
         border-radius: 3px;
         transition: all 0.2s;
-        min-height: 24px;
+        min-height: 20px;
         
         // 子要素のクリックイベントを無効にして、親要素のクリックを確実に実行
         * {

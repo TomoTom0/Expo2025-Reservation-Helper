@@ -26,7 +26,6 @@ export interface ReservationResult {
   success: boolean
   gate: string
   time: string
-  timestamp: string
 }
 
 export class EntranceReservationApiManager {
@@ -445,8 +444,7 @@ export class EntranceReservationApiManager {
     const result: ReservationResult = {
       success,
       gate,
-      time,
-      timestamp: new Date().toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit', second: '2-digit' })
+      time
     }
     
     // 最新の結果を先頭に追加し、3つまでに制限
