@@ -23,6 +23,8 @@ export const useMainDialogStore = defineStore('mainDialog', () => {
   // Actions
   const showDialog = () => {
     isVisible.value = true
+    // 初期表示時は常にチケットタブを表示
+    activeTab.value = 'ticket'
   }
 
   const hideDialog = () => {

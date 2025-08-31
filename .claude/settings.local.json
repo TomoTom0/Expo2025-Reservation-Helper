@@ -48,7 +48,8 @@
       "Bash(npm run type-check:*)",
       "Bash(for:*)",
       "Bash(git log:*)",
-      "Bash(LOG_LEVEL=DEBUG mise run build-rsync)"
+      "Bash(LOG_LEVEL=DEBUG mise run build-rsync)",
+      "Bash(LOG_LEVEL=INFO mise run build-rsync)"
     ],
     "deny": []
   }

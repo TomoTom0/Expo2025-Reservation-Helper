@@ -8,7 +8,7 @@
 // @run-at       document-end
 // ==/UserScript==
 
-// Built: 2025/08/29 18:07:41
+// Built: 2025/08/31 10:07:29
 
 
 (function webpackUniversalModuleDefinition(root, factory) {
@@ -24,28 +24,6 @@
 return /******/ (() => { // webpackBootstrap
 /******/ 	"use strict";
 /******/ 	var __webpack_modules__ = ({
-
-/***/ 29:
-/***/ ((module, __webpack_exports__, __webpack_require__) => {
-
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   A: () => (__WEBPACK_DEFAULT_EXPORT__)
-/* harmony export */ });
-/* harmony import */ var _node_modules_css_loader_dist_runtime_noSourceMaps_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(601);
-/* harmony import */ var _node_modules_css_loader_dist_runtime_noSourceMaps_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_css_loader_dist_runtime_noSourceMaps_js__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(314);
-/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1__);
-// Imports
-
-
-var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1___default()((_node_modules_css_loader_dist_runtime_noSourceMaps_js__WEBPACK_IMPORTED_MODULE_0___default()));
-// Module
-___CSS_LOADER_EXPORT___.push([module.id, `.ytomo-ticket-tab[data-v-393ab085]{padding:0 12px 20px 12px;height:100%;overflow-y:auto;color-scheme:light}@media(max-width: 768px){.ytomo-ticket-tab[data-v-393ab085]{padding:0 8px 16px 8px}}.ytomo-quick-select[data-v-393ab085]{background:#fff;border-radius:8px;padding:12px;box-shadow:0 1px 3px rgba(0,0,0,.1);border:1px solid #e2e8f0;flex-shrink:0;display:flex;align-items:center;gap:10px;flex-wrap:wrap}.ytomo-quick-select .ytomo-control-left[data-v-393ab085]{display:flex;align-items:center;gap:12px;margin-right:auto}.ytomo-refresh-button[data-v-393ab085]{display:flex;align-items:center;gap:6px;padding:6px 12px;background:#f8fafc;border:1px solid #cbd5e1;border-radius:6px;color:#475569;font-size:12px;font-weight:500;cursor:pointer;transition:all .2s ease}.ytomo-refresh-button[data-v-393ab085]:hover:not(:disabled){background:#e2e8f0;border-color:#94a3b8}.ytomo-refresh-button[data-v-393ab085]:disabled{opacity:.6;cursor:not-allowed;background:#f1f5f9}.ytomo-refresh-icon[data-v-393ab085]{flex-shrink:0}.ytomo-refresh-icon.rotating[data-v-393ab085]{animation:spin-393ab085 1s linear infinite}@keyframes spin-393ab085{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}.ytomo-toggle-container[data-v-393ab085]{display:flex;align-items:center;cursor:pointer;user-select:none}.ytomo-toggle-input[data-v-393ab085]{display:none}.ytomo-toggle-slider[data-v-393ab085]{position:relative;width:44px;height:24px;background:#cbd5e1;border-radius:12px;transition:background-color .2s;margin-right:8px}.ytomo-toggle-slider[data-v-393ab085]::before{content:"";position:absolute;top:2px;left:2px;width:20px;height:20px;background:#fff;border-radius:50%;transition:transform .2s}.ytomo-toggle-input:checked+.ytomo-toggle-slider[data-v-393ab085]{background:#2c5aa0}.ytomo-toggle-input:checked+.ytomo-toggle-slider[data-v-393ab085]::before{transform:translateX(20px)}.ytomo-toggle-label[data-v-393ab085]{font-size:14px;font-weight:500;color:#374151}.ytomo-date-buttons[data-v-393ab085]{display:flex;flex-wrap:wrap;gap:8px;flex:1}.ytomo-entrance-date-button[data-v-393ab085],.ytomo-date-button[data-v-393ab085]{background:#e0f2fe;border:1px solid #0891b2;border-radius:4px;padding:4px 8px;font-size:12px;color:#0c4a6e;cursor:pointer;transition:all .2s;display:flex;flex-direction:column;gap:2px;align-items:center}.ytomo-entrance-date-button[data-v-393ab085] *,.ytomo-date-button[data-v-393ab085] *{pointer-events:none}.ytomo-entrance-date-button[data-v-393ab085]:focus,.ytomo-date-button[data-v-393ab085]:focus{outline:none;box-shadow:none}.ytomo-entrance-date-button[data-v-393ab085]:hover,.ytomo-date-button[data-v-393ab085]:hover{background:#dbeafe;color:#0c4a6e;transform:translateY(-1px);box-shadow:0 2px 4px rgba(186,230,253,.3)}.selected.ytomo-entrance-date-button[data-v-393ab085],.selected.ytomo-date-button[data-v-393ab085]{background:#0284c7;color:#fff;border-color:#0284c7;outline:2px solid #0284c7;outline-offset:-1px}.ytomo-entrance-date-button[data-v-393ab085]:active,.ytomo-date-button[data-v-393ab085]:active{transform:translateY(0);box-shadow:none}.disabled.ytomo-entrance-date-button[data-v-393ab085],.disabled.ytomo-date-button[data-v-393ab085],.ytomo-entrance-date-button[data-v-393ab085]:disabled,.ytomo-date-button[data-v-393ab085]:disabled{background:#e2e8f0;border-color:#94a3b8;color:#475569;cursor:not-allowed}.disabled.ytomo-entrance-date-button[data-v-393ab085]:hover,.disabled.ytomo-date-button[data-v-393ab085]:hover,.ytomo-entrance-date-button[data-v-393ab085]:disabled:hover,.ytomo-date-button[data-v-393ab085]:disabled:hover{background:#e2e8f0;color:#475569;transform:none;box-shadow:none}.ytomo-ticket-tab[data-v-393ab085]{padding:0 12px 20px 12px;height:100%;overflow-y:auto;color-scheme:light}@media(max-width: 768px){.ytomo-ticket-tab[data-v-393ab085]{padding:0 8px 16px 8px}}.ytomo-quick-select[data-v-393ab085]{background:#fff;border-radius:8px;padding:16px;box-shadow:0 1px 3px rgba(0,0,0,.1);border:1px solid #e2e8f0;flex-shrink:0;display:flex;align-items:center;gap:10px;flex-wrap:wrap;min-height:52px}.ytomo-toggle-container[data-v-393ab085]{display:flex;align-items:center;cursor:pointer;user-select:none}.ytomo-toggle-input[data-v-393ab085]{display:none}.ytomo-toggle-slider[data-v-393ab085]{position:relative;width:44px;height:24px;background:#cbd5e1;border-radius:12px;transition:background-color .2s;margin-right:8px}.ytomo-toggle-slider[data-v-393ab085]::before{content:"";position:absolute;top:2px;left:2px;width:20px;height:20px;background:#fff;border-radius:50%;transition:transform .2s}.ytomo-toggle-input:checked+.ytomo-toggle-slider[data-v-393ab085]{background:#2c5aa0}.ytomo-toggle-input:checked+.ytomo-toggle-slider[data-v-393ab085]::before{transform:translateX(20px)}.ytomo-toggle-label[data-v-393ab085]{font-size:14px;font-weight:500;color:#374151}.ytomo-date-buttons[data-v-393ab085]{display:flex;flex-wrap:wrap;gap:8px;flex:1}.ytomo-ticket-list[data-v-393ab085]{display:flex;flex-direction:column;gap:8px;margin-bottom:20px}.ytomo-ticket-item[data-v-393ab085]{background:#fff;border-radius:6px;border:1px solid #e2e8f0;overflow:hidden;transition:all .2s}.ytomo-ticket-item[data-v-393ab085]:first-of-type{margin-top:12px}.hidden[data-v-393ab085]{display:none}.ytomo-ticket-item[data-v-393ab085]:hover{border-color:#cbd5e1;box-shadow:0 2px 4px rgba(0,0,0,.1)}.ytomo-ticket-item.selected[data-v-393ab085]{border-color:#2c5aa0;box-shadow:0 0 0 2px rgba(44,90,160,.2)}.ytomo-ticket-upper[data-v-393ab085]{background:#e2e8f0;padding:8px 12px;display:flex;align-items:center;gap:8px;border-bottom:1px solid #cbd5e1}.ytomo-ticket-id[data-v-393ab085]{font-family:"Courier New",monospace;font-size:13px;font-weight:600;color:#374151;background:#e2e8f0;padding:2px 6px;border-radius:3px}.ytomo-me-tip[data-v-393ab085]{background:linear-gradient(135deg, #10b981 0%, #059669 100%);color:#fff;padding:2px 6px;border-radius:10px;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.3px}.ytomo-external-tip[data-v-393ab085]{background:linear-gradient(135deg, #f59e0b 0%, #d97706 100%);color:#fff;padding:2px 6px;border-radius:10px;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.3px}.ytomo-ticket-delete-button[data-v-393ab085]{background:#ef4444;color:#fff;border:none;border-radius:50%;width:20px;height:20px;font-size:14px;font-weight:bold;cursor:pointer;display:flex;align-items:center;justify-content:center;margin-left:auto;transition:all .2s ease}.ytomo-ticket-delete-button[data-v-393ab085]:hover{background:#dc2626;transform:scale(1.1)}.ytomo-item-name[data-v-393ab085]{background:linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);color:#fff;padding:2px 6px;border-radius:10px;font-size:9px;font-weight:500;max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.ytomo-label-tag[data-v-393ab085]{background:linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);color:#fff;padding:2px 6px;border-radius:10px;font-size:10px;font-weight:600}.ytomo-ticket-lower[data-v-393ab085]{padding:8px 12px;display:flex;flex-direction:column;gap:8px}.ytomo-entrance-dates[data-v-393ab085]{display:flex;flex-wrap:wrap;gap:6px}.ytomo-reservation-types[data-v-393ab085]{display:flex;flex-wrap:wrap;gap:6px;align-items:center}.ytomo-reservation-type[data-v-393ab085]{padding:4px 8px;border-radius:4px;font-size:12px;font-weight:500}.ytomo-reservation-type.active[data-v-393ab085]{background:#dcfce7;color:#166534;border:1px solid #22c55e}.ytomo-reservation-type.inactive[data-v-393ab085]{background:#fef2f2;color:#991b1b;border:1px solid #ef4444}.ytomo-no-reservation-types[data-v-393ab085]{color:#6b7280;font-size:12px;font-style:italic}.ytomo-add-ticket[data-v-393ab085]{background:#fff;border-radius:8px;padding:16px;border:2px dashed #cbd5e1;margin-top:20px}.ytomo-add-ticket h4[data-v-393ab085]{margin:0 0 12px 0;color:#374151;font-size:14px;font-weight:600}.ytomo-add-result[data-v-393ab085]{margin-top:8px;padding:8px 12px;border-radius:4px;font-size:12px;font-weight:500;text-align:center}.ytomo-add-result.success[data-v-393ab085]{background:#dcfce7;color:#166534;border:1px solid #22c55e}.ytomo-add-result.error[data-v-393ab085]{background:#fee2e2;color:#dc2626;border:1px solid #ef4444}.ytomo-add-ticket-form[data-v-393ab085]{display:flex;gap:8px;align-items:center;flex-wrap:wrap}@media(max-width: 768px){.ytomo-add-ticket-form[data-v-393ab085]{flex-direction:column;align-items:stretch;gap:12px}}.ytomo-input-inline[data-v-393ab085]{padding:4px 8px;border:1px solid #d1d5db;border-radius:4px;font-size:12px;transition:border-color .2s;background:#fff}.ytomo-input-inline[data-v-393ab085]:focus{outline:none;border-color:#2c5aa0;box-shadow:0 0 0 2px rgba(44,90,160,.1)}.ytomo-input-inline[data-v-393ab085]::placeholder{color:#9ca3af}.ytomo-input-inline.ytomo-input-ticket-id[data-v-393ab085]{width:120px}.ytomo-input-inline.ytomo-input-label[data-v-393ab085]{width:60px}.ytomo-select-inline[data-v-393ab085]{padding:4px 8px;border:1px solid #d1d5db;border-radius:4px;font-size:12px;background:#fff;cursor:pointer;width:50px}.ytomo-select-inline[data-v-393ab085]:focus{outline:none;border-color:#2c5aa0;box-shadow:0 0 0 2px rgba(44,90,160,.1)}.ytomo-ticket-upper[data-v-393ab085]{background:#e2e8f0;padding:8px 12px;display:flex;align-items:center;gap:8px;border-bottom:1px solid #cbd5e1}.ytomo-ticket-id[data-v-393ab085]{font-family:"Courier New",monospace;font-size:13px;font-weight:600;color:#374151;background:#e2e8f0;padding:2px 6px;border-radius:3px}.ytomo-me-tip[data-v-393ab085]{background:linear-gradient(135deg, #10b981 0%, #059669 100%);color:#fff;padding:2px 6px;border-radius:10px;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.3px}.ytomo-external-tip[data-v-393ab085]{background:linear-gradient(135deg, #f59e0b 0%, #d97706 100%);color:#fff;padding:2px 6px;border-radius:10px;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.3px}.ytomo-ticket-lower[data-v-393ab085]{padding:8px 12px;display:flex;flex-direction:column;gap:8px}.ytomo-entrance-date-button .ytomo-reservation-status[data-v-393ab085]{background:hsla(0,0%,100%,.9);color:#0891b2;padding:2px 4px;border-radius:3px;font-size:9px;font-weight:500;line-height:1.1;text-align:center}.ytomo-entrance-date-button .ytomo-reservation-status[data-v-393ab085]:empty{background:rgba(0,0,0,0);padding:0}.ytomo-entrance-date-button:hover .ytomo-reservation-status[data-v-393ab085]{background:hsla(0,0%,100%,.95);color:#0ea5e9}.ytomo-entrance-date-button:hover .ytomo-reservation-status[data-v-393ab085]:empty{background:rgba(0,0,0,0)}.ytomo-entrance-button-container[data-v-393ab085]{display:flex;flex-direction:column;border:1px solid #e5e7eb;border-radius:8px;overflow:hidden;background:#fff}.ytomo-entrance-date-part[data-v-393ab085]{border-radius:0 !important;border:none !important;border-bottom:1px solid #e5e7eb !important;margin:0 !important}.ytomo-entrance-date-part.new-reservation[data-v-393ab085]{background:#f0f9ff;color:#0369a1;font-weight:600}.ytomo-entrance-date-part.new-reservation[data-v-393ab085]:hover{background:#e0f2fe}.ytomo-pavilion-part[data-v-393ab085]{border-radius:0 !important;border:none !important;margin:0 !important;background:#fafafa;transition:background-color .2s ease}.ytomo-pavilion-part[data-v-393ab085]:hover{background:#f5f5f5}.ytomo-pavilion-part[data-v-393ab085]:disabled{background:#f9fafb;color:#9ca3af}.ytomo-pavilion-part.expanded[data-v-393ab085]{background:#e5e7eb}.ytomo-pavilion-part.expanded[data-v-393ab085]:hover{background:#d1d5db}.ytomo-pavilion-part .ytomo-no-reservation[data-v-393ab085]{color:#059669;font-weight:500}.ytomo-reservation-type-indicator[data-v-393ab085]{display:inline-block;width:16px;height:13px;font-size:10px;font-weight:400;text-align:center;line-height:13px;border-radius:3px;border:1px solid rgba(0,0,0,0);-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif}.ytomo-reservation-type-indicator.indicator-won[data-v-393ab085]{background:#10b981;color:#fff;border-color:#059669}.ytomo-reservation-type-indicator.indicator-active[data-v-393ab085]{background:#10b981;color:#fff;border-color:#059669}.ytomo-reservation-type-indicator.indicator-before[data-v-393ab085]{background:#6b7280;color:#fff;border-color:#4b5563}.ytomo-reservation-type-indicator.indicator-none[data-v-393ab085]{background:#e5e7eb;color:#6b7280;border-color:#d1d5db}.ytomo-no-reservation[data-v-393ab085]{font-style:italic;color:#9ca3af}.ytomo-entrance-date-button.selected .ytomo-reservation-status[data-v-393ab085]{background:hsla(0,0%,100%,.95);color:#0891b2}.ytomo-entrance-date-button.selected .ytomo-reservation-status[data-v-393ab085]:empty{background:rgba(0,0,0,0)}.ytomo-entrance-date-button.disabled .ytomo-reservation-status[data-v-393ab085]{background:hsla(0,0%,100%,.9);color:#475569}.ytomo-entrance-date-button.disabled .ytomo-reservation-status[data-v-393ab085]:empty{background:rgba(0,0,0,0)}.ytomo-entrance-date-button .ytomo-schedule-line[data-v-393ab085]{padding:2px 0;font-size:11px;line-height:1.2}.ytomo-entrance-date-button .ytomo-schedule-line.ytomo-reservation-line[data-v-393ab085]{color:#6b7280;display:flex;align-items:center;gap:4px;font-size:10px}.ytomo-entrance-date-button .ytomo-schedule-divider[data-v-393ab085]{height:1px;background:#d1d5db;margin:3px 0;width:100%;opacity:.8}.ytomo-entrance-date-button.selected .ytomo-schedule-line.ytomo-reservation-line[data-v-393ab085]{color:hsla(0,0%,100%,.8)}.ytomo-entrance-date-button.selected .ytomo-schedule-divider[data-v-393ab085]{background:hsla(0,0%,100%,.4)}.ytomo-entrance-date-group[data-v-393ab085]{display:flex;gap:6px;align-items:stretch}.ytomo-expand-button[data-v-393ab085]{background:#f8fafc;border:1px solid #cbd5e1;color:#374151;font-size:12px;font-weight:600;padding:3px 8px;cursor:pointer;border-radius:4px;transition:all .2s ease;min-width:24px;height:50%;display:flex;align-items:center;justify-content:center;align-self:flex-end}.ytomo-expand-button[data-v-393ab085]:disabled{background:#f3f4f6;border-color:#d1d5db;color:#9ca3af;cursor:not-allowed;opacity:.5}.ytomo-expand-button[data-v-393ab085]:hover{background:#e2e8f0;border-color:#94a3b8;transform:translateY(-1px)}.ytomo-expand-button[data-v-393ab085]:active{transform:translateY(0)}.ytomo-expand-button[data-v-393ab085]:focus{outline:none;box-shadow:0 0 0 2px rgba(44,90,160,.2)}.ytomo-pavilion-details[data-v-393ab085]{margin-top:12px;padding:12px;background:#f8fafc;border-radius:6px;border:1px solid #e2e8f0}.ytomo-schedule-detail[data-v-393ab085]{margin-bottom:16px}.ytomo-schedule-detail[data-v-393ab085]:last-child{margin-bottom:0}.ytomo-schedule-date-header[data-v-393ab085]{font-weight:600;color:#334155;margin-bottom:8px;font-size:13px;padding-bottom:4px;border-bottom:1px solid #e2e8f0}.ytomo-pavilion-reservation-group[data-v-393ab085]{margin-bottom:12px;padding:8px 0;border-bottom:1px solid #e5e7eb}.ytomo-pavilion-reservation-group[data-v-393ab085]:last-child{margin-bottom:0;border-bottom:none}.ytomo-reservation-header[data-v-393ab085]{display:flex;align-items:flex-start;gap:12px}.ytomo-reservation-left[data-v-393ab085]{display:flex;flex-direction:column;gap:4px;min-width:80px;flex-shrink:0}.ytomo-reservation-right[data-v-393ab085]{flex:1;display:flex;flex-direction:column;gap:4px}.ytomo-reservation-type-badge[data-v-393ab085]{padding:2px 8px;border-radius:12px;font-size:11px;font-weight:600;white-space:nowrap;text-align:center}.ytomo-reservation-type-badge.badge-won[data-v-393ab085]{background:#10b981;color:#fff}.ytomo-reservation-type-badge.badge-expired[data-v-393ab085]{background:#ef4444;color:#fff}.ytomo-reservation-type-badge.badge-before[data-v-393ab085]{background:#f59e0b;color:#fff}.ytomo-reservation-type-badge.badge-submitted[data-v-393ab085]{background:#8b5cf6;color:#fff}.ytomo-reservation-type-badge.badge-none[data-v-393ab085]{background:#6b7280;color:#fff}.ytomo-time-slot-badge[data-v-393ab085]{background:#f8fafc;color:#475569;padding:2px 8px;border-radius:8px;font-size:11px;font-weight:500;text-align:center;border:1px solid #e2e8f0}.ytomo-time-slot-badge[data-v-393ab085]:empty::after{content:"—"}.ytomo-pavilion-name[data-v-393ab085]{font-weight:600;color:#334155;font-size:13px;line-height:1.3}.ytomo-pavilion-name.ytomo-status-text[data-v-393ab085]{color:#6b7280;font-style:italic;font-weight:500}.ytomo-use-status[data-v-393ab085]{color:#475569;font-size:11px;font-weight:500}.ytomo-reservation-type-header[data-v-393ab085]{display:flex;flex-direction:column;gap:4px;min-width:80px;flex-shrink:0}.ytomo-reservation-type-badge[data-v-393ab085]{background:#3b82f6;color:#fff;padding:4px 8px;border-radius:4px;font-size:10px;font-weight:600;text-align:center;line-height:1.2}.ytomo-time-slot-badge[data-v-393ab085]{background:#2c5aa0;color:#fff;padding:3px 6px;border-radius:3px;font-size:10px;font-weight:500;text-align:center;line-height:1.2}.ytomo-pavilion-info[data-v-393ab085]{flex:1;color:#374151;font-size:12px;line-height:1.4;display:flex;align-items:center}.ytomo-no-entrance-dates[data-v-393ab085]{color:#6b7280;font-size:12px;font-style:italic}.ytomo-input-inline[data-v-393ab085]{padding:4px 8px;border:1px solid #d1d5db;border-radius:4px;font-size:12px;transition:border-color .2s;background:#fff}.ytomo-input-inline[data-v-393ab085]:focus{outline:none;border-color:#2c5aa0;box-shadow:0 0 0 2px rgba(44,90,160,.1)}.ytomo-input-inline[data-v-393ab085]::placeholder{color:#9ca3af}.ytomo-input-inline.ytomo-input-ticket-id[data-v-393ab085]{width:120px}.ytomo-input-inline.ytomo-input-label[data-v-393ab085]{width:60px}.ytomo-select-inline[data-v-393ab085]{padding:4px 8px;border:1px solid #d1d5db;border-radius:4px;font-size:12px;background:#fff;cursor:pointer;width:50px}.ytomo-select-inline[data-v-393ab085]:focus{outline:none;border-color:#2c5aa0;box-shadow:0 0 0 2px rgba(44,90,160,.1)}.ytomo-button[data-v-393ab085]{padding:8px 16px;border:none;border-radius:6px;font-size:14px;font-weight:500;cursor:pointer;transition:all .2s;display:inline-flex;align-items:center;justify-content:center;white-space:nowrap}.ytomo-button.primary[data-v-393ab085]{background:linear-gradient(135deg, #2c5aa0 0%, #1a365d 100%);color:#fff}.ytomo-button.primary[data-v-393ab085]:hover{background:linear-gradient(135deg, #1a365d 0%, #2c5aa0 100%);transform:translateY(-1px);box-shadow:0 4px 12px rgba(44,90,160,.3)}.ytomo-button.primary[data-v-393ab085]:active{transform:translateY(0)}.ytomo-button.retry-button[data-v-393ab085]{background:linear-gradient(135deg, #f59e0b 0%, #d97706 100%);color:#fff;margin-top:12px}.ytomo-button.retry-button[data-v-393ab085]:hover{background:linear-gradient(135deg, #d97706 0%, #f59e0b 100%)}.ytomo-button[data-v-393ab085]:focus{outline:2px solid #2c5aa0;outline-offset:2px}.ytomo-button[data-v-393ab085]:disabled{opacity:.5;cursor:not-allowed;transform:none !important}.ytomo-empty-state[data-v-393ab085]{text-align:center;padding:40px 20px;color:#6b7280;font-style:italic}.ytomo-empty-state p[data-v-393ab085]{margin:0;font-size:14px}.ytomo-error[data-v-393ab085]{text-align:center;padding:40px 20px;color:#dc2626}.ytomo-error h3[data-v-393ab085]{margin:0 0 8px 0;font-size:16px;color:#dc2626}.ytomo-error p[data-v-393ab085]{margin:0;font-size:14px;color:#6b7280}.ytomo-ticket-tab .ytomo-loading[data-v-393ab085]{height:150px}.ytomo-ticket-item[data-v-393ab085]{animation:slideIn-393ab085 .2s ease-out}@keyframes slideIn-393ab085{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}@media(prefers-reduced-motion: reduce){.ytomo-ticket-item[data-v-393ab085],.ytomo-button[data-v-393ab085],.ytomo-date-button[data-v-393ab085],.ytomo-entrance-date-button[data-v-393ab085],.ytomo-toggle-slider[data-v-393ab085],.ytomo-input-inline[data-v-393ab085]{animation:none;transition:none}}@media(prefers-contrast: high){.ytomo-ticket-item[data-v-393ab085]{border-width:3px}.ytomo-ticket-item.selected[data-v-393ab085]{border-width:4px}.ytomo-button[data-v-393ab085]:focus,.ytomo-input-inline[data-v-393ab085]:focus,.ytomo-date-button[data-v-393ab085]:focus,.ytomo-entrance-date-button[data-v-393ab085]:focus,.ytomo-input-inline[data-v-393ab085]:focus,.ytomo-select-inline[data-v-393ab085]:focus{outline:3px solid #000}}.ytomo-empty-state[data-v-393ab085]{text-align:center;padding:40px 20px;color:#6b7280;font-style:italic}.ytomo-empty-state p[data-v-393ab085]{margin:0;font-size:14px}.ytomo-error[data-v-393ab085]{text-align:center;padding:40px 20px;color:#dc2626}.ytomo-error h3[data-v-393ab085]{margin:0 0 8px 0;font-size:16px;color:#dc2626}.ytomo-error p[data-v-393ab085]{margin:0;font-size:14px;color:#6b7280}.ytomo-ticket-list[data-v-393ab085]::-webkit-scrollbar{width:6px}.ytomo-ticket-list[data-v-393ab085]::-webkit-scrollbar-track{background:#f1f5f9;border-radius:3px}.ytomo-ticket-list[data-v-393ab085]::-webkit-scrollbar-thumb{background:#cbd5e1;border-radius:3px}.ytomo-ticket-list[data-v-393ab085]::-webkit-scrollbar-thumb:hover{background:#94a3b8}.ytomo-ticket-item[data-v-393ab085]{animation:slideIn-393ab085 .2s ease-out}@keyframes slideIn-393ab085{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}`, ""]);
-// Exports
-/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
-
-
-/***/ }),
 
 /***/ 45:
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
@@ -85,6 +63,8 @@ ___CSS_LOADER_EXPORT___.push([module.id, `.ytomo-ticket-tab[data-v-393ab085]{pad
 // 統一状態管理システム
 
 
+// グローバルアクセス用
+window.entranceReservationStateManager = _entrance_reservation_state_manager__WEBPACK_IMPORTED_MODULE_0__/* .entranceReservationStateManager */ .xx;
 // DOM操作ユーティリティ
 
 const logger = _utils_logger__WEBPACK_IMPORTED_MODULE_1__/* .loggers */ .C$.tickets;
@@ -690,6 +670,312 @@ module.exports = styleTagTransform;
 
 /***/ }),
 
+/***/ 223:
+/***/ ((module, __webpack_exports__, __webpack_require__) => {
+
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   A: () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _node_modules_css_loader_dist_runtime_noSourceMaps_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(601);
+/* harmony import */ var _node_modules_css_loader_dist_runtime_noSourceMaps_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_css_loader_dist_runtime_noSourceMaps_js__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(314);
+/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1__);
+// Imports
+
+
+var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1___default()((_node_modules_css_loader_dist_runtime_noSourceMaps_js__WEBPACK_IMPORTED_MODULE_0___default()));
+// Module
+___CSS_LOADER_EXPORT___.push([module.id, `
+/* ダイアログオーバーレイ */
+.ytomo-dialog-overlay[data-v-5829ca31] {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10000;
+    opacity: 0;
+    animation: fadeIn-5829ca31 0.2s ease-out forwards;
+    overflow-y: auto;
+}
+@keyframes fadeIn-5829ca31 {
+to {
+        opacity: 1;
+}
+}
+
+/* メインダイアログコンテナ */
+.ytomo-main-dialog[data-v-5829ca31] {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    width: 90vw;
+    max-width: 95vw;
+    min-width: 320px;
+    height: auto;
+    max-height: none;
+    min-height: 500px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    transform: scale(0.9);
+    animation: dialogAppear-5829ca31 0.2s ease-out forwards;
+}
+
+/* ytomoページでのレスポンシブレイアウト */
+.ytomo-page .ytomo-main-dialog[data-v-5829ca31] {
+    width: 95vw;
+    max-width: none;
+    max-height: none;
+    height: auto;
+}
+@media (max-width: 768px) {
+.ytomo-main-dialog[data-v-5829ca31] {
+        width: 95vw;
+        height: 90vh;
+        min-width: 320px;
+        min-height: 400px;
+}
+}
+@media (min-width: 1200px) {
+.ytomo-page .ytomo-main-dialog[data-v-5829ca31] {
+        width: 90vw;
+}
+}
+@keyframes dialogAppear-5829ca31 {
+to {
+        transform: scale(1);
+}
+}
+
+/* ダイアログボディ */
+.ytomo-dialog-body[data-v-5829ca31] {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    background: #f8fafc;
+}
+
+/* タブナビゲーション */
+.ytomo-tab-navigation[data-v-5829ca31] {
+    display: flex;
+    background: white;
+    border-bottom: 1px solid #e2e8f0;
+    flex-shrink: 0;
+    position: relative;
+}
+.ytomo-tab-button[data-v-5829ca31] {
+    flex: 1;
+    background: none;
+    border: none;
+    padding: 16px 12px;
+    font-size: 14px;
+    font-weight: 500;
+    color: #64748b;
+    cursor: pointer;
+    position: relative;
+    transition: all 0.2s;
+    border-bottom: 3px solid transparent;
+}
+.ytomo-tab-button[data-v-5829ca31]:hover {
+    background-color: #f1f5f9;
+    color: #475569;
+}
+.ytomo-tab-button.active[data-v-5829ca31] {
+    color: #2c5aa0;
+    background-color: #f8fafc;
+    border-bottom-color: #2c5aa0;
+}
+.ytomo-tab-button[data-v-5829ca31]:focus {
+    outline: 2px solid #2c5aa0;
+    outline-offset: -2px;
+}
+.ytomo-tab-content[data-v-5829ca31] {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    align-items: center;
+}
+.ytomo-tab-title[data-v-5829ca31] {
+    font-size: 14px;
+    font-weight: 500;
+}
+.ytomo-tab-dates[data-v-5829ca31] {
+    font-size: 12px;
+    color: #6b7280;
+    line-height: 1.2;
+    min-height: 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+}
+.ytomo-latest-time[data-v-5829ca31] {
+    font-size: 11px;
+    color: #059669;
+    font-weight: 500;
+}
+.ytomo-tab-count[data-v-5829ca31] {
+    display: inline-block;
+    margin-left: 8px;
+    font-size: 12px;
+    color: #475569;
+    font-weight: 500;
+    min-width: 18px;
+    text-align: center;
+    transition: all 0.2s;
+    background: #f8fafc;
+    padding: 2px 6px;
+    border-radius: 10px;
+    border: 1px solid #e2e8f0;
+}
+.ytomo-tab-button.active .ytomo-tab-count[data-v-5829ca31] {
+    color: #2c5aa0;
+    background: #dbeafe;
+    border-color: #93c5fd;
+}
+.ytomo-pavilion-reservation-info[data-v-5829ca31] {
+    font-size: 11px;
+    color: #64748b;
+    font-family: 'Courier New', 'Monaco', 'Menlo', monospace;
+    font-weight: 600;
+    margin-top: 1px;
+}
+.ytomo-tab-button.active .ytomo-pavilion-reservation-info[data-v-5829ca31] {
+    color: #2c5aa0;
+}
+.ytomo-tab-info[data-v-5829ca31] {
+    font-size: 11px;
+    color: #64748b;
+    font-family: 'Courier New', 'Monaco', 'Menlo', monospace;
+    font-weight: 600;
+    margin-top: 1px;
+}
+.ytomo-tab-button.active .ytomo-tab-info[data-v-5829ca31] {
+    color: #2c5aa0;
+}
+.ytomo-dialog-close[data-v-5829ca31] {
+    position: absolute;
+    right: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: black;
+    font-size: 24px;
+    width: 32px;
+    height: 32px;
+    border-radius: 6px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.2s;
+}
+.ytomo-dialog-close[data-v-5829ca31]:hover {
+    background-color: rgba(0, 0, 0, 0.1);
+}
+.ytomo-dialog-close[data-v-5829ca31]:focus {
+    outline: 2px solid rgba(0, 0, 0, 0.5);
+    outline-offset: 2px;
+}
+
+/* タブコンテンツ */
+.ytomo-tab-content[data-v-5829ca31] {
+    flex: 1;
+    position: relative;
+    min-height: 0;
+}
+.ytomo-tab-pane[data-v-5829ca31] {
+    opacity: 0;
+    transform: translateX(20px);
+    transition: all 0.2s ease-out;
+    padding: 20px;
+    display: none;
+    min-height: max-content;
+}
+.ytomo-tab-pane.active[data-v-5829ca31] {
+    opacity: 1;
+    transform: translateX(0);
+    display: block;
+}
+
+/* ローディング表示 */
+.ytomo-loading[data-v-5829ca31] {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 200px;
+    text-align: center;
+}
+.ytomo-loading[data-v-5829ca31]::before {
+    content: "";
+    width: 40px;
+    height: 40px;
+    border: 3px solid #e2e8f0;
+    border-top-color: #2c5aa0;
+    border-radius: 50%;
+    animation: spin-5829ca31 1s linear infinite;
+    margin-bottom: 16px;
+}
+.ytomo-loading p[data-v-5829ca31] {
+    margin: 0;
+    color: #64748b;
+    font-size: 14px;
+}
+@keyframes spin-5829ca31 {
+to {
+        transform: rotate(360deg);
+}
+}
+
+/* アクセシビリティ対応 */
+@media (prefers-reduced-motion: reduce) {
+.ytomo-dialog-overlay[data-v-5829ca31],
+    .ytomo-main-dialog[data-v-5829ca31],
+    .ytomo-tab-pane[data-v-5829ca31],
+    .ytomo-tab-button[data-v-5829ca31],
+    .ytomo-loading[data-v-5829ca31]::before {
+        animation: none;
+        transition: none;
+}
+}
+
+/* ハイコントラストモード対応 */
+@media (prefers-contrast: high) {
+.ytomo-main-dialog[data-v-5829ca31] {
+        border: 2px solid #000;
+}
+.ytomo-tab-button.active[data-v-5829ca31] {
+        border-bottom-width: 4px;
+}
+.ytomo-dialog-close[data-v-5829ca31]:focus,
+    .ytomo-tab-button[data-v-5829ca31]:focus {
+        outline: 3px solid #000;
+}
+}
+
+/* ダークモード対応を無効化（明示的にライトテーマを強制） */
+.ytomo-dialog-overlay[data-v-5829ca31] {
+    color-scheme: light;
+}
+.ytomo-main-dialog[data-v-5829ca31] {
+    color-scheme: light;
+    background: white !important;
+    color: #1f2937 !important;
+}
+`, ""]);
+// Exports
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
+
+
+/***/ }),
+
 /***/ 241:
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
@@ -903,6 +1189,28 @@ exports.A = (sfc, props) => {
 
 /***/ }),
 
+/***/ 269:
+/***/ ((module, __webpack_exports__, __webpack_require__) => {
+
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   A: () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _node_modules_css_loader_dist_runtime_noSourceMaps_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(601);
+/* harmony import */ var _node_modules_css_loader_dist_runtime_noSourceMaps_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_css_loader_dist_runtime_noSourceMaps_js__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(314);
+/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1__);
+// Imports
+
+
+var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1___default()((_node_modules_css_loader_dist_runtime_noSourceMaps_js__WEBPACK_IMPORTED_MODULE_0___default()));
+// Module
+___CSS_LOADER_EXPORT___.push([module.id, `.ytomo-sequential-overlay[data-v-5522ceeb]{position:fixed;top:0;left:0;width:100%;height:100%;background-color:rgba(0,0,0,.8);display:flex;align-items:center;justify-content:center;z-index:10002;opacity:0;animation:fadeIn-5522ceeb .2s ease-out forwards}.ytomo-sequential-content[data-v-5522ceeb]{background:#fff;border-radius:12px;padding:32px;box-shadow:0 20px 60px rgba(0,0,0,.3);text-align:center;min-width:400px;max-width:500px;transform:scale(0.9);animation:dialogAppear-5522ceeb .2s ease-out forwards}.ytomo-sequential-content .ytomo-header-with-spinner[data-v-5522ceeb]{display:flex;align-items:center;justify-content:center;gap:12px;margin-bottom:24px}.ytomo-sequential-content .ytomo-loading-spinner[data-v-5522ceeb]{width:20px;height:20px;border:2px solid #f3f4f6;border-top:2px solid #2c5aa0;border-radius:50%;animation:spin-5522ceeb 1s linear infinite !important;will-change:transform}.ytomo-sequential-content h3[data-v-5522ceeb]{margin:0 0 12px 0;color:#374151;font-size:20px;font-weight:600}.ytomo-sequential-content h3 .status-text[data-v-5522ceeb]{display:inline-block;font-size:16px;color:#6b7280;font-weight:400;margin-left:8px}.ytomo-sequential-content .ytomo-progress-bar[data-v-5522ceeb]{width:100%;height:8px;background-color:#e5e7eb;border-radius:4px;overflow:hidden;margin-bottom:4px}.ytomo-sequential-content .ytomo-progress-bar .ytomo-progress-fill[data-v-5522ceeb]{height:100%;background:linear-gradient(90deg, #3b82f6, #1d4ed8);border-radius:4px;transition:width .3s ease}.ytomo-sequential-settings-row[data-v-5522ceeb]{display:flex;align-items:center;justify-content:center;gap:16px;margin-bottom:24px}.ytomo-sequential-settings-row .ytomo-mode-buttons[data-v-5522ceeb]{display:flex;gap:8px}.ytomo-sequential-settings-row .ytomo-mode-button[data-v-5522ceeb]{padding:8px 16px;border:1px solid #d1d5db;border-radius:6px;background:#fff;color:#374151;cursor:pointer;transition:all .2s;font-size:14px}.ytomo-sequential-settings-row .ytomo-mode-button[data-v-5522ceeb]:hover{background:#f3f4f6;border-color:#9ca3af}.ytomo-sequential-settings-row .ytomo-mode-button.active[data-v-5522ceeb]{background:#2c5aa0;border-color:#2c5aa0;color:#fff}.ytomo-sequential-settings-row .ytomo-mode-button[data-v-5522ceeb]:focus{outline:none}.ytomo-sequential-settings-row .ytomo-interval-dropdown[data-v-5522ceeb]{padding:8px 12px;border:1px solid #d1d5db;border-radius:6px;background:#fff;font-size:14px;min-width:120px}.ytomo-sequential-settings-row .ytomo-interval-dropdown[data-v-5522ceeb]:focus{outline:none;border-color:#2c5aa0}.ytomo-sequential-progress[data-v-5522ceeb]{margin-bottom:24px;display:flex;align-items:center;justify-content:space-between;gap:16px}.ytomo-sequential-progress .ytomo-sequential-target[data-v-5522ceeb]{flex:1;font-size:14px;color:#374151}.ytomo-sequential-progress .ytomo-sequential-target .current-target[data-v-5522ceeb]{text-align:left}.ytomo-sequential-progress .ytomo-sequential-target .current-target .pavilion-name[data-v-5522ceeb]{font-weight:600;font-size:16px;margin-bottom:8px}.ytomo-sequential-progress .ytomo-sequential-target .current-target .time-slot-button[data-v-5522ceeb]{display:inline-block;padding:4px 8px;background:#2c5aa0;color:#fff;border-radius:4px;font-size:12px;font-weight:500;border:1px solid #2c5aa0}.ytomo-sequential-progress .ytomo-sequential-target .current-target .time-slot-button.time-slot-small[data-v-5522ceeb]{font-size:10px;padding:2px 6px}.ytomo-sequential-progress .ytomo-sequential-status[data-v-5522ceeb]{flex-shrink:0;text-align:right}.ytomo-sequential-progress .ytomo-sequential-status .ytomo-sequential-current[data-v-5522ceeb]{font-size:18px;font-weight:600;color:#2c5aa0}@keyframes fadeIn-5522ceeb{to{opacity:1}}@keyframes dialogAppear-5522ceeb{to{transform:scale(1)}}@keyframes spin-5522ceeb{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}@media(prefers-reduced-motion: reduce){.ytomo-sequential-overlay[data-v-5522ceeb],.ytomo-sequential-content[data-v-5522ceeb]{animation:none;transition:none}.ytomo-loading-spinner[data-v-5522ceeb]{animation:spin-5522ceeb 1s linear infinite !important}}`, ""]);
+// Exports
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
+
+
+/***/ }),
+
 /***/ 314:
 /***/ ((module) => {
 
@@ -1071,13 +1379,23 @@ class PageChecker {
         const pathname = window.location.pathname.toLowerCase();
         return pathname === '/ytomo' || pathname === '/ytomo/';
     }
+    /**
+     * 待機室ページかどうかをチェック
+     */
+    static isWaitingRoomPage() {
+        return window.location.hostname === 'tktwaitingroom.expo2025.or.jp';
+    }
 }
 // URL判定とページタイプ識別
 const identify_page_type = (url) => {
     try {
         const urlObj = new URL(url);
         const pathname = urlObj.pathname;
-        if (pathname === '/ticket_visiting_reservation/') {
+        const hostname = urlObj.hostname;
+        if (hostname === 'tktwaitingroom.expo2025.or.jp') {
+            return "waiting_room";
+        }
+        else if (pathname === '/ticket_visiting_reservation/') {
             return "entrance_reservation";
         }
         else if (pathname === '/event_search/') {
@@ -1765,294 +2083,6 @@ const processingOverlay = new ProcessingOverlay();
 
 /***/ }),
 
-/***/ 410:
-/***/ ((module, __webpack_exports__, __webpack_require__) => {
-
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   A: () => (__WEBPACK_DEFAULT_EXPORT__)
-/* harmony export */ });
-/* harmony import */ var _node_modules_css_loader_dist_runtime_noSourceMaps_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(601);
-/* harmony import */ var _node_modules_css_loader_dist_runtime_noSourceMaps_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_css_loader_dist_runtime_noSourceMaps_js__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(314);
-/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1__);
-// Imports
-
-
-var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1___default()((_node_modules_css_loader_dist_runtime_noSourceMaps_js__WEBPACK_IMPORTED_MODULE_0___default()));
-// Module
-___CSS_LOADER_EXPORT___.push([module.id, `
-/* ダイアログオーバーレイ */
-.ytomo-dialog-overlay[data-v-50a82e78] {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.6);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 10000;
-    opacity: 0;
-    animation: fadeIn-50a82e78 0.2s ease-out forwards;
-    overflow-y: auto;
-}
-@keyframes fadeIn-50a82e78 {
-to {
-        opacity: 1;
-}
-}
-
-/* メインダイアログコンテナ */
-.ytomo-main-dialog[data-v-50a82e78] {
-    background: white;
-    border-radius: 12px;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-    width: 90vw;
-    max-width: 800px;
-    min-width: 600px;
-    height: 80vh;
-    max-height: 700px;
-    min-height: 500px;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-    transform: scale(0.9);
-    animation: dialogAppear-50a82e78 0.2s ease-out forwards;
-}
-@media (max-width: 768px) {
-.ytomo-main-dialog[data-v-50a82e78] {
-        width: 95vw;
-        height: 90vh;
-        min-width: 320px;
-        min-height: 400px;
-}
-}
-@keyframes dialogAppear-50a82e78 {
-to {
-        transform: scale(1);
-}
-}
-
-/* ダイアログボディ */
-.ytomo-dialog-body[data-v-50a82e78] {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-    background: #f8fafc;
-}
-
-/* タブナビゲーション */
-.ytomo-tab-navigation[data-v-50a82e78] {
-    display: flex;
-    background: white;
-    border-bottom: 1px solid #e2e8f0;
-    flex-shrink: 0;
-    position: relative;
-}
-.ytomo-tab-button[data-v-50a82e78] {
-    flex: 1;
-    background: none;
-    border: none;
-    padding: 16px 12px;
-    font-size: 14px;
-    font-weight: 500;
-    color: #64748b;
-    cursor: pointer;
-    position: relative;
-    transition: all 0.2s;
-    border-bottom: 3px solid transparent;
-}
-.ytomo-tab-button[data-v-50a82e78]:hover {
-    background-color: #f1f5f9;
-    color: #475569;
-}
-.ytomo-tab-button.active[data-v-50a82e78] {
-    color: #2c5aa0;
-    background-color: #f8fafc;
-    border-bottom-color: #2c5aa0;
-}
-.ytomo-tab-button[data-v-50a82e78]:focus {
-    outline: 2px solid #2c5aa0;
-    outline-offset: -2px;
-}
-.ytomo-tab-content[data-v-50a82e78] {
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-    align-items: center;
-}
-.ytomo-tab-title[data-v-50a82e78] {
-    font-size: 14px;
-    font-weight: 500;
-}
-.ytomo-tab-dates[data-v-50a82e78] {
-    font-size: 12px;
-    color: #6b7280;
-    line-height: 1.2;
-    min-height: 14px;
-    display: flex;
-    flex-direction: column;
-    gap: 1px;
-}
-.ytomo-latest-time[data-v-50a82e78] {
-    font-size: 11px;
-    color: #059669;
-    font-weight: 500;
-}
-.ytomo-tab-count[data-v-50a82e78] {
-    display: inline-block;
-    margin-left: 8px;
-    font-size: 12px;
-    color: #475569;
-    font-weight: 500;
-    min-width: 18px;
-    text-align: center;
-    transition: all 0.2s;
-    background: #f8fafc;
-    padding: 2px 6px;
-    border-radius: 10px;
-    border: 1px solid #e2e8f0;
-}
-.ytomo-tab-button.active .ytomo-tab-count[data-v-50a82e78] {
-    color: #2c5aa0;
-    background: #dbeafe;
-    border-color: #93c5fd;
-}
-.ytomo-pavilion-reservation-info[data-v-50a82e78] {
-    font-size: 11px;
-    color: #64748b;
-    font-family: 'Courier New', 'Monaco', 'Menlo', monospace;
-    font-weight: 600;
-    margin-top: 1px;
-}
-.ytomo-tab-button.active .ytomo-pavilion-reservation-info[data-v-50a82e78] {
-    color: #2c5aa0;
-}
-.ytomo-dialog-close[data-v-50a82e78] {
-    position: absolute;
-    right: 16px;
-    top: 50%;
-    transform: translateY(-50%);
-    background: none;
-    border: none;
-    color: black;
-    font-size: 24px;
-    width: 32px;
-    height: 32px;
-    border-radius: 6px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: background-color 0.2s;
-}
-.ytomo-dialog-close[data-v-50a82e78]:hover {
-    background-color: rgba(0, 0, 0, 0.1);
-}
-.ytomo-dialog-close[data-v-50a82e78]:focus {
-    outline: 2px solid rgba(0, 0, 0, 0.5);
-    outline-offset: 2px;
-}
-
-/* タブコンテンツ */
-.ytomo-tab-content[data-v-50a82e78] {
-    flex: 1;
-    overflow: hidden;
-    position: relative;
-}
-.ytomo-tab-pane[data-v-50a82e78] {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    opacity: 0;
-    transform: translateX(20px);
-    transition: all 0.2s ease-out;
-    overflow-y: auto;
-    padding: 20px;
-    display: none;
-}
-.ytomo-tab-pane.active[data-v-50a82e78] {
-    opacity: 1;
-    transform: translateX(0);
-    display: block;
-}
-
-/* ローディング表示 */
-.ytomo-loading[data-v-50a82e78] {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    height: 200px;
-    text-align: center;
-}
-.ytomo-loading[data-v-50a82e78]::before {
-    content: "";
-    width: 40px;
-    height: 40px;
-    border: 3px solid #e2e8f0;
-    border-top-color: #2c5aa0;
-    border-radius: 50%;
-    animation: spin-50a82e78 1s linear infinite;
-    margin-bottom: 16px;
-}
-.ytomo-loading p[data-v-50a82e78] {
-    margin: 0;
-    color: #64748b;
-    font-size: 14px;
-}
-@keyframes spin-50a82e78 {
-to {
-        transform: rotate(360deg);
-}
-}
-
-/* アクセシビリティ対応 */
-@media (prefers-reduced-motion: reduce) {
-.ytomo-dialog-overlay[data-v-50a82e78],
-    .ytomo-main-dialog[data-v-50a82e78],
-    .ytomo-tab-pane[data-v-50a82e78],
-    .ytomo-tab-button[data-v-50a82e78],
-    .ytomo-loading[data-v-50a82e78]::before {
-        animation: none;
-        transition: none;
-}
-}
-
-/* ハイコントラストモード対応 */
-@media (prefers-contrast: high) {
-.ytomo-main-dialog[data-v-50a82e78] {
-        border: 2px solid #000;
-}
-.ytomo-tab-button.active[data-v-50a82e78] {
-        border-bottom-width: 4px;
-}
-.ytomo-dialog-close[data-v-50a82e78]:focus,
-    .ytomo-tab-button[data-v-50a82e78]:focus {
-        outline: 3px solid #000;
-}
-}
-
-/* ダークモード対応を無効化（明示的にライトテーマを強制） */
-.ytomo-dialog-overlay[data-v-50a82e78] {
-    color-scheme: light;
-}
-.ytomo-main-dialog[data-v-50a82e78] {
-    color-scheme: light;
-    background: white !important;
-    color: #1f2937 !important;
-}
-`, ""]);
-// Exports
-/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
-
-
-/***/ }),
-
 /***/ 540:
 /***/ ((module) => {
 
@@ -2066,28 +2096,6 @@ function insertStyleElement(options) {
   return element;
 }
 module.exports = insertStyleElement;
-
-/***/ }),
-
-/***/ 559:
-/***/ ((module, __webpack_exports__, __webpack_require__) => {
-
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   A: () => (__WEBPACK_DEFAULT_EXPORT__)
-/* harmony export */ });
-/* harmony import */ var _node_modules_css_loader_dist_runtime_noSourceMaps_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(601);
-/* harmony import */ var _node_modules_css_loader_dist_runtime_noSourceMaps_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_css_loader_dist_runtime_noSourceMaps_js__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(314);
-/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1__);
-// Imports
-
-
-var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1___default()((_node_modules_css_loader_dist_runtime_noSourceMaps_js__WEBPACK_IMPORTED_MODULE_0___default()));
-// Module
-___CSS_LOADER_EXPORT___.push([module.id, `.ytomo-sequential-overlay[data-v-87268ea4]{position:fixed;top:0;left:0;width:100%;height:100%;background-color:rgba(0,0,0,.8);display:flex;align-items:center;justify-content:center;z-index:10002;opacity:0;animation:fadeIn-87268ea4 .2s ease-out forwards}.ytomo-sequential-content[data-v-87268ea4]{background:#fff;border-radius:12px;padding:32px;box-shadow:0 20px 60px rgba(0,0,0,.3);text-align:center;min-width:400px;max-width:500px;transform:scale(0.9);animation:dialogAppear-87268ea4 .2s ease-out forwards}.ytomo-sequential-content h3[data-v-87268ea4]{margin:0 0 24px 0;color:#374151;font-size:20px;font-weight:600}.ytomo-sequential-content h3 .countdown-seconds[data-v-87268ea4]{display:inline-block;width:40px;font-size:18px;color:#ef4444;font-weight:500;margin-left:8px;text-align:right;font-family:monospace}.ytomo-sequential-settings-row[data-v-87268ea4]{display:flex;align-items:center;justify-content:center;gap:16px;margin-bottom:24px}.ytomo-sequential-settings-row .ytomo-mode-buttons[data-v-87268ea4]{display:flex;gap:8px}.ytomo-sequential-settings-row .ytomo-mode-button[data-v-87268ea4]{padding:8px 16px;border:1px solid #d1d5db;border-radius:6px;background:#fff;color:#374151;cursor:pointer;transition:all .2s;font-size:14px}.ytomo-sequential-settings-row .ytomo-mode-button[data-v-87268ea4]:hover{background:#f3f4f6;border-color:#9ca3af}.ytomo-sequential-settings-row .ytomo-mode-button.active[data-v-87268ea4]{background:#2c5aa0;border-color:#2c5aa0;color:#fff}.ytomo-sequential-settings-row .ytomo-mode-button[data-v-87268ea4]:focus{outline:none}.ytomo-sequential-settings-row .ytomo-interval-dropdown[data-v-87268ea4]{padding:8px 12px;border:1px solid #d1d5db;border-radius:6px;background:#fff;font-size:14px;min-width:120px}.ytomo-sequential-settings-row .ytomo-interval-dropdown[data-v-87268ea4]:focus{outline:none;border-color:#2c5aa0}.ytomo-sequential-progress[data-v-87268ea4]{margin-bottom:24px;display:flex;align-items:center;justify-content:space-between;gap:16px}.ytomo-sequential-progress .ytomo-sequential-target[data-v-87268ea4]{flex:1;font-size:14px;color:#374151}.ytomo-sequential-progress .ytomo-sequential-target .current-target[data-v-87268ea4]{text-align:left}.ytomo-sequential-progress .ytomo-sequential-target .current-target .pavilion-name[data-v-87268ea4]{font-weight:600;font-size:16px;margin-bottom:8px}.ytomo-sequential-progress .ytomo-sequential-target .current-target .time-slot-button[data-v-87268ea4]{display:inline-block;padding:4px 8px;background:#2c5aa0;color:#fff;border-radius:4px;font-size:12px;font-weight:500;border:1px solid #2c5aa0}.ytomo-sequential-progress .ytomo-sequential-status[data-v-87268ea4]{flex-shrink:0;text-align:right}.ytomo-sequential-progress .ytomo-sequential-status .ytomo-sequential-current[data-v-87268ea4]{font-size:18px;font-weight:600;color:#2c5aa0}@keyframes fadeIn-87268ea4{to{opacity:1}}@keyframes dialogAppear-87268ea4{to{transform:scale(1)}}@media(prefers-reduced-motion: reduce){.ytomo-sequential-overlay[data-v-87268ea4],.ytomo-sequential-content[data-v-87268ea4]{animation:none;transition:none}}`, ""]);
-// Exports
-/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
-
 
 /***/ }),
 
@@ -3552,9 +3560,10 @@ class EntranceReservationStateManager {
             attempts: 0 // 予約試行回数（サイクルカウンタ）
         };
         // ==================== 効率モード管理 ====================
-        /** 効率モード設定管理（毎分00秒/30秒のsubmitタイミング制御） */
+        /** 効率モード設定管理（目標秒タイミング制御） */
         this.efficiencyMode = {
             enabled: true, // 常時有効に設定（v1.0.0ではデフォルト有効）
+            targetSecond: 35, // デフォルト目標秒（35秒）
             nextSubmitTarget: null, // 次のsubmit目標時刻
             updateTimer: null // FABボタン更新タイマー
         };
@@ -4318,34 +4327,31 @@ class EntranceReservationStateManager {
     setNextSubmitTarget(target) {
         this.efficiencyMode.nextSubmitTarget = target;
     }
-    // 次の00秒/30秒を計算（15秒未満の場合は次の目標時刻を選択）
+    // 次の目標時刻を計算（デフォルト35秒）
     calculateNext00or30Seconds() {
         const now = new Date();
         const currentSeconds = now.getSeconds();
         const nextTarget = new Date(now);
-        let targetSeconds;
+        // デフォルトの目標秒を使用（35秒）
+        const targetSecond = this.efficiencyMode.targetSecond || 35;
         let targetMinutes = nextTarget.getMinutes();
         // 0-2秒で0秒側に比重のあるランダム時間を生成（二次分布）
         const randomBuffer = Math.pow(Math.random(), 2) * 2; // 0～2秒、0側に比重
-        if (currentSeconds < 30) {
-            // 今の分の30秒 + ランダムバッファを候補とする
-            targetSeconds = 30 + randomBuffer;
-        }
-        else {
-            // 次の分の00秒 + ランダムバッファを候補とする
+        const targetSeconds = targetSecond + randomBuffer;
+        // 現在の秒が目標秒を過ぎている場合は次の分にする
+        if (currentSeconds >= targetSecond) {
             targetMinutes += 1;
-            targetSeconds = randomBuffer;
         }
-        // 候補時刻までの猶予を計算
+        // 目標時刻を設定
         const candidateTarget = new Date(now);
         candidateTarget.setMinutes(targetMinutes);
         candidateTarget.setSeconds(Math.floor(targetSeconds));
         candidateTarget.setMilliseconds((targetSeconds % 1) * 1000); // 小数部をミリ秒に
         const remainingMs = candidateTarget.getTime() - now.getTime();
-        // 15秒未満の場合は30秒後に変更
+        // 15秒未満の場合は次の分に変更
         if (remainingMs < 15000) { // 15秒 = 15000ms
-            candidateTarget.setSeconds(candidateTarget.getSeconds() + 30);
-            this.log('効率モード: 猶予時間が短いため30秒後に変更', 'debug', { remainingSeconds: Math.floor(remainingMs / 1000) });
+            candidateTarget.setMinutes(candidateTarget.getMinutes() + 1);
+            this.log('効率モード: 猶予時間が短いため次の分に変更', 'debug', { remainingSeconds: Math.floor(remainingMs / 1000) });
         }
         return candidateTarget;
     }
@@ -4403,11 +4409,31 @@ class EntranceReservationStateManager {
             entrance_reservation_state_manager_logger.info('効率モードFAB更新タイマー停止');
         }
     }
+    // 目標秒を設定
+    setTargetSecond(second) {
+        if (second >= 0 && second <= 59) {
+            this.efficiencyMode.targetSecond = second;
+            this.saveEfficiencyModeSettings();
+            // 次回の目標時刻を再計算
+            if (this.efficiencyMode.enabled) {
+                this.efficiencyMode.nextSubmitTarget = this.calculateNext00or30Seconds();
+                this.log('目標秒を更新', 'info', { targetSecond: second });
+            }
+        }
+        else {
+            entrance_reservation_state_manager_logger.warn('無効な目標秒', { second });
+        }
+    }
+    // 現在の目標秒を取得
+    getTargetSecond() {
+        return this.efficiencyMode.targetSecond;
+    }
     // 効率モード設定保存
     saveEfficiencyModeSettings() {
         try {
             localStorage.setItem('ytomo-efficiency-mode', JSON.stringify({
-                enabled: this.efficiencyMode.enabled
+                enabled: this.efficiencyMode.enabled,
+                targetSecond: this.efficiencyMode.targetSecond
             }));
         }
         catch (error) {
@@ -4422,6 +4448,7 @@ class EntranceReservationStateManager {
                 const settings = JSON.parse(saved);
                 if (settings.enabled) {
                     this.efficiencyMode.enabled = true;
+                    this.efficiencyMode.targetSecond = settings.targetSecond || 35; // デフォルト35秒
                     this.efficiencyMode.nextSubmitTarget = this.calculateNext00or30Seconds();
                 }
             }
@@ -4575,7 +4602,7 @@ module.exports = insertBySelector;
 
 /***/ }),
 
-/***/ 695:
+/***/ 665:
 /***/ ((module, __webpack_exports__, __webpack_require__) => {
 
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
@@ -4590,7 +4617,7 @@ module.exports = insertBySelector;
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1___default()((_node_modules_css_loader_dist_runtime_noSourceMaps_js__WEBPACK_IMPORTED_MODULE_0___default()));
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, `.ytomo-entrance-tab[data-v-7d814b81]{height:100%;display:flex;flex-direction:column;padding:12px;overflow:hidden}.ytomo-entrance-layout[data-v-7d814b81]{display:flex;gap:16px;height:100%;overflow:hidden}@media(max-width: 520px){.ytomo-entrance-layout[data-v-7d814b81]{flex-direction:column;gap:12px}}.ytomo-entrance-calendar[data-v-7d814b81]{flex:0 0 220px;height:300px;border:1px solid #e5e7eb;border-radius:8px;display:flex;flex-direction:column;overflow:hidden}.ytomo-entrance-calendar .ytomo-calendar-header[data-v-7d814b81]{display:flex;align-items:center;justify-content:space-between;padding:6px 8px;background:#f9fafb;border-radius:8px 8px 0 0;border-bottom:1px solid #e5e7eb}.ytomo-entrance-calendar .ytomo-calendar-header .ytomo-calendar-title[data-v-7d814b81]{flex:1;display:flex;align-items:center;gap:6px;cursor:pointer}.ytomo-entrance-calendar .ytomo-calendar-header .ytomo-calendar-title[data-v-7d814b81]:hover{background:#f3f4f6;border-radius:3px;padding:3px;margin:-3px}.ytomo-entrance-calendar .ytomo-calendar-header .ytomo-calendar-title h3[data-v-7d814b81]{margin:0;font-size:11px;font-weight:600;color:#374151}.ytomo-entrance-calendar .ytomo-calendar-header .ytomo-calendar-title .ytomo-selected-date[data-v-7d814b81]{font-size:14px;color:#059669;font-weight:700;background:#ecfdf5;padding:2px 6px;border-radius:4px;border:1px solid #a7f3d0}.ytomo-entrance-calendar .ytomo-calendar-header .ytomo-header-buttons[data-v-7d814b81]{display:flex;align-items:center;gap:4px}.ytomo-entrance-calendar .ytomo-calendar-header .ytomo-header-buttons .ytomo-refresh-button[data-v-7d814b81]{background:none;border:1px solid #d1d5db;border-radius:3px;width:20px;height:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#6b7280}.ytomo-entrance-calendar .ytomo-calendar-header .ytomo-header-buttons .ytomo-refresh-button[data-v-7d814b81]:hover{background:#f3f4f6;border-color:#9ca3af}.ytomo-entrance-calendar .ytomo-calendar-header .ytomo-header-buttons .ytomo-calendar-toggle[data-v-7d814b81]{font-size:11px;color:#6b7280;cursor:pointer;padding:3px 6px;border-radius:3px}.ytomo-entrance-calendar .ytomo-calendar-header .ytomo-header-buttons .ytomo-calendar-toggle[data-v-7d814b81]:hover{background:#f3f4f6}.ytomo-entrance-calendar .ytomo-calendar-body[data-v-7d814b81]{flex:1;padding:8px;overflow:auto}.ytomo-entrance-calendar .ytomo-calendar-controls[data-v-7d814b81]{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}.ytomo-entrance-calendar .ytomo-calendar-controls .ytomo-month-button[data-v-7d814b81]{background:none;border:1px solid #d1d5db;border-radius:3px;width:22px;height:22px;cursor:pointer;font-size:12px;display:flex;align-items:center;justify-content:center}.ytomo-entrance-calendar .ytomo-calendar-controls .ytomo-month-button[data-v-7d814b81]:hover{background:#f3f4f6}.ytomo-entrance-calendar .ytomo-calendar-controls .ytomo-current-month[data-v-7d814b81]{font-weight:600;color:#374151}.ytomo-entrance-calendar .ytomo-calendar-grid .ytomo-calendar-weekdays[data-v-7d814b81]{display:grid;grid-template-columns:repeat(7, 1fr);gap:1px;margin-bottom:4px}.ytomo-entrance-calendar .ytomo-calendar-grid .ytomo-calendar-weekdays .ytomo-weekday[data-v-7d814b81]{text-align:center;font-size:12px;font-weight:600;color:#6b7280;padding:4px}.ytomo-entrance-calendar .ytomo-calendar-grid .ytomo-calendar-days[data-v-7d814b81]{display:grid;grid-template-columns:repeat(7, 1fr);gap:1px}.ytomo-entrance-calendar .ytomo-calendar-grid .ytomo-calendar-days .ytomo-calendar-day[data-v-7d814b81]{aspect-ratio:1;display:flex;align-items:center;justify-content:center;font-size:11px;cursor:pointer;border-radius:3px;transition:all .2s;min-height:24px}.ytomo-entrance-calendar .ytomo-calendar-grid .ytomo-calendar-days .ytomo-calendar-day[data-v-7d814b81]:hover:not(.disabled):not(.other-month){background:#f3f4f6}.ytomo-entrance-calendar .ytomo-calendar-grid .ytomo-calendar-days .ytomo-calendar-day.selected[data-v-7d814b81]{background:#2c5aa0;color:#fff}.ytomo-entrance-calendar .ytomo-calendar-grid .ytomo-calendar-days .ytomo-calendar-day.today[data-v-7d814b81]{background:#dbeafe;color:#1e40af;font-weight:600}.ytomo-entrance-calendar .ytomo-calendar-grid .ytomo-calendar-days .ytomo-calendar-day.other-month[data-v-7d814b81]{color:#d1d5db;cursor:default}.ytomo-entrance-calendar .ytomo-calendar-grid .ytomo-calendar-days .ytomo-calendar-day.disabled[data-v-7d814b81]{color:#d1d5db;cursor:not-allowed}.ytomo-entrance-reservations[data-v-7d814b81]{flex:1;min-width:0;overflow:hidden;display:flex;flex-direction:column}.ytomo-entrance-reservations .ytomo-reservation-table-container[data-v-7d814b81]{flex:1;min-height:0}.ytomo-entrance-reservations .ytomo-reservation-table-container .ytomo-no-date-selected[data-v-7d814b81]{display:flex;align-items:center;justify-content:center;height:150px;color:#9ca3af;font-size:12px}.ytomo-entrance-reservations .ytomo-reservation-actions[data-v-7d814b81]{display:flex;flex-direction:column;gap:8px;margin-top:8px;padding-top:8px;border-top:1px solid #e5e7eb}.ytomo-entrance-reservations .ytomo-reservation-actions .ytomo-datetime-change[data-v-7d814b81]{font-size:11px;color:#374151;background:#f9fafb;padding:6px 8px;border-radius:4px;border:1px solid #e5e7eb;text-align:center}.ytomo-entrance-reservations .ytomo-reservation-actions button[data-v-7d814b81]{flex:1;padding:8px 12px;border:none;border-radius:4px;font-size:12px;font-weight:500;cursor:pointer;transition:all .2s}.ytomo-entrance-reservations .ytomo-reservation-actions button.ytomo-reserve-button[data-v-7d814b81]{flex:1;background:#2c5aa0;color:#fff;padding:8px 12px;border:none;border-radius:4px;font-size:12px;font-weight:500;cursor:pointer;transition:all .2s}.ytomo-entrance-reservations .ytomo-reservation-actions button.ytomo-reserve-button[data-v-7d814b81]:hover:not(.disabled){background:#1e3d72}.ytomo-entrance-reservations .ytomo-reservation-actions button.ytomo-reserve-button.disabled[data-v-7d814b81]{background:#9ca3af;color:#d1d5db;cursor:not-allowed}.ytomo-entrance-reservations .ytomo-reservation-actions button.ytomo-reserve-button.disabled[data-v-7d814b81]:hover{background:#9ca3af}.ytomo-entrance-reservations .ytomo-reservation-actions button.ytomo-clear-button[data-v-7d814b81]{background:#f3f4f6;color:#374151;border:1px solid #d1d5db}.ytomo-entrance-reservations .ytomo-reservation-actions button.ytomo-clear-button[data-v-7d814b81]:hover{background:#e5e7eb}.ytomo-entrance-table[data-v-7d814b81]{width:100%;max-width:200px;border-collapse:collapse}.ytomo-entrance-table th[data-v-7d814b81]{background:#f9fafb;border:1px solid #e5e7eb;padding:6px 8px;text-align:center;font-weight:600;font-size:12px;color:#374151;width:50%}.ytomo-entrance-table td[data-v-7d814b81]{border:1px solid #e5e7eb;padding:2px;vertical-align:middle;width:50%}.ytomo-entrance-table .ytomo-time-button[data-v-7d814b81]{width:100%;background:#fff;border:1px solid #d1d5db;border-radius:4px;padding:6px 8px;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center}.ytomo-entrance-table .ytomo-time-button[data-v-7d814b81]:hover{border-color:#9ca3af}.ytomo-entrance-table .ytomo-time-button.status-disabled[data-v-7d814b81]{background:#f3f4f6;color:#9ca3af;cursor:not-allowed;opacity:.6}.ytomo-entrance-table .ytomo-time-button.status-disabled[data-v-7d814b81]:hover{border-color:#d1d5db;background:#f3f4f6}.ytomo-entrance-table .ytomo-time-button.selected[data-v-7d814b81]{border-width:2px;border-color:#2c5aa0;border-style:solid}.ytomo-entrance-table .ytomo-time-button .ytomo-status-icon[data-v-7d814b81]{margin-right:6px;font-size:12px;font-weight:700;min-width:14px;display:inline-block;text-align:center}.ytomo-entrance-table .ytomo-time-button .ytomo-status-icon.status-low[data-v-7d814b81]{color:#3b82f6}.ytomo-entrance-table .ytomo-time-button .ytomo-status-icon.status-high[data-v-7d814b81]{color:#f97316}.ytomo-entrance-table .ytomo-time-button .ytomo-status-icon.status-full[data-v-7d814b81]{color:#dc2626}.ytomo-entrance-table .ytomo-time-button .ytomo-status-icon.status-disabled[data-v-7d814b81]{color:#9ca3af}.ytomo-entrance-table .ytomo-time-button .ytomo-check-mark[data-v-7d814b81]{font-size:10px;margin-left:4px;color:#059669;font-weight:700}.ytomo-entrance-table .ytomo-time-button .ytomo-time-text[data-v-7d814b81]{font-size:11px;font-weight:500}@media(max-width: 520px){.ytomo-entrance-calendar[data-v-7d814b81]{flex:1 1 auto;height:250px}.ytomo-entrance-calendar .ytomo-calendar-header[data-v-7d814b81]{padding:8px 12px}.ytomo-entrance-calendar .ytomo-calendar-header .ytomo-calendar-title h3[data-v-7d814b81]{font-size:12px}.ytomo-entrance-calendar .ytomo-calendar-header .ytomo-selected-date[data-v-7d814b81]{font-size:11px}.ytomo-entrance-calendar .ytomo-calendar-body[data-v-7d814b81]{padding:12px}.ytomo-entrance-calendar .ytomo-calendar-grid .ytomo-calendar-days .ytomo-calendar-day[data-v-7d814b81]{font-size:10px;min-height:20px}.ytomo-entrance-reservations[data-v-7d814b81]{flex:1 1 auto;min-height:200px}.ytomo-entrance-table[data-v-7d814b81]{max-width:100%}.ytomo-entrance-table th[data-v-7d814b81],.ytomo-entrance-table td[data-v-7d814b81]{padding:4px 6px}.ytomo-entrance-table th[data-v-7d814b81]{font-size:11px}.ytomo-entrance-table .ytomo-time-button[data-v-7d814b81]{padding:4px 6px}.ytomo-entrance-table .ytomo-time-button .ytomo-time-text[data-v-7d814b81]{font-size:10px}.ytomo-reservation-actions button[data-v-7d814b81]{padding:6px 8px;font-size:11px}}@media(max-width: 400px){.ytomo-entrance-tab[data-v-7d814b81]{padding:8px}.ytomo-entrance-layout[data-v-7d814b81]{gap:8px}.ytomo-entrance-calendar[data-v-7d814b81]{height:200px}.ytomo-entrance-calendar .ytomo-calendar-header[data-v-7d814b81]{padding:6px 8px}.ytomo-entrance-calendar .ytomo-calendar-header .ytomo-calendar-title h3[data-v-7d814b81]{font-size:11px}.ytomo-entrance-calendar .ytomo-calendar-header .ytomo-selected-date[data-v-7d814b81]{font-size:10px}.ytomo-entrance-calendar .ytomo-calendar-body[data-v-7d814b81]{padding:8px}.ytomo-entrance-calendar .ytomo-calendar-grid .ytomo-calendar-days .ytomo-calendar-day[data-v-7d814b81]{font-size:9px;min-height:18px}.ytomo-entrance-table th[data-v-7d814b81],.ytomo-entrance-table td[data-v-7d814b81]{padding:3px 4px}.ytomo-entrance-table th[data-v-7d814b81]{font-size:10px}.ytomo-entrance-table .ytomo-time-button[data-v-7d814b81]{padding:3px 4px}.ytomo-entrance-table .ytomo-time-button .ytomo-time-text[data-v-7d814b81]{font-size:9px}.ytomo-reservation-actions[data-v-7d814b81]{flex-direction:column;gap:6px}.ytomo-reservation-actions button[data-v-7d814b81]{padding:8px 12px;font-size:12px}}`, ""]);
+___CSS_LOADER_EXPORT___.push([module.id, `.ytomo-processing-overlay[data-v-7575496b]{position:fixed;top:0;left:0;right:0;bottom:0;width:100vw;height:100vh;background-color:rgba(0,0,0,.7);display:flex;align-items:center;justify-content:center;z-index:10001;opacity:0;animation:fadeIn-7575496b .2s ease-out forwards}.ytomo-processing-content[data-v-7575496b]{background:#fff;border-radius:12px;padding:32px;box-shadow:0 20px 60px rgba(0,0,0,.3);text-align:center;min-width:300px;transform:scale(0.9);animation:dialogAppear-7575496b .2s ease-out forwards}.ytomo-processing-spinner[data-v-7575496b]{width:40px;height:40px;border:3px solid #e2e8f0;border-top-color:#2c5aa0;border-radius:50%;animation:spin-7575496b 1s linear infinite;margin:0 auto 16px}.ytomo-processing-message[data-v-7575496b]{margin:0;color:#374151;font-size:16px;font-weight:500}.ytomo-target-time-control[data-v-7575496b]{margin-top:24px;padding-top:20px;border-top:1px solid #e5e7eb}.ytomo-target-time-control .ytomo-target-time-label[data-v-7575496b]{color:#6b7280;font-size:14px;font-weight:500;margin-bottom:12px}.ytomo-target-time-control .ytomo-target-time-selector .ytomo-target-second-select[data-v-7575496b]{background:#fff;border:2px solid #d1d5db;border-radius:8px;padding:8px 12px;font-size:14px;font-weight:500;color:#374151;min-width:100px;cursor:pointer;transition:all .2s}.ytomo-target-time-control .ytomo-target-time-selector .ytomo-target-second-select[data-v-7575496b]:focus{outline:none;border-color:#2c5aa0;box-shadow:0 0 0 3px rgba(44,90,160,.1)}.ytomo-target-time-control .ytomo-target-time-selector .ytomo-target-second-select[data-v-7575496b]:hover{border-color:#9ca3af}.ytomo-target-time-control .ytomo-target-time-selector .ytomo-target-second-select option[data-v-7575496b]{padding:8px}@keyframes fadeIn-7575496b{to{opacity:1}}@keyframes dialogAppear-7575496b{to{transform:scale(1)}}@keyframes spin-7575496b{to{transform:rotate(360deg)}}@media(prefers-reduced-motion: reduce){.ytomo-processing-overlay[data-v-7575496b],.ytomo-processing-content[data-v-7575496b],.ytomo-processing-spinner[data-v-7575496b]{animation:none;transition:none}}`, ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -4804,7 +4831,7 @@ async function waitForCalendar(timeout = 10000) {
 
 /***/ }),
 
-/***/ 790:
+/***/ 753:
 /***/ ((module, __webpack_exports__, __webpack_require__) => {
 
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
@@ -4819,7 +4846,29 @@ async function waitForCalendar(timeout = 10000) {
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1___default()((_node_modules_css_loader_dist_runtime_noSourceMaps_js__WEBPACK_IMPORTED_MODULE_0___default()));
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, `.ytomo-processing-overlay[data-v-b2331216]{position:fixed;top:0;left:0;right:0;bottom:0;width:100vw;height:100vh;background-color:rgba(0,0,0,.7);display:flex;align-items:center;justify-content:center;z-index:10001;opacity:0;animation:fadeIn-b2331216 .2s ease-out forwards}.ytomo-processing-content[data-v-b2331216]{background:#fff;border-radius:12px;padding:32px;box-shadow:0 20px 60px rgba(0,0,0,.3);text-align:center;min-width:300px;transform:scale(0.9);animation:dialogAppear-b2331216 .2s ease-out forwards}.ytomo-processing-spinner[data-v-b2331216]{width:40px;height:40px;border:3px solid #e2e8f0;border-top-color:#2c5aa0;border-radius:50%;animation:spin-b2331216 1s linear infinite;margin:0 auto 16px}.ytomo-processing-message[data-v-b2331216]{margin:0;color:#374151;font-size:16px;font-weight:500}@keyframes fadeIn-b2331216{to{opacity:1}}@keyframes dialogAppear-b2331216{to{transform:scale(1)}}@keyframes spin-b2331216{to{transform:rotate(360deg)}}@media(prefers-reduced-motion: reduce){.ytomo-processing-overlay[data-v-b2331216],.ytomo-processing-content[data-v-b2331216],.ytomo-processing-spinner[data-v-b2331216]{animation:none;transition:none}}`, ""]);
+___CSS_LOADER_EXPORT___.push([module.id, `.ytomo-entrance-tab[data-v-328e00e4]{height:100%;display:flex;flex-direction:column;padding:12px;overflow:hidden}.ytomo-entrance-layout[data-v-328e00e4]{display:flex;gap:16px;height:100%;overflow:hidden;justify-content:center;align-items:flex-start;margin-bottom:16px}.ytomo-execution-info[data-v-328e00e4]{width:100%;min-height:0;overflow:hidden;display:flex;flex-direction:row;gap:16px;justify-content:center}.ytomo-execution-info .ytomo-reservation-info[data-v-328e00e4],.ytomo-execution-info .ytomo-reservation-status[data-v-328e00e4]{flex:1 1 0;max-width:300px}.ytomo-execution-info .ytomo-reservation-info[data-v-328e00e4]{margin-top:0}.ytomo-execution-info .ytomo-reservation-info.completed[data-v-328e00e4]{opacity:.6}.ytomo-execution-info .ytomo-reservation-info.completed .ytomo-reservation-box[data-v-328e00e4]{background:linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);border-color:#6c757d}.ytomo-execution-info .ytomo-reservation-info.completed .ytomo-reservation-date[data-v-328e00e4]{color:#6c757d;border-color:#6c757d}.ytomo-execution-info .ytomo-reservation-info .ytomo-reservation-box[data-v-328e00e4]{background:linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);border:1px solid #0891b2;border-radius:8px;padding:16px;position:relative}.ytomo-execution-info .ytomo-reservation-info .ytomo-reservation-box .ytomo-reservation-date[data-v-328e00e4]{position:absolute;top:-8px;left:12px;font-weight:600;font-size:12px;color:#0c4a6e;background:#fff;padding:4px 8px;border-radius:4px;border:1px solid #0891b2;box-shadow:0 1px 3px rgba(0,0,0,.1)}.ytomo-execution-info .ytomo-reservation-info .ytomo-reservation-box .ytomo-reservation-timeslots[data-v-328e00e4]{margin-top:8px;display:flex;flex-wrap:wrap;gap:8px}.ytomo-execution-info .ytomo-reservation-info .ytomo-reservation-box .ytomo-reservation-timeslots .ytomo-timeslot[data-v-328e00e4]{background:rgba(8,145,178,.1);border:1px solid #0891b2;border-radius:6px;padding:4px 8px;font-size:10px;font-weight:500;color:#0c4a6e}.ytomo-execution-info .ytomo-reservation-status[data-v-328e00e4]{background:linear-gradient(135deg, #fef3c7 0%, #fed7aa 100%);border:1px solid #f59e0b;border-radius:8px;padding:12px;margin-top:0}.ytomo-execution-info .ytomo-reservation-status.success[data-v-328e00e4]{background:linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);border-color:#059669}.ytomo-execution-info .ytomo-reservation-status.cancelled[data-v-328e00e4]{background:linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);border-color:#6b7280}.ytomo-execution-info .ytomo-reservation-status .ytomo-status-content[data-v-328e00e4]{display:flex;align-items:flex-start;gap:12px}.ytomo-execution-info .ytomo-reservation-status .ytomo-status-content .ytomo-status-icon[data-v-328e00e4]{width:20px;height:20px;flex-shrink:0;margin-top:2px}.ytomo-execution-info .ytomo-reservation-status .ytomo-status-content .ytomo-status-icon svg[data-v-328e00e4]{width:100%;height:100%;fill:#d97706}.ytomo-execution-info .ytomo-reservation-status .ytomo-status-content .ytomo-status-icon.spinning svg[data-v-328e00e4]{animation:spin 1s linear infinite}.ytomo-execution-info .ytomo-reservation-status .ytomo-status-content .ytomo-status-details .ytomo-status-current[data-v-328e00e4]{font-size:12px;color:#92400e;margin-bottom:8px;font-weight:500}.ytomo-execution-info .ytomo-reservation-status .ytomo-status-content .ytomo-status-details .ytomo-datetime-change[data-v-328e00e4]{font-size:11px;color:#059669;font-weight:bold;margin-bottom:8px}.ytomo-execution-info .ytomo-reservation-status .ytomo-status-content .ytomo-status-details .ytomo-status-progress .ytomo-progress-bar[data-v-328e00e4]{width:200px;height:6px;background:rgba(217,119,6,.2);border-radius:3px;overflow:hidden;margin-bottom:4px}.ytomo-execution-info .ytomo-reservation-status .ytomo-status-content .ytomo-status-details .ytomo-status-progress .ytomo-progress-bar .ytomo-progress-fill[data-v-328e00e4]{height:100%;background:linear-gradient(90deg, #f59e0b 0%, #d97706 100%);transition:width .3s ease}.ytomo-execution-info .ytomo-reservation-status .ytomo-status-content .ytomo-status-details .ytomo-status-progress .ytomo-progress-text[data-v-328e00e4]{font-size:11px;color:#78716c;text-align:right;display:block}.ytomo-execution-info .ytomo-reservation-status .ytomo-status-content .ytomo-status-details .ytomo-status-progress .ytomo-reservation-history[data-v-328e00e4]{position:absolute;bottom:0;right:0;font-size:10px;max-width:120px}.ytomo-execution-info .ytomo-reservation-status .ytomo-status-content .ytomo-status-details .ytomo-status-progress .ytomo-reservation-history .ytomo-history-item[data-v-328e00e4]{display:flex;align-items:center;gap:4px;margin-bottom:2px}.ytomo-execution-info .ytomo-reservation-status .ytomo-status-content .ytomo-status-details .ytomo-status-progress .ytomo-reservation-history .ytomo-history-item .ytomo-history-time[data-v-328e00e4]{color:#6b7280;font-size:9px}.ytomo-execution-info .ytomo-reservation-status .ytomo-status-content .ytomo-status-details .ytomo-status-progress .ytomo-reservation-history .ytomo-history-item .ytomo-history-result[data-v-328e00e4]{font-weight:bold;font-size:10px}.ytomo-execution-info .ytomo-reservation-status .ytomo-status-content .ytomo-status-details .ytomo-status-progress .ytomo-reservation-history .ytomo-history-item .ytomo-history-result.success[data-v-328e00e4]{color:#059669}.ytomo-execution-info .ytomo-reservation-status .ytomo-status-content .ytomo-status-details .ytomo-status-progress .ytomo-reservation-history .ytomo-history-item .ytomo-history-result.failure[data-v-328e00e4]{color:#dc2626}.ytomo-execution-info .ytomo-reservation-status .ytomo-status-content .ytomo-status-details .ytomo-status-progress .ytomo-reservation-history .ytomo-history-item .ytomo-history-slot[data-v-328e00e4]{color:#374151;font-size:9px}@media(max-width: 520px){.ytomo-entrance-layout[data-v-328e00e4]{flex-direction:column;gap:12px}}.ytomo-entrance-calendar[data-v-328e00e4]{flex:0 0 220px;height:300px;border:1px solid #e5e7eb;border-radius:8px;display:flex;flex-direction:column;overflow:hidden}.ytomo-entrance-calendar .ytomo-calendar-header[data-v-328e00e4]{display:flex;align-items:center;justify-content:space-between;padding:6px 8px;background:#f9fafb;border-radius:8px 8px 0 0;border-bottom:1px solid #e5e7eb}.ytomo-entrance-calendar .ytomo-calendar-header .ytomo-calendar-title[data-v-328e00e4]{flex:1;display:flex;align-items:center;gap:6px;cursor:pointer}.ytomo-entrance-calendar .ytomo-calendar-header .ytomo-calendar-title[data-v-328e00e4]:hover{background:#f3f4f6;border-radius:3px;padding:3px;margin:-3px}.ytomo-entrance-calendar .ytomo-calendar-header .ytomo-calendar-title h3[data-v-328e00e4]{margin:0;font-size:11px;font-weight:600;color:#374151}.ytomo-entrance-calendar .ytomo-calendar-header .ytomo-calendar-title .ytomo-selected-date[data-v-328e00e4]{font-size:14px;color:#059669;font-weight:700;background:#ecfdf5;padding:2px 6px;border-radius:4px;border:1px solid #a7f3d0}.ytomo-entrance-calendar .ytomo-calendar-header .ytomo-header-buttons[data-v-328e00e4]{display:flex;align-items:center;gap:4px}.ytomo-entrance-calendar .ytomo-calendar-header .ytomo-header-buttons .ytomo-refresh-button[data-v-328e00e4]{background:none;border:1px solid #d1d5db;border-radius:3px;width:20px;height:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#6b7280}.ytomo-entrance-calendar .ytomo-calendar-header .ytomo-header-buttons .ytomo-refresh-button[data-v-328e00e4]:hover{background:#f3f4f6;border-color:#9ca3af}.ytomo-entrance-calendar .ytomo-calendar-header .ytomo-header-buttons .ytomo-calendar-toggle[data-v-328e00e4]{font-size:11px;color:#6b7280;cursor:pointer;padding:3px 6px;border-radius:3px}.ytomo-entrance-calendar .ytomo-calendar-header .ytomo-header-buttons .ytomo-calendar-toggle[data-v-328e00e4]:hover{background:#f3f4f6}.ytomo-entrance-calendar .ytomo-calendar-body[data-v-328e00e4]{flex:1;padding:8px;overflow:auto}.ytomo-entrance-calendar .ytomo-calendar-controls[data-v-328e00e4]{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}.ytomo-entrance-calendar .ytomo-calendar-controls .ytomo-month-display[data-v-328e00e4]{display:flex;align-items:center;gap:8px}.ytomo-entrance-calendar .ytomo-calendar-controls .ytomo-month-button[data-v-328e00e4]{background:none;border:1px solid #d1d5db;border-radius:3px;width:22px;height:22px;cursor:pointer;font-size:12px;display:flex;align-items:center;justify-content:center}.ytomo-entrance-calendar .ytomo-calendar-controls .ytomo-month-button[data-v-328e00e4]:hover{background:#f3f4f6}.ytomo-entrance-calendar .ytomo-calendar-controls .ytomo-current-month[data-v-328e00e4]{font-weight:600;color:#374151;flex:1;text-align:center}.ytomo-entrance-calendar .ytomo-calendar-controls .ytomo-calendar-refresh-button[data-v-328e00e4]{background:none;border:1px solid #d1d5db;border-radius:3px;width:20px;height:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#6b7280;margin-left:8px}.ytomo-entrance-calendar .ytomo-calendar-controls .ytomo-calendar-refresh-button[data-v-328e00e4]:hover{background:#f3f4f6;border-color:#9ca3af}.ytomo-entrance-calendar .ytomo-calendar-grid .ytomo-calendar-weekdays[data-v-328e00e4]{display:grid;grid-template-columns:repeat(7, 1fr);gap:1px;margin-bottom:4px}.ytomo-entrance-calendar .ytomo-calendar-grid .ytomo-calendar-weekdays .ytomo-weekday[data-v-328e00e4]{text-align:center;font-size:12px;font-weight:600;color:#6b7280;padding:4px}.ytomo-entrance-calendar .ytomo-calendar-grid .ytomo-calendar-days[data-v-328e00e4]{display:grid;grid-template-columns:repeat(7, 1fr);gap:1px}.ytomo-entrance-calendar .ytomo-calendar-grid .ytomo-calendar-days .ytomo-calendar-day[data-v-328e00e4]{aspect-ratio:1;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:11px;cursor:pointer;border-radius:3px;transition:all .2s;min-height:24px}.ytomo-entrance-calendar .ytomo-calendar-grid .ytomo-calendar-days .ytomo-calendar-day[data-v-328e00e4] *{pointer-events:none}.ytomo-entrance-calendar .ytomo-calendar-grid .ytomo-calendar-days .ytomo-calendar-day[data-v-328e00e4]:hover:not(.disabled):not(.other-month){background:#f3f4f6}.ytomo-entrance-calendar .ytomo-calendar-grid .ytomo-calendar-days .ytomo-calendar-day.selected[data-v-328e00e4]{background:#fff;color:#0c4a6e;border:2px solid #0891b2;font-weight:600}.ytomo-entrance-calendar .ytomo-calendar-grid .ytomo-calendar-days .ytomo-calendar-day.today[data-v-328e00e4]{background:#dbeafe;color:#1e40af;font-weight:600}.ytomo-entrance-calendar .ytomo-calendar-grid .ytomo-calendar-days .ytomo-calendar-day.has-reservation[data-v-328e00e4]{background:#f0fdf4;color:#166534}.ytomo-entrance-calendar .ytomo-calendar-grid .ytomo-calendar-days .ytomo-calendar-day.has-reservation.selected[data-v-328e00e4]{background:#fff;color:#0c4a6e;border:2px solid #0891b2;font-weight:600}.ytomo-entrance-calendar .ytomo-calendar-grid .ytomo-calendar-days .ytomo-calendar-day.other-month[data-v-328e00e4]{color:#d1d5db;cursor:default}.ytomo-entrance-calendar .ytomo-calendar-grid .ytomo-calendar-days .ytomo-calendar-day.disabled[data-v-328e00e4]{color:#d1d5db;cursor:not-allowed}.ytomo-entrance-calendar .ytomo-calendar-grid .ytomo-calendar-days .ytomo-calendar-day .ytomo-day-number[data-v-328e00e4]{margin-bottom:2px}.ytomo-entrance-calendar .ytomo-calendar-grid .ytomo-calendar-days .ytomo-calendar-day .ytomo-availability-indicator[data-v-328e00e4]{display:flex;gap:2px;height:8px}.ytomo-entrance-calendar .ytomo-calendar-grid .ytomo-calendar-days .ytomo-calendar-day .ytomo-availability-indicator .ytomo-gate-availability[data-v-328e00e4]{display:flex;align-items:center}.ytomo-entrance-calendar .ytomo-calendar-grid .ytomo-calendar-days .ytomo-calendar-day .ytomo-availability-indicator .ytomo-gate-availability .ytomo-status-dot[data-v-328e00e4]{width:6px;height:6px;border-radius:50%;border:1px solid #d1d5db}.ytomo-entrance-calendar .ytomo-calendar-grid .ytomo-calendar-days .ytomo-calendar-day .ytomo-availability-indicator .ytomo-gate-availability .ytomo-status-dot.available[data-v-328e00e4]{background-color:#10b981;border-color:#10b981}.ytomo-entrance-calendar .ytomo-calendar-grid .ytomo-calendar-days .ytomo-calendar-day .ytomo-availability-indicator .ytomo-gate-availability .ytomo-status-dot.few-left[data-v-328e00e4]{background-color:#f59e0b;border-color:#f59e0b}.ytomo-entrance-calendar .ytomo-calendar-grid .ytomo-calendar-days .ytomo-calendar-day .ytomo-availability-indicator .ytomo-gate-availability .ytomo-status-dot.full[data-v-328e00e4]{background-color:#ef4444;border-color:#ef4444}.ytomo-entrance-calendar .ytomo-calendar-grid .ytomo-calendar-days .ytomo-calendar-day .ytomo-availability-indicator .ytomo-gate-availability .ytomo-status-dot.unavailable[data-v-328e00e4]{background-color:#9ca3af;border-color:#9ca3af}.ytomo-entrance-calendar .ytomo-calendar-grid .ytomo-calendar-days .ytomo-calendar-day .ytomo-availability-indicator .ytomo-gate-availability .ytomo-status-dot.unknown[data-v-328e00e4]{background-color:#d1d5db;border-color:#d1d5db}.ytomo-entrance-reservations[data-v-328e00e4]{flex:1;min-width:0;overflow:hidden;display:flex;flex-direction:column}.ytomo-entrance-reservations .ytomo-date-display-container[data-v-328e00e4]{display:flex;align-items:center;gap:8px;margin-bottom:8px;max-width:300px;margin-left:auto;margin-right:auto}.ytomo-entrance-reservations .ytomo-change-arrow[data-v-328e00e4]{display:flex;align-items:center;justify-content:center;flex-shrink:0}.ytomo-entrance-reservations .ytomo-change-arrow .ytomo-arrow-icon[data-v-328e00e4]{width:20px;height:20px;fill:#059669;opacity:.8;transition:all .3s ease;filter:drop-shadow(0 1px 2px rgba(5, 150, 105, 0.2))}.ytomo-entrance-reservations .ytomo-change-arrow .ytomo-arrow-icon[data-v-328e00e4]:hover{opacity:1;transform:translateX(2px)}.ytomo-entrance-reservations .ytomo-existing-datetime-display[data-v-328e00e4]{background:rgba(239,68,68,.1);color:#dc2626;font-weight:600;font-size:10px;text-align:center;padding:4px 6px;border-radius:4px;border:1px solid rgba(239,68,68,.3);white-space:nowrap;flex-shrink:0}.ytomo-entrance-reservations .ytomo-selected-date-display[data-v-328e00e4]{background:linear-gradient(135deg, #059669 0%, #047857 100%);color:#fff;font-weight:700;font-size:14px;text-align:center;padding:8px 12px;border-radius:6px;box-shadow:0 2px 4px rgba(5,150,105,.2);flex:1}.ytomo-entrance-reservations .ytomo-reservation-table-container[data-v-328e00e4]{flex:1;min-height:0;max-width:600px}.ytomo-entrance-reservations .ytomo-reservation-table-container .ytomo-no-date-selected[data-v-328e00e4]{display:flex;align-items:center;justify-content:center;height:150px;color:#9ca3af;font-size:12px}.ytomo-entrance-reservations .ytomo-reservation-actions[data-v-328e00e4]{display:flex;flex-direction:column;align-items:center;gap:8px;margin-top:8px;padding-top:8px;border-top:1px solid #e5e7eb;max-width:300px;margin-left:auto;margin-right:auto}.ytomo-entrance-reservations .ytomo-reservation-actions .ytomo-datetime-change[data-v-328e00e4]{min-height:40px;margin-bottom:8px;display:flex;align-items:center;justify-content:center}.ytomo-entrance-reservations .ytomo-reservation-actions .ytomo-datetime-change .ytomo-change-buttons[data-v-328e00e4]{display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap}.ytomo-entrance-reservations .ytomo-reservation-actions .ytomo-datetime-change .ytomo-datetime-button[data-v-328e00e4]{background:#e0f2fe;border:1px solid #0891b2;border-radius:4px;padding:4px 8px;font-size:11px;color:#0c4a6e;font-weight:500;transition:all .2s;min-width:80px;text-align:center;display:flex;align-items:center;justify-content:center}.ytomo-entrance-reservations .ytomo-reservation-actions .ytomo-datetime-change .ytomo-datetime-button.ytomo-from-datetime[data-v-328e00e4]{opacity:.8}.ytomo-entrance-reservations .ytomo-reservation-actions .ytomo-datetime-change .ytomo-datetime-button.ytomo-to-datetime[data-v-328e00e4]{background:#0891b2;color:#fff;border-color:#0891b2}.ytomo-entrance-reservations .ytomo-reservation-actions .ytomo-datetime-change .ytomo-arrow[data-v-328e00e4]{font-size:14px;font-weight:bold;color:#6b7280;padding:0 4px}.ytomo-entrance-reservations .ytomo-reservation-actions button[data-v-328e00e4]{flex:1;padding:8px 12px;border:none;border-radius:4px;font-size:12px;font-weight:500;cursor:pointer;transition:all .2s}.ytomo-entrance-reservations .ytomo-reservation-actions button.ytomo-reserve-button[data-v-328e00e4]{width:120px;background:#2c5aa0;color:#fff;padding:8px 12px;border:none;border-radius:4px;font-size:12px;font-weight:500;cursor:pointer;transition:all .2s}.ytomo-entrance-reservations .ytomo-reservation-actions button.ytomo-reserve-button[data-v-328e00e4]:hover:not(.disabled){background:#1e3d72}.ytomo-entrance-reservations .ytomo-reservation-actions button.ytomo-reserve-button.disabled[data-v-328e00e4]{background:#9ca3af;color:#d1d5db;cursor:not-allowed}.ytomo-entrance-reservations .ytomo-reservation-actions button.ytomo-reserve-button.disabled[data-v-328e00e4]:hover{background:#9ca3af}.ytomo-entrance-reservations .ytomo-reservation-actions button.ytomo-reserve-button.cancel-mode[data-v-328e00e4]{background:#dc2626;color:#fff}.ytomo-entrance-reservations .ytomo-reservation-actions button.ytomo-reserve-button.cancel-mode[data-v-328e00e4]:hover{background:#b91c1c}.ytomo-entrance-reservations .ytomo-reservation-actions button.ytomo-clear-button[data-v-328e00e4]{background:#f3f4f6;color:#374151;border:1px solid #d1d5db}.ytomo-entrance-reservations .ytomo-reservation-actions button.ytomo-clear-button[data-v-328e00e4]:hover{background:#e5e7eb}.ytomo-entrance-reservations .ytomo-reservation-actions button.ytomo-clear-button.cancel-mode[data-v-328e00e4]{background:#dc2626;border-color:#dc2626}.ytomo-entrance-reservations .ytomo-reservation-actions button.ytomo-clear-button.cancel-mode[data-v-328e00e4]:hover{background:#b91c1c;border-color:#b91c1c}.ytomo-entrance-reservations .ytomo-reservation-actions .ytomo-reservation-info[data-v-328e00e4]{width:100%;margin-top:12px}.ytomo-entrance-reservations .ytomo-reservation-actions .ytomo-reservation-info.completed[data-v-328e00e4]{opacity:.6}.ytomo-entrance-reservations .ytomo-reservation-actions .ytomo-reservation-info.completed .ytomo-reservation-box[data-v-328e00e4]{background:linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);border-color:#6c757d}.ytomo-entrance-reservations .ytomo-reservation-actions .ytomo-reservation-info.completed .ytomo-reservation-date[data-v-328e00e4]{color:#6c757d;border-color:#6c757d}.ytomo-entrance-reservations .ytomo-reservation-actions .ytomo-reservation-info .ytomo-reservation-box[data-v-328e00e4]{background:linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);border:1px solid #0891b2;border-radius:8px;padding:16px;position:relative}.ytomo-entrance-reservations .ytomo-reservation-actions .ytomo-reservation-info .ytomo-reservation-box .ytomo-reservation-date[data-v-328e00e4]{position:absolute;top:-8px;left:12px;font-weight:600;font-size:12px;color:#0c4a6e;background:#fff;padding:4px 8px;border-radius:4px;border:1px solid #0891b2;box-shadow:0 1px 3px rgba(0,0,0,.1)}.ytomo-entrance-reservations .ytomo-reservation-actions .ytomo-reservation-info .ytomo-reservation-box .ytomo-reservation-timeslots[data-v-328e00e4]{margin-top:8px;display:flex;flex-wrap:wrap;gap:8px}.ytomo-entrance-reservations .ytomo-reservation-actions .ytomo-reservation-info .ytomo-reservation-box .ytomo-reservation-timeslots .ytomo-timeslot[data-v-328e00e4]{background:rgba(8,145,178,.1);border:1px solid #0891b2;border-radius:6px;padding:4px 8px;font-size:10px;font-weight:500;color:#0c4a6e}.ytomo-entrance-reservations .ytomo-reservation-actions .ytomo-reservation-status[data-v-328e00e4]{width:100%;background:linear-gradient(135deg, #fef3c7 0%, #fed7aa 100%);border:1px solid #f59e0b;border-radius:8px;padding:12px;margin-top:8px}.ytomo-entrance-reservations .ytomo-reservation-actions .ytomo-reservation-status.success[data-v-328e00e4]{background:linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);border-color:#059669}.ytomo-entrance-reservations .ytomo-reservation-actions .ytomo-reservation-status.cancelled[data-v-328e00e4]{background:linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);border-color:#6b7280}.ytomo-entrance-reservations .ytomo-reservation-actions .ytomo-reservation-status .ytomo-status-content[data-v-328e00e4]{display:flex;align-items:flex-start;gap:12px}.ytomo-entrance-reservations .ytomo-reservation-actions .ytomo-reservation-status .ytomo-status-content .ytomo-status-icon[data-v-328e00e4]{width:20px;height:20px;flex-shrink:0;margin-top:2px}.ytomo-entrance-reservations .ytomo-reservation-actions .ytomo-reservation-status .ytomo-status-content .ytomo-status-icon svg[data-v-328e00e4]{width:100%;height:100%;fill:#d97706}.ytomo-entrance-reservations .ytomo-reservation-actions .ytomo-reservation-status .ytomo-status-content .ytomo-status-icon.spinning svg[data-v-328e00e4]{animation:spin 1s linear infinite}.ytomo-entrance-reservations .ytomo-reservation-actions .ytomo-reservation-status .ytomo-status-content .ytomo-status-details[data-v-328e00e4]{position:relative}.ytomo-entrance-reservations .ytomo-reservation-actions .ytomo-reservation-status .ytomo-status-content .ytomo-status-details .ytomo-status-current[data-v-328e00e4]{font-size:12px;color:#92400e;margin-bottom:8px;font-weight:500}.ytomo-entrance-reservations .ytomo-reservation-actions .ytomo-reservation-status .ytomo-status-content .ytomo-status-details .ytomo-datetime-change[data-v-328e00e4]{font-size:11px;color:#059669;font-weight:bold;margin-bottom:8px}.ytomo-entrance-reservations .ytomo-reservation-actions .ytomo-reservation-status .ytomo-status-content .ytomo-status-details .ytomo-status-progress .ytomo-progress-bar[data-v-328e00e4]{width:200px;height:6px;background:rgba(217,119,6,.2);border-radius:3px;overflow:hidden;margin-bottom:4px}.ytomo-entrance-reservations .ytomo-reservation-actions .ytomo-reservation-status .ytomo-status-content .ytomo-status-details .ytomo-status-progress .ytomo-progress-bar .ytomo-progress-fill[data-v-328e00e4]{height:100%;background:linear-gradient(90deg, #f59e0b 0%, #d97706 100%);transition:width .3s ease}.ytomo-entrance-reservations .ytomo-reservation-actions .ytomo-reservation-status .ytomo-status-content .ytomo-status-details .ytomo-status-progress .ytomo-progress-text[data-v-328e00e4]{font-size:11px;color:#78716c;text-align:right;display:block}.ytomo-entrance-reservations .ytomo-reservation-actions .ytomo-reservation-status .ytomo-status-content .ytomo-status-details .ytomo-status-progress .ytomo-reservation-history[data-v-328e00e4]{position:absolute;bottom:0;right:0;font-size:10px;max-width:120px}.ytomo-entrance-reservations .ytomo-reservation-actions .ytomo-reservation-status .ytomo-status-content .ytomo-status-details .ytomo-status-progress .ytomo-reservation-history .ytomo-history-item[data-v-328e00e4]{display:flex;align-items:center;gap:4px;margin-bottom:2px}.ytomo-entrance-reservations .ytomo-reservation-actions .ytomo-reservation-status .ytomo-status-content .ytomo-status-details .ytomo-status-progress .ytomo-reservation-history .ytomo-history-item .ytomo-history-time[data-v-328e00e4]{color:#6b7280;font-size:9px}.ytomo-entrance-reservations .ytomo-reservation-actions .ytomo-reservation-status .ytomo-status-content .ytomo-status-details .ytomo-status-progress .ytomo-reservation-history .ytomo-history-item .ytomo-history-result[data-v-328e00e4]{font-weight:bold;font-size:10px}.ytomo-entrance-reservations .ytomo-reservation-actions .ytomo-reservation-status .ytomo-status-content .ytomo-status-details .ytomo-status-progress .ytomo-reservation-history .ytomo-history-item .ytomo-history-result.success[data-v-328e00e4]{color:#059669}.ytomo-entrance-reservations .ytomo-reservation-actions .ytomo-reservation-status .ytomo-status-content .ytomo-status-details .ytomo-status-progress .ytomo-reservation-history .ytomo-history-item .ytomo-history-result.failure[data-v-328e00e4]{color:#dc2626}.ytomo-entrance-reservations .ytomo-reservation-actions .ytomo-reservation-status .ytomo-status-content .ytomo-status-details .ytomo-status-progress .ytomo-reservation-history .ytomo-history-item .ytomo-history-slot[data-v-328e00e4]{color:#374151;font-size:9px}.ytomo-entrance-table[data-v-328e00e4]{width:100%;max-width:300px;border-collapse:collapse;margin:0 auto}.ytomo-entrance-table th[data-v-328e00e4]{background:#f9fafb;border:1px solid #e5e7eb;padding:6px 8px;text-align:center;font-weight:600;font-size:12px;color:#374151;width:50%}.ytomo-entrance-table td[data-v-328e00e4]{border:1px solid #e5e7eb;padding:2px;vertical-align:middle;width:50%}.ytomo-entrance-table .ytomo-time-button[data-v-328e00e4]{width:100%;background:#fff;border:1px solid #d1d5db;border-radius:4px;padding:6px 8px;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center}.ytomo-entrance-table .ytomo-time-button[data-v-328e00e4]:hover{border-color:#9ca3af}.ytomo-entrance-table .ytomo-time-button.status-disabled[data-v-328e00e4]{background:#f3f4f6;color:#9ca3af;cursor:not-allowed;opacity:.6}.ytomo-entrance-table .ytomo-time-button.status-disabled[data-v-328e00e4]:hover{border-color:#d1d5db;background:#f3f4f6}.ytomo-entrance-table .ytomo-time-button.selected[data-v-328e00e4]{border-color:#2c5aa0;border-style:solid;box-shadow:inset 0 0 0 1px #2c5aa0}.ytomo-entrance-table .ytomo-time-button .ytomo-status-icon[data-v-328e00e4]{margin-right:6px;font-size:12px;font-weight:700;min-width:14px;display:inline-block;text-align:center}.ytomo-entrance-table .ytomo-time-button .ytomo-status-icon.status-low[data-v-328e00e4]{color:#3b82f6}.ytomo-entrance-table .ytomo-time-button .ytomo-status-icon.status-high[data-v-328e00e4]{color:#f97316}.ytomo-entrance-table .ytomo-time-button .ytomo-status-icon.status-full[data-v-328e00e4]{color:#dc2626}.ytomo-entrance-table .ytomo-time-button .ytomo-status-icon.status-disabled[data-v-328e00e4]{color:#9ca3af}.ytomo-entrance-table .ytomo-time-button .ytomo-selection-area[data-v-328e00e4]{width:22px;height:18px;display:inline-flex;align-items:center;justify-content:center;margin-left:4px}.ytomo-entrance-table .ytomo-time-button .ytomo-selection-number[data-v-328e00e4]{font-size:12px;font-weight:900;color:#059669;background:rgba(5,150,105,.1);border-radius:50%;width:18px;height:18px;display:inline-flex;align-items:center;justify-content:center;border:1px solid #059669}.ytomo-entrance-table .ytomo-time-button .ytomo-time-text[data-v-328e00e4]{font-size:11px;font-weight:500}@media(min-width: 768px)and (max-width: 1199px){.ytomo-entrance-calendar[data-v-328e00e4]{flex:0 0 260px;height:320px}.ytomo-entrance-calendar .ytomo-calendar-body[data-v-328e00e4]{padding:14px}.ytomo-entrance-calendar .ytomo-calendar-grid .ytomo-calendar-days .ytomo-calendar-day[data-v-328e00e4]{font-size:12px;min-height:26px}.ytomo-selected-date-display[data-v-328e00e4]{font-size:15px;max-width:220px}.ytomo-reservation-table-container[data-v-328e00e4]{font-size:13px}}@media(min-width: 1200px){.ytomo-entrance-layout[data-v-328e00e4]{gap:24px}.ytomo-entrance-calendar[data-v-328e00e4]{flex:0 0 320px;height:400px}.ytomo-entrance-calendar .ytomo-calendar-body[data-v-328e00e4]{padding:20px}.ytomo-entrance-calendar .ytomo-calendar-grid .ytomo-calendar-days .ytomo-calendar-day[data-v-328e00e4]{font-size:13px;min-height:32px}.ytomo-selected-date-display[data-v-328e00e4]{font-size:16px;padding:10px 16px;max-width:250px}.ytomo-reservation-table-container[data-v-328e00e4]{font-size:14px}}@media(max-width: 520px){.ytomo-entrance-calendar[data-v-328e00e4]{flex:0 0 200px;height:240px}.ytomo-entrance-calendar .ytomo-calendar-header[data-v-328e00e4]{padding:8px 12px}.ytomo-entrance-calendar .ytomo-calendar-header .ytomo-calendar-title h3[data-v-328e00e4]{font-size:12px}.ytomo-entrance-calendar .ytomo-calendar-header .ytomo-selected-date[data-v-328e00e4]{font-size:11px}.ytomo-entrance-calendar .ytomo-calendar-body[data-v-328e00e4]{padding:12px}.ytomo-entrance-calendar .ytomo-calendar-grid .ytomo-calendar-days .ytomo-calendar-day[data-v-328e00e4]{font-size:10px;min-height:20px}.ytomo-entrance-reservations[data-v-328e00e4]{flex:1 1 auto;min-height:200px}.ytomo-entrance-table[data-v-328e00e4]{max-width:100%}.ytomo-entrance-table th[data-v-328e00e4],.ytomo-entrance-table td[data-v-328e00e4]{padding:4px 6px}.ytomo-entrance-table th[data-v-328e00e4]{font-size:11px}.ytomo-entrance-table .ytomo-time-button[data-v-328e00e4]{padding:4px 6px}.ytomo-entrance-table .ytomo-time-button .ytomo-time-text[data-v-328e00e4]{font-size:10px}.ytomo-reservation-actions button[data-v-328e00e4]{padding:6px 8px;font-size:11px}}@media(max-width: 400px){.ytomo-entrance-tab[data-v-328e00e4]{padding:8px}.ytomo-entrance-layout[data-v-328e00e4]{gap:8px}.ytomo-entrance-calendar[data-v-328e00e4]{height:180px}.ytomo-entrance-calendar .ytomo-calendar-header[data-v-328e00e4]{padding:6px 8px}.ytomo-entrance-calendar .ytomo-calendar-header .ytomo-calendar-title h3[data-v-328e00e4]{font-size:11px}.ytomo-entrance-calendar .ytomo-calendar-header .ytomo-selected-date[data-v-328e00e4]{font-size:10px}.ytomo-entrance-calendar .ytomo-calendar-body[data-v-328e00e4]{padding:8px}.ytomo-entrance-calendar .ytomo-calendar-grid .ytomo-calendar-days .ytomo-calendar-day[data-v-328e00e4]{font-size:9px;min-height:18px}.ytomo-entrance-table th[data-v-328e00e4],.ytomo-entrance-table td[data-v-328e00e4]{padding:3px 4px}.ytomo-entrance-table th[data-v-328e00e4]{font-size:10px}.ytomo-entrance-table .ytomo-time-button[data-v-328e00e4]{padding:3px 4px}.ytomo-entrance-table .ytomo-time-button .ytomo-time-text[data-v-328e00e4]{font-size:9px}.ytomo-reservation-actions[data-v-328e00e4]{flex-direction:column;gap:6px}.ytomo-reservation-actions button[data-v-328e00e4]{padding:8px 12px;font-size:12px}}`, ""]);
+// Exports
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
+
+
+/***/ }),
+
+/***/ 757:
+/***/ ((module, __webpack_exports__, __webpack_require__) => {
+
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   A: () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _node_modules_css_loader_dist_runtime_noSourceMaps_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(601);
+/* harmony import */ var _node_modules_css_loader_dist_runtime_noSourceMaps_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_css_loader_dist_runtime_noSourceMaps_js__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(314);
+/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1__);
+// Imports
+
+
+var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1___default()((_node_modules_css_loader_dist_runtime_noSourceMaps_js__WEBPACK_IMPORTED_MODULE_0___default()));
+// Module
+___CSS_LOADER_EXPORT___.push([module.id, `.ytomo-ticket-tab[data-v-91fda206]{padding:0 12px 20px 12px;height:100%;overflow-y:auto;color-scheme:light}@media(max-width: 768px){.ytomo-ticket-tab[data-v-91fda206]{padding:0 8px 16px 8px}}.ytomo-quick-select[data-v-91fda206]{background:#fff;border-radius:8px;padding:12px;box-shadow:0 1px 3px rgba(0,0,0,.1);border:1px solid #e2e8f0;flex-shrink:0;display:flex;align-items:center;gap:10px;flex-wrap:wrap}.ytomo-quick-select .ytomo-control-left[data-v-91fda206]{display:flex;align-items:center;gap:12px;margin-right:auto}.ytomo-refresh-button[data-v-91fda206]{display:flex;align-items:center;gap:6px;padding:6px 12px;background:#f8fafc;border:1px solid #cbd5e1;border-radius:6px;color:#475569;font-size:12px;font-weight:500;cursor:pointer;transition:all .2s ease}.ytomo-refresh-button[data-v-91fda206]:hover:not(:disabled){background:#e2e8f0;border-color:#94a3b8}.ytomo-refresh-button[data-v-91fda206]:disabled{opacity:.6;cursor:not-allowed;background:#f1f5f9}.ytomo-refresh-icon[data-v-91fda206]{flex-shrink:0}.ytomo-refresh-icon.rotating[data-v-91fda206]{animation:spin-91fda206 1s linear infinite}@keyframes spin-91fda206{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}.ytomo-toggle-container[data-v-91fda206]{display:flex;align-items:center;cursor:pointer;user-select:none}.ytomo-toggle-input[data-v-91fda206]{display:none}.ytomo-toggle-slider[data-v-91fda206]{position:relative;width:44px;height:24px;background:#cbd5e1;border-radius:12px;transition:background-color .2s;margin-right:8px}.ytomo-toggle-slider[data-v-91fda206]::before{content:"";position:absolute;top:2px;left:2px;width:20px;height:20px;background:#fff;border-radius:50%;transition:transform .2s}.ytomo-toggle-input:checked+.ytomo-toggle-slider[data-v-91fda206]{background:#2c5aa0}.ytomo-toggle-input:checked+.ytomo-toggle-slider[data-v-91fda206]::before{transform:translateX(20px)}.ytomo-toggle-label[data-v-91fda206]{font-size:14px;font-weight:500;color:#374151}.ytomo-date-buttons[data-v-91fda206]{display:flex;flex-wrap:wrap;gap:8px;flex:1}.ytomo-entrance-date-button[data-v-91fda206],.ytomo-date-button[data-v-91fda206]{background:#e0f2fe;border:1px solid #0891b2;border-radius:4px;padding:4px 8px;font-size:12px;color:#0c4a6e;cursor:pointer;transition:all .2s;display:flex;flex-direction:column;gap:2px;align-items:center}.ytomo-entrance-date-button[data-v-91fda206] *,.ytomo-date-button[data-v-91fda206] *{pointer-events:none}.ytomo-entrance-date-button[data-v-91fda206]:focus,.ytomo-date-button[data-v-91fda206]:focus{outline:none;box-shadow:none}.ytomo-entrance-date-button[data-v-91fda206]:hover,.ytomo-date-button[data-v-91fda206]:hover{background:#dbeafe;color:#0c4a6e;transform:translateY(-1px);box-shadow:0 2px 4px rgba(186,230,253,.3)}.selected.ytomo-entrance-date-button[data-v-91fda206],.selected.ytomo-date-button[data-v-91fda206]{background:#0284c7;color:#fff;border-color:#0284c7;outline:2px solid #0284c7;outline-offset:-1px}.ytomo-entrance-date-button[data-v-91fda206]:active,.ytomo-date-button[data-v-91fda206]:active{transform:translateY(0);box-shadow:none}.disabled.ytomo-entrance-date-button[data-v-91fda206],.disabled.ytomo-date-button[data-v-91fda206],.ytomo-entrance-date-button[data-v-91fda206]:disabled,.ytomo-date-button[data-v-91fda206]:disabled{background:#e2e8f0;border-color:#94a3b8;color:#475569;cursor:not-allowed}.disabled.ytomo-entrance-date-button[data-v-91fda206]:hover,.disabled.ytomo-date-button[data-v-91fda206]:hover,.ytomo-entrance-date-button[data-v-91fda206]:disabled:hover,.ytomo-date-button[data-v-91fda206]:disabled:hover{background:#e2e8f0;color:#475569;transform:none;box-shadow:none}.ytomo-ticket-tab[data-v-91fda206]{padding:0 12px 20px 12px;height:100%;overflow-y:auto;color-scheme:light}@media(max-width: 768px){.ytomo-ticket-tab[data-v-91fda206]{padding:0 8px 16px 8px}}.ytomo-quick-select[data-v-91fda206]{background:#fff;border-radius:8px;padding:16px;box-shadow:0 1px 3px rgba(0,0,0,.1);border:1px solid #e2e8f0;flex-shrink:0;display:flex;align-items:center;gap:10px;flex-wrap:wrap;min-height:52px}.ytomo-toggle-container[data-v-91fda206]{display:flex;align-items:center;cursor:pointer;user-select:none}.ytomo-toggle-input[data-v-91fda206]{display:none}.ytomo-toggle-slider[data-v-91fda206]{position:relative;width:44px;height:24px;background:#cbd5e1;border-radius:12px;transition:background-color .2s;margin-right:8px}.ytomo-toggle-slider[data-v-91fda206]::before{content:"";position:absolute;top:2px;left:2px;width:20px;height:20px;background:#fff;border-radius:50%;transition:transform .2s}.ytomo-toggle-input:checked+.ytomo-toggle-slider[data-v-91fda206]{background:#2c5aa0}.ytomo-toggle-input:checked+.ytomo-toggle-slider[data-v-91fda206]::before{transform:translateX(20px)}.ytomo-toggle-label[data-v-91fda206]{font-size:14px;font-weight:500;color:#374151}.ytomo-date-buttons[data-v-91fda206]{display:flex;flex-wrap:wrap;gap:8px;flex:1}.ytomo-ticket-list[data-v-91fda206]{display:flex;flex-direction:column;gap:8px;margin-bottom:20px}.ytomo-ticket-item[data-v-91fda206]{background:#fff;border-radius:6px;border:1px solid #e2e8f0;overflow:hidden;transition:all .2s}.ytomo-ticket-item[data-v-91fda206]:first-of-type{margin-top:12px}.hidden[data-v-91fda206]{display:none}.ytomo-ticket-item[data-v-91fda206]:hover{border-color:#cbd5e1;box-shadow:0 2px 4px rgba(0,0,0,.1)}.ytomo-ticket-item.selected[data-v-91fda206]{border-color:#2c5aa0;box-shadow:0 0 0 2px rgba(44,90,160,.2)}.ytomo-ticket-upper[data-v-91fda206]{background:#e2e8f0;padding:8px 12px;display:flex;align-items:center;gap:8px;border-bottom:1px solid #cbd5e1}.ytomo-ticket-id[data-v-91fda206]{font-family:"Courier New",monospace;font-size:13px;font-weight:600;color:#374151;background:#e2e8f0;padding:2px 6px;border-radius:3px}.ytomo-me-tip[data-v-91fda206]{background:linear-gradient(135deg, #10b981 0%, #059669 100%);color:#fff;padding:2px 6px;border-radius:10px;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.3px}.ytomo-external-tip[data-v-91fda206]{background:linear-gradient(135deg, #f59e0b 0%, #d97706 100%);color:#fff;padding:2px 6px;border-radius:10px;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.3px}.ytomo-ticket-delete-button[data-v-91fda206]{background:#ef4444;color:#fff;border:none;border-radius:50%;width:20px;height:20px;font-size:14px;font-weight:bold;cursor:pointer;display:flex;align-items:center;justify-content:center;margin-left:auto;transition:all .2s ease}.ytomo-ticket-delete-button[data-v-91fda206]:hover{background:#dc2626;transform:scale(1.1)}.ytomo-item-name[data-v-91fda206]{background:linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);color:#fff;padding:2px 6px;border-radius:10px;font-size:9px;font-weight:500;max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.ytomo-label-tag[data-v-91fda206]{background:linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);color:#fff;padding:2px 6px;border-radius:10px;font-size:10px;font-weight:600}.ytomo-ticket-lower[data-v-91fda206]{padding:8px 12px;display:flex;flex-direction:column;gap:8px}.ytomo-entrance-dates[data-v-91fda206]{display:flex;flex-wrap:wrap;gap:6px}.ytomo-reservation-types[data-v-91fda206]{display:flex;flex-wrap:wrap;gap:6px;align-items:center}.ytomo-reservation-type[data-v-91fda206]{padding:4px 8px;border-radius:4px;font-size:12px;font-weight:500}.ytomo-reservation-type.active[data-v-91fda206]{background:#dcfce7;color:#166534;border:1px solid #22c55e}.ytomo-reservation-type.inactive[data-v-91fda206]{background:#fef2f2;color:#991b1b;border:1px solid #ef4444}.ytomo-no-reservation-types[data-v-91fda206]{color:#6b7280;font-size:12px;font-style:italic}.ytomo-add-ticket[data-v-91fda206]{background:#fff;border-radius:8px;padding:16px;border:2px dashed #cbd5e1;margin-top:20px}.ytomo-add-ticket h4[data-v-91fda206]{margin:0 0 12px 0;color:#374151;font-size:14px;font-weight:600}.ytomo-add-result[data-v-91fda206]{margin-top:8px;padding:8px 12px;border-radius:4px;font-size:12px;font-weight:500;text-align:center}.ytomo-add-result.success[data-v-91fda206]{background:#dcfce7;color:#166534;border:1px solid #22c55e}.ytomo-add-result.error[data-v-91fda206]{background:#fee2e2;color:#dc2626;border:1px solid #ef4444}.ytomo-add-ticket-form[data-v-91fda206]{display:flex;gap:8px;align-items:center;flex-wrap:wrap}@media(max-width: 768px){.ytomo-add-ticket-form[data-v-91fda206]{flex-direction:column;align-items:stretch;gap:12px}}.ytomo-input-inline[data-v-91fda206]{padding:4px 8px;border:1px solid #d1d5db;border-radius:4px;font-size:12px;transition:border-color .2s;background:#fff}.ytomo-input-inline[data-v-91fda206]:focus{outline:none;border-color:#2c5aa0;box-shadow:0 0 0 2px rgba(44,90,160,.1)}.ytomo-input-inline[data-v-91fda206]::placeholder{color:#9ca3af}.ytomo-input-inline.ytomo-input-ticket-id[data-v-91fda206]{width:120px}.ytomo-input-inline.ytomo-input-label[data-v-91fda206]{width:60px}.ytomo-select-inline[data-v-91fda206]{padding:4px 8px;border:1px solid #d1d5db;border-radius:4px;font-size:12px;background:#fff;cursor:pointer;width:50px}.ytomo-select-inline[data-v-91fda206]:focus{outline:none;border-color:#2c5aa0;box-shadow:0 0 0 2px rgba(44,90,160,.1)}.ytomo-ticket-upper[data-v-91fda206]{background:#e2e8f0;padding:8px 12px;display:flex;align-items:center;gap:8px;border-bottom:1px solid #cbd5e1}.ytomo-ticket-id[data-v-91fda206]{font-family:"Courier New",monospace;font-size:13px;font-weight:600;color:#374151;background:#e2e8f0;padding:2px 6px;border-radius:3px}.ytomo-me-tip[data-v-91fda206]{background:linear-gradient(135deg, #10b981 0%, #059669 100%);color:#fff;padding:2px 6px;border-radius:10px;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.3px}.ytomo-external-tip[data-v-91fda206]{background:linear-gradient(135deg, #f59e0b 0%, #d97706 100%);color:#fff;padding:2px 6px;border-radius:10px;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.3px}.ytomo-ticket-lower[data-v-91fda206]{padding:8px 12px;display:flex;flex-direction:column;gap:8px}.ytomo-entrance-date-button .ytomo-reservation-status[data-v-91fda206]{background:hsla(0,0%,100%,.9);color:#0891b2;padding:2px 4px;border-radius:3px;font-size:9px;font-weight:500;line-height:1.1;text-align:center}.ytomo-entrance-date-button .ytomo-reservation-status[data-v-91fda206]:empty{background:rgba(0,0,0,0);padding:0}.ytomo-entrance-date-button:hover .ytomo-reservation-status[data-v-91fda206]{background:hsla(0,0%,100%,.95);color:#0ea5e9}.ytomo-entrance-date-button:hover .ytomo-reservation-status[data-v-91fda206]:empty{background:rgba(0,0,0,0)}.ytomo-entrance-button-container[data-v-91fda206]{display:flex;flex-direction:column;border:1px solid #e5e7eb;border-radius:8px;overflow:hidden;background:#fff}.ytomo-entrance-date-part[data-v-91fda206]{border-radius:0 !important;border:none !important;border-bottom:1px solid #e5e7eb !important;margin:0 !important}.ytomo-entrance-date-part.new-reservation[data-v-91fda206]{background:#f0f9ff;color:#0369a1;font-weight:600}.ytomo-entrance-date-part.new-reservation[data-v-91fda206]:hover{background:#e0f2fe}.ytomo-pavilion-part[data-v-91fda206]{border-radius:0 !important;border:none !important;margin:0 !important;background:#fafafa;transition:background-color .2s ease}.ytomo-pavilion-part[data-v-91fda206]:hover{background:#f5f5f5}.ytomo-pavilion-part[data-v-91fda206]:disabled{background:#f9fafb;color:#9ca3af}.ytomo-pavilion-part.expanded[data-v-91fda206]{background:#e5e7eb}.ytomo-pavilion-part.expanded[data-v-91fda206]:hover{background:#d1d5db}.ytomo-pavilion-part .ytomo-no-reservation[data-v-91fda206]{color:#059669;font-weight:500}.ytomo-reservation-type-indicator[data-v-91fda206]{display:inline-block;width:16px;height:13px;font-size:10px;font-weight:400;text-align:center;line-height:13px;border-radius:3px;border:1px solid rgba(0,0,0,0);-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif}.ytomo-reservation-type-indicator.indicator-won[data-v-91fda206]{background:#10b981;color:#fff;border-color:#059669}.ytomo-reservation-type-indicator.indicator-active[data-v-91fda206]{background:#10b981;color:#fff;border-color:#059669}.ytomo-reservation-type-indicator.indicator-before[data-v-91fda206]{background:#6b7280;color:#fff;border-color:#4b5563}.ytomo-reservation-type-indicator.indicator-none[data-v-91fda206]{background:#e5e7eb;color:#6b7280;border-color:#d1d5db}.ytomo-no-reservation[data-v-91fda206]{font-style:italic;color:#9ca3af}.ytomo-entrance-date-button.selected .ytomo-reservation-status[data-v-91fda206]{background:hsla(0,0%,100%,.95);color:#0891b2}.ytomo-entrance-date-button.selected .ytomo-reservation-status[data-v-91fda206]:empty{background:rgba(0,0,0,0)}.ytomo-entrance-date-button.disabled .ytomo-reservation-status[data-v-91fda206]{background:hsla(0,0%,100%,.9);color:#475569}.ytomo-entrance-date-button.disabled .ytomo-reservation-status[data-v-91fda206]:empty{background:rgba(0,0,0,0)}.ytomo-entrance-date-button .ytomo-schedule-line[data-v-91fda206]{padding:2px 0;font-size:11px;line-height:1.2}.ytomo-entrance-date-button .ytomo-schedule-line.ytomo-reservation-line[data-v-91fda206]{color:#6b7280;display:flex;align-items:center;gap:4px;font-size:10px}.ytomo-entrance-date-button .ytomo-schedule-divider[data-v-91fda206]{height:1px;background:#d1d5db;margin:3px 0;width:100%;opacity:.8}.ytomo-entrance-date-button.selected .ytomo-schedule-line.ytomo-reservation-line[data-v-91fda206]{color:hsla(0,0%,100%,.8)}.ytomo-entrance-date-button.selected .ytomo-schedule-divider[data-v-91fda206]{background:hsla(0,0%,100%,.4)}.ytomo-entrance-date-group[data-v-91fda206]{display:flex;gap:6px;align-items:stretch}.ytomo-expand-button[data-v-91fda206]{background:#f8fafc;border:1px solid #cbd5e1;color:#374151;font-size:12px;font-weight:600;padding:3px 8px;cursor:pointer;border-radius:4px;transition:all .2s ease;min-width:24px;height:50%;display:flex;align-items:center;justify-content:center;align-self:flex-end}.ytomo-expand-button[data-v-91fda206]:disabled{background:#f3f4f6;border-color:#d1d5db;color:#9ca3af;cursor:not-allowed;opacity:.5}.ytomo-expand-button[data-v-91fda206]:hover{background:#e2e8f0;border-color:#94a3b8;transform:translateY(-1px)}.ytomo-expand-button[data-v-91fda206]:active{transform:translateY(0)}.ytomo-expand-button[data-v-91fda206]:focus{outline:none;box-shadow:0 0 0 2px rgba(44,90,160,.2)}.ytomo-pavilion-details[data-v-91fda206]{margin-top:12px;padding:12px;background:#f8fafc;border-radius:6px;border:1px solid #e2e8f0}.ytomo-schedule-detail[data-v-91fda206]{margin-bottom:16px}.ytomo-schedule-detail[data-v-91fda206]:last-child{margin-bottom:0}.ytomo-schedule-date-header[data-v-91fda206]{font-weight:600;color:#334155;margin-bottom:8px;font-size:13px;padding-bottom:4px;border-bottom:1px solid #e2e8f0}.ytomo-pavilion-reservation-group[data-v-91fda206]{margin-bottom:12px;padding:8px 0;border-bottom:1px solid #e5e7eb}.ytomo-pavilion-reservation-group[data-v-91fda206]:last-child{margin-bottom:0;border-bottom:none}.ytomo-reservation-header[data-v-91fda206]{display:flex;align-items:flex-start;gap:12px}.ytomo-reservation-left[data-v-91fda206]{display:flex;flex-direction:column;gap:4px;min-width:80px;flex-shrink:0}.ytomo-reservation-right[data-v-91fda206]{flex:1;display:flex;flex-direction:column;gap:4px}.ytomo-reservation-type-badge[data-v-91fda206]{padding:2px 8px;border-radius:12px;font-size:11px;font-weight:600;white-space:nowrap;text-align:center}.ytomo-reservation-type-badge.badge-won[data-v-91fda206]{background:#10b981;color:#fff}.ytomo-reservation-type-badge.badge-expired[data-v-91fda206]{background:#ef4444;color:#fff}.ytomo-reservation-type-badge.badge-active[data-v-91fda206]{background:#10b981;color:#fff}.ytomo-reservation-type-badge.badge-before[data-v-91fda206]{background:#f59e0b;color:#fff}.ytomo-reservation-type-badge.badge-submitted[data-v-91fda206]{background:#8b5cf6;color:#fff}.ytomo-reservation-type-badge.badge-none[data-v-91fda206]{background:#6b7280;color:#fff}.ytomo-time-slot-badge[data-v-91fda206]{background:#f8fafc;color:#475569;padding:2px 8px;border-radius:8px;font-size:11px;font-weight:500;text-align:center;border:1px solid #e2e8f0}.ytomo-time-slot-badge[data-v-91fda206]:empty::after{content:"—"}.ytomo-pavilion-name[data-v-91fda206]{font-weight:600;color:#334155;font-size:13px;line-height:1.3}.ytomo-pavilion-name.ytomo-status-text[data-v-91fda206]{color:#6b7280;font-style:italic;font-weight:500}.ytomo-use-status[data-v-91fda206]{color:#475569;font-size:11px;font-weight:500}.ytomo-reservation-type-header[data-v-91fda206]{display:flex;flex-direction:column;gap:4px;min-width:80px;flex-shrink:0}.ytomo-reservation-type-badge[data-v-91fda206]{background:#3b82f6;color:#fff;padding:4px 8px;border-radius:4px;font-size:10px;font-weight:600;text-align:center;line-height:1.2}.ytomo-time-slot-badge[data-v-91fda206]{background:#2c5aa0;color:#fff;padding:3px 6px;border-radius:3px;font-size:10px;font-weight:500;text-align:center;line-height:1.2}.ytomo-pavilion-info[data-v-91fda206]{flex:1;color:#374151;font-size:12px;line-height:1.4;display:flex;align-items:center}.ytomo-no-entrance-dates[data-v-91fda206]{color:#6b7280;font-size:12px;font-style:italic}.ytomo-input-inline[data-v-91fda206]{padding:4px 8px;border:1px solid #d1d5db;border-radius:4px;font-size:12px;transition:border-color .2s;background:#fff}.ytomo-input-inline[data-v-91fda206]:focus{outline:none;border-color:#2c5aa0;box-shadow:0 0 0 2px rgba(44,90,160,.1)}.ytomo-input-inline[data-v-91fda206]::placeholder{color:#9ca3af}.ytomo-input-inline.ytomo-input-ticket-id[data-v-91fda206]{width:120px}.ytomo-input-inline.ytomo-input-label[data-v-91fda206]{width:60px}.ytomo-select-inline[data-v-91fda206]{padding:4px 8px;border:1px solid #d1d5db;border-radius:4px;font-size:12px;background:#fff;cursor:pointer;width:50px}.ytomo-select-inline[data-v-91fda206]:focus{outline:none;border-color:#2c5aa0;box-shadow:0 0 0 2px rgba(44,90,160,.1)}.ytomo-button[data-v-91fda206]{padding:8px 16px;border:none;border-radius:6px;font-size:14px;font-weight:500;cursor:pointer;transition:all .2s;display:inline-flex;align-items:center;justify-content:center;white-space:nowrap}.ytomo-button.primary[data-v-91fda206]{background:linear-gradient(135deg, #2c5aa0 0%, #1a365d 100%);color:#fff}.ytomo-button.primary[data-v-91fda206]:hover{background:linear-gradient(135deg, #1a365d 0%, #2c5aa0 100%);transform:translateY(-1px);box-shadow:0 4px 12px rgba(44,90,160,.3)}.ytomo-button.primary[data-v-91fda206]:active{transform:translateY(0)}.ytomo-button.retry-button[data-v-91fda206]{background:linear-gradient(135deg, #f59e0b 0%, #d97706 100%);color:#fff;margin-top:12px}.ytomo-button.retry-button[data-v-91fda206]:hover{background:linear-gradient(135deg, #d97706 0%, #f59e0b 100%)}.ytomo-button[data-v-91fda206]:focus{outline:2px solid #2c5aa0;outline-offset:2px}.ytomo-button[data-v-91fda206]:disabled{opacity:.5;cursor:not-allowed;transform:none !important}.ytomo-empty-state[data-v-91fda206]{text-align:center;padding:40px 20px;color:#6b7280;font-style:italic}.ytomo-empty-state p[data-v-91fda206]{margin:0;font-size:14px}.ytomo-error[data-v-91fda206]{text-align:center;padding:40px 20px;color:#dc2626}.ytomo-error h3[data-v-91fda206]{margin:0 0 8px 0;font-size:16px;color:#dc2626}.ytomo-error p[data-v-91fda206]{margin:0;font-size:14px;color:#6b7280}.ytomo-ticket-tab .ytomo-loading[data-v-91fda206]{height:150px}.ytomo-ticket-item[data-v-91fda206]{animation:slideIn-91fda206 .2s ease-out}@keyframes slideIn-91fda206{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}@media(prefers-reduced-motion: reduce){.ytomo-ticket-item[data-v-91fda206],.ytomo-button[data-v-91fda206],.ytomo-date-button[data-v-91fda206],.ytomo-entrance-date-button[data-v-91fda206],.ytomo-toggle-slider[data-v-91fda206],.ytomo-input-inline[data-v-91fda206]{animation:none;transition:none}}@media(prefers-contrast: high){.ytomo-ticket-item[data-v-91fda206]{border-width:3px}.ytomo-ticket-item.selected[data-v-91fda206]{border-width:4px}.ytomo-button[data-v-91fda206]:focus,.ytomo-input-inline[data-v-91fda206]:focus,.ytomo-date-button[data-v-91fda206]:focus,.ytomo-entrance-date-button[data-v-91fda206]:focus,.ytomo-input-inline[data-v-91fda206]:focus,.ytomo-select-inline[data-v-91fda206]:focus{outline:3px solid #000}}.ytomo-empty-state[data-v-91fda206]{text-align:center;padding:40px 20px;color:#6b7280;font-style:italic}.ytomo-empty-state p[data-v-91fda206]{margin:0;font-size:14px}.ytomo-error[data-v-91fda206]{text-align:center;padding:40px 20px;color:#dc2626}.ytomo-error h3[data-v-91fda206]{margin:0 0 8px 0;font-size:16px;color:#dc2626}.ytomo-error p[data-v-91fda206]{margin:0;font-size:14px;color:#6b7280}.ytomo-ticket-list[data-v-91fda206]::-webkit-scrollbar{width:6px}.ytomo-ticket-list[data-v-91fda206]::-webkit-scrollbar-track{background:#f1f5f9;border-radius:3px}.ytomo-ticket-list[data-v-91fda206]::-webkit-scrollbar-thumb{background:#cbd5e1;border-radius:3px}.ytomo-ticket-list[data-v-91fda206]::-webkit-scrollbar-thumb:hover{background:#94a3b8}.ytomo-ticket-item[data-v-91fda206]{animation:slideIn-91fda206 .2s ease-out}@keyframes slideIn-91fda206{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}`, ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -5312,6 +5361,7 @@ ___CSS_LOADER_EXPORT___.push([module.id, `.ytomo-pavilion-tab[data-v-910d08c4]{p
  */
 // ログレベルの優先度定義
 const LOG_PRIORITIES = {
+    TEMP: -1, // ERRORより上位
     ERROR: 0,
     WARN: 1,
     INFO: 2,
@@ -5319,7 +5369,7 @@ const LOG_PRIORITIES = {
 };
 // ビルド時のログレベル設定（環境変数で制御、デフォルト: WARN）
 // WARN以上（WARN, ERROR）のみが出力される
-const BUILD_LOG_LEVEL = "DEBUG" || 0;
+const BUILD_LOG_LEVEL = "WARN" || 0;
 // グローバルログ設定（ビルド時設定で初期化）
 let globalLogLevel = (/* unused pure expression or super */ null && (BUILD_LOG_LEVEL));
 let globalEnabled = true;
@@ -5402,6 +5452,14 @@ class CustomLogger {
         }
         const formattedMessage = this.formatMessage(level, message);
         switch (level) {
+            case 'TEMP':
+                if (data) {
+                    console.log(formattedMessage, data);
+                }
+                else {
+                    console.log(formattedMessage);
+                }
+                break;
             case 'ERROR':
                 if (data) {
                     console.error(formattedMessage, data);
@@ -5430,6 +5488,9 @@ class CustomLogger {
         }
     }
     // パブリックログメソッド
+    temp(message, data) {
+        this.output('TEMP', message, data);
+    }
     error(message, data) {
         this.output('ERROR', message, data);
     }
@@ -36770,6 +36831,8 @@ const useMainDialogStore = defineStore('mainDialog', () => {
     // Actions
     const showDialog = () => {
         isVisible.value = true;
+        // 初期表示時は常にチケットタブを表示
+        activeTab.value = 'ticket';
     };
     const hideDialog = () => {
         isVisible.value = false;
@@ -37307,7 +37370,15 @@ const useTicketsStore = defineStore('tickets', () => {
     const selectedTicketIds = ref(new Set());
     const selectedEntranceDates = ref(new Map()); // ticketId -> scheduleId mapping for persistence
     const isLoading = ref(false);
-    const isInitialized = ref(false);
+    const isInitialized = ref(false); // ストア初期化状態
+    // データの新鮮さ判定のcomputed（1時間以内）
+    const isFresh = runtime_core_esm_bundler_computed(() => {
+        if (lastUpdateTime.value === 0)
+            return false;
+        const now = Date.now();
+        const oneHour = 60 * 60 * 1000;
+        return now - lastUpdateTime.value < oneHour;
+    });
     const availableDates = ref([]);
     const todayStr = ref(getTodayString());
     const lastUpdateTime = ref(0); // 最後の更新時刻（Unix時間）
@@ -37385,8 +37456,10 @@ const useTicketsStore = defineStore('tickets', () => {
                 }
             }
             const scheduleData = {
+                user_visiting_reservation_id: schedule.user_visiting_reservation_id,
                 entrance_date: schedule.entrance_date || '',
                 use_state: schedule.use_state || 0,
+                gate_type: schedule.gate_type,
                 schedule_name: schedule.schedule_name,
                 time_start: timeStart,
                 time_end: schedule.time_end,
@@ -37424,29 +37497,24 @@ const useTicketsStore = defineStore('tickets', () => {
      * 全チケット情報を初期化・取得
      */
     const loadAllTickets = async (forceUpdate = false) => {
-        // 1時間制限チェック（強制更新でない場合）
-        if (!forceUpdate) {
-            const now = Date.now();
-            const oneHour = 60 * 60 * 1000; // 1時間をミリ秒で
-            if (lastUpdateTime.value > 0 && now - lastUpdateTime.value < oneHour) {
-                tickets_logger.info(`前回更新から1時間未満のため更新をスキップ（${Math.round((now - lastUpdateTime.value) / (1000 * 60))}分経過）`);
-                return ticketsArray.value;
-            }
-        }
         tickets_logger.info('全チケット情報取得開始');
         setLoading(true);
         try {
-            // 自分のチケットを最優先で読み込み
-            let ownTickets = [];
+            // 旧チケット情報を保存（選択状態等の保持用）
+            const previousTickets = new Map(tickets.value);
+            // 新チケット情報を一時変数に取得
+            let newOwnTickets = [];
             try {
-                ownTickets = await loadOwnTickets();
-                tickets_logger.info(`自分のチケット取得完了: ${ownTickets.length}個`);
-                // 自分のチケットを追加（通期パス用の空欄入場予約データも追加）
-                for (const ticket of ownTickets) {
+                newOwnTickets = await loadOwnTickets();
+                tickets_logger.info(`自分のチケット取得完了: ${newOwnTickets.length}個`);
+                // 新チケット情報に旧情報の状態を反映
+                const processedTickets = new Map();
+                for (const newTicket of newOwnTickets) {
+                    const previousTicket = previousTickets.get(newTicket.ticket_id);
                     // 通期パス（Season Pass）の場合は追加予約可能性をチェック
-                    if (ticket.item_name?.includes('Season Pass')) {
+                    if (newTicket.item_name?.includes('Season Pass')) {
                         // 現在の予約数をチェック（最大3件）
-                        const currentReservationCount = ticket.schedules?.length || 0;
+                        const currentReservationCount = newTicket.schedules?.length || 0;
                         if (currentReservationCount < 3) {
                             // 日付空欄の入場予約データを追加
                             const emptyReservation = {
@@ -37457,22 +37525,40 @@ const useTicketsStore = defineStore('tickets', () => {
                                 location_index: 0,
                                 schedule_name: '新規予約',
                                 time_start: '',
-                                isOwn: true,
                                 selected: false,
                                 isEffective: false, // 新規予約なので無効
                                 pavilionReservationInfo: undefined
                             };
                             // schedulesが未初期化の場合は初期化
-                            if (!ticket.schedules) {
-                                ticket.schedules = [];
+                            if (!newTicket.schedules) {
+                                newTicket.schedules = [];
                             }
                             // 空欄の入場予約データを追加
-                            ticket.schedules.push(emptyReservation);
-                            tickets_logger.info(`通期パス ${ticket.ticket_id} に新規予約枠を追加`);
+                            newTicket.schedules.push(emptyReservation);
+                            tickets_logger.info(`通期パス ${newTicket.ticket_id} に新規予約枠を追加`);
                         }
                     }
-                    tickets.value.set(ticket.ticket_id, ticket);
+                    // 旧情報からselected状態を継承
+                    if (previousTicket && newTicket.schedules && previousTicket.schedules) {
+                        for (const newSchedule of newTicket.schedules) {
+                            const previousSchedule = previousTicket.schedules.find(s => s.user_visiting_reservation_id === newSchedule.user_visiting_reservation_id &&
+                                s.entrance_date === newSchedule.entrance_date &&
+                                s.schedule_name === newSchedule.schedule_name &&
+                                s.gate_type === newSchedule.gate_type);
+                            // 同じ予約が見つかった場合はselected状態を継承
+                            if (previousSchedule) {
+                                newSchedule.selected = previousSchedule.selected;
+                                if (newSchedule.selected) {
+                                    tickets_logger.debug(`予約ID ${newSchedule.user_visiting_reservation_id} のselected状態を継承`);
+                                }
+                            }
+                        }
+                    }
+                    processedTickets.set(newTicket.ticket_id, newTicket);
                 }
+                // 最後に一括でstoreに反映
+                tickets.value = processedTickets;
+                tickets_logger.info('チケット情報を一括更新', { ticketCount: processedTickets.size });
             }
             catch (error) {
                 tickets_logger.error('自分のチケット取得エラー', error);
@@ -37882,12 +37968,24 @@ const useTicketsStore = defineStore('tickets', () => {
         await Promise.all(promises);
         tickets_logger.info('入場スケジュール一括取得完了', { count: promises.length });
     };
-    // 初期化メソッド
+    // 初期化メソッド - キャッシュ復元と新鮮さ判定を担当
     const init = async () => {
+        if (isInitialized.value) {
+            tickets_logger.debug('既に初期化済みのためスキップ');
+            return;
+        }
         tickets_logger.info('チケットストア初期化開始');
-        await loadAllTickets();
-        await loadEntranceSchedulesRange(); // 入場スケジュール一括取得
+        // 1. キャッシュからの選択状態復元
         restoreSelectedEntranceDates();
+        // 2. データの新鮮さをチェック
+        if (!isFresh.value) {
+            tickets_logger.info('データが古いためチケット情報を更新');
+            await loadAllTickets(true); // 強制更新
+            await loadEntranceSchedulesRange(true); // 入場スケジュール一括取得
+        }
+        else {
+            tickets_logger.info(`キャッシュが新鮮のためAPI取得をスキップ（${Math.round((Date.now() - lastUpdateTime.value) / (1000 * 60))}分経過）`);
+        }
         isInitialized.value = true;
         tickets_logger.info('チケットストア初期化完了');
     };
@@ -37900,6 +37998,8 @@ const useTicketsStore = defineStore('tickets', () => {
         isInitialized,
         availableDates,
         entranceSchedules,
+        lastUpdateTime,
+        isFresh,
         // Getters
         ticketsArray,
         selectedTickets,
@@ -37930,7 +38030,7 @@ const useTicketsStore = defineStore('tickets', () => {
 }, {
     persist: {
         key: 'ytomo-tickets-store',
-        pick: ['selectedEntranceDates', 'tickets', 'lastUpdateTime', 'entranceSchedules', 'entranceSchedulesUpdateTime'], // キャッシュも永続化
+        pick: ['selectedEntranceDates', 'tickets', 'lastUpdateTime', 'entranceSchedules', 'entranceSchedulesUpdateTime'], // キャッシュを永続化
         serializer: {
             serialize: (data) => {
                 // MapをObjectに変換してシリアライズ
@@ -38624,7 +38724,8 @@ const _hoisted_4 = ["disabled", "title"];
         const ticketsStore = useTicketsStore();
         const pavilionsStore = usePavilionsStore();
         const isInitialized = runtime_core_esm_bundler_computed(() => {
-            return ticketsStore.isInitialized && pavilionsStore.isInitialized;
+            // lastUpdateTimeが存在すれば初期化済みと判定
+            return ticketsStore.lastUpdateTime > 0 && pavilionsStore.isInitialized;
         });
         const reservationResult = ref(null);
         const handleClick = () => {
@@ -39303,6 +39404,8 @@ const _hoisted_35 = ["disabled"];
                 return 'badge-won';
             if (reservationStatus.periodStatus === 'expired')
                 return 'badge-expired';
+            if (reservationStatus.periodStatus === 'active')
+                return 'badge-active';
             if (reservationStatus.periodStatus === 'before')
                 return 'badge-before';
             if (reservationStatus.submissionStatus === 'submitted')
@@ -39669,9 +39772,9 @@ const _hoisted_35 = ["disabled"];
 
 ;// ./ts/components/TicketTab.vue?vue&type=script&setup=true&lang=ts
  
-// EXTERNAL MODULE: ./node_modules/css-loader/dist/cjs.js!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/sass-loader/dist/cjs.js!./node_modules/vue-loader/dist/index.js??ruleSet[1].rules[8].use[0]!./ts/components/TicketTab.vue?vue&type=style&index=0&id=393ab085&scoped=true&lang=scss
-var TicketTabvue_type_style_index_0_id_393ab085_scoped_true_lang_scss = __webpack_require__(29);
-;// ./node_modules/style-loader/dist/cjs.js!./node_modules/css-loader/dist/cjs.js!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/sass-loader/dist/cjs.js!./node_modules/vue-loader/dist/index.js??ruleSet[1].rules[8].use[0]!./ts/components/TicketTab.vue?vue&type=style&index=0&id=393ab085&scoped=true&lang=scss
+// EXTERNAL MODULE: ./node_modules/css-loader/dist/cjs.js!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/sass-loader/dist/cjs.js!./node_modules/vue-loader/dist/index.js??ruleSet[1].rules[8].use[0]!./ts/components/TicketTab.vue?vue&type=style&index=0&id=91fda206&scoped=true&lang=scss
+var TicketTabvue_type_style_index_0_id_91fda206_scoped_true_lang_scss = __webpack_require__(757);
+;// ./node_modules/style-loader/dist/cjs.js!./node_modules/css-loader/dist/cjs.js!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/sass-loader/dist/cjs.js!./node_modules/vue-loader/dist/index.js??ruleSet[1].rules[8].use[0]!./ts/components/TicketTab.vue?vue&type=style&index=0&id=91fda206&scoped=true&lang=scss
 
       
       
@@ -39683,22 +39786,22 @@ var TicketTabvue_type_style_index_0_id_393ab085_scoped_true_lang_scss = __webpac
       
       
 
-var TicketTabvue_type_style_index_0_id_393ab085_scoped_true_lang_scss_options = {};
+var TicketTabvue_type_style_index_0_id_91fda206_scoped_true_lang_scss_options = {};
 
-TicketTabvue_type_style_index_0_id_393ab085_scoped_true_lang_scss_options.styleTagTransform = (styleTagTransform_default());
-TicketTabvue_type_style_index_0_id_393ab085_scoped_true_lang_scss_options.setAttributes = (setAttributesWithoutAttributes_default());
-TicketTabvue_type_style_index_0_id_393ab085_scoped_true_lang_scss_options.insert = insertBySelector_default().bind(null, "head");
-TicketTabvue_type_style_index_0_id_393ab085_scoped_true_lang_scss_options.domAPI = (styleDomAPI_default());
-TicketTabvue_type_style_index_0_id_393ab085_scoped_true_lang_scss_options.insertStyleElement = (insertStyleElement_default());
+TicketTabvue_type_style_index_0_id_91fda206_scoped_true_lang_scss_options.styleTagTransform = (styleTagTransform_default());
+TicketTabvue_type_style_index_0_id_91fda206_scoped_true_lang_scss_options.setAttributes = (setAttributesWithoutAttributes_default());
+TicketTabvue_type_style_index_0_id_91fda206_scoped_true_lang_scss_options.insert = insertBySelector_default().bind(null, "head");
+TicketTabvue_type_style_index_0_id_91fda206_scoped_true_lang_scss_options.domAPI = (styleDomAPI_default());
+TicketTabvue_type_style_index_0_id_91fda206_scoped_true_lang_scss_options.insertStyleElement = (insertStyleElement_default());
 
-var TicketTabvue_type_style_index_0_id_393ab085_scoped_true_lang_scss_update = injectStylesIntoStyleTag_default()(TicketTabvue_type_style_index_0_id_393ab085_scoped_true_lang_scss/* default */.A, TicketTabvue_type_style_index_0_id_393ab085_scoped_true_lang_scss_options);
-
-
+var TicketTabvue_type_style_index_0_id_91fda206_scoped_true_lang_scss_update = injectStylesIntoStyleTag_default()(TicketTabvue_type_style_index_0_id_91fda206_scoped_true_lang_scss/* default */.A, TicketTabvue_type_style_index_0_id_91fda206_scoped_true_lang_scss_options);
 
 
-       /* harmony default export */ const components_TicketTabvue_type_style_index_0_id_393ab085_scoped_true_lang_scss = (TicketTabvue_type_style_index_0_id_393ab085_scoped_true_lang_scss/* default */.A && TicketTabvue_type_style_index_0_id_393ab085_scoped_true_lang_scss/* default */.A.locals ? TicketTabvue_type_style_index_0_id_393ab085_scoped_true_lang_scss/* default */.A.locals : undefined);
 
-;// ./ts/components/TicketTab.vue?vue&type=style&index=0&id=393ab085&scoped=true&lang=scss
+
+       /* harmony default export */ const components_TicketTabvue_type_style_index_0_id_91fda206_scoped_true_lang_scss = (TicketTabvue_type_style_index_0_id_91fda206_scoped_true_lang_scss/* default */.A && TicketTabvue_type_style_index_0_id_91fda206_scoped_true_lang_scss/* default */.A.locals ? TicketTabvue_type_style_index_0_id_91fda206_scoped_true_lang_scss/* default */.A.locals : undefined);
+
+;// ./ts/components/TicketTab.vue?vue&type=style&index=0&id=91fda206&scoped=true&lang=scss
 
 // EXTERNAL MODULE: ./node_modules/vue-loader/dist/exportHelper.js
 var exportHelper = __webpack_require__(262);
@@ -39709,7 +39812,7 @@ var exportHelper = __webpack_require__(262);
 ;
 
 
-const TicketTab_exports_ = /*#__PURE__*/(0,exportHelper/* default */.A)(TicketTabvue_type_script_setup_true_lang_ts, [['__scopeId',"data-v-393ab085"]])
+const TicketTab_exports_ = /*#__PURE__*/(0,exportHelper/* default */.A)(TicketTabvue_type_script_setup_true_lang_ts, [['__scopeId',"data-v-91fda206"]])
 
 /* harmony default export */ const TicketTab = (TicketTab_exports_);
 ;// ./ts/stores/overlays.ts
@@ -39858,6 +39961,11 @@ const useSequentialReservationStore = defineStore('sequentialReservation', () =>
     };
     // 次の予約を実行（再帰呼び出し）
     const executeNextReservation = async () => {
+        loggerInstance.temp('executeNextReservation開始', {
+            isRunning: state.value.isRunning,
+            currentTargetIndex: state.value.currentTargetIndex,
+            targetsLength: state.value.reservationTargets.length
+        });
         if (!state.value.isRunning) {
             loggerInstance.info('継続予約が中断されました');
             return;
@@ -40805,64 +40913,529 @@ var PavilionTabvue_type_style_index_0_id_910d08c4_scoped_true_lang_scss_update =
 const PavilionTab_exports_ = /*#__PURE__*/(0,exportHelper/* default */.A)(PavilionTabvue_type_script_setup_true_lang_ts, [['__scopeId',"data-v-910d08c4"]])
 
 /* harmony default export */ const PavilionTab = (PavilionTab_exports_);
+;// ./ts/modules/entrance-reservation-api-manager.ts
+
+
+const entrance_reservation_api_manager_logger = utils_logger/* loggers */.C$.entranceReservation;
+class EntranceReservationApiManager {
+    constructor() {
+        // タイマー管理
+        this.reservationTimer = null;
+        this.waitingProgressTimer = null;
+        this.waitingStartTime = null;
+        this.waitingDuration = 0;
+        this.executedReservations = new Set();
+        this.reservationStatus = ref({
+            visible: false,
+            isActive: false,
+            currentAction: '',
+            progress: 0,
+            progressText: '',
+            statusClass: '',
+            dateChange: undefined
+        });
+        this.reservationInfo = ref({
+            visible: false,
+            date: '',
+            timeSlots: [],
+            completed: false
+        });
+        this.isReservationRunning = ref(false);
+        this.reservationHistory = ref([]);
+    }
+    // 待機時間プログレスバーの開始
+    startWaitingProgress(durationMs, actionText) {
+        this.waitingStartTime = Date.now();
+        this.waitingDuration = durationMs;
+        // 既存のタイマーをクリア
+        if (this.waitingProgressTimer) {
+            clearInterval(this.waitingProgressTimer);
+        }
+        // プログレスバーを定期的に更新
+        this.waitingProgressTimer = setInterval(() => {
+            if (!this.waitingStartTime || !this.reservationStatus.value.visible) {
+                clearInterval(this.waitingProgressTimer);
+                this.waitingProgressTimer = null;
+                return;
+            }
+            const elapsed = Date.now() - this.waitingStartTime;
+            const remaining = Math.max(0, this.waitingDuration - elapsed);
+            const progress = Math.min(100, (elapsed / this.waitingDuration) * 100);
+            this.reservationStatus.value.progress = progress;
+            this.reservationStatus.value.progressText = `${Math.floor(progress)}%`;
+            this.reservationStatus.value.currentAction = `待機中 ${Math.ceil(remaining / 1000)}秒`;
+            // 待機時間終了
+            if (remaining <= 0) {
+                clearInterval(this.waitingProgressTimer);
+                this.waitingProgressTimer = null;
+                this.waitingStartTime = null;
+            }
+        }, 100); // 100ms間隔で更新
+    }
+    // 待機プログレスバーのクリア
+    clearWaitingProgress() {
+        if (this.waitingProgressTimer) {
+            clearInterval(this.waitingProgressTimer);
+            this.waitingProgressTimer = null;
+        }
+        this.waitingStartTime = null;
+        this.waitingDuration = 0;
+    }
+    // サイクル処理を停止
+    clearReservationTimer() {
+        if (this.reservationTimer) {
+            clearTimeout(this.reservationTimer);
+            this.reservationTimer = null;
+        }
+        this.clearWaitingProgress();
+        this.executedReservations.clear();
+    }
+    // 35秒まで待機
+    waitUntil35Seconds(selectedTimeSlots) {
+        if (!this.isReservationRunning.value)
+            return;
+        // 次の35秒まで待機
+        const now = new Date();
+        const currentSeconds = now.getSeconds();
+        const waitTime = currentSeconds <= 35 ?
+            (35 - currentSeconds) * 1000 :
+            (60 + 35 - currentSeconds) * 1000;
+        this.reservationStatus.value = {
+            visible: true,
+            isActive: true,
+            currentAction: `待機中 ${Math.ceil(waitTime / 1000)}秒`,
+            progress: 0,
+            progressText: '待機中',
+            statusClass: ''
+        };
+        // 待機時間のプログレスバーを開始
+        this.startWaitingProgress(waitTime, `待機中 ${Math.ceil(waitTime / 1000)}秒`);
+        this.reservationTimer = setTimeout(() => {
+            this.executeCycleStep(selectedTimeSlots);
+        }, waitTime);
+    }
+    // サイクルステップを実行（毎分35秒に実行）
+    async executeCycleStep(selectedTimeSlots) {
+        try {
+            if (!this.isReservationRunning.value)
+                return;
+            // 未実行の時間帯のうち、最も優先度の高いものを実行
+            const unexecutedSlots = selectedTimeSlots.filter(slot => !this.executedReservations.has(`${slot.gate}-${slot.time}`));
+            if (unexecutedSlots.length === 0) {
+                // すべて実行済みの場合は60秒後に再実行
+                this.scheduleNextCycle(selectedTimeSlots);
+                return;
+            }
+            // 最優先の時間帯を選択（優先度の高い順）
+            const topPrioritySlot = unexecutedSlots.reduce((prev, current) => (prev.priority > current.priority) ? prev : current);
+            const topPriorityKey = `${topPrioritySlot.gate}-${topPrioritySlot.time}`;
+            this.reservationStatus.value = {
+                visible: true,
+                isActive: true,
+                currentAction: `予約実行中 - ${topPrioritySlot.gate}${topPrioritySlot.time}`,
+                progress: 0,
+                progressText: '実行中',
+                statusClass: ''
+            };
+            // 実際の予約処理を実行
+            entrance_reservation_api_manager_logger.info('最優先予約実行開始', { slot: topPrioritySlot });
+            this.simulateReservationSteps(topPrioritySlot);
+            // TODO: 実際のAPI呼び出しに置き換える
+            const reservationResult = await this.mockReservationCall(topPrioritySlot);
+            if (reservationResult.success) {
+                // 成功時の処理
+                this.executedReservations.add(topPriorityKey);
+                this.addToHistory(true, topPrioritySlot.gate, topPrioritySlot.time);
+                entrance_reservation_api_manager_logger.info('最優先予約成功', { slot: topPrioritySlot, result: reservationResult });
+                // 予約成功時の処理
+                this.isReservationRunning.value = false;
+                this.clearReservationTimer();
+                // 日時変更情報を作成
+                const originalSlots = this.reservationInfo.value.timeSlots;
+                const originalSlot = originalSlots.length > 0 ? originalSlots[0] : null;
+                const originalDateTime = originalSlot ? `${this.reservationInfo.value.date} ${originalSlot.gate}${originalSlot.time}` : this.reservationInfo.value.date;
+                const newDate = this.formatDateForDisplay(new Date());
+                const newDateTime = `${newDate} ${topPrioritySlot.gate}${topPrioritySlot.time}`;
+                const dateTimeChange = originalDateTime !== newDateTime ? `${originalDateTime} → ${newDateTime}` : undefined;
+                this.reservationStatus.value = {
+                    visible: true,
+                    isActive: false,
+                    currentAction: `予約成功しました - ${topPrioritySlot.gate}${topPrioritySlot.time}`,
+                    progress: 100,
+                    progressText: '完了',
+                    statusClass: 'success',
+                    dateChange: dateTimeChange
+                };
+                // 実行時情報は変更しない（元の情報を保持）
+                // 条件付き追加実行の判定
+                await this.executeAdditionalReservations(selectedTimeSlots);
+            }
+            else {
+                // 失敗時は次のサイクルをスケジュール
+                this.addToHistory(false, topPrioritySlot.gate, topPrioritySlot.time);
+                entrance_reservation_api_manager_logger.warn('最優先予約失敗', { slot: topPrioritySlot, error: reservationResult.error });
+                this.scheduleNextCycle(selectedTimeSlots);
+            }
+        }
+        catch (error) {
+            entrance_reservation_api_manager_logger.error('サイクルステップエラー', error);
+            this.reservationStatus.value = {
+                visible: true,
+                isActive: false,
+                currentAction: 'エラーが発生しました',
+                progress: 0,
+                progressText: 'エラー',
+                statusClass: 'error'
+            };
+        }
+    }
+    // 次のサイクルをスケジュール
+    scheduleNextCycle(selectedTimeSlots) {
+        if (!this.isReservationRunning.value)
+            return;
+        const waitTime = 60 * 1000; // 60秒後
+        this.reservationStatus.value = {
+            visible: true,
+            isActive: true,
+            currentAction: '待機中 60秒',
+            progress: 0,
+            progressText: '待機中',
+            statusClass: ''
+        };
+        // 待機時間のプログレスバーを開始
+        this.startWaitingProgress(waitTime, '待機中 60秒');
+        this.reservationTimer = setTimeout(() => {
+            this.executeCycleStep(selectedTimeSlots);
+        }, waitTime);
+    }
+    // 条件付き追加実行
+    async executeAdditionalReservations(selectedTimeSlots) {
+        this.reservationStatus.value = {
+            visible: true,
+            isActive: true,
+            currentAction: '条件付き追加実行判定中',
+            progress: 50,
+            progressText: '判定中',
+            statusClass: ''
+        };
+        // 未実行の時間帯を取得
+        const unexecutedSlots = selectedTimeSlots.filter(slot => !this.executedReservations.has(`${slot.gate}-${slot.time}`));
+        if (unexecutedSlots.length === 0) {
+            entrance_reservation_api_manager_logger.info('すべての予約が完了しました');
+            return;
+        }
+        // 条件判定（例：特定の条件下でのみ追加実行）
+        const shouldExecuteAdditional = this.shouldExecuteAdditionalReservation(unexecutedSlots);
+        if (!shouldExecuteAdditional) {
+            entrance_reservation_api_manager_logger.info('条件付き追加実行：条件を満たさないため終了');
+            return;
+        }
+        entrance_reservation_api_manager_logger.info('条件付き追加実行開始', { slots: unexecutedSlots });
+        // 優先度順に実行する時間帯を決定（最大3つまで）
+        const slotsToExecute = unexecutedSlots
+            .sort((a, b) => b.priority - a.priority)
+            .slice(0, 3);
+        for (const [index, slot] of slotsToExecute.entries()) {
+            this.reservationStatus.value = {
+                visible: true,
+                isActive: true,
+                currentAction: `追加予約実行中 - ${slot.gate}${slot.time} (${index + 1}/${slotsToExecute.length})`,
+                progress: (index / slotsToExecute.length) * 100,
+                progressText: `${index + 1}/${slotsToExecute.length}`,
+                statusClass: ''
+            };
+            const slotKey = `${slot.gate}-${slot.time}`;
+            try {
+                const result = await this.mockReservationCall(slot);
+                if (result.success) {
+                    this.executedReservations.add(slotKey);
+                    this.addToHistory(true, slot.gate, slot.time);
+                    entrance_reservation_api_manager_logger.info('追加実行成功', { slot, result });
+                    // 予約成功時の処理
+                    this.isReservationRunning.value = false;
+                    this.clearReservationTimer();
+                    // 日時変更情報を作成
+                    const originalSlots = this.reservationInfo.value.timeSlots;
+                    const originalSlot = originalSlots.length > 0 ? originalSlots[0] : null;
+                    const originalDateTime = originalSlot ? `${this.reservationInfo.value.date} ${originalSlot.gate}${originalSlot.time}` : this.reservationInfo.value.date;
+                    const newDate = this.formatDateForDisplay(new Date());
+                    const newDateTime = `${newDate} ${slot.gate}${slot.time}`;
+                    const dateTimeChange = originalDateTime !== newDateTime ? `${originalDateTime} → ${newDateTime}` : undefined;
+                    this.reservationStatus.value = {
+                        visible: true,
+                        isActive: false,
+                        currentAction: `予約成功しました - ${slot.gate}${slot.time}`,
+                        progress: 100,
+                        progressText: '完了',
+                        statusClass: 'success',
+                        dateChange: dateTimeChange
+                    };
+                    // 最初の成功で終了
+                    break;
+                }
+                else {
+                    this.addToHistory(false, slot.gate, slot.time);
+                    entrance_reservation_api_manager_logger.warn('追加実行失敗', { slot, error: result.error });
+                    // 失敗した場合は次のスロットを試行
+                    continue;
+                }
+            }
+            catch (error) {
+                entrance_reservation_api_manager_logger.error('追加実行エラー', { slot, error });
+                continue;
+            }
+        }
+    }
+    // 条件付き追加実行の判定
+    shouldExecuteAdditionalReservation(unexecutedSlots) {
+        // 例：未実行の時間帯が3つ以下の場合のみ実行
+        return unexecutedSlots.length <= 3;
+    }
+    // 予約結果を履歴に追加
+    addToHistory(success, gate, time) {
+        const result = {
+            success,
+            gate,
+            time,
+            timestamp: new Date().toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit', second: '2-digit' })
+        };
+        // 最新の結果を先頭に追加し、3つまでに制限
+        this.reservationHistory.value.unshift(result);
+        if (this.reservationHistory.value.length > 3) {
+            this.reservationHistory.value = this.reservationHistory.value.slice(0, 3);
+        }
+    }
+    // 日付を表示用形式（8/31形式）でフォーマット
+    formatDateForDisplay(date) {
+        const month = date.getMonth() + 1;
+        const day = date.getDate();
+        return `${month}/${day}`;
+    }
+    // 予約実行を開始
+    async executeReservation(selectedTimeSlots) {
+        if (this.isReservationRunning.value) {
+            // 予約中断処理
+            this.isReservationRunning.value = false;
+            this.clearReservationTimer();
+            this.reservationStatus.value = {
+                visible: true,
+                isActive: false,
+                currentAction: '予約を中断しました',
+                progress: 0,
+                progressText: '中断',
+                statusClass: 'cancelled'
+            };
+            return;
+        }
+        // 選択された時間帯の検証
+        if (selectedTimeSlots.length === 0) {
+            entrance_reservation_api_manager_logger.warn('選択された時間帯がありません');
+            return;
+        }
+        // 予約情報を表示（実行時情報として表示）
+        this.reservationInfo.value = {
+            visible: true,
+            date: this.formatDateForDisplay(new Date()), // 今日の日付を表示用形式で
+            timeSlots: selectedTimeSlots,
+            completed: false
+        };
+        // 予約実行状態を開始
+        this.isReservationRunning.value = true;
+        this.reservationStatus.value = {
+            visible: true,
+            isActive: true,
+            currentAction: '予約実行準備中',
+            progress: 0,
+            progressText: '準備中',
+            statusClass: ''
+        };
+        entrance_reservation_api_manager_logger.info('入場予約実行開始', { selectedTimeSlots });
+        try {
+            // 35秒まで待機してから実行開始
+            this.waitUntil35Seconds(selectedTimeSlots);
+        }
+        catch (error) {
+            entrance_reservation_api_manager_logger.error('予約実行エラー', error);
+            this.isReservationRunning.value = false;
+            this.clearReservationTimer();
+            this.reservationStatus.value = {
+                visible: true,
+                isActive: false,
+                currentAction: 'エラーが発生しました',
+                progress: 0,
+                progressText: 'エラー',
+                statusClass: 'error'
+            };
+        }
+    }
+    // 予約処理のシミュレーション（段階的進行）
+    simulateReservationSteps(slot) {
+        const stages = [
+            { action: 'アクセス中...', progress: 20, progressText: '1/5' },
+            { action: 'ページ遷移中...', progress: 40, progressText: '2/5' },
+            { action: '予約フォーム入力中...', progress: 60, progressText: '3/5' },
+            { action: '送信中...', progress: 80, progressText: '4/5' },
+            { action: '結果確認中...', progress: 100, progressText: '5/5' }
+        ];
+        stages.forEach((stage, index) => {
+            setTimeout(() => {
+                if (this.reservationStatus.value.visible) {
+                    this.reservationStatus.value.currentAction = stage.action;
+                    this.reservationStatus.value.progress = stage.progress;
+                    this.reservationStatus.value.progressText = stage.progressText;
+                    if (index === stages.length - 1) {
+                        // 最後のステージ後、実行結果確認中に変更
+                        setTimeout(() => {
+                            if (this.reservationStatus.value.visible) {
+                                this.reservationStatus.value.currentAction = '実行結果確認中...';
+                                this.reservationStatus.value.isActive = true;
+                                this.reservationStatus.value.progress = 100;
+                                this.reservationStatus.value.progressText = '確認中';
+                            }
+                        }, 2000);
+                    }
+                }
+            }, (index + 1) * 3000);
+        });
+    }
+    // モック予約API呼び出し
+    async mockReservationCall(slot) {
+        // 実際のAPI呼び出しの代わりのモック
+        await new Promise(resolve => setTimeout(resolve, 15000)); // 15秒待機
+        // ランダムに成功/失敗を決定（70%の確率で成功）
+        const success = Math.random() < 0.7;
+        if (success) {
+            return {
+                success: true,
+                date: new Date().toLocaleDateString('ja-JP', { month: 'long', day: 'numeric' })
+            };
+        }
+        else {
+            return {
+                success: false,
+                error: '予約に失敗しました'
+            };
+        }
+    }
+    // 状態リセット
+    resetState() {
+        this.isReservationRunning.value = false;
+        this.clearReservationTimer();
+        this.reservationStatus.value = {
+            visible: false,
+            isActive: false,
+            currentAction: '',
+            progress: 0,
+            progressText: '',
+            statusClass: ''
+        };
+        this.reservationInfo.value = {
+            visible: false,
+            date: '',
+            timeSlots: [],
+            completed: false
+        };
+        this.executedReservations.clear();
+        this.reservationHistory.value = [];
+    }
+}
+
 ;// ./node_modules/ts-loader/index.js??clonedRuleSet-1.use!./node_modules/vue-loader/dist/index.js??ruleSet[1].rules[8].use[0]!./ts/components/EntranceTab.vue?vue&type=script&setup=true&lang=ts
 
 
 const EntranceTabvue_type_script_setup_true_lang_ts_hoisted_1 = { class: "ytomo-entrance-tab" };
 const EntranceTabvue_type_script_setup_true_lang_ts_hoisted_2 = { class: "ytomo-entrance-layout" };
 const EntranceTabvue_type_script_setup_true_lang_ts_hoisted_3 = { class: "ytomo-entrance-calendar" };
-const EntranceTabvue_type_script_setup_true_lang_ts_hoisted_4 = { class: "ytomo-calendar-header" };
-const EntranceTabvue_type_script_setup_true_lang_ts_hoisted_5 = {
+const EntranceTabvue_type_script_setup_true_lang_ts_hoisted_4 = { class: "ytomo-calendar-body" };
+const EntranceTabvue_type_script_setup_true_lang_ts_hoisted_5 = { class: "ytomo-calendar-controls" };
+const EntranceTabvue_type_script_setup_true_lang_ts_hoisted_6 = { class: "ytomo-month-display" };
+const EntranceTabvue_type_script_setup_true_lang_ts_hoisted_7 = { class: "ytomo-current-month" };
+const EntranceTabvue_type_script_setup_true_lang_ts_hoisted_8 = { class: "ytomo-calendar-grid" };
+const EntranceTabvue_type_script_setup_true_lang_ts_hoisted_9 = { class: "ytomo-calendar-weekdays" };
+const EntranceTabvue_type_script_setup_true_lang_ts_hoisted_10 = { class: "ytomo-calendar-days" };
+const EntranceTabvue_type_script_setup_true_lang_ts_hoisted_11 = ["data-date"];
+const EntranceTabvue_type_script_setup_true_lang_ts_hoisted_12 = { class: "ytomo-day-number" };
+const EntranceTabvue_type_script_setup_true_lang_ts_hoisted_13 = { class: "ytomo-availability-indicator" };
+const EntranceTabvue_type_script_setup_true_lang_ts_hoisted_14 = { class: "ytomo-gate-availability" };
+const EntranceTabvue_type_script_setup_true_lang_ts_hoisted_15 = { class: "ytomo-gate-availability" };
+const EntranceTabvue_type_script_setup_true_lang_ts_hoisted_16 = { class: "ytomo-entrance-reservations" };
+const EntranceTabvue_type_script_setup_true_lang_ts_hoisted_17 = {
     key: 0,
-    class: "ytomo-selected-date"
+    class: "ytomo-date-display-container"
 };
-const EntranceTabvue_type_script_setup_true_lang_ts_hoisted_6 = { class: "ytomo-header-buttons" };
-const EntranceTabvue_type_script_setup_true_lang_ts_hoisted_7 = { class: "ytomo-calendar-body" };
-const EntranceTabvue_type_script_setup_true_lang_ts_hoisted_8 = { class: "ytomo-calendar-controls" };
-const EntranceTabvue_type_script_setup_true_lang_ts_hoisted_9 = { class: "ytomo-current-month" };
-const EntranceTabvue_type_script_setup_true_lang_ts_hoisted_10 = { class: "ytomo-calendar-grid" };
-const EntranceTabvue_type_script_setup_true_lang_ts_hoisted_11 = { class: "ytomo-calendar-weekdays" };
-const EntranceTabvue_type_script_setup_true_lang_ts_hoisted_12 = { class: "ytomo-calendar-days" };
-const EntranceTabvue_type_script_setup_true_lang_ts_hoisted_13 = ["data-date"];
-const EntranceTabvue_type_script_setup_true_lang_ts_hoisted_14 = { class: "ytomo-entrance-reservations" };
-const EntranceTabvue_type_script_setup_true_lang_ts_hoisted_15 = { class: "ytomo-reservation-table-container" };
-const EntranceTabvue_type_script_setup_true_lang_ts_hoisted_16 = {
+const EntranceTabvue_type_script_setup_true_lang_ts_hoisted_18 = {
+    key: 0,
+    class: "ytomo-existing-datetime-display"
+};
+const EntranceTabvue_type_script_setup_true_lang_ts_hoisted_19 = {
+    key: 1,
+    class: "ytomo-change-arrow"
+};
+const EntranceTabvue_type_script_setup_true_lang_ts_hoisted_20 = { class: "ytomo-selected-date-display" };
+const EntranceTabvue_type_script_setup_true_lang_ts_hoisted_21 = { class: "ytomo-reservation-table-container" };
+const EntranceTabvue_type_script_setup_true_lang_ts_hoisted_22 = {
     key: 0,
     class: "ytomo-entrance-table"
 };
-const EntranceTabvue_type_script_setup_true_lang_ts_hoisted_17 = ["onClick"];
-const EntranceTabvue_type_script_setup_true_lang_ts_hoisted_18 = { key: 0 };
-const EntranceTabvue_type_script_setup_true_lang_ts_hoisted_19 = { key: 1 };
-const EntranceTabvue_type_script_setup_true_lang_ts_hoisted_20 = { key: 2 };
-const EntranceTabvue_type_script_setup_true_lang_ts_hoisted_21 = { key: 3 };
-const EntranceTabvue_type_script_setup_true_lang_ts_hoisted_22 = { class: "ytomo-time-text" };
-const EntranceTabvue_type_script_setup_true_lang_ts_hoisted_23 = {
-    key: 0,
-    class: "ytomo-check-mark"
-};
-const EntranceTabvue_type_script_setup_true_lang_ts_hoisted_24 = ["onClick"];
-const EntranceTabvue_type_script_setup_true_lang_ts_hoisted_25 = { key: 0 };
-const EntranceTabvue_type_script_setup_true_lang_ts_hoisted_26 = { key: 1 };
-const EntranceTabvue_type_script_setup_true_lang_ts_hoisted_27 = { key: 2 };
-const EntranceTabvue_type_script_setup_true_lang_ts_hoisted_28 = { key: 3 };
-const EntranceTabvue_type_script_setup_true_lang_ts_hoisted_29 = { class: "ytomo-time-text" };
+const EntranceTabvue_type_script_setup_true_lang_ts_hoisted_23 = ["onClick"];
+const EntranceTabvue_type_script_setup_true_lang_ts_hoisted_24 = { key: 0 };
+const EntranceTabvue_type_script_setup_true_lang_ts_hoisted_25 = { key: 1 };
+const EntranceTabvue_type_script_setup_true_lang_ts_hoisted_26 = { key: 2 };
+const EntranceTabvue_type_script_setup_true_lang_ts_hoisted_27 = { key: 3 };
+const EntranceTabvue_type_script_setup_true_lang_ts_hoisted_28 = { class: "ytomo-time-text" };
+const EntranceTabvue_type_script_setup_true_lang_ts_hoisted_29 = { class: "ytomo-selection-area" };
 const EntranceTabvue_type_script_setup_true_lang_ts_hoisted_30 = {
     key: 0,
-    class: "ytomo-check-mark"
+    class: "ytomo-selection-number"
 };
-const EntranceTabvue_type_script_setup_true_lang_ts_hoisted_31 = {
+const EntranceTabvue_type_script_setup_true_lang_ts_hoisted_31 = ["onClick"];
+const EntranceTabvue_type_script_setup_true_lang_ts_hoisted_32 = { key: 0 };
+const EntranceTabvue_type_script_setup_true_lang_ts_hoisted_33 = { key: 1 };
+const EntranceTabvue_type_script_setup_true_lang_ts_hoisted_34 = { key: 2 };
+const EntranceTabvue_type_script_setup_true_lang_ts_hoisted_35 = { key: 3 };
+const _hoisted_36 = { class: "ytomo-time-text" };
+const _hoisted_37 = { class: "ytomo-selection-area" };
+const _hoisted_38 = {
+    key: 0,
+    class: "ytomo-selection-number"
+};
+const _hoisted_39 = {
     key: 1,
     class: "ytomo-no-date-selected"
 };
-const EntranceTabvue_type_script_setup_true_lang_ts_hoisted_32 = {
-    key: 0,
+const _hoisted_40 = {
+    key: 1,
     class: "ytomo-reservation-actions"
 };
-const EntranceTabvue_type_script_setup_true_lang_ts_hoisted_33 = {
+const _hoisted_41 = ["disabled"];
+const _hoisted_42 = { class: "ytomo-execution-info" };
+const _hoisted_43 = { class: "ytomo-reservation-box" };
+const _hoisted_44 = { class: "ytomo-reservation-date" };
+const _hoisted_45 = { class: "ytomo-reservation-timeslots" };
+const _hoisted_46 = { class: "ytomo-status-content" };
+const _hoisted_47 = {
+    key: 0,
+    class: "ytomo-status-icon spinning"
+};
+const _hoisted_48 = { class: "ytomo-status-details" };
+const _hoisted_49 = { class: "ytomo-status-current" };
+const _hoisted_50 = {
     key: 0,
     class: "ytomo-datetime-change"
 };
-const EntranceTabvue_type_script_setup_true_lang_ts_hoisted_34 = ["disabled"];
+const _hoisted_51 = {
+    key: 1,
+    class: "ytomo-status-progress"
+};
+const _hoisted_52 = { class: "ytomo-progress-bar" };
+const _hoisted_53 = { class: "ytomo-progress-text" };
+const _hoisted_54 = {
+    key: 2,
+    class: "ytomo-reservation-history"
+};
+const _hoisted_55 = { class: "ytomo-history-time" };
+const _hoisted_56 = { class: "ytomo-history-slot" };
+
 
 
 
@@ -40871,12 +41444,64 @@ const EntranceTabvue_type_script_setup_true_lang_ts_hoisted_34 = ["disabled"];
     setup(__props) {
         const logger = utils_logger/* loggers */.C$.ui;
         const ticketsStore = useTicketsStore();
+        // 予約管理インスタンス
+        const reservationManager = new EntranceReservationApiManager();
         // カレンダー状態
         const isCalendarExpanded = ref(true);
         const selectedDate = ref('');
         const currentMonth = ref(new Date()); // 現在の年月
-        // 現在選択されているスケジュール（入場予約）
-        const selectedSchedule = ref(null);
+        // 現在選択されているスケジュール（ticket.schedulesから検索）
+        const selectedSchedule = runtime_core_esm_bundler_computed(() => {
+            for (const ticket of ticketsStore.tickets.values()) {
+                if (ticket.schedules) {
+                    const selected = ticket.schedules.find(schedule => schedule.selected === true);
+                    if (selected) {
+                        return selected;
+                    }
+                }
+            }
+            return null;
+        });
+        // 時間帯選択順を管理（選択順序を記録）
+        const selectionOrder = ref([]);
+        // カレンダー空き状況キャッシュ
+        const calendarAvailabilityCache = ref(null);
+        // watcherは削除（toggleTimeSlot内で直接処理）
+        // カレンダー空き状況キャッシュを更新（全期間）
+        const updateCalendarAvailabilityCache = (selectedTime) => {
+            const cache = {};
+            // 全期間（2024年12月〜2025年10月）の空き状況を計算
+            const startYear = 2024;
+            const startMonth = 12;
+            const endYear = 2025;
+            const endMonth = 10;
+            for (let year = startYear; year <= endYear; year++) {
+                const monthStart = year === startYear ? startMonth : 1;
+                const monthEnd = year === endYear ? endMonth : 12;
+                for (let month = monthStart; month <= monthEnd; month++) {
+                    const lastDay = new Date(year, month, 0).getDate();
+                    for (let day = 1; day <= lastDay; day++) {
+                        const dateString = `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                        cache[dateString] = getSelectedTimeSlotAvailability(dateString, selectedTime);
+                    }
+                }
+            }
+            calendarAvailabilityCache.value = cache;
+            logger.info('全期間の空き状況キャッシュ更新完了', {
+                selectedTime,
+                totalDates: Object.keys(cache).length
+            });
+        };
+        // 選択順序の数字を取得
+        const getSelectionNumber = (timeSlot, gate) => {
+            const key = `${timeSlot}-${gate}`;
+            const orderItem = selectionOrder.value.find(item => item.key === key);
+            return orderItem ? orderItem.order : null;
+        };
+        // 予約状態をマネージャーから取得
+        const reservationInfo = reservationManager.reservationInfo;
+        const reservationStatus = reservationManager.reservationStatus;
+        const isReservationRunning = reservationManager.isReservationRunning;
         // 選択されている時間帯の数を計算
         const selectedTimeSlotCount = runtime_core_esm_bundler_computed(() => {
             return timeSlots.value.reduce((count, slot) => {
@@ -40885,54 +41510,146 @@ const EntranceTabvue_type_script_setup_true_lang_ts_hoisted_34 = ["disabled"];
         });
         // 予約ボタンの有効性判定
         const isReservationButtonEnabled = runtime_core_esm_bundler_computed(() => {
-            // 条件: 選択中の入場予約が1つかつ、それが自分の予約かつ、時間帯が選択されている
-            return selectedSchedule.value &&
-                selectedSchedule.value.isOwn === true &&
-                selectedTimeSlotCount.value === 1;
+            // 条件: 時間帯が1つ以上選択されている かつ（新規予約 または 自分の予約を変更）
+            if (selectedTimeSlotCount.value < 1) {
+                return false;
+            }
+            // 新規予約の場合（selectedScheduleがnull）は有効
+            if (!selectedSchedule.value) {
+                return true;
+            }
+            // 既存予約の場合は自分の予約のみ変更可能
+            // selectedScheduleのuser_visiting_reservation_idで親チケットを探す
+            const selectedTickets = ticketsStore.selectedTickets;
+            const parentTicket = selectedTickets.find(ticket => ticket.schedules?.some(s => s.user_visiting_reservation_id === selectedSchedule.value?.user_visiting_reservation_id));
+            // デバッグ用ログ
+            logger.info('予約ボタン有効性判定', {
+                selectedSchedule: selectedSchedule.value,
+                hasSchedule: !!selectedSchedule.value,
+                reservationId: selectedSchedule.value?.user_visiting_reservation_id,
+                parentTicketFound: !!parentTicket,
+                isOwn: parentTicket?.isOwn,
+                timeSlotCount: selectedTimeSlotCount.value
+            });
+            return parentTicket?.isOwn === true;
         });
         // 予約ボタンテキストの動的決定
         const reservationButtonText = runtime_core_esm_bundler_computed(() => {
             if (!selectedSchedule.value) {
                 return '新規予約';
             }
-            // 既存の入場日時があるかチェック
-            const hasExistingDateTime = selectedSchedule.value.entrance_date &&
-                selectedSchedule.value.time_start;
-            return hasExistingDateTime ? '変更予約' : '新規予約';
+            // 既存の予約があるかチェック
+            // user_visiting_reservation_idが存在し、-1以外で、entrance_dateが設定済みの場合は変更予約
+            const hasExistingReservation = selectedSchedule.value.user_visiting_reservation_id != null &&
+                selectedSchedule.value.user_visiting_reservation_id > 0 &&
+                selectedSchedule.value.entrance_date;
+            logger.info('予約ボタンテキスト判定', {
+                hasSelectedSchedule: !!selectedSchedule.value,
+                reservationId: selectedSchedule.value?.user_visiting_reservation_id,
+                entranceDate: selectedSchedule.value?.entrance_date,
+                hasExistingReservation,
+                buttonText: hasExistingReservation ? '変更予約' : '新規予約'
+            });
+            return hasExistingReservation ? '変更予約' : '新規予約';
         });
         // 既存日時→新日時の表示テキスト
         const dateTimeChangeText = runtime_core_esm_bundler_computed(() => {
-            if (!selectedSchedule.value || selectedTimeSlotCount.value !== 1) {
+            if (!selectedSchedule.value || selectedTimeSlotCount.value < 1) {
                 return '';
             }
-            const hasExistingDateTime = selectedSchedule.value.entrance_date &&
-                selectedSchedule.value.time_start;
-            if (!hasExistingDateTime) {
+            const hasExistingReservation = selectedSchedule.value.user_visiting_reservation_id != null &&
+                selectedSchedule.value.user_visiting_reservation_id > 0 &&
+                selectedSchedule.value.entrance_date;
+            if (!hasExistingReservation) {
                 return ''; // 新規予約の場合は矢印表示なし
             }
             // 選択された新しい時間帯情報を取得
             const newTimeSlot = getSelectedTimeSlotInfo();
             if (!newTimeSlot)
                 return '';
-            const existingDate = formatDateFromDateString(selectedSchedule.value.entrance_date);
+            const existingDate = formatDateForDisplay(selectedSchedule.value.entrance_date);
             const existingTime = selectedSchedule.value.time_start;
             const existingGate = selectedSchedule.value.gate_type === 1 ? '東' : '西';
-            const newDate = formatDate(selectedDate.value);
+            const newDate = formatDateForDisplay(selectedDate.value);
             const newGate = newTimeSlot.gate;
             const newTime = newTimeSlot.time;
-            return `${existingDate} ${existingTime} (${existingGate}) → ${newDate} ${newTime} (${newGate})`;
+            return `${existingDate} ${existingGate}${existingTime} → ${newDate} ${newGate}${newTime}`;
         });
-        // 選択された時間帯情報を取得
-        const getSelectedTimeSlotInfo = () => {
-            for (const slot of timeSlots.value) {
-                if (slot.east.selected) {
-                    return { time: slot.time, gate: '東', gateType: 1 };
-                }
-                if (slot.west.selected) {
-                    return { time: slot.time, gate: '西', gateType: 2 };
-                }
+        // 変更前の日時テキストを取得
+        const getFromDateTimeText = () => {
+            if (!selectedSchedule.value) {
+                logger.debug('getFromDateTimeText: selectedScheduleがnull');
+                return '';
             }
-            return null;
+            // 必要なプロパティが存在するかチェック
+            if (!selectedSchedule.value.entrance_date || !selectedSchedule.value.time_start || selectedSchedule.value.gate_type == null) {
+                logger.debug('getFromDateTimeText: 必要なプロパティが不足', {
+                    entrance_date: selectedSchedule.value.entrance_date,
+                    time_start: selectedSchedule.value.time_start,
+                    gate_type: selectedSchedule.value.gate_type
+                });
+                return '';
+            }
+            const date = formatDateForDisplay(selectedSchedule.value.entrance_date);
+            const time = selectedSchedule.value.time_start;
+            const gate = selectedSchedule.value.gate_type === 1 ? '東' : '西';
+            const result = `${date} ${gate}${time}`;
+            logger.debug('getFromDateTimeText: 結果', {
+                selectedSchedule: selectedSchedule.value,
+                result
+            });
+            return result;
+        };
+        // 変更後の日時テキストを取得
+        const getToDateTimeText = () => {
+            const newTimeSlot = getSelectedTimeSlotInfo();
+            if (!newTimeSlot)
+                return '';
+            const date = formatDateForDisplay(selectedDate.value);
+            const gate = newTimeSlot.gate;
+            const time = newTimeSlot.time;
+            return `${date} ${gate}${time}`;
+        };
+        // 選択された時間帯情報を取得（選択順1番の要素を返す）
+        const getSelectedTimeSlotInfo = () => {
+            if (selectionOrder.value.length === 0) {
+                return null;
+            }
+            // 選択順1番の要素を取得
+            const firstSelection = selectionOrder.value.find(item => item.order === 1);
+            if (!firstSelection) {
+                logger.warn('選択順1番の要素が見つかりません', {
+                    selectionOrder: selectionOrder.value,
+                    allOrders: selectionOrder.value.map(item => item.order)
+                });
+                return null;
+            }
+            const [time, gate] = firstSelection.key.split('-');
+            const gateType = gate === 'east' ? 1 : 2;
+            const gateText = gate === 'east' ? '東' : '西';
+            logger.debug('選択時間帯情報取得', {
+                firstSelection,
+                time,
+                gate: gateText,
+                gateType,
+                totalSelections: selectionOrder.value.length
+            });
+            return { time, gate: gateText, gateType };
+        };
+        // 選択された時間帯を優先度順に取得
+        const getSelectedTimeSlotsInPriorityOrder = () => {
+            // 選択順序でソート
+            const sortedSelections = [...selectionOrder.value].sort((a, b) => a.order - b.order);
+            return sortedSelections.map((selection, index) => {
+                const [time, gate] = selection.key.split('-');
+                const gateText = gate === 'east' ? '東' : '西';
+                return {
+                    id: selection.key,
+                    time: time,
+                    gate: gateText,
+                    priority: index + 1
+                };
+            });
         };
         // YYYYMMDD形式の日付をフォーマット
         const formatDateFromDateString = (dateString) => {
@@ -40944,12 +41661,30 @@ const EntranceTabvue_type_script_setup_true_lang_ts_hoisted_34 = ["disabled"];
             }
             return dateString;
         };
+        // 日付を「8/31」形式でフォーマット（チケットタブと同様）
+        const formatDateForDisplay = (dateString) => {
+            if (dateString.includes('-')) {
+                // YYYY-MM-DD形式の場合
+                const date = new Date(dateString + 'T00:00:00');
+                return `${date.getMonth() + 1}/${date.getDate()}`;
+            }
+            else if (dateString.length === 8) {
+                // YYYYMMDD形式の場合
+                const month = parseInt(dateString.substring(4, 6));
+                const day = parseInt(dateString.substring(6, 8));
+                return `${month}/${day}`;
+            }
+            return dateString;
+        };
         // カレンダー表示用データ
         const weekdays = ['日', '月', '火', '水', '木', '金', '土'];
         const currentMonthDisplay = runtime_core_esm_bundler_computed(() => {
             return `${currentMonth.value.getFullYear()}年${currentMonth.value.getMonth() + 1}月`;
         });
         const calendarDates = runtime_core_esm_bundler_computed(() => {
+            if (!currentMonth.value) {
+                return [];
+            }
             const year = currentMonth.value.getFullYear();
             const month = currentMonth.value.getMonth();
             const firstDay = new Date(year, month, 1);
@@ -40972,14 +41707,21 @@ const EntranceTabvue_type_script_setup_true_lang_ts_hoisted_34 = ["disabled"];
                 const todayMonth = String(today.getMonth() + 1).padStart(2, '0');
                 const todayDay = String(today.getDate()).padStart(2, '0');
                 const todayString = `${todayYear}-${todayMonth}-${todayDay}`;
-                dates.push({
+                // 空き状況をすべての月の日付に表示（選択時間帯がある場合）
+                let availability = null;
+                if (selectedTimeSlotCount.value > 0 && calendarAvailabilityCache.value) {
+                    availability = calendarAvailabilityCache.value[dateString] || null;
+                }
+                const dateObj = {
                     key: dateString,
                     day: date.getDate(),
                     dateString,
                     isCurrentMonth,
                     isToday: dateString === todayString,
-                    disabled: !isCurrentMonth || isDateDisabled(date) // 今日〜2025年10月のみ有効
-                });
+                    disabled: !isCurrentMonth || isDateDisabled(date),
+                    availability
+                };
+                dates.push(dateObj);
             }
             return dates;
         });
@@ -40989,23 +41731,63 @@ const EntranceTabvue_type_script_setup_true_lang_ts_hoisted_34 = ["disabled"];
         const toggleCalendar = () => {
             isCalendarExpanded.value = !isCalendarExpanded.value;
         };
-        const previousMonth = () => {
+        const previousMonth = async () => {
+            logger.info('previousMonth関数実行開始');
             const newMonth = new Date(currentMonth.value);
             newMonth.setMonth(newMonth.getMonth() - 1);
             const today = new Date();
             const minDate = new Date(today.getFullYear(), today.getMonth(), 1); // 当月の1日
             // 当月以降の制限
+            logger.info('前月ボタン:条件チェック', { newMonth: newMonth.toISOString(), minDate: minDate.toISOString(), canProceed: newMonth >= minDate });
             if (newMonth >= minDate) {
                 currentMonth.value = newMonth;
+                // 月変更時に入場スケジュールを取得
+                const year = newMonth.getFullYear();
+                const month = newMonth.getMonth() + 1;
+                logger.info('前月ボタン:データ取得開始', { year, month });
+                await ticketsStore.getEntranceScheduleData(year, month, false);
+                logger.info('前月ボタン:データ取得完了', {
+                    year,
+                    month,
+                    hasData: ticketsStore.entranceSchedules.has(`${year}-${month}`),
+                    scheduleKeys: ticketsStore.entranceSchedules.has(`${year}-${month}`) ? Object.keys(ticketsStore.entranceSchedules.get(`${year}-${month}`)?.states || {}) : []
+                });
+                // 選択日付がある場合は時間帯データを更新（選択状態を保持）
+                if (selectedDate.value) {
+                    await loadTimeSlotsForDateWithSelection(selectedDate.value);
+                }
             }
         };
-        const nextMonth = () => {
+        const nextMonth = async () => {
+            logger.info('nextMonth関数実行開始');
             const newMonth = new Date(currentMonth.value);
             newMonth.setMonth(newMonth.getMonth() + 1);
-            const maxDate = new Date(2025, 9, 13); // 2025年10月13日（万博最終日）
-            // 2025年10月以前の制限
-            if (newMonth <= maxDate) {
+            // 2025年10月までの制限（月のみで比較）
+            const newYear = newMonth.getFullYear();
+            const newMonthNum = newMonth.getMonth() + 1;
+            const canProceed = newYear < 2025 || (newYear === 2025 && newMonthNum <= 10);
+            logger.info('次月ボタン:条件チェック', {
+                newYear,
+                newMonthNum,
+                canProceed
+            });
+            if (canProceed) {
                 currentMonth.value = newMonth;
+                // 月変更時に入場スケジュールを取得
+                const year = newMonth.getFullYear();
+                const month = newMonth.getMonth() + 1;
+                logger.info('前月ボタン:データ取得開始', { year, month });
+                await ticketsStore.getEntranceScheduleData(year, month, false);
+                logger.info('次月ボタン:データ取得完了', {
+                    year,
+                    month,
+                    hasData: ticketsStore.entranceSchedules.has(`${year}-${month}`),
+                    scheduleKeys: ticketsStore.entranceSchedules.has(`${year}-${month}`) ? Object.keys(ticketsStore.entranceSchedules.get(`${year}-${month}`)?.states || {}) : []
+                });
+                // 選択日付がある場合は時間帯データを更新（選択状態を保持）
+                if (selectedDate.value) {
+                    await loadTimeSlotsForDateWithSelection(selectedDate.value);
+                }
             }
         };
         const selectDate = async (event) => {
@@ -41034,17 +41816,41 @@ const EntranceTabvue_type_script_setup_true_lang_ts_hoisted_34 = ["disabled"];
                     newMonth: `${selectedDateObj.getFullYear()}年${selectedDateObj.getMonth() + 1}月`
                 });
             }
-            // 日付変更時は時間帯選択をクリア
-            clearTimeSlotSelection();
             logger.info('日付選択', { date: dateString });
-            // 選択された日付の時間帯データを取得
-            await loadTimeSlotsForDate(dateString);
+            // 選択された日付の時間帯データを取得（選択状態を保持）
+            await loadTimeSlotsForDateWithSelection(dateString);
         };
         // 時間帯選択のみをクリア（予約選択は保持）
         const clearTimeSlotSelection = () => {
             timeSlots.value.forEach(slot => {
                 slot.east.selected = false;
                 slot.west.selected = false;
+            });
+        };
+        // 指定日の時間帯データを読み込み（選択状態を保持）
+        const loadTimeSlotsForDateWithSelection = async (date) => {
+            // 既存の選択状態を保存
+            const existingSelections = new Map();
+            timeSlots.value.forEach(slot => {
+                if (slot.east.selected || slot.west.selected) {
+                    existingSelections.set(slot.time, {
+                        east: slot.east.selected,
+                        west: slot.west.selected
+                    });
+                }
+            });
+            // 時間帯データを再構築
+            await loadTimeSlotsForDate(date);
+            // 選択状態を復元
+            timeSlots.value.forEach(slot => {
+                const saved = existingSelections.get(slot.time);
+                if (saved) {
+                    slot.east.selected = saved.east;
+                    slot.west.selected = saved.west;
+                }
+            });
+            logger.info('時間帯選択状態を復元', {
+                復元した選択: Array.from(existingSelections.entries()).map(([time, selection]) => ({ time, ...selection }))
             });
         };
         // 指定日の時間帯データを読み込み
@@ -41056,10 +41862,17 @@ const EntranceTabvue_type_script_setup_true_lang_ts_hoisted_34 = ["disabled"];
                 // 入場予約スケジュールを取得
                 const year = parseInt(date.substring(0, 4));
                 const month = parseInt(date.substring(5, 7));
-                logger.info('API呼び出し開始', { date, year, month, formattedDate });
-                const scheduleData = await ticketsStore.getEntranceScheduleData(year, month);
-                // 指定日のスケジュールを検索（ドキュメント通り日のみ使用）
-                const dayOfMonth = date.substring(8, 10).replace(/^0/, ''); // "29"
+                // キャッシュからデータを取得（API呼び出しは月変更時と手動更新時のみ）
+                const cacheKey = `${year}-${String(month).padStart(2, '0')}`;
+                const scheduleData = ticketsStore.entranceSchedules.get(cacheKey);
+                if (!scheduleData) {
+                    logger.warn('入場スケジュールキャッシュがありません（月変更または手動更新が必要）', { date, year, month, cacheKey });
+                    timeSlots.value = [];
+                    return;
+                }
+                logger.info('キャッシュからデータ取得', { date, year, month, cacheKey });
+                // 指定日のスケジュールを検索（0埋め形式）
+                const dayOfMonth = date.substring(8, 10); // "01", "29"
                 const dayData = scheduleData?.states?.[dayOfMonth];
                 // デバッグ用ログ
                 logger.info('スケジュールデータ検索', {
@@ -41068,6 +41881,8 @@ const EntranceTabvue_type_script_setup_true_lang_ts_hoisted_34 = ["disabled"];
                     hasScheduleData: !!scheduleData,
                     scheduleData: scheduleData ? JSON.stringify(scheduleData).substring(0, 200) + '...' : null,
                     availableDates: scheduleData?.states ? Object.keys(scheduleData.states) : [],
+                    availableDatesDetail: scheduleData?.states ? Object.keys(scheduleData.states).slice(0, 10) : [],
+                    searchKey: dayOfMonth,
                     hasDayData: !!dayData,
                     dayDataKeys: dayData ? Object.keys(dayData) : null
                 });
@@ -41133,7 +41948,7 @@ const EntranceTabvue_type_script_setup_true_lang_ts_hoisted_34 = ["disabled"];
         // 日付フォーマット
         const formatDate = (dateString) => {
             const date = new Date(dateString + 'T00:00:00'); // UTC時刻で正確に解析
-            return `${date.getMonth() + 1}月${date.getDate()}日`;
+            return `${date.getMonth() + 1}/${date.getDate()}`;
         };
         // ステータスアイコン取得
         const getStatusIcon = (status) => {
@@ -41161,6 +41976,21 @@ const EntranceTabvue_type_script_setup_true_lang_ts_hoisted_34 = ["disabled"];
                     return '混雑が予想されます';
             }
         };
+        // 指定日に予約があるかチェック
+        const hasReservationForDate = (dateString) => {
+            const selectedTickets = ticketsStore.selectedTickets;
+            const targetDate = dateString.replace(/-/g, ''); // YYYYMMDD形式に変換
+            for (const ticket of selectedTickets) {
+                if (ticket.schedules) {
+                    for (const schedule of ticket.schedules) {
+                        if (schedule.entrance_date === targetDate && schedule.isEffective === true) {
+                            return true;
+                        }
+                    }
+                }
+            }
+            return false;
+        };
         // 日付の有効性チェック（今日〜2025年10月）
         const isDateDisabled = (date) => {
             const today = new Date();
@@ -41173,29 +42003,81 @@ const EntranceTabvue_type_script_setup_true_lang_ts_hoisted_34 = ["disabled"];
         // 入場予約データの更新
         const refreshEntranceData = async () => {
             logger.info('入場予約データ更新開始');
-            await ticketsStore.init();
-            initializeDefaultSelection();
+            // 現在選択中の日付を保持
+            const currentSelectedDate = selectedDate.value;
+            const currentSelectedSchedule = selectedSchedule.value;
+            // 現在の月の入場スケジュールデータを強制更新
+            const year = currentMonth.value.getFullYear();
+            const month = currentMonth.value.getMonth() + 1;
+            await ticketsStore.getEntranceScheduleData(year, month, true); // 強制更新
+            // 選択日付がある場合は必ず保持（schedule.selectedは自動的に保持される）
+            if (currentSelectedDate) {
+                selectedDate.value = currentSelectedDate;
+                logger.info('既存の選択日付を保持', { date: currentSelectedDate, hasSchedule: !!selectedSchedule.value });
+                // 選択日の時間帯データを再読み込み（選択状態を保持）
+                await loadTimeSlotsForDateWithSelection(currentSelectedDate);
+            }
+            else {
+                // 選択日付がない場合のみデフォルト選択を実行
+                initializeDefaultSelection();
+            }
             logger.info('入場予約データ更新完了');
         };
         // デフォルト選択の初期化
         const initializeDefaultSelection = () => {
             // 選択済みの入場予約から日付を取得
             const selectedTickets = ticketsStore.selectedTickets;
+            logger.info('入場タブ初期化開始', {
+                selectedTicketsCount: selectedTickets.length,
+                ticketIds: selectedTickets.map(t => t.ticket_id),
+                currentSelectedSchedule: selectedSchedule.value
+            });
             for (const ticket of selectedTickets) {
+                logger.info('チケット確認', {
+                    ticketId: ticket.ticket_id,
+                    schedulesCount: ticket.schedules?.length || 0,
+                    schedules: ticket.schedules?.map(s => ({
+                        selected: s.selected,
+                        isOwn: ticket.isOwn,
+                        entrance_date: s.entrance_date,
+                        gate_type: s.gate_type,
+                        time_start: s.time_start
+                    }))
+                });
                 if (ticket.schedules) {
                     for (const schedule of ticket.schedules) {
-                        if (schedule.selected && schedule.isOwn) {
+                        logger.info('スケジュール確認', {
+                            selected: schedule.selected,
+                            isOwn: ticket.isOwn,
+                            ticketIsOwn: ticket.isOwn,
+                            entrance_date: schedule.entrance_date,
+                            time_start: schedule.time_start,
+                            gate_type: schedule.gate_type,
+                            user_visiting_reservation_id: schedule.user_visiting_reservation_id,
+                            conditionMet: schedule.selected && ticket.isOwn
+                        });
+                        if (schedule.selected && ticket.isOwn) {
                             // 選択済みの入場予約がある場合、その日付をデフォルト選択
-                            if (schedule.entrance_date) {
-                                const formattedDate = formatScheduleDate(schedule.entrance_date);
-                                selectedDate.value = formattedDate;
-                                selectedSchedule.value = schedule;
-                                // カレンダー月も連動
-                                const selectedDateObj = new Date(formattedDate + 'T00:00:00');
-                                currentMonth.value = new Date(selectedDateObj.getFullYear(), selectedDateObj.getMonth(), 1);
-                                logger.info('選択済み入場予約の日付をデフォルト選択', { date: formattedDate, schedule });
-                                return;
-                            }
+                            const formattedDate = formatScheduleDate(schedule.entrance_date);
+                            selectedDate.value = formattedDate;
+                            // schedule.selectedは既にtrueの状態
+                            // カレンダー月も連動
+                            const selectedDateObj = new Date(formattedDate + 'T00:00:00');
+                            currentMonth.value = new Date(selectedDateObj.getFullYear(), selectedDateObj.getMonth(), 1);
+                            logger.info('選択済み入場予約の日付をデフォルト選択', {
+                                date: formattedDate,
+                                reservationId: schedule.user_visiting_reservation_id,
+                                scheduleData: {
+                                    entrance_date: schedule.entrance_date,
+                                    time_start: schedule.time_start,
+                                    gate_type: schedule.gate_type,
+                                    user_visiting_reservation_id: schedule.user_visiting_reservation_id
+                                }
+                            });
+                            // getFromDateTimeText()が正常に動作するかテスト
+                            const testResult = getFromDateTimeText();
+                            logger.info('getFromDateTimeText テスト結果', { testResult });
+                            return;
                         }
                     }
                 }
@@ -41207,13 +42089,27 @@ const EntranceTabvue_type_script_setup_true_lang_ts_hoisted_34 = ["disabled"];
             const todayDay = String(today.getDate()).padStart(2, '0');
             const todayString = `${todayYear}-${todayMonth}-${todayDay}`;
             selectedDate.value = todayString;
-            selectedSchedule.value = null;
-            logger.info('今日の日付をデフォルト選択', {
+            // 全ての予約の選択状態をクリア
+            for (const ticket of ticketsStore.tickets.values()) {
+                if (ticket.schedules) {
+                    ticket.schedules.forEach(schedule => {
+                        schedule.selected = false;
+                    });
+                }
+            }
+            logger.info('今日の日付をデフォルト選択（選択済み入場予約なし）', {
                 date: todayString,
                 todayObject: today.toString(),
                 year: todayYear,
                 month: todayMonth,
-                day: todayDay
+                day: todayDay,
+                finalSelectedSchedule: selectedSchedule.value
+            });
+            // 最終的なselectedSchedule状態をログ出力
+            logger.info('initializeDefaultSelection完了', {
+                finalSelectedDate: selectedDate.value,
+                finalSelectedSchedule: selectedSchedule.value,
+                hasSelectedSchedule: !!selectedSchedule.value
             });
         };
         // スケジュールの日付をISO形式に変換
@@ -41226,9 +42122,265 @@ const EntranceTabvue_type_script_setup_true_lang_ts_hoisted_34 = ["disabled"];
             }
             return dateString;
         };
+        // 毎分35秒タイマーを開始
+        const startReservationCycle = (selectedTimeSlots) => {
+            logger.info('毎分35秒サイクル開始', { timeSlots: selectedTimeSlots.length });
+            // 次の35秒まで待機
+            const now = new Date();
+            const currentSeconds = now.getSeconds();
+            const waitTime = currentSeconds <= 35 ?
+                (35 - currentSeconds) * 1000 :
+                (60 + 35 - currentSeconds) * 1000;
+            reservationStatus.value = {
+                visible: true,
+                isActive: true,
+                currentAction: `次回実行待機中（${Math.ceil(waitTime / 1000)}秒）`,
+                progress: 0,
+                progressText: '待機中',
+                statusClass: ''
+            };
+            // 待機時間のプログレスバーを開始
+            // startWaitingProgress(waitTime, `次回実行待機中（${Math.ceil(waitTime / 1000)}秒）`)
+            // reservationTimer = setTimeout(() => {
+            //   executeCycleStep(selectedTimeSlots)
+            // }, waitTime)
+        };
+        // サイクル処理を停止
+        const clearReservationTimer = () => {
+            reservationManager.clearReservationTimer();
+        };
+        // サイクルステップを実行（毎分35秒に実行）
+        const executeCycleStep = async (selectedTimeSlots) => {
+            try {
+                logger.info('サイクルステップ開始', {
+                    time: new Date().toLocaleTimeString(),
+                    selectedTimeSlots: selectedTimeSlots.length
+                });
+                // 1. 並行処理：最優先予約実行 + 空き情報取得
+                await executeParallelTasks(selectedTimeSlots);
+                // 2. 条件付き追加実行
+                await executeAdditionalReservations(selectedTimeSlots);
+                // 3. 次の分の35秒まで待機
+                scheduleNextCycle(selectedTimeSlots);
+            }
+            catch (error) {
+                logger.error('サイクルステップエラー', error);
+                reservationStatus.value = {
+                    visible: true,
+                    isActive: false,
+                    currentAction: 'エラーが発生しました',
+                    progress: 0,
+                    progressText: 'エラー',
+                    statusClass: ''
+                };
+            }
+        };
+        // 次のサイクルをスケジュール
+        const scheduleNextCycle = (selectedTimeSlots) => {
+            if (!isReservationRunning.value)
+                return;
+            const waitTime = 60 * 1000; // 60秒後
+            reservationStatus.value = {
+                visible: true,
+                isActive: true,
+                currentAction: '次回実行待機中（60秒）',
+                progress: 0,
+                progressText: '待機中',
+                statusClass: ''
+            };
+            // 待機時間のプログレスバーを開始
+            // startWaitingProgress(waitTime, '次回実行待機中（60秒）')
+            // reservationTimer = setTimeout(() => {
+            //   executeCycleStep(selectedTimeSlots)
+            // }, waitTime)
+        };
+        // 並行処理：最優先予約実行 + 空き情報取得
+        const executeParallelTasks = async (selectedTimeSlots) => {
+            const topPrioritySlot = selectedTimeSlots[0]; // 最優先（order=1）
+            if (!topPrioritySlot)
+                return;
+            const topPriorityKey = `${topPrioritySlot.gate}-${topPrioritySlot.time}`;
+            reservationStatus.value = {
+                visible: true,
+                isActive: true,
+                currentAction: '並行処理実行中...',
+                progress: 25,
+                progressText: '1/4',
+                statusClass: ''
+            };
+            logger.info('並行処理開始', {
+                topPrioritySlot,
+                selectedDate: selectedDate.value
+            });
+            // 並行実行
+            const [reservationResult, availabilityData] = await Promise.all([
+                // 最優先の予約実行
+                executePriorityReservation(topPrioritySlot),
+                // 空き情報取得
+                getAvailabilityInfo()
+            ]);
+            // 最優先予約が成功した場合は実行済みとして記録
+            if (reservationResult?.success) {
+                // executedReservations.add(topPriorityKey)
+                logger.info('最優先予約成功', { slot: topPrioritySlot, result: reservationResult });
+                // 予約成功時の処理
+                isReservationRunning.value = false;
+                clearReservationTimer();
+                reservationStatus.value = {
+                    visible: true,
+                    isActive: false,
+                    currentAction: `予約成功しました - ${topPrioritySlot.gate}${topPrioritySlot.time}`,
+                    progress: 100,
+                    progressText: '成功',
+                    statusClass: 'success'
+                };
+                reservationInfo.value = { ...reservationInfo.value, completed: true };
+                // 成功時はチケット情報を更新
+                setTimeout(async () => {
+                    await ticketsStore.loadAllTickets();
+                }, 2000);
+            }
+            return { reservationResult, availabilityData };
+        };
+        // 最優先予約を実行
+        const executePriorityReservation = async (slot) => {
+            try {
+                const apiTime = getApiTimeForReservation(slot.time);
+                const gateType = slot.gate === '東' ? '1' : '2';
+                let result;
+                if (selectedSchedule.value && selectedSchedule.value.user_visiting_reservation_id && selectedSchedule.value.user_visiting_reservation_id > 0) {
+                    result = await changeEntranceReservation(selectedSchedule.value.user_visiting_reservation_id, apiTime, gateType);
+                }
+                else {
+                    const selectedTickets = ticketsStore.selectedTickets;
+                    const ticketIds = selectedTickets.map(ticket => ticket.ticket_id);
+                    result = await createEntranceReservation(ticketIds, selectedDate.value, apiTime, gateType);
+                }
+                logger.info('最優先予約実行結果', { slot, result });
+                return result;
+            }
+            catch (error) {
+                logger.error('最優先予約エラー', { slot, error });
+                return { success: false, error };
+            }
+        };
+        // 空き情報を取得
+        const getAvailabilityInfo = async () => {
+            try {
+                const year = parseInt(selectedDate.value.substring(0, 4));
+                const month = parseInt(selectedDate.value.substring(5, 7));
+                // 月の空き情報を取得
+                const scheduleData = await ticketsStore.getEntranceScheduleData(year, month, true);
+                // 指定日の時間帯情報を取得
+                const dayOfMonth = selectedDate.value.substring(8, 10);
+                const dayData = scheduleData?.states?.[dayOfMonth];
+                logger.info('空き情報取得結果', { year, month, dayOfMonth, hasDayData: !!dayData });
+                return dayData;
+            }
+            catch (error) {
+                logger.error('空き情報取得エラー', error);
+                return null;
+            }
+        };
+        // 条件付き追加実行
+        const executeAdditionalReservations = async (selectedTimeSlots) => {
+            reservationStatus.value = {
+                visible: true,
+                isActive: true,
+                currentAction: '追加実行判定中...',
+                progress: 50,
+                progressText: '2/4',
+                statusClass: ''
+            };
+            // 空き情報を再取得（最新状態確認）
+            const availabilityData = await getAvailabilityInfo();
+            if (!availabilityData) {
+                logger.warn('空き情報が取得できないため追加実行をスキップ');
+                return;
+            }
+            // 実行済みを除く選択済み時間帯で満員でない時間帯を抽出
+            const availableSlots = selectedTimeSlots.filter(slot => {
+                const slotKey = `${slot.gate}-${slot.time}`;
+                // if (executedReservations.has(slotKey)) return false // 実行済みは除外
+                // 空き状況を確認
+                const gateKey = slot.gate === '東' ? '1' : '2';
+                const timeKey = getApiTimeForReservation(slot.time);
+                const timeState = availabilityData[gateKey]?.[timeKey]?.time_state;
+                // time_state: 0=空きあり, 1=残り少ない, 2=満席, 4=利用不可
+                return timeState === 0 || timeState === 1;
+            });
+            logger.info('追加実行対象判定', {
+                totalSlots: selectedTimeSlots.length,
+                // executedCount: executedReservations.size,
+                availableSlots: availableSlots.length,
+                availableSlotDetails: availableSlots.map(slot => ({ gate: slot.gate, time: slot.time }))
+            });
+            if (availableSlots.length === 0) {
+                logger.info('追加実行対象なし');
+                return;
+            }
+            // 優先度順で最大2つを実行
+            const slotsToExecute = availableSlots.slice(0, 2);
+            for (const [index, slot] of slotsToExecute.entries()) {
+                reservationStatus.value = {
+                    visible: true,
+                    isActive: true,
+                    currentAction: `追加実行中: ${slot.gate}${slot.time}`,
+                    progress: 50 + (index + 1) * 20,
+                    progressText: `${3 + index}/4`,
+                    statusClass: ''
+                };
+                try {
+                    const result = await executePriorityReservation(slot);
+                    if (result?.success) {
+                        const slotKey = `${slot.gate}-${slot.time}`;
+                        // executedReservations.add(slotKey)
+                        logger.info('追加実行成功', { slot, result });
+                        // 予約成功時の処理
+                        isReservationRunning.value = false;
+                        clearReservationTimer();
+                        reservationStatus.value = {
+                            visible: true,
+                            isActive: false,
+                            currentAction: `予約成功しました - ${slot.gate}${slot.time}`,
+                            progress: 100,
+                            progressText: '成功',
+                            statusClass: 'success'
+                        };
+                        reservationInfo.value = { ...reservationInfo.value, completed: true };
+                        // 成功時はチケット情報を更新
+                        setTimeout(async () => {
+                            await ticketsStore.loadAllTickets();
+                        }, 2000);
+                        return; // 成功したらここで終了
+                    }
+                    else {
+                        logger.warn('追加実行失敗', { slot, result });
+                    }
+                    // 次の実行まで少し間隔を空ける
+                    if (index < slotsToExecute.length - 1) {
+                        await new Promise(resolve => setTimeout(resolve, 1000));
+                    }
+                }
+                catch (error) {
+                    logger.error('追加実行エラー', { slot, error });
+                }
+            }
+        };
+        // 予約実行時のみ時間マッピングを実行
+        const getApiTimeForReservation = (displayTime) => {
+            switch (displayTime) {
+                case '9:00': return '0700';
+                case '10:00': return '0900';
+                case '11:00': return '1000';
+                case '12:00': return '1100';
+                case '17:00': return '1600';
+                default: return '';
+            }
+        };
         // 予約実行
-        const executeReservation = () => {
-            if (!isReservationButtonEnabled.value) {
+        const executeReservation = async () => {
+            if (!isReservationRunning.value && !isReservationButtonEnabled.value) {
                 logger.warn('予約ボタンが無効な状態で実行されました');
                 return;
             }
@@ -41237,12 +42389,144 @@ const EntranceTabvue_type_script_setup_true_lang_ts_hoisted_34 = ["disabled"];
                 logger.warn('必要な情報が不足しています', { timeSlotInfo, selectedSchedule: selectedSchedule.value });
                 return;
             }
-            logger.info('予約実行', {
+            // 選択された時間帯を優先度順に取得
+            const selectedTimeSlots = getSelectedTimeSlotsInPriorityOrder();
+            logger.info('予約実行開始', {
                 selectedDate: selectedDate.value,
                 timeSlot: timeSlotInfo,
-                schedule: selectedSchedule.value
+                schedule: selectedSchedule.value,
+                selectedTimeSlots
             });
-            // TODO: 実際の予約処理を実装
+            // マネージャーに処理を委譲
+            await reservationManager.executeReservation(selectedTimeSlots);
+        };
+        // 新規入場予約作成
+        const createEntranceReservation = async (ticketIds, entranceDate, startTime, gateType) => {
+            const response = await fetch('/api/d/user_visiting_reservations', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'Accept-Language': 'ja,en-US;q=0.9,en;q=0.8',
+                    'X-Api-Lang': 'ja'
+                },
+                body: JSON.stringify({
+                    ticket_ids: ticketIds,
+                    start_time: startTime,
+                    gate_type: gateType,
+                    entrance_date: entranceDate.replace(/-/g, '') // YYYY-MM-DD → YYYYMMDD
+                })
+            });
+            if (response.ok) {
+                const result = await response.json();
+                return { success: true, data: result };
+            }
+            else {
+                const error = await response.json();
+                return { success: false, error };
+            }
+        };
+        // 入場予約変更
+        const changeEntranceReservation = async (reservationId, startTime, gateType) => {
+            const response = await fetch('/api/d/user_visiting_reservations', {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'Accept-Language': 'ja,en-US;q=0.9,en;q=0.8',
+                    'X-Api-Lang': 'ja'
+                },
+                body: JSON.stringify({
+                    user_visiting_reservation_ids: [reservationId],
+                    start_time: startTime,
+                    gate_type: gateType,
+                    entrance_date: selectedDate.value.replace(/-/g, '') // YYYY-MM-DD → YYYYMMDD
+                })
+            });
+            if (response.ok) {
+                const result = await response.json();
+                return { success: true, data: result };
+            }
+            else {
+                const error = await response.json();
+                return { success: false, error };
+            }
+        };
+        // デモ用の予約進行状況シミュレーション（削除予定）
+        const simulateReservationProgress = () => {
+            const stages = [
+                { action: '空き情報取得中...', progress: 33, progressText: '1/3' },
+                { action: '予約実行中...', progress: 66, progressText: '2/3' },
+                { action: '結果確認中...', progress: 100, progressText: '3/3' }
+            ];
+            stages.forEach((stage, index) => {
+                setTimeout(() => {
+                    if (reservationStatus.value.visible) {
+                        reservationStatus.value.currentAction = stage.action;
+                        reservationStatus.value.progress = stage.progress;
+                        reservationStatus.value.progressText = stage.progressText;
+                        if (index === stages.length - 1) {
+                            // 最後のステージ後、待機状態に戻る
+                            setTimeout(() => {
+                                if (reservationStatus.value.visible) {
+                                    reservationStatus.value.currentAction = '次回実行待機中（35秒まで待機）';
+                                    reservationStatus.value.isActive = false;
+                                    reservationStatus.value.progress = 0;
+                                    reservationStatus.value.progressText = '0/3';
+                                }
+                            }, 2000);
+                        }
+                    }
+                }, (index + 1) * 3000);
+            });
+        };
+        // 選択された時間帯の指定日での空き状況を取得
+        const getSelectedTimeSlotAvailability = (dateString, selectedTime) => {
+            // 指定日のスケジュールデータを取得
+            const year = parseInt(dateString.substring(0, 4));
+            const month = parseInt(dateString.substring(5, 7));
+            const day = dateString.substring(8, 10); // 0埋め形式
+            const scheduleKey = `${year}-${String(month).padStart(2, '0')}`;
+            const scheduleData = ticketsStore.entranceSchedules.get(scheduleKey);
+            if (!scheduleData || !scheduleData.states?.[day]) {
+                return null;
+            }
+            const dayData = scheduleData.states[day];
+            const eastGate = dayData['1'];
+            const westGate = dayData['2'];
+            // 表示時間から直接対応するAPI時間キーを取得
+            const getApiTimeKey = (displayTime) => {
+                switch (displayTime) {
+                    case '9:00': return '0700';
+                    case '10:00': return '0900';
+                    case '11:00': return '1000';
+                    case '12:00': return '1100';
+                    case '17:00': return '1600';
+                    default: return '';
+                }
+            };
+            const apiTime = getApiTimeKey(selectedTime);
+            if (!apiTime) {
+                return null;
+            }
+            // 空き状況のクラス名を取得
+            const getStatusClass = (timeState) => {
+                switch (timeState) {
+                    case 0: return 'available'; // 空きあり
+                    case 1: return 'few-left'; // 残り少ない  
+                    case 2: return 'full'; // 満席
+                    case 4: return 'unavailable'; // 利用不可
+                    default: return 'unknown';
+                }
+            };
+            return {
+                east: {
+                    class: getStatusClass(eastGate?.[apiTime]?.time_state ?? 4)
+                },
+                west: {
+                    class: getStatusClass(westGate?.[apiTime]?.time_state ?? 4)
+                }
+            };
         };
         // 選択クリア
         const clearSelection = () => {
@@ -41250,6 +42534,7 @@ const EntranceTabvue_type_script_setup_true_lang_ts_hoisted_34 = ["disabled"];
                 slot.east.selected = false;
                 slot.west.selected = false;
             });
+            selectionOrder.value = [];
             logger.info('選択をクリア', { selectedDate: selectedDate.value });
         };
         // 時間帯選択の切り替え（満員時間帯も選択可能、複数選択可）
@@ -41257,17 +42542,64 @@ const EntranceTabvue_type_script_setup_true_lang_ts_hoisted_34 = ["disabled"];
             const slot = timeSlots.value.find(s => s.time === time);
             if (!slot)
                 return;
+            const gateData = slot[gate];
+            if (!gateData)
+                return;
             // 無効な時間帯は選択不可
-            if (slot[gate].status === 'disabled') {
+            if (gateData.status === 'disabled') {
                 logger.warn('無効な時間帯の選択を試行', { gate, time });
                 return;
             }
+            const key = `${time}-${gate}`;
+            // 変更前の優先度1の時間帯を取得
+            const previousPriority1Time = selectionOrder.value.find(item => item.order === 1)?.key?.split('-')[0] || null;
             // 選択状態を切り替え
-            slot[gate].selected = !slot[gate].selected;
-            logger.info('時間帯選択切り替え', { gate, time, status: slot[gate].status, selected: slot[gate].selected });
+            if (gateData.selected) {
+                // 選択解除：順序から削除
+                gateData.selected = false;
+                selectionOrder.value = selectionOrder.value.filter(item => item.key !== key);
+                // 残りの順序を再調整
+                selectionOrder.value.forEach((item, index) => {
+                    item.order = index + 1;
+                });
+            }
+            else {
+                // 選択：順序に追加
+                gateData.selected = true;
+                const nextOrder = Math.max(...selectionOrder.value.map(item => item.order), 0) + 1;
+                selectionOrder.value.push({ key, order: nextOrder });
+            }
+            // 変更後の優先度1の時間帯を取得
+            const currentPriority1Time = selectionOrder.value.find(item => item.order === 1)?.key?.split('-')[0] || null;
+            // 優先度1の時間帯が変わった場合はキャッシュを更新
+            if (previousPriority1Time !== currentPriority1Time) {
+                if (currentPriority1Time) {
+                    updateCalendarAvailabilityCache(currentPriority1Time);
+                }
+                else {
+                    calendarAvailabilityCache.value = null;
+                }
+            }
+            logger.info('時間帯選択切り替え', {
+                gate,
+                time,
+                status: gateData.status,
+                selected: gateData.selected,
+                selectionOrder: selectionOrder.value
+            });
         };
         // コンポーネントマウント時の初期化
         onMounted(async () => {
+            // 事前初期化完了を待機
+            while (!ticketsStore.isInitialized) {
+                await new Promise(resolve => setTimeout(resolve, 50)); // 50ms間隔でポーリング
+            }
+            logger.info('事前初期化完了を確認');
+            // 初期読み込み: 現在月のスケジュールデータを取得
+            const year = currentMonth.value.getFullYear();
+            const month = currentMonth.value.getMonth() + 1;
+            await ticketsStore.getEntranceScheduleData(year, month, false);
+            logger.info('初期読み込み完了', { year, month });
             initializeDefaultSelection();
             // 初期日付の時間帯データを読み込み
             if (selectedDate.value) {
@@ -41280,57 +42612,46 @@ const EntranceTabvue_type_script_setup_true_lang_ts_hoisted_34 = ["disabled"];
                 createBaseVNode("div", EntranceTabvue_type_script_setup_true_lang_ts_hoisted_2, [
                     createCommentVNode(" 左側: カレンダー "),
                     createBaseVNode("div", EntranceTabvue_type_script_setup_true_lang_ts_hoisted_3, [
-                        createBaseVNode("div", EntranceTabvue_type_script_setup_true_lang_ts_hoisted_4, [
-                            createBaseVNode("div", {
-                                class: "ytomo-calendar-title",
-                                onClick: toggleCalendar
-                            }, [
-                                _cache[0] || (_cache[0] = createBaseVNode("h3", null, "入場日選択", -1 /* CACHED */)),
-                                (selectedDate.value)
-                                    ? (openBlock(), createElementBlock("span", EntranceTabvue_type_script_setup_true_lang_ts_hoisted_5, toDisplayString(formatDate(selectedDate.value)), 1 /* TEXT */))
-                                    : createCommentVNode("v-if", true)
-                            ]),
-                            createBaseVNode("div", EntranceTabvue_type_script_setup_true_lang_ts_hoisted_6, [
-                                createBaseVNode("button", {
-                                    class: "ytomo-refresh-button",
-                                    onClick: refreshEntranceData,
-                                    title: "入場予約データを更新"
-                                }, [...(_cache[1] || (_cache[1] = [
-                                        createBaseVNode("svg", {
-                                            viewBox: "0 0 24 24",
-                                            width: "14",
-                                            height: "14"
-                                        }, [
-                                            createBaseVNode("path", {
-                                                d: "M4 4v5h.582m15.356 2A8.001 8.001 0 0 0 4.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 0 1-15.357-2m15.357 2H15",
-                                                stroke: "currentColor",
-                                                "stroke-width": "2",
-                                                fill: "none",
-                                                "stroke-linecap": "round",
-                                                "stroke-linejoin": "round"
-                                            })
-                                        ], -1 /* CACHED */)
-                                    ]))]),
-                                createBaseVNode("span", {
-                                    class: "ytomo-calendar-toggle",
-                                    onClick: toggleCalendar
-                                }, toDisplayString(isCalendarExpanded.value ? '▼' : '▶'), 1 /* TEXT */)
-                            ])
-                        ]),
-                        withDirectives(createBaseVNode("div", EntranceTabvue_type_script_setup_true_lang_ts_hoisted_7, [
-                            createBaseVNode("div", EntranceTabvue_type_script_setup_true_lang_ts_hoisted_8, [
+                        createCommentVNode(" カレンダーヘッダーを非表示（上部領域削除）\n        <div class=\"ytomo-calendar-header\">\n          <div class=\"ytomo-calendar-title\">\n            <h3>入場日選択</h3>\n            <span v-if=\"selectedDate\" class=\"ytomo-selected-date\">{{ formatDate(selectedDate) }}</span>\n          </div>\n          <div class=\"ytomo-header-buttons\">\n            <button class=\"ytomo-refresh-button\" @click=\"refreshEntranceData\" title=\"入場予約データを更新\">\n              <svg viewBox=\"0 0 24 24\" width=\"14\" height=\"14\">\n                <path d=\"M4 4v5h.582m15.356 2A8.001 8.001 0 0 0 4.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 0 1-15.357-2m15.357 2H15\" stroke=\"currentColor\" stroke-width=\"2\" fill=\"none\" stroke-linecap=\"round\" stroke-linejoin=\"round\"/>\n              </svg>\n            </button>\n          </div>\n        </div>\n        "),
+                        withDirectives(createBaseVNode("div", EntranceTabvue_type_script_setup_true_lang_ts_hoisted_4, [
+                            createBaseVNode("div", EntranceTabvue_type_script_setup_true_lang_ts_hoisted_5, [
                                 createBaseVNode("button", {
                                     onClick: previousMonth,
-                                    class: "ytomo-month-button"
+                                    id: "ytomo-previous-month-button",
+                                    class: "ytomo-month-button ytomo-month-button--prev"
                                 }, "‹"),
-                                createBaseVNode("span", EntranceTabvue_type_script_setup_true_lang_ts_hoisted_9, toDisplayString(currentMonthDisplay.value), 1 /* TEXT */),
+                                createBaseVNode("div", EntranceTabvue_type_script_setup_true_lang_ts_hoisted_6, [
+                                    createBaseVNode("span", EntranceTabvue_type_script_setup_true_lang_ts_hoisted_7, toDisplayString(currentMonthDisplay.value), 1 /* TEXT */),
+                                    createBaseVNode("button", {
+                                        id: "ytomo-calendar-refresh-button",
+                                        class: "ytomo-calendar-refresh-button",
+                                        onClick: refreshEntranceData,
+                                        title: "入場予約データを更新"
+                                    }, [...(_cache[0] || (_cache[0] = [
+                                            createBaseVNode("svg", {
+                                                viewBox: "0 0 24 24",
+                                                width: "12",
+                                                height: "12"
+                                            }, [
+                                                createBaseVNode("path", {
+                                                    d: "M4 4v5h.582m15.356 2A8.001 8.001 0 0 0 4.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 0 1-15.357-2m15.357 2H15",
+                                                    stroke: "currentColor",
+                                                    "stroke-width": "2",
+                                                    fill: "none",
+                                                    "stroke-linecap": "round",
+                                                    "stroke-linejoin": "round"
+                                                })
+                                            ], -1 /* CACHED */)
+                                        ]))])
+                                ]),
                                 createBaseVNode("button", {
                                     onClick: nextMonth,
-                                    class: "ytomo-month-button"
+                                    id: "ytomo-next-month-button",
+                                    class: "ytomo-month-button ytomo-month-button--next"
                                 }, "›")
                             ]),
-                            createBaseVNode("div", EntranceTabvue_type_script_setup_true_lang_ts_hoisted_10, [
-                                createBaseVNode("div", EntranceTabvue_type_script_setup_true_lang_ts_hoisted_11, [
+                            createBaseVNode("div", EntranceTabvue_type_script_setup_true_lang_ts_hoisted_8, [
+                                createBaseVNode("div", EntranceTabvue_type_script_setup_true_lang_ts_hoisted_9, [
                                     (openBlock(), createElementBlock(Fragment, null, renderList(weekdays, (day) => {
                                         return createBaseVNode("div", {
                                             key: day,
@@ -41338,19 +42659,38 @@ const EntranceTabvue_type_script_setup_true_lang_ts_hoisted_34 = ["disabled"];
                                         }, toDisplayString(day), 1 /* TEXT */);
                                     }), 64 /* STABLE_FRAGMENT */))
                                 ]),
-                                createBaseVNode("div", EntranceTabvue_type_script_setup_true_lang_ts_hoisted_12, [
-                                    (openBlock(true), createElementBlock(Fragment, null, renderList(calendarDates.value, (date) => {
+                                createBaseVNode("div", EntranceTabvue_type_script_setup_true_lang_ts_hoisted_10, [
+                                    (openBlock(true), createElementBlock(Fragment, null, renderList(calendarDates.value, (date, index) => {
                                         return (openBlock(), createElementBlock("div", {
                                             key: date.key,
                                             class: normalizeClass(["ytomo-calendar-day", {
-                                                    'other-month': !date.isCurrentMonth,
+                                                    'empty-date': !date.isCurrentMonth,
                                                     'selected': date.dateString === selectedDate.value,
                                                     'today': date.isToday,
-                                                    'disabled': date.disabled
+                                                    'disabled': date.disabled,
+                                                    'has-reservation': hasReservationForDate(date.dateString)
                                                 }]),
                                             "data-date": date.dateString,
                                             onClick: selectDate
-                                        }, toDisplayString(date.day), 11 /* TEXT, CLASS, PROPS */, EntranceTabvue_type_script_setup_true_lang_ts_hoisted_13));
+                                        }, [
+                                            (date.isCurrentMonth)
+                                                ? (openBlock(), createElementBlock(Fragment, { key: 0 }, [
+                                                    createBaseVNode("div", EntranceTabvue_type_script_setup_true_lang_ts_hoisted_12, toDisplayString(date.day), 1 /* TEXT */),
+                                                    createBaseVNode("div", EntranceTabvue_type_script_setup_true_lang_ts_hoisted_13, [
+                                                        createBaseVNode("div", EntranceTabvue_type_script_setup_true_lang_ts_hoisted_14, [
+                                                            createBaseVNode("span", {
+                                                                class: normalizeClass(["ytomo-status-dot", date.availability?.east.class])
+                                                            }, null, 2 /* CLASS */)
+                                                        ]),
+                                                        createBaseVNode("div", EntranceTabvue_type_script_setup_true_lang_ts_hoisted_15, [
+                                                            createBaseVNode("span", {
+                                                                class: normalizeClass(["ytomo-status-dot", date.availability?.west.class])
+                                                            }, null, 2 /* CLASS */)
+                                                        ])
+                                                    ])
+                                                ], 64 /* STABLE_FRAGMENT */))
+                                                : createCommentVNode("v-if", true)
+                                        ], 10 /* CLASS, PROPS */, EntranceTabvue_type_script_setup_true_lang_ts_hoisted_11));
                                     }), 128 /* KEYED_FRAGMENT */))
                                 ])
                             ])
@@ -41359,10 +42699,32 @@ const EntranceTabvue_type_script_setup_true_lang_ts_hoisted_34 = ["disabled"];
                         ])
                     ]),
                     createCommentVNode(" 右側: 予約状況テーブル "),
-                    createBaseVNode("div", EntranceTabvue_type_script_setup_true_lang_ts_hoisted_14, [
-                        createBaseVNode("div", EntranceTabvue_type_script_setup_true_lang_ts_hoisted_15, [
+                    createBaseVNode("div", EntranceTabvue_type_script_setup_true_lang_ts_hoisted_16, [
+                        createCommentVNode(" 日付表示エリア（既存日時と選択日付を横並び） "),
+                        (selectedDate.value)
+                            ? (openBlock(), createElementBlock("div", EntranceTabvue_type_script_setup_true_lang_ts_hoisted_17, [
+                                createCommentVNode(" 既存入場日時表示（左側） "),
+                                (getFromDateTimeText())
+                                    ? (openBlock(), createElementBlock("div", EntranceTabvue_type_script_setup_true_lang_ts_hoisted_18, toDisplayString(getFromDateTimeText()), 1 /* TEXT */))
+                                    : createCommentVNode("v-if", true),
+                                createCommentVNode(" 変更矢印アイコン "),
+                                (getFromDateTimeText())
+                                    ? (openBlock(), createElementBlock("div", EntranceTabvue_type_script_setup_true_lang_ts_hoisted_19, [...(_cache[1] || (_cache[1] = [
+                                            createBaseVNode("svg", {
+                                                viewBox: "0 0 24 24",
+                                                class: "ytomo-arrow-icon"
+                                            }, [
+                                                createBaseVNode("path", { d: "M8.59 16.59L10 18l6-6-6-6-1.41 1.41L13.17 12z" })
+                                            ], -1 /* CACHED */)
+                                        ]))]))
+                                    : createCommentVNode("v-if", true),
+                                createCommentVNode(" 入場日表示（右側） "),
+                                createBaseVNode("div", EntranceTabvue_type_script_setup_true_lang_ts_hoisted_20, toDisplayString(formatDate(selectedDate.value)), 1 /* TEXT */)
+                            ]))
+                            : createCommentVNode("v-if", true),
+                        createBaseVNode("div", EntranceTabvue_type_script_setup_true_lang_ts_hoisted_21, [
                             (selectedDate.value)
-                                ? (openBlock(), createElementBlock("table", EntranceTabvue_type_script_setup_true_lang_ts_hoisted_16, [
+                                ? (openBlock(), createElementBlock("table", EntranceTabvue_type_script_setup_true_lang_ts_hoisted_22, [
                                     _cache[2] || (_cache[2] = createBaseVNode("thead", null, [
                                         createBaseVNode("tr", null, [
                                             createBaseVNode("th", null, "東"),
@@ -41387,18 +42749,20 @@ const EntranceTabvue_type_script_setup_true_lang_ts_hoisted_34 = ["disabled"];
                                                             class: normalizeClass(["ytomo-status-icon", `status-${timeSlot.east.status}`])
                                                         }, [
                                                             (timeSlot.east.status === 'low')
-                                                                ? (openBlock(), createElementBlock("span", EntranceTabvue_type_script_setup_true_lang_ts_hoisted_18, "●"))
+                                                                ? (openBlock(), createElementBlock("span", EntranceTabvue_type_script_setup_true_lang_ts_hoisted_24, "●"))
                                                                 : (timeSlot.east.status === 'high')
-                                                                    ? (openBlock(), createElementBlock("span", EntranceTabvue_type_script_setup_true_lang_ts_hoisted_19, "▲"))
+                                                                    ? (openBlock(), createElementBlock("span", EntranceTabvue_type_script_setup_true_lang_ts_hoisted_25, "▲"))
                                                                     : (timeSlot.east.status === 'full')
-                                                                        ? (openBlock(), createElementBlock("span", EntranceTabvue_type_script_setup_true_lang_ts_hoisted_20, "×"))
-                                                                        : (openBlock(), createElementBlock("span", EntranceTabvue_type_script_setup_true_lang_ts_hoisted_21, "－"))
+                                                                        ? (openBlock(), createElementBlock("span", EntranceTabvue_type_script_setup_true_lang_ts_hoisted_26, "×"))
+                                                                        : (openBlock(), createElementBlock("span", EntranceTabvue_type_script_setup_true_lang_ts_hoisted_27, "－"))
                                                         ], 2 /* CLASS */),
-                                                        createBaseVNode("span", EntranceTabvue_type_script_setup_true_lang_ts_hoisted_22, toDisplayString(timeSlot.time) + "-", 1 /* TEXT */),
-                                                        (timeSlot.east.selected)
-                                                            ? (openBlock(), createElementBlock("span", EntranceTabvue_type_script_setup_true_lang_ts_hoisted_23, "✓"))
-                                                            : createCommentVNode("v-if", true)
-                                                    ], 10 /* CLASS, PROPS */, EntranceTabvue_type_script_setup_true_lang_ts_hoisted_17)
+                                                        createBaseVNode("span", EntranceTabvue_type_script_setup_true_lang_ts_hoisted_28, toDisplayString(timeSlot.time) + "-", 1 /* TEXT */),
+                                                        createBaseVNode("span", EntranceTabvue_type_script_setup_true_lang_ts_hoisted_29, [
+                                                            (timeSlot.east.selected)
+                                                                ? (openBlock(), createElementBlock("span", EntranceTabvue_type_script_setup_true_lang_ts_hoisted_30, toDisplayString(getSelectionNumber(timeSlot.time, 'east')), 1 /* TEXT */))
+                                                                : createCommentVNode("v-if", true)
+                                                        ])
+                                                    ], 10 /* CLASS, PROPS */, EntranceTabvue_type_script_setup_true_lang_ts_hoisted_23)
                                                 ]),
                                                 createBaseVNode("td", null, [
                                                     createBaseVNode("div", {
@@ -41413,41 +42777,111 @@ const EntranceTabvue_type_script_setup_true_lang_ts_hoisted_34 = ["disabled"];
                                                             class: normalizeClass(["ytomo-status-icon", `status-${timeSlot.west.status}`])
                                                         }, [
                                                             (timeSlot.west.status === 'low')
-                                                                ? (openBlock(), createElementBlock("span", EntranceTabvue_type_script_setup_true_lang_ts_hoisted_25, "●"))
+                                                                ? (openBlock(), createElementBlock("span", EntranceTabvue_type_script_setup_true_lang_ts_hoisted_32, "●"))
                                                                 : (timeSlot.west.status === 'high')
-                                                                    ? (openBlock(), createElementBlock("span", EntranceTabvue_type_script_setup_true_lang_ts_hoisted_26, "▲"))
+                                                                    ? (openBlock(), createElementBlock("span", EntranceTabvue_type_script_setup_true_lang_ts_hoisted_33, "▲"))
                                                                     : (timeSlot.west.status === 'full')
-                                                                        ? (openBlock(), createElementBlock("span", EntranceTabvue_type_script_setup_true_lang_ts_hoisted_27, "×"))
-                                                                        : (openBlock(), createElementBlock("span", EntranceTabvue_type_script_setup_true_lang_ts_hoisted_28, "－"))
+                                                                        ? (openBlock(), createElementBlock("span", EntranceTabvue_type_script_setup_true_lang_ts_hoisted_34, "×"))
+                                                                        : (openBlock(), createElementBlock("span", EntranceTabvue_type_script_setup_true_lang_ts_hoisted_35, "－"))
                                                         ], 2 /* CLASS */),
-                                                        createBaseVNode("span", EntranceTabvue_type_script_setup_true_lang_ts_hoisted_29, toDisplayString(timeSlot.time) + "-", 1 /* TEXT */),
-                                                        (timeSlot.west.selected)
-                                                            ? (openBlock(), createElementBlock("span", EntranceTabvue_type_script_setup_true_lang_ts_hoisted_30, "✓"))
-                                                            : createCommentVNode("v-if", true)
-                                                    ], 10 /* CLASS, PROPS */, EntranceTabvue_type_script_setup_true_lang_ts_hoisted_24)
+                                                        createBaseVNode("span", _hoisted_36, toDisplayString(timeSlot.time) + "-", 1 /* TEXT */),
+                                                        createBaseVNode("span", _hoisted_37, [
+                                                            (timeSlot.west.selected)
+                                                                ? (openBlock(), createElementBlock("span", _hoisted_38, toDisplayString(getSelectionNumber(timeSlot.time, 'west')), 1 /* TEXT */))
+                                                                : createCommentVNode("v-if", true)
+                                                        ])
+                                                    ], 10 /* CLASS, PROPS */, EntranceTabvue_type_script_setup_true_lang_ts_hoisted_31)
                                                 ])
                                             ]));
                                         }), 128 /* KEYED_FRAGMENT */))
                                     ])
                                 ]))
-                                : (openBlock(), createElementBlock("div", EntranceTabvue_type_script_setup_true_lang_ts_hoisted_31, " 日付を選択してください "))
+                                : (openBlock(), createElementBlock("div", _hoisted_39, " 日付を選択してください "))
                         ]),
-                        createCommentVNode(" 予約操作ボタン（テーブルのすぐ下に配置） "),
+                        createCommentVNode(" 予約操作ボタン "),
                         (selectedDate.value)
-                            ? (openBlock(), createElementBlock("div", EntranceTabvue_type_script_setup_true_lang_ts_hoisted_32, [
-                                createCommentVNode(" 日時変更表示 "),
-                                (dateTimeChangeText.value)
-                                    ? (openBlock(), createElementBlock("div", EntranceTabvue_type_script_setup_true_lang_ts_hoisted_33, toDisplayString(dateTimeChangeText.value), 1 /* TEXT */))
-                                    : createCommentVNode("v-if", true),
+                            ? (openBlock(), createElementBlock("div", _hoisted_40, [
                                 createBaseVNode("button", {
-                                    class: normalizeClass(["ytomo-reserve-button", { 'disabled': !isReservationButtonEnabled.value }]),
+                                    class: normalizeClass(["ytomo-reserve-button", { 'disabled': !isReservationButtonEnabled.value, 'cancel-mode': unref(isReservationRunning) }]),
                                     disabled: !isReservationButtonEnabled.value,
                                     onClick: executeReservation
-                                }, toDisplayString(reservationButtonText.value), 11 /* TEXT, CLASS, PROPS */, EntranceTabvue_type_script_setup_true_lang_ts_hoisted_34),
-                                createCommentVNode(" <button class=\"ytomo-clear-button\" @click=\"clearSelection\">削除</button> ")
+                                }, toDisplayString(unref(isReservationRunning) ? '予約中断' : reservationButtonText.value), 11 /* TEXT, CLASS, PROPS */, _hoisted_41)
                             ]))
                             : createCommentVNode("v-if", true)
                     ])
+                ]),
+                createCommentVNode(" 下段: 実行情報ブロック "),
+                createBaseVNode("div", _hoisted_42, [
+                    createCommentVNode(" 予約情報表示エリア "),
+                    (unref(reservationInfo).visible)
+                        ? (openBlock(), createElementBlock("div", {
+                            key: 0,
+                            class: normalizeClass(["ytomo-reservation-info", { 'completed': unref(reservationInfo).completed }])
+                        }, [
+                            createBaseVNode("div", _hoisted_43, [
+                                createBaseVNode("div", _hoisted_44, toDisplayString(unref(reservationInfo).date), 1 /* TEXT */),
+                                createBaseVNode("div", _hoisted_45, [
+                                    (openBlock(true), createElementBlock(Fragment, null, renderList(unref(reservationInfo).timeSlots, (slot) => {
+                                        return (openBlock(), createElementBlock("div", {
+                                            key: slot.id,
+                                            class: "ytomo-timeslot"
+                                        }, toDisplayString(slot.gate) + toDisplayString(slot.time), 1 /* TEXT */));
+                                    }), 128 /* KEYED_FRAGMENT */))
+                                ])
+                            ])
+                        ], 2 /* CLASS */))
+                        : createCommentVNode("v-if", true),
+                    createCommentVNode(" 予約実行状態表示エリア "),
+                    (unref(reservationStatus).visible)
+                        ? (openBlock(), createElementBlock("div", {
+                            key: 1,
+                            class: normalizeClass(["ytomo-reservation-status", unref(reservationStatus).statusClass])
+                        }, [
+                            createBaseVNode("div", _hoisted_46, [
+                                (unref(reservationStatus).isActive)
+                                    ? (openBlock(), createElementBlock("div", _hoisted_47, [...(_cache[3] || (_cache[3] = [
+                                            createBaseVNode("svg", { viewBox: "0 0 24 24" }, [
+                                                createBaseVNode("path", { d: "M12,4V2A10,10 0 0,0 2,12H4A8,8 0 0,1 12,4Z" })
+                                            ], -1 /* CACHED */)
+                                        ]))]))
+                                    : createCommentVNode("v-if", true),
+                                createBaseVNode("div", _hoisted_48, [
+                                    createBaseVNode("div", _hoisted_49, toDisplayString(unref(reservationStatus).currentAction), 1 /* TEXT */),
+                                    (unref(reservationStatus).statusClass === 'success' && unref(reservationStatus).dateChange)
+                                        ? (openBlock(), createElementBlock("div", _hoisted_50, toDisplayString(unref(reservationStatus).dateChange), 1 /* TEXT */))
+                                        : createCommentVNode("v-if", true),
+                                    (unref(reservationStatus).isActive)
+                                        ? (openBlock(), createElementBlock("div", _hoisted_51, [
+                                            createBaseVNode("div", _hoisted_52, [
+                                                createBaseVNode("div", {
+                                                    class: "ytomo-progress-fill",
+                                                    style: normalizeStyle({ width: unref(reservationStatus).progress + '%' })
+                                                }, null, 4 /* STYLE */)
+                                            ]),
+                                            createBaseVNode("span", _hoisted_53, toDisplayString(unref(reservationStatus).progressText), 1 /* TEXT */)
+                                        ]))
+                                        : createCommentVNode("v-if", true),
+                                    createCommentVNode(" 予約履歴表示（右下に表示） "),
+                                    (_ctx.apiManager.reservationHistory.value.length > 0)
+                                        ? (openBlock(), createElementBlock("div", _hoisted_54, [
+                                            (openBlock(true), createElementBlock(Fragment, null, renderList(_ctx.apiManager.reservationHistory.value, (result, index) => {
+                                                return (openBlock(), createElementBlock("div", {
+                                                    key: index,
+                                                    class: "ytomo-history-item"
+                                                }, [
+                                                    createBaseVNode("span", _hoisted_55, toDisplayString(result.timestamp), 1 /* TEXT */),
+                                                    createBaseVNode("span", {
+                                                        class: normalizeClass(["ytomo-history-result", result.success ? 'success' : 'failure'])
+                                                    }, toDisplayString(result.success ? '成功' : '失敗'), 3 /* TEXT, CLASS */),
+                                                    createBaseVNode("span", _hoisted_56, toDisplayString(result.gate) + toDisplayString(result.time), 1 /* TEXT */)
+                                                ]));
+                                            }), 128 /* KEYED_FRAGMENT */))
+                                        ]))
+                                        : createCommentVNode("v-if", true)
+                                ])
+                            ])
+                        ], 2 /* CLASS */))
+                        : createCommentVNode("v-if", true)
                 ])
             ]));
         };
@@ -41456,9 +42890,9 @@ const EntranceTabvue_type_script_setup_true_lang_ts_hoisted_34 = ["disabled"];
 
 ;// ./ts/components/EntranceTab.vue?vue&type=script&setup=true&lang=ts
  
-// EXTERNAL MODULE: ./node_modules/css-loader/dist/cjs.js!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/sass-loader/dist/cjs.js!./node_modules/vue-loader/dist/index.js??ruleSet[1].rules[8].use[0]!./ts/components/EntranceTab.vue?vue&type=style&index=0&id=7d814b81&scoped=true&lang=scss
-var EntranceTabvue_type_style_index_0_id_7d814b81_scoped_true_lang_scss = __webpack_require__(695);
-;// ./node_modules/style-loader/dist/cjs.js!./node_modules/css-loader/dist/cjs.js!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/sass-loader/dist/cjs.js!./node_modules/vue-loader/dist/index.js??ruleSet[1].rules[8].use[0]!./ts/components/EntranceTab.vue?vue&type=style&index=0&id=7d814b81&scoped=true&lang=scss
+// EXTERNAL MODULE: ./node_modules/css-loader/dist/cjs.js!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/sass-loader/dist/cjs.js!./node_modules/vue-loader/dist/index.js??ruleSet[1].rules[8].use[0]!./ts/components/EntranceTab.vue?vue&type=style&index=0&id=328e00e4&scoped=true&lang=scss
+var EntranceTabvue_type_style_index_0_id_328e00e4_scoped_true_lang_scss = __webpack_require__(753);
+;// ./node_modules/style-loader/dist/cjs.js!./node_modules/css-loader/dist/cjs.js!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/sass-loader/dist/cjs.js!./node_modules/vue-loader/dist/index.js??ruleSet[1].rules[8].use[0]!./ts/components/EntranceTab.vue?vue&type=style&index=0&id=328e00e4&scoped=true&lang=scss
 
       
       
@@ -41470,22 +42904,22 @@ var EntranceTabvue_type_style_index_0_id_7d814b81_scoped_true_lang_scss = __webp
       
       
 
-var EntranceTabvue_type_style_index_0_id_7d814b81_scoped_true_lang_scss_options = {};
+var EntranceTabvue_type_style_index_0_id_328e00e4_scoped_true_lang_scss_options = {};
 
-EntranceTabvue_type_style_index_0_id_7d814b81_scoped_true_lang_scss_options.styleTagTransform = (styleTagTransform_default());
-EntranceTabvue_type_style_index_0_id_7d814b81_scoped_true_lang_scss_options.setAttributes = (setAttributesWithoutAttributes_default());
-EntranceTabvue_type_style_index_0_id_7d814b81_scoped_true_lang_scss_options.insert = insertBySelector_default().bind(null, "head");
-EntranceTabvue_type_style_index_0_id_7d814b81_scoped_true_lang_scss_options.domAPI = (styleDomAPI_default());
-EntranceTabvue_type_style_index_0_id_7d814b81_scoped_true_lang_scss_options.insertStyleElement = (insertStyleElement_default());
+EntranceTabvue_type_style_index_0_id_328e00e4_scoped_true_lang_scss_options.styleTagTransform = (styleTagTransform_default());
+EntranceTabvue_type_style_index_0_id_328e00e4_scoped_true_lang_scss_options.setAttributes = (setAttributesWithoutAttributes_default());
+EntranceTabvue_type_style_index_0_id_328e00e4_scoped_true_lang_scss_options.insert = insertBySelector_default().bind(null, "head");
+EntranceTabvue_type_style_index_0_id_328e00e4_scoped_true_lang_scss_options.domAPI = (styleDomAPI_default());
+EntranceTabvue_type_style_index_0_id_328e00e4_scoped_true_lang_scss_options.insertStyleElement = (insertStyleElement_default());
 
-var EntranceTabvue_type_style_index_0_id_7d814b81_scoped_true_lang_scss_update = injectStylesIntoStyleTag_default()(EntranceTabvue_type_style_index_0_id_7d814b81_scoped_true_lang_scss/* default */.A, EntranceTabvue_type_style_index_0_id_7d814b81_scoped_true_lang_scss_options);
-
-
+var EntranceTabvue_type_style_index_0_id_328e00e4_scoped_true_lang_scss_update = injectStylesIntoStyleTag_default()(EntranceTabvue_type_style_index_0_id_328e00e4_scoped_true_lang_scss/* default */.A, EntranceTabvue_type_style_index_0_id_328e00e4_scoped_true_lang_scss_options);
 
 
-       /* harmony default export */ const components_EntranceTabvue_type_style_index_0_id_7d814b81_scoped_true_lang_scss = (EntranceTabvue_type_style_index_0_id_7d814b81_scoped_true_lang_scss/* default */.A && EntranceTabvue_type_style_index_0_id_7d814b81_scoped_true_lang_scss/* default */.A.locals ? EntranceTabvue_type_style_index_0_id_7d814b81_scoped_true_lang_scss/* default */.A.locals : undefined);
 
-;// ./ts/components/EntranceTab.vue?vue&type=style&index=0&id=7d814b81&scoped=true&lang=scss
+
+       /* harmony default export */ const components_EntranceTabvue_type_style_index_0_id_328e00e4_scoped_true_lang_scss = (EntranceTabvue_type_style_index_0_id_328e00e4_scoped_true_lang_scss/* default */.A && EntranceTabvue_type_style_index_0_id_328e00e4_scoped_true_lang_scss/* default */.A.locals ? EntranceTabvue_type_style_index_0_id_328e00e4_scoped_true_lang_scss/* default */.A.locals : undefined);
+
+;// ./ts/components/EntranceTab.vue?vue&type=style&index=0&id=328e00e4&scoped=true&lang=scss
 
 ;// ./ts/components/EntranceTab.vue
 
@@ -41494,7 +42928,7 @@ var EntranceTabvue_type_style_index_0_id_7d814b81_scoped_true_lang_scss_update =
 ;
 
 
-const EntranceTab_exports_ = /*#__PURE__*/(0,exportHelper/* default */.A)(EntranceTabvue_type_script_setup_true_lang_ts, [['__scopeId',"data-v-7d814b81"]])
+const EntranceTab_exports_ = /*#__PURE__*/(0,exportHelper/* default */.A)(EntranceTabvue_type_script_setup_true_lang_ts, [['__scopeId',"data-v-328e00e4"]])
 
 /* harmony default export */ const EntranceTab = (EntranceTab_exports_);
 ;// ./node_modules/ts-loader/index.js??clonedRuleSet-1.use!./node_modules/vue-loader/dist/index.js??ruleSet[1].rules[8].use[0]!./ts/components/MainDialog.vue?vue&type=script&setup=true&lang=ts
@@ -41522,6 +42956,11 @@ const MainDialogvue_type_script_setup_true_lang_ts_hoisted_9 = {
     class: "ytomo-latest-time"
 };
 const MainDialogvue_type_script_setup_true_lang_ts_hoisted_10 = { class: "ytomo-tab-content" };
+const MainDialogvue_type_script_setup_true_lang_ts_hoisted_11 = {
+    key: 0,
+    class: "ytomo-tab-info"
+};
+const MainDialogvue_type_script_setup_true_lang_ts_hoisted_12 = { class: "ytomo-tab-content" };
 
 
 
@@ -41622,6 +43061,23 @@ const MainDialogvue_type_script_setup_true_lang_ts_hoisted_10 = { class: "ytomo-
             }
             return timeDisplay || date || '';
         });
+        // 入場タブの情報表示（予約ボタン有効時にチケットID表示）
+        const entranceTabInfo = runtime_core_esm_bundler_computed(() => {
+            // 選択されたチケットがあり、予約ボタンが有効な場合にチケットIDを表示
+            const selectedTickets = ticketsStore.selectedTickets;
+            if (selectedTickets.length === 0)
+                return '';
+            // 自分のチケットで未使用の入場予約があるチケットを表示
+            const ownTicketsWithReservations = selectedTickets.filter(ticket => ticket.isOwn &&
+                ticket.schedules &&
+                ticket.schedules.some(schedule => schedule.use_state === 0) // 未使用の入場予約がある
+            );
+            if (ownTicketsWithReservations.length === 0)
+                return '';
+            // チケットIDを表示（複数ある場合はカンマ区切り）
+            const ticketIds = ownTicketsWithReservations.map(ticket => ticket.ticket_id);
+            return ticketIds.join(', ');
+        });
         // オーバーレイクリックでダイアログを閉じる
         const handleOverlayClick = (e) => {
             if (e.target === e.currentTarget) {
@@ -41707,11 +43163,14 @@ const MainDialogvue_type_script_setup_true_lang_ts_hoisted_10 = { class: "ytomo-
                                     class: normalizeClass(["ytomo-tab-button", { active: unref(activeTab) === 'entrance' }]),
                                     onClick: _cache[2] || (_cache[2] = ($event) => (unref(setActiveTab)('entrance'))),
                                     "data-tab": "entrance"
-                                }, [...(_cache[7] || (_cache[7] = [
-                                        createBaseVNode("div", { class: "ytomo-tab-content" }, [
-                                            createBaseVNode("div", { class: "ytomo-tab-title" }, "入場")
-                                        ], -1 /* CACHED */)
-                                    ]))], 2 /* CLASS */),
+                                }, [
+                                    createBaseVNode("div", MainDialogvue_type_script_setup_true_lang_ts_hoisted_10, [
+                                        _cache[7] || (_cache[7] = createBaseVNode("div", { class: "ytomo-tab-title" }, "入場", -1 /* CACHED */)),
+                                        (entranceTabInfo.value)
+                                            ? (openBlock(), createElementBlock("div", MainDialogvue_type_script_setup_true_lang_ts_hoisted_11, toDisplayString(entranceTabInfo.value), 1 /* TEXT */))
+                                            : createCommentVNode("v-if", true)
+                                    ])
+                                ], 2 /* CLASS */),
                                 (!unref(isYtomoPage))
                                     ? (openBlock(), createElementBlock("button", {
                                         key: 0,
@@ -41723,7 +43182,7 @@ const MainDialogvue_type_script_setup_true_lang_ts_hoisted_10 = { class: "ytomo-
                                     }, " × "))
                                     : createCommentVNode("v-if", true)
                             ]),
-                            createBaseVNode("div", MainDialogvue_type_script_setup_true_lang_ts_hoisted_10, [
+                            createBaseVNode("div", MainDialogvue_type_script_setup_true_lang_ts_hoisted_12, [
                                 createBaseVNode("div", {
                                     class: normalizeClass(["ytomo-tab-pane", { active: unref(activeTab) === 'ticket' }]),
                                     id: "ticket-tab"
@@ -41753,9 +43212,9 @@ const MainDialogvue_type_script_setup_true_lang_ts_hoisted_10 = { class: "ytomo-
 
 ;// ./ts/components/MainDialog.vue?vue&type=script&setup=true&lang=ts
  
-// EXTERNAL MODULE: ./node_modules/css-loader/dist/cjs.js!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/vue-loader/dist/index.js??ruleSet[1].rules[8].use[0]!./ts/components/MainDialog.vue?vue&type=style&index=0&id=50a82e78&scoped=true&lang=css
-var MainDialogvue_type_style_index_0_id_50a82e78_scoped_true_lang_css = __webpack_require__(410);
-;// ./node_modules/style-loader/dist/cjs.js!./node_modules/css-loader/dist/cjs.js!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/vue-loader/dist/index.js??ruleSet[1].rules[8].use[0]!./ts/components/MainDialog.vue?vue&type=style&index=0&id=50a82e78&scoped=true&lang=css
+// EXTERNAL MODULE: ./node_modules/css-loader/dist/cjs.js!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/vue-loader/dist/index.js??ruleSet[1].rules[8].use[0]!./ts/components/MainDialog.vue?vue&type=style&index=0&id=5829ca31&scoped=true&lang=css
+var MainDialogvue_type_style_index_0_id_5829ca31_scoped_true_lang_css = __webpack_require__(223);
+;// ./node_modules/style-loader/dist/cjs.js!./node_modules/css-loader/dist/cjs.js!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/vue-loader/dist/index.js??ruleSet[1].rules[8].use[0]!./ts/components/MainDialog.vue?vue&type=style&index=0&id=5829ca31&scoped=true&lang=css
 
       
       
@@ -41767,22 +43226,22 @@ var MainDialogvue_type_style_index_0_id_50a82e78_scoped_true_lang_css = __webpac
       
       
 
-var MainDialogvue_type_style_index_0_id_50a82e78_scoped_true_lang_css_options = {};
+var MainDialogvue_type_style_index_0_id_5829ca31_scoped_true_lang_css_options = {};
 
-MainDialogvue_type_style_index_0_id_50a82e78_scoped_true_lang_css_options.styleTagTransform = (styleTagTransform_default());
-MainDialogvue_type_style_index_0_id_50a82e78_scoped_true_lang_css_options.setAttributes = (setAttributesWithoutAttributes_default());
-MainDialogvue_type_style_index_0_id_50a82e78_scoped_true_lang_css_options.insert = insertBySelector_default().bind(null, "head");
-MainDialogvue_type_style_index_0_id_50a82e78_scoped_true_lang_css_options.domAPI = (styleDomAPI_default());
-MainDialogvue_type_style_index_0_id_50a82e78_scoped_true_lang_css_options.insertStyleElement = (insertStyleElement_default());
+MainDialogvue_type_style_index_0_id_5829ca31_scoped_true_lang_css_options.styleTagTransform = (styleTagTransform_default());
+MainDialogvue_type_style_index_0_id_5829ca31_scoped_true_lang_css_options.setAttributes = (setAttributesWithoutAttributes_default());
+MainDialogvue_type_style_index_0_id_5829ca31_scoped_true_lang_css_options.insert = insertBySelector_default().bind(null, "head");
+MainDialogvue_type_style_index_0_id_5829ca31_scoped_true_lang_css_options.domAPI = (styleDomAPI_default());
+MainDialogvue_type_style_index_0_id_5829ca31_scoped_true_lang_css_options.insertStyleElement = (insertStyleElement_default());
 
-var MainDialogvue_type_style_index_0_id_50a82e78_scoped_true_lang_css_update = injectStylesIntoStyleTag_default()(MainDialogvue_type_style_index_0_id_50a82e78_scoped_true_lang_css/* default */.A, MainDialogvue_type_style_index_0_id_50a82e78_scoped_true_lang_css_options);
-
-
+var MainDialogvue_type_style_index_0_id_5829ca31_scoped_true_lang_css_update = injectStylesIntoStyleTag_default()(MainDialogvue_type_style_index_0_id_5829ca31_scoped_true_lang_css/* default */.A, MainDialogvue_type_style_index_0_id_5829ca31_scoped_true_lang_css_options);
 
 
-       /* harmony default export */ const components_MainDialogvue_type_style_index_0_id_50a82e78_scoped_true_lang_css = (MainDialogvue_type_style_index_0_id_50a82e78_scoped_true_lang_css/* default */.A && MainDialogvue_type_style_index_0_id_50a82e78_scoped_true_lang_css/* default */.A.locals ? MainDialogvue_type_style_index_0_id_50a82e78_scoped_true_lang_css/* default */.A.locals : undefined);
 
-;// ./ts/components/MainDialog.vue?vue&type=style&index=0&id=50a82e78&scoped=true&lang=css
+
+       /* harmony default export */ const components_MainDialogvue_type_style_index_0_id_5829ca31_scoped_true_lang_css = (MainDialogvue_type_style_index_0_id_5829ca31_scoped_true_lang_css/* default */.A && MainDialogvue_type_style_index_0_id_5829ca31_scoped_true_lang_css/* default */.A.locals ? MainDialogvue_type_style_index_0_id_5829ca31_scoped_true_lang_css/* default */.A.locals : undefined);
+
+;// ./ts/components/MainDialog.vue?vue&type=style&index=0&id=5829ca31&scoped=true&lang=css
 
 ;// ./ts/components/MainDialog.vue
 
@@ -41791,7 +43250,7 @@ var MainDialogvue_type_style_index_0_id_50a82e78_scoped_true_lang_css_update = i
 ;
 
 
-const MainDialog_exports_ = /*#__PURE__*/(0,exportHelper/* default */.A)(MainDialogvue_type_script_setup_true_lang_ts, [['__scopeId',"data-v-50a82e78"]])
+const MainDialog_exports_ = /*#__PURE__*/(0,exportHelper/* default */.A)(MainDialogvue_type_script_setup_true_lang_ts, [['__scopeId',"data-v-5829ca31"]])
 
 /* harmony default export */ const MainDialog = (MainDialog_exports_);
 ;// ./node_modules/ts-loader/index.js??clonedRuleSet-1.use!./node_modules/vue-loader/dist/index.js??ruleSet[1].rules[8].use[0]!./ts/components/ProcessingOverlay.vue?vue&type=script&setup=true&lang=ts
@@ -41799,11 +43258,54 @@ const MainDialog_exports_ = /*#__PURE__*/(0,exportHelper/* default */.A)(MainDia
 
 const ProcessingOverlayvue_type_script_setup_true_lang_ts_hoisted_1 = { class: "ytomo-processing-content" };
 const ProcessingOverlayvue_type_script_setup_true_lang_ts_hoisted_2 = { class: "ytomo-processing-message" };
+const ProcessingOverlayvue_type_script_setup_true_lang_ts_hoisted_3 = {
+    key: 0,
+    class: "ytomo-target-time-control"
+};
+const ProcessingOverlayvue_type_script_setup_true_lang_ts_hoisted_4 = { class: "ytomo-target-time-selector" };
+const ProcessingOverlayvue_type_script_setup_true_lang_ts_hoisted_5 = ["value"];
+
+
 
 /* harmony default export */ const ProcessingOverlayvue_type_script_setup_true_lang_ts = (/*@__PURE__*/defineComponent({
     __name: 'ProcessingOverlay',
     setup(__props) {
         const overlaysStore = useOverlaysStore();
+        const sequentialReservationStore = useSequentialReservationStore();
+        // 目標秒の選択肢（0-59）
+        const secondOptions = Array.from({ length: 60 }, (_, i) => i);
+        // 現在選択されている目標秒
+        const selectedTargetSecond = ref(35); // デフォルト35秒
+        // 入場予約実行中かどうかの判定
+        const isEntranceReservationRunning = runtime_core_esm_bundler_computed(() => {
+            const message = overlaysStore.processingMessage.toLowerCase();
+            return message.includes('入場予約') || message.includes('entrance') || message.includes('reservation');
+        });
+        // 目標秒を更新
+        const updateTargetSecond = () => {
+            try {
+                // グローバルの入場予約状態管理にアクセス
+                const stateManager = window.entranceReservationStateManager;
+                if (stateManager && typeof stateManager.setTargetSecond === 'function') {
+                    stateManager.setTargetSecond(selectedTargetSecond.value);
+                }
+            }
+            catch (error) {
+                console.warn('目標秒設定エラー', error);
+            }
+        };
+        // 初期化時に現在の目標秒を取得
+        onMounted(() => {
+            try {
+                const stateManager = window.entranceReservationStateManager;
+                if (stateManager && typeof stateManager.getTargetSecond === 'function') {
+                    selectedTargetSecond.value = stateManager.getTargetSecond();
+                }
+            }
+            catch (error) {
+                console.warn('目標秒取得エラー', error);
+            }
+        });
         const handleClick = (e) => {
             e.preventDefault();
             e.stopPropagation();
@@ -41813,15 +43315,37 @@ const ProcessingOverlayvue_type_script_setup_true_lang_ts_hoisted_2 = { class: "
                 (unref(overlaysStore).processingOverlayVisible)
                     ? (openBlock(), createElementBlock("div", {
                         key: 0,
-                        class: "ytomo-processing-overlay",
+                        class: normalizeClass(["ytomo-processing-overlay", { 'ytomo-responsive-layout': unref(sequentialReservationStore).state.isRunning }]),
                         id: "ytomo-processing-overlay",
                         onClick: handleClick
                     }, [
                         createBaseVNode("div", ProcessingOverlayvue_type_script_setup_true_lang_ts_hoisted_1, [
-                            _cache[0] || (_cache[0] = createBaseVNode("div", { class: "ytomo-processing-spinner" }, null, -1 /* CACHED */)),
-                            createBaseVNode("div", ProcessingOverlayvue_type_script_setup_true_lang_ts_hoisted_2, toDisplayString(unref(overlaysStore).processingMessage), 1 /* TEXT */)
+                            _cache[2] || (_cache[2] = createBaseVNode("div", { class: "ytomo-processing-spinner" }, null, -1 /* CACHED */)),
+                            createBaseVNode("div", ProcessingOverlayvue_type_script_setup_true_lang_ts_hoisted_2, toDisplayString(unref(overlaysStore).processingMessage), 1 /* TEXT */),
+                            createCommentVNode(" 入場予約実行中の場合は目標時間選択UIを表示 "),
+                            (isEntranceReservationRunning.value)
+                                ? (openBlock(), createElementBlock("div", ProcessingOverlayvue_type_script_setup_true_lang_ts_hoisted_3, [
+                                    _cache[1] || (_cache[1] = createBaseVNode("div", { class: "ytomo-target-time-label" }, "目標時間 (次周期から適用)", -1 /* CACHED */)),
+                                    createBaseVNode("div", ProcessingOverlayvue_type_script_setup_true_lang_ts_hoisted_4, [
+                                        withDirectives(createBaseVNode("select", {
+                                            "onUpdate:modelValue": _cache[0] || (_cache[0] = ($event) => ((selectedTargetSecond).value = $event)),
+                                            onChange: updateTargetSecond,
+                                            class: "ytomo-target-second-select"
+                                        }, [
+                                            (openBlock(true), createElementBlock(Fragment, null, renderList(unref(secondOptions), (second) => {
+                                                return (openBlock(), createElementBlock("option", {
+                                                    key: second,
+                                                    value: second
+                                                }, toDisplayString(second) + "秒 ", 9 /* TEXT, PROPS */, ProcessingOverlayvue_type_script_setup_true_lang_ts_hoisted_5));
+                                            }), 128 /* KEYED_FRAGMENT */))
+                                        ], 544 /* NEED_HYDRATION, NEED_PATCH */), [
+                                            [vModelSelect, selectedTargetSecond.value]
+                                        ])
+                                    ])
+                                ]))
+                                : createCommentVNode("v-if", true)
                         ])
-                    ]))
+                    ], 2 /* CLASS */))
                     : createCommentVNode("v-if", true)
             ]));
         };
@@ -41830,9 +43354,9 @@ const ProcessingOverlayvue_type_script_setup_true_lang_ts_hoisted_2 = { class: "
 
 ;// ./ts/components/ProcessingOverlay.vue?vue&type=script&setup=true&lang=ts
  
-// EXTERNAL MODULE: ./node_modules/css-loader/dist/cjs.js!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/sass-loader/dist/cjs.js!./node_modules/vue-loader/dist/index.js??ruleSet[1].rules[8].use[0]!./ts/components/ProcessingOverlay.vue?vue&type=style&index=0&id=b2331216&scoped=true&lang=scss
-var ProcessingOverlayvue_type_style_index_0_id_b2331216_scoped_true_lang_scss = __webpack_require__(790);
-;// ./node_modules/style-loader/dist/cjs.js!./node_modules/css-loader/dist/cjs.js!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/sass-loader/dist/cjs.js!./node_modules/vue-loader/dist/index.js??ruleSet[1].rules[8].use[0]!./ts/components/ProcessingOverlay.vue?vue&type=style&index=0&id=b2331216&scoped=true&lang=scss
+// EXTERNAL MODULE: ./node_modules/css-loader/dist/cjs.js!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/sass-loader/dist/cjs.js!./node_modules/vue-loader/dist/index.js??ruleSet[1].rules[8].use[0]!./ts/components/ProcessingOverlay.vue?vue&type=style&index=0&id=7575496b&scoped=true&lang=scss
+var ProcessingOverlayvue_type_style_index_0_id_7575496b_scoped_true_lang_scss = __webpack_require__(665);
+;// ./node_modules/style-loader/dist/cjs.js!./node_modules/css-loader/dist/cjs.js!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/sass-loader/dist/cjs.js!./node_modules/vue-loader/dist/index.js??ruleSet[1].rules[8].use[0]!./ts/components/ProcessingOverlay.vue?vue&type=style&index=0&id=7575496b&scoped=true&lang=scss
 
       
       
@@ -41844,22 +43368,22 @@ var ProcessingOverlayvue_type_style_index_0_id_b2331216_scoped_true_lang_scss = 
       
       
 
-var ProcessingOverlayvue_type_style_index_0_id_b2331216_scoped_true_lang_scss_options = {};
+var ProcessingOverlayvue_type_style_index_0_id_7575496b_scoped_true_lang_scss_options = {};
 
-ProcessingOverlayvue_type_style_index_0_id_b2331216_scoped_true_lang_scss_options.styleTagTransform = (styleTagTransform_default());
-ProcessingOverlayvue_type_style_index_0_id_b2331216_scoped_true_lang_scss_options.setAttributes = (setAttributesWithoutAttributes_default());
-ProcessingOverlayvue_type_style_index_0_id_b2331216_scoped_true_lang_scss_options.insert = insertBySelector_default().bind(null, "head");
-ProcessingOverlayvue_type_style_index_0_id_b2331216_scoped_true_lang_scss_options.domAPI = (styleDomAPI_default());
-ProcessingOverlayvue_type_style_index_0_id_b2331216_scoped_true_lang_scss_options.insertStyleElement = (insertStyleElement_default());
+ProcessingOverlayvue_type_style_index_0_id_7575496b_scoped_true_lang_scss_options.styleTagTransform = (styleTagTransform_default());
+ProcessingOverlayvue_type_style_index_0_id_7575496b_scoped_true_lang_scss_options.setAttributes = (setAttributesWithoutAttributes_default());
+ProcessingOverlayvue_type_style_index_0_id_7575496b_scoped_true_lang_scss_options.insert = insertBySelector_default().bind(null, "head");
+ProcessingOverlayvue_type_style_index_0_id_7575496b_scoped_true_lang_scss_options.domAPI = (styleDomAPI_default());
+ProcessingOverlayvue_type_style_index_0_id_7575496b_scoped_true_lang_scss_options.insertStyleElement = (insertStyleElement_default());
 
-var ProcessingOverlayvue_type_style_index_0_id_b2331216_scoped_true_lang_scss_update = injectStylesIntoStyleTag_default()(ProcessingOverlayvue_type_style_index_0_id_b2331216_scoped_true_lang_scss/* default */.A, ProcessingOverlayvue_type_style_index_0_id_b2331216_scoped_true_lang_scss_options);
-
-
+var ProcessingOverlayvue_type_style_index_0_id_7575496b_scoped_true_lang_scss_update = injectStylesIntoStyleTag_default()(ProcessingOverlayvue_type_style_index_0_id_7575496b_scoped_true_lang_scss/* default */.A, ProcessingOverlayvue_type_style_index_0_id_7575496b_scoped_true_lang_scss_options);
 
 
-       /* harmony default export */ const components_ProcessingOverlayvue_type_style_index_0_id_b2331216_scoped_true_lang_scss = (ProcessingOverlayvue_type_style_index_0_id_b2331216_scoped_true_lang_scss/* default */.A && ProcessingOverlayvue_type_style_index_0_id_b2331216_scoped_true_lang_scss/* default */.A.locals ? ProcessingOverlayvue_type_style_index_0_id_b2331216_scoped_true_lang_scss/* default */.A.locals : undefined);
 
-;// ./ts/components/ProcessingOverlay.vue?vue&type=style&index=0&id=b2331216&scoped=true&lang=scss
+
+       /* harmony default export */ const components_ProcessingOverlayvue_type_style_index_0_id_7575496b_scoped_true_lang_scss = (ProcessingOverlayvue_type_style_index_0_id_7575496b_scoped_true_lang_scss/* default */.A && ProcessingOverlayvue_type_style_index_0_id_7575496b_scoped_true_lang_scss/* default */.A.locals ? ProcessingOverlayvue_type_style_index_0_id_7575496b_scoped_true_lang_scss/* default */.A.locals : undefined);
+
+;// ./ts/components/ProcessingOverlay.vue?vue&type=style&index=0&id=7575496b&scoped=true&lang=scss
 
 ;// ./ts/components/ProcessingOverlay.vue
 
@@ -41868,29 +43392,30 @@ var ProcessingOverlayvue_type_style_index_0_id_b2331216_scoped_true_lang_scss_up
 ;
 
 
-const ProcessingOverlay_exports_ = /*#__PURE__*/(0,exportHelper/* default */.A)(ProcessingOverlayvue_type_script_setup_true_lang_ts, [['__scopeId',"data-v-b2331216"]])
+const ProcessingOverlay_exports_ = /*#__PURE__*/(0,exportHelper/* default */.A)(ProcessingOverlayvue_type_script_setup_true_lang_ts, [['__scopeId',"data-v-7575496b"]])
 
 /* harmony default export */ const ProcessingOverlay = (ProcessingOverlay_exports_);
 ;// ./node_modules/ts-loader/index.js??clonedRuleSet-1.use!./node_modules/vue-loader/dist/index.js??ruleSet[1].rules[8].use[0]!./ts/components/SequentialReservationOverlay.vue?vue&type=script&setup=true&lang=ts
 
 
 const SequentialReservationOverlayvue_type_script_setup_true_lang_ts_hoisted_1 = { class: "ytomo-sequential-content" };
-const SequentialReservationOverlayvue_type_script_setup_true_lang_ts_hoisted_2 = { class: "countdown-seconds" };
-const SequentialReservationOverlayvue_type_script_setup_true_lang_ts_hoisted_3 = { class: "ytomo-sequential-settings-row" };
-const SequentialReservationOverlayvue_type_script_setup_true_lang_ts_hoisted_4 = { class: "ytomo-mode-buttons" };
-const SequentialReservationOverlayvue_type_script_setup_true_lang_ts_hoisted_5 = ["value"];
-const SequentialReservationOverlayvue_type_script_setup_true_lang_ts_hoisted_6 = {
+const SequentialReservationOverlayvue_type_script_setup_true_lang_ts_hoisted_2 = { class: "ytomo-header-with-spinner" };
+const SequentialReservationOverlayvue_type_script_setup_true_lang_ts_hoisted_3 = { class: "ytomo-progress-bar" };
+const SequentialReservationOverlayvue_type_script_setup_true_lang_ts_hoisted_4 = { class: "ytomo-sequential-settings-row" };
+const SequentialReservationOverlayvue_type_script_setup_true_lang_ts_hoisted_5 = { class: "ytomo-mode-buttons" };
+const SequentialReservationOverlayvue_type_script_setup_true_lang_ts_hoisted_6 = ["value"];
+const SequentialReservationOverlayvue_type_script_setup_true_lang_ts_hoisted_7 = {
     key: 0,
     value: "1"
 };
-const SequentialReservationOverlayvue_type_script_setup_true_lang_ts_hoisted_7 = { class: "ytomo-sequential-progress" };
-const SequentialReservationOverlayvue_type_script_setup_true_lang_ts_hoisted_8 = { class: "ytomo-sequential-target" };
-const SequentialReservationOverlayvue_type_script_setup_true_lang_ts_hoisted_9 = {
+const SequentialReservationOverlayvue_type_script_setup_true_lang_ts_hoisted_8 = { class: "ytomo-sequential-progress" };
+const SequentialReservationOverlayvue_type_script_setup_true_lang_ts_hoisted_9 = { class: "ytomo-sequential-target" };
+const SequentialReservationOverlayvue_type_script_setup_true_lang_ts_hoisted_10 = {
     key: 0,
     class: "current-target"
 };
-const SequentialReservationOverlayvue_type_script_setup_true_lang_ts_hoisted_10 = { class: "pavilion-name" };
-const SequentialReservationOverlayvue_type_script_setup_true_lang_ts_hoisted_11 = { class: "time-slot-button" };
+const SequentialReservationOverlayvue_type_script_setup_true_lang_ts_hoisted_11 = { class: "pavilion-name" };
+const SequentialReservationOverlayvue_type_script_setup_true_lang_ts_hoisted_12 = { class: "time-slot-button time-slot-small" };
 
 
 
@@ -41907,6 +43432,20 @@ const SequentialReservationOverlayvue_type_script_setup_true_lang_ts_hoisted_11 
                 return state.reservationTargets[state.currentTargetIndex];
             }
             return null;
+        });
+        const progressPercentage = runtime_core_esm_bundler_computed(() => {
+            const countdownText = sequentialReservationStore.state.countdownText;
+            if (!countdownText)
+                return 0;
+            // カウントダウンテキストから秒数を抽出
+            const match = countdownText.match(/(\d+)/);
+            if (!match)
+                return 0;
+            const currentSeconds = parseInt(match[1]);
+            const intervalTime = sequentialReservationStore.state.nextIntervalTime || 30;
+            // 残り時間の逆算でプログレスバーを表示（0%から100%へ）
+            const progress = ((intervalTime - currentSeconds) / intervalTime) * 100;
+            return Math.max(0, Math.min(100, progress));
         });
         const handleOverlayClick = (e) => {
             e.preventDefault();
@@ -41937,12 +43476,21 @@ const SequentialReservationOverlayvue_type_script_setup_true_lang_ts_hoisted_11 
                         onClick: handleOverlayClick
                     }, [
                         createBaseVNode("div", SequentialReservationOverlayvue_type_script_setup_true_lang_ts_hoisted_1, [
-                            createBaseVNode("h3", null, [
-                                createTextVNode(" 順次予約実行中 " + toDisplayString(unref(sequentialReservationStore).state.currentTargetIndex + 1) + "/" + toDisplayString(unref(sequentialReservationStore).state.reservationTargets.length) + " ", 1 /* TEXT */),
-                                createBaseVNode("span", SequentialReservationOverlayvue_type_script_setup_true_lang_ts_hoisted_2, toDisplayString(unref(sequentialReservationStore).state.countdownText), 1 /* TEXT */)
+                            createBaseVNode("div", SequentialReservationOverlayvue_type_script_setup_true_lang_ts_hoisted_2, [
+                                _cache[1] || (_cache[1] = createBaseVNode("div", { class: "ytomo-loading-spinner" }, null, -1 /* CACHED */)),
+                                createBaseVNode("h3", null, [
+                                    createTextVNode(" 順次予約実行中 " + toDisplayString(unref(sequentialReservationStore).state.currentTargetIndex + 1) + "/" + toDisplayString(unref(sequentialReservationStore).state.reservationTargets.length) + " ", 1 /* TEXT */),
+                                    _cache[0] || (_cache[0] = createBaseVNode("span", { class: "status-text" }, "待機中", -1 /* CACHED */))
+                                ]),
+                                createBaseVNode("div", SequentialReservationOverlayvue_type_script_setup_true_lang_ts_hoisted_3, [
+                                    createBaseVNode("div", {
+                                        class: "ytomo-progress-fill",
+                                        style: normalizeStyle({ width: progressPercentage.value + '%' })
+                                    }, null, 4 /* STYLE */)
+                                ])
                             ]),
-                            createBaseVNode("div", SequentialReservationOverlayvue_type_script_setup_true_lang_ts_hoisted_3, [
-                                createBaseVNode("div", SequentialReservationOverlayvue_type_script_setup_true_lang_ts_hoisted_4, [
+                            createBaseVNode("div", SequentialReservationOverlayvue_type_script_setup_true_lang_ts_hoisted_4, [
+                                createBaseVNode("div", SequentialReservationOverlayvue_type_script_setup_true_lang_ts_hoisted_5, [
                                     createBaseVNode("button", {
                                         id: "ytomo-reservation-mode",
                                         class: normalizeClass(["ytomo-mode-button", { active: !unref(sequentialReservationStore).state.nextMonitoringMode }]),
@@ -41961,20 +43509,24 @@ const SequentialReservationOverlayvue_type_script_setup_true_lang_ts_hoisted_11 
                                     onChange: onIntervalChange
                                 }, [
                                     (!unref(sequentialReservationStore).state.nextMonitoringMode)
-                                        ? (openBlock(), createElementBlock("option", SequentialReservationOverlayvue_type_script_setup_true_lang_ts_hoisted_6, "1秒"))
+                                        ? (openBlock(), createElementBlock("option", SequentialReservationOverlayvue_type_script_setup_true_lang_ts_hoisted_7, "1秒"))
                                         : createCommentVNode("v-if", true),
-                                    _cache[0] || (_cache[0] = createBaseVNode("option", { value: "5" }, "5秒", -1 /* CACHED */)),
-                                    _cache[1] || (_cache[1] = createBaseVNode("option", { value: "15" }, "15秒", -1 /* CACHED */)),
-                                    _cache[2] || (_cache[2] = createBaseVNode("option", { value: "30" }, "30秒", -1 /* CACHED */)),
-                                    _cache[3] || (_cache[3] = createBaseVNode("option", { value: "60" }, "60秒", -1 /* CACHED */))
-                                ], 40 /* PROPS, NEED_HYDRATION */, SequentialReservationOverlayvue_type_script_setup_true_lang_ts_hoisted_5)
+                                    _cache[2] || (_cache[2] = createBaseVNode("option", { value: "5" }, "5秒", -1 /* CACHED */)),
+                                    _cache[3] || (_cache[3] = createBaseVNode("option", { value: "15" }, "15秒", -1 /* CACHED */)),
+                                    _cache[4] || (_cache[4] = createBaseVNode("option", { value: "30" }, "30秒", -1 /* CACHED */)),
+                                    _cache[5] || (_cache[5] = createBaseVNode("option", { value: "60" }, "60秒", -1 /* CACHED */))
+                                ], 40 /* PROPS, NEED_HYDRATION */, SequentialReservationOverlayvue_type_script_setup_true_lang_ts_hoisted_6),
+                                createBaseVNode("button", {
+                                    class: "ytomo-cancel-button",
+                                    onClick: cancelSequentialReservation
+                                }, " 中断 ")
                             ]),
-                            createBaseVNode("div", SequentialReservationOverlayvue_type_script_setup_true_lang_ts_hoisted_7, [
-                                createBaseVNode("div", SequentialReservationOverlayvue_type_script_setup_true_lang_ts_hoisted_8, [
+                            createBaseVNode("div", SequentialReservationOverlayvue_type_script_setup_true_lang_ts_hoisted_8, [
+                                createBaseVNode("div", SequentialReservationOverlayvue_type_script_setup_true_lang_ts_hoisted_9, [
                                     (currentTarget.value)
-                                        ? (openBlock(), createElementBlock("div", SequentialReservationOverlayvue_type_script_setup_true_lang_ts_hoisted_9, [
-                                            createBaseVNode("div", SequentialReservationOverlayvue_type_script_setup_true_lang_ts_hoisted_10, toDisplayString(currentTarget.value.pavilionName), 1 /* TEXT */),
-                                            createBaseVNode("div", SequentialReservationOverlayvue_type_script_setup_true_lang_ts_hoisted_11, toDisplayString(currentTarget.value.timeSlot), 1 /* TEXT */)
+                                        ? (openBlock(), createElementBlock("div", SequentialReservationOverlayvue_type_script_setup_true_lang_ts_hoisted_10, [
+                                            createBaseVNode("div", SequentialReservationOverlayvue_type_script_setup_true_lang_ts_hoisted_11, toDisplayString(currentTarget.value.pavilionName), 1 /* TEXT */),
+                                            createBaseVNode("div", SequentialReservationOverlayvue_type_script_setup_true_lang_ts_hoisted_12, toDisplayString(currentTarget.value.timeSlot), 1 /* TEXT */)
                                         ]))
                                         : createCommentVNode("v-if", true)
                                 ]),
@@ -41990,9 +43542,9 @@ const SequentialReservationOverlayvue_type_script_setup_true_lang_ts_hoisted_11 
 
 ;// ./ts/components/SequentialReservationOverlay.vue?vue&type=script&setup=true&lang=ts
  
-// EXTERNAL MODULE: ./node_modules/css-loader/dist/cjs.js!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/sass-loader/dist/cjs.js!./node_modules/vue-loader/dist/index.js??ruleSet[1].rules[8].use[0]!./ts/components/SequentialReservationOverlay.vue?vue&type=style&index=0&id=87268ea4&scoped=true&lang=scss
-var SequentialReservationOverlayvue_type_style_index_0_id_87268ea4_scoped_true_lang_scss = __webpack_require__(559);
-;// ./node_modules/style-loader/dist/cjs.js!./node_modules/css-loader/dist/cjs.js!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/sass-loader/dist/cjs.js!./node_modules/vue-loader/dist/index.js??ruleSet[1].rules[8].use[0]!./ts/components/SequentialReservationOverlay.vue?vue&type=style&index=0&id=87268ea4&scoped=true&lang=scss
+// EXTERNAL MODULE: ./node_modules/css-loader/dist/cjs.js!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/sass-loader/dist/cjs.js!./node_modules/vue-loader/dist/index.js??ruleSet[1].rules[8].use[0]!./ts/components/SequentialReservationOverlay.vue?vue&type=style&index=0&id=5522ceeb&scoped=true&lang=scss
+var SequentialReservationOverlayvue_type_style_index_0_id_5522ceeb_scoped_true_lang_scss = __webpack_require__(269);
+;// ./node_modules/style-loader/dist/cjs.js!./node_modules/css-loader/dist/cjs.js!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/sass-loader/dist/cjs.js!./node_modules/vue-loader/dist/index.js??ruleSet[1].rules[8].use[0]!./ts/components/SequentialReservationOverlay.vue?vue&type=style&index=0&id=5522ceeb&scoped=true&lang=scss
 
       
       
@@ -42004,22 +43556,22 @@ var SequentialReservationOverlayvue_type_style_index_0_id_87268ea4_scoped_true_l
       
       
 
-var SequentialReservationOverlayvue_type_style_index_0_id_87268ea4_scoped_true_lang_scss_options = {};
+var SequentialReservationOverlayvue_type_style_index_0_id_5522ceeb_scoped_true_lang_scss_options = {};
 
-SequentialReservationOverlayvue_type_style_index_0_id_87268ea4_scoped_true_lang_scss_options.styleTagTransform = (styleTagTransform_default());
-SequentialReservationOverlayvue_type_style_index_0_id_87268ea4_scoped_true_lang_scss_options.setAttributes = (setAttributesWithoutAttributes_default());
-SequentialReservationOverlayvue_type_style_index_0_id_87268ea4_scoped_true_lang_scss_options.insert = insertBySelector_default().bind(null, "head");
-SequentialReservationOverlayvue_type_style_index_0_id_87268ea4_scoped_true_lang_scss_options.domAPI = (styleDomAPI_default());
-SequentialReservationOverlayvue_type_style_index_0_id_87268ea4_scoped_true_lang_scss_options.insertStyleElement = (insertStyleElement_default());
+SequentialReservationOverlayvue_type_style_index_0_id_5522ceeb_scoped_true_lang_scss_options.styleTagTransform = (styleTagTransform_default());
+SequentialReservationOverlayvue_type_style_index_0_id_5522ceeb_scoped_true_lang_scss_options.setAttributes = (setAttributesWithoutAttributes_default());
+SequentialReservationOverlayvue_type_style_index_0_id_5522ceeb_scoped_true_lang_scss_options.insert = insertBySelector_default().bind(null, "head");
+SequentialReservationOverlayvue_type_style_index_0_id_5522ceeb_scoped_true_lang_scss_options.domAPI = (styleDomAPI_default());
+SequentialReservationOverlayvue_type_style_index_0_id_5522ceeb_scoped_true_lang_scss_options.insertStyleElement = (insertStyleElement_default());
 
-var SequentialReservationOverlayvue_type_style_index_0_id_87268ea4_scoped_true_lang_scss_update = injectStylesIntoStyleTag_default()(SequentialReservationOverlayvue_type_style_index_0_id_87268ea4_scoped_true_lang_scss/* default */.A, SequentialReservationOverlayvue_type_style_index_0_id_87268ea4_scoped_true_lang_scss_options);
-
-
+var SequentialReservationOverlayvue_type_style_index_0_id_5522ceeb_scoped_true_lang_scss_update = injectStylesIntoStyleTag_default()(SequentialReservationOverlayvue_type_style_index_0_id_5522ceeb_scoped_true_lang_scss/* default */.A, SequentialReservationOverlayvue_type_style_index_0_id_5522ceeb_scoped_true_lang_scss_options);
 
 
-       /* harmony default export */ const components_SequentialReservationOverlayvue_type_style_index_0_id_87268ea4_scoped_true_lang_scss = (SequentialReservationOverlayvue_type_style_index_0_id_87268ea4_scoped_true_lang_scss/* default */.A && SequentialReservationOverlayvue_type_style_index_0_id_87268ea4_scoped_true_lang_scss/* default */.A.locals ? SequentialReservationOverlayvue_type_style_index_0_id_87268ea4_scoped_true_lang_scss/* default */.A.locals : undefined);
 
-;// ./ts/components/SequentialReservationOverlay.vue?vue&type=style&index=0&id=87268ea4&scoped=true&lang=scss
+
+       /* harmony default export */ const components_SequentialReservationOverlayvue_type_style_index_0_id_5522ceeb_scoped_true_lang_scss = (SequentialReservationOverlayvue_type_style_index_0_id_5522ceeb_scoped_true_lang_scss/* default */.A && SequentialReservationOverlayvue_type_style_index_0_id_5522ceeb_scoped_true_lang_scss/* default */.A.locals ? SequentialReservationOverlayvue_type_style_index_0_id_5522ceeb_scoped_true_lang_scss/* default */.A.locals : undefined);
+
+;// ./ts/components/SequentialReservationOverlay.vue?vue&type=style&index=0&id=5522ceeb&scoped=true&lang=scss
 
 ;// ./ts/components/SequentialReservationOverlay.vue
 
@@ -42028,7 +43580,7 @@ var SequentialReservationOverlayvue_type_style_index_0_id_87268ea4_scoped_true_l
 ;
 
 
-const SequentialReservationOverlay_exports_ = /*#__PURE__*/(0,exportHelper/* default */.A)(SequentialReservationOverlayvue_type_script_setup_true_lang_ts, [['__scopeId',"data-v-87268ea4"]])
+const SequentialReservationOverlay_exports_ = /*#__PURE__*/(0,exportHelper/* default */.A)(SequentialReservationOverlayvue_type_script_setup_true_lang_ts, [['__scopeId',"data-v-5522ceeb"]])
 
 /* harmony default export */ const SequentialReservationOverlay = (SequentialReservationOverlay_exports_);
 ;// ./node_modules/ts-loader/index.js??clonedRuleSet-1.use!./node_modules/vue-loader/dist/index.js??ruleSet[1].rules[8].use[0]!./ts/components/YtomoPageContent.vue?vue&type=script&setup=true&lang=ts
@@ -42082,7 +43634,11 @@ const SequentialReservationOverlay_exports_ = /*#__PURE__*/(0,exportHelper/* def
         // スクリプト読み込み時点で実行
         waitForMainAndLoadDialog();
         onMounted(() => {
-            // onMountedでは何もしない（すでに処理済み）
+            // ページタイトルを変更
+            document.title = 'Expo YTomo';
+            // ytomoページ用のクラスを追加
+            document.body.classList.add('ytomo-page');
+            logger.info('ytomoページタイトルを変更', { title: document.title });
         });
         return (_ctx, _cache) => {
             return (openBlock(), createElementBlock("div"));
@@ -42552,6 +44108,270 @@ else {
     })();
 }
 
+;// ./ts/modules/waiting-room-page.ts
+/**
+ * 待機室ページ機能
+ *
+ * 【責務】
+ * - tktwaitingroom.expo2025.or.jpページでの機能拡張
+ * - [#headerparagraph]直後に/ytomoへのURL移動ボタンを追加
+ *
+ * @version v1.0.0
+ */
+
+const waiting_room_page_logger = utils_logger/* loggers */.C$.ui;
+/**
+ * 待機室ページの初期化可能判定
+ */
+function judge_waiting_room_init() {
+    // ページの基本要素が存在するかチェック
+    return document.body !== null && (document.getElementById('headerparagraph') !== null ||
+        document.getElementById('child_menu_2') !== null);
+}
+/**
+ * /ytomoへの移動ボタンを作成
+ */
+function createYtomoNavigationButton() {
+    const button = document.createElement('button');
+    button.id = 'ytomo-navigation-button';
+    button.textContent = 'YTomo';
+    button.style.cssText = `
+        background: linear-gradient(135deg, #2c5aa0 0%, #1a365d 100%);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        padding: 12px 24px;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        margin: 16px 0;
+        box-shadow: 0 2px 8px rgba(44, 90, 160, 0.3);
+        transition: all 0.2s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+    `;
+    // ホバーエフェクト
+    button.addEventListener('mouseenter', () => {
+        button.style.transform = 'translateY(-2px)';
+        button.style.boxShadow = '0 4px 12px rgba(44, 90, 160, 0.4)';
+    });
+    button.addEventListener('mouseleave', () => {
+        button.style.transform = 'translateY(0)';
+        button.style.boxShadow = '0 2px 8px rgba(44, 90, 160, 0.3)';
+    });
+    // クリックイベント
+    button.addEventListener('click', () => {
+        // 現在のURLから基本URLを抽出
+        const currentUrl = new URL(window.location.href);
+        const baseUrl = `${currentUrl.protocol}//${currentUrl.hostname.replace('tktwaitingroom.', 'ticket.')}`;
+        const targetUrl = `${baseUrl}/ytomo`;
+        waiting_room_page_logger.info('YTomoページへ移動', { targetUrl });
+        window.location.href = targetUrl;
+    });
+    return button;
+}
+/**
+ * メニュー項目としてのliを作成
+ */
+function createYtomoMenuListItem() {
+    const li = document.createElement('li');
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.tabIndex = -1;
+    const span = document.createElement('span');
+    span.textContent = '/ytomo移行';
+    span.className = 'style_renderer__ip0Pm'; // 参考の例に合わせてクラスを設定
+    button.appendChild(span);
+    li.appendChild(button);
+    // クリックイベント
+    button.addEventListener('click', () => {
+        // 現在のURLから基本URLを抽出
+        const currentUrl = new URL(window.location.href);
+        const baseUrl = `${currentUrl.protocol}//${currentUrl.hostname.replace('tktwaitingroom.', 'ticket.')}`;
+        const targetUrl = `${baseUrl}/ytomo`;
+        waiting_room_page_logger.info('/ytomoメニューから移動', { targetUrl });
+        window.location.href = targetUrl;
+    });
+    return li;
+}
+/**
+ * 待機室ページの初期化処理
+ */
+function init_waiting_room_page() {
+    try {
+        waiting_room_page_logger.info('待機室ページ初期化開始');
+        // #child_menu_2が存在する場合の処理を優先
+        const childMenu2 = document.getElementById('child_menu_2');
+        if (childMenu2) {
+            // 既存のメニュー項目がないかチェック
+            const existingMenuItems = childMenu2.querySelectorAll('li');
+            const existingYtomoItem = Array.from(existingMenuItems).find(li => {
+                const span = li.querySelector('span');
+                return span && span.textContent?.includes('/ytomo');
+            });
+            if (!existingYtomoItem) {
+                // /ytomoメニュー項目を作成
+                const ytomoMenuItem = createYtomoMenuListItem();
+                // 最初の子要素として挿入
+                if (childMenu2.firstChild) {
+                    childMenu2.insertBefore(ytomoMenuItem, childMenu2.firstChild);
+                }
+                else {
+                    childMenu2.appendChild(ytomoMenuItem);
+                }
+                waiting_room_page_logger.info('/ytomoメニュー項目を追加', {
+                    position: '#child_menu_2の最初の子要素'
+                });
+            }
+            else {
+                waiting_room_page_logger.debug('/ytomoメニュー項目は既に存在します');
+            }
+        }
+        // #headerparagraphも存在する場合の従来の処理
+        const headerParagraph = document.getElementById('headerparagraph');
+        if (headerParagraph) {
+            // 既存のボタンがないかチェック
+            const existingButton = document.getElementById('ytomo-navigation-button');
+            if (!existingButton) {
+                // /ytomoナビゲーションボタンを作成
+                const navigationButton = createYtomoNavigationButton();
+                // #headerparagraphの直後に挿入
+                if (headerParagraph.nextSibling) {
+                    headerParagraph.parentNode?.insertBefore(navigationButton, headerParagraph.nextSibling);
+                }
+                else {
+                    headerParagraph.parentNode?.appendChild(navigationButton);
+                }
+                waiting_room_page_logger.info('#headerparagraph直後にボタンを追加');
+            }
+            else {
+                waiting_room_page_logger.debug('/ytomoボタンは既に存在します');
+            }
+        }
+        if (!childMenu2 && !headerParagraph) {
+            waiting_room_page_logger.warn('#child_menu_2も#headerparagraphも見つかりません');
+            return;
+        }
+        waiting_room_page_logger.info('待機室ページ初期化完了');
+    }
+    catch (error) {
+        waiting_room_page_logger.error('待機室ページ初期化エラー', error);
+    }
+}
+
+;// ./ts/modules/ytomo-menu-enhancer.ts
+/**
+ * /ytomoメニュー拡張機能
+ *
+ * 【責務】
+ * - 通常ページでの#child_menu_2に/ytomoメニュー項目を追加
+ * - メニュー項目クリックでの/ytomoページ移動
+ *
+ * @version v1.0.0
+ */
+
+const ytomo_menu_enhancer_logger = utils_logger/* loggers */.C$.ui;
+/**
+ * /ytomoメニュー項目としてのliを作成
+ */
+function createYtomoMenuItem() {
+    const li = document.createElement('li');
+    li.id = 'ytomo-extension-child-menu-2-navigation-item'; // 識別用ID
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.tabIndex = -1;
+    const span = document.createElement('span');
+    span.setAttribute('data-message-code', 'SW_GP_DL_001_0201');
+    span.className = 'style_renderer__ip0Pm';
+    span.textContent = 'YTomo';
+    button.appendChild(span);
+    li.appendChild(button);
+    // クリックイベント
+    button.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        const targetUrl = `${window.location.protocol}//${window.location.hostname}/ytomo`;
+        ytomo_menu_enhancer_logger.info('YTomoメニューから移動', { targetUrl });
+        window.location.href = targetUrl;
+    });
+    return li;
+}
+/**
+ * #child_menu_2の存在をチェックし、/ytomoメニュー項目を追加
+ */
+function enhanceChildMenu2() {
+    const childMenu2 = document.getElementById('child_menu_2');
+    if (!childMenu2) {
+        return;
+    }
+    // 既存のYTomoメニュー項目がないかチェック（IDによる確実な判定）
+    const existingYtomoItem = childMenu2.querySelector('#ytomo-extension-child-menu-2-navigation-item');
+    if (existingYtomoItem) {
+        ytomo_menu_enhancer_logger.debug('YTomoメニュー項目は既に存在します');
+        return;
+    }
+    // /ytomoメニュー項目を作成
+    const ytomoMenuItem = createYtomoMenuItem();
+    // 最初の子要素として挿入
+    if (childMenu2.firstChild) {
+        childMenu2.insertBefore(ytomoMenuItem, childMenu2.firstChild);
+    }
+    else {
+        childMenu2.appendChild(ytomoMenuItem);
+    }
+    ytomo_menu_enhancer_logger.info('YTomoメニュー項目を追加', {
+        position: '#child_menu_2の最初の子要素',
+        childCount: childMenu2.children.length
+    });
+}
+/**
+ * MutationObserverでDOM変更を監視し、#child_menu_2が追加されたら拡張
+ */
+function observeForChildMenu2() {
+    const observer = new MutationObserver((mutations) => {
+        mutations.forEach((mutation) => {
+            mutation.addedNodes.forEach((node) => {
+                if (node.nodeType === Node.ELEMENT_NODE) {
+                    const element = node;
+                    // 追加されたノード自体が#child_menu_2の場合
+                    if (element.id === 'child_menu_2') {
+                        ytomo_menu_enhancer_logger.debug('#child_menu_2の追加を検知');
+                        setTimeout(() => enhanceChildMenu2(), 100);
+                    }
+                    // 追加されたノードの子要素に#child_menu_2がある場合
+                    const childMenu2 = element.querySelector('#child_menu_2');
+                    if (childMenu2) {
+                        ytomo_menu_enhancer_logger.debug('#child_menu_2の追加を検知（子要素内）');
+                        setTimeout(() => enhanceChildMenu2(), 100);
+                    }
+                }
+            });
+        });
+    });
+    observer.observe(document.body, {
+        childList: true,
+        subtree: true
+    });
+    ytomo_menu_enhancer_logger.debug('MutationObserver開始: #child_menu_2の動的追加を監視');
+}
+/**
+ * /ytomoメニュー拡張の初期化
+ */
+function initializeYtomoMenuEnhancer() {
+    try {
+        ytomo_menu_enhancer_logger.info('YTomoメニュー拡張機能初期化開始');
+        // 即座にチェック
+        enhanceChildMenu2();
+        // DOM変更の監視開始（動的に追加される場合に対応）
+        observeForChildMenu2();
+        ytomo_menu_enhancer_logger.info('YTomoメニュー拡張機能初期化完了');
+    }
+    catch (error) {
+        ytomo_menu_enhancer_logger.error('/ytomoメニュー拡張機能初期化エラー', error);
+    }
+}
+
 // EXTERNAL MODULE: ./ts/modules/entrance-reservation-state-manager.ts + 1 modules
 var entrance_reservation_state_manager = __webpack_require__(608);
 ;// ./ts/modules/app-router.ts
@@ -42588,6 +44408,10 @@ var entrance_reservation_state_manager = __webpack_require__(608);
 // 同行者チケット機能モジュール
 
 // メインダイアログFABモジュール
+
+// 待機室ページモジュール
+
+// /ytomoメニュー拡張機能
 
 // 統一状態管理システム（アプリケーションの中核）
 
@@ -42795,6 +44619,20 @@ const trigger_init = (url_record) => {
             }
         }, 500);
     }
+    else if (page_type === "waiting_room") {
+        if (isPageInitializing)
+            return;
+        isPageInitializing = true;
+        // 待機室ページの初期化（DOM準備完了を待機）
+        const interval_waiting_room = setInterval(() => {
+            if (judge_waiting_room_init()) {
+                clearInterval(interval_waiting_room);
+                init_waiting_room_page();
+                isPageInitializing = false;
+                app_router_logger.info('ytomo extension loaded (waiting room)');
+            }
+        }, 500);
+    }
     else {
         // 対象外のページの場合はログ出力のみ
         app_router_logger.debug('対象外ページ', { url_record });
@@ -42814,6 +44652,10 @@ function initializeExtension() {
         trigger_init(url);
         // メインダイアログFAB初期化（全ページ共通）
         initializeMainDialogFab();
+        // /ytomoメニュー拡張機能初期化（通常ページ共通）
+        if (url.includes('ticket.expo2025.or.jp')) {
+            initializeYtomoMenuEnhancer();
+        }
         let url_record = url;
         // 方法1: popstateイベント（ブラウザの戻る/進む）
         window.addEventListener('popstate', () => {
@@ -45761,6 +47603,8 @@ const main_logger = utils_logger/* loggers */.C$.ui;
 
  // グローバル通知システム
  // ページ復帰システム
+ // 待機室ページ機能
+ // /ytomoメニュー拡張機能
 // test-exportsは削除されました（不要なテストファイルのため）
 // Vue.js統合は各MainDialogFabで直接実行
 // グローバル予約結果通知チェック（すべてのページで動作）

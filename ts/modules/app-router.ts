@@ -49,6 +49,12 @@ import {
 // メインダイアログFABモジュール
 import { initializeMainDialogFab } from './main-dialog-fab';
 
+// 待機室ページモジュール
+import { judge_waiting_room_init, init_waiting_room_page } from './waiting-room-page';
+
+// /ytomoメニュー拡張機能
+import { initializeYtomoMenuEnhancer } from './ytomo-menu-enhancer';
+
 // 統一状態管理システム（アプリケーションの中核）
 import { entranceReservationStateManager } from './entrance-reservation-state-manager';
 
@@ -279,6 +285,19 @@ const trigger_init = (url_record: string): void => {
                 logger.info('ytomo extension loaded', { page_type });
             }
         }, 500);
+    } else if (page_type === "waiting_room") {
+        if (isPageInitializing) return;
+        isPageInitializing = true;
+        
+        // 待機室ページの初期化（DOM準備完了を待機）
+        const interval_waiting_room = setInterval(() => {
+            if (judge_waiting_room_init()) {
+                clearInterval(interval_waiting_room);
+                init_waiting_room_page();
+                isPageInitializing = false;
+                logger.info('ytomo extension loaded (waiting room)');
+            }
+        }, 500);
     } else {
         // 対象外のページの場合はログ出力のみ
         logger.debug('対象外ページ', { url_record });
@@ -301,6 +320,11 @@ function initializeExtension() {
 
         // メインダイアログFAB初期化（全ページ共通）
         initializeMainDialogFab();
+        
+        // /ytomoメニュー拡張機能初期化（通常ページ共通）
+        if (url.includes('ticket.expo2025.or.jp')) {
+            initializeYtomoMenuEnhancer();
+        }
 
     let url_record = url;
     

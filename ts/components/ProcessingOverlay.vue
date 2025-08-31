@@ -3,21 +3,78 @@
     <div 
       v-if="overlaysStore.processingOverlayVisible"
       class="ytomo-processing-overlay"
+      :class="{ 'ytomo-responsive-layout': sequentialReservationStore.state.isRunning }"
       id="ytomo-processing-overlay"
       @click="handleClick"
     >
       <div class="ytomo-processing-content">
         <div class="ytomo-processing-spinner"></div>
         <div class="ytomo-processing-message">{{ overlaysStore.processingMessage }}</div>
+        
+        <!-- 入場予約実行中の場合は目標時間選択UIを表示 -->
+        <div v-if="isEntranceReservationRunning" class="ytomo-target-time-control">
+          <div class="ytomo-target-time-label">目標時間 (次周期から適用)</div>
+          <div class="ytomo-target-time-selector">
+            <select 
+              v-model="selectedTargetSecond" 
+              @change="updateTargetSecond"
+              class="ytomo-target-second-select"
+            >
+              <option v-for="second in secondOptions" :key="second" :value="second">
+                {{ second }}秒
+              </option>
+            </select>
+          </div>
+        </div>
       </div>
     </div>
   </Teleport>
 </template>
 
 <script setup lang="ts">
+import { ref, computed, onMounted } from 'vue'
 import { useOverlaysStore } from '@/stores/overlays'
+import { useSequentialReservationStore } from '@/stores/sequentialReservation'
 
 const overlaysStore = useOverlaysStore()
+const sequentialReservationStore = useSequentialReservationStore()
+
+// 目標秒の選択肢（0-59）
+const secondOptions = Array.from({ length: 60 }, (_, i) => i)
+
+// 現在選択されている目標秒
+const selectedTargetSecond = ref(35) // デフォルト35秒
+
+// 入場予約実行中かどうかの判定
+const isEntranceReservationRunning = computed(() => {
+  const message = overlaysStore.processingMessage.toLowerCase()
+  return message.includes('入場予約') || message.includes('entrance') || message.includes('reservation')
+})
+
+// 目標秒を更新
+const updateTargetSecond = () => {
+  try {
+    // グローバルの入場予約状態管理にアクセス
+    const stateManager = (window as any).entranceReservationStateManager
+    if (stateManager && typeof stateManager.setTargetSecond === 'function') {
+      stateManager.setTargetSecond(selectedTargetSecond.value)
+    }
+  } catch (error) {
+    console.warn('目標秒設定エラー', error)
+  }
+}
+
+// 初期化時に現在の目標秒を取得
+onMounted(() => {
+  try {
+    const stateManager = (window as any).entranceReservationStateManager
+    if (stateManager && typeof stateManager.getTargetSecond === 'function') {
+      selectedTargetSecond.value = stateManager.getTargetSecond()
+    }
+  } catch (error) {
+    console.warn('目標秒取得エラー', error)
+  }
+})
 
 const handleClick = (e: Event) => {
   e.preventDefault()
@@ -69,6 +126,48 @@ const handleClick = (e: Event) => {
   color: #374151;
   font-size: 16px;
   font-weight: 500;
+}
+
+.ytomo-target-time-control {
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 1px solid #e5e7eb;
+  
+  .ytomo-target-time-label {
+    color: #6b7280;
+    font-size: 14px;
+    font-weight: 500;
+    margin-bottom: 12px;
+  }
+  
+  .ytomo-target-time-selector {
+    .ytomo-target-second-select {
+      background: white;
+      border: 2px solid #d1d5db;
+      border-radius: 8px;
+      padding: 8px 12px;
+      font-size: 14px;
+      font-weight: 500;
+      color: #374151;
+      min-width: 100px;
+      cursor: pointer;
+      transition: all 0.2s;
+      
+      &:focus {
+        outline: none;
+        border-color: #2c5aa0;
+        box-shadow: 0 0 0 3px rgba(44, 90, 160, 0.1);
+      }
+      
+      &:hover {
+        border-color: #9ca3af;
+      }
+      
+      option {
+        padding: 8px;
+      }
+    }
+  }
 }
 
 @keyframes fadeIn {

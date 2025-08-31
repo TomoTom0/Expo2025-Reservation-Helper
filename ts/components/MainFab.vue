@@ -43,7 +43,8 @@ const ticketsStore = useTicketsStore()
 const pavilionsStore = usePavilionsStore()
 
 const isInitialized = computed(() => {
-  return ticketsStore.isInitialized && pavilionsStore.isInitialized
+  // lastUpdateTimeが存在すれば初期化済みと判定
+  return ticketsStore.lastUpdateTime > 0 && pavilionsStore.isInitialized
 })
 const reservationResult = ref<ReservationResult | null>(null)
 

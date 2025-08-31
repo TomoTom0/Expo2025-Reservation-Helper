@@ -219,9 +219,10 @@ export class EntranceReservationStateManager {
     };
 
     // ==================== 効率モード管理 ====================
-    /** 効率モード設定管理（毎分00秒/30秒のsubmitタイミング制御） */
+    /** 効率モード設定管理（目標秒タイミング制御） */
     private efficiencyMode = {
         enabled: true, // 常時有効に設定（v1.0.0ではデフォルト有効）
+        targetSecond: 35, // デフォルト目標秒（35秒）
         nextSubmitTarget: null as Date | null,     // 次のsubmit目標時刻
         updateTimer: null as number | null         // FABボタン更新タイマー
     };
@@ -1145,28 +1146,27 @@ export class EntranceReservationStateManager {
         this.efficiencyMode.nextSubmitTarget = target;
     }
     
-    // 次の00秒/30秒を計算（15秒未満の場合は次の目標時刻を選択）
+    // 次の目標時刻を計算（デフォルト35秒）
     calculateNext00or30Seconds(): Date {
         const now = new Date();
         const currentSeconds = now.getSeconds();
         const nextTarget = new Date(now);
         
-        let targetSeconds: number;
+        // デフォルトの目標秒を使用（35秒）
+        const targetSecond = this.efficiencyMode.targetSecond || 35;
+        
         let targetMinutes = nextTarget.getMinutes();
         
         // 0-2秒で0秒側に比重のあるランダム時間を生成（二次分布）
         const randomBuffer = Math.pow(Math.random(), 2) * 2; // 0～2秒、0側に比重
+        const targetSeconds = targetSecond + randomBuffer;
         
-        if (currentSeconds < 30) {
-            // 今の分の30秒 + ランダムバッファを候補とする
-            targetSeconds = 30 + randomBuffer;
-        } else {
-            // 次の分の00秒 + ランダムバッファを候補とする
+        // 現在の秒が目標秒を過ぎている場合は次の分にする
+        if (currentSeconds >= targetSecond) {
             targetMinutes += 1;
-            targetSeconds = randomBuffer;
         }
         
-        // 候補時刻までの猶予を計算
+        // 目標時刻を設定
         const candidateTarget = new Date(now);
         candidateTarget.setMinutes(targetMinutes);
         candidateTarget.setSeconds(Math.floor(targetSeconds));
@@ -1174,10 +1174,10 @@ export class EntranceReservationStateManager {
         
         const remainingMs = candidateTarget.getTime() - now.getTime();
         
-        // 15秒未満の場合は30秒後に変更
+        // 15秒未満の場合は次の分に変更
         if (remainingMs < 15000) { // 15秒 = 15000ms
-            candidateTarget.setSeconds(candidateTarget.getSeconds() + 30);
-            this.log('効率モード: 猶予時間が短いため30秒後に変更', 'debug', { remainingSeconds: Math.floor(remainingMs/1000) });
+            candidateTarget.setMinutes(candidateTarget.getMinutes() + 1);
+            this.log('効率モード: 猶予時間が短いため次の分に変更', 'debug', { remainingSeconds: Math.floor(remainingMs/1000) });
         }
         
         return candidateTarget;
@@ -1244,11 +1244,33 @@ export class EntranceReservationStateManager {
     }
     
     
+    // 目標秒を設定
+    setTargetSecond(second: number): void {
+        if (second >= 0 && second <= 59) {
+            this.efficiencyMode.targetSecond = second;
+            this.saveEfficiencyModeSettings();
+            
+            // 次回の目標時刻を再計算
+            if (this.efficiencyMode.enabled) {
+                this.efficiencyMode.nextSubmitTarget = this.calculateNext00or30Seconds();
+                this.log('目標秒を更新', 'info', { targetSecond: second });
+            }
+        } else {
+            logger.warn('無効な目標秒', { second });
+        }
+    }
+
+    // 現在の目標秒を取得
+    getTargetSecond(): number {
+        return this.efficiencyMode.targetSecond;
+    }
+
     // 効率モード設定保存
     private saveEfficiencyModeSettings(): void {
         try {
             localStorage.setItem('ytomo-efficiency-mode', JSON.stringify({
-                enabled: this.efficiencyMode.enabled
+                enabled: this.efficiencyMode.enabled,
+                targetSecond: this.efficiencyMode.targetSecond
             }));
         } catch (error) {
             logger.error('効率モード設定保存エラー', { error });
@@ -1263,6 +1285,7 @@ export class EntranceReservationStateManager {
                 const settings = JSON.parse(saved);
                 if (settings.enabled) {
                     this.efficiencyMode.enabled = true;
+                    this.efficiencyMode.targetSecond = settings.targetSecond || 35; // デフォルト35秒
                     this.efficiencyMode.nextSubmitTarget = this.calculateNext00or30Seconds();
                 }
             }

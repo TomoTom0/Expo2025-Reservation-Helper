@@ -764,6 +764,7 @@ const getReservationTypeBadgeClass = (reservationStatus: any): string => {
   
   if (reservationStatus.submissionStatus === 'won') return 'badge-won'
   if (reservationStatus.periodStatus === 'expired') return 'badge-expired'
+  if (reservationStatus.periodStatus === 'active') return 'badge-active'
   if (reservationStatus.periodStatus === 'before') return 'badge-before'
   if (reservationStatus.submissionStatus === 'submitted') return 'badge-submitted'
   return 'badge-none'
@@ -1775,6 +1776,11 @@ onUnmounted(() => {
     
     &.badge-expired {
         background: #ef4444;
+        color: white;
+    }
+    
+    &.badge-active {
+        background: #10b981;
         color: white;
     }
     

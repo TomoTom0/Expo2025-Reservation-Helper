@@ -155,6 +155,12 @@ export const useSequentialReservationStore = defineStore('sequentialReservation'
 
   // 次の予約を実行（再帰呼び出し）
   const executeNextReservation = async (): Promise<void> => {
+    loggerInstance.temp('executeNextReservation開始', {
+      isRunning: state.value.isRunning,
+      currentTargetIndex: state.value.currentTargetIndex,
+      targetsLength: state.value.reservationTargets.length
+    })
+    
     if (!state.value.isRunning) {
       loggerInstance.info('継続予約が中断されました')
       return

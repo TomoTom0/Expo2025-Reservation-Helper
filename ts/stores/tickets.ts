@@ -22,7 +22,15 @@ export const useTicketsStore = defineStore('tickets', () => {
   const selectedTicketIds = ref<Set<string>>(new Set())
   const selectedEntranceDates = ref<Map<string, string>>(new Map()) // ticketId -> scheduleId mapping for persistence
   const isLoading = ref(false)
-  const isInitialized = ref(false)
+  const isInitialized = ref(false) // ストア初期化状態
+  
+  // データの新鮮さ判定のcomputed（1時間以内）
+  const isFresh = computed(() => {
+    if (lastUpdateTime.value === 0) return false
+    const now = Date.now()
+    const oneHour = 60 * 60 * 1000
+    return now - lastUpdateTime.value < oneHour
+  })
   const availableDates = ref<string[]>([])
   const todayStr = ref<string>(getTodayString())
   const lastUpdateTime = ref<number>(0) // 最後の更新時刻（Unix時間）
@@ -133,8 +141,10 @@ export const useTicketsStore = defineStore('tickets', () => {
       }
       
       const scheduleData: ScheduleData = {
+        user_visiting_reservation_id: schedule.user_visiting_reservation_id,
         entrance_date: schedule.entrance_date || '',
         use_state: schedule.use_state || 0,
+        gate_type: schedule.gate_type,
         schedule_name: schedule.schedule_name,
         time_start: timeStart,
         time_end: schedule.time_end,
@@ -177,33 +187,30 @@ export const useTicketsStore = defineStore('tickets', () => {
    * 全チケット情報を初期化・取得
    */
   const loadAllTickets = async (forceUpdate: boolean = false): Promise<TicketData[]> => {
-    // 1時間制限チェック（強制更新でない場合）
-    if (!forceUpdate) {
-      const now = Date.now()
-      const oneHour = 60 * 60 * 1000 // 1時間をミリ秒で
-      
-      if (lastUpdateTime.value > 0 && now - lastUpdateTime.value < oneHour) {
-        logger.info(`前回更新から1時間未満のため更新をスキップ（${Math.round((now - lastUpdateTime.value) / (1000 * 60))}分経過）`)
-        return ticketsArray.value
-      }
-    }
     
     logger.info('全チケット情報取得開始')
     setLoading(true)
     
     try {
-      // 自分のチケットを最優先で読み込み
-      let ownTickets: TicketData[] = []
+      // 旧チケット情報を保存（選択状態等の保持用）
+      const previousTickets = new Map(tickets.value)
+      
+      // 新チケット情報を一時変数に取得
+      let newOwnTickets: TicketData[] = []
       try {
-        ownTickets = await loadOwnTickets()
-        logger.info(`自分のチケット取得完了: ${ownTickets.length}個`)
+        newOwnTickets = await loadOwnTickets()
+        logger.info(`自分のチケット取得完了: ${newOwnTickets.length}個`)
         
-        // 自分のチケットを追加（通期パス用の空欄入場予約データも追加）
-        for (const ticket of ownTickets) {
+        // 新チケット情報に旧情報の状態を反映
+        const processedTickets = new Map<string, TicketData>()
+        
+        for (const newTicket of newOwnTickets) {
+          const previousTicket = previousTickets.get(newTicket.ticket_id)
+          
           // 通期パス（Season Pass）の場合は追加予約可能性をチェック
-          if (ticket.item_name?.includes('Season Pass')) {
+          if (newTicket.item_name?.includes('Season Pass')) {
             // 現在の予約数をチェック（最大3件）
-            const currentReservationCount = ticket.schedules?.length || 0
+            const currentReservationCount = newTicket.schedules?.length || 0
             if (currentReservationCount < 3) {
               // 日付空欄の入場予約データを追加
               const emptyReservation: ScheduleData = {
@@ -214,25 +221,48 @@ export const useTicketsStore = defineStore('tickets', () => {
                 location_index: 0,
                 schedule_name: '新規予約',
                 time_start: '',
-                isOwn: true,
                 selected: false,
                 isEffective: false, // 新規予約なので無効
                 pavilionReservationInfo: undefined
               }
               
               // schedulesが未初期化の場合は初期化
-              if (!ticket.schedules) {
-                ticket.schedules = []
+              if (!newTicket.schedules) {
+                newTicket.schedules = []
               }
               
               // 空欄の入場予約データを追加
-              ticket.schedules.push(emptyReservation)
-              logger.info(`通期パス ${ticket.ticket_id} に新規予約枠を追加`)
+              newTicket.schedules.push(emptyReservation)
+              logger.info(`通期パス ${newTicket.ticket_id} に新規予約枠を追加`)
             }
           }
           
-          tickets.value.set(ticket.ticket_id, ticket)
+          // 旧情報からselected状態を継承
+          if (previousTicket && newTicket.schedules && previousTicket.schedules) {
+            for (const newSchedule of newTicket.schedules) {
+              const previousSchedule = previousTicket.schedules.find(s =>
+                s.user_visiting_reservation_id === newSchedule.user_visiting_reservation_id &&
+                s.entrance_date === newSchedule.entrance_date &&
+                s.schedule_name === newSchedule.schedule_name &&
+                s.gate_type === newSchedule.gate_type
+              )
+              
+              // 同じ予約が見つかった場合はselected状態を継承
+              if (previousSchedule) {
+                newSchedule.selected = previousSchedule.selected
+                if (newSchedule.selected) {
+                  logger.debug(`予約ID ${newSchedule.user_visiting_reservation_id} のselected状態を継承`)
+                }
+              }
+            }
+          }
+          
+          processedTickets.set(newTicket.ticket_id, newTicket)
         }
+        
+        // 最後に一括でstoreに反映
+        tickets.value = processedTickets
+        logger.info('チケット情報を一括更新', { ticketCount: processedTickets.size })
       } catch (error) {
         logger.error('自分のチケット取得エラー', error)
       }
@@ -703,12 +733,27 @@ export const useTicketsStore = defineStore('tickets', () => {
     logger.info('入場スケジュール一括取得完了', { count: promises.length })
   }
 
-  // 初期化メソッド
+  // 初期化メソッド - キャッシュ復元と新鮮さ判定を担当
   const init = async (): Promise<void> => {
+    if (isInitialized.value) {
+      logger.debug('既に初期化済みのためスキップ')
+      return
+    }
+    
     logger.info('チケットストア初期化開始')
-    await loadAllTickets()
-    await loadEntranceSchedulesRange() // 入場スケジュール一括取得
+    
+    // 1. キャッシュからの選択状態復元
     restoreSelectedEntranceDates()
+    
+    // 2. データの新鮮さをチェック
+    if (!isFresh.value) {
+      logger.info('データが古いためチケット情報を更新')
+      await loadAllTickets(true) // 強制更新
+      await loadEntranceSchedulesRange(true) // 入場スケジュール一括取得
+    } else {
+      logger.info(`キャッシュが新鮮のためAPI取得をスキップ（${Math.round((Date.now() - lastUpdateTime.value) / (1000 * 60))}分経過）`)
+    }
+    
     isInitialized.value = true
     logger.info('チケットストア初期化完了')
   }
@@ -722,6 +767,8 @@ export const useTicketsStore = defineStore('tickets', () => {
     isInitialized,
     availableDates,
     entranceSchedules,
+    lastUpdateTime,
+    isFresh,
     
     // Getters
     ticketsArray,
@@ -754,7 +801,7 @@ export const useTicketsStore = defineStore('tickets', () => {
 }, {
   persist: {
     key: 'ytomo-tickets-store',
-    pick: ['selectedEntranceDates', 'tickets', 'lastUpdateTime', 'entranceSchedules', 'entranceSchedulesUpdateTime'], // キャッシュも永続化
+    pick: ['selectedEntranceDates', 'tickets', 'lastUpdateTime', 'entranceSchedules', 'entranceSchedulesUpdateTime'], // キャッシュを永続化
     serializer: {
       serialize: (data: any) => {
         // MapをObjectに変換してシリアライズ

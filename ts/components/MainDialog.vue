@@ -42,6 +42,7 @@
           >
             <div class="ytomo-tab-content">
               <div class="ytomo-tab-title">入場</div>
+              <div class="ytomo-tab-info" v-if="entranceTabInfo">{{ entranceTabInfo }}</div>
             </div>
           </button>
           <button 
@@ -198,6 +199,26 @@ const latestEntranceDateTime = computed(() => {
   return timeDisplay || date || ''
 })
 
+// 入場タブの情報表示（予約ボタン有効時にチケットID表示）
+const entranceTabInfo = computed(() => {
+  // 選択されたチケットがあり、予約ボタンが有効な場合にチケットIDを表示
+  const selectedTickets = ticketsStore.selectedTickets
+  if (selectedTickets.length === 0) return ''
+  
+  // 自分のチケットで未使用の入場予約があるチケットを表示
+  const ownTicketsWithReservations = selectedTickets.filter(ticket => 
+    ticket.isOwn && 
+    ticket.schedules && 
+    ticket.schedules.some(schedule => schedule.use_state === 0) // 未使用の入場予約がある
+  )
+  
+  if (ownTicketsWithReservations.length === 0) return ''
+  
+  // チケットIDを表示（複数ある場合はカンマ区切り）
+  const ticketIds = ownTicketsWithReservations.map(ticket => ticket.ticket_id)
+  return ticketIds.join(', ')
+})
+
 // オーバーレイクリックでダイアログを閉じる
 const handleOverlayClick = (e: Event) => {
   if (e.target === e.currentTarget) {
@@ -276,10 +297,10 @@ onUnmounted(() => {
     border-radius: 12px;
     box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
     width: 90vw;
-    max-width: 800px;
-    min-width: 600px;
-    height: 80vh;
-    max-height: 700px;
+    max-width: 95vw;
+    min-width: 320px;
+    height: auto;
+    max-height: none;
     min-height: 500px;
     display: flex;
     flex-direction: column;
@@ -288,12 +309,26 @@ onUnmounted(() => {
     animation: dialogAppear 0.2s ease-out forwards;
 }
 
+/* ytomoページでのレスポンシブレイアウト */
+.ytomo-page .ytomo-main-dialog {
+    width: 95vw;
+    max-width: none;
+    max-height: none;
+    height: auto;
+}
+
 @media (max-width: 768px) {
     .ytomo-main-dialog {
         width: 95vw;
         height: 90vh;
         min-width: 320px;
         min-height: 400px;
+    }
+}
+
+@media (min-width: 1200px) {
+    .ytomo-page .ytomo-main-dialog {
+        width: 90vw;
     }
 }
 
@@ -412,6 +447,18 @@ onUnmounted(() => {
     color: #2c5aa0;
 }
 
+.ytomo-tab-info {
+    font-size: 11px;
+    color: #64748b;
+    font-family: 'Courier New', 'Monaco', 'Menlo', monospace;
+    font-weight: 600;
+    margin-top: 1px;
+}
+
+.ytomo-tab-button.active .ytomo-tab-info {
+    color: #2c5aa0;
+}
+
 .ytomo-dialog-close {
     position: absolute;
     right: 16px;
@@ -443,22 +490,17 @@ onUnmounted(() => {
 /* タブコンテンツ */
 .ytomo-tab-content {
     flex: 1;
-    overflow: hidden;
     position: relative;
+    min-height: 0;
 }
 
 .ytomo-tab-pane {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
     opacity: 0;
     transform: translateX(20px);
     transition: all 0.2s ease-out;
-    overflow-y: auto;
     padding: 20px;
     display: none;
+    min-height: max-content;
 }
 
 .ytomo-tab-pane.active {

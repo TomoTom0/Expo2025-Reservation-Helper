@@ -21,6 +21,9 @@
 import { entranceReservationStateManager } from './entrance-reservation-state-manager';
 import { loggers } from '../utils/logger';
 
+// グローバルアクセス用
+(window as any).entranceReservationStateManager = entranceReservationStateManager;
+
 // DOM操作ユーティリティ
 import {
     timeSlotSelectors  // 時間帯関連のDOMセレクタ群

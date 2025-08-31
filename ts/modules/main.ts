@@ -26,6 +26,8 @@ import './monitoring-service';
 import './immediate-reservation';
 import './notification-system'; // グローバル通知システム
 import './page-return-system'; // ページ復帰システム
+import './waiting-room-page'; // 待機室ページ機能
+import './ytomo-menu-enhancer'; // /ytomoメニュー拡張機能
 
 // test-exportsは削除されました（不要なテストファイルのため）
 

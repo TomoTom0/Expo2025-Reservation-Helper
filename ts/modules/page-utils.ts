@@ -52,6 +52,13 @@ export class PageChecker {
         const pathname = window.location.pathname.toLowerCase();
         return pathname === '/ytomo' || pathname === '/ytomo/';
     }
+
+    /**
+     * 待機室ページかどうかをチェック
+     */
+    static isWaitingRoomPage(): boolean {
+        return window.location.hostname === 'tktwaitingroom.expo2025.or.jp';
+    }
 }
 
 // URL判定とページタイプ識別
@@ -59,8 +66,11 @@ export const identify_page_type = (url: string): string | null => {
     try {
         const urlObj = new URL(url);
         const pathname = urlObj.pathname;
+        const hostname = urlObj.hostname;
         
-        if (pathname === '/ticket_visiting_reservation/') {
+        if (hostname === 'tktwaitingroom.expo2025.or.jp') {
+            return "waiting_room";
+        } else if (pathname === '/ticket_visiting_reservation/') {
             return "entrance_reservation";
         } else if (pathname === '/event_search/') {
             return "pavilion_reservation";

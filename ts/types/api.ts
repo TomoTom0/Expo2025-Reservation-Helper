@@ -9,7 +9,6 @@ export interface ScheduleData {
     use_state: number;          // 利用状態（0:未使用, 1:入場済み, 2:使用済み等）
     gate_type?: number;         // ゲート種別（1:東, 2:西）
     schedule_name?: string;     // スケジュール名
-    isOwn?: boolean;            // 自分の予約かどうか
     isEffective?: boolean;      // 有効フラグ（処理時に付与）
     time_start?: string;        // 開始時間
     time_end?: string;          // 終了時間

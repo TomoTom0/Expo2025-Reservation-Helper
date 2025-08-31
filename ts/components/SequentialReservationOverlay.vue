@@ -7,12 +7,19 @@
       @click="handleOverlayClick"
     >
       <div class="ytomo-sequential-content">
-        <h3>
-          順次予約実行中 {{ sequentialReservationStore.state.currentTargetIndex + 1 }}/{{ sequentialReservationStore.state.reservationTargets.length }}
-          <span class="countdown-seconds">
-            {{ sequentialReservationStore.state.countdownText }}
-          </span>
-        </h3>
+        <div class="ytomo-header-with-spinner">
+          <div class="ytomo-loading-spinner"></div>
+          <h3>
+            順次予約実行中 {{ sequentialReservationStore.state.currentTargetIndex + 1 }}/{{ sequentialReservationStore.state.reservationTargets.length }}
+            <span class="status-text">待機中</span>
+          </h3>
+          <div class="ytomo-progress-bar">
+            <div 
+              class="ytomo-progress-fill" 
+              :style="{ width: progressPercentage + '%' }"
+            ></div>
+          </div>
+        </div>
         <div class="ytomo-sequential-settings-row">
           <div class="ytomo-mode-buttons">
             <button 
@@ -44,12 +51,18 @@
             <option value="30">30秒</option>
             <option value="60">60秒</option>
           </select>
+          <button 
+            class="ytomo-cancel-button"
+            @click="cancelSequentialReservation"
+          >
+            中断
+          </button>
         </div>
         <div class="ytomo-sequential-progress">
           <div class="ytomo-sequential-target">
             <div v-if="currentTarget" class="current-target">
               <div class="pavilion-name">{{ currentTarget.pavilionName }}</div>
-              <div class="time-slot-button">{{ currentTarget.timeSlot }}</div>
+              <div class="time-slot-button time-slot-small">{{ currentTarget.timeSlot }}</div>
             </div>
           </div>
           <!-- パビリオン名横の「1/1」表示を削除 -->
@@ -75,6 +88,22 @@ const currentTarget = computed(() => {
     return state.reservationTargets[state.currentTargetIndex]
   }
   return null
+})
+
+const progressPercentage = computed(() => {
+  const countdownText = sequentialReservationStore.state.countdownText
+  if (!countdownText) return 0
+  
+  // カウントダウンテキストから秒数を抽出
+  const match = countdownText.match(/(\d+)/)
+  if (!match) return 0
+  
+  const currentSeconds = parseInt(match[1])
+  const intervalTime = sequentialReservationStore.state.nextIntervalTime || 30
+  
+  // 残り時間の逆算でプログレスバーを表示（0%から100%へ）
+  const progress = ((intervalTime - currentSeconds) / intervalTime) * 100
+  return Math.max(0, Math.min(100, progress))
 })
 
 const handleOverlayClick = (e: Event) => {
@@ -129,21 +158,52 @@ const cancelSequentialReservation = () => {
   transform: scale(0.9);
   animation: dialogAppear 0.2s ease-out forwards;
 
+  .ytomo-header-with-spinner {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+  
+  .ytomo-loading-spinner {
+    width: 20px;
+    height: 20px;
+    border: 2px solid #f3f4f6;
+    border-top: 2px solid #2c5aa0;
+    border-radius: 50%;
+    animation: spin 1s linear infinite !important;
+    will-change: transform;
+  }
+
   h3 {
-    margin: 0 0 24px 0;
+    margin: 0 0 12px 0;
     color: #374151;
     font-size: 20px;
     font-weight: 600;
     
-    .countdown-seconds {
+    .status-text {
       display: inline-block;
-      width: 40px;
-      font-size: 18px;
-      color: #ef4444;
-      font-weight: 500;
+      font-size: 16px;
+      color: #6b7280;
+      font-weight: 400;
       margin-left: 8px;
-      text-align: right;
-      font-family: monospace;
+    }
+  }
+  
+  .ytomo-progress-bar {
+    width: 100%;
+    height: 8px;
+    background-color: #e5e7eb;
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: 4px;
+    
+    .ytomo-progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #3b82f6, #1d4ed8);
+      border-radius: 4px;
+      transition: width 0.3s ease;
     }
   }
 }
@@ -231,6 +291,11 @@ const cancelSequentialReservation = () => {
         font-size: 12px;
         font-weight: 500;
         border: 1px solid #2c5aa0;
+        
+        &.time-slot-small {
+          font-size: 10px;
+          padding: 2px 6px;
+        }
       }
     }
   }
@@ -260,11 +325,24 @@ const cancelSequentialReservation = () => {
   }
 }
 
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .ytomo-sequential-overlay,
   .ytomo-sequential-content {
     animation: none;
     transition: none;
+  }
+  
+  .ytomo-loading-spinner {
+    animation: spin 1s linear infinite !important;
   }
 }
 </style>

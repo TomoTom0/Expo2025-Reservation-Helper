@@ -57,7 +57,13 @@ const waitForMainAndLoadDialog = () => {
 waitForMainAndLoadDialog()
 
 onMounted(() => {
-  // onMountedでは何もしない（すでに処理済み）
+  // ページタイトルを変更
+  document.title = 'Expo YTomo'
+  
+  // ytomoページ用のクラスを追加
+  document.body.classList.add('ytomo-page')
+  
+  logger.info('ytomoページタイトルを変更', { title: document.title })
 })
 
 </script>

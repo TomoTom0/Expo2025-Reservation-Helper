@@ -7,7 +7,7 @@
  * - 優先度: ERROR(0) > WARN(1) > INFO(2) > DEBUG(3)
  */
 
-export type LogLevel = 'ERROR' | 'WARN' | 'INFO' | 'DEBUG'
+export type LogLevel = 'TEMP' | 'ERROR' | 'WARN' | 'INFO' | 'DEBUG'
 
 interface LoggerConfig {
   level: LogLevel
@@ -17,6 +17,7 @@ interface LoggerConfig {
 
 // ログレベルの優先度定義
 const LOG_PRIORITIES: Record<LogLevel, number> = {
+  TEMP: -1,  // ERRORより上位
   ERROR: 0,
   WARN: 1,
   INFO: 2,
@@ -121,6 +122,13 @@ export class CustomLogger {
     const formattedMessage = this.formatMessage(level, message)
     
     switch (level) {
+      case 'TEMP':
+        if (data) {
+          console.log(formattedMessage, data)
+        } else {
+          console.log(formattedMessage)
+        }
+        break
       case 'ERROR':
         if (data) {
           console.error(formattedMessage, data)
@@ -147,6 +155,10 @@ export class CustomLogger {
   }
 
   // パブリックログメソッド
+  temp(message: string, data?: any): void {
+    this.output('TEMP', message, data)
+  }
+
   error(message: string, data?: any): void {
     this.output('ERROR', message, data)
   }
