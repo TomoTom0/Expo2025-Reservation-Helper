@@ -156,14 +156,24 @@
       </button>
     </Teleport>
     
-    <!-- ステータスFAB（予約結果表示用） -->
-    <button 
-      id="status-fab" 
-      class="ytomo-status-fab" 
-      :class="{ 'ytomo-visible': statusFabVisible }"
-    >
-      📋
-    </button>
+    <!-- 予約結果FAB（予約FABの左側に配置） -->
+    <Teleport to="body">
+      <button 
+        v-if="reservationResult"
+        id="reservation-result-fab" 
+        class="ytomo-reservation-result-fab" 
+        :class="{ 
+          'success': reservationResult?.success, 
+          'error': reservationResult && !reservationResult.success 
+        }"
+      >
+        <div class="ytomo-result-status">
+          {{ reservationResult.success ? '予約成功' : `予約失敗` }}
+        </div>
+        <div class="ytomo-result-pavilion">{{ reservationResult.pavilionName }}</div>
+        <div class="ytomo-result-time">{{ reservationResult.datetime }}</div>
+      </button>
+    </Teleport>
     
     <!-- 予約結果表示（非表示） -->
     <div 
@@ -174,9 +184,6 @@
     
     <!-- 選択情報表示 -->
     <div class="ytomo-selected-info" id="selected-info">
-      <div v-if="selectedSlotsCount > 0" class="ytomo-selection-summary">
-        選択中: {{ selectedSlotsCount }}時間帯
-      </div>
     </div>
     
   </div>
@@ -243,8 +250,17 @@ const {
 
 // ローカル状態
 const searchInput = ref('')
-const statusFabVisible = ref(false)
 const resultDisplayVisible = ref(false)
+
+// 予約結果表示のためのリアクティブ状態
+interface ReservationResult {
+  success: boolean
+  reason?: string
+  pavilionName: string
+  datetime: string
+}
+
+const reservationResult = ref<ReservationResult | null>(null)
 
 // 計算プロパティ
 // パビリオンタブがアクティブかどうか
@@ -642,27 +658,21 @@ const handleReservationExecution = async () => {
     // 継続予約の場合はダイアログは隠さない（sequentialReservationStoreで管理）
     hideProcessingOverlay()
     
-    // 予約結果をMainFab.vueと同様の形式で発火
+    // 予約結果を直接表示
     results.forEach(result => {
       if (result.details) {
-        const reservationResult = {
+        const formattedResult = {
           success: result.success,
           reason: result.success ? undefined : result.message,
           pavilionName: result.details.pavilionName || '',
           datetime: `${formatDate(entranceDate)} ${result.details.timeSlot || ''}`
         }
         
-        // CustomEventでMainFab.vueに結果を通知
-        const event = new CustomEvent('reservation-result', { detail: reservationResult })
-        document.dispatchEvent(event)
+        showReservationResult(formattedResult)
       }
     })
     
-    // 結果メッセージ表示
-    if (successCount > 0) {
-      statusFabVisible.value = true
-      setTimeout(() => { statusFabVisible.value = false }, 5000)
-    }
+    // 結果メッセージ表示は showReservationResult内で管理
     
   } catch (error) {
     logger.error('継続予約実行エラー', error)
@@ -706,6 +716,40 @@ const updateTimeSlotInfoAsync = async () => {
       error: error instanceof Error ? error.message : String(error)
     })
   }
+}
+
+// 予約結果表示関数
+const showReservationResult = (result: ReservationResult) => {
+  // 時刻フォーマット（HHMMをHH:MMに変換）
+  const formatTime = (timeStr: string): string => {
+    const match = timeStr.match(/(\d{2})(\d{2})/)
+    if (match) {
+      return `${match[1]}:${match[2]}`
+    }
+    return timeStr
+  }
+
+  // エラーメッセージの日本語化
+  const translateErrorMessage = (reason: string): string => {
+    if (reason.includes('select ticket valid error')) {
+      return '無効'
+    }
+    return reason
+  }
+
+  // 時刻フォーマットを修正
+  const formattedResult = {
+    ...result,
+    datetime: result.datetime.replace(/(\d{4})$/, (match) => formatTime(match)),
+    reason: result.reason ? translateErrorMessage(result.reason) : undefined
+  }
+  
+  reservationResult.value = formattedResult
+  
+  // 10秒後に自動で非表示
+  setTimeout(() => {
+    reservationResult.value = null
+  }, 10000)
 }
 
 // ヘルパー関数
@@ -1642,6 +1686,73 @@ onUnmounted(() => {
     }
 }
 
+/* 予約結果FAB（予約FABの左側に配置） */
+.ytomo-reservation-result-fab {
+    position: fixed;
+    bottom: 80px;  /* 予約FABと同じ高さ */
+    right: 84px;   /* 予約FABの左側に配置 (20px + 56px + 8px = 84px) */
+    min-width: 120px;
+    min-height: 50px;
+    border: none;
+    border-radius: 6px;
+    color: white;
+    font-size: 11px;
+    font-weight: 500;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    transition: all 0.3s ease;
+    z-index: 10003;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 8px 12px;
+    line-height: 1.2;
+    
+    &.success {
+        background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+        box-shadow: 0 4px 12px rgba(34, 197, 94, 0.4);
+    }
+    
+    &.error {
+        background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+        box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4);
+    }
+    
+    .ytomo-result-status {
+        font-weight: 600;
+        font-size: 11px;
+        margin-bottom: 2px;
+    }
+    
+    .ytomo-result-pavilion {
+        font-size: 12px;
+        opacity: 0.95;
+        margin-bottom: 2px;
+        font-weight: 500;
+    }
+    
+    .ytomo-result-time {
+        font-size: 12px;
+        opacity: 0.9;
+        font-weight: 600;
+    }
+    
+    &:hover:not(:disabled) {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
+    }
+    
+    &:active:not(:disabled) {
+        transform: translateY(0);
+    }
+    
+    &:focus {
+        outline: none;
+    }
+}
+
 /* アクセシビリティ対応 */
 @media (prefers-reduced-motion: reduce) {
     .ytomo-processing-overlay,
@@ -1650,5 +1761,6 @@ onUnmounted(() => {
         animation: none;
         transition: none;
     }
+    
 }
 </style>

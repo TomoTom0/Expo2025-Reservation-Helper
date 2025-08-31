@@ -24,7 +24,7 @@
             <button @click="previousMonth" id="ytomo-previous-month-button" class="ytomo-month-button ytomo-month-button--prev">‹</button>
             <div class="ytomo-month-display">
               <span class="ytomo-current-month">{{ currentMonthDisplay }}</span>
-              <span v-if="availabilityDisplayTime" class="ytomo-availability-time">{{ availabilityDisplayTime }}時点</span>
+              <span class="ytomo-availability-time">{{ availabilityDisplayTime || '' }}</span>
               <button id="ytomo-calendar-refresh-button" class="ytomo-calendar-refresh-button" @click="refreshEntranceData" title="入場予約データを更新">
                 <svg viewBox="0 0 24 24" width="12" height="12">
                   <path d="M4 4v5h.582m15.356 2A8.001 8.001 0 0 0 4.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 0 1-15.357-2m15.357 2H15" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
@@ -205,17 +205,18 @@
               <div class="ytomo-progress-bar">
                 <div class="ytomo-progress-fill" :style="{ width: reservationStatus.progress + '%' }"></div>
               </div>
-              <span class="ytomo-progress-text">{{ reservationStatus.progressText }}</span>
+              <div class="ytomo-progress-text">{{ reservationStatus.progressText }}</div>
             </div>
             
-            <!-- 予約履歴表示（右下に表示） -->
-            <div v-if="apiManager.reservationHistory.value.length > 0" class="ytomo-reservation-history">
-              <div v-for="(result, index) in apiManager.reservationHistory.value" :key="index" class="ytomo-history-item">
-                <span class="ytomo-history-time">{{ result.timestamp }}</span>
-                <span class="ytomo-history-result" :class="result.success ? 'success' : 'failure'">
-                  {{ result.success ? '成功' : '失敗' }}
-                </span>
-                <span class="ytomo-history-slot">{{ result.gate }}{{ result.time }}</span>
+            <!-- 実行履歴表示 -->
+            <div v-if="reservationManager.reservationHistory.value.length > 0" class="ytomo-execution-history">
+              <div class="ytomo-history-title">実行履歴</div>
+              <div class="ytomo-history-items">
+                <div v-for="(result, index) in reservationManager.reservationHistory.value" :key="index" 
+                     class="ytomo-history-item" :class="result.success ? 'success' : 'failure'">
+                  <span class="ytomo-history-result">{{ result.success ? '成功' : '失敗' }}</span>
+                  <span class="ytomo-history-detail">{{ result.gate }}{{ result.time }} {{ result.timestamp }}</span>
+                </div>
               </div>
             </div>
           </div>
@@ -261,14 +262,17 @@ const isTimeSlotDisabled = (gate: string, time: string) => {
   if (!selectedDate.value) return false
   
   const selectedDateStr = selectedDate.value
+  const selectedDateYYYYMMDD = selectedDateStr.replace(/-/g, '') // YYYY-MM-DD → YYYYMMDD
   const gateType = gate === 'east' ? 1 : 2
   
   // 同じ日付の既存予約があるかチェック
+  
   for (const ticket of ticketsStore.tickets.values()) {
     if (ticket.schedules) {
       for (const schedule of ticket.schedules) {
+        
         if (schedule.selected && 
-            schedule.entrance_date === selectedDateStr &&
+            schedule.entrance_date === selectedDateYYYYMMDD &&
             schedule.gate_type === gateType &&
             schedule.time_start === time) {
           return true
@@ -295,13 +299,36 @@ const selectedSchedule = computed(() => {
 // 時間帯選択順を管理（選択順序を記録）
 const selectionOrder = ref<{ key: string; order: number }[]>([])
 
-// カレンダー空き状況キャッシュ
-const calendarAvailabilityCache = ref<{ [dateString: string]: any } | null>(null)
+// 優先度1の時間帯を取得（カレンダー空き表示用）
+const selectedTimeSlot = computed(() => {
+  const selectedSlots = selectionOrder.value.filter(item => {
+    const [time, gate] = item.key.split('-')
+    const timeSlot = timeSlots.value.find(slot => slot.time === time)
+    if (!timeSlot) return false
+    
+    const gateKey = gate as 'east' | 'west'
+    return timeSlot[gateKey].selected
+  })
+  
+  if (selectedSlots.length === 0) return null
+  
+  // 最も早く選択された時間帯を返す
+  const earliestSlot = selectedSlots.reduce((earliest, current) => 
+    current.order < earliest.order ? current : earliest
+  )
+  
+  return earliestSlot.key.split('-')[0] // 時間部分のみ返す
+})
 
-// watcherは削除（toggleTimeSlot内で直接処理）
-
-// カレンダー空き状況キャッシュを更新（全期間）
-const updateCalendarAvailabilityCache = (selectedTime: string) => {
+// カレンダー空き状況をcomputedで自動計算
+const calendarAvailabilityCache = computed(() => {
+  const selectedTimeSlotValue = selectedTimeSlot.value
+  if (!selectedTimeSlotValue) return null
+  
+  // ticketsStoreのentranceSchedulesに依存することを明示
+  const entranceSchedules = ticketsStore.entranceSchedules
+  if (entranceSchedules.size === 0) return null
+  
   const cache: { [dateString: string]: any } = {}
   
   // 全期間（2024年12月〜2025年10月）の空き状況を計算
@@ -319,17 +346,13 @@ const updateCalendarAvailabilityCache = (selectedTime: string) => {
       
       for (let day = 1; day <= lastDay; day++) {
         const dateString = `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`
-        cache[dateString] = getSelectedTimeSlotAvailability(dateString, selectedTime)
+        cache[dateString] = getSelectedTimeSlotAvailability(dateString, selectedTimeSlotValue)
       }
     }
   }
   
-  calendarAvailabilityCache.value = cache
-  logger.info('全期間の空き状況キャッシュ更新完了', { 
-    selectedTime,
-    totalDates: Object.keys(cache).length 
-  })
-}
+  return cache
+})
 
 // 選択順序の数字を取得
 const getSelectionNumber = (timeSlot: string, gate: 'east' | 'west'): number | null => {
@@ -556,19 +579,19 @@ const formatDateForDisplay = (dateString: string): string => {
 const weekdays = ['日', '月', '火', '水', '木', '金', '土']
 
 const currentMonthDisplay = computed(() => {
-  return `${currentMonth.value.getFullYear()}年${currentMonth.value.getMonth() + 1}月`
+  return `${currentMonth.value.getMonth() + 1}月`
 })
 
-// 空き情報を表示している時間を取得
+// カレンダーが表示している空き情報の対象時間（優先度1位の時間帯）
 const availabilityDisplayTime = computed(() => {
-  // 現在の時刻を表示（リアルタイム更新の代替）
-  const now = new Date()
-  return now.toLocaleTimeString('ja-JP', { 
-    hour: '2-digit', 
-    minute: '2-digit',
-    hour12: false
-  })
+  const priority1Selection = selectionOrder.value.find(item => item.order === 1)
+  if (!priority1Selection) {
+    return null
+  }
+  const time = priority1Selection.key.split('-')[0]
+  return time
 })
+
 
 const calendarDates = computed(() => {
   if (!currentMonth.value) {
@@ -1410,8 +1433,8 @@ const executeReservation = async () => {
     selectedTimeSlots 
   })
   
-  // マネージャーに処理を委譲
-  await reservationManager.executeReservation(selectedTimeSlots)
+  // マネージャーに処理を委譲（選択日付を渡す）
+  await reservationManager.executeReservation(selectedTimeSlots, selectedDate.value)
 }
 
 
@@ -1608,9 +1631,9 @@ const toggleTimeSlot = (gate: 'east' | 'west', time: string) => {
   // 優先度1の時間帯が変わった場合はキャッシュを更新
   if (previousPriority1Time !== currentPriority1Time) {
     if (currentPriority1Time) {
-      updateCalendarAvailabilityCache(currentPriority1Time)
+      // computedで自動更新されるため手動更新は不要
     } else {
-      calendarAvailabilityCache.value = null
+      // computedで自動更新されるためキャッシュクリアは不要
     }
   }
   
@@ -1819,41 +1842,65 @@ onMounted(async () => {
             display: block;
           }
           
-          // 予約履歴表示（右下に配置）
-          .ytomo-reservation-history {
-            position: absolute;
-            bottom: 0;
-            right: 0;
-            font-size: 10px;
-            max-width: 120px;
+          .ytomo-progress-text {
+            font-size: 11px;
+            color: #78716c;
+            text-align: right;
+            display: block;
+            margin-top: 4px;
+          }
+        }
+        
+        // 実行履歴表示
+        .ytomo-execution-history {
+          margin-top: 12px;
+          
+          .ytomo-history-title {
+            font-size: 11px;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 6px;
+          }
+          
+          .ytomo-history-items {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
             
             .ytomo-history-item {
               display: flex;
               align-items: center;
-              gap: 4px;
-              margin-bottom: 2px;
+              gap: 8px;
+              padding: 4px 8px;
+              border-radius: 4px;
+              font-size: 12px;
               
-              .ytomo-history-time {
-                color: #6b7280;
-                font-size: 9px;
+              &.success {
+                background-color: rgba(5, 150, 105, 0.1);
+                border-left: 3px solid #059669;
+              }
+              
+              &.failure {
+                background-color: rgba(220, 38, 38, 0.1);
+                border-left: 3px solid #dc2626;
               }
               
               .ytomo-history-result {
-                font-weight: bold;
-                font-size: 10px;
+                font-weight: 600;
+                min-width: 30px;
                 
-                &.success {
+                .success & {
                   color: #059669;
                 }
                 
-                &.failure {
+                .failure & {
                   color: #dc2626;
                 }
               }
               
-              .ytomo-history-slot {
-                color: #374151;
-                font-size: 9px;
+              .ytomo-history-detail {
+                color: #6b7280;
+                font-size: 11px;
               }
             }
           }
@@ -2014,6 +2061,9 @@ onMounted(async () => {
       color: #6b7280;
       margin-left: 8px;
       white-space: nowrap;
+      width: 40px;
+      display: inline-block;
+      text-align: left;
     }
     
     .ytomo-calendar-refresh-button {
@@ -2525,43 +2575,6 @@ onMounted(async () => {
             }
             
             // 予約履歴表示（右下に配置）
-            .ytomo-reservation-history {
-              position: absolute;
-              bottom: 0;
-              right: 0;
-              font-size: 10px;
-              max-width: 120px;
-              
-              .ytomo-history-item {
-                display: flex;
-                align-items: center;
-                gap: 4px;
-                margin-bottom: 2px;
-                
-                .ytomo-history-time {
-                  color: #6b7280;
-                  font-size: 9px;
-                }
-                
-                .ytomo-history-result {
-                  font-weight: bold;
-                  font-size: 10px;
-                  
-                  &.success {
-                    color: #059669;
-                  }
-                  
-                  &.failure {
-                    color: #dc2626;
-                  }
-                }
-                
-                .ytomo-history-slot {
-                  color: #374151;
-                  font-size: 9px;
-                }
-              }
-            }
           }
         }
       }

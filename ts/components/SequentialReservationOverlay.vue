@@ -7,12 +7,8 @@
       @click="handleOverlayClick"
     >
       <div class="ytomo-sequential-content">
-        <div class="ytomo-header-with-spinner">
-          <div class="ytomo-loading-spinner"></div>
-          <h3>
-            順次予約実行中 {{ sequentialReservationStore.state.currentTargetIndex + 1 }}/{{ sequentialReservationStore.state.reservationTargets.length }}
-            <span class="status-text">待機中</span>
-          </h3>
+        <div class="ytomo-header-vertical">
+          <h3>順次予約実行中</h3>
           <div class="ytomo-progress-bar">
             <div 
               class="ytomo-progress-fill" 
@@ -51,12 +47,6 @@
             <option value="30">30秒</option>
             <option value="60">60秒</option>
           </select>
-          <button 
-            class="ytomo-cancel-button"
-            @click="cancelSequentialReservation"
-          >
-            中断
-          </button>
         </div>
         <div class="ytomo-sequential-progress">
           <div class="ytomo-sequential-target">
@@ -158,11 +148,12 @@ const cancelSequentialReservation = () => {
   transform: scale(0.9);
   animation: dialogAppear 0.2s ease-out forwards;
 
-  .ytomo-header-with-spinner {
+  .ytomo-header-vertical {
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 12px;
+    gap: 16px;
     margin-bottom: 24px;
   }
   

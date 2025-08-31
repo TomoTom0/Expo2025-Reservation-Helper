@@ -566,6 +566,59 @@ export const useTicketsStore = defineStore('tickets', () => {
     tickets.value.set(ticket.ticket_id, ticket)
   }
 
+  // 個別チケットIDの情報更新
+  const updateSingleTicket = async (ticketId: string, forceRefresh: boolean = false) => {
+    logger.info('個別チケット情報更新開始', { ticketId, forceRefresh })
+    
+    try {
+      // 該当チケットの最新情報を取得
+      const userReservationsResponse = await getUserReservations()
+      const updatedTicketData = userReservationsResponse.find(
+        (ticket: any) => ticket.ticket_id === ticketId
+      )
+      
+      if (updatedTicketData) {
+        // 既存のチケット情報を取得してisOwnとlabelを保持
+        const existingTicket = tickets.value.get(ticketId)
+        const isOwn = existingTicket?.isOwn ?? true // デフォルトでtrue
+        const label = existingTicket?.label
+        
+        // パビリオン予約情報を追加
+        const ticketWithPavilionInfo: TicketData = {
+          ticket_id: updatedTicketData.ticket_id,
+          item_name: updatedTicketData.item_name,
+          isOwn: isOwn,
+          label: label,
+          schedules: await Promise.all((updatedTicketData.schedules || []).map(async (schedule: any) => {
+            const pavilionType = determinePavilionReservationType(schedule)
+            const pavilionStatus = await getAllPavilionReservationStatus(schedule)
+            
+            return {
+              ...schedule,
+              pavilionReservationType: pavilionType,
+              pavilionReservationActive: pavilionType !== null,
+              pavilionReservationStatus: pavilionStatus
+            }
+          }))
+        }
+        
+        // 既存チケットを更新
+        tickets.value.set(ticketId, ticketWithPavilionInfo)
+        
+        logger.info('個別チケット情報更新完了', { 
+          ticketId,
+          hasSchedules: (ticketWithPavilionInfo.schedules || []).length > 0
+        })
+      } else {
+        logger.warn('指定されたチケットIDが見つかりません', { ticketId })
+      }
+      
+    } catch (error) {
+      logger.error('個別チケット情報更新エラー', { ticketId, error })
+      throw error
+    }
+  }
+
   const removeTicket = (ticketId: string) => {
     tickets.value.delete(ticketId)
     logger.info('チケットを削除しました', { ticketId })
@@ -787,6 +840,7 @@ export const useTicketsStore = defineStore('tickets', () => {
     loadEntranceSchedulesRange,
     setTickets,
     addTicket,
+    updateSingleTicket,
     removeTicket,
     selectTicket,
     selectAllTickets,

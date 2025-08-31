@@ -131,14 +131,16 @@ const pavilionReservationDisplayText = computed(() => {
     return `${longName} 有効`
   }
   
-  // 有効な期間がない場合、次の期間を探す
-  const nextEntry = Object.entries(info.allStatus || {})
-    .find(([type, status]) => status.periodStatus === 'before')
+  // 有効な期間がない場合、時系列順に最も近い「期間前」を探す
+  // 予約の時系列順: 月 → 週 → 3 → 1
+  const priorityOrder = ['月', '週', '3', '1']
   
-  if (nextEntry) {
-    const [type, status] = nextEntry
-    const longName = getLongNameFromShortName(type)
-    return `${longName} 期間前`
+  for (const type of priorityOrder) {
+    const status = info.allStatus?.[type]
+    if (status && status.periodStatus === 'before') {
+      const longName = getLongNameFromShortName(type)
+      return `${longName} 期間前`
+    }
   }
   
   return ''
@@ -219,9 +221,10 @@ const entranceTabInfo = computed(() => {
   return ticketIds.join(', ')
 })
 
-// オーバーレイクリックでダイアログを閉じる
+// オーバーレイクリックでダイアログを閉じる（ytomoページでは無効）
 const handleOverlayClick = (e: Event) => {
-  if (e.target === e.currentTarget) {
+  // ytomoページではページ内埋め込み表示のためオーバーレイクリック処理を無効化
+  if (!isYtomoPage && e.target === e.currentTarget) {
     hideDialog()
   }
 }
@@ -399,8 +402,11 @@ onUnmounted(() => {
 }
 
 .ytomo-tab-dates {
-    font-size: 12px;
-    color: #6b7280;
+    font-size: 11px;
+    color: #64748b;
+    font-family: 'Courier New', 'Monaco', 'Menlo', monospace;
+    font-weight: 600;
+    margin-top: 1px;
     line-height: 1.2;
     min-height: 14px;
     display: flex;
@@ -444,6 +450,10 @@ onUnmounted(() => {
 }
 
 .ytomo-tab-button.active .ytomo-pavilion-reservation-info {
+    color: #2c5aa0;
+}
+
+.ytomo-tab-button.active .ytomo-tab-dates {
     color: #2c5aa0;
 }
 
