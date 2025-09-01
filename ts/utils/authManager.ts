@@ -4,6 +4,7 @@
  */
 
 import { loggers } from './logger'
+import { redirectToLogin } from './auth'
 
 const logger = loggers.ui
 
@@ -16,7 +17,6 @@ class AuthManager {
   private static instance: AuthManager
   private authCheckInterval: number | null = null
   private readonly AUTH_CHECK_INTERVAL = 10 * 60 * 1000 // 10分
-  private readonly LOGIN_URL = '/login'
   private lastAuthCheck: number = 0
   private isRedirecting: boolean = false
 
@@ -158,7 +158,7 @@ class AuthManager {
       
       // 2秒後にリダイレクト（ユーザーが通知を確認できるように）
       setTimeout(() => {
-        window.location.href = this.LOGIN_URL
+        redirectToLogin()
       }, 2000)
       
     } catch (error) {
@@ -168,7 +168,7 @@ class AuthManager {
       
       // エラーが発生してもリダイレクトは実行
       setTimeout(() => {
-        window.location.href = this.LOGIN_URL
+        redirectToLogin()
       }, 1000)
     }
   }

@@ -38,6 +38,9 @@ export class EntranceReservationApiManager {
   // 選択解除用のコールバック
   private clearSelectionCallback: (() => void) | null = null
 
+  // 既存予約ID（変更予約の場合に使用）
+  private existingReservationId: number | null = null
+
   // タイマー管理
   private reservationTimer: NodeJS.Timeout | null = null
   private waitingProgressTimer: NodeJS.Timeout | null = null
@@ -214,16 +217,19 @@ export class EntranceReservationApiManager {
 
     if (!topPrioritySlot) return
 
-    // 並行実行
+    // 並行実行（EntranceTab.vueと同じ関数を使用）
     const [reservationResult, availabilityData] = await Promise.all([
       this.executeTopPriorityReservation(topPrioritySlot),
-      this.refreshAvailabilityInfo()
+      this.getAvailabilityInfo()
     ])
     
     logger.info('並行実行完了', { 
       reservationSuccess: reservationResult?.success, 
       availabilityDataReceived: !!availabilityData 
     })
+
+    // 空き情報取得でstoreは既に更新済み（getEntranceScheduleDataで強制更新実行）
+    logger.info('空き情報取得完了（store更新済み）', { availabilityDataReceived: !!availabilityData })
 
     if (reservationResult?.success) {
       // 予約成功時の処理
@@ -265,33 +271,26 @@ export class EntranceReservationApiManager {
     }
   }
 
-  // 空き情報取得
-  private async refreshAvailabilityInfo() {
+  // 空き情報取得（EntranceTab.vueと同じ実装）
+  private async getAvailabilityInfo() {
     try {
-      logger.info('空き情報取得実行中')
+      const targetDate = this.reservationInfo.value.date // MM/DD形式
+      if (!targetDate) return null
       
-      // 現在の年月を取得
-      const now = new Date()
-      const year = now.getFullYear()
-      const month = now.getMonth() + 1
+      const month = parseInt(targetDate.split('/')[0])
+      const year = new Date().getFullYear() // MM/DD形式には年がないので現在年を使用
       
-      // 入場予約スケジュール取得API呼び出し
-      const response = await fetch(`/api/d/schedules/${year}/${month}`, {
-        method: 'GET',
-        headers: {
-          'Accept': 'application/json',
-          'Accept-Language': 'ja,en-US;q=0.9,en;q=0.8'
-        }
-      })
+      // EntranceTab.vueと同じ関数を使用
+      const ticketsStore = useTicketsStore()
+      const scheduleData = await ticketsStore.getEntranceScheduleData(year, month, true)
       
-      if (response.ok) {
-        const scheduleData = await response.json()
-        logger.info('空き情報取得成功', { year, month, dataSize: JSON.stringify(scheduleData).length })
-        return scheduleData
-      } else {
-        logger.warn('空き情報取得失敗', { status: response.status, year, month })
-        return null
-      }
+      // 指定日の時間帯情報を取得（EntranceTab.vueと同じ処理）
+      const dayOfMonth = targetDate.split('/')[1].padStart(2, '0') // MM/DD → DD（0埋め）
+      const dayData = scheduleData?.states?.[dayOfMonth]
+      
+      logger.info('空き情報取得結果', { year, month, dayOfMonth, hasDayData: !!dayData })
+      return dayData
+      
     } catch (error) {
       logger.error('空き情報取得エラー', error)
       return null
@@ -303,12 +302,13 @@ export class EntranceReservationApiManager {
     this.isReservationRunning.value = false
     this.clearReservationTimer()
     
-    const originalSlots = this.reservationInfo.value.timeSlots
-    const originalSlot = originalSlots.length > 0 ? originalSlots[0] : null
-    const originalDateTime = originalSlot ? `${this.reservationInfo.value.date} ${originalSlot.gate}${originalSlot.time}` : this.reservationInfo.value.date
+    // 変更前後の情報を正しく設定
+    const originalDateTime = this.reservationInfo.value.timeSlots.length > 0 
+      ? `${this.reservationInfo.value.date} ${this.reservationInfo.value.timeSlots[0].gate}${this.reservationInfo.value.timeSlots[0].time}`
+      : this.reservationInfo.value.date
     
-    const newDate = this.formatDateForDisplay(new Date())
-    const newDateTime = `${newDate} ${slot.gate}${slot.time}`
+    // 変更後の情報（予約対象の日付を使用）
+    const newDateTime = `${this.reservationInfo.value.date} ${slot.gate}${slot.time}`
     
     const dateTimeChange = originalDateTime !== newDateTime ? `${originalDateTime} → ${newDateTime}` : undefined
     
@@ -336,8 +336,12 @@ export class EntranceReservationApiManager {
     const currentMinute = now.getMinutes()
     const currentSecond = now.getSeconds()
     
-    // 次の分の35秒までの待機時間を計算
-    const waitTimeMs = ((60 - currentSecond) + 35) * 1000
+    // 次の35秒までの待機時間を計算（5-65秒の範囲）
+    let waitTimeSeconds = (35 - currentSecond + 60) % 60
+    if (waitTimeSeconds < 5) {
+      waitTimeSeconds += 60  // 5秒未満の場合は次の分まで待機
+    }
+    const waitTimeMs = waitTimeSeconds * 1000
     
     // 初回実行は waitUntil35Seconds で処理済み
     
@@ -372,19 +376,24 @@ export class EntranceReservationApiManager {
           return false
         }
         
-        // 空き情報がある場合は満員でないかチェック
-        if (availabilityData && availabilityData.states) {
-          const dateKey = this.reservationInfo.value.date.split('/')[1] // MM/DD → DD
+        // 空き情報がある場合は満員でないかチェック（EntranceTab.vueと同じ構造）
+        if (availabilityData) {
           const gateKey = slot.gate === '東' ? '1' : '2'
           const timeKey = this.convertTimeToAPIFormat(slot.time)
           
-          const timeState = availabilityData.states[dateKey]?.[gateKey]?.[timeKey]?.time_state
+          const timeState = availabilityData[gateKey]?.[timeKey]?.time_state
+          logger.info('空き情報チェック', { slot: `${slot.gate}${slot.time}`, gateKey, timeKey, timeState })
+          
           // time_state: 0=空きあり, 1=残り少ない, 2=満席, 4=利用不可
           // 満席(2)と利用不可(4)は除外
           if (timeState === 2 || timeState === 4) {
             logger.info('満員/利用不可のため追加実行から除外', { slot, timeState })
             return false
           }
+        } else {
+          // 空き情報が取得できない場合は追加実行を行わない（安全のため）
+          logger.warn('空き情報未取得のため追加実行をスキップ', { slot })
+          return false
         }
         
         return true
@@ -427,7 +436,10 @@ export class EntranceReservationApiManager {
           return
         } else {
           this.addToHistory(false, slot.gate, slot.time)
-          logger.warn('追加実行失敗', { slot, error: result.error })
+          logger.warn('予約失敗', { 
+            日時: `${slot.date} ${slot.gate}ゲート ${slot.time}`,
+            理由: result.error || '予約実行に失敗しました'
+          })
           // 失敗した場合は次のスロットを試行
           continue
         }
@@ -462,7 +474,10 @@ export class EntranceReservationApiManager {
   }
 
   // 予約実行を開始
-  public async executeReservation(selectedTimeSlots: any[], selectedDate?: string) {
+  public async executeReservation(selectedTimeSlots: any[], selectedDate?: string, existingReservationId?: number | null, originalReservationInfo?: any) {
+    // 既存予約IDを保存
+    this.existingReservationId = existingReservationId || null
+    
     if (this.isReservationRunning.value) {
       // 予約中断処理
       this.isReservationRunning.value = false
@@ -502,7 +517,7 @@ export class EntranceReservationApiManager {
     this.reservationInfo.value = {
       visible: true,
       date: this.formatDateForDisplay(new Date(targetDate + 'T00:00:00')),
-      timeSlots: selectedTimeSlots,
+      timeSlots: originalReservationInfo ? [originalReservationInfo] : selectedTimeSlots,
       completed: false
     }
 
@@ -579,47 +594,66 @@ export class EntranceReservationApiManager {
         return { success: false, error: '選択されたチケットがありません' }
       }
       
-      // 日付を取得（reservationInfo.dateから）
-      const entranceDate = this.reservationInfo.value.date
+      // 日付を取得（reservationInfo.dateから）MM/DD形式をYYYYMMDD形式に変換
+      const rawDate = this.reservationInfo.value.date // MM/DD形式
+      const currentYear = new Date().getFullYear()
+      const [month, day] = rawDate.split('/')
+      const entranceDate = `${currentYear}${month.padStart(2, '0')}${day.padStart(2, '0')}`
       const gateType = slot.gate === '東' ? '1' : '2'
       
       logger.info('万博予約API呼び出し開始', {
         ticketIds: selectedTickets,
+        rawDate,
         entranceDate,
         time: slot.time,
         gateType,
         slot
       })
       
+      // 新規予約か変更予約かを判定
+      const isChangeReservation = this.existingReservationId && this.existingReservationId > 0
+      const method = isChangeReservation ? 'PUT' : 'POST'
+      
+      let body: any
+      if (isChangeReservation) {
+        // 変更予約（PUT）のパラメータ
+        body = {
+          user_visiting_reservation_ids: [this.existingReservationId],
+          start_time: this.convertTimeToAPIFormat(slot.time),
+          gate_type: gateType,
+          entrance_date: entranceDate
+        }
+      } else {
+        // 新規予約（POST）のパラメータ
+        body = {
+          ticket_ids: selectedTickets,
+          start_time: this.convertTimeToAPIFormat(slot.time),
+          gate_type: gateType,
+          entrance_date: entranceDate
+        }
+      }
+
       const response = await fetch('/api/d/user_visiting_reservations', {
-        method: 'POST',
+        method,
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json',
           'Accept-Language': 'ja,en-US;q=0.9,en;q=0.8',
           'X-Api-Lang': 'ja'
         },
-        body: JSON.stringify({
-          ticket_ids: selectedTickets,
-          start_time: slot.time,
-          gate_type: gateType,
-          entrance_date: entranceDate.replace(/[\/\-]/g, '') // MM/DD or YYYY-MM-DD → YYYYMMDD
-        })
+        body: JSON.stringify(body)
       })
+      
+      logger.info('予約API HTTP結果', { status: response.status, ok: response.ok, url: response.url })
       
       if (response.ok) {
         const result = await response.json()
-        logger.info('予約API成功', result)
+        logger.info('予約API成功レスポンス', result)
         
-        // verified-api-analysis.mdに基づく予約成功判定
-        logger.info('予約API結果確認', { hasReservationIds: !!result.user_visiting_reservation_ids, idsLength: result.user_visiting_reservation_ids?.length })
-        if (result.user_visiting_reservation_ids && result.user_visiting_reservation_ids.length > 0) {
-          logger.info('結果確認待機開始', { waitTime: '2秒' })
-          // API成功後、サーバー処理完了を待ってマイチケット情報で実際の変更を確認（ドキュメント必須要件）
-          await new Promise(resolve => setTimeout(resolve, 2000)) // 2秒待機
-          logger.info('結果確認待機完了')
-          const confirmationResult = await this.confirmReservationSuccess(result.user_visiting_reservation_ids)
-          if (confirmationResult.confirmed) {
+        // verified-api-analysis.mdに基づく成功判定
+        if (method === 'POST') {
+          // 新規予約：user_visiting_reservation_idsで判定
+          if (result.user_visiting_reservation_ids && result.user_visiting_reservation_ids.length > 0) {
             return { 
               success: true, 
               date: entranceDate,
@@ -628,18 +662,40 @@ export class EntranceReservationApiManager {
           } else {
             return { 
               success: false, 
-              error: '予約APIは成功しましたが、実際の予約が確認できませんでした' 
+              error: '予約IDが取得できませんでした（予約が作成されていません）' 
             }
           }
         } else {
-          return { 
-            success: false, 
-            error: '予約IDが取得できませんでした（予約が作成されていません）' 
+          // 予約変更：doing: false + マイチケット確認（ドキュメント必須要件）
+          if (result.doing === false) {
+            logger.info('予約変更申請完了 - マイチケット確認開始', { waitTime: '2秒' })
+            await new Promise(resolve => setTimeout(resolve, 2000))
+            // 既存予約IDが変更されているかマイチケット情報で確認
+            const confirmationResult = await this.confirmReservationSuccess([body.user_visiting_reservation_ids[0]])
+            if (confirmationResult.confirmed) {
+              return { 
+                success: true, 
+                date: entranceDate
+              }
+            } else {
+              return { 
+                success: false, 
+                error: '予約変更申請は完了しましたが、実際の変更が確認できませんでした' 
+              }
+            }
+          } else {
+            return { 
+              success: false, 
+              error: '予約変更申請が完了していません' 
+            }
           }
         }
       } else {
         const error = await response.json()
-        logger.warn('予約API失敗', error)
+        logger.warn('予約失敗', { 
+          日時: `${slot.date} APIレベル`,
+          理由: error.message || 'API呼び出しに失敗しました'
+        })
         
         // エラー時も一定時間待機してから次の処理へ
         logger.info('エラー後待機開始', { waitTime: '1秒' })
@@ -671,7 +727,7 @@ export class EntranceReservationApiManager {
     try {
       logger.info('予約確認開始', { reservationIds })
       
-      const response = await fetch('/api/d/my/tickets/?count=1', {
+      const response = await fetch('/api/d/my/tickets/', {
         method: 'GET',
         headers: {
           'Accept': 'application/json',
@@ -706,9 +762,18 @@ export class EntranceReservationApiManager {
     }
   }
 
-  // 時間表示形式をAPI形式に変換（例：11:00 → 1000）
+  // 時間表示形式をAPI形式に変換（ドキュメントの実証済みマッピング）
   private convertTimeToAPIFormat(time: string): string {
-    return time.replace(':', '')
+    // verified-api-analysis.mdの実証済みマッピング
+    const timeMapping: { [key: string]: string } = {
+      '9:00': '0700',
+      '10:00': '0900', 
+      '11:00': '1000',
+      '12:00': '1100',
+      '17:00': '1600'
+    }
+    
+    return timeMapping[time] || time.replace(':', '')
   }
   
   // 選択されたチケットIDを取得するヘルパーメソッド

@@ -25,8 +25,8 @@
             <div class="ytomo-month-display">
               <span class="ytomo-current-month">{{ currentMonthDisplay }}</span>
               <span class="ytomo-availability-time">{{ availabilityDisplayTime || '' }}</span>
-              <button id="ytomo-calendar-refresh-button" class="ytomo-calendar-refresh-button" @click="refreshEntranceData" title="入場予約データを更新">
-                <svg viewBox="0 0 24 24" width="12" height="12">
+              <button id="ytomo-calendar-refresh-button" class="ytomo-calendar-refresh-button" @click="refreshEntranceData" :disabled="isRefreshing" title="入場予約データを更新">
+                <svg viewBox="0 0 24 24" width="12" height="12" :class="{ 'ytomo-rotating': isRefreshing }">
                   <path d="M4 4v5h.582m15.356 2A8.001 8.001 0 0 0 4.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 0 1-15.357-2m15.357 2H15" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
                 </svg>
               </button>
@@ -47,7 +47,8 @@
                   'selected': date.dateString === selectedDate,
                   'today': date.isToday,
                   'disabled': date.disabled,
-                  'has-reservation': hasReservationForDate(date.dateString)
+                  'has-reservation': hasReservationForDate(date.dateString),
+                  'special-lottery-date': date.isSpecialLotteryDate
                 }"
                 :data-date="date.dateString"
                 @click="selectDate"
@@ -205,16 +206,14 @@
               <div class="ytomo-progress-bar">
                 <div class="ytomo-progress-fill" :style="{ width: reservationStatus.progress + '%' }"></div>
               </div>
-              <div class="ytomo-progress-text">{{ reservationStatus.progressText }}</div>
             </div>
             
             <!-- 実行履歴表示 -->
             <div v-if="reservationManager.reservationHistory.value.length > 0" class="ytomo-execution-history">
-              <div class="ytomo-history-title">実行履歴</div>
               <div class="ytomo-history-items">
                 <div v-for="(result, index) in reservationManager.reservationHistory.value" :key="index" 
                      class="ytomo-history-item" :class="result.success ? 'success' : 'failure'">
-                  <span class="ytomo-history-result">{{ result.success ? '成功' : '失敗' }}</span>
+                  <span class="ytomo-history-result">{{ result.success ? '成功' : '' }}</span>
                   <span class="ytomo-history-detail">{{ result.gate }}{{ result.time }}</span>
                 </div>
               </div>
@@ -227,7 +226,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import { loggers } from '@/utils/logger'
 import { useTicketsStore } from '@/stores/tickets'
 import type { ScheduleData } from '@/types/api'
@@ -240,28 +239,29 @@ const ticketsStore = useTicketsStore()
 const reservationManager = new EntranceReservationApiManager()
 
 // 選択解除関数
-const clearTimeSlotSelection = () => {
+const clearTimeSlotSelection = (): void => {
   selectionOrder.value = []
   timeSlots.value.forEach(slot => {
     slot.east.selected = false
     slot.west.selected = false
   })
-  logger.info('予約成功により時間帯選択を解除しました')
+  logger.info('予約成功により時間帯選択を解除しました', {})
 }
 
-// 選択解除コールバックを設定
+// 選択解除コールバックを設定  
 reservationManager.setClearSelectionCallback(clearTimeSlotSelection)
 
 // カレンダー状態
 const isCalendarExpanded = ref(true)
-const selectedDate = ref<string>('')
+const selectedDate = ref('')
 const currentMonth = ref(new Date()) // 現在の年月
+const isRefreshing = ref(false) // 手動更新中フラグ
 
 // 既存の入場日時と重複する時間帯を判定
 const isTimeSlotDisabled = (gate: string, time: string) => {
   if (!selectedDate.value) return false
   
-  const selectedDateStr = selectedDate.value
+  const selectedDateStr = selectedDate.value!
   const selectedDateYYYYMMDD = selectedDateStr.replace(/-/g, '') // YYYY-MM-DD → YYYYMMDD
   const gateType = gate === 'east' ? 1 : 2
   
@@ -285,19 +285,89 @@ const isTimeSlotDisabled = (gate: string, time: string) => {
 
 // 現在選択されているスケジュール（ticket.schedulesから検索）
 const selectedSchedule = computed(() => {
+  logger.debug('selectedSchedule computed実行', {
+    ticketsCount: ticketsStore.tickets.size,
+    ticketsRef: ticketsStore.tickets,
+    callStack: new Error().stack?.split('\n')[1]?.trim()
+  })
+  
   for (const ticket of ticketsStore.tickets.values()) {
     if (ticket.schedules) {
       const selected = ticket.schedules.find(schedule => schedule.selected === true)
       if (selected) {
+        logger.debug('selectedSchedule found', {
+          entrance_date: selected.entrance_date,
+          user_visiting_reservation_id: selected.user_visiting_reservation_id,
+          scheduleRef: selected
+        })
         return selected
       }
     }
   }
+  
+  logger.debug('selectedSchedule not found')
   return null
 })
 
 // 時間帯選択順を管理（選択順序を記録）
 const selectionOrder = ref<{ key: string; order: number }[]>([])
+
+// 入場日時選択変更時の連動処理
+watch(selectedSchedule, (newSchedule, oldSchedule) => {
+  logger.info('selectedSchedule watcher発火', {
+    isRefreshing: isRefreshing.value,
+    oldSchedule: oldSchedule ? {
+      entrance_date: oldSchedule.entrance_date,
+      user_visiting_reservation_id: oldSchedule.user_visiting_reservation_id,
+      objectRef: oldSchedule === newSchedule ? 'SAME_REF' : 'DIFF_REF'
+    } : null,
+    newSchedule: newSchedule ? {
+      entrance_date: newSchedule.entrance_date,
+      user_visiting_reservation_id: newSchedule.user_visiting_reservation_id
+    } : null,
+    condition1: !!newSchedule,
+    condition2: newSchedule !== oldSchedule,
+    condition3: !!newSchedule?.entrance_date,
+    willExecuteSync: !isRefreshing.value && newSchedule && newSchedule !== oldSchedule && newSchedule.entrance_date
+  })
+  
+  // 手動更新中は連動処理をスキップ
+  if (isRefreshing.value) {
+    logger.info('手動更新中のため連動処理をスキップ')
+    return
+  }
+  
+  if (newSchedule && newSchedule !== oldSchedule && newSchedule.entrance_date) {
+    logger.info('入場日時選択変更検知 - 同期実行', { 
+      old: oldSchedule?.entrance_date, 
+      new: newSchedule.entrance_date,
+      currentSelectedDate: selectedDate.value
+    })
+    
+    // カレンダー選択日を新しい入場日に同期
+    if (newSchedule.entrance_date) {
+      selectedDate.value = newSchedule.entrance_date
+      logger.info('selectedDate.value更新完了', { newValue: selectedDate.value })
+    }
+    
+    // 時間帯選択を解除（disabled状態になった選択も含めて全解除）
+    selectionOrder.value = []
+    timeSlots.value.forEach(slot => {
+      slot.east.selected = false
+      slot.west.selected = false
+    })
+    
+    // 選択日の時間帯データを再読み込み
+    if (newSchedule.entrance_date) {
+      loadTimeSlotsForDate(newSchedule.entrance_date)
+    }
+    
+    logger.info('入場日時連動処理完了', { 
+      selectedDate: selectedDate.value,
+      clearedSelections: true
+    })
+  }
+}, { deep: true })
 
 // 優先度1の時間帯を取得（カレンダー空き表示用）
 const selectedTimeSlot = computed(() => {
@@ -323,7 +393,16 @@ const selectedTimeSlot = computed(() => {
 // カレンダー空き状況をcomputedで自動計算
 const calendarAvailabilityCache = computed(() => {
   const selectedTimeSlotValue = selectedTimeSlot.value
-  if (!selectedTimeSlotValue) return null
+  // 時間帯未選択時は9時（"0700"）をデフォルトとして使用
+  const timeSlotForDisplay = selectedTimeSlotValue || { time: "0700", gate: "east" }
+  const timeForDisplay = typeof timeSlotForDisplay === 'string' ? timeSlotForDisplay : timeSlotForDisplay.time
+  
+  logger.info('calendarAvailabilityCache 実行', {
+    selectedTimeSlotValue,
+    timeSlotForDisplay,
+    timeForDisplay,
+    hasSchedules: ticketsStore.entranceSchedules.size > 0
+  })
   
   // ticketsStoreのentranceSchedulesに依存することを明示
   const entranceSchedules = ticketsStore.entranceSchedules
@@ -346,7 +425,7 @@ const calendarAvailabilityCache = computed(() => {
       
       for (let day = 1; day <= lastDay; day++) {
         const dateString = `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`
-        cache[dateString] = getSelectedTimeSlotAvailability(dateString, selectedTimeSlotValue)
+        cache[dateString] = getSelectedTimeSlotAvailability(dateString, timeForDisplay)
       }
     }
   }
@@ -449,11 +528,11 @@ const dateTimeChangeText = computed(() => {
   const newTimeSlot = getSelectedTimeSlotInfo()
   if (!newTimeSlot) return ''
   
-  const existingDate = formatDateForDisplay(selectedSchedule.value.entrance_date!)
+  const existingDate = selectedSchedule.value.entrance_date ? formatDateForDisplay(selectedSchedule.value.entrance_date) : ''
   const existingTime = selectedSchedule.value.time_start
   const existingGate = selectedSchedule.value.gate_type === 1 ? '東' : '西'
   
-  const newDate = formatDateForDisplay(selectedDate.value)
+  const newDate = selectedDate.value ? formatDateForDisplay(selectedDate.value) : ''
   const newGate = newTimeSlot.gate
   const newTime = newTimeSlot.time
   
@@ -477,7 +556,7 @@ const getFromDateTimeText = () => {
     return ''
   }
   
-  const date = formatDateForDisplay(selectedSchedule.value.entrance_date!)
+  const date = selectedSchedule.value.entrance_date ? formatDateForDisplay(selectedSchedule.value.entrance_date) : ''
   const time = selectedSchedule.value.time_start
   const gate = selectedSchedule.value.gate_type === 1 ? '東' : '西'
   const result = `${date} ${gate}${time}`
@@ -494,7 +573,7 @@ const getFromDateTimeText = () => {
 const getToDateTimeText = () => {
   const newTimeSlot = getSelectedTimeSlotInfo()
   if (!newTimeSlot) return ''
-  const date = formatDateForDisplay(selectedDate.value)
+  const date = selectedDate.value ? formatDateForDisplay(selectedDate.value) : ''
   const gate = newTimeSlot.gate
   const time = newTimeSlot.time
   return `${date} ${gate}${time}`
@@ -528,7 +607,12 @@ const getSelectedTimeSlotInfo = () => {
     totalSelections: selectionOrder.value.length
   })
   
-  return { time, gate: gateText, gateType }
+  return { 
+    time: formatTimeForDisplay(time), // 表示用時間
+    timeInternal: time, // API用内部形式時間
+    gate: gateText, 
+    gateType 
+  }
 }
 
 // 選択された時間帯を優先度順に取得
@@ -560,16 +644,51 @@ const formatDateFromDateString = (dateString: string): string => {
   return dateString
 }
 
+// 時間を内部形式（"0700"）から表示形式（"7:00"）に変換
+const formatTimeForDisplay = (timeString: string): string => {
+  if (!timeString || typeof timeString !== 'string') {
+    return ''
+  }
+  
+  // 4桁の時間形式（"0700" -> "7:00"）
+  if (timeString.length === 4 && /^\d{4}$/.test(timeString)) {
+    const hour = parseInt(timeString.substring(0, 2))
+    const minute = parseInt(timeString.substring(2, 4))
+    return `${hour}:${minute.toString().padStart(2, '0')}`
+  }
+  
+  // すでに表示形式の場合はそのまま返す
+  if (timeString.includes(':')) {
+    return timeString
+  }
+  
+  return timeString
+}
+
 // 日付を「8/31」形式でフォーマット（チケットタブと同様）
 const formatDateForDisplay = (dateString: string): string => {
+  if (!dateString || typeof dateString !== 'string') {
+    return ''
+  }
+  
   if (dateString.includes('-')) {
     // YYYY-MM-DD形式の場合
     const date = new Date(dateString + 'T00:00:00')
+    // Invalid Dateの場合は空文字を返す
+    if (isNaN(date.getTime())) {
+      logger.warn('formatDateForDisplay: 不正な日付文字列 (YYYY-MM-DD)', { dateString })
+      return ''
+    }
     return `${date.getMonth() + 1}/${date.getDate()}`
   } else if (dateString.length === 8) {
     // YYYYMMDD形式の場合
     const month = parseInt(dateString.substring(4, 6))
     const day = parseInt(dateString.substring(6, 8))
+    // 月や日が不正な値でないかチェック
+    if (isNaN(month) || isNaN(day) || month < 1 || month > 12 || day < 1 || day > 31) {
+      logger.warn('formatDateForDisplay: 不正な日付文字列 (YYYYMMDD)', { dateString, month, day })
+      return ''
+    }
     return `${month}/${day}`
   }
   return dateString
@@ -586,10 +705,11 @@ const currentMonthDisplay = computed(() => {
 const availabilityDisplayTime = computed(() => {
   const priority1Selection = selectionOrder.value.find(item => item.order === 1)
   if (!priority1Selection) {
-    return null
+    // 時間帯未選択時は9時の情報をデフォルト表示
+    return "9:00"
   }
-  const time = priority1Selection.key.split('-')[0]
-  return time
+  const internalTimeFormat = priority1Selection.key.split('-')[0]
+  return formatTimeForDisplay(internalTimeFormat)
 })
 
 
@@ -625,9 +745,9 @@ const calendarDates = computed(() => {
     const todayDay = String(today.getDate()).padStart(2, '0')
     const todayString = `${todayYear}-${todayMonth}-${todayDay}`
     
-    // 空き状況をすべての月の日付に表示（選択時間帯がある場合）
+    // 空き状況をすべての月の日付に表示（時間帯選択済みまたはデフォルト9時表示）
     let availability = null
-    if (selectedTimeSlotCount.value > 0 && calendarAvailabilityCache.value) {
+    if (calendarAvailabilityCache.value) {
       availability = calendarAvailabilityCache.value[dateString] || null
     }
     
@@ -638,6 +758,7 @@ const calendarDates = computed(() => {
       isCurrentMonth,
       isToday: dateString === todayString,
       disabled: !isCurrentMonth || isDateDisabled(date),
+      isSpecialLotteryDate: isCurrentMonth && isSpecialLotteryDate(date),
       availability
     }
     
@@ -807,8 +928,8 @@ const loadTimeSlotsForDate = async (date: string) => {
     const formattedDate = date.replace(/-/g, '')
     
     // 入場予約スケジュールを取得
-    const year = parseInt(date.substring(0, 4))
-    const month = parseInt(date.substring(5, 7))
+    const year = parseInt(formattedDate.substring(0, 4))
+    const month = parseInt(formattedDate.substring(4, 6))
     
     // キャッシュからデータを取得（API呼び出しは月変更時と手動更新時のみ）
     const cacheKey = `${year}-${String(month).padStart(2, '0')}`
@@ -823,7 +944,7 @@ const loadTimeSlotsForDate = async (date: string) => {
     logger.info('キャッシュからデータ取得', { date, year, month, cacheKey })
     
     // 指定日のスケジュールを検索（0埋め形式）
-    const dayOfMonth = date.substring(8, 10) // "01", "29"
+    const dayOfMonth = formattedDate.substring(6, 8) // "01", "29"
     const dayData = scheduleData?.states?.[dayOfMonth]
     
     // デバッグ用ログ
@@ -910,7 +1031,18 @@ const getStatusFromTimeState = (timeState?: number): string => {
 
 // 日付フォーマット
 const formatDate = (dateString: string): string => {
+  if (!dateString || typeof dateString !== 'string') {
+    return ''
+  }
+  
   const date = new Date(dateString + 'T00:00:00') // UTC時刻で正確に解析
+  
+  // Invalid Dateの場合は空文字を返す
+  if (isNaN(date.getTime())) {
+    logger.warn('formatDate: 不正な日付文字列', { dateString })
+    return ''
+  }
+  
   return `${date.getMonth() + 1}/${date.getDate()}`
 }
 
@@ -971,32 +1103,111 @@ const isDateDisabled = (date: Date): boolean => {
   return targetDate < today || targetDate > maxDate
 }
 
-// 入場予約データの更新
-const refreshEntranceData = async () => {
-  logger.info('入場予約データ更新開始')
+// 抽選期間特別日付の判定
+const isSpecialLotteryDate = (date: Date): boolean => {
+  // 万博入場可能期間（2025年4月13日〜10月13日）の日付のみチェック
+  const year = date.getFullYear()
+  const month = date.getMonth() + 1 // 0-indexedなので+1
+  const day = date.getDate()
   
-  // 現在選択中の日付を保持
-  const currentSelectedDate = selectedDate.value
-  const currentSelectedSchedule = selectedSchedule.value
-  
-  // 現在の月の入場スケジュールデータを強制更新
-  const year = currentMonth.value.getFullYear()
-  const month = currentMonth.value.getMonth() + 1
-  await ticketsStore.getEntranceScheduleData(year, month, true) // 強制更新
-  
-  // 選択日付がある場合は必ず保持（schedule.selectedは自動的に保持される）
-  if (currentSelectedDate) {
-    selectedDate.value = currentSelectedDate
-    logger.info('既存の選択日付を保持', { date: currentSelectedDate, hasSchedule: !!selectedSchedule.value })
-    
-    // 選択日の時間帯データを再読み込み（選択状態を保持）
-    await loadTimeSlotsForDateWithSelection(currentSelectedDate)
-  } else {
-    // 選択日付がない場合のみデフォルト選択を実行
-    initializeDefaultSelection()
+  if (year !== 2025 || month < 4 || (month === 4 && day < 13) || month > 10 || (month === 10 && day > 13)) {
+    return false
   }
   
-  logger.info('入場予約データ更新完了')
+  // 各入場可能日に対して判定
+  const entranceDate = new Date(date)
+  
+  // 条件1: その日が「7日前抽選の期間終了日」= 入場日の8日前
+  const eightDaysBefore = new Date(entranceDate)
+  eightDaysBefore.setDate(eightDaysBefore.getDate() - 8)
+  
+  // 条件2: 「翌日が3日前抽選の開始日」= 入場日の4日前（3日前抽選開始の前日）
+  const fourDaysBefore = new Date(entranceDate)
+  fourDaysBefore.setDate(fourDaysBefore.getDate() - 4)
+  
+  // 現在の日付がこれらの特別日付のいずれかと一致するか判定
+  const currentDateString = `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`
+  const eightDaysBeforeString = `${eightDaysBefore.getFullYear()}-${String(eightDaysBefore.getMonth() + 1).padStart(2, '0')}-${String(eightDaysBefore.getDate()).padStart(2, '0')}`
+  const fourDaysBeforeString = `${fourDaysBefore.getFullYear()}-${String(fourDaysBefore.getMonth() + 1).padStart(2, '0')}-${String(fourDaysBefore.getDate()).padStart(2, '0')}`
+  
+  return currentDateString === eightDaysBeforeString || currentDateString === fourDaysBeforeString
+}
+
+// 入場予約データの更新
+const refreshEntranceData = async () => {
+  isRefreshing.value = true
+  try {
+    logger.info('[ENTRANCE:EntranceTab] 入場予約データ更新開始')
+    
+    // 現在選択中の日付を保持
+    const currentSelectedDate = selectedDate.value
+    const currentSelectedSchedule = selectedSchedule.value
+    
+    logger.info('手動更新前の状態', { 
+      currentSelectedDate, 
+      currentSelectedDateType: typeof currentSelectedDate,
+      currentSelectedDateLength: currentSelectedDate?.length,
+      hasSchedule: !!currentSelectedSchedule 
+    })
+    
+    // 現在の月の入場スケジュールデータを強制更新
+    const year = currentMonth.value.getFullYear()
+    const month = currentMonth.value.getMonth() + 1
+    
+    // API呼び出し前の状態をログ
+    logger.info('API呼び出し前のtickets状態', {
+      ticketsSize: ticketsStore.tickets.size,
+      ticketsRef: ticketsStore.tickets,
+      selectedScheduleBefore: selectedSchedule.value ? {
+        entrance_date: selectedSchedule.value.entrance_date,
+        user_visiting_reservation_id: selectedSchedule.value.user_visiting_reservation_id,
+        ref: selectedSchedule.value
+      } : null
+    })
+    
+    await ticketsStore.getEntranceScheduleData(year, month, true) // 強制更新
+    
+    // API呼び出し後の状態をログ
+    logger.info('API呼び出し後のtickets状態', {
+      ticketsSize: ticketsStore.tickets.size,
+      ticketsRef: ticketsStore.tickets,
+      selectedScheduleAfter: selectedSchedule.value ? {
+        entrance_date: selectedSchedule.value.entrance_date,
+        user_visiting_reservation_id: selectedSchedule.value.user_visiting_reservation_id,
+        ref: selectedSchedule.value
+      } : null
+    })
+    
+    logger.info('データ更新後の状態', {
+      selectedDateAfterUpdate: selectedDate.value,
+      selectedScheduleAfterUpdate: !!selectedSchedule.value
+    })
+  
+    // 選択日付がある場合は必ず保持（schedule.selectedは自動的に保持される）
+    if (currentSelectedDate && currentSelectedDate.trim() !== '') {
+      selectedDate.value = currentSelectedDate
+      logger.info('既存の選択日付を保持', { date: currentSelectedDate, hasSchedule: !!selectedSchedule.value })
+      
+      // 選択日の時間帯データを再読み込み（選択状態を保持）
+      await loadTimeSlotsForDateWithSelection(currentSelectedDate)
+    } else {
+      logger.info('選択日付が無効なためデフォルト選択を実行', { 
+        currentSelectedDate, 
+        isEmpty: !currentSelectedDate,
+        isEmptyString: currentSelectedDate === '',
+        isTrimEmpty: currentSelectedDate?.trim() === ''
+      })
+      // 選択日付がない場合のみデフォルト選択を実行
+      initializeDefaultSelection()
+    }
+    
+    logger.info('入場予約データ更新完了', {
+      finalSelectedDate: selectedDate.value,
+      finalSchedule: !!selectedSchedule.value
+    })
+  } finally {
+    isRefreshing.value = false
+  }
 }
 
 // デフォルト選択の初期化
@@ -1265,7 +1476,9 @@ const executePriorityReservation = async (slot: any) => {
     } else {
       const selectedTickets = ticketsStore.selectedTickets
       const ticketIds = selectedTickets.map(ticket => ticket.ticket_id)
-      result = await createEntranceReservation(ticketIds, selectedDate.value, apiTime, gateType)
+      if (selectedDate.value && selectedDate.value.trim() !== '') {
+        result = await createEntranceReservation(ticketIds, selectedDate.value, apiTime, gateType)
+      }
     }
     
     logger.info('最優先予約実行結果', { slot, result })
@@ -1398,9 +1611,15 @@ const executeAdditionalReservations = async (selectedTimeSlots: any[]) => {
 }
 
 
-// 予約実行時のみ時間マッピングを実行
-const getApiTimeForReservation = (displayTime: string): string => {
-  switch (displayTime) {
+// 予約実行時のみ時間マッピングを実行（内部形式を受け取り、そのまま返す）
+const getApiTimeForReservation = (internalTime: string): string => {
+  // すでに内部形式（"0700"）を受け取っているので、そのまま返す
+  if (internalTime.length === 4 && /^\d{4}$/.test(internalTime)) {
+    return internalTime
+  }
+  
+  // 万が一表示形式が渡された場合の変換
+  switch (internalTime) {
     case '9:00': return '0700'
     case '10:00': return '0900' 
     case '11:00': return '1000'
@@ -1433,8 +1652,17 @@ const executeReservation = async () => {
     selectedTimeSlots 
   })
   
-  // マネージャーに処理を委譲（選択日付を渡す）
-  await reservationManager.executeReservation(selectedTimeSlots, selectedDate.value)
+  // マネージャーに処理を委譲（選択日付、既存予約ID、元の予約情報を渡す）
+  const existingReservationId = selectedSchedule.value?.user_visiting_reservation_id || null
+  const originalReservationInfo = selectedSchedule.value ? {
+    gate: selectedSchedule.value.gate_type === 1 ? '東' : '西',
+    time: selectedSchedule.value.schedule_name?.replace('-', '') || '',
+    date: selectedDate.value
+  } : null
+  
+  if (selectedDate.value && selectedDate.value.trim() !== '') {
+    await reservationManager.executeReservation(selectedTimeSlots, selectedDate.value, existingReservationId, originalReservationInfo)
+  }
 }
 
 
@@ -1529,7 +1757,7 @@ const getSelectedTimeSlotAvailability = (dateString: string, selectedTime: strin
   // 指定日のスケジュールデータを取得
   const year = parseInt(dateString.substring(0, 4))
   const month = parseInt(dateString.substring(5, 7))
-  const day = dateString.substring(8, 10) // 0埋め形式
+  const day = dateString.substring(8, 10) // 0埋め形式 (YYYY-MM-DD形式の場合)
   
   const scheduleKey = `${year}-${String(month).padStart(2, '0')}`
   const scheduleData = ticketsStore.entranceSchedules.get(scheduleKey)
@@ -1864,8 +2092,9 @@ onMounted(async () => {
           
           .ytomo-history-items {
             display: flex;
-            flex-direction: column;
-            gap: 4px;
+            flex-direction: row;
+            gap: 8px;
+            flex-wrap: wrap;
             
             .ytomo-history-item {
               display: flex;
@@ -1887,7 +2116,6 @@ onMounted(async () => {
               
               .ytomo-history-result {
                 font-weight: 600;
-                min-width: 30px;
                 
                 .success & {
                   color: #059669;
@@ -2083,6 +2311,20 @@ onMounted(async () => {
         background: #f3f4f6;
         border-color: #9ca3af;
       }
+      
+      &:disabled {
+        cursor: not-allowed;
+        opacity: 0.7;
+      }
+    }
+    
+    .ytomo-rotating {
+      animation: ytomo-rotate 1s linear infinite;
+    }
+    
+    @keyframes ytomo-rotate {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
     }
   }
   
@@ -2208,6 +2450,18 @@ onMounted(async () => {
               }
             }
           }
+        }
+        
+        // 抽選期間特別日付の丸囲み表示
+        &.special-lottery-date .ytomo-day-number {
+          border: 2px solid #f97316; // オレンジ色の丸
+          border-radius: 50%;
+          width: 16px;
+          height: 16px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-weight: 600;
         }
       }
     }
