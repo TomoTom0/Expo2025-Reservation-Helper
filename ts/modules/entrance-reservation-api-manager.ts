@@ -37,6 +37,12 @@ export class EntranceReservationApiManager {
   
   // 選択解除用のコールバック
   private clearSelectionCallback: (() => void) | null = null
+  
+  // 設定から目標時間を取得
+  private getTargetUpdateTime(): number {
+    const storedTime = localStorage.getItem('ytomo-target-update-time')
+    return storedTime ? parseInt(storedTime) || 35 : 35
+  }
 
   // 既存予約ID（変更予約の場合に使用）
   private existingReservationId: number | null = null
@@ -132,16 +138,17 @@ export class EntranceReservationApiManager {
     logger.info('予約履歴をクリアしました')
   }
 
-  // 35秒まで待機
+  // 設定された目標時間まで待機
   public async waitUntil35Seconds(selectedTimeSlots: any[]) {
     if (!this.isReservationRunning.value) return
     
-    // 次の35秒まで待機
+    const targetTime = this.getTargetUpdateTime()
+    // 設定された目標時間まで待機
     const now = new Date()
     const currentSeconds = now.getSeconds()
-    const waitTime = currentSeconds <= 35 ? 
-      (35 - currentSeconds) * 1000 : 
-      (60 + 35 - currentSeconds) * 1000
+    const waitTime = currentSeconds <= targetTime ? 
+      (targetTime - currentSeconds) * 1000 : 
+      (60 + targetTime - currentSeconds) * 1000
     
     // 初回のみ：10秒以上の待機時間の場合は即座に1回実行
     if (this.flag_first.value && waitTime >= 10000) {
@@ -191,8 +198,8 @@ export class EntranceReservationApiManager {
       
       if (!this.isReservationRunning.value) return
 
-      // 3. 次の分の35秒まで待機
-      this.scheduleNextMinute35(selectedTimeSlots)
+      // 3. 次の分の目標時間まで待機
+      this.scheduleNextMinuteTargetTime(selectedTimeSlots)
 
       
     } catch (error) {
@@ -328,16 +335,17 @@ export class EntranceReservationApiManager {
     }
   }
 
-  // 次の分の35秒まで待機
-  private async scheduleNextMinute35(selectedTimeSlots: any[]) {
+  // 次の分の目標時間まで待機
+  private async scheduleNextMinuteTargetTime(selectedTimeSlots: any[]) {
     if (!this.isReservationRunning.value) return
     
+    const targetTime = this.getTargetUpdateTime()
     const now = new Date()
     const currentMinute = now.getMinutes()
     const currentSecond = now.getSeconds()
     
-    // 次の35秒までの待機時間を計算（5-65秒の範囲）
-    let waitTimeSeconds = (35 - currentSecond + 60) % 60
+    // 次の目標時間までの待機時間を計算（5-65秒の範囲）
+    let waitTimeSeconds = (targetTime - currentSecond + 60) % 60
     if (waitTimeSeconds < 5) {
       waitTimeSeconds += 60  // 5秒未満の場合は次の分まで待機
     }
@@ -517,7 +525,7 @@ export class EntranceReservationApiManager {
     this.reservationInfo.value = {
       visible: true,
       date: this.formatDateForDisplay(new Date(targetDate + 'T00:00:00')),
-      timeSlots: originalReservationInfo ? [originalReservationInfo] : selectedTimeSlots,
+      timeSlots: selectedTimeSlots, // これから実行する予約情報を表示
       completed: false
     }
 
@@ -599,19 +607,19 @@ export class EntranceReservationApiManager {
       const currentYear = new Date().getFullYear()
       const [month, day] = rawDate.split('/')
       const entranceDate = `${currentYear}${month.padStart(2, '0')}${day.padStart(2, '0')}`
-      const gateType = slot.gate === '東' ? '1' : '2'
+      const gateType = slot.gate === '東' ? 1 : 2
+      
+      // 新規予約か変更予約かを判定
+      const isChangeReservation = this.existingReservationId && this.existingReservationId > 0
       
       logger.info('万博予約API呼び出し開始', {
-        ticketIds: selectedTickets,
+        ticketIds: selectedTickets.length,
         rawDate,
         entranceDate,
         time: slot.time,
         gateType,
-        slot
+        method: isChangeReservation ? 'PUT' : 'POST'
       })
-      
-      // 新規予約か変更予約かを判定
-      const isChangeReservation = this.existingReservationId && this.existingReservationId > 0
       const method = isChangeReservation ? 'PUT' : 'POST'
       
       let body: any
@@ -632,6 +640,7 @@ export class EntranceReservationApiManager {
           entrance_date: entranceDate
         }
       }
+
 
       const response = await fetch('/api/d/user_visiting_reservations', {
         method,
@@ -691,10 +700,20 @@ export class EntranceReservationApiManager {
           }
         }
       } else {
-        const error = await response.json()
+        let errorDetail
+        try {
+          errorDetail = await response.json()
+        } catch (e) {
+          errorDetail = await response.text()
+        }
+        
         logger.warn('予約失敗', { 
-          日時: `${slot.date} APIレベル`,
-          理由: error.message || 'API呼び出しに失敗しました'
+          日時: `${entranceDate} ${slot.gate}ゲート ${slot.time} APIレベル`,
+          httpStatus: response.status,
+          httpStatusText: response.statusText,
+          errorDetail,
+          sentBody: body,
+          理由: errorDetail?.message || errorDetail?.error || 'API呼び出しに失敗しました'
         })
         
         // エラー時も一定時間待機してから次の処理へ
@@ -704,7 +723,7 @@ export class EntranceReservationApiManager {
         
         return { 
           success: false, 
-          error: error.message || '予約に失敗しました' 
+          error: errorDetail?.message || errorDetail?.error || '予約に失敗しました' 
         }
       }
     } catch (error) {

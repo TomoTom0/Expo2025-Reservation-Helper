@@ -46,3 +46,5 @@ dist-ts/
 *.backup
 *-backup.*
 *-temp.*
+
+_archived/

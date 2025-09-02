@@ -46,6 +46,16 @@
             </div>
           </button>
           <button 
+            class="ytomo-tab-button ytomo-tab-others"
+            :class="{ active: activeTab === 'others' }"
+            @click="setActiveTab('others')"
+            data-tab="others"
+          >
+            <div class="ytomo-tab-content">
+              <div class="ytomo-tab-title">他</div>
+            </div>
+          </button>
+          <button 
             v-if="!isYtomoPage"
             class="ytomo-dialog-close" 
             aria-label="閉じる"
@@ -76,6 +86,13 @@
           >
             <EntranceTab />
           </div>
+          <div 
+            class="ytomo-tab-pane"
+            :class="{ active: activeTab === 'others' }"
+            id="others-tab"
+          >
+            <OthersTab />
+          </div>
         </div>
       </div>
     </div>
@@ -96,6 +113,7 @@ import { loggers } from '@/utils/logger'
 import TicketTab from './TicketTab.vue'
 import PavilionTab from './PavilionTab.vue'
 import EntranceTab from './EntranceTab.vue'
+import OthersTab from './OthersTab.vue'
 
 const logger = loggers.ui
 
@@ -371,6 +389,12 @@ onUnmounted(() => {
     position: relative;
     transition: all 0.2s;
     border-bottom: 3px solid transparent;
+    
+    &.ytomo-tab-others {
+      flex: 0 0 60px; /* 他タブの幅を60pxに固定 */
+      min-width: 60px;
+      padding: 16px 8px; /* 左右のパディングを狭く */
+    }
 }
 
 .ytomo-tab-button:hover {

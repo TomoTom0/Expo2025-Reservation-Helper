@@ -11,7 +11,7 @@ export const useMainDialogStore = defineStore('mainDialog', () => {
   
   // State - 初期化時に強制的にfalseに設定（永続化の問題を回避）
   const isVisible = ref(false)
-  const activeTab = ref<'ticket' | 'pavilion' | 'entrance'>('ticket')
+  const activeTab = ref<'ticket' | 'pavilion' | 'entrance' | 'others'>('ticket')
   const version = ref('0.5.4') // version.datから動的に読み込む予定
   // selectedEntranceDate は計算プロパティで取得するため削除
 
@@ -31,7 +31,7 @@ export const useMainDialogStore = defineStore('mainDialog', () => {
     isVisible.value = false
   }
 
-  const setActiveTab = (tab: 'ticket' | 'pavilion' | 'entrance') => {
+  const setActiveTab = (tab: 'ticket' | 'pavilion' | 'entrance' | 'others') => {
     activeTab.value = tab
   }
 

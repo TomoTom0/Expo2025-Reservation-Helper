@@ -261,18 +261,18 @@ const isRefreshing = ref(false) // 手動更新中フラグ
 const isTimeSlotDisabled = (gate: string, time: string) => {
   if (!selectedDate.value) return false
   
-  const selectedDateStr = selectedDate.value!
-  const selectedDateYYYYMMDD = selectedDateStr.replace(/-/g, '') // YYYY-MM-DD → YYYYMMDD
+  const selectedDateStr = selectedDate.value! // 内部形式（YYYY-MM-DD）
   const gateType = gate === 'east' ? 1 : 2
   
   // 同じ日付の既存予約があるかチェック
-  
   for (const ticket of ticketsStore.tickets.values()) {
     if (ticket.schedules) {
       for (const schedule of ticket.schedules) {
+        // schedule.entrance_date（YYYYMMDD）を内部形式に正規化して比較
+        const scheduleDate = dateHelpers.normalize(schedule.entrance_date)
         
         if (schedule.selected && 
-            schedule.entrance_date === selectedDateYYYYMMDD &&
+            scheduleDate === selectedDateStr &&
             schedule.gate_type === gateType &&
             schedule.time_start === time) {
           return true
@@ -344,10 +344,13 @@ watch(selectedSchedule, (newSchedule, oldSchedule) => {
       currentSelectedDate: selectedDate.value
     })
     
-    // カレンダー選択日を新しい入場日に同期
+    // カレンダー選択日を新しい入場日に同期（YYYYMMDD→YYYY-MM-DDに正規化）
     if (newSchedule.entrance_date) {
-      selectedDate.value = newSchedule.entrance_date
-      logger.info('selectedDate.value更新完了', { newValue: selectedDate.value })
+      selectedDate.value = dateHelpers.normalize(newSchedule.entrance_date)
+      logger.info('selectedDate.value更新完了', { 
+        original: newSchedule.entrance_date, 
+        normalized: selectedDate.value 
+      })
     }
     
     // 時間帯選択を解除（disabled状態になった選択も含めて全解除）
@@ -357,9 +360,9 @@ watch(selectedSchedule, (newSchedule, oldSchedule) => {
       slot.west.selected = false
     })
     
-    // 選択日の時間帯データを再読み込み
-    if (newSchedule.entrance_date) {
-      loadTimeSlotsForDate(newSchedule.entrance_date)
+    // 選択日の時間帯データを再読み込み（内部形式で呼び出し）
+    if (selectedDate.value) {
+      loadTimeSlotsForDate(selectedDate.value)
     }
     
     logger.info('入場日時連動処理完了', { 
@@ -528,11 +531,11 @@ const dateTimeChangeText = computed(() => {
   const newTimeSlot = getSelectedTimeSlotInfo()
   if (!newTimeSlot) return ''
   
-  const existingDate = selectedSchedule.value.entrance_date ? formatDateForDisplay(selectedSchedule.value.entrance_date) : ''
+  const existingDate = selectedSchedule.value.entrance_date ? formatDate(selectedSchedule.value.entrance_date) : ''
   const existingTime = selectedSchedule.value.time_start
   const existingGate = selectedSchedule.value.gate_type === 1 ? '東' : '西'
   
-  const newDate = selectedDate.value ? formatDateForDisplay(selectedDate.value) : ''
+  const newDate = selectedDate.value ? formatDate(selectedDate.value) : ''
   const newGate = newTimeSlot.gate
   const newTime = newTimeSlot.time
   
@@ -556,7 +559,7 @@ const getFromDateTimeText = () => {
     return ''
   }
   
-  const date = selectedSchedule.value.entrance_date ? formatDateForDisplay(selectedSchedule.value.entrance_date) : ''
+  const date = selectedSchedule.value.entrance_date ? formatDate(selectedSchedule.value.entrance_date) : ''
   const time = selectedSchedule.value.time_start
   const gate = selectedSchedule.value.gate_type === 1 ? '東' : '西'
   const result = `${date} ${gate}${time}`
@@ -573,7 +576,7 @@ const getFromDateTimeText = () => {
 const getToDateTimeText = () => {
   const newTimeSlot = getSelectedTimeSlotInfo()
   if (!newTimeSlot) return ''
-  const date = selectedDate.value ? formatDateForDisplay(selectedDate.value) : ''
+  const date = selectedDate.value ? formatDate(selectedDate.value) : ''
   const gate = newTimeSlot.gate
   const time = newTimeSlot.time
   return `${date} ${gate}${time}`
@@ -665,34 +668,6 @@ const formatTimeForDisplay = (timeString: string): string => {
   return timeString
 }
 
-// 日付を「8/31」形式でフォーマット（チケットタブと同様）
-const formatDateForDisplay = (dateString: string): string => {
-  if (!dateString || typeof dateString !== 'string') {
-    return ''
-  }
-  
-  if (dateString.includes('-')) {
-    // YYYY-MM-DD形式の場合
-    const date = new Date(dateString + 'T00:00:00')
-    // Invalid Dateの場合は空文字を返す
-    if (isNaN(date.getTime())) {
-      logger.warn('formatDateForDisplay: 不正な日付文字列 (YYYY-MM-DD)', { dateString })
-      return ''
-    }
-    return `${date.getMonth() + 1}/${date.getDate()}`
-  } else if (dateString.length === 8) {
-    // YYYYMMDD形式の場合
-    const month = parseInt(dateString.substring(4, 6))
-    const day = parseInt(dateString.substring(6, 8))
-    // 月や日が不正な値でないかチェック
-    if (isNaN(month) || isNaN(day) || month < 1 || month > 12 || day < 1 || day > 31) {
-      logger.warn('formatDateForDisplay: 不正な日付文字列 (YYYYMMDD)', { dateString, month, day })
-      return ''
-    }
-    return `${month}/${day}`
-  }
-  return dateString
-}
 
 // カレンダー表示用データ
 const weekdays = ['日', '月', '火', '水', '木', '金', '土']
@@ -1029,17 +1004,37 @@ const getStatusFromTimeState = (timeState?: number): string => {
   }
 }
 
-// 日付フォーマット
+// 日付フォーマット（YYYY-MM-DDとYYYYMMDD両対応）
 const formatDate = (dateString: string): string => {
   if (!dateString || typeof dateString !== 'string') {
     return ''
   }
   
-  const date = new Date(dateString + 'T00:00:00') // UTC時刻で正確に解析
+  if (dateString.includes('-')) {
+    // YYYY-MM-DD形式の場合
+    const date = new Date(dateString + 'T00:00:00')
+    // Invalid Dateの場合は空文字を返す
+    if (isNaN(date.getTime())) {
+      logger.warn('formatDate: 不正な日付文字列 (YYYY-MM-DD)', { dateString })
+      return ''
+    }
+    return `${date.getMonth() + 1}/${date.getDate()}`
+  } else if (dateString.length === 8) {
+    // YYYYMMDD形式の場合
+    const month = parseInt(dateString.substring(4, 6))
+    const day = parseInt(dateString.substring(6, 8))
+    // 月や日が不正な値でないかチェック
+    if (isNaN(month) || isNaN(day) || month < 1 || month > 12 || day < 1 || day > 31) {
+      logger.warn('formatDate: 不正な日付文字列 (YYYYMMDD)', { dateString, month, day })
+      return ''
+    }
+    return `${month}/${day}`
+  }
   
-  // Invalid Dateの場合は空文字を返す
+  // その他の形式の場合、YYYY-MM-DD形式として扱う
+  const date = new Date(dateString + 'T00:00:00')
   if (isNaN(date.getTime())) {
-    logger.warn('formatDate: 不正な日付文字列', { dateString })
+    logger.warn('formatDate: 不正な日付文字列 (その他)', { dateString })
     return ''
   }
   
@@ -1077,7 +1072,7 @@ const getStatusAlt = (status: string): string => {
 // 指定日に予約があるかチェック
 const hasReservationForDate = (dateString: string): boolean => {
   const selectedTickets = ticketsStore.selectedTickets
-  const targetDate = dateString.replace(/-/g, '') // YYYYMMDD形式に変換
+  const targetDate = dateHelpers.toApiFormat(dateString)
   
   for (const ticket of selectedTickets) {
     if (ticket.schedules) {
@@ -1249,7 +1244,7 @@ const initializeDefaultSelection = () => {
         
         if (schedule.selected && ticket.isOwn) {
           // 選択済みの入場予約がある場合、その日付をデフォルト選択
-          const formattedDate = formatScheduleDate(schedule.entrance_date)
+          const formattedDate = dateHelpers.normalize(schedule.entrance_date)
           selectedDate.value = formattedDate
           // schedule.selectedは既にtrueの状態
           
@@ -1311,16 +1306,7 @@ const initializeDefaultSelection = () => {
   })
 }
 
-// スケジュールの日付をISO形式に変換
-const formatScheduleDate = (dateString: string): string => {
-  if (dateString.length === 8) {
-    const year = dateString.substring(0, 4)
-    const month = dateString.substring(4, 6)
-    const day = dateString.substring(6, 8)
-    return `${year}-${month}-${day}`
-  }
-  return dateString
-}
+// 注意: formatScheduleDate は dateHelpers.normalize に統一されました
 
 // 毎分35秒タイマーを開始
 const startReservationCycle = (selectedTimeSlots: any[]) => {
@@ -1467,7 +1453,7 @@ const executeParallelTasks = async (selectedTimeSlots: any[]) => {
 // 最優先予約を実行
 const executePriorityReservation = async (slot: any) => {
   try {
-    const apiTime = getApiTimeForReservation(slot.time)
+    const apiTime = getApiTimeKey(slot.time)
     const gateType = slot.gate === '東' ? '1' : '2'
     
     let result
@@ -1537,7 +1523,7 @@ const executeAdditionalReservations = async (selectedTimeSlots: any[]) => {
     
     // 空き状況を確認
     const gateKey = slot.gate === '東' ? '1' : '2'
-    const timeKey = getApiTimeForReservation(slot.time)
+    const timeKey = getApiTimeKey(slot.time)
     const timeState = availabilityData[gateKey]?.[timeKey]?.time_state
     
     // time_state: 0=空きあり, 1=残り少ない, 2=満席, 4=利用不可
@@ -1611,21 +1597,45 @@ const executeAdditionalReservations = async (selectedTimeSlots: any[]) => {
 }
 
 
-// 予約実行時のみ時間マッピングを実行（内部形式を受け取り、そのまま返す）
-const getApiTimeForReservation = (internalTime: string): string => {
-  // すでに内部形式（"0700"）を受け取っているので、そのまま返す
-  if (internalTime.length === 4 && /^\d{4}$/.test(internalTime)) {
-    return internalTime
-  }
+// 日付形式変換ヘルパー関数群
+const dateHelpers = {
+  // YYYY-MM-DD → YYYYMMDD
+  toApiFormat: (dateString: string): string => {
+    if (!dateString) return ''
+    return dateString.replace(/-/g, '')
+  },
   
-  // 万が一表示形式が渡された場合の変換
-  switch (internalTime) {
+  // YYYYMMDD → YYYY-MM-DD
+  toDisplayFormat: (dateString: string): string => {
+    if (!dateString || dateString.length !== 8) return dateString
+    return `${dateString.substring(0, 4)}-${dateString.substring(4, 6)}-${dateString.substring(6, 8)}`
+  },
+  
+  // 日付文字列の正規化（どちらの形式でも内部形式YYYY-MM-DDに統一）
+  normalize: (dateString: string): string => {
+    if (!dateString) return ''
+    if (dateString.length === 8) {
+      return dateHelpers.toDisplayFormat(dateString)
+    }
+    return dateString // 既にYYYY-MM-DD形式
+  }
+}
+
+// 表示時間からAPI時間キーを取得（共通関数）
+const getApiTimeKey = (displayTime: string): string => {
+  switch (displayTime) {
     case '9:00': return '0700'
     case '10:00': return '0900' 
     case '11:00': return '1000'
     case '12:00': return '1100'
     case '17:00': return '1600'
-    default: return ''
+    default: 
+      // API形式がそのまま渡された場合（互換性のため）
+      if (displayTime.length === 4 && /^\d{4}$/.test(displayTime)) {
+        return displayTime
+      }
+      logger.warn('未対応の時間形式', { displayTime })
+      return ''
   }
 }
 
@@ -1680,7 +1690,7 @@ const createEntranceReservation = async (ticketIds: string[], entranceDate: stri
       ticket_ids: ticketIds,
       start_time: startTime,
       gate_type: gateType,
-      entrance_date: entranceDate.replace(/-/g, '') // YYYY-MM-DD → YYYYMMDD
+      entrance_date: dateHelpers.toApiFormat(entranceDate)
     })
   })
   
@@ -1707,7 +1717,7 @@ const changeEntranceReservation = async (reservationId: number, startTime: strin
       user_visiting_reservation_ids: [reservationId],
       start_time: startTime,
       gate_type: gateType,
-      entrance_date: selectedDate.value.replace(/-/g, '') // YYYY-MM-DD → YYYYMMDD
+      entrance_date: dateHelpers.toApiFormat(selectedDate.value)
     })
   })
   
@@ -1770,17 +1780,7 @@ const getSelectedTimeSlotAvailability = (dateString: string, selectedTime: strin
   const eastGate = dayData['1']
   const westGate = dayData['2']
   
-  // 表示時間から直接対応するAPI時間キーを取得
-  const getApiTimeKey = (displayTime: string): string => {
-    switch (displayTime) {
-      case '9:00': return '0700'
-      case '10:00': return '0900' 
-      case '11:00': return '1000'
-      case '12:00': return '1100'
-      case '17:00': return '1600'
-      default: return ''
-    }
-  }
+  // グローバルのgetApiTimeKey関数を使用
   
   const apiTime = getApiTimeKey(selectedTime)
   if (!apiTime) {
@@ -2219,17 +2219,6 @@ onMounted(async () => {
         }
       }
       
-      .ytomo-calendar-toggle {
-        font-size: 11px;
-        color: #6b7280;
-        cursor: pointer;
-        padding: 3px 6px;
-        border-radius: 3px;
-        
-        &:hover {
-          background: #f3f4f6;
-        }
-      }
     }
   }
   
