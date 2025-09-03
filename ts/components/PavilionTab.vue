@@ -1047,6 +1047,89 @@ const formatTimeSlot = (timeStr: string): string => {
 }
 
 
+// スケジュール実行イベントハンドラ
+const handleScheduleExecuteReservation = async (event: Event) => {
+  const customEvent = event as CustomEvent
+  const { scheduleId, schedule, executionRecord } = customEvent.detail
+  
+  logger.info('スケジュール実行イベント受信', { 
+    scheduleId, 
+    label: schedule.label,
+    timeSlotsCount: schedule.selectedTimeSlots.length 
+  })
+
+  try {
+    // Sequential Reservation用のターゲットに変換
+    const reservationTargets = schedule.selectedTimeSlots.map((slot: any) => ({
+      pavilionId: slot.pavilionId,
+      pavilionName: slot.pavilionName,
+      timeSlot: formatTimeSlot(slot.timeSlot),
+      entranceDate: slot.entranceDate,
+      registeredChannel: '4', // デフォルトはfast
+      ticketIds: [] // チケットIDは現在の選択状態から取得
+    }))
+
+    // 選択されたチケットIDを取得
+    const selectedTickets = ticketsStore.ticketsArray.filter(ticket => 
+      ticket.schedules?.some(schedule => schedule.selected)
+    )
+    const ticketIds = selectedTickets.map(t => t.ticket_id)
+
+    if (ticketIds.length === 0) {
+      throw new Error('チケットが選択されていません')
+    }
+
+    // チケットIDを設定
+    reservationTargets.forEach((target: any) => {
+      target.ticketIds = ticketIds
+    })
+
+    logger.info('スケジュール予約実行開始', {
+      scheduleId,
+      targetsCount: reservationTargets.length,
+      interval: schedule.interval,
+      maxRetries: schedule.maxRetries
+    })
+
+    // Sequential Reservationで予約実行
+    sequentialReservationStore.startSequentialReservation(reservationTargets, false)
+    
+    // 特別な設定で実行（スケジュール用のカスタマイズ）
+    const results = await sequentialReservationStore.executeSequentialReservation(
+      pavilionsStore.executeReservation,
+      [], // selectedSlotsはスケジュールでは不要
+      formatTimeSlot,
+      logger
+    )
+
+    // 結果をスケジュールストアに反映
+    const successCount = results.filter(r => r.success).length
+    const success = successCount > 0
+    
+    scheduledReservationStore.updateScheduleExecutionResult(
+      scheduleId,
+      success,
+      success ? undefined : `${results.length - successCount}件失敗`
+    )
+
+    logger.info('スケジュール予約実行結果', {
+      scheduleId,
+      successCount,
+      totalCount: results.length,
+      overallSuccess: success
+    })
+
+  } catch (error) {
+    logger.error('スケジュール予約実行エラー', { scheduleId, error })
+    
+    scheduledReservationStore.updateScheduleExecutionResult(
+      scheduleId,
+      false,
+      error instanceof Error ? error.message : String(error)
+    )
+  }
+}
+
 // 複製編集イベントハンドラ
 const handleScheduleDuplicateEdit = async (event: Event) => {
   const customEvent = event as CustomEvent
@@ -1108,13 +1191,15 @@ onMounted(() => {
   // スケジュールフォームの初期化
   resetScheduleForm()
   
-  // 複製編集イベントリスナーを登録
+  // スケジュール関連イベントリスナーを登録
+  window.addEventListener('schedule-execute-reservation', handleScheduleExecuteReservation as EventListener)
   window.addEventListener('schedule-duplicate-edit', handleScheduleDuplicateEdit as EventListener)
 })
 
 onUnmounted(() => {
   logger.info('PavilionTab unmounted')
   // イベントリスナーを削除
+  window.removeEventListener('schedule-execute-reservation', handleScheduleExecuteReservation as EventListener)
   window.removeEventListener('schedule-duplicate-edit', handleScheduleDuplicateEdit as EventListener)
 })
 </script>

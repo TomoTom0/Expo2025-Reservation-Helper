@@ -332,9 +332,68 @@ export const useScheduledReservationStore = defineStore('scheduledReservation', 
   }
 
   const executeScheduledReservation = async (scheduleId: string) => {
-    // TODO: 実際の予約実行ロジックを実装
-    // Sequential Reservationとの連携が必要
-    logger.info('スケジュール予約実行（未実装）', { scheduleId })
+    const schedule = scheduledReservations.value.get(scheduleId)
+    if (!schedule || !schedule.isEnabled) {
+      logger.error('スケジュールが無効または存在しない', { scheduleId })
+      return
+    }
+
+    // アクティブスケジュールから削除
+    executionState.value.activeSchedules.delete(scheduleId)
+    executionState.value.isAnyScheduleRunning = executionState.value.activeSchedules.size > 0
+
+    try {
+      logger.info('スケジュール予約実行開始', { 
+        scheduleId, 
+        label: schedule.label,
+        timeSlotsCount: schedule.selectedTimeSlots.length 
+      })
+
+      // 実行履歴に記録を追加
+      const executionRecord: ScheduleExecutionRecord = {
+        scheduleId: schedule.id,
+        scheduleLabel: schedule.label,
+        executedAt: new Date(),
+        success: false,
+        attemptNumber: 1,
+        totalAttempts: schedule.maxRetries
+      }
+
+      // Sequential Reservationとの連携のためのイベントを発火
+      const event = new CustomEvent('schedule-execute-reservation', {
+        detail: {
+          scheduleId: schedule.id,
+          schedule: schedule,
+          executionRecord: executionRecord
+        }
+      })
+      window.dispatchEvent(event)
+      
+      // 実行履歴に追加（成功判定はSequential Reservation側で行う）
+      executionState.value.executionHistory.unshift(executionRecord)
+      
+      // 履歴を100件に制限
+      if (executionState.value.executionHistory.length > 100) {
+        executionState.value.executionHistory = executionState.value.executionHistory.slice(0, 100)
+      }
+
+      logger.info('スケジュール予約実行処理完了', { scheduleId })
+      
+    } catch (error) {
+      logger.error('スケジュール予約実行エラー', { scheduleId, error })
+      
+      // エラーを履歴に記録
+      const errorRecord: ScheduleExecutionRecord = {
+        scheduleId: schedule.id,
+        scheduleLabel: schedule.label,
+        executedAt: new Date(),
+        success: false,
+        error: error instanceof Error ? error.message : String(error),
+        attemptNumber: 1,
+        totalAttempts: schedule.maxRetries
+      }
+      executionState.value.executionHistory.unshift(errorRecord)
+    }
   }
 
   const stopAllScheduleExecutions = () => {
@@ -346,10 +405,50 @@ export const useScheduledReservationStore = defineStore('scheduledReservation', 
     logger.info('全スケジュール実行を停止')
   }
 
+  // スケジュール結果更新
+  const updateScheduleExecutionResult = (scheduleId: string, success: boolean, error?: string) => {
+    const latestRecord = executionState.value.executionHistory.find(record => 
+      record.scheduleId === scheduleId
+    )
+    
+    if (latestRecord) {
+      latestRecord.success = success
+      if (error) {
+        latestRecord.error = error
+      }
+      
+      logger.info('スケジュール実行結果更新', { 
+        scheduleId, 
+        success, 
+        error 
+      })
+    }
+  }
+
+  // 有効なスケジュールを自動開始
+  const startEnabledSchedules = () => {
+    const now = new Date()
+    const enabledSchedules = scheduledReservationsArray.value.filter(schedule => 
+      schedule.isEnabled && schedule.executeAt > now
+    )
+
+    enabledSchedules.forEach(schedule => {
+      startScheduleExecution(schedule.id)
+    })
+
+    logger.info('有効スケジュール自動開始', { 
+      count: enabledSchedules.length 
+    })
+  }
+
   // 初期化
   const initialize = () => {
     loadFromStorage()
     loadUIState()
+    
+    // 有効なスケジュールを自動開始
+    startEnabledSchedules()
+    
     logger.info('スケジュール予約ストアを初期化', { 
       schedulesCount: scheduledReservations.value.size 
     })
@@ -384,6 +483,10 @@ export const useScheduledReservationStore = defineStore('scheduledReservation', 
     startScheduleExecution,
     stopScheduleExecution,
     stopAllScheduleExecutions,
+
+    // Actions - 実行結果管理
+    updateScheduleExecutionResult,
+    startEnabledSchedules,
 
     // Actions - 初期化
     initialize
