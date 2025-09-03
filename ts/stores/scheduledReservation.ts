@@ -1,0 +1,391 @@
+/**
+ * スケジュール予約管理ストア
+ */
+
+import { defineStore } from 'pinia'
+import { ref, computed } from 'vue'
+import type { 
+  ScheduledReservation, 
+  ScheduleUIState, 
+  ScheduleFormData,
+  ScheduleExecutionState,
+  ScheduleExecutionRecord,
+  ScheduledTimeSlot
+} from '@/types/scheduledReservation'
+import { loggers } from '@/utils/logger'
+
+const logger = loggers.ui
+
+export const useScheduledReservationStore = defineStore('scheduledReservation', () => {
+  // ストレージキー
+  const STORAGE_KEY = 'ytomo-scheduled-reservations'
+  const UI_STATE_KEY = 'ytomo-schedule-ui-state'
+
+  // スケジュール予約データ
+  const scheduledReservations = ref<Map<string, ScheduledReservation>>(new Map())
+  
+  // UI状態
+  const uiState = ref<ScheduleUIState>({
+    showScheduleRow: false,
+    showScheduleDialog: false,
+    selectedScheduleId: null,
+    editingSchedule: null
+  })
+
+  // 実行状態
+  const executionState = ref<ScheduleExecutionState>({
+    activeSchedules: new Map(),
+    executionHistory: [],
+    isAnyScheduleRunning: false
+  })
+
+  // 計算プロパティ
+  const scheduledReservationsArray = computed(() => {
+    return Array.from(scheduledReservations.value.values()).sort((a, b) => 
+      a.executeAt.getTime() - b.executeAt.getTime()
+    )
+  })
+
+  const enabledSchedules = computed(() => {
+    return scheduledReservationsArray.value.filter(schedule => schedule.isEnabled)
+  })
+
+  const selectedSchedule = computed(() => {
+    if (!uiState.value.selectedScheduleId) return null
+    return scheduledReservations.value.get(uiState.value.selectedScheduleId) || null
+  })
+
+  // データ永続化
+  const saveToStorage = () => {
+    try {
+      const data = Array.from(scheduledReservations.value.entries()).map(([id, schedule]) => [
+        id, 
+        {
+          ...schedule,
+          executeAt: schedule.executeAt.toISOString(),
+          createdAt: schedule.createdAt.toISOString(),
+          updatedAt: schedule.updatedAt.toISOString()
+        }
+      ])
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(data))
+      logger.debug('スケジュール予約データを保存', { count: data.length })
+    } catch (error) {
+      logger.error('スケジュール予約データ保存エラー', error)
+    }
+  }
+
+  const loadFromStorage = () => {
+    try {
+      const stored = localStorage.getItem(STORAGE_KEY)
+      if (!stored) return
+
+      const data = JSON.parse(stored)
+      const loadedMap = new Map()
+
+      data.forEach(([id, schedule]: [string, any]) => {
+        loadedMap.set(id, {
+          ...schedule,
+          executeAt: new Date(schedule.executeAt),
+          createdAt: new Date(schedule.createdAt),
+          updatedAt: new Date(schedule.updatedAt)
+        })
+      })
+
+      scheduledReservations.value = loadedMap
+      logger.info('スケジュール予約データを読み込み', { count: loadedMap.size })
+    } catch (error) {
+      logger.error('スケジュール予約データ読み込みエラー', error)
+    }
+  }
+
+  const saveUIState = () => {
+    try {
+      localStorage.setItem(UI_STATE_KEY, JSON.stringify(uiState.value))
+    } catch (error) {
+      logger.error('UI状態保存エラー', error)
+    }
+  }
+
+  const loadUIState = () => {
+    try {
+      const stored = localStorage.getItem(UI_STATE_KEY)
+      if (stored) {
+        const loaded = JSON.parse(stored)
+        // ダイアログ状態は復元しない（起動時は必ず閉じた状態）
+        uiState.value = {
+          ...loaded,
+          showScheduleDialog: false,
+          editingSchedule: null
+        }
+      }
+    } catch (error) {
+      logger.error('UI状態読み込みエラー', error)
+    }
+  }
+
+  // スケジュール予約の操作
+  const createScheduledReservation = (
+    formData: ScheduleFormData,
+    selectedTimeSlots: ScheduledTimeSlot[]
+  ): string => {
+    const id = `schedule_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+    
+    // 実行日時を作成
+    const [year, month, day] = formData.executeDate.split('-').map(Number)
+    const [hour, minute] = formData.executeTime.split(':').map(Number)
+    const executeAt = new Date(year, month - 1, day, hour, minute)
+
+    const now = new Date()
+    const scheduledReservation: ScheduledReservation = {
+      id,
+      label: formData.label,
+      executeAt,
+      interval: formData.interval,
+      maxRetries: formData.maxRetries,
+      isEnabled: formData.isEnabled,
+      selectedTimeSlots: [...selectedTimeSlots],
+      createdAt: now,
+      updatedAt: now
+    }
+
+    scheduledReservations.value.set(id, scheduledReservation)
+    saveToStorage()
+
+    logger.info('スケジュール予約を作成', { 
+      id, 
+      label: formData.label, 
+      executeAt: executeAt.toLocaleString(),
+      timeSlotsCount: selectedTimeSlots.length 
+    })
+
+    return id
+  }
+
+  const updateScheduledReservation = (
+    id: string,
+    formData: ScheduleFormData,
+    selectedTimeSlots: ScheduledTimeSlot[]
+  ): boolean => {
+    const existing = scheduledReservations.value.get(id)
+    if (!existing) {
+      logger.error('更新対象のスケジュール予約が見つからない', { id })
+      return false
+    }
+
+    // 実行日時を作成
+    const [year, month, day] = formData.executeDate.split('-').map(Number)
+    const [hour, minute] = formData.executeTime.split(':').map(Number)
+    const executeAt = new Date(year, month - 1, day, hour, minute)
+
+    const updated: ScheduledReservation = {
+      ...existing,
+      label: formData.label,
+      executeAt,
+      interval: formData.interval,
+      maxRetries: formData.maxRetries,
+      isEnabled: formData.isEnabled,
+      selectedTimeSlots: [...selectedTimeSlots],
+      updatedAt: new Date()
+    }
+
+    scheduledReservations.value.set(id, updated)
+    saveToStorage()
+
+    logger.info('スケジュール予約を更新', { 
+      id, 
+      label: formData.label,
+      executeAt: executeAt.toLocaleString(),
+      timeSlotsCount: selectedTimeSlots.length 
+    })
+
+    return true
+  }
+
+  const deleteScheduledReservation = (id: string): boolean => {
+    const existing = scheduledReservations.value.get(id)
+    if (!existing) {
+      logger.error('削除対象のスケジュール予約が見つからない', { id })
+      return false
+    }
+
+    // 実行中の場合は停止
+    stopScheduleExecution(id)
+
+    scheduledReservations.value.delete(id)
+    saveToStorage()
+
+    // 選択中だった場合は選択解除
+    if (uiState.value.selectedScheduleId === id) {
+      uiState.value.selectedScheduleId = null
+    }
+
+    logger.info('スケジュール予約を削除', { id, label: existing.label })
+    return true
+  }
+
+  const duplicateScheduledReservation = (id: string, newLabel?: string): string | null => {
+    const original = scheduledReservations.value.get(id)
+    if (!original) {
+      logger.error('複製元のスケジュール予約が見つからない', { id })
+      return null
+    }
+
+    const copyLabel = newLabel || `${original.label}_COPY`
+    const formData: ScheduleFormData = {
+      label: copyLabel,
+      executeDate: original.executeAt.toISOString().split('T')[0],
+      executeTime: original.executeAt.toTimeString().substr(0, 5),
+      interval: original.interval,
+      maxRetries: original.maxRetries,
+      isEnabled: original.isEnabled
+    }
+
+    const newId = createScheduledReservation(formData, original.selectedTimeSlots)
+    logger.info('スケジュール予約を複製', { originalId: id, newId, newLabel: copyLabel })
+
+    return newId
+  }
+
+  // UI状態の操作
+  const toggleScheduleRow = () => {
+    uiState.value.showScheduleRow = !uiState.value.showScheduleRow
+    saveUIState()
+    logger.debug('スケジュール設定行の表示切り替え', { show: uiState.value.showScheduleRow })
+  }
+
+  const showScheduleDialog = () => {
+    uiState.value.showScheduleDialog = true
+    logger.debug('スケジュール管理ダイアログを表示')
+  }
+
+  const hideScheduleDialog = () => {
+    uiState.value.showScheduleDialog = false
+    uiState.value.editingSchedule = null
+    logger.debug('スケジュール管理ダイアログを非表示')
+  }
+
+  const selectSchedule = (id: string | null) => {
+    uiState.value.selectedScheduleId = id
+    logger.debug('スケジュール選択', { selectedId: id })
+  }
+
+  const startEditingSchedule = (schedule: ScheduledReservation) => {
+    uiState.value.editingSchedule = { ...schedule }
+    logger.debug('スケジュール編集開始', { id: schedule.id, label: schedule.label })
+  }
+
+  const stopEditingSchedule = () => {
+    uiState.value.editingSchedule = null
+    logger.debug('スケジュール編集終了')
+  }
+
+  // スケジュール実行管理
+  const startScheduleExecution = (scheduleId: string) => {
+    const schedule = scheduledReservations.value.get(scheduleId)
+    if (!schedule || !schedule.isEnabled) {
+      logger.warn('実行対象のスケジュールが無効', { scheduleId })
+      return false
+    }
+
+    // 既に実行中の場合は停止してから開始
+    if (executionState.value.activeSchedules.has(scheduleId)) {
+      stopScheduleExecution(scheduleId)
+    }
+
+    const now = new Date()
+    const delay = schedule.executeAt.getTime() - now.getTime()
+
+    if (delay <= 0) {
+      logger.warn('実行時刻が過去のスケジュール', { 
+        scheduleId, 
+        executeAt: schedule.executeAt.toLocaleString() 
+      })
+      return false
+    }
+
+    const timeoutId = setTimeout(() => {
+      executeScheduledReservation(scheduleId)
+    }, delay)
+
+    executionState.value.activeSchedules.set(scheduleId, timeoutId)
+    executionState.value.isAnyScheduleRunning = executionState.value.activeSchedules.size > 0
+
+    logger.info('スケジュール実行を開始', { 
+      scheduleId, 
+      label: schedule.label,
+      executeAt: schedule.executeAt.toLocaleString(),
+      delayMs: delay 
+    })
+
+    return true
+  }
+
+  const stopScheduleExecution = (scheduleId: string) => {
+    const timeoutId = executionState.value.activeSchedules.get(scheduleId)
+    if (timeoutId) {
+      clearTimeout(timeoutId)
+      executionState.value.activeSchedules.delete(scheduleId)
+      executionState.value.isAnyScheduleRunning = executionState.value.activeSchedules.size > 0
+
+      logger.info('スケジュール実行を停止', { scheduleId })
+    }
+  }
+
+  const executeScheduledReservation = async (scheduleId: string) => {
+    // TODO: 実際の予約実行ロジックを実装
+    // Sequential Reservationとの連携が必要
+    logger.info('スケジュール予約実行（未実装）', { scheduleId })
+  }
+
+  const stopAllScheduleExecutions = () => {
+    executionState.value.activeSchedules.forEach((timeoutId) => {
+      clearTimeout(timeoutId)
+    })
+    executionState.value.activeSchedules.clear()
+    executionState.value.isAnyScheduleRunning = false
+    logger.info('全スケジュール実行を停止')
+  }
+
+  // 初期化
+  const initialize = () => {
+    loadFromStorage()
+    loadUIState()
+    logger.info('スケジュール予約ストアを初期化', { 
+      schedulesCount: scheduledReservations.value.size 
+    })
+  }
+
+  return {
+    // State
+    scheduledReservations,
+    uiState,
+    executionState,
+
+    // Computed
+    scheduledReservationsArray,
+    enabledSchedules,
+    selectedSchedule,
+
+    // Actions - データ操作
+    createScheduledReservation,
+    updateScheduledReservation,
+    deleteScheduledReservation,
+    duplicateScheduledReservation,
+
+    // Actions - UI操作
+    toggleScheduleRow,
+    showScheduleDialog,
+    hideScheduleDialog,
+    selectSchedule,
+    startEditingSchedule,
+    stopEditingSchedule,
+
+    // Actions - 実行管理
+    startScheduleExecution,
+    stopScheduleExecution,
+    stopAllScheduleExecutions,
+
+    // Actions - 初期化
+    initialize
+  }
+})

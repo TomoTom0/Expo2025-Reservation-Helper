@@ -44,6 +44,16 @@
           </svg>
           <span id="available-count" class="ytomo-count-badge">{{ availablePavilionsCount }}</span>
         </button>
+        <button 
+          id="schedule-button" 
+          class="ytomo-icon-button" 
+          :class="{ active: scheduledReservationStore.uiState.showScheduleRow }"
+          title="スケジュール予約"
+          @click="handleToggleScheduleRow"
+          :disabled="isLoading"
+        >
+          <span>📅</span>
+        </button>
         <div class="ytomo-button-separator"></div>
         <button 
           id="refresh-button" 
@@ -63,6 +73,111 @@
       </div>
     </div>
 
+    <!-- スケジュール設定行 -->
+    <div 
+      v-if="scheduledReservationStore.uiState.showScheduleRow" 
+      class="ytomo-schedule-controls"
+    >
+      <div class="ytomo-schedule-form">
+        <div class="ytomo-form-row">
+          <div class="ytomo-form-group">
+            <label class="ytomo-form-label">実行日時</label>
+            <div class="ytomo-datetime-inputs">
+              <input 
+                type="date" 
+                v-model="scheduleFormData.executeDate"
+                class="ytomo-form-input ytomo-date-input"
+                :min="minScheduleDate"
+              >
+              <input 
+                type="time" 
+                v-model="scheduleFormData.executeTime"
+                class="ytomo-form-input ytomo-time-input"
+              >
+            </div>
+          </div>
+          
+          <div class="ytomo-form-group">
+            <label class="ytomo-form-label">間隔(秒)</label>
+            <input 
+              type="number" 
+              v-model.number="scheduleFormData.interval"
+              class="ytomo-form-input ytomo-number-input"
+              min="5"
+              max="300"
+              placeholder="15"
+            >
+          </div>
+          
+          <div class="ytomo-form-group">
+            <label class="ytomo-form-label">ラベル</label>
+            <input 
+              type="text" 
+              v-model="scheduleFormData.label"
+              class="ytomo-form-input ytomo-text-input"
+              placeholder="予約名"
+              maxlength="50"
+            >
+          </div>
+          
+          <div class="ytomo-form-group">
+            <label class="ytomo-form-label">回数</label>
+            <input 
+              type="number" 
+              v-model.number="scheduleFormData.maxRetries"
+              class="ytomo-form-input ytomo-number-input"
+              min="1"
+              max="200"
+              placeholder="10"
+            >
+          </div>
+          
+          <div class="ytomo-form-group">
+            <label class="ytomo-form-label">状態</label>
+            <button 
+              class="ytomo-toggle-button"
+              :class="{ active: scheduleFormData.isEnabled }"
+              @click="scheduleFormData.isEnabled = !scheduleFormData.isEnabled"
+            >
+              {{ scheduleFormData.isEnabled ? '有効' : '無効' }}
+            </button>
+          </div>
+          
+          <div class="ytomo-form-actions">
+            <button 
+              class="ytomo-action-button ytomo-save-button"
+              @click="handleSaveSchedule"
+              :disabled="!canSaveSchedule"
+            >
+              保存
+            </button>
+            <button 
+              class="ytomo-action-button ytomo-dialog-button"
+              @click="handleOpenScheduleDialog"
+            >
+              ダイアログ
+            </button>
+          </div>
+        </div>
+        
+        <div class="ytomo-selected-timeslots-info">
+          <span class="ytomo-info-label">選択中:</span>
+          <span class="ytomo-info-count">{{ scheduleSelectedSlotsCount }}件</span>
+          <div class="ytomo-selected-slots-preview">
+            <span 
+              v-for="slot in Array.from(scheduleSelectedSlots.values()).slice(0, 3)"
+              :key="`${slot.pavilionId}-${slot.timeSlot}`"
+              class="ytomo-slot-preview"
+            >
+              {{ slot.pavilionName }} {{ formatTimeSlot(slot.timeSlot) }}
+            </span>
+            <span v-if="scheduleSelectedSlotsCount > 3" class="ytomo-more-slots">
+              他{{ scheduleSelectedSlotsCount - 3 }}件
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
 
     <!-- パビリオン一覧エリア -->
     <div class="ytomo-pavilion-list" id="pavilion-list-container">
@@ -111,7 +226,7 @@
               :class="getTimeSlotClasses(pavilion.id, timeSlot)"
               :data-pavilion-id="pavilion.id"
               :data-time-slot="timeSlot.time"
-              :disabled="isTimeSlotDisabledByEntranceTime(timeSlot)"
+              :disabled="isTimeSlotDisabledByEntranceTime(timeSlot) && !scheduledReservationStore.uiState.showScheduleRow"
               @click="handleTimeSlotClick(pavilion.id, timeSlot)"
             >
               {{ formatTimeSlot(timeSlot.time) }}
@@ -186,19 +301,25 @@
     <div class="ytomo-selected-info" id="selected-info">
     </div>
     
+    <!-- スケジュール管理ダイアログ -->
+    <ScheduleManagementDialog />
+    
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { storeToRefs } from 'pinia'
+import ScheduleManagementDialog from '@/components/ScheduleManagementDialog.vue'
 import { usePavilionsStore } from '@/stores/pavilions'
 import { useTicketsStore } from '@/stores/tickets'
 import { useMainDialogStore } from '@/stores/mainDialog'
 import { useOverlaysStore } from '@/stores/overlays'
 import { useSequentialReservationStore } from '@/stores/sequentialReservation'
+import { useScheduledReservationStore } from '@/stores/scheduledReservation'
 import { usePavilions } from '@/composables/usePavilions'
 import type { ScheduleData, TicketData } from '@/types/api'
+import type { ScheduleFormData, ScheduledTimeSlot } from '@/types/scheduledReservation'
 import { loggers } from '@/utils/logger'
 
 // 型定義
@@ -231,6 +352,7 @@ const ticketsStore = useTicketsStore()
 const mainDialogStore = useMainDialogStore()
 const overlaysStore = useOverlaysStore()
 const sequentialReservationStore = useSequentialReservationStore()
+const scheduledReservationStore = useScheduledReservationStore()
 const { allPavilions, filteredPavilions, isLoading, isAvailableOnlyFilter, availablePavilionsCount } = storeToRefs(pavilionsStore)
 const { activeTab } = storeToRefs(mainDialogStore)
 
@@ -251,6 +373,19 @@ const {
 // ローカル状態
 const searchInput = ref('')
 const resultDisplayVisible = ref(false)
+
+// スケジュールフォームデータ
+const scheduleFormData = ref<ScheduleFormData>({
+  label: '',
+  executeDate: '',
+  executeTime: '',
+  interval: 15,
+  maxRetries: 10,
+  isEnabled: true
+})
+
+// スケジュール用選択状態管理
+const scheduleSelectedSlots = ref<Map<string, ScheduledTimeSlot>>(new Map())
 
 // 予約結果表示のためのリアクティブ状態
 interface ReservationResult {
@@ -525,15 +660,29 @@ const getTimeSlotClasses = (pavilionId: string, timeSlot: TimeSlotData) => {
     classes.push('unavailable', 'full')
   }
   
-  // 選択状態をチェック
-  if (isTimeSlotSelected(pavilionId, timeSlot.time)) {
-    classes.push('selected')
+  // スケジュールモードの場合はスケジュール選択状態をチェック
+  if (scheduledReservationStore.uiState.showScheduleRow) {
+    const slotKey = `${pavilionId}-${timeSlot.time}`
+    if (scheduleSelectedSlots.value.has(slotKey)) {
+      classes.push('schedule-selected')
+    }
+  } else {
+    // 通常モードの場合は通常選択状態をチェック
+    if (isTimeSlotSelected(pavilionId, timeSlot.time)) {
+      classes.push('selected')
+    }
   }
   
   return classes
 }
 
 const handleTimeSlotClick = (pavilionId: string, timeSlot: TimeSlotData) => {
+  // スケジュールモードの場合は別処理
+  if (scheduledReservationStore.uiState.showScheduleRow) {
+    handleScheduleTimeSlotClick(pavilionId, timeSlot)
+    return
+  }
+
   const pavilion = pavilionsStore.pavilions.get(pavilionId)
   if (!pavilion) return
 
@@ -752,6 +901,105 @@ const showReservationResult = (result: ReservationResult) => {
   }, 10000)
 }
 
+// スケジュール関連の計算プロパティ
+const minScheduleDate = computed(() => {
+  const today = new Date()
+  return today.toISOString().split('T')[0]
+})
+
+const scheduleSelectedSlotsCount = computed(() => {
+  return scheduleSelectedSlots.value.size
+})
+
+const canSaveSchedule = computed(() => {
+  return scheduleFormData.value.label.trim() !== '' &&
+         scheduleFormData.value.executeDate !== '' &&
+         scheduleFormData.value.executeTime !== '' &&
+         scheduleSelectedSlotsCount.value > 0
+})
+
+// スケジュール関連メソッド
+const handleToggleScheduleRow = () => {
+  scheduledReservationStore.toggleScheduleRow()
+  
+  // 表示切り替え時に初期化
+  if (scheduledReservationStore.uiState.showScheduleRow) {
+    resetScheduleForm()
+    scheduleSelectedSlots.value.clear()
+  }
+}
+
+const resetScheduleForm = () => {
+  const now = new Date()
+  const tomorrow = new Date(now.getTime() + 24 * 60 * 60 * 1000)
+  
+  scheduleFormData.value = {
+    label: `予約${now.getMonth() + 1}/${now.getDate()}`,
+    executeDate: tomorrow.toISOString().split('T')[0],
+    executeTime: '09:00',
+    interval: 15,
+    maxRetries: 10,
+    isEnabled: true
+  }
+}
+
+const handleScheduleTimeSlotClick = (pavilionId: string, timeSlot: TimeSlotData) => {
+  const pavilion = pavilionsStore.pavilions.get(pavilionId)
+  if (!pavilion) return
+
+  const slotKey = `${pavilionId}-${timeSlot.time}`
+  const entranceDate = selectedEntranceDate.value || ''
+  
+  if (scheduleSelectedSlots.value.has(slotKey)) {
+    // 選択解除
+    scheduleSelectedSlots.value.delete(slotKey)
+    logger.info('スケジュール時間帯選択解除', { 
+      pavilionName: pavilion.name, 
+      timeSlot: timeSlot.time 
+    })
+  } else {
+    // 選択追加
+    const scheduledSlot: ScheduledTimeSlot = {
+      pavilionId,
+      pavilionName: pavilion.name,
+      timeSlot: timeSlot.time,
+      entranceDate: entranceDate
+    }
+    scheduleSelectedSlots.value.set(slotKey, scheduledSlot)
+    logger.info('スケジュール時間帯選択追加', { 
+      pavilionName: pavilion.name, 
+      timeSlot: timeSlot.time 
+    })
+  }
+}
+
+const handleSaveSchedule = () => {
+  if (!canSaveSchedule.value) {
+    logger.warn('スケジュール保存: 必要項目が不足')
+    return
+  }
+
+  const timeSlots = Array.from(scheduleSelectedSlots.value.values())
+  const scheduleId = scheduledReservationStore.createScheduledReservation(
+    scheduleFormData.value,
+    timeSlots
+  )
+
+  logger.info('スケジュール予約を保存', { 
+    scheduleId, 
+    label: scheduleFormData.value.label,
+    timeSlotsCount: timeSlots.length 
+  })
+
+  // フォームをリセット
+  resetScheduleForm()
+  scheduleSelectedSlots.value.clear()
+}
+
+const handleOpenScheduleDialog = () => {
+  scheduledReservationStore.showScheduleDialog()
+}
+
 // ヘルパー関数
 const formatDate = (dateStr: string | null): string => {
   // YYYYMMDD形式（例：20250826）をパース
@@ -799,14 +1047,75 @@ const formatTimeSlot = (timeStr: string): string => {
 }
 
 
+// 複製編集イベントハンドラ
+const handleScheduleDuplicateEdit = async (event: Event) => {
+  const customEvent = event as CustomEvent
+  const { newScheduleId, originalTimeSlots, searchQuery } = customEvent.detail
+  
+  logger.info('複製編集イベント受信', { 
+    newScheduleId, 
+    searchQuery, 
+    timeSlotsCount: originalTimeSlots.length 
+  })
+  
+  try {
+    // スケジュール設定行を表示
+    if (!scheduledReservationStore.uiState.showScheduleRow) {
+      scheduledReservationStore.toggleScheduleRow()
+    }
+    
+    // 検索フィールドにパビリオン名を設定
+    searchInput.value = searchQuery
+    
+    // 検索を実行
+    await handlePavilionSearch()
+    
+    // 少し待ってから自動選択を実行
+    setTimeout(() => {
+      originalTimeSlots.forEach((originalSlot: any) => {
+        // 現在の検索結果から同じパビリオンと時間帯を探して選択
+        const matchingPavilion = filteredPavilions.value.find((p: any) => 
+          p.name === originalSlot.pavilionName
+        )
+        
+        if (matchingPavilion) {
+          const matchingTimeSlot = matchingPavilion.timeSlots?.find((ts: any) => 
+            ts.time === originalSlot.timeSlot
+          )
+          
+          if (matchingTimeSlot) {
+            handleScheduleTimeSlotClick(matchingPavilion.id, matchingTimeSlot)
+            logger.debug('複製編集: 時間帯自動選択', {
+              pavilionName: matchingPavilion.name,
+              timeSlot: matchingTimeSlot.time
+            })
+          }
+        }
+      })
+    }, 1000) // 1秒待機
+    
+  } catch (error) {
+    logger.error('複製編集イベント処理エラー', error)
+  }
+}
+
 // ライフサイクル
 onMounted(() => {
   logger.info('PavilionTab mounted')
-  // ストア初期化はページ読み込み時に行済み
+  // ストア初期化
+  scheduledReservationStore.initialize()
+  
+  // スケジュールフォームの初期化
+  resetScheduleForm()
+  
+  // 複製編集イベントリスナーを登録
+  window.addEventListener('schedule-duplicate-edit', handleScheduleDuplicateEdit as EventListener)
 })
 
 onUnmounted(() => {
   logger.info('PavilionTab unmounted')
+  // イベントリスナーを削除
+  window.removeEventListener('schedule-duplicate-edit', handleScheduleDuplicateEdit as EventListener)
 })
 </script>
 
@@ -1540,6 +1849,223 @@ onUnmounted(() => {
     background: #d1d5db;
     margin: 0 6px;
     align-self: center;
+}
+
+/* スケジュール設定行 */
+.ytomo-schedule-controls {
+    background: white;
+    border-radius: 8px;
+    padding: 16px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    border: 1px solid #e2e8f0;
+    margin-bottom: 16px;
+    flex-shrink: 0;
+}
+
+.ytomo-schedule-form {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.ytomo-form-row {
+    display: flex;
+    align-items: end;
+    gap: 16px;
+    flex-wrap: wrap;
+
+    @media (max-width: 1200px) {
+        gap: 12px;
+    }
+
+    @media (max-width: 800px) {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 16px;
+    }
+}
+
+.ytomo-form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 120px;
+
+    &:last-of-type {
+        margin-left: auto;
+
+        @media (max-width: 800px) {
+            margin-left: 0;
+        }
+    }
+}
+
+.ytomo-form-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: #374151;
+    margin-bottom: 4px;
+}
+
+.ytomo-form-input {
+    padding: 8px 12px;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    font-size: 14px;
+    transition: all 0.2s;
+
+    &:focus {
+        outline: none;
+        border-color: #2c5aa0;
+    }
+
+    &.ytomo-date-input, &.ytomo-time-input {
+        width: 140px;
+    }
+
+    &.ytomo-number-input {
+        width: 80px;
+    }
+
+    &.ytomo-text-input {
+        width: 160px;
+    }
+}
+
+.ytomo-datetime-inputs {
+    display: flex;
+    gap: 8px;
+}
+
+.ytomo-toggle-button {
+    padding: 8px 16px;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    background: white;
+    color: #374151;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    min-width: 60px;
+
+    &.active {
+        background: #22c55e;
+        border-color: #22c55e;
+        color: white;
+    }
+
+    &:hover {
+        border-color: #9ca3af;
+    }
+
+    &:focus {
+        outline: none;
+        border-color: #2c5aa0;
+    }
+}
+
+.ytomo-form-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.ytomo-action-button {
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    border: 1px solid;
+
+    &:focus {
+        outline: none;
+    }
+
+    &.ytomo-save-button {
+        background: #2c5aa0;
+        border-color: #2c5aa0;
+        color: white;
+
+        &:hover:not(:disabled) {
+            background: #1a365d;
+            border-color: #1a365d;
+        }
+
+        &:disabled {
+            background: #94a3b8;
+            border-color: #94a3b8;
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+    }
+
+    &.ytomo-dialog-button {
+        background: white;
+        border-color: #d1d5db;
+        color: #374151;
+
+        &:hover {
+            background: #f3f4f6;
+            border-color: #9ca3af;
+        }
+    }
+}
+
+.ytomo-selected-timeslots-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding-top: 12px;
+    border-top: 1px solid #f1f5f9;
+    font-size: 14px;
+}
+
+.ytomo-info-label {
+    color: #6b7280;
+    font-weight: 500;
+}
+
+.ytomo-info-count {
+    color: #2c5aa0;
+    font-weight: 600;
+}
+
+.ytomo-selected-slots-preview {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.ytomo-slot-preview {
+    background: #f3f4f6;
+    color: #374151;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.ytomo-more-slots {
+    color: #6b7280;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+/* スケジュール選択状態 */
+.ytomo-time-slot-button {
+    &.schedule-selected {
+        background: #3b82f6 !important;
+        border-color: #3b82f6 !important;
+        color: white !important;
+        box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3) !important;
+
+        &:hover {
+            background: #2563eb !important;
+            border-color: #2563eb !important;
+        }
+    }
 }
 
 /* アニメーション */
