@@ -152,13 +152,19 @@
                   :title="!ticket.isOwn ? 'パビリオン予約は自分のチケットのみ操作可能' : 'パビリオン予約詳細・追加'"
                 >
                   <div class="ytomo-schedule-line ytomo-reservation-line">
-                    <span v-for="reservationType in getReservationTypesForSecondLine(schedule)" :key="reservationType.type" 
-                          class="ytomo-reservation-type-indicator" 
-                          :class="reservationType.statusClass">
-                      {{ reservationType.shortName }}
-                    </span>
-                    <span v-if="getReservationTypesForSecondLine(schedule).length === 0" class="ytomo-no-reservation">
-                      + パビリオン予約
+                    <div class="ytomo-reservation-info">
+                      <span v-for="reservationType in getReservationTypesForSecondLine(schedule)" :key="reservationType.type" 
+                            class="ytomo-reservation-type-indicator" 
+                            :class="reservationType.statusClass">
+                        {{ reservationType.shortName }}
+                      </span>
+                      <span v-if="getReservationTypesForSecondLine(schedule).length === 0" class="ytomo-no-reservation">
+                        + パビリオン予約
+                      </span>
+                    </div>
+                    <span v-if="schedule.user_visiting_reservation_id && getReservationManagement(schedule.user_visiting_reservation_id.toString())?.isLocked" 
+                          class="ytomo-lock-indicator">
+                      🔒
                     </span>
                   </div>
                 </button>
@@ -170,7 +176,28 @@
         <!-- パビリオン予約詳細表示 -->
         <div v-if="hasExpandedSchedules(ticket)" class="ytomo-pavilion-details">
           <div v-for="schedule in getExpandedSchedules(ticket)" :key="`${ticket.ticket_id}-${schedule.entrance_date}`" class="ytomo-schedule-detail">
-            <div class="ytomo-schedule-date-header">{{ formatEntranceDate(schedule.entrance_date) }}</div>
+            <div class="ytomo-schedule-date-header">
+              <span class="ytomo-date-text">{{ formatEntranceDate(schedule.entrance_date) }}</span>
+              <!-- ロックボタンとラベル表示 -->
+              <span v-if="schedule.user_visiting_reservation_id" class="ytomo-date-header-controls">
+                <button 
+                  class="ytomo-lock-toggle-btn"
+                  :class="{ 'locked': getReservationManagement(schedule.user_visiting_reservation_id.toString())?.isLocked }"
+                  @click.stop="schedule.user_visiting_reservation_id ? toggleLock(schedule.user_visiting_reservation_id.toString(), ticket.ticket_id) : undefined"
+                >
+                  {{ getReservationManagement(schedule.user_visiting_reservation_id.toString())?.isLocked ? '🔒' : '🔓' }}
+                </button>
+                <input 
+                  type="text" 
+                  class="ytomo-date-header-label-input"
+                  placeholder="ラベル"
+                  :value="schedule.user_visiting_reservation_id ? getReservationManagement(schedule.user_visiting_reservation_id.toString())?.userLabel || '' : ''"
+                  @input="schedule.user_visiting_reservation_id ? updateLabel(schedule.user_visiting_reservation_id.toString(), ($event.target as HTMLInputElement).value, ticket.ticket_id) : undefined"
+                  @click.stop
+                />
+              </span>
+            </div>
+            
             
             <!-- 予約種類ごとの詳細表示（5,4,3,2の順） -->
             <template v-for="reservationType in getSortedReservationTypes(schedule)" :key="`${ticket.ticket_id}-${schedule.entrance_date}-${reservationType}`">
@@ -277,11 +304,15 @@ const ticketsStore = useTicketsStore()
 const mainDialogStore = useMainDialogStore()
 const { ticketsArray, isLoading, selectedTickets } = storeToRefs(ticketsStore)
 
+// 予約ID管理関数
+const { getReservationManagement, toggleLock, updateLabel } = ticketsStore
+
 // Composable使用
 const { loadAllTickets } = useTickets()
 
 // ローカル状態
 const isOwnOnlyToggle = ref(false)
+const errorMessage = ref('')
 const selectedDateFilter = ref<string | null>(null) // 日付フィルター用の独立した状態
 const newTicketId = ref('')
 const newTicketLabel = ref('')
@@ -640,12 +671,65 @@ const extractTimeFromSchedule = (schedule: ScheduleData): string => {
 }
 
 const getReservationStatus = (schedule: ScheduleData, ticket: TicketData): ReservationStatus => {
-  // TODO: 既存実装のgetReservationStatusメソッドを正確に移植
-  // 一時的な実装
-  return {
-    statusText: '',
-    availableTypes: ['immediate'] // 仮の値
+  // 新規入場予約の場合（entrance_dateが空）
+  if (schedule.entrance_date === '') {
+    // 選択されている入場予約が1つだけかつ未使用かつそれが自分のものかチェック
+    const selectedSchedules = ticketsArray.value.filter(t => 
+      t.schedules?.some(s => s.selected && s.entrance_date !== '')
+    )
+    
+    if (selectedSchedules.length !== 1) {
+      return {
+        statusText: '入場予約を1つ選択してください',
+        availableTypes: []
+      }
+    }
+    
+    const selectedTicket = selectedSchedules[0]
+    const selectedSchedule = selectedTicket.schedules?.find(s => s.selected)
+    
+    if (!selectedTicket.isOwn) {
+      return {
+        statusText: '自分の入場予約を選択してください',
+        availableTypes: []
+      }
+    }
+    
+    if (selectedSchedule?.use_state !== 0) {
+      return {
+        statusText: '未使用の入場予約を選択してください',
+        availableTypes: []
+      }
+    }
+    
+    return {
+      statusText: '新規予約可能',
+      availableTypes: ['immediate']
+    }
   }
+  
+  // 既存の入場予約がある場合
+  if (ticket.isOwn) {
+    const canChange = schedule.use_state === 0 || 
+                     (schedule.use_state === 1 && schedule.entrance_date === getTodayString())
+    
+    return {
+      statusText: canChange ? '変更可能' : '変更不可',
+      availableTypes: canChange ? ['change'] : []
+    }
+  }
+  
+  // 他人の予約は変更不可
+  return {
+    statusText: '他人の予約',
+    availableTypes: []
+  }
+}
+
+// 今日の日付を YYYY-MM-DD 形式で取得
+const getTodayString = (): string => {
+  const today = new Date()
+  return `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`
 }
 
 const isScheduleSelected = (schedule: ScheduleData, ticket: TicketData): boolean => {
@@ -1639,8 +1723,22 @@ onUnmounted(() => {
             color: #6b7280;
             display: flex;
             align-items: center;
-            gap: 4px;
+            justify-content: space-between;
             font-size: 10px;
+            
+            .ytomo-reservation-info {
+                display: flex;
+                align-items: center;
+                gap: 4px;
+            }
+            
+            .ytomo-lock-indicator {
+                font-size: 11px;
+                color: #dc2626;
+                opacity: 0.8;
+                margin-left: 8px;
+                flex-shrink: 0;
+            }
         }
     }
     
@@ -1733,6 +1831,75 @@ onUnmounted(() => {
     font-weight: 600;
     color: #334155;
     margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    
+    .ytomo-date-text {
+        flex: 1;
+    }
+    
+    .ytomo-date-header-controls {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-left: 12px;
+    }
+    
+    .ytomo-lock-toggle-btn {
+        background: rgba(255, 255, 255, 0.9);
+        border: 1px solid rgba(0, 0, 0, 0.15);
+        border-radius: 4px;
+        padding: 4px 6px;
+        font-size: 12px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 24px;
+        height: 20px;
+        transition: all 0.2s ease;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+        
+        &:hover {
+            background: rgba(255, 255, 255, 1);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        &.locked {
+            background: rgba(239, 68, 68, 0.1);
+            border-color: rgba(239, 68, 68, 0.3);
+            color: #dc2626;
+            
+            &:hover {
+                background: rgba(239, 68, 68, 0.15);
+            }
+        }
+    }
+    
+    .ytomo-date-header-label-input {
+        font-size: 11px;
+        color: #374151;
+        background: rgba(255, 255, 255, 0.9);
+        border: 1px solid rgba(0, 0, 0, 0.15);
+        border-radius: 3px;
+        padding: 2px 6px;
+        width: 80px;
+        height: 20px;
+        transition: all 0.2s ease;
+        
+        &:focus {
+            outline: none;
+            background: rgba(255, 255, 255, 1);
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 1px #3b82f6;
+        }
+        
+        &::placeholder {
+            color: #9ca3af;
+            font-size: 10px;
+        }
+    }
     font-size: 13px;
     padding-bottom: 4px;
     border-bottom: 1px solid #e2e8f0;
@@ -2124,5 +2291,73 @@ onUnmounted(() => {
         opacity: 1;
         transform: translateY(0);
     }
+}
+
+/* 予約管理UI */
+.ytomo-reservation-management {
+    margin: 8px 0;
+    padding: 8px;
+    background: #f0f9ff;
+    border-radius: 6px;
+    border-left: 3px solid #0ea5e9;
+}
+
+.ytomo-management-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.ytomo-lock-checkbox {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    cursor: pointer;
+    font-size: 13px;
+    color: #374151;
+    
+    input[type="checkbox"] {
+        width: 16px;
+        height: 16px;
+        cursor: pointer;
+    }
+}
+
+.ytomo-lock-icon {
+    font-size: 14px;
+}
+
+.ytomo-lock-text {
+    font-weight: 500;
+}
+
+.ytomo-user-label-input {
+    padding: 4px 8px;
+    border: 1px solid #d1d5db;
+    border-radius: 4px;
+    font-size: 13px;
+    min-width: 120px;
+    max-width: 200px;
+    
+    &:focus {
+        outline: none;
+        border-color: #0ea5e9;
+        box-shadow: 0 0 0 2px rgba(14, 165, 233, 0.2);
+    }
+    
+    &::placeholder {
+        color: #9ca3af;
+    }
+}
+
+/* ロック状態の視覚的フィードバック */
+.ytomo-lock-checkbox input[type="checkbox"]:checked + .ytomo-lock-icon {
+    color: #dc2626;
+}
+
+.ytomo-lock-checkbox input[type="checkbox"]:checked ~ .ytomo-lock-text {
+    color: #dc2626;
+    font-weight: 600;
 }
 </style>

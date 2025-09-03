@@ -44,25 +44,17 @@
         <div class="ytomo-investigation-controls">
           <button 
             class="ytomo-investigate-button" 
-            :class="{ 'disabled': !canStartInvestigation, 'cancel-mode': othersStore.isInvestigationRunning }"
-            :disabled="!canStartInvestigation"
+            :class="{ 'cancel-mode': othersStore.isInvestigationRunning }"
             @click="executeInvestigation"
           >
             <span v-if="othersStore.isInvestigationRunning" class="ytomo-loading-icon">⏳</span>
             {{ othersStore.isInvestigationRunning ? '調査中断' : '調査' }}
           </button>
           
-          <button 
-            v-if="othersStore.investigationResults.length > 0"
-            class="ytomo-clear-button"
-            @click="clearResults"
-          >
-            結果クリア
-          </button>
         </div>
         
         <!-- 調査状況表示 -->
-        <div v-if="othersStore.isInvestigationRunning || othersStore.investigationStatus" class="ytomo-investigation-status">
+        <div v-if="othersStore.isInvestigationRunning || othersStore.investigationStatusText" class="ytomo-investigation-status">
           <div class="ytomo-status-content">
             <div v-if="othersStore.isInvestigationRunning" class="ytomo-status-icon spinning">
               <svg viewBox="0 0 24 24">
@@ -70,15 +62,12 @@
               </svg>
             </div>
             <div class="ytomo-status-details">
-              <div class="ytomo-status-current">{{ othersStore.investigationStatus }}</div>
-              
-              <!-- 調査結果表示 -->
-              <div v-if="othersStore.investigationResults.length > 0" class="ytomo-investigation-results">
-                <div class="ytomo-results-title">調査結果:</div>
-                <div v-for="(result, index) in othersStore.investigationResults" :key="index" class="ytomo-result-item">
-                  {{ result.time }}秒: {{ result.status }}
-                </div>
+              <div v-if="othersStore.phaseLabel" class="ytomo-phase-info">
+                <span class="phase-label">{{ othersStore.phaseLabel }}</span>
+                <span class="detection-info">{{ othersStore.detectionDisplay }}</span>
               </div>
+              <div v-if="othersStore.investigationWaitingText" class="ytomo-waiting-info">{{ othersStore.investigationWaitingText }}</div>
+              <div class="ytomo-status-current">{{ othersStore.investigationStatusText }}</div>
             </div>
           </div>
         </div>
@@ -117,23 +106,20 @@ const handleTargetTimeChange = () => {
 }
 
 // 結果クリア
-const clearResults = () => {
-  othersStore.clearInvestigationResults()
-}
 
 // 調査実行
 const executeInvestigation = async () => {
   if (othersStore.isInvestigationRunning) {
     // 調査中断
     othersStore.isInvestigationRunning = false
-    othersStore.investigationStatus = '調査が中断されました'
+    othersStore.lastComparison = '調査が中断されました'
     logger.info('タイミング調査を中断しました')
     return
   }
   
   try {
     othersStore.isInvestigationRunning = true
-    othersStore.investigationStatus = '調査開始...'
+    othersStore.lastComparison = '調査開始...'
     othersStore.clearInvestigationResults()
     logger.info('タイミング調査開始')
     
@@ -141,7 +127,7 @@ const executeInvestigation = async () => {
     
   } catch (error) {
     logger.error('調査実行エラー', error)
-    othersStore.investigationStatus = '調査でエラーが発生しました'
+    othersStore.lastComparison = '調査でエラーが発生しました'
   } finally {
     if (othersStore.isInvestigationRunning) {
       othersStore.isInvestigationRunning = false
@@ -149,168 +135,375 @@ const executeInvestigation = async () => {
   }
 }
 
-// 時間調査の実行
+// 4段階調査の実行
 const performTimeInvestigation = async () => {
-  othersStore.investigationStatus = '候補時間を分析中...'
+  logger.info('4段階タイミング調査開始')
   
-  // フェーズ1: 広域調査（10秒間隔）
-  const broadResults = await investigateBroadRange()
+  // フェーズ1: 粗調査 (15秒刻み)
+  othersStore.currentPhase = 1
+  othersStore.currentRound = 0
+  othersStore.investigationRange = null
+  const phase1Result = await phase1CoarseInvestigation()
+  logger.temp('Phase1実行結果', { phase1Result, isRunning: othersStore.isInvestigationRunning })
+  if (!othersStore.isInvestigationRunning || !phase1Result) return
   
-  if (!othersStore.isInvestigationRunning) return
+  // フェーズ2: 中調査 (5秒刻み)
+  othersStore.currentPhase = 2
+  othersStore.currentRound = 0
+  // Phase2の検出結果をリセット
+  othersStore.updatePhaseStatus(2, [])
+  const phase2Result = await phase2MediumInvestigation(phase1Result)
+  if (!othersStore.isInvestigationRunning || !phase2Result) return
   
-  // フェーズ2: 精密調査
-  if (broadResults.length > 0) {
-    othersStore.investigationStatus = '精密調査中...'
-    const preciseResult = await investigatePreciseRange(broadResults)
-    
-    if (preciseResult) {
-      // 設定を自動更新
-      othersStore.saveTargetTime(preciseResult.targetTime)
-      othersStore.investigationStatus = `調査完了: ${preciseResult.targetTime}秒に設定されました`
-      logger.info('目標時間調査完了', preciseResult)
-    }
+  // フェーズ3: 精密調査 (1秒刻み)
+  othersStore.currentPhase = 3
+  othersStore.currentRound = 0
+  // Phase3の検出結果をリセット
+  othersStore.updatePhaseStatus(3, [])
+  const phase3Result = await phase3PreciseInvestigation(phase2Result)
+  if (!othersStore.isInvestigationRunning || !phase3Result) return
+  
+  // フェーズ4: 最終確認 (1秒刻み)
+  othersStore.currentPhase = 4
+  othersStore.currentRound = 0
+  // Phase4の検出結果をリセット
+  othersStore.updatePhaseStatus(4, [])
+  const finalResult = await phase4FinalConfirmation(phase3Result)
+  
+  if (finalResult) {
+    othersStore.saveTargetTime(finalResult.end) // 変更区間の終了時間を更新目標時間にする
+    othersStore.lastComparison = `調査完了: ${finalResult.start}-${finalResult.end}秒に設定されました`
+    logger.info('4段階調査完了', { finalResult })
   } else {
-    othersStore.investigationStatus = '変更時間が検出されませんでした'
+    othersStore.lastComparison = '調査完了: 更新タイミングが特定できませんでした'
   }
+}
+
+// フェーズ1: 粗調査 (15秒刻み、2周)
+const phase1CoarseInvestigation = async () => {
+  // フェーズ1の調査間隔と開始位置を決定（unixtimeベース）
+  const nowUnixTime = Math.floor(Date.now() / 1000)
+  const currentSeconds = nowUnixTime % 60
   
-  logger.info('タイミング調査完了', {
-    results: othersStore.investigationResults,
-    finalStatus: othersStore.investigationStatus
+  // 次の15秒の倍数を取得
+  let nextInterval = Math.floor(currentSeconds / 15 + 1) * 15
+  if (nextInterval >= 60) {
+    nextInterval = 15 // 次の分の15秒から開始
+  }
+  const startSecond = nextInterval
+  
+  logger.temp('Phase1開始計算', { 
+    currentSeconds, 
+    nextInterval, 
+    startSecond 
   })
+  
+  // 開始時刻情報は状態から自動生成される
+  othersStore.lastComparison = ''
+  
+  
+  // 最大5周実行
+  for (let round = 1; round <= 5; round++) {
+    othersStore.currentRound = round
+    
+    if (!othersStore.isInvestigationRunning) return null
+    
+    // 各周回で時刻配列を再生成（現在時刻ベース）
+    const intervals = generateUnixTimeArray(startSecond, 15, 5)
+    
+    // 非同期API実行システムを使用
+    await executeApisAtSeconds(intervals, 1, round)
+    
+    if (!othersStore.isInvestigationRunning) return null
+    
+    // 周回終了後に最多検出範囲をチェック
+    const mostDetected = othersStore.getMostDetectedRange(1)
+    if (mostDetected) {
+      othersStore.updatePhaseStatus(1, mostDetected)
+      othersStore.lastComparison = ''
+      return { start: mostDetected[0], end: mostDetected[1] }
+    }
+    
+    // 1秒待機してから次の周回
+    await new Promise(resolve => setTimeout(resolve, 1000))
+  }
+  
+  
+  // 5周回完了後も検出できなかった場合は重み付き平均を計算
+  const weightedAverage = othersStore.getWeightedAverageRange(1)
+  if (weightedAverage) {
+    othersStore.updatePhaseStatus(1, weightedAverage)
+    othersStore.lastComparison = ''
+    return { start: weightedAverage[0], end: weightedAverage[1] }
+  }
+  
+  othersStore.lastComparison = '終了: 変化区間未検出'
+  return null
 }
 
-// 広域調査
-const investigateBroadRange = async (): Promise<any[]> => {
-  const results = []
-  const intervals = [10, 20, 30, 40, 50] // 10秒間隔で調査
+// Phase2,3,4共通実行関数
+const executePhase = async (
+  prevResult: { start: number, end: number }, 
+  phaseNum: number, 
+  expandStart: number, 
+  expandEnd: number, 
+  interval: number
+) => {
+  logger.temp(`Phase${phaseNum}開始`, { prevResult })
+  // 範囲拡大計算（unixTimeベース）
+  const nowUnixTime = Math.floor(Date.now() / 1000)
+  const currentSecond = nowUnixTime % 60
   
-  for (let i = 0; i < intervals.length; i++) {
-    if (!othersStore.isInvestigationRunning) break
+  // 拡大後のstartSecondが現在より後なら現在の分、前なら次の分を使用
+  const expandedStartSecond = prevResult.start + expandStart
+  let baseUnixTime
+  if (expandedStartSecond > currentSecond) {
+    baseUnixTime = nowUnixTime - currentSecond // 現在の分の0秒
+  } else {
+    baseUnixTime = nowUnixTime - currentSecond + 60 // 次の分の0秒
+  }
+  
+  const startUnixTime = baseUnixTime + prevResult.start
+  const endUnixTime = baseUnixTime + prevResult.end
+  
+  const expandedStartUnix = startUnixTime + expandStart
+  const expandedEndUnix = endUnixTime + expandEnd
+  
+  const expandedStart = ((expandedStartUnix % 60) + 60) % 60
+  const expandedEnd = ((expandedEndUnix % 60) + 60) % 60
+  
+  // 調査範囲をstoreに設定
+  othersStore.investigationRange = { start: expandedStart, end: expandedEnd }
+  
+  // 最大5周実行
+  for (let round = 1; round <= 5; round++) {
+    othersStore.currentRound = round
     
-    const targetSecond = intervals[i]
-    othersStore.investigationStatus = `広域調査: ${targetSecond}秒での変化を確認中...`
+    if (!othersStore.isInvestigationRunning) return null
     
-    try {
-      const result = await executeAtSpecificTime(targetSecond)
-      results.push({ targetSecond, ...result })
-      
-      // UIに結果を追加
-      othersStore.addInvestigationResult(targetSecond, result.changed ? '変化検出' : '変化なし')
-      
-      logger.info(`調査結果 ${targetSecond}秒`, result)
-      
-      // 次の調査まで待機
-      if (i < intervals.length - 1) {
-        await new Promise(resolve => setTimeout(resolve, 2000))
+    // 各周回で時刻配列を再生成（現在時刻ベース）
+    const nowUnixTime = Math.floor(Date.now() / 1000)
+    const currentSecond = nowUnixTime % 60
+    
+    // 拡大後のstartSecondが現在より後なら現在の分、前なら次の分を使用
+    const expandedStartSecond = prevResult.start + expandStart
+    let baseUnixTime
+    if (expandedStartSecond > currentSecond) {
+      baseUnixTime = nowUnixTime - currentSecond // 現在の分の0秒
+    } else {
+      baseUnixTime = nowUnixTime - currentSecond + 60 // 次の分の0秒
+    }
+    
+    const startUnixTime = baseUnixTime + prevResult.start
+    const endUnixTime = baseUnixTime + prevResult.end
+    
+    const expandedStartUnix = startUnixTime + expandStart
+    const expandedEndUnix = endUnixTime + expandEnd
+    
+    // 指定間隔で時刻配列を生成（現在時刻ベース）
+    const intervalCount = Math.floor((expandedEndUnix - expandedStartUnix) / interval) + 1
+    const intervals = []
+    for (let i = 0; i < intervalCount; i++) {
+      let targetTime = expandedStartUnix + (i * interval)
+      // 過去の時刻になる場合は次の分に調整
+      if (targetTime <= nowUnixTime) {
+        targetTime += 60
       }
-    } catch (error) {
-      logger.error(`${targetSecond}秒での調査エラー`, error)
-      othersStore.addInvestigationResult(targetSecond, 'エラー')
+      intervals.push(targetTime)
     }
+    
+    // 非同期API実行システムを使用
+    await executeApisAtSeconds(intervals, phaseNum, round)
+    
+    if (!othersStore.isInvestigationRunning) return null
+    
+    // 周回終了後に最多検出範囲をチェック
+    const mostDetected = othersStore.getMostDetectedRange(phaseNum)
+    if (mostDetected) {
+      othersStore.updatePhaseStatus(phaseNum, mostDetected)
+      othersStore.lastComparison = ''
+      return { start: mostDetected[0], end: mostDetected[1] }
+    }
+    
+    // 1秒待機してから次の周回
+    await new Promise(resolve => setTimeout(resolve, 1000))
   }
   
-  return results.filter(r => r.changed)
+  // 5周回完了後も検出できなかった場合は重み付き平均を計算
+  const weightedAverage = othersStore.getWeightedAverageRange(phaseNum)
+  if (weightedAverage) {
+    othersStore.updatePhaseStatus(phaseNum, weightedAverage)
+    othersStore.lastComparison = ''
+    return { start: weightedAverage[0], end: weightedAverage[1] }
+  }
+  
+  othersStore.lastComparison = '終了: 変化区間未検出'
+  return null
 }
 
-// 精密調査
-const investigatePreciseRange = async (broadResults: any[]): Promise<any> => {
-  // 変化が検出された範囲を特定
-  let changeDetected = false
-  let targetRange = { min: 30, max: 40 } // デフォルト範囲
+// フェーズ2: 中調査 (5秒刻み、2周)
+const phase2MediumInvestigation = async (phase1Result: { start: number, end: number }) => {
+  return await executePhase(phase1Result, 2, -2, 3, 5)
+}
+
+// フェーズ3: 精密調査 (1秒刻み、2周)
+const phase3PreciseInvestigation = async (phase2Result: { start: number, end: number }) => {
+  return await executePhase(phase2Result, 3, -2, 2, 1)
+}
+
+// フェーズ4: 最終確認 (1秒刻み、2周)
+const phase4FinalConfirmation = async (phase3Result: { start: number, end: number }) => {
+  return await executePhase(phase3Result, 4, -2, 2, 1)
+}
+
+// 汎用unixtime配列生成関数
+const generateUnixTimeArray = (startSecond: number, interval: number, count: number): number[] => {
+  const nowUnixTime = Math.floor(Date.now() / 1000)
+  const currentSecond = nowUnixTime % 60
   
-  for (let i = 0; i < broadResults.length - 1; i++) {
-    const current = broadResults[i]
-    const next = broadResults[i + 1]
+  // 現在の分の0秒を基準とする
+  const baseUnixTime = nowUnixTime - currentSecond
+  
+  const result = []
+  for (let i = 0; i < count; i++) {
+    let targetUnixTime = baseUnixTime + startSecond + (i * interval)
     
-    if (current.changed !== next.changed) {
-      targetRange = { min: current.targetSecond, max: next.targetSecond }
-      changeDetected = true
-      break
+    // 過去の時刻になる場合は次の分に調整
+    if (targetUnixTime <= nowUnixTime) {
+      targetUnixTime += 60
     }
+    
+    result.push(targetUnixTime)
   }
   
-  if (!changeDetected) return null
+  logger.temp('generateUnixTimeArray結果', {
+    startSecond, interval, count,
+    currentSecond, baseUnixTime: baseUnixTime % 86400,
+    results: result.map(t => ({ unix: t, display: t % 60, realTime: new Date(t * 1000).toLocaleTimeString() }))
+  })
   
-  // 精密調査実行
-  const preciseIntervals = []
-  for (let sec = targetRange.min + 1; sec < targetRange.max; sec++) {
-    preciseIntervals.push(sec)
-  }
+  return result
+}
+
+// 新しいAPI実行システム - 新状態管理対応
+const executeApisAtSeconds = async (seconds: number[], phaseNum: number, roundNum: number): Promise<void> => {
+  // Phase状態はリセットしない（検出結果を保持する必要がある）
   
-  for (const targetSecond of preciseIntervals) {
-    if (!othersStore.isInvestigationRunning) break
+  // 全API実行状態を初期化
+  othersStore.currentPhaseExecutions = {}
+  seconds.forEach(unixTime => {
+    othersStore.updateExecutionStatus(unixTime, 'Waiting')
+  })
+  
+  let previousData: any = null
+  
+  // API実行管理 - 100ms間隔で判定・実行
+  const executionInterval = setInterval(() => {
+    const nowUnixTime = Math.floor(Date.now() / 1000)
     
-    othersStore.investigationStatus = `精密調査: ${targetSecond}秒での変化を確認中...`
+    // 次に実行すべき時刻を確認（Waitingの最小時刻）
+    const waitingTimes = Object.entries(othersStore.currentPhaseExecutions)
+      .filter(([_, exec]) => exec.status === 'Waiting')
+      .map(([unixTime, _]) => parseInt(unixTime))
     
-    try {
-      const result = await executeAtSpecificTime(targetSecond)
+    if (waitingTimes.length > 0) {
+      const nextTargetTime = Math.min(...waitingTimes)
       
-      // UIに結果を追加
-      othersStore.addInvestigationResult(targetSecond, result.changed ? '✓変化検出' : '変化なし')
-      
-      if (result.changed) {
-        return { targetTime: targetSecond, confidence: 'high' }
+      if (nowUnixTime >= nextTargetTime) {
+        // API実行開始
+        othersStore.updateExecutionStatus(nextTargetTime, 'Doing')
+        
+        executeApiNow(nextTargetTime).then(data => {
+          othersStore.updateExecutionStatus(nextTargetTime, 'Done', data)
+        }).catch(error => {
+          othersStore.updateExecutionStatus(nextTargetTime, 'Done', null)
+          logger.error(`${nextTargetTime}秒でのAPI実行エラー`, error)
+        })
       }
-      
-      await new Promise(resolve => setTimeout(resolve, 1500))
-    } catch (error) {
-      logger.error(`精密調査 ${targetSecond}秒エラー`, error)
-      othersStore.addInvestigationResult(targetSecond, 'エラー')
     }
-  }
+  }, 100)
   
-  return { targetTime: Math.round((targetRange.min + targetRange.max) / 2), confidence: 'medium' }
-}
-
-// 特定時間でのAPI実行
-const executeAtSpecificTime = async (targetSecond: number): Promise<any> => {
-  return new Promise(async (resolve) => {
-    const executeAt = async () => {
-      const now = new Date()
-      const currentSecond = now.getSeconds()
+  // データ処理管理 - 1000ms間隔で時刻順処理
+  return new Promise((resolve) => {
+    const processingInterval = setInterval(() => {
+      // 処理可能な最も古い時刻を確認（Doneで結果ありの最小時刻）
+      const doneTimes = Object.entries(othersStore.currentPhaseExecutions)
+        .filter(([_, exec]) => exec.status === 'Done' && exec.result !== undefined)
+        .map(([unixTime, _]) => parseInt(unixTime))
+        .sort((a, b) => a - b)
       
-      if (currentSecond === targetSecond) {
-        // 実際の空き情報を取得して比較
-        try {
-          const beforeData = await getAvailabilityInfo()
-          await new Promise(r => setTimeout(r, 1000)) // 1秒待機
-          const afterData = await getAvailabilityInfo()
-          
-          const changed = JSON.stringify(beforeData) !== JSON.stringify(afterData)
-          logger.info(`${targetSecond}秒でAPI実行`, { changed, beforeData, afterData })
-          
-          resolve({ changed, timestamp: now.toISOString() })
-        } catch (error) {
-          logger.error(`${targetSecond}秒でのAPI実行エラー`, error)
-          resolve({ changed: false, timestamp: now.toISOString(), error: true })
+      if (doneTimes.length > 0) {
+        const oldestTime = doneTimes[0]
+        const currentData = othersStore.currentPhaseExecutions[oldestTime].result
+        
+        // 前回データと比較
+        if (previousData !== null) {
+          if (JSON.stringify(previousData) !== JSON.stringify(currentData)) {
+            // フェーズごとの間隔を取得
+            const interval = phaseNum === 1 ? 15 : phaseNum === 2 ? 5 : 1
+            const prevTime = oldestTime - interval
+            othersStore.lastComparison = `${oldestTime % 60}秒: 変化検出`
+            // 検出カウントを更新
+            othersStore.updateDetectionCount(phaseNum, prevTime % 60, oldestTime % 60)
+            logger.temp(`Phase${phaseNum} Round${roundNum}: ${prevTime % 60}-${oldestTime % 60}秒で変化検出`, {
+              比較対象時間: {
+                前回: `${prevTime}秒 (${prevTime % 60}秒表示)`,
+                今回: `${oldestTime}秒 (${oldestTime % 60}秒表示)`
+              },
+              データ比較: {
+                前回データ: previousData,
+                今回データ: currentData,
+                前回JSON: JSON.stringify(previousData),
+                今回JSON: JSON.stringify(currentData)
+              }
+            })
+          } else {
+            othersStore.lastComparison = `${oldestTime % 60}秒: 変化なし`
+          }
         }
-      } else {
-        // 100ms後に再試行
-        setTimeout(executeAt, 100)
+        
+        // 今回データを前回として保存、実行状態から削除
+        previousData = currentData
+        delete othersStore.currentPhaseExecutions[oldestTime]
+        logger.temp(`Phase${phaseNum} Round${roundNum}: ${oldestTime}秒処理完了、残り${Object.keys(othersStore.currentPhaseExecutions).length}個`)
       }
-    }
-    
-    executeAt()
+      
+      // 全完了チェック
+      const remainingExecutions = Object.keys(othersStore.currentPhaseExecutions)
+      if (remainingExecutions.length === 0) {
+        // 全完了 - 移行条件
+        clearInterval(executionInterval)
+        clearInterval(processingInterval)
+        logger.temp(`Phase${phaseNum} Round${roundNum}: 完了`)
+        resolve()
+      }
+    }, 1000)
   })
 }
 
-// 空き情報を取得（簡略化版）
+// 即座にAPI実行する関数
+const executeApiNow = async (unixTime: number): Promise<any> => {
+  return await getAvailabilityInfo()
+}
+
+
+
+// 空き情報を取得
+// APIは月全体のデータを返す: { year: "2025", month: "09", states: { "01": {...}, "02": {...}, ... "31": {...} } }
+// ここから今日の日付（例: "02"）のデータのみを抽出
+// 取得データ例: { "gate1": { "09:00": { "schedule_name": "朝", "time_state": 0 } }, "date_state": 1 }
+// time_state: 0=空き, 1=残り少ない, 2=満席, 4=利用不可
 const getAvailabilityInfo = async () => {
   try {
-    // 今日の日付を取得
     const today = new Date()
     const year = today.getFullYear()
     const month = today.getMonth() + 1
     
-    // 月の空き情報を取得
+    // 月全体のスケジュールデータを取得
     const scheduleData = await ticketsStore.getEntranceScheduleData(year, month, true)
     
-    // 今日の日付の時間帯情報を取得
-    const dayOfMonth = String(today.getDate()).padStart(2, '0')
-    const dayData = scheduleData?.states?.[dayOfMonth]
-    
-    logger.info('空き情報取得結果', { year, month, dayOfMonth, hasDayData: !!dayData })
-    return dayData
+    // 空き情報更新タイミング調査のため、全データを監視対象とする
+    return scheduleData
     
   } catch (error) {
     logger.error('空き情報取得エラー', error)
@@ -499,6 +692,39 @@ onMounted(() => {
         
         .ytomo-status-details {
           flex: 1;
+          
+          .ytomo-phase-info {
+            font-size: 13px;
+            margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            
+            .phase-label {
+              font-weight: 600;
+              color: #059669;
+              padding: 2px 6px;
+              background: #d1fae5;
+              border-radius: 3px;
+              flex-shrink: 0;
+            }
+            
+            .detection-info {
+              font-weight: 500;
+              color: #374151;
+              font-family: 'Consolas', 'Monaco', monospace;
+              min-width: 200px;
+            }
+          }
+          
+          .ytomo-waiting-info {
+            font-size: 12px;
+            color: #6b7280;
+            margin-bottom: 4px;
+            font-style: italic;
+            min-height: 18px; // 1行分の高さを確保
+            line-height: 18px;
+          }
           
           .ytomo-status-current {
             font-size: 14px;

@@ -26,7 +26,7 @@ const loadMainDialog = (mainElement: Element, loadingContainer: Element) => {
   
   // storeを初期化してからMainDialogをマウント
   const mainDialogStore = useMainDialogStore()
-  mainDialogStore.showDialog()
+  mainDialogStore.showDialog(true) // ytomoページでは現在のタブを保持
   mainDialogApp = createApp(MainDialog)
   mainDialogApp.mount(dialogContainer)
   

@@ -6,6 +6,7 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import type { TicketData, ScheduleData } from '@/types/api'
+import type { ReservationManagementData } from '@/types/reservationManagement'
 import { loggers } from '@/utils/logger'
 import { authenticatedFetch } from '@/utils/authManager'
 import { 
@@ -24,6 +25,9 @@ export const useTicketsStore = defineStore('tickets', () => {
   const selectedEntranceDates = ref<Map<string, string>>(new Map()) // ticketId -> scheduleId mapping for persistence
   const isLoading = ref(false)
   const isInitialized = ref(false) // ストア初期化状態
+  
+  // 予約ID管理システム
+  const reservationManagement = ref<Map<string, ReservationManagementData>>(new Map())
   
   // データの新鮮さ判定のcomputed（1時間以内）
   const isFresh = computed(() => {
@@ -783,6 +787,250 @@ export const useTicketsStore = defineStore('tickets', () => {
     logger.info('入場スケジュール一括取得完了', { count: promises.length })
   }
 
+  // 予約ID管理システム
+  const setReservationManagement = (reservationId: string, data: Partial<ReservationManagementData>): void => {
+    const existing = reservationManagement.value.get(reservationId)
+    const now = Date.now()
+    
+    const newData: ReservationManagementData = {
+      ticketId: existing?.ticketId || data.ticketId || '',
+      isSelected: data.isSelected ?? existing?.isSelected ?? false,
+      isLocked: data.isLocked ?? existing?.isLocked ?? false,
+      userLabel: data.userLabel ?? existing?.userLabel ?? '',
+      entranceDate: data.entranceDate ?? existing?.entranceDate ?? '',
+      reservationType: data.reservationType ?? existing?.reservationType,
+      createdAt: existing?.createdAt || now,
+      updatedAt: now
+    }
+    
+    reservationManagement.value.set(reservationId, newData)
+    logger.debug('予約ID管理データ更新', { reservationId, data: newData })
+  }
+
+  const getReservationManagement = (reservationId: string): ReservationManagementData | undefined => {
+    return reservationManagement.value.get(reservationId)
+  }
+
+  const getReservationsByTicketId = (ticketId: string): ReservationManagementData[] => {
+    return Array.from(reservationManagement.value.values())
+      .filter(reservation => reservation.ticketId === ticketId)
+  }
+
+  const toggleSelection = (reservationId: string): void => {
+    const existing = reservationManagement.value.get(reservationId)
+    if (existing) {
+      setReservationManagement(reservationId, { isSelected: !existing.isSelected })
+    }
+  }
+
+  const toggleLock = (reservationId: string, ticketId?: string): void => {
+    const existing = reservationManagement.value.get(reservationId)
+    const currentLocked = existing?.isLocked || false
+    setReservationManagement(reservationId, { 
+      isLocked: !currentLocked,
+      ticketId: ticketId || existing?.ticketId || ''
+    })
+    logger.debug('ロック状態切り替え', { reservationId, ticketId, from: currentLocked, to: !currentLocked })
+  }
+
+  const updateLabel = (reservationId: string, label: string, ticketId?: string): void => {
+    const existing = reservationManagement.value.get(reservationId)
+    setReservationManagement(reservationId, { 
+      userLabel: label,
+      ticketId: ticketId || existing?.ticketId || ''
+    })
+  }
+
+  const getSelectedReservationIds = (): string[] => {
+    return Array.from(reservationManagement.value.entries())
+      .filter(([_, data]) => data.isSelected)
+      .map(([reservationId, _]) => reservationId)
+  }
+
+  const getLockedReservationIds = (): string[] => {
+    return Array.from(reservationManagement.value.entries())
+      .filter(([_, data]) => data.isLocked)
+      .map(([reservationId, _]) => reservationId)
+  }
+
+  const removeReservationManagement = (reservationId: string): void => {
+    reservationManagement.value.delete(reservationId)
+    logger.debug('予約ID管理データ削除', { reservationId })
+  }
+
+  const clearAllReservationManagement = (): void => {
+    reservationManagement.value.clear()
+    logger.debug('全予約ID管理データクリア')
+  }
+
+  // チケット単体情報更新関数
+  const updateTicketFromAPI = async (ticketId: string): Promise<TicketData | null> => {
+    try {
+      logger.info('チケット単体情報更新開始', { ticketId })
+      
+      const response = await authenticatedFetch(`/api/d/user_visiting_reservations?ticket_id=${ticketId}`)
+      if (!response.ok) {
+        logger.error('チケット情報取得失敗', { ticketId, status: response.status })
+        return null
+      }
+      
+      const apiData = await response.json()
+      
+      if (!apiData.data || apiData.data.length === 0) {
+        logger.warn('チケット情報が空', { ticketId })
+        return null
+      }
+      
+      // 最初のチケットデータを使用（通常1件のはず）
+      const ticketData = apiData.data[0]
+      
+      const updatedTicket: TicketData = {
+        ticket_id: ticketData.ticket_id,
+        item_name: ticketData.item_name,
+        isOwn: true, // API取得したチケットは自分のもの
+        schedules: (ticketData.schedules || []).map((schedule: any) => {
+          const scheduleData: ScheduleData = {
+            user_visiting_reservation_id: schedule.user_visiting_reservation_id,
+            entrance_date: schedule.entrance_date || '',
+            use_state: schedule.use_state || 0,
+            gate_type: schedule.gate_type,
+            schedule_name: schedule.schedule_name,
+            time_start: schedule.time_start,
+            time_end: schedule.time_end,
+            reservation_type: schedule.reservation_type,
+            location_index: schedule.gate_type === 1 ? 0 : 1,
+            isEffective: schedule.use_state === 0 || 
+                       (schedule.use_state === 1 && schedule.entrance_date === getTodayString())
+          }
+          
+          // パビリオン予約種類情報を付与
+          if (scheduleData.entrance_date) {
+            const pavilionReservation = determinePavilionReservationType(scheduleData.entrance_date)
+            scheduleData.pavilionReservationType = pavilionReservation.channel
+            scheduleData.pavilionReservationActive = pavilionReservation.isActive
+            
+            // 全ての予約区分の状況も付与
+            const allStatus = getAllPavilionReservationStatus(scheduleData.entrance_date)
+            scheduleData.pavilionReservationStatus = {}
+            for (const [type, status] of Object.entries(allStatus)) {
+              scheduleData.pavilionReservationStatus[type] = {
+                periodStatus: status.periodStatus,
+                submissionStatus: status.submissionStatus,
+                winningInfo: status.winningInfo
+              }
+            }
+          }
+          
+          return scheduleData
+        })
+      }
+      
+      // 既存のチケット情報を更新
+      tickets.value.set(ticketId, updatedTicket)
+      
+      // 予約ID管理データを自動作成/更新
+      updatedTicket.schedules?.forEach(schedule => {
+        if (schedule.user_visiting_reservation_id != null) {
+          const reservationId = schedule.user_visiting_reservation_id.toString()
+          const existing = getReservationManagement(reservationId)
+          
+          setReservationManagement(reservationId, {
+            ticketId: ticketId,
+            entranceDate: schedule.entrance_date,
+            reservationType: schedule.reservation_type,
+            // 既存の選択状態・ロック状態・ラベルは保持
+            isSelected: existing?.isSelected ?? false,
+            isLocked: existing?.isLocked ?? false,
+            userLabel: existing?.userLabel ?? ''
+          })
+        }
+      })
+      
+      logger.info('チケット単体情報更新完了', { 
+        ticketId, 
+        schedulesCount: updatedTicket.schedules?.length || 0 
+      })
+      
+      return updatedTicket
+      
+    } catch (error) {
+      logger.error('チケット単体情報更新エラー', { ticketId, error })
+      return null
+    }
+  }
+  
+  // 取得済みチケットデータでstoreを更新する関数
+  const updateTicketFromData = (ticketData: any): void => {
+    if (!ticketData || !ticketData.ticket_id) {
+      logger.error('無効なチケットデータ', { ticketData })
+      return
+    }
+    
+    const ticketId = ticketData.ticket_id
+    logger.info('チケットデータ直接更新開始', { ticketId })
+    
+    try {
+      // 現在のチケットに関連する既存の予約IDを取得
+      const existingReservationIds = Array.from(reservationManagement.value.entries())
+        .filter(([_, data]) => data.ticketId === ticketId)
+        .map(([reservationId, _]) => reservationId)
+      
+      // 更新後のチケット情報に含まれる予約IDを収集
+      const updatedReservationIds = new Set<string>()
+      
+      // パビリオン予約情報を処理
+      if (ticketData.schedules) {
+        ticketData.schedules.forEach((schedule: any) => {
+          if (schedule.user_visiting_reservation_id) {
+            const reservationId = schedule.user_visiting_reservation_id.toString()
+            updatedReservationIds.add(reservationId)
+            
+            const existing = reservationManagement.value.get(reservationId)
+            
+            // 予約ID管理データを設定/更新（既存の選択状態・ロック状態・ラベルは保持）
+            setReservationManagement(reservationId, {
+              ticketId: ticketId,
+              entranceDate: schedule.entrance_date,
+              reservationType: schedule.reservation_type,
+              // 既存の選択状態・ロック状態・ラベルは保持
+              isSelected: existing?.isSelected ?? false,
+              isLocked: existing?.isLocked ?? false,
+              userLabel: existing?.userLabel ?? ''
+            })
+          }
+        })
+      }
+      
+      // 更新後のチケット情報に含まれなくなった予約IDの選択状態を解除
+      existingReservationIds.forEach(reservationId => {
+        if (!updatedReservationIds.has(reservationId)) {
+          const existingData = reservationManagement.value.get(reservationId)
+          if (existingData?.isSelected) {
+            logger.info('削除された予約IDの選択状態を解除', { 
+              ticketId, 
+              reservationId,
+              wasSelected: existingData.isSelected 
+            })
+            // 選択状態のみ解除（ロック状態とラベルは保持）
+            setReservationManagement(reservationId, { isSelected: false })
+          }
+        }
+      })
+      
+      // チケットデータを直接更新（API呼び出しなし）
+      tickets.value.set(ticketId, ticketData)
+      lastUpdateTime.value = Date.now()
+      
+      logger.info('チケットデータ直接更新完了', { 
+        ticketId, 
+        schedulesCount: ticketData.schedules?.length || 0 
+      })
+      
+    } catch (error) {
+      logger.error('チケットデータ直接更新エラー', { ticketId, error })
+    }
+  }
+
   // 初期化メソッド - キャッシュ復元と新鮮さ判定を担当
   const init = async (): Promise<void> => {
     if (isInitialized.value) {
@@ -819,6 +1067,7 @@ export const useTicketsStore = defineStore('tickets', () => {
     entranceSchedules,
     lastUpdateTime,
     isFresh,
+    reservationManagement,
     
     // Getters
     ticketsArray,
@@ -847,12 +1096,28 @@ export const useTicketsStore = defineStore('tickets', () => {
     extractAvailableDates,
     saveSelectedEntranceDate,
     removeSelectedEntranceDate,
-    restoreSelectedEntranceDates
+    restoreSelectedEntranceDates,
+    
+    // 予約ID管理システム
+    setReservationManagement,
+    getReservationManagement,
+    getReservationsByTicketId,
+    toggleSelection,
+    toggleLock,
+    updateLabel,
+    getSelectedReservationIds,
+    getLockedReservationIds,
+    removeReservationManagement,
+    clearAllReservationManagement,
+    
+    // チケット単体更新
+    updateTicketFromAPI,
+    updateTicketFromData
   }
 }, {
   persist: {
     key: 'ytomo-tickets-store',
-    pick: ['selectedEntranceDates', 'tickets', 'lastUpdateTime', 'entranceSchedules', 'entranceSchedulesUpdateTime'], // キャッシュを永続化
+    pick: ['selectedEntranceDates', 'tickets', 'lastUpdateTime', 'entranceSchedules', 'entranceSchedulesUpdateTime', 'isInitialized', 'reservationManagement'], // キャッシュ・初期化状態・予約ID管理を永続化
     serializer: {
       serialize: (data: any) => {
         // MapをObjectに変換してシリアライズ
@@ -868,6 +1133,9 @@ export const useTicketsStore = defineStore('tickets', () => {
         }
         if (serialized['entranceSchedulesUpdateTime'] instanceof Map) {
           serialized['entranceSchedulesUpdateTime'] = Object.fromEntries(serialized['entranceSchedulesUpdateTime'])
+        }
+        if (serialized['reservationManagement'] instanceof Map) {
+          serialized['reservationManagement'] = Object.fromEntries(serialized['reservationManagement'])
         }
         return JSON.stringify(serialized)
       },
@@ -885,6 +1153,9 @@ export const useTicketsStore = defineStore('tickets', () => {
         }
         if (parsed['entranceSchedulesUpdateTime'] && typeof parsed['entranceSchedulesUpdateTime'] === 'object') {
           parsed['entranceSchedulesUpdateTime'] = new Map(Object.entries(parsed['entranceSchedulesUpdateTime']))
+        }
+        if (parsed['reservationManagement'] && typeof parsed['reservationManagement'] === 'object') {
+          parsed['reservationManagement'] = new Map(Object.entries(parsed['reservationManagement']))
         }
         return parsed
       }

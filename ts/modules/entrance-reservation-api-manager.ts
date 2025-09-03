@@ -46,6 +46,12 @@ export class EntranceReservationApiManager {
 
   // 既存予約ID（変更予約の場合に使用）
   private existingReservationId: number | null = null
+  
+  // 選択された日付（エラーログ用）
+  private selectedDate: string = ''
+  
+  // tickets store（チケット情報更新用）
+  private ticketsStore: any
 
   // タイマー管理
   private reservationTimer: NodeJS.Timeout | null = null
@@ -56,6 +62,9 @@ export class EntranceReservationApiManager {
   private flag_first = ref(true)
 
   constructor() {
+    // tickets storeのインスタンスを取得
+    this.ticketsStore = useTicketsStore()
+    
     this.reservationStatus = ref({
       visible: false,
       isActive: false,
@@ -240,7 +249,7 @@ export class EntranceReservationApiManager {
 
     if (reservationResult?.success) {
       // 予約成功時の処理
-      this.handleReservationSuccess(topPrioritySlot, reservationResult)
+      await this.handleReservationSuccess(topPrioritySlot, reservationResult)
     } else if (reservationResult?.error) {
       this.addToHistory(false, topPrioritySlot.gate, topPrioritySlot.time)
     }
@@ -305,7 +314,7 @@ export class EntranceReservationApiManager {
   }
 
   // 予約成功時の処理
-  private handleReservationSuccess(slot: any, result: any) {
+  private async handleReservationSuccess(slot: any, result: any) {
     this.isReservationRunning.value = false
     this.clearReservationTimer()
     
@@ -327,6 +336,30 @@ export class EntranceReservationApiManager {
       progressText: '完了',
       statusClass: 'success',
       dateChange: dateTimeChange
+    }
+    
+    // 予約成功時にチケット情報を更新
+    if (result.ticketsData) {
+      try {
+        // 選択中のチケットIDを取得
+        const selectedTickets = Array.from(this.getSelectedTicketIds())
+        if (selectedTickets.length > 0) {
+          const targetTicketId = selectedTickets[0]
+          logger.info('予約成功後チケット情報更新開始（API取得済みデータ使用）', { ticketId: targetTicketId })
+          
+          // 既に取得されているチケットデータから該当チケットを抽出
+          const updatedTicket = result.ticketsData.list.find((ticket: any) => ticket.ticket_id === targetTicketId)
+          if (updatedTicket) {
+            // 取得済みチケットデータでstoreを更新（予約ID管理含む）
+            this.ticketsStore.updateTicketFromData(updatedTicket)
+            logger.info('予約成功後チケット情報更新完了（効率的更新）', { ticketId: targetTicketId })
+          } else {
+            logger.warn('対象チケットが取得データに含まれていません', { ticketId: targetTicketId })
+          }
+        }
+      } catch (error) {
+        logger.error('予約成功後チケット情報更新エラー', { error })
+      }
     }
     
     // 選択解除コールバックを実行
@@ -440,12 +473,12 @@ export class EntranceReservationApiManager {
           logger.info('追加実行成功', { slot, result })
           
           // 予約成功時は全体処理を完了
-          this.handleReservationSuccess(slot, result)
+          await this.handleReservationSuccess(slot, result)
           return
         } else {
           this.addToHistory(false, slot.gate, slot.time)
           logger.warn('予約失敗', { 
-            日時: `${slot.date} ${slot.gate}ゲート ${slot.time}`,
+            日時: `${this.selectedDate} ${slot.gate}ゲート ${slot.time}`,
             理由: result.error || '予約実行に失敗しました'
           })
           // 失敗した場合は次のスロットを試行
@@ -483,8 +516,9 @@ export class EntranceReservationApiManager {
 
   // 予約実行を開始
   public async executeReservation(selectedTimeSlots: any[], selectedDate?: string, existingReservationId?: number | null, originalReservationInfo?: any) {
-    // 既存予約IDを保存
+    // 既存予約ID、選択日付を保存
     this.existingReservationId = existingReservationId || null
+    this.selectedDate = selectedDate || ''
     
     if (this.isReservationRunning.value) {
       // 予約中断処理
@@ -594,7 +628,7 @@ export class EntranceReservationApiManager {
   }
 
   // 実際の万博予約API呼び出し
-  private async callActualReservationAPI(slot: any): Promise<{ success: boolean; date?: string; error?: string; reservationIds?: number[] }> {
+  private async callActualReservationAPI(slot: any): Promise<{ success: boolean; date?: string; error?: string; reservationIds?: number[]; ticketsData?: any }> {
     try {
       // 選択されたチケットIDを取得
       const selectedTickets = Array.from(this.getSelectedTicketIds())
@@ -684,7 +718,8 @@ export class EntranceReservationApiManager {
             if (confirmationResult.confirmed) {
               return { 
                 success: true, 
-                date: entranceDate
+                date: entranceDate,
+                ticketsData: confirmationResult.ticketsData
               }
             } else {
               return { 
@@ -742,7 +777,7 @@ export class EntranceReservationApiManager {
   }
 
   // verified-api-analysis.md必須要件：マイチケット情報で実際の予約変更を確認
-  private async confirmReservationSuccess(reservationIds: number[]): Promise<{ confirmed: boolean; error?: string }> {
+  private async confirmReservationSuccess(reservationIds: number[]): Promise<{ confirmed: boolean; error?: string; ticketsData?: any }> {
     try {
       logger.info('予約確認開始', { reservationIds })
       
@@ -769,7 +804,7 @@ export class EntranceReservationApiManager {
       
       if (allConfirmed) {
         logger.info('予約確認成功', { reservationIds, confirmed: true })
-        return { confirmed: true }
+        return { confirmed: true, ticketsData }
       } else {
         logger.warn('予約確認失敗', { reservationIds, allReservationIds, confirmed: false })
         return { confirmed: false, error: '作成された予約IDがマイチケット情報に見つかりませんでした' }
