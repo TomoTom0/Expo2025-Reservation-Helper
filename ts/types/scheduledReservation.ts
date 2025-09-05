@@ -40,6 +40,7 @@ export interface ScheduleFormData {
 // スケジュール実行状態
 export interface ScheduleExecutionState {
   activeSchedules: Map<string, NodeJS.Timeout> // 実行中のスケジュールID -> タイマーID
+  currentlyExecutingTimeSlots: Map<string, ScheduledTimeSlot[]> // 実行中の時間帯 scheduleId -> time slots
   executionHistory: ScheduleExecutionRecord[]
   isAnyScheduleRunning: boolean
 }

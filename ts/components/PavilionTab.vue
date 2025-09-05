@@ -46,13 +46,22 @@
         </button>
         <button 
           id="schedule-button" 
-          class="ytomo-icon-button" 
-          :class="{ active: scheduledReservationStore.uiState.showScheduleRow }"
+          class="ytomo-icon-button ytomo-schedule-button" 
+          :class="{ 
+            active: scheduledReservationStore.uiState.showScheduleRow,
+            running: scheduledReservationStore.executionState.isAnyScheduleRunning
+          }"
           title="スケジュール予約"
           @click="handleToggleScheduleRow"
           :disabled="isLoading"
         >
-          <span>📅</span>
+          <span class="ytomo-schedule-icon">📅</span>
+          <span 
+            v-if="scheduledReservationStore.enabledSchedules.length > 0"
+            class="ytomo-count-badge"
+          >
+            {{ scheduledReservationStore.enabledSchedules.length }}
+          </span>
         </button>
         <div class="ytomo-button-separator"></div>
         <button 
@@ -767,9 +776,9 @@ const handleReservationExecution = async () => {
       ticketIds
     }))
     
-    // 継続予約開始 - 必要な情報を渡して継続予約storeに委譲
+    // 継続予約開始 - 必要な情報を渡して継続予約storeに委譲（オーバーレイ非表示）
     const endlessMode = sequentialReservationStore.state.endlessMode
-    sequentialReservationStore.startSequentialReservation(reservationTargets, endlessMode)
+    sequentialReservationStore.startSequentialReservation(reservationTargets, endlessMode, false)
     
     // 継続予約storeに予約実行を完全委譲
     const results = await sequentialReservationStore.executeSequentialReservation(
@@ -1091,8 +1100,8 @@ const handleScheduleExecuteReservation = async (event: Event) => {
       maxRetries: schedule.maxRetries
     })
 
-    // Sequential Reservationで予約実行
-    sequentialReservationStore.startSequentialReservation(reservationTargets, false)
+    // Sequential Reservationで予約実行（オーバーレイ非表示）
+    sequentialReservationStore.startSequentialReservation(reservationTargets, false, false)
     
     // 特別な設定で実行（スケジュール用のカスタマイズ）
     const results = await sequentialReservationStore.executeSequentialReservation(
@@ -1118,6 +1127,16 @@ const handleScheduleExecuteReservation = async (event: Event) => {
       totalCount: results.length,
       overallSuccess: success
     })
+
+    // 成功時のみグローバル通知を表示
+    if (success && typeof (window as any).showReservationNotification === 'function') {
+      const message = successCount === results.length 
+        ? `スケジュール予約成功: ${schedule.label} (${successCount}件)`
+        : `スケジュール予約一部成功: ${schedule.label} (${successCount}/${results.length}件)`
+      
+      ;(window as any).showReservationNotification('success', message, true)
+      logger.info('スケジュール成功通知を表示', { message })
+    }
 
   } catch (error) {
     logger.error('スケジュール予約実行エラー', { scheduleId, error })
@@ -1320,6 +1339,55 @@ onUnmounted(() => {
         line-height: 1.2;
         pointer-events: none;
         z-index: 10;
+    }
+
+    /* スケジュールボタン専用スタイル */
+    .ytomo-schedule-button {
+        position: relative;
+        
+        .ytomo-schedule-icon {
+            transition: transform 0.3s ease;
+        }
+        
+        .ytomo-count-badge {
+            background: #00b894; /* スケジュール用は緑色 */
+        }
+        
+        /* 実行中状態 */
+        &.running {
+            background: #e17055 !important;
+            border-color: #e17055 !important;
+            
+            .ytomo-schedule-icon {
+                animation: ytomo-schedule-spin 2s linear infinite;
+            }
+            
+            .ytomo-count-badge {
+                background: #fdcb6e;
+                animation: ytomo-schedule-pulse 1.5s ease-in-out infinite;
+            }
+        }
+    }
+
+    /* スケジュール実行中アニメーション */
+    @keyframes ytomo-schedule-spin {
+        from {
+            transform: rotate(0deg);
+        }
+        to {
+            transform: rotate(360deg);
+        }
+    }
+
+    @keyframes ytomo-schedule-pulse {
+        0%, 100% {
+            transform: scale(1);
+            opacity: 1;
+        }
+        50% {
+            transform: scale(1.1);
+            opacity: 0.8;
+        }
     }
 
     &:focus {
@@ -1939,41 +2007,41 @@ onUnmounted(() => {
 /* スケジュール設定行 */
 .ytomo-schedule-controls {
     background: white;
-    border-radius: 8px;
-    padding: 16px;
+    border-radius: 6px;
+    padding: 10px 12px;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
     border: 1px solid #e2e8f0;
-    margin-bottom: 16px;
+    margin-bottom: 12px;
     flex-shrink: 0;
 }
 
 .ytomo-schedule-form {
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 8px;
 }
 
 .ytomo-form-row {
     display: flex;
     align-items: end;
-    gap: 16px;
+    gap: 10px;
     flex-wrap: wrap;
 
     @media (max-width: 1200px) {
-        gap: 12px;
+        gap: 8px;
     }
 
     @media (max-width: 800px) {
         flex-direction: column;
         align-items: stretch;
-        gap: 16px;
+        gap: 12px;
     }
 }
 
 .ytomo-form-group {
     display: flex;
     flex-direction: column;
-    gap: 4px;
+    gap: 2px;
     min-width: 120px;
 
     &:last-of-type {
@@ -1986,17 +2054,17 @@ onUnmounted(() => {
 }
 
 .ytomo-form-label {
-    font-size: 12px;
+    font-size: 11px;
     font-weight: 600;
     color: #374151;
-    margin-bottom: 4px;
+    margin-bottom: 2px;
 }
 
 .ytomo-form-input {
-    padding: 8px 12px;
+    padding: 6px 8px;
     border: 1px solid #d1d5db;
-    border-radius: 6px;
-    font-size: 14px;
+    border-radius: 4px;
+    font-size: 13px;
     transition: all 0.2s;
 
     &:focus {
@@ -2019,20 +2087,20 @@ onUnmounted(() => {
 
 .ytomo-datetime-inputs {
     display: flex;
-    gap: 8px;
+    gap: 6px;
 }
 
 .ytomo-toggle-button {
-    padding: 8px 16px;
+    padding: 6px 12px;
     border: 1px solid #d1d5db;
-    border-radius: 6px;
+    border-radius: 4px;
     background: white;
     color: #374151;
-    font-size: 14px;
+    font-size: 13px;
     font-weight: 500;
     cursor: pointer;
     transition: all 0.2s;
-    min-width: 60px;
+    min-width: 50px;
 
     &.active {
         background: #22c55e;
@@ -2056,9 +2124,9 @@ onUnmounted(() => {
 }
 
 .ytomo-action-button {
-    padding: 8px 16px;
-    border-radius: 6px;
-    font-size: 14px;
+    padding: 6px 12px;
+    border-radius: 4px;
+    font-size: 12px;
     font-weight: 500;
     cursor: pointer;
     transition: all 0.2s;
@@ -2101,10 +2169,10 @@ onUnmounted(() => {
 .ytomo-selected-timeslots-info {
     display: flex;
     align-items: center;
-    gap: 12px;
-    padding-top: 12px;
+    gap: 8px;
+    padding-top: 8px;
     border-top: 1px solid #f1f5f9;
-    font-size: 14px;
+    font-size: 12px;
 }
 
 .ytomo-info-label {

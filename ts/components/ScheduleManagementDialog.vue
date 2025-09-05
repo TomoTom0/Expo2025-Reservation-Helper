@@ -17,94 +17,14 @@
           </button>
         </div>
 
-        <!-- 上部管理エリア -->
-        <div class="ytomo-management-area">
-          <div class="ytomo-management-form">
-            <div class="ytomo-form-group">
-              <label class="ytomo-form-label">ラベル</label>
-              <input 
-                type="text" 
-                v-model="editFormData.label"
-                class="ytomo-form-input"
-                placeholder="予約名"
-                maxlength="50"
-              >
-            </div>
-            
-            <div class="ytomo-form-group">
-              <label class="ytomo-form-label">実行日時</label>
-              <div class="ytomo-datetime-inputs">
-                <input 
-                  type="date" 
-                  v-model="editFormData.executeDate"
-                  class="ytomo-form-input"
-                  :min="minScheduleDate"
-                >
-                <input 
-                  type="time" 
-                  v-model="editFormData.executeTime"
-                  class="ytomo-form-input"
-                >
-              </div>
-            </div>
-            
-            <div class="ytomo-form-group">
-              <label class="ytomo-form-label">繰り返し回数</label>
-              <input 
-                type="number" 
-                v-model.number="editFormData.maxRetries"
-                class="ytomo-form-input"
-                min="1"
-                max="200"
-              >
-            </div>
-            
-            <div class="ytomo-form-group">
-              <label class="ytomo-form-label">間隔(秒)</label>
-              <input 
-                type="number" 
-                v-model.number="editFormData.interval"
-                class="ytomo-form-input"
-                min="5"
-                max="300"
-              >
-            </div>
-            
-            <div class="ytomo-form-group">
-              <label class="ytomo-form-label">状態</label>
-              <button 
-                class="ytomo-toggle-button"
-                :class="{ active: editFormData.isEnabled }"
-                @click="editFormData.isEnabled = !editFormData.isEnabled"
-              >
-                {{ editFormData.isEnabled ? '有効' : '無効' }}
-              </button>
-            </div>
-            
-            <div class="ytomo-management-actions">
-              <button 
-                class="ytomo-action-button ytomo-duplicate-button"
-                :disabled="!selectedSchedule"
-                @click="handleDuplicateEdit"
-              >
-                複製編集
-              </button>
-              <button 
-                class="ytomo-action-button ytomo-save-button"
-                :disabled="!canSaveEditingSchedule"
-                @click="handleSaveEditingSchedule"
-              >
-                保存
-              </button>
-              <button 
-                class="ytomo-action-button ytomo-delete-button"
-                :disabled="!selectedSchedule"
-                @click="handleDeleteSchedule"
-              >
-                削除
-              </button>
-            </div>
-          </div>
+        <!-- コンパクトアクションバー -->
+        <div class="ytomo-action-bar">
+          <button 
+            class="ytomo-action-btn ytomo-btn-new"
+            @click="handleNewSchedule"
+          >
+            + 新規
+          </button>
         </div>
 
         <!-- メインコンテンツエリア -->
@@ -112,7 +32,7 @@
           <!-- 左サイドバー -->
           <div class="ytomo-schedule-list">
             <div class="ytomo-list-header">
-              <h3>予約一覧</h3>
+              <h3>スケジュール一覧</h3>
               <span class="ytomo-list-count">{{ scheduledReservationsArray.length }}件</span>
             </div>
             <div class="ytomo-list-items">
@@ -120,11 +40,34 @@
                 v-for="schedule in scheduledReservationsArray"
                 :key="schedule.id"
                 class="ytomo-schedule-item"
-                :class="{ active: selectedScheduleId === schedule.id }"
+                :class="{ 
+                  active: selectedScheduleId === schedule.id,
+                  running: scheduledReservationStore.executionState.activeSchedules.has(schedule.id)
+                }"
                 @click="selectSchedule(schedule)"
               >
                 <div class="ytomo-schedule-info">
-                  <div class="ytomo-schedule-label">{{ schedule.label }}</div>
+                  <div class="ytomo-schedule-header">
+                    <div class="ytomo-schedule-label">{{ schedule.label }}</div>
+                    <div class="ytomo-schedule-controls">
+                      <button 
+                        v-if="scheduledReservationStore.executionState.activeSchedules.has(schedule.id)"
+                        class="ytomo-control-button ytomo-stop-button"
+                        title="実行停止"
+                        @click.stop="handleStopSchedule(schedule.id)"
+                      >
+                        ⏹️
+                      </button>
+                      <button 
+                        v-else-if="schedule.isEnabled && isScheduleExecutable(schedule)"
+                        class="ytomo-control-button ytomo-start-button" 
+                        title="手動実行"
+                        @click.stop="handleStartSchedule(schedule.id)"
+                      >
+                        ▶️
+                      </button>
+                    </div>
+                  </div>
                   <div class="ytomo-schedule-time">
                     {{ formatScheduleTime(schedule.executeAt) }}
                   </div>
@@ -149,36 +92,139 @@
           <!-- 右メインエリア -->
           <div class="ytomo-schedule-details">
             <div v-if="selectedSchedule" class="ytomo-details-content">
-              <div class="ytomo-details-header">
-                <h3>{{ selectedSchedule.label }}</h3>
-                <div class="ytomo-schedule-summary">
-                  <span>{{ formatScheduleTime(selectedSchedule.executeAt) }}</span>
-                  <span>・</span>
-                  <span>{{ selectedSchedule.maxRetries }}回</span>
-                  <span>・</span>
-                  <span>{{ selectedSchedule.interval }}秒間隔</span>
-                  <span>・</span>
-                  <span :class="{ enabled: selectedSchedule.isEnabled, disabled: !selectedSchedule.isEnabled }">
-                    {{ selectedSchedule.isEnabled ? '有効' : '無効' }}
-                  </span>
+              <!-- インライン編集フォーム -->
+              <div class="ytomo-inline-form">
+                <div class="ytomo-form-row">
+                  <label>ラベル</label>
+                  <input 
+                    type="text" 
+                    v-model="editFormData.label"
+                    class="ytomo-compact-input"
+                    placeholder="予約名"
+                  >
+                </div>
+                
+                <div class="ytomo-form-row">
+                  <label>実行時刻</label>
+                  <div class="ytomo-datetime-compact">
+                    <input 
+                      type="date" 
+                      v-model="editFormData.executeDate"
+                      class="ytomo-compact-input"
+                    >
+                    <input 
+                      type="time" 
+                      v-model="editFormData.executeTime"
+                      class="ytomo-compact-input"
+                    >
+                  </div>
+                </div>
+                
+                <div class="ytomo-form-row">
+                  <label>設定</label>
+                  <div class="ytomo-settings-compact">
+                    <span class="ytomo-setting-item">
+                      <span class="ytomo-setting-label">回数</span>
+                      <input 
+                        type="number" 
+                        v-model.number="editFormData.maxRetries"
+                        class="ytomo-number-input"
+                        min="1" max="200"
+                      >
+                    </span>
+                    <span class="ytomo-setting-item">
+                      <span class="ytomo-setting-label">間隔</span>
+                      <input 
+                        type="number" 
+                        v-model.number="editFormData.interval"
+                        class="ytomo-number-input"
+                        min="5" max="300"
+                      >秒
+                    </span>
+                    <button 
+                      class="ytomo-toggle-compact"
+                      :class="{ active: editFormData.isEnabled }"
+                      @click="editFormData.isEnabled = !editFormData.isEnabled"
+                    >
+                      {{ editFormData.isEnabled ? '有効' : '無効' }}
+                    </button>
+                  </div>
+                </div>
+                
+                <div class="ytomo-form-actions">
+                  <button 
+                    class="ytomo-save-btn"
+                    :disabled="!canSaveEditingSchedule"
+                    @click="handleSaveEditingSchedule"
+                  >
+                    保存
+                  </button>
+                  <button 
+                    class="ytomo-duplicate-btn"
+                    :disabled="!selectedSchedule"
+                    @click="handleDuplicateEdit"
+                  >
+                    複製
+                  </button>
+                  <button 
+                    class="ytomo-delete-btn"
+                    :disabled="!selectedSchedule"
+                    @click="handleDeleteSchedule"
+                  >
+                    削除
+                  </button>
                 </div>
               </div>
               
               <div class="ytomo-timeslots-grid">
                 <div 
-                  v-for="timeSlot in selectedSchedule.selectedTimeSlots"
+                  v-for="timeSlot in selectedSchedule?.selectedTimeSlots || []"
                   :key="`${timeSlot.pavilionId}-${timeSlot.timeSlot}`"
                   class="ytomo-timeslot-card"
+                  :class="{
+                    running: isSelectedScheduleRunning
+                  }"
                 >
                   <div class="ytomo-pavilion-name">{{ timeSlot.pavilionName }}</div>
                   <div class="ytomo-timeslot-time">{{ formatTimeSlot(timeSlot.timeSlot) }}</div>
                   <div class="ytomo-entrance-date">{{ formatEntranceDate(timeSlot.entranceDate) }}</div>
                 </div>
               </div>
+              
+              <!-- 実行履歴セクション -->
+              <div v-if="selectedScheduleExecutionHistory.length > 0" class="ytomo-execution-history">
+                <h4>実行履歴</h4>
+                <div class="ytomo-history-list">
+                  <div 
+                    v-for="record in selectedScheduleExecutionHistory" 
+                    :key="`${record.scheduleId}-${record.executedAt.getTime()}`"
+                    class="ytomo-history-item"
+                    :class="{ success: record.success, failed: !record.success }"
+                  >
+                    <div class="ytomo-history-info">
+                      <div class="ytomo-history-time">
+                        {{ formatExecutionTime(record.executedAt) }}
+                      </div>
+                      <div class="ytomo-history-status">
+                        <span class="ytomo-status-icon">{{ record.success ? '✅' : '❌' }}</span>
+                        <span class="ytomo-status-text">
+                          {{ record.success ? '成功' : '失敗' }}
+                        </span>
+                      </div>
+                      <div v-if="record.error" class="ytomo-history-error">
+                        {{ record.error }}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
             
             <div v-else class="ytomo-no-selection">
-              <p>左側から予約を選択してください</p>
+              <p>
+                <span class="ytomo-desktop-message">左側から予約を選択してください</span>
+                <span class="ytomo-mobile-message">上部のドロップダウンから予約を選択してください</span>
+              </p>
             </div>
           </div>
         </div>
@@ -229,24 +275,37 @@ const canSaveEditingSchedule = computed(() => {
          editFormData.value.executeTime !== ''
 })
 
+const isSelectedScheduleRunning = computed(() => {
+  if (!selectedSchedule.value?.id) return false
+  return scheduledReservationStore.executionState.activeSchedules.has(selectedSchedule.value.id)
+})
+
+const selectedScheduleExecutionHistory = computed(() => {
+  if (!selectedSchedule.value?.id) return []
+  return scheduledReservationStore.executionState.executionHistory.filter(record => 
+    record.scheduleId === selectedSchedule.value?.id
+  )
+})
+
 // 選択されたスケジュールの監視
 watch(selectedScheduleId, (newId) => {
   scheduledReservationStore.selectSchedule(newId)
 })
 
 watch(selectedSchedule, (newSchedule) => {
-  if (newSchedule) {
+  if (newSchedule?.executeAt) {
     // 編集フォームに選択されたスケジュールの内容を設定
     const executeDate = newSchedule.executeAt.toISOString().split('T')[0]
-    const executeTime = newSchedule.executeAt.toTimeString().substring(0, 5)
+    const executeTimeString = newSchedule.executeAt.toTimeString()
+    const executeTime = executeTimeString ? executeTimeString.substring(0, 5) : '09:00'
     
     editFormData.value = {
-      label: newSchedule.label,
-      executeDate: executeDate,
+      label: newSchedule.label || '',
+      executeDate: executeDate || '',
       executeTime: executeTime,
-      interval: newSchedule.interval,
-      maxRetries: newSchedule.maxRetries,
-      isEnabled: newSchedule.isEnabled
+      interval: newSchedule.interval || 15,
+      maxRetries: newSchedule.maxRetries || 10,
+      isEnabled: newSchedule.isEnabled ?? true
     }
   }
 })
@@ -263,30 +322,45 @@ const selectSchedule = (schedule: ScheduledReservation) => {
 }
 
 const handleSaveEditingSchedule = () => {
-  if (!selectedSchedule.value || !canSaveEditingSchedule.value) {
-    logger.warn('スケジュール更新: 選択されたスケジュールまたは必要項目が不足')
+  if (!canSaveEditingSchedule.value) {
+    logger.warn('スケジュール保存: 必要項目が不足')
     return
   }
 
   const schedule = selectedSchedule.value
-  const success = scheduledReservationStore.updateScheduledReservation(
-    schedule.id,
-    editFormData.value,
-    schedule.selectedTimeSlots
-  )
-
-  if (success) {
-    logger.info('スケジュール更新成功', { id: schedule.id })
+  
+  if (schedule) {
+    // 既存スケジュールの更新
+    const success = scheduledReservationStore.updateScheduledReservation(
+      schedule.id,
+      editFormData.value,
+      schedule.selectedTimeSlots
+    )
+    
+    if (success) {
+      logger.info('スケジュール更新成功', { id: schedule.id })
+    }
+  } else {
+    // 新規スケジュール作成
+    const newScheduleId = scheduledReservationStore.createScheduledReservation(
+      editFormData.value,
+      [] // 新規作成時は時間帯なし
+    )
+    
+    if (newScheduleId) {
+      selectedScheduleId.value = newScheduleId
+      logger.info('新規スケジュール作成成功', { id: newScheduleId })
+    }
   }
 }
 
 const handleDeleteSchedule = () => {
-  if (!selectedSchedule.value) {
+  const schedule = selectedSchedule.value
+  if (!schedule) {
     logger.warn('削除対象のスケジュールが選択されていない')
     return
   }
 
-  const schedule = selectedSchedule.value
   if (confirm(`「${schedule.label}」を削除しますか？`)) {
     const success = scheduledReservationStore.deleteScheduledReservation(schedule.id)
     if (success) {
@@ -296,13 +370,26 @@ const handleDeleteSchedule = () => {
   }
 }
 
+const handleNewSchedule = () => {
+  // 新規スケジュール作成 - 選択をクリアして新規フォームを表示
+  selectedScheduleId.value = null
+  editFormData.value = {
+    label: '新規予約',
+    executeTime: '09:00',
+    executeDate: new Date().toISOString().split('T')[0],
+    interval: 30,
+    maxRetries: 10,
+    isEnabled: true
+  }
+  logger.info('新規スケジュール作成開始')
+}
+
 const handleDuplicateEdit = async () => {
-  if (!selectedSchedule.value) {
+  const originalSchedule = selectedSchedule.value
+  if (!originalSchedule) {
     logger.warn('複製対象のスケジュールが選択されていない')
     return
   }
-
-  const originalSchedule = selectedSchedule.value
   
   // 複製を作成
   const newId = scheduledReservationStore.duplicateScheduledReservation(originalSchedule.id)
@@ -344,7 +431,8 @@ const handleDuplicateEdit = async () => {
 }
 
 // フォーマット関数
-const formatScheduleTime = (date: Date): string => {
+const formatScheduleTime = (date: Date | null | undefined): string => {
+  if (!date) return ''
   return `${date.getMonth() + 1}/${date.getDate()} ${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}`
 }
 
@@ -373,6 +461,32 @@ const formatEntranceDate = (dateStr: string): string => {
   }
   return dateStr || ''
 }
+
+const formatExecutionTime = (date: Date): string => {
+  return `${date.getMonth() + 1}/${date.getDate()} ${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}`
+}
+
+// スケジュール実行可能判定
+const isScheduleExecutable = (schedule: any): boolean => {
+  // 有効で、時間帯が選択されている
+  return schedule.isEnabled && schedule.selectedTimeSlots && schedule.selectedTimeSlots.length > 0
+}
+
+// スケジュール停止処理
+const handleStopSchedule = (scheduleId: string) => {
+  scheduledReservationStore.stopScheduleExecution(scheduleId)
+  logger.info('スケジュール手動停止', { scheduleId })
+}
+
+// スケジュール開始処理（手動実行）
+const handleStartSchedule = (scheduleId: string) => {
+  const success = scheduledReservationStore.startScheduleExecution(scheduleId)
+  if (success) {
+    logger.info('スケジュール手動開始', { scheduleId })
+  } else {
+    logger.warn('スケジュール開始失敗', { scheduleId })
+  }
+}
 </script>
 
 <style scoped lang="scss">
@@ -389,30 +503,49 @@ const formatEntranceDate = (dateStr: string): string => {
   z-index: 10010;
   opacity: 0;
   animation: fadeIn 0.2s ease-out forwards;
+  padding: 16px;
 }
 
 .ytomo-schedule-dialog {
   background: white;
   border-radius: 12px;
-  width: 90%;
-  max-width: 1200px;
-  height: 80%;
-  max-height: 800px;
+  width: 100%;
+  max-width: 1000px; /* コンパクト化 */
+  height: 85vh; /* ビューポート基準 */
+  max-height: 700px; /* 最大高さ削減 */
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
   display: flex;
   flex-direction: column;
   transform: scale(0.9);
   animation: dialogAppear 0.2s ease-out forwards;
   overflow: hidden;
+  
+  /* レスポンシブ対応 */
+  @media (max-width: 768px) {
+    width: 95%;
+    height: 90vh;
+    max-height: none;
+    border-radius: 8px;
+  }
+  
+  @media (max-width: 480px) {
+    width: 98%;
+    height: 95vh;
+    margin: 8px;
+  }
 }
 
 .ytomo-dialog-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 20px 24px;
+  padding: 16px 20px;
   border-bottom: 1px solid #e2e8f0;
   flex-shrink: 0;
+  
+  @media (max-width: 480px) {
+    padding: 12px 16px;
+  }
 }
 
 .ytomo-dialog-title {
@@ -420,6 +553,10 @@ const formatEntranceDate = (dateStr: string): string => {
   font-size: 18px;
   font-weight: 600;
   color: #374151;
+  
+  @media (max-width: 480px) {
+    font-size: 16px;
+  }
 }
 
 .ytomo-close-button {
@@ -442,164 +579,309 @@ const formatEntranceDate = (dateStr: string): string => {
   }
 }
 
-.ytomo-management-area {
-  padding: 16px 24px;
+/* アクションバースタイル */
+.ytomo-action-bar {
+  padding: 12px 20px;
   border-bottom: 1px solid #e2e8f0;
   flex-shrink: 0;
-}
-
-.ytomo-management-form {
-  display: flex;
-  align-items: end;
-  gap: 16px;
-  flex-wrap: wrap;
-
-  @media (max-width: 1000px) {
-    flex-direction: column;
-    align-items: stretch;
-  }
-}
-
-.ytomo-form-group {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.ytomo-form-label {
-  font-size: 12px;
-  font-weight: 600;
-  color: #374151;
-}
-
-.ytomo-form-input {
-  padding: 8px 12px;
-  border: 1px solid #d1d5db;
-  border-radius: 6px;
-  font-size: 14px;
-  transition: all 0.2s;
-  width: 120px;
-
-  &:focus {
-    outline: none;
-    border-color: #2c5aa0;
-  }
-}
-
-.ytomo-datetime-inputs {
   display: flex;
   gap: 8px;
-}
-
-.ytomo-toggle-button {
-  padding: 8px 16px;
-  border: 1px solid #d1d5db;
-  border-radius: 6px;
-  background: white;
-  color: #374151;
-  font-size: 14px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s;
-  min-width: 60px;
-
-  &.active {
-    background: #22c55e;
-    border-color: #22c55e;
-    color: white;
+  align-items: center;
+  background: #f8fafc;
+  
+  @media (max-width: 768px) {
+    padding: 10px 16px;
+    gap: 6px;
   }
-
-  &:hover {
-    border-color: #9ca3af;
-  }
-
-  &:focus {
-    outline: none;
-    border-color: #2c5aa0;
+  
+  @media (max-width: 480px) {
+    flex-wrap: wrap;
+    padding: 8px 16px;
   }
 }
 
-.ytomo-management-actions {
-  display: flex;
-  gap: 8px;
-  margin-left: auto;
-
-  @media (max-width: 1000px) {
-    margin-left: 0;
-    justify-content: center;
-  }
-}
-
-.ytomo-action-button {
+.ytomo-action-btn {
   padding: 8px 16px;
   border-radius: 6px;
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s;
   border: 1px solid;
-
+  min-width: 0;
+  
   &:focus {
     outline: none;
   }
-
-  &.ytomo-duplicate-button {
-    background: #f59e0b;
-    border-color: #f59e0b;
-    color: white;
-
-    &:hover:not(:disabled) {
-      background: #d97706;
-      border-color: #d97706;
-    }
-  }
-
-  &.ytomo-save-button {
+  
+  &.ytomo-btn-new {
     background: #2c5aa0;
     border-color: #2c5aa0;
     color: white;
-
+    
     &:hover:not(:disabled) {
       background: #1a365d;
       border-color: #1a365d;
     }
   }
-
-  &.ytomo-delete-button {
-    background: #ef4444;
-    border-color: #ef4444;
-    color: white;
-
-    &:hover:not(:disabled) {
-      background: #dc2626;
-      border-color: #dc2626;
-    }
-  }
-
+  
+  /* 複製ボタンスタイルを削除 */
+  
+  /* 削除ボタンスタイルを削除 */
+  
   &:disabled {
     background: #94a3b8;
     border-color: #94a3b8;
     cursor: not-allowed;
     opacity: 0.6;
   }
+  
+  @media (max-width: 480px) {
+    padding: 6px 12px;
+    font-size: 12px;
+    flex: 1;
+  }
 }
+
+/* インラインフォームスタイル */
+.ytomo-inline-form {
+  background: #f8fafc;
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 20px;
+  border: 1px solid #e2e8f0;
+  
+  @media (max-width: 768px) {
+    padding: 12px;
+    margin-bottom: 16px;
+  }
+}
+
+.ytomo-form-row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 12px;
+  gap: 12px;
+  
+  &:last-child {
+    margin-bottom: 0;
+  }
+  
+  @media (max-width: 640px) {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 6px;
+  }
+  
+  label {
+    font-size: 12px;
+    font-weight: 600;
+    color: #374151;
+    min-width: 60px;
+    
+    @media (max-width: 640px) {
+      min-width: 0;
+    }
+  }
+}
+
+.ytomo-compact-input {
+  padding: 6px 10px;
+  border: 1px solid #d1d5db;
+  border-radius: 4px;
+  font-size: 13px;
+  transition: all 0.2s;
+  flex: 1;
+  
+  &:focus {
+    outline: none;
+    border-color: #2c5aa0;
+  }
+}
+
+.ytomo-datetime-compact {
+  display: flex;
+  gap: 8px;
+  flex: 1;
+  
+  @media (max-width: 480px) {
+    flex-direction: column;
+    gap: 6px;
+  }
+}
+
+.ytomo-settings-compact {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+  
+  @media (max-width: 480px) {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+  }
+}
+
+.ytomo-setting-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  
+  .ytomo-setting-label {
+    font-size: 11px;
+    color: #6b7280;
+    white-space: nowrap;
+  }
+}
+
+.ytomo-number-input {
+  padding: 4px 8px;
+  border: 1px solid #d1d5db;
+  border-radius: 4px;
+  font-size: 12px;
+  width: 50px;
+  text-align: center;
+  
+  &:focus {
+    outline: none;
+    border-color: #2c5aa0;
+  }
+}
+
+.ytomo-toggle-compact {
+  padding: 4px 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 4px;
+  background: white;
+  color: #374151;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  min-width: 50px;
+  
+  &.active {
+    background: #22c55e;
+    border-color: #22c55e;
+    color: white;
+  }
+  
+  &:hover {
+    border-color: #9ca3af;
+  }
+}
+
+.ytomo-form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 16px;
+  padding-top: 12px;
+  border-top: 1px solid #e2e8f0;
+  
+  @media (max-width: 480px) {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+}
+
+.ytomo-save-btn,
+.ytomo-duplicate-btn,
+.ytomo-delete-btn {
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  border: 1px solid;
+  min-width: 0;
+  
+  &:focus {
+    outline: none;
+  }
+  
+  &:disabled {
+    background: #94a3b8;
+    border-color: #94a3b8;
+    cursor: not-allowed;
+    opacity: 0.6;
+  }
+  
+  @media (max-width: 480px) {
+    flex: 1;
+    min-width: 80px;
+  }
+}
+
+.ytomo-save-btn {
+  background: #2c5aa0;
+  border-color: #2c5aa0;
+  color: white;
+  
+  &:hover:not(:disabled) {
+    background: #1a365d;
+    border-color: #1a365d;
+  }
+}
+
+.ytomo-duplicate-btn {
+  background: #f59e0b;
+  border-color: #f59e0b;
+  color: white;
+  
+  &:hover:not(:disabled) {
+    background: #d97706;
+    border-color: #d97706;
+  }
+}
+
+.ytomo-delete-btn {
+  background: #ef4444;
+  border-color: #ef4444;
+  color: white;
+  
+  &:hover:not(:disabled) {
+    background: #dc2626;
+    border-color: #dc2626;
+  }
+}
+
+/* 不要なスタイルを削除済み */
 
 .ytomo-dialog-content {
   flex: 1;
   display: flex;
   min-height: 0;
+  
+  @media (max-width: 640px) {
+    flex-direction: column;
+  }
 }
 
 .ytomo-schedule-list {
-  width: 300px;
+  width: 280px; /* コンパクト化 */
+  min-width: 280px;
+  max-width: 280px;
   border-right: 1px solid #e2e8f0;
   display: flex;
   flex-direction: column;
   flex-shrink: 0;
+  
+  @media (max-width: 768px) {
+    width: 250px;
+    min-width: 250px;
+    max-width: 250px;
+  }
+  
+  @media (max-width: 640px) {
+    display: none; /* モバイルでは非表示 */
+  }
 }
 
 .ytomo-list-header {
-  padding: 16px 20px;
+  padding: 12px 16px;
   border-bottom: 1px solid #f1f5f9;
   display: flex;
   align-items: center;
@@ -607,9 +889,17 @@ const formatEntranceDate = (dateStr: string): string => {
 
   h3 {
     margin: 0;
-    font-size: 16px;
+    font-size: 14px; /* コンパクト化 */
     font-weight: 600;
     color: #374151;
+  }
+  
+  @media (max-width: 768px) {
+    padding: 10px 14px;
+    
+    h3 {
+      font-size: 13px;
+    }
   }
 }
 
@@ -625,10 +915,15 @@ const formatEntranceDate = (dateStr: string): string => {
 }
 
 .ytomo-schedule-item {
-  padding: 16px 20px;
+  padding: 12px 16px; /* コンパクト化 */
   border-bottom: 1px solid #f1f5f9;
   cursor: pointer;
   transition: all 0.2s;
+  box-sizing: border-box;
+  
+  @media (max-width: 768px) {
+    padding: 10px 14px;
+  }
 
   &:hover {
     background: #f8fafc;
@@ -638,6 +933,45 @@ const formatEntranceDate = (dateStr: string): string => {
     background: #e0f2fe;
     border-left: 4px solid #2c5aa0;
     padding-left: 16px;
+    box-sizing: border-box; /* ボックスサイズを固定 */
+  }
+
+  &.running {
+    background: linear-gradient(135deg, #fff5f5 0%, #fed7d7 100%);
+    border-left: 4px solid #e53e3e;
+    padding-left: 16px;
+    position: relative;
+    box-sizing: border-box; /* ボックスサイズを固定 */
+    
+    &::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(90deg, 
+        transparent 0%, 
+        rgba(229, 62, 62, 0.1) 50%, 
+        transparent 100%
+      );
+      animation: ytomo-schedule-running-glow 2s ease-in-out infinite;
+    }
+    
+    .ytomo-schedule-label {
+      color: #c53030;
+      font-weight: 700;
+    }
+    
+    .ytomo-schedule-time {
+      color: #e53e3e;
+      font-weight: 600;
+    }
+    
+    &.active {
+      background: linear-gradient(135deg, #fef5e7 0%, #fed7aa 100%);
+      border-left-color: #ed8936;
+    }
   }
 
   &:last-child {
@@ -651,11 +985,55 @@ const formatEntranceDate = (dateStr: string): string => {
   gap: 4px;
 }
 
+.ytomo-schedule-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
 .ytomo-schedule-label {
   font-size: 14px;
   font-weight: 600;
   color: #374151;
   line-height: 1.3;
+  flex: 1;
+  min-width: 0; /* テキストが長い場合の省略対応 */
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ytomo-schedule-controls {
+  display: flex;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.ytomo-control-button {
+  background: none;
+  border: none;
+  padding: 4px;
+  cursor: pointer;
+  border-radius: 4px;
+  font-size: 14px;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  
+  &:hover {
+    background: rgba(0, 0, 0, 0.1);
+    transform: scale(1.1);
+  }
+  
+  &.ytomo-stop-button:hover {
+    background: rgba(239, 68, 68, 0.1);
+  }
+  
+  &.ytomo-start-button:hover {
+    background: rgba(34, 197, 94, 0.1);
+  }
 }
 
 .ytomo-schedule-time {
@@ -704,61 +1082,102 @@ const formatEntranceDate = (dateStr: string): string => {
   display: flex;
   flex-direction: column;
   min-width: 0;
+  
+  @media (max-width: 640px) {
+    /* モバイルでスケジュール選択ドロップダウンを表示 */
+    &::before {
+      content: '';
+      display: block;
+      padding: 12px 16px;
+      background: #f8fafc;
+      border-bottom: 1px solid #e2e8f0;
+      font-size: 13px;
+      color: #6b7280;
+    }
+  }
 }
 
 .ytomo-details-content {
-  padding: 20px 24px;
+  padding: 16px 20px; /* コンパクト化 */
   flex: 1;
   overflow-y: auto;
-}
-
-.ytomo-details-header {
-  margin-bottom: 20px;
-  padding-bottom: 16px;
-  border-bottom: 1px solid #f1f5f9;
-
-  h3 {
-    margin: 0 0 8px 0;
-    font-size: 18px;
-    font-weight: 600;
-    color: #374151;
+  
+  @media (max-width: 768px) {
+    padding: 14px 16px;
+  }
+  
+  @media (max-width: 480px) {
+    padding: 12px 16px;
   }
 }
 
-.ytomo-schedule-summary {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 14px;
-  color: #6b7280;
-
-  .enabled {
-    color: #22c55e;
-    font-weight: 600;
-  }
-
-  .disabled {
-    color: #ef4444;
-    font-weight: 600;
-  }
-}
+/* 使用しないヘッダースタイルを削除 */
 
 .ytomo-timeslots-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-  gap: 16px;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); /* コンパクト化 */
+  gap: 12px;
+  
+  @media (max-width: 768px) {
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 10px;
+  }
+  
+  @media (max-width: 480px) {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
 }
 
 .ytomo-timeslot-card {
   background: white;
   border: 1px solid #e2e8f0;
-  border-radius: 8px;
-  padding: 16px;
+  border-radius: 6px;
+  padding: 12px; /* コンパクト化 */
   transition: all 0.2s;
+  
+  @media (max-width: 768px) {
+    padding: 10px;
+  }
 
   &:hover {
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     border-color: #cbd5e1;
+  }
+  
+  &.running {
+    background: linear-gradient(135deg, #fff5f5 0%, #fef2f2 100%);
+    border: 2px solid #fca5a5;
+    position: relative;
+    
+    &::before {
+      content: '';
+      position: absolute;
+      top: -2px;
+      left: -2px;
+      right: -2px;
+      bottom: -2px;
+      border-radius: 10px;
+      background: linear-gradient(45deg, #fca5a5, #f87171, #ef4444, #dc2626);
+      background-size: 300% 300%;
+      animation: ytomo-timeslot-running-border 3s ease-in-out infinite;
+      z-index: -1;
+    }
+    
+    .ytomo-pavilion-name {
+      color: #dc2626;
+      font-weight: 700;
+    }
+    
+    .ytomo-timeslot-time {
+      color: #ef4444;
+      font-weight: 700;
+    }
+    
+    .ytomo-entrance-date {
+      color: #991b1b;
+      font-weight: 600;
+    }
   }
 }
 
@@ -783,13 +1202,141 @@ const formatEntranceDate = (dateStr: string): string => {
   font-weight: 500;
 }
 
+/* 実行中アニメーション */
+@keyframes ytomo-schedule-running-glow {
+  0%, 100% {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+  50% {
+    transform: translateX(100%);
+    opacity: 1;
+  }
+}
+
+@keyframes ytomo-timeslot-running-border {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+/* 実行履歴 */
+.ytomo-execution-history {
+  margin-top: 24px;
+  padding-top: 24px;
+  border-top: 1px solid #e2e8f0;
+
+  h4 {
+    margin: 0 0 16px 0;
+    font-size: 16px;
+    font-weight: 600;
+    color: #374151;
+  }
+}
+
+.ytomo-history-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.ytomo-history-item {
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 12px 16px;
+  transition: all 0.2s;
+
+  &:hover {
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    border-color: #cbd5e1;
+  }
+
+  &.success {
+    border-left: 4px solid #10b981;
+    background: linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 100%);
+  }
+
+  &.failed {
+    border-left: 4px solid #ef4444;
+    background: linear-gradient(135deg, #fef2f2 0%, #fef1f1 100%);
+  }
+}
+
+.ytomo-history-info {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.ytomo-history-time {
+  font-size: 12px;
+  color: #6b7280;
+  font-weight: 500;
+}
+
+.ytomo-history-status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  .ytomo-status-icon {
+    font-size: 16px;
+  }
+
+  .ytomo-status-text {
+    font-size: 14px;
+    font-weight: 600;
+    color: #374151;
+  }
+}
+
+.ytomo-history-error {
+  font-size: 12px;
+  color: #dc2626;
+  background: #fef2f2;
+  padding: 6px 8px;
+  border-radius: 4px;
+  border: 1px solid #fecaca;
+  margin-top: 4px;
+}
+
 .ytomo-no-selection {
   flex: 1;
   display: flex;
   align-items: center;
   justify-content: center;
   color: #6b7280;
-  font-size: 16px;
+  font-size: 14px;
+  text-align: center;
+  padding: 40px 20px;
+  
+  @media (max-width: 480px) {
+    font-size: 13px;
+    padding: 30px 16px;
+  }
+  
+  .ytomo-mobile-message {
+    display: none;
+    
+    @media (max-width: 640px) {
+      display: inline;
+    }
+  }
+  
+  .ytomo-desktop-message {
+    @media (max-width: 640px) {
+      display: none;
+    }
+  }
 }
 
 @keyframes fadeIn {

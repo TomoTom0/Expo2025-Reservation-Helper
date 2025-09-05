@@ -271,11 +271,15 @@ const isTimeSlotDisabled = (gate: string, time: string) => {
         // schedule.entrance_date（YYYYMMDD）を内部形式に正規化して比較
         const scheduleDate = dateHelpers.normalize(schedule.entrance_date)
         
-        if (schedule.selected && 
-            scheduleDate === selectedDateStr &&
-            schedule.gate_type === gateType &&
-            schedule.time_start === time) {
-          return true
+        const reservationId = schedule.user_visiting_reservation_id?.toString()
+        if (reservationId) {
+          const reservationData = ticketsStore.getReservationManagement(reservationId)
+          if (reservationData?.isSelected && 
+              scheduleDate === selectedDateStr &&
+              schedule.gate_type === gateType &&
+              schedule.time_start === time) {
+            return true
+          }
         }
       }
     }
@@ -293,7 +297,12 @@ const selectedSchedule = computed(() => {
   
   for (const ticket of ticketsStore.tickets.values()) {
     if (ticket.schedules) {
-      const selected = ticket.schedules.find(schedule => schedule.selected === true)
+      const selected = ticket.schedules.find(schedule => {
+        const reservationId = schedule.user_visiting_reservation_id?.toString()
+        if (!reservationId) return false
+        const reservationData = ticketsStore.getReservationManagement(reservationId)
+        return !!reservationData?.isSelected
+      })
       if (selected) {
         logger.debug('selectedSchedule found', {
           entrance_date: selected.entrance_date,
@@ -1231,22 +1240,25 @@ const initializeDefaultSelection = () => {
     
     if (ticket.schedules) {
       for (const schedule of ticket.schedules) {
+        const reservationId = schedule.user_visiting_reservation_id?.toString()
+        const reservationData = reservationId ? ticketsStore.getReservationManagement(reservationId) : null
+        const isScheduleSelected = !!reservationData?.isSelected
+        
         logger.info('スケジュール確認', {
-          selected: schedule.selected,
+          selected: isScheduleSelected,
           isOwn: ticket.isOwn,  
           ticketIsOwn: ticket.isOwn,
           entrance_date: schedule.entrance_date,
           time_start: schedule.time_start,
           gate_type: schedule.gate_type,
           user_visiting_reservation_id: schedule.user_visiting_reservation_id,
-          conditionMet: schedule.selected && ticket.isOwn
+          conditionMet: isScheduleSelected && ticket.isOwn
         })
         
-        if (schedule.selected && ticket.isOwn) {
-          // 選択済みの入場予約がある場合、その日付をデフォルト選択
-          const formattedDate = dateHelpers.normalize(schedule.entrance_date)
-          selectedDate.value = formattedDate
-          // schedule.selectedは既にtrueの状態
+        if (reservationId && ticket.isOwn && reservationData?.isSelected) {
+            // 選択済みの入場予約がある場合、その日付をデフォルト選択
+            const formattedDate = dateHelpers.normalize(schedule.entrance_date)
+            selectedDate.value = formattedDate
           
           // カレンダー月も連動
           const selectedDateObj = new Date(formattedDate + 'T00:00:00')
@@ -1282,13 +1294,10 @@ const initializeDefaultSelection = () => {
   const todayString = `${todayYear}-${todayMonth}-${todayDay}`
   selectedDate.value = todayString
   // 全ての予約の選択状態をクリア
-  for (const ticket of ticketsStore.tickets.values()) {
-    if (ticket.schedules) {
-      ticket.schedules.forEach(schedule => {
-        schedule.selected = false
-      })
-    }
-  }
+  const allSelectedReservationIds = ticketsStore.getSelectedReservationIds()
+  allSelectedReservationIds.forEach(id => {
+    ticketsStore.toggleSelection(id)
+  })
   logger.info('今日の日付をデフォルト選択（選択済み入場予約なし）', { 
     date: todayString, 
     todayObject: today.toString(),

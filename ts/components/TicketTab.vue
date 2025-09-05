@@ -69,7 +69,7 @@
         :key="ticket.ticket_id"
         class="ytomo-ticket-item" 
         :class="{ 
-          selected: false
+          selected: hasSelectedReservations(ticket)
         }"
         :data-ticket-id="ticket.ticket_id"
         @click="handleTicketSelection(ticket)"
@@ -414,58 +414,89 @@ const handleRefreshTickets = async () => {
 const handleDateSelection = (date: string) => {
   logger.debug('日付ボタン選択', { date })
   
-  // その日付のすべての有効なスケジュールを選択/選択解除
-  const dateSchedules: ScheduleData[] = []
+  // その日付のすべての有効な予約を取得
+  const dateReservations: { reservationId: string, schedule: ScheduleData }[] = []
   ticketsArray.value.forEach((ticket: TicketData) => {
     ticket.schedules?.forEach((schedule: ScheduleData) => {
       if (schedule.entrance_date === date && schedule.isEffective === true) {
-        dateSchedules.push(schedule)
+        const reservationId = schedule.user_visiting_reservation_id?.toString()
+        if (reservationId) {
+          dateReservations.push({ reservationId, schedule })
+        }
       }
     })
   })
   
-  if (dateSchedules.length === 0) return
+  if (dateReservations.length === 0) return
   
-  // その日付のスケジュールがすべて選択されている場合は選択解除、そうでなければ全選択
-  const allSelected = dateSchedules.every(schedule => schedule.selected)
+  // その日付の予約がすべて選択されている場合は選択解除、そうでなければ全選択
+  const allSelected = dateReservations.every(({ reservationId }) => {
+    const reservationData = ticketsStore.getReservationManagement(reservationId)
+    return !!reservationData?.isSelected
+  })
   const newSelectedState = !allSelected
   
-  // 分散状態更新: その日付のすべてのスケジュールの選択状態を更新
-  ticketsArray.value.forEach((ticket: TicketData) => {
-    if (ticket.schedules) {
-      // まず他の日付の選択を解除（新しく選択する場合のみ）
-      if (newSelectedState) {
-        ticket.schedules.forEach((schedule: ScheduleData) => {
-          if (schedule.entrance_date !== date && schedule.selected) {
-            schedule.selected = false
-            ticketsStore.removeSelectedEntranceDate(ticket.ticket_id)
-          }
-        })
+  // 新しく選択する場合は、まず他の日付の選択を解除
+  if (newSelectedState) {
+    const allSelectedReservationIds = ticketsStore.getSelectedReservationIds()
+    allSelectedReservationIds.forEach(id => {
+      ticketsStore.toggleSelection(id)
+    })
+  }
+  
+  // 指定日付の予約の選択状態を更新
+  dateReservations.forEach(({ reservationId }) => {
+    const reservationData = ticketsStore.getReservationManagement(reservationId)
+    if (reservationData) {
+      const isCurrentlySelected = reservationData.isSelected
+      if (isCurrentlySelected !== newSelectedState) {
+        ticketsStore.toggleSelection(reservationId)
       }
-      
-      // 指定日付のスケジュールを更新
-      ticket.schedules.forEach((schedule: ScheduleData) => {
-        if (schedule.entrance_date === date && schedule.isEffective === true) {
-          schedule.selected = newSelectedState
-          
-          // 永続化状態を更新
-          if (newSelectedState) {
-            const scheduleId = schedule.entrance_date + (schedule.time_start || '')
-            ticketsStore.saveSelectedEntranceDate(ticket.ticket_id, scheduleId)
-          } else {
-            ticketsStore.removeSelectedEntranceDate(ticket.ticket_id)
-          }
-        }
-      })
     }
   })
   
-  logger.info('日付スケジュール操作', { date, 操作: newSelectedState ? '全選択' : '全選択解除', 件数: dateSchedules.length })
+  logger.info('日付スケジュール操作', { 
+    date, 
+    操作: newSelectedState ? '全選択' : '全選択解除', 
+    件数: dateReservations.length 
+  })
 }
 
 const handleTicketSelection = (ticket: TicketData) => {
-  // チケット選択ロジック（既存実装に従い、入場予約選択で連動するため無効化予定）
   logger.info('チケット選択', { ticketId: ticket.ticket_id })
+  
+  // このチケットに関連する全予約の選択状態をトグル
+  const hasSelected = hasSelectedReservations(ticket)
+  
+  if (ticket.schedules && ticket.schedules.length > 0) {
+    ticket.schedules.forEach(schedule => {
+      const reservationId = schedule.user_visiting_reservation_id?.toString()
+      if (reservationId) {
+        const reservationData = ticketsStore.getReservationManagement(reservationId)
+        if (reservationData) {
+          // 現在選択されている予約があれば全て解除、なければ最初の予約を選択
+          if (hasSelected) {
+            if (reservationData.isSelected) {
+              ticketsStore.toggleSelection(reservationId)
+            }
+          }
+        }
+      }
+    })
+    
+    // 選択されていなかった場合は最初の有効な予約を選択
+    if (!hasSelected && ticket.schedules.length > 0) {
+      const firstValidSchedule = ticket.schedules.find(schedule => 
+        schedule.user_visiting_reservation_id
+      )
+      if (firstValidSchedule) {
+        const reservationId = firstValidSchedule.user_visiting_reservation_id?.toString()
+        if (reservationId) {
+          ticketsStore.toggleSelection(reservationId)
+        }
+      }
+    }
+  }
 }
 
 const handleTicketDelete = (ticket: TicketData) => {
@@ -505,38 +536,41 @@ const handleEntranceDateSelection = (schedule: ScheduleData, ticket: TicketData,
   if (target.disabled) return
   
   const date = schedule.entrance_date
+  const reservationId = schedule.user_visiting_reservation_id?.toString()
+  
+  if (!reservationId) {
+    logger.warn('予約IDが存在しません', { ticketId: ticket.ticket_id, schedule })
+    return
+  }
+  
   logger.info('入場日時選択', {
     ticketId: ticket.ticket_id,
+    reservationId,
     date: date,
     scheduleName: schedule.schedule_name
   })
   
-  // 入場日付は常に一つに限定される: 他の日付のスケジュール選択を解除
-  if (schedule.selected === false || !schedule.selected) {
-    ticketsArray.value.forEach((t: TicketData) => {
-      t.schedules?.forEach((s: ScheduleData) => {
-        if (s.entrance_date !== date && s.selected) {
-          s.selected = false
-          // 永続化状態からも削除（チケット選択状態は維持）
-          ticketsStore.removeSelectedEntranceDate(t.ticket_id)
-        }
-      })
+  const reservationData = ticketsStore.getReservationManagement(reservationId)
+  const isCurrentlySelected = !!reservationData?.isSelected
+  
+  // 入場日付は常に一つに限定される: 他の予約の選択を解除
+  if (!isCurrentlySelected) {
+    // 全ての予約の選択を解除
+    const allReservationIds = ticketsStore.getSelectedReservationIds()
+    allReservationIds.forEach(id => {
+      ticketsStore.toggleSelection(id)
     })
   }
   
-  // この特定のスケジュールの選択状態をトグル
-  schedule.selected = !schedule.selected
+  // この予約の選択状態をトグル
+  ticketsStore.toggleSelection(reservationId)
   
-  
-  // 永続化状態を更新
-  if (schedule.selected) {
-    const scheduleId = schedule.entrance_date + (schedule.time_start || '')
-    ticketsStore.saveSelectedEntranceDate(ticket.ticket_id, scheduleId)
-  } else {
-    ticketsStore.removeSelectedEntranceDate(ticket.ticket_id)
-  }
-  
-  logger.info('入場日時状態変更', { date, scheduleName: schedule.schedule_name || '', 状態: schedule.selected ? '選択' : '選択解除' })
+  logger.info('入場日時状態変更', { 
+    reservationId, 
+    date, 
+    scheduleName: schedule.schedule_name || '', 
+    状態: !isCurrentlySelected ? '選択' : '選択解除' 
+  })
 }
 
 const handleAddTicket = async () => {
@@ -733,23 +767,46 @@ const getTodayString = (): string => {
 }
 
 const isScheduleSelected = (schedule: ScheduleData, ticket: TicketData): boolean => {
-  // 分散状態管理: スケジュール固有の選択フラグを確認
-  return !!schedule.selected
+  // 予約管理の選択状態を確認
+  const reservationId = schedule.user_visiting_reservation_id?.toString()
+  if (!reservationId) return false
+  
+  const reservationData = ticketsStore.getReservationManagement(reservationId)
+  return !!reservationData?.isSelected
+}
+
+const hasSelectedReservations = (ticket: TicketData): boolean => {
+  // このチケットに関連する予約で選択されているものがあるかチェック
+  if (!ticket.schedules || ticket.schedules.length === 0) return false
+  
+  return ticket.schedules.some(schedule => {
+    const reservationId = schedule.user_visiting_reservation_id?.toString()
+    if (!reservationId) return false
+    
+    const reservationData = ticketsStore.getReservationManagement(reservationId)
+    return !!reservationData?.isSelected
+  })
 }
 
 const isDateSelected = (date: string): boolean => {
-  // その日付の有効なスケジュールをすべて取得
-  const dateSchedules: ScheduleData[] = []
+  // その日付の有効な予約をすべて取得
+  const dateReservations: string[] = []
   ticketsArray.value.forEach((ticket: TicketData) => {
     ticket.schedules?.forEach((schedule: ScheduleData) => {
       if (schedule.entrance_date === date && schedule.isEffective === true) {
-        dateSchedules.push(schedule)
+        const reservationId = schedule.user_visiting_reservation_id?.toString()
+        if (reservationId) {
+          dateReservations.push(reservationId)
+        }
       }
     })
   })
   
-  // スケジュールが存在し、すべて選択されている場合に true
-  return dateSchedules.length > 0 && dateSchedules.every(schedule => schedule.selected)
+  // すべての予約が選択されている場合のみtrueを返す
+  return dateReservations.length > 0 && dateReservations.every(reservationId => {
+    const reservationData = ticketsStore.getReservationManagement(reservationId)
+    return !!reservationData?.isSelected
+  })
 }
 
 // 展開されたスケジュールを取得

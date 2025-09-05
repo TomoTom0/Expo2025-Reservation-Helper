@@ -141,7 +141,7 @@ const pavilionReservationDisplayText = computed(() => {
   
   // 現在有効な予約種類を特定
   const activeEntry = Object.entries(info.allStatus || {})
-    .find(([type, status]) => status.periodStatus === 'active')
+    .find(([type, status]) => (status as any)?.periodStatus === 'active')
   
   if (activeEntry) {
     const [type, status] = activeEntry
@@ -154,7 +154,7 @@ const pavilionReservationDisplayText = computed(() => {
   const priorityOrder = ['月', '週', '3', '1']
   
   for (const type of priorityOrder) {
-    const status = info.allStatus?.[type]
+    const status = info.allStatus?.[type] as any
     if (status && status.periodStatus === 'before') {
       const longName = getLongNameFromShortName(type)
       return `${longName} 期間前`
@@ -169,8 +169,12 @@ const selectedSchedules = computed(() => {
   const selected: ScheduleData[] = []
   ticketsStore.ticketsArray.forEach((ticket: TicketData) => {
     ticket.schedules?.forEach((schedule: ScheduleData) => {
-      if (schedule.selected) {
-        selected.push(schedule)
+      const reservationId = schedule.user_visiting_reservation_id?.toString()
+      if (reservationId) {
+        const reservationData = ticketsStore.getReservationManagement(reservationId)
+        if (reservationData?.isSelected) {
+          selected.push(schedule)
+        }
       }
     })
   })

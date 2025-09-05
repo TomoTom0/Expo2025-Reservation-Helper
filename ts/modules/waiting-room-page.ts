@@ -9,7 +9,15 @@
  */
 
 import { loggers } from '../utils/logger';
+import { createApp } from 'vue';
+import { createPinia } from 'pinia';
+import MainDialog from '../components/MainDialog.vue';
+
 const logger = loggers.ui;
+
+// ytomoコンテンツの表示状態を管理
+let isYtomoContentVisible = false;
+let ytomoApp: any = null;
 
 /**
  * 待機室ページの初期化可能判定
@@ -28,7 +36,7 @@ export function judge_waiting_room_init(): boolean {
 function createYtomoNavigationButton(): HTMLButtonElement {
     const button = document.createElement('button');
     button.id = 'ytomo-navigation-button';
-    button.textContent = 'YTomo';
+    button.textContent = 'YTomo表示';
     button.style.cssText = `
         background: linear-gradient(135deg, #2c5aa0 0%, #1a365d 100%);
         color: white;
@@ -59,13 +67,7 @@ function createYtomoNavigationButton(): HTMLButtonElement {
     
     // クリックイベント
     button.addEventListener('click', () => {
-        // 現在のURLから基本URLを抽出
-        const currentUrl = new URL(window.location.href);
-        const baseUrl = `${currentUrl.protocol}//${currentUrl.hostname.replace('tktwaitingroom.', 'ticket.')}`;
-        const targetUrl = `${baseUrl}/ytomo`;
-        
-        logger.info('YTomoページへ移動', { targetUrl });
-        window.location.href = targetUrl;
+        toggleYtomoContent();
     });
     
     return button;
@@ -82,7 +84,7 @@ function createYtomoMenuListItem(): HTMLLIElement {
     button.tabIndex = -1;
     
     const span = document.createElement('span');
-    span.textContent = '/ytomo移行';
+    span.textContent = '/ytomo表示';
     span.className = 'style_renderer__ip0Pm'; // 参考の例に合わせてクラスを設定
     
     button.appendChild(span);
@@ -90,84 +92,157 @@ function createYtomoMenuListItem(): HTMLLIElement {
     
     // クリックイベント
     button.addEventListener('click', () => {
-        // 現在のURLから基本URLを抽出
-        const currentUrl = new URL(window.location.href);
-        const baseUrl = `${currentUrl.protocol}//${currentUrl.hostname.replace('tktwaitingroom.', 'ticket.')}`;
-        const targetUrl = `${baseUrl}/ytomo`;
-        
-        logger.info('/ytomoメニューから移動', { targetUrl });
-        window.location.href = targetUrl;
+        toggleYtomoContent();
     });
     
     return li;
 }
 
 /**
- * 待機室ページの初期化処理
+ * #wrapperを折りたたんでytomoコンテンツを表示/非表示する
  */
-export function init_waiting_room_page(): void {
+function toggleYtomoContent(): void {
     try {
-        logger.info('待機室ページ初期化開始');
-        
-        // #child_menu_2が存在する場合の処理を優先
-        const childMenu2 = document.getElementById('child_menu_2');
-        if (childMenu2) {
-            // 既存のメニュー項目がないかチェック
-            const existingMenuItems = childMenu2.querySelectorAll('li');
-            const existingYtomoItem = Array.from(existingMenuItems).find(li => {
-                const span = li.querySelector('span');
-                return span && span.textContent?.includes('/ytomo');
-            });
-            
-            if (!existingYtomoItem) {
-                // /ytomoメニュー項目を作成
-                const ytomoMenuItem = createYtomoMenuListItem();
-                
-                // 最初の子要素として挿入
-                if (childMenu2.firstChild) {
-                    childMenu2.insertBefore(ytomoMenuItem, childMenu2.firstChild);
-                } else {
-                    childMenu2.appendChild(ytomoMenuItem);
-                }
-                
-                logger.info('/ytomoメニュー項目を追加', {
-                    position: '#child_menu_2の最初の子要素'
-                });
-            } else {
-                logger.debug('/ytomoメニュー項目は既に存在します');
-            }
-        }
-        
-        // #headerparagraphも存在する場合の従来の処理
-        const headerParagraph = document.getElementById('headerparagraph');
-        if (headerParagraph) {
-            // 既存のボタンがないかチェック
-            const existingButton = document.getElementById('ytomo-navigation-button');
-            if (!existingButton) {
-                // /ytomoナビゲーションボタンを作成
-                const navigationButton = createYtomoNavigationButton();
-                
-                // #headerparagraphの直後に挿入
-                if (headerParagraph.nextSibling) {
-                    headerParagraph.parentNode?.insertBefore(navigationButton, headerParagraph.nextSibling);
-                } else {
-                    headerParagraph.parentNode?.appendChild(navigationButton);
-                }
-                
-                logger.info('#headerparagraph直後にボタンを追加');
-            } else {
-                logger.debug('/ytomoボタンは既に存在します');
-            }
-        }
-        
-        if (!childMenu2 && !headerParagraph) {
-            logger.warn('#child_menu_2も#headerparagraphも見つかりません');
+        const wrapper = document.getElementById('wrapper');
+        if (!wrapper) {
+            logger.warn('#wrapperが見つかりません');
             return;
         }
-        
-        logger.info('待機室ページ初期化完了');
-        
+
+        if (!isYtomoContentVisible) {
+            // ytomoコンテンツを表示
+            showYtomoContent(wrapper);
+        } else {
+            // ytomoコンテンツを非表示
+            hideYtomoContent(wrapper);
+        }
     } catch (error) {
-        logger.error('待機室ページ初期化エラー', error);
+        logger.error('ytomoコンテンツ表示切り替えエラー', error);
     }
+}
+
+/**
+ * ytomoコンテンツを表示
+ */
+function showYtomoContent(wrapper: HTMLElement): void {
+    logger.info('ytomoコンテンツを表示開始');
+    
+    // #wrapperを折りたたみ
+    wrapper.style.display = 'none';
+    
+    // ytomoコンテナがまだ存在しない場合は作成
+    let ytomoContainer = document.getElementById('ytomo-content-container');
+    if (!ytomoContainer) {
+        ytomoContainer = document.createElement('div');
+        ytomoContainer.id = 'ytomo-content-container';
+        ytomoContainer.style.cssText = `
+            width: 100%;
+            min-height: 100vh;
+            background: #f5f5f5;
+            padding: 20px;
+            box-sizing: border-box;
+        `;
+        
+        // #wrapperの後に挿入
+        wrapper.parentNode?.insertBefore(ytomoContainer, wrapper.nextSibling);
+    }
+    
+    // MainDialogをytomoコンテナ内にマウント
+    if (!ytomoApp) {
+        const dialogContainer = document.createElement('div');
+        dialogContainer.id = 'waiting-room-ytomo-dialog';
+        dialogContainer.style.cssText = `
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        `;
+        
+        ytomoContainer.appendChild(dialogContainer);
+        
+        // Vueアプリを作成してMainDialogをマウント
+        ytomoApp = createApp(MainDialog);
+        
+        // Piniaを設定
+        const pinia = createPinia();
+        ytomoApp.use(pinia);
+        
+        ytomoApp.mount(dialogContainer);
+        
+        // アプリマウント後にストアを初期化
+        setTimeout(() => {
+            try {
+                // dynamic importでストアを取得
+                import('../stores/mainDialog').then(({ useMainDialogStore }) => {
+                    const mainDialogStore = useMainDialogStore();
+                    mainDialogStore.showDialog(true);
+                });
+            } catch (error) {
+                logger.warn('MainDialogStore初期化エラー', error);
+            }
+        }, 100);
+    }
+    
+    ytomoContainer.style.display = 'block';
+    isYtomoContentVisible = true;
+    
+    // ボタンのテキストを更新
+    updateButtonTexts();
+    
+    logger.info('ytomoコンテンツ表示完了');
+}
+
+/**
+ * ytomoコンテンツを非表示
+ */
+function hideYtomoContent(wrapper: HTMLElement): void {
+    logger.info('ytomoコンテンツを非表示');
+    
+    // #wrapperを表示
+    wrapper.style.display = '';
+    
+    // ytomoコンテナを非表示
+    const ytomoContainer = document.getElementById('ytomo-content-container');
+    if (ytomoContainer) {
+        ytomoContainer.style.display = 'none';
+    }
+    
+    isYtomoContentVisible = false;
+    
+    // ボタンのテキストを更新
+    updateButtonTexts();
+    
+    logger.info('ytomoコンテンツ非表示完了');
+}
+
+/**
+ * ボタンのテキストを現在の状態に応じて更新
+ */
+function updateButtonTexts(): void {
+    // navigationボタンのテキスト更新
+    const navigationButton = document.getElementById('ytomo-navigation-button') as HTMLButtonElement;
+    if (navigationButton) {
+        navigationButton.textContent = isYtomoContentVisible ? 'YTomo非表示' : 'YTomo表示';
+    }
+    
+    // メニュー項目のテキスト更新
+    const menuSpans = document.querySelectorAll('#child_menu_2 span');
+    for (const span of menuSpans) {
+        if (span.textContent?.includes('/ytomo') || span.textContent?.includes('YTomo')) {
+            span.textContent = isYtomoContentVisible ? 'YTomo非表示' : '/ytomo表示';
+            break;
+        }
+    }
+}
+
+/**
+ * 待機室ページの初期化処理
+ * 
+ * 【仕様変更】待機画面では何も処理を実行しない
+ */
+export function init_waiting_room_page(): void {
+    logger.info('待機室ページ: 仕様変更により処理をスキップ');
+    return;
 }

@@ -35,6 +35,7 @@ export const useScheduledReservationStore = defineStore('scheduledReservation', 
   // 実行状態
   const executionState = ref<ScheduleExecutionState>({
     activeSchedules: new Map(),
+    currentlyExecutingTimeSlots: new Map(),
     executionHistory: [],
     isAnyScheduleRunning: false
   })
@@ -53,6 +54,20 @@ export const useScheduledReservationStore = defineStore('scheduledReservation', 
   const selectedSchedule = computed(() => {
     if (!uiState.value.selectedScheduleId) return null
     return scheduledReservations.value.get(uiState.value.selectedScheduleId) || null
+  })
+
+  // 現在実行中の時間帯を取得
+  const currentlyExecutingTimeSlots = computed(() => {
+    const allTimeSlots = new Map<string, ScheduledTimeSlot>() // key: pavilionId_timeSlot
+    
+    for (const [scheduleId, timeSlots] of executionState.value.currentlyExecutingTimeSlots.entries()) {
+      for (const slot of timeSlots) {
+        const key = `${slot.pavilionId}_${slot.timeSlot}`
+        allTimeSlots.set(key, slot)
+      }
+    }
+    
+    return allTimeSlots
   })
 
   // データ永続化
@@ -327,6 +342,9 @@ export const useScheduledReservationStore = defineStore('scheduledReservation', 
       executionState.value.activeSchedules.delete(scheduleId)
       executionState.value.isAnyScheduleRunning = executionState.value.activeSchedules.size > 0
 
+      // 実行中時間帯もクリア
+      executionState.value.currentlyExecutingTimeSlots.delete(scheduleId)
+
       logger.info('スケジュール実行を停止', { scheduleId })
     }
   }
@@ -348,6 +366,9 @@ export const useScheduledReservationStore = defineStore('scheduledReservation', 
         label: schedule.label,
         timeSlotsCount: schedule.selectedTimeSlots.length 
       })
+
+      // 実行中時間帯を設定
+      executionState.value.currentlyExecutingTimeSlots.set(scheduleId, schedule.selectedTimeSlots)
 
       // 実行履歴に記録を追加
       const executionRecord: ScheduleExecutionRecord = {
@@ -393,6 +414,9 @@ export const useScheduledReservationStore = defineStore('scheduledReservation', 
         totalAttempts: schedule.maxRetries
       }
       executionState.value.executionHistory.unshift(errorRecord)
+    } finally {
+      // 実行中時間帯をクリア
+      executionState.value.currentlyExecutingTimeSlots.delete(scheduleId)
     }
   }
 
@@ -401,6 +425,7 @@ export const useScheduledReservationStore = defineStore('scheduledReservation', 
       clearTimeout(timeoutId)
     })
     executionState.value.activeSchedules.clear()
+    executionState.value.currentlyExecutingTimeSlots.clear()
     executionState.value.isAnyScheduleRunning = false
     logger.info('全スケジュール実行を停止')
   }
@@ -464,6 +489,7 @@ export const useScheduledReservationStore = defineStore('scheduledReservation', 
     scheduledReservationsArray,
     enabledSchedules,
     selectedSchedule,
+    currentlyExecutingTimeSlots,
 
     // Actions - データ操作
     createScheduledReservation,

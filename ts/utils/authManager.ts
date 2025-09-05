@@ -73,11 +73,27 @@ class AuthManager {
   }
 
   /**
+   * APIベースURLを取得
+   */
+  private getApiBaseUrl(): string {
+    // 本番環境では常にticket.expo2025.or.jpを使用
+    return 'https://ticket.expo2025.or.jp'
+  }
+
+  /**
    * fetch リクエストをインターセプトして401エラーを自動処理
    */
   public async authenticatedFetch(input: RequestInfo | URL, init?: RequestInit): Promise<Response> {
     try {
-      const response = await fetch(input, {
+      // 相対パスの場合、固定のAPIベースURLを使用
+      let url: string
+      if (typeof input === 'string' && input.startsWith('/api/')) {
+        url = `${this.getApiBaseUrl()}${input}`
+      } else {
+        url = input.toString()
+      }
+      
+      const response = await fetch(url, {
         credentials: 'include', // セッションクッキーを含める
         ...init
       })
@@ -114,9 +130,8 @@ class AuthManager {
       logger.debug('定期認証状態確認実行')
       
       // 既存で確認済みの軽量な認証確認API
-      const response = await fetch('/api/d/my/tickets/?count=1', {
+      const response = await this.authenticatedFetch('/api/d/my/tickets/?count=1', {
         method: 'GET',
-        credentials: 'include',
         headers: {
           'Accept': 'application/json'
         }

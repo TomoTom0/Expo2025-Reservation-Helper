@@ -37,6 +37,7 @@ interface SequentialReservationState {
   
   // 実行状態
   isRunning: boolean
+  shouldShowOverlay: boolean      // オーバーレイ表示制御フラグ
 }
 
 export const useSequentialReservationStore = defineStore('sequentialReservation', () => {
@@ -51,11 +52,12 @@ export const useSequentialReservationStore = defineStore('sequentialReservation'
     nextIntervalTime: 15,
     nextReservationTarget: null,
     countdownText: '',
-    isRunning: false
+    isRunning: false,
+    shouldShowOverlay: true
   })
 
   // 継続予約開始
-  const startSequentialReservation = (targets: ReservationTarget[], endlessMode: boolean = false) => {
+  const startSequentialReservation = (targets: ReservationTarget[], endlessMode: boolean = false, showOverlay: boolean = true) => {
     state.value = {
       reservationTargets: targets,
       currentTargetIndex: 0,
@@ -67,7 +69,8 @@ export const useSequentialReservationStore = defineStore('sequentialReservation'
       nextIntervalTime: 15,
       nextReservationTarget: targets.length > 1 ? targets[1] : null,
       countdownText: '',
-      isRunning: true
+      isRunning: true,
+      shouldShowOverlay: showOverlay
     }
   }
 
@@ -117,6 +120,10 @@ export const useSequentialReservationStore = defineStore('sequentialReservation'
 
   const setEndlessMode = (isEndless: boolean) => {
     state.value.endlessMode = isEndless
+  }
+
+  const setShouldShowOverlay = (shouldShow: boolean) => {
+    state.value.shouldShowOverlay = shouldShow
   }
 
   // 継続予約の実行処理（再帰呼び出し）
@@ -297,6 +304,7 @@ export const useSequentialReservationStore = defineStore('sequentialReservation'
     setNextMonitoringMode,
     setNextInterval,
     setEndlessMode,
+    setShouldShowOverlay,
     executeSequentialReservation,
     executeNextReservation
   }

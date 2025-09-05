@@ -1,7 +1,7 @@
 <template>
   <Teleport to="body">
     <div 
-      v-if="sequentialReservationStore.state.isRunning"
+      v-if="sequentialReservationStore.state.isRunning && sequentialReservationStore.state.shouldShowOverlay"
       class="ytomo-sequential-overlay"
       id="ytomo-sequential-overlay"
       @click="handleOverlayClick"

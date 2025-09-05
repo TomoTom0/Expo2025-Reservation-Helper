@@ -659,6 +659,13 @@ export class EntranceReservationApiManager {
       let body: any
       if (isChangeReservation) {
         // 変更予約（PUT）のパラメータ
+        logger.temp('変更予約リクエスト送信', {
+          existingReservationId: this.existingReservationId,
+          slot: slot.time,
+          convertedTime: this.convertTimeToAPIFormat(slot.time),
+          gateType,
+          entranceDate
+        })
         body = {
           user_visiting_reservation_ids: [this.existingReservationId],
           start_time: this.convertTimeToAPIFormat(slot.time),
