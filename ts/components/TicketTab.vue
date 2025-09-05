@@ -682,10 +682,28 @@ const formatDate = (dateStr: string): string => {
 }
 
 const getVisibleSchedules = (ticket: TicketData): ScheduleData[] => {
-  if (!Array.isArray(ticket.schedules)) return []
-  return ticket.schedules
-    .filter(schedule => schedule.isEffective === true)
-    .sort((a, b) => {
+  if (!Array.isArray(ticket.schedules)) {
+    logger.debug('getVisibleSchedules: schedulesが配列でない', { ticketId: ticket.ticket_id, schedules: ticket.schedules })
+    return []
+  }
+  
+  const filtered = ticket.schedules.filter(schedule => schedule.isEffective === true)
+  
+  // 頻繁に「利用可能な入場予約取得なし」が出る場合のデバッグ
+  if (filtered.length === 0 && ticket.schedules.length > 0) {
+    logger.temp('getVisibleSchedules: 全スケジュールが無効', {
+      ticketId: ticket.ticket_id,
+      totalSchedules: ticket.schedules.length,
+      schedules: ticket.schedules.map(s => ({
+        entrance_date: s.entrance_date,
+        use_state: s.use_state,
+        isEffective: s.isEffective,
+        schedule_name: s.schedule_name
+      }))
+    })
+  }
+  
+  return filtered.sort((a, b) => {
       // 日付順でソート
       const dateA = a.entrance_date
       const dateB = b.entrance_date
