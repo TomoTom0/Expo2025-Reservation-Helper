@@ -81,13 +81,14 @@ import { ref, computed, onMounted } from 'vue'
 import { useOthersStore } from '@/stores/others'
 import { useTicketsStore } from '@/stores/tickets'
 import { loggers } from '@/utils/logger'
+import { logApiUsageModeChange, type ApiUsageMode } from '@/utils/apiUsageMode'
 
 const logger = loggers.ui
 const othersStore = useOthersStore()
 const ticketsStore = useTicketsStore()
 
 // API利用設定
-const apiUsageMode = ref('full')
+const apiUsageMode = ref('none')
 
 // 調査開始可能かどうか
 const canStartInvestigation = computed(() => {
@@ -98,6 +99,15 @@ const canStartInvestigation = computed(() => {
 const handleApiUsageChange = () => {
   logger.info('API利用モード変更', { apiUsageMode: apiUsageMode.value })
   localStorage.setItem('ytomo-api-usage-mode', apiUsageMode.value)
+  
+  // 設定変更をログに記録
+  logApiUsageModeChange(apiUsageMode.value as ApiUsageMode)
+  
+  // CustomEventでMainDialogなど他のコンポーネントに通知
+  const event = new CustomEvent('ytomo-api-usage-mode-changed', {
+    detail: { newMode: apiUsageMode.value }
+  })
+  window.dispatchEvent(event)
 }
 
 // 目標時間変更ハンドラ
@@ -519,6 +529,9 @@ onMounted(() => {
   const storedApiUsageMode = localStorage.getItem('ytomo-api-usage-mode')
   if (storedApiUsageMode) {
     apiUsageMode.value = storedApiUsageMode
+  } else {
+    // デフォルト値'none'をlocalStorageに保存
+    localStorage.setItem('ytomo-api-usage-mode', 'none')
   }
   
   logger.info('OthersTabコンポーネント初期化完了', {

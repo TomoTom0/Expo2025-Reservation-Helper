@@ -7,6 +7,7 @@ import { loggers } from '../utils/logger'
 import { useTicketsStore } from '../stores/tickets'
 import { usePavilionsStore } from '../stores/pavilions'
 import { checkLoginStatus, checkLoginAndRedirect } from '../utils/auth'
+import { isApiUsageSuppressed } from '../utils/apiUsageMode'
 
 /**
  * 簡素化されたメインダイアログFAB実装
@@ -35,28 +36,33 @@ export class MainDialogFabImpl implements MainDialogFab {
 
     /**
      * メインダイアログFABシステムを初期化
+     * FAB機能は廃止のため、常にスキップ
      */
     initialize(): void {
-        this.logger.info('メインダイアログFAB初期化開始（Vue/Piniaのみ）');
+        this.logger.info('FAB機能は廃止のためメインダイアログFAB初期化をスキップ');
         
-        // PageCheckerを初期化
-        if (!this.pageChecker) {
-            this.pageChecker = new PageChecker();
-        }
-
-        // VueでFABボタンとダイアログを作成
-        this.initializeVueComponents();
-        
-        // ドロワーメニューにytomoページボタンを追加
+        // ただし、ytomoページナビゲーション機能は追加
         this.addYtomoNavigationButton();
-        
-        this.logger.info('メインダイアログFAB初期化完了（Vue/Piniaのみ）');
+        return;
     }
     
     /**
      * ページ読み込み時のVue統合システム事前初期化
+     * ytomoページでのみVueアプリケーション埋め込み用
      */
     async preInitializeVueSystem(): Promise<void> {
+        // 待機室ページでは事前初期化をスキップ
+        if (PageChecker.isWaitingRoomPage()) {
+            this.logger.info('待機室ページのためVue事前初期化をスキップ');
+            return;
+        }
+        
+        // ytomoページ以外では事前初期化をスキップ（FAB廃止のため）
+        if (!PageChecker.isYtomoPage()) {
+            this.logger.info('ytomoページ以外のためVue事前初期化をスキップ（FAB廃止）');
+            return;
+        }
+
         this.logger.info('Vue統合システム事前初期化開始');
         
         // ログイン状態確認
@@ -83,26 +89,16 @@ export class MainDialogFabImpl implements MainDialogFab {
             return
         }
         
-        // ストア初期化をページ読み込み時に1回だけ行う
-        try {
-            const ticketsStore = useTicketsStore()
-            const pavilionsStore = usePavilionsStore()
-            
-            await Promise.all([
-                ticketsStore.init(),
-                pavilionsStore.init()
-            ])
-            
-            this.logger.info('全ストア初期化完了')
-        } catch (error) {
-            this.logger.error('ストア初期化エラー', error)
-        }
+        // ストア初期化は後でVueアプリマウント後に行う
+        this.initializeVueApp()
+        
+        this.logger.info('Vue事前初期化完了')
     }
     
     /**
-     * Vueアプリケーションを初期化
+     * Vueアプリケーションを初期化してマウント
      */
-    private initializeVueComponents(): void {
+    private initializeVueApp(): void {
         try {
             // ytomoページの場合は即座にmainタグをクリア
             this.handleYtomoPageImmediate();
@@ -117,11 +113,32 @@ export class MainDialogFabImpl implements MainDialogFab {
             this.vueApp.use(pinia);
             this.vueApp.mount(this.appMountPoint);
             
-            this.logger.info('Vueアプリケーション初期化完了');
+            this.logger.info('Vueアプリケーション初期化・マウント完了');
+            
+            // マウント後にストア初期化
+            this.initializeStores();
             
         } catch (error) {
             this.logger.error('Vueアプリケーション初期化エラー', error);
-            throw error;
+        }
+    }
+    
+    /**
+     * Piniaストアを初期化
+     */
+    private async initializeStores(): Promise<void> {
+        try {
+            const ticketsStore = useTicketsStore()
+            const pavilionsStore = usePavilionsStore()
+            
+            await Promise.all([
+                ticketsStore.init(),
+                pavilionsStore.init()
+            ])
+            
+            this.logger.info('全ストア初期化完了')
+        } catch (error) {
+            this.logger.error('ストア初期化エラー', error)
         }
     }
     

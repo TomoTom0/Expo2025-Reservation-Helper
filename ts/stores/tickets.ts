@@ -8,6 +8,7 @@ import { ref, computed } from 'vue'
 import type { TicketData, ScheduleData } from '@/types/api'
 import type { ReservationManagementData } from '@/types/reservationManagement'
 import { loggers } from '@/utils/logger'
+import { isApiUsageDisabled } from '@/utils/apiUsageMode'
 import { authenticatedFetch } from '@/utils/authManager'
 import { 
   getEntranceSchedules, 
@@ -157,6 +158,18 @@ export const useTicketsStore = defineStore('tickets', () => {
     const today = new Date()
     return `${today.getFullYear()}${String(today.getMonth() + 1).padStart(2, '0')}${String(today.getDate()).padStart(2, '0')}`
   }
+  
+  // todayStrを定期的に更新する関数
+  function updateTodayString(): void {
+    const newTodayStr = getTodayString()
+    if (todayStr.value !== newTodayStr) {
+      logger.info('日付変更を検出', { 
+        old: todayStr.value, 
+        new: newTodayStr 
+      })
+      todayStr.value = newTodayStr
+    }
+  }
 
   // Actions - TicketManagerから完全移行
   
@@ -164,9 +177,10 @@ export const useTicketsStore = defineStore('tickets', () => {
    * スケジュールデータに有効フラグとパビリオン予約種類情報を付与
    */
   const processSchedules = (schedules: any[]): ScheduleData[] => {
+    logger.temp('processSchedules実行開始', { schedulesCount: schedules.length })
     if (!Array.isArray(schedules)) return []
     
-    return schedules.map(schedule => {
+    const result = schedules.map(schedule => {
       
       // schedule_nameから時刻情報を抽出（例: "9:00-" → "9:00"）
       let timeStart = undefined
@@ -188,8 +202,25 @@ export const useTicketsStore = defineStore('tickets', () => {
         reservation_type: schedule.reservation_type,
         location_index: schedule.gate_type === 1 ? 0 : 1, // gate_type: 1=東(0), 2=西(1)
         // 有効フラグを付与: 未使用または当日入場済みは有効
-        isEffective: schedule.use_state === 0 || 
-                     (schedule.use_state === 1 && schedule.entrance_date === todayStr.value)
+        isEffective: (() => {
+          const isUnused = schedule.use_state === 0
+          const isTodayUsed = schedule.use_state === 1 && schedule.entrance_date === todayStr.value
+          const result = isUnused || isTodayUsed
+          
+          // デバッグログ（詳細レベル）
+          if (schedule.entrance_date) {
+            logger.debug('isEffective判定', {
+              entrance_date: schedule.entrance_date,
+              use_state: schedule.use_state,
+              today: todayStr.value,
+              isUnused,
+              isTodayUsed,
+              result
+            })
+          }
+          
+          return result
+        })()
       }
       
       // パビリオン予約情報はcomputedで動的計算するため、ここでは設定しない
@@ -201,6 +232,18 @@ export const useTicketsStore = defineStore('tickets', () => {
       const dateTimeB = `${b.entrance_date}${b.time_start || '0000'}`
       return dateTimeA.localeCompare(dateTimeB)
     })
+    
+    logger.temp('processSchedules実行完了', {
+      processedCount: result.length,
+      sample: result.slice(0, 2).map(s => ({
+        entrance_date: s.entrance_date,
+        use_state: s.use_state,
+        isEffective: s.isEffective,
+        schedule_name: s.schedule_name
+      }))
+    })
+    
+    return result
   }
 
   /**
@@ -235,6 +278,11 @@ export const useTicketsStore = defineStore('tickets', () => {
       // 旧チケット情報を保存（選択状態等の保持用）
       const previousTickets = new Map(tickets.value)
       
+      logger.temp('チケット復元開始', {
+        previousTicketsCount: previousTickets.size,
+        previousTicketIds: Array.from(previousTickets.keys())
+      })
+      
       // 新チケット情報を一時変数に取得
       let newOwnTickets: TicketData[] = []
       try {
@@ -246,6 +294,13 @@ export const useTicketsStore = defineStore('tickets', () => {
         
         for (const newTicket of newOwnTickets) {
           const previousTicket = previousTickets.get(newTicket.ticket_id)
+          
+          logger.temp('チケット処理', {
+            ticketId: newTicket.ticket_id,
+            hasPrevious: !!previousTicket,
+            newSchedulesCount: newTicket.schedules?.length || 0,
+            previousSchedulesCount: previousTicket?.schedules?.length || 0
+          })
           
           // 通期パス（Season Pass）の場合は追加予約可能性をチェック
           if (newTicket.item_name?.includes('Season Pass')) {
@@ -293,6 +348,14 @@ export const useTicketsStore = defineStore('tickets', () => {
                 if (newSchedule.selected) {
                   logger.debug(`予約ID ${newSchedule.user_visiting_reservation_id} のselected状態を継承`)
                 }
+                
+                // デバッグ: isEffective値の確認
+                logger.temp('状態継承後のisEffective確認', {
+                  ticketId: newTicket.ticket_id,
+                  reservationId: newSchedule.user_visiting_reservation_id,
+                  newIsEffective: newSchedule.isEffective,
+                  previousIsEffective: previousSchedule.isEffective
+                })
               }
             }
           }
@@ -307,6 +370,9 @@ export const useTicketsStore = defineStore('tickets', () => {
         logger.error('自分のチケット取得エラー', error)
       }
 
+
+      // 日付を最新に更新
+      updateTodayString()
 
       // パビリオン予約当選情報を取得
       await fetchPavilionWinningInfo()
@@ -603,6 +669,22 @@ export const useTicketsStore = defineStore('tickets', () => {
   }
 
   const addTicket = (ticket: TicketData) => {
+    // スケジュールデータがある場合は正しくprocessSchedulesを通す
+    if (ticket.schedules && Array.isArray(ticket.schedules)) {
+      const processedSchedules = processSchedules(ticket.schedules)
+      ticket.schedules = processedSchedules
+      
+      logger.temp('addTicket: スケジュール処理完了', {
+        ticketId: ticket.ticket_id,
+        schedulesCount: processedSchedules.length,
+        sample: processedSchedules.slice(0, 2).map(s => ({
+          entrance_date: s.entrance_date,
+          use_state: s.use_state,
+          isEffective: s.isEffective
+        }))
+      })
+    }
+    
     tickets.value.set(ticket.ticket_id, ticket)
   }
 
@@ -623,13 +705,15 @@ export const useTicketsStore = defineStore('tickets', () => {
         const isOwn = existingTicket?.isOwn ?? true // デフォルトでtrue
         const label = existingTicket?.label
         
-        // パビリオン予約情報を追加
+        // スケジュールデータを正しく処理してからパビリオン予約情報を追加
+        const processedSchedules = processSchedules(updatedTicketData.schedules || [])
+        
         const ticketWithPavilionInfo: TicketData = {
           ticket_id: updatedTicketData.ticket_id,
           item_name: updatedTicketData.item_name,
           isOwn: isOwn,
           label: label,
-          schedules: await Promise.all((updatedTicketData.schedules || []).map(async (schedule: any) => {
+          schedules: await Promise.all(processedSchedules.map(async (schedule: any) => {
             const pavilionType = determinePavilionReservationType(schedule)
             const pavilionStatus = await getAllPavilionReservationStatus(schedule)
             
@@ -928,25 +1012,7 @@ export const useTicketsStore = defineStore('tickets', () => {
         ticket_id: ticketData.ticket_id,
         item_name: ticketData.item_name,
         isOwn: true, // API取得したチケットは自分のもの
-        schedules: (ticketData.schedules || []).map((schedule: any) => {
-          const scheduleData: ScheduleData = {
-            user_visiting_reservation_id: schedule.user_visiting_reservation_id,
-            entrance_date: schedule.entrance_date || '',
-            use_state: schedule.use_state || 0,
-            gate_type: schedule.gate_type,
-            schedule_name: schedule.schedule_name,
-            time_start: schedule.time_start,
-            time_end: schedule.time_end,
-            reservation_type: schedule.reservation_type,
-            location_index: schedule.gate_type === 1 ? 0 : 1,
-            isEffective: schedule.use_state === 0 || 
-                       (schedule.use_state === 1 && schedule.entrance_date === getTodayString())
-          }
-          
-          // パビリオン予約情報はcomputedで動的計算するため、ここでは設定しない
-          
-          return scheduleData
-        })
+        schedules: processSchedules(ticketData.schedules || [])
       }
       
       // 既存のチケット情報を更新
@@ -1041,7 +1107,15 @@ export const useTicketsStore = defineStore('tickets', () => {
         }
       })
       
-      // チケットデータを直接更新（API呼び出しなし）
+      // チケットデータを直接更新（processSchedulesを通して isEffective を計算）
+      if (ticketData.schedules && Array.isArray(ticketData.schedules)) {
+        ticketData.schedules = processSchedules(ticketData.schedules)
+        logger.debug('updateTicketFromData: processSchedules実行済み', { 
+          ticketId, 
+          schedulesCount: ticketData.schedules.length 
+        })
+      }
+      
       tickets.value.set(ticketId, ticketData)
       lastUpdateTime.value = Date.now()
       
@@ -1057,6 +1131,13 @@ export const useTicketsStore = defineStore('tickets', () => {
 
   // 初期化メソッド - キャッシュ復元と新鮮さ判定を担当
   const init = async (): Promise<void> => {
+    // API利用なしモードでは初期化をスキップ
+    if (isApiUsageDisabled()) {
+      logger.info('API利用なしモードのためチケットストア初期化をスキップ')
+      isInitialized.value = true
+      return
+    }
+    
     if (isInitialized.value) {
       logger.debug('既に初期化済みのためスキップ')
       return

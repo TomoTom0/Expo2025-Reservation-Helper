@@ -5,6 +5,8 @@
 
 import { loggers } from './logger'
 import { redirectToLogin } from './auth'
+import { isApiUsageDisabled, isApiUsageSuppressed } from './apiUsageMode'
+import { PageChecker } from '../modules/page-utils'
 
 const logger = loggers.ui
 
@@ -33,6 +35,24 @@ class AuthManager {
    * 認証管理を開始
    */
   public startAuthMonitoring(): void {
+    // 待機室ページでは認証監視を無効化
+    if (PageChecker.isWaitingRoomPage()) {
+      logger.info('待機室ページのため認証監視をスキップ')
+      return
+    }
+    
+    // API利用なしモードでは認証監視を無効化
+    if (isApiUsageDisabled()) {
+      logger.info('API利用なしモードのため認証監視をスキップ')
+      return
+    }
+    
+    // API利用抑制モードかつytomoページ以外では認証監視を無効化
+    if (isApiUsageSuppressed() && !PageChecker.isYtomoPage()) {
+      logger.info('API利用抑制モードかつytomoページ以外のため認証監視をスキップ')
+      return
+    }
+    
     logger.info('認証監視開始')
     
     // 即座に認証状態をチェック
@@ -84,6 +104,20 @@ class AuthManager {
    * fetch リクエストをインターセプトして401エラーを自動処理
    */
   public async authenticatedFetch(input: RequestInfo | URL, init?: RequestInit): Promise<Response> {
+    // API利用なしモードではエラーを即座に返す
+    if (isApiUsageDisabled()) {
+      const error = new Error('API利用が無効化されています')
+      logger.info('API利用なしモードのためAPI呼び出しを拒否', { url: input.toString() })
+      throw error
+    }
+    
+    // API利用抑制モードかつytomoページ以外では呼び出しを拒否
+    if (isApiUsageSuppressed() && !PageChecker.isYtomoPage()) {
+      const error = new Error('API利用が抑制されています（ytomoページ以外）')
+      logger.info('API利用抑制モードかつytomoページ以外のためAPI呼び出しを拒否', { url: input.toString() })
+      throw error
+    }
+    
     try {
       // 相対パスの場合、固定のAPIベースURLを使用
       let url: string
@@ -159,6 +193,18 @@ class AuthManager {
    * 認証エラー処理
    */
   private async handleAuthError(): Promise<void> {
+    // API利用なしモードでは認証エラーを無視
+    if (isApiUsageDisabled()) {
+      logger.info('API利用なしモードのため認証エラーを無視')
+      return
+    }
+    
+    // API利用抑制モードかつytomoページ以外では認証エラーを無視
+    if (isApiUsageSuppressed() && !PageChecker.isYtomoPage()) {
+      logger.info('API利用抑制モードかつytomoページ以外のため認証エラーを無視')
+      return
+    }
+    
     if (this.isRedirecting) {
       return // 既にリダイレクト処理中
     }

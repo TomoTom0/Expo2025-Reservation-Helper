@@ -7,6 +7,8 @@ import { getPageDetector, resetPageDetector } from './page-detector';
 import { getAutomationEngine } from './automation-engine';
 import { PavilionReservationCache } from './pavilion-reservation-cache';
 import { loggers } from '../utils/logger';
+import { PageChecker } from './page-utils';
+import { isApiUsageSuppressed } from '../utils/apiUsageMode';
 
 // 初期化状態の管理
 let isInitialized = false;
@@ -19,6 +21,21 @@ function initializeAutomation(): void {
     if (isInitialized) return;
 
     const logger = loggers.automation;
+    
+    // 待機室ページでは自動操作エンジンを初期化しない
+    if (PageChecker.isWaitingRoomPage()) {
+        logger.info('待機室ページのため自動操作エンジン初期化をスキップ');
+        isInitialized = true;
+        return;
+    }
+    
+    // API利用抑制モードかつytomoページ以外では自動操作エンジンを初期化しない
+    if (isApiUsageSuppressed() && !PageChecker.isYtomoPage()) {
+        logger.info('API利用抑制モードかつytomoページ以外のため自動操作エンジン初期化をスキップ');
+        isInitialized = true;
+        return;
+    }
+
     logger.info('自動操作エンジン初期化開始');
 
     // ページロード完了後に実行

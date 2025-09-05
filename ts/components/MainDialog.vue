@@ -9,6 +9,7 @@
       <div class="ytomo-dialog-body">
         <div class="ytomo-tab-navigation">
           <button 
+            v-if="!shouldHideNonOthersTabs"
             class="ytomo-tab-button"
             :class="{ active: activeTab === 'ticket' }"
             @click="setActiveTab('ticket')"
@@ -22,6 +23,7 @@
             </div>
           </button>
           <button 
+            v-if="!shouldHideNonOthersTabs"
             class="ytomo-tab-button"
             :class="{ active: activeTab === 'pavilion' }"
             @click="setActiveTab('pavilion')"
@@ -35,6 +37,7 @@
             </div>
           </button>
           <button 
+            v-if="!shouldHideNonOthersTabs"
             class="ytomo-tab-button"
             :class="{ active: activeTab === 'entrance' }"
             @click="setActiveTab('entrance')"
@@ -66,6 +69,7 @@
         </div>
         <div class="ytomo-tab-content">
           <div 
+            v-if="!shouldHideNonOthersTabs"
             class="ytomo-tab-pane"
             :class="{ active: activeTab === 'ticket' }"
             id="ticket-tab"
@@ -73,6 +77,7 @@
             <TicketTab />
           </div>
           <div 
+            v-if="!shouldHideNonOthersTabs"
             class="ytomo-tab-pane"
             :class="{ active: activeTab === 'pavilion' }"
             id="pavilion-tab"
@@ -80,6 +85,7 @@
             <PavilionTab />
           </div>
           <div 
+            v-if="!shouldHideNonOthersTabs"
             class="ytomo-tab-pane"
             :class="{ active: activeTab === 'entrance' }"
             id="entrance-tab"
@@ -100,7 +106,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, onUnmounted } from 'vue'
+import { computed, onMounted, onUnmounted, ref } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useMainDialogStore } from '@/stores/mainDialog'
 import { useTicketsStore } from '@/stores/tickets'
@@ -110,6 +116,7 @@ import type { ScheduleData, TicketData } from '@/types/api'
 import { getLongNameFromShortName } from '@/utils/pavilionReservationMapping'
 import { PageChecker } from '@/modules/page-utils'
 import { loggers } from '@/utils/logger'
+import { isApiUsageDisabled, isApiUsageSuppressed } from '@/utils/apiUsageMode'
 import TicketTab from './TicketTab.vue'
 import PavilionTab from './PavilionTab.vue'
 import EntranceTab from './EntranceTab.vue'
@@ -123,6 +130,15 @@ const pavilionsStore = usePavilionsStore()
 
 // ytomoページ判定
 const isYtomoPage = PageChecker.isYtomoPage()
+
+// API利用モード判定（リアクティブ）
+const apiUsageDisabled = ref(isApiUsageDisabled())
+const apiUsageSuppressed = ref(isApiUsageSuppressed())
+
+// タブ表示制限判定（API利用なし、またはAPI利用抑制かつytomoページ以外）
+const shouldHideNonOthersTabs = computed(() => {
+  return apiUsageDisabled.value || (apiUsageSuppressed.value && !isYtomoPage)
+})
 
 // ストアの状態を取得（リアクティビティ保持）
 const { isVisible, activeTab, version } = storeToRefs(mainDialogStore)
@@ -251,9 +267,9 @@ const handleOverlayClick = (e: Event) => {
   }
 }
 
-// Escキーでダイアログを閉じる
+// Escキーでダイアログを閉じる（ytomoページ以外では無効）
 const handleEscapeKey = (e: KeyboardEvent) => {
-  if (e.key === 'Escape' && isVisible) {
+  if (e.key === 'Escape' && isVisible && isYtomoPage) {
     hideDialog()
   }
 }
@@ -261,6 +277,13 @@ const handleEscapeKey = (e: KeyboardEvent) => {
 // カスタムイベントハンドラー
 const handleShowEvent = async () => {
   logger.debug('main-dialog-showイベント受信')
+  
+  // ytomoページ以外ではダイアログ表示を無効化（FAB廃止のため）
+  if (!isYtomoPage) {
+    logger.info('ytomoページ以外のためダイアログ表示を拒否（FAB廃止）')
+    return
+  }
+  
   mainDialogStore.showDialog()
   
   // 事前読み込み完了により初期化処理は不要
@@ -269,6 +292,25 @@ const handleShowEvent = async () => {
 const handleHideEvent = () => {
   logger.debug('main-dialog-hideイベント受信')
   mainDialogStore.hideDialog()
+}
+
+// API利用モード変更イベントハンドラー
+const handleApiUsageModeChanged = (event: Event) => {
+  const customEvent = event as CustomEvent<{ newMode: string }>
+  const { newMode } = customEvent.detail
+  apiUsageDisabled.value = newMode === 'none'
+  apiUsageSuppressed.value = newMode === 'suppressed' || newMode === 'none'
+  logger.info('API利用モード変更検知', { 
+    newMode, 
+    apiUsageDisabled: apiUsageDisabled.value,
+    apiUsageSuppressed: apiUsageSuppressed.value
+  })
+  
+  // タブが非表示になる場合は他タブに強制移動
+  if (shouldHideNonOthersTabs.value && activeTab.value !== 'others') {
+    setActiveTab('others')
+    logger.info('API利用制限のため設定タブに切り替え')
+  }
 }
 
 // 事前読み込み完了により初期化処理は削除済み
@@ -281,13 +323,32 @@ onMounted(() => {
   document.addEventListener('keydown', handleEscapeKey)
   document.addEventListener('main-dialog-show', handleShowEvent)
   document.addEventListener('main-dialog-hide', handleHideEvent)
-  logger.info('MainDialog mounted', { 初期表示状態: isVisible.value })
+  window.addEventListener('ytomo-api-usage-mode-changed', handleApiUsageModeChanged)
+  
+  // ytomoページでは常に表示
+  if (isYtomoPage) {
+    mainDialogStore.showDialog()
+    logger.info('ytomoページでMainDialogを自動表示')
+  }
+  
+  // API利用制限時は設定タブのみ表示
+  if (shouldHideNonOthersTabs.value && activeTab.value !== 'others') {
+    setActiveTab('others')
+    logger.info('API利用制限のため設定タブに切り替え')
+  }
+  
+  logger.info('MainDialog mounted', { 
+    初期表示状態: isVisible.value, 
+    apiUsageDisabled: apiUsageDisabled.value,
+    activeTab: activeTab.value 
+  })
 })
 
 onUnmounted(() => {
   document.removeEventListener('keydown', handleEscapeKey)
   document.removeEventListener('main-dialog-show', handleShowEvent)
   document.removeEventListener('main-dialog-hide', handleHideEvent)
+  window.removeEventListener('ytomo-api-usage-mode-changed', handleApiUsageModeChanged)
   logger.info('MainDialog unmounted')
 })
 </script>

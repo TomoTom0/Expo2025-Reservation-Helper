@@ -5,6 +5,7 @@
 
 import { loggers } from '@/utils/logger';
 import { authManager } from '@/utils/authManager';
+import { PageChecker } from './page-utils';
 const logger = loggers.ui;
 
 // すべてのモジュールをimport（副作用importも含む）
@@ -79,20 +80,25 @@ const checkGlobalReservationResult = (): void => {
     }
 };
 
-// DOMContentLoaded時にグローバル予約結果通知をチェックし、認証監視を開始
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', () => {
+// 待機室ページでは何も処理しない
+if (PageChecker.isWaitingRoomPage()) {
+    logger.info('待機室ページ検知: 全処理をスキップします');
+} else {
+    // DOMContentLoaded時にグローバル予約結果通知をチェックし、認証監視を開始
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', () => {
+            setTimeout(() => {
+                checkGlobalReservationResult();
+                // 認証監視を開始
+                authManager.startAuthMonitoring();
+            }, 1000); // グローバル通知システムの初期化を待つ
+        });
+    } else {
+        // DOMが既に読み込まれている場合は即座に実行
         setTimeout(() => {
             checkGlobalReservationResult();
             // 認証監視を開始
             authManager.startAuthMonitoring();
-        }, 1000); // グローバル通知システムの初期化を待つ
-    });
-} else {
-    // DOMが既に読み込まれている場合は即座に実行
-    setTimeout(() => {
-        checkGlobalReservationResult();
-        // 認証監視を開始
-        authManager.startAuthMonitoring();
-    }, 1000);
+        }, 1000);
+    }
 }

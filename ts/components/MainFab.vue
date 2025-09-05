@@ -1,25 +1,28 @@
 <template>
-  <!-- 予約結果表示 -->
-  <div 
-    v-if="reservationResult"
-    class="ytomo-reservation-result"
-    :class="{ success: reservationResult.success, failed: !reservationResult.success }"
-  >
-    <div class="ytomo-result-status">
-      {{ reservationResult.success ? '予約成功' : `予約失敗: ${reservationResult.reason}` }}
+  <!-- ytomoページ以外では表示しない -->
+  <div v-if="shouldShowFab">
+    <!-- 予約結果表示 -->
+    <div 
+      v-if="reservationResult"
+      class="ytomo-reservation-result"
+      :class="{ success: reservationResult.success, failed: !reservationResult.success }"
+    >
+      <div class="ytomo-result-status">
+        {{ reservationResult.success ? '予約成功' : `予約失敗: ${reservationResult.reason}` }}
+      </div>
+      <div class="ytomo-result-pavilion">{{ reservationResult.pavilionName }}</div>
+      <div class="ytomo-result-time">{{ reservationResult.datetime }}</div>
     </div>
-    <div class="ytomo-result-pavilion">{{ reservationResult.pavilionName }}</div>
-    <div class="ytomo-result-time">{{ reservationResult.datetime }}</div>
+    
+    <button 
+      class="ytomo-main-fab"
+      :disabled="!isInitialized"
+      :title="isInitialized ? 'YTダイアログを開く' : '初期化中...'"
+      @click="handleClick"
+    >
+      YT
+    </button>
   </div>
-  
-  <button 
-    class="ytomo-main-fab"
-    :disabled="!isInitialized"
-    :title="isInitialized ? 'YTダイアログを開く' : '初期化中...'"
-    @click="handleClick"
-  >
-    YT
-  </button>
 </template>
 
 <script setup lang="ts">
@@ -28,6 +31,7 @@ import { useMainDialogStore } from '@/stores/mainDialog'
 import { useTicketsStore } from '@/stores/tickets'
 import { usePavilionsStore } from '@/stores/pavilions'
 import { loggers } from '@/utils/logger'
+import { PageChecker } from '@/modules/page-utils'
 
 const logger = loggers.ui
 
@@ -41,6 +45,11 @@ interface ReservationResult {
 const mainDialogStore = useMainDialogStore()
 const ticketsStore = useTicketsStore()
 const pavilionsStore = usePavilionsStore()
+
+// ytomoページでのみFABを表示
+const shouldShowFab = computed(() => {
+  return PageChecker.isYtomoPage()
+})
 
 const isInitialized = computed(() => {
   // lastUpdateTimeが存在すれば初期化済みと判定
