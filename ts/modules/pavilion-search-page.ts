@@ -127,12 +127,6 @@ const prepare_filter = (val_search: string): { include: RegExp, exclude: RegExp[
 
 // ページ初期化処理
 const init_page = (): void => {
-    // ヘッダーにFAB切替ボタンを追加（DOM構築完了を待つ）
-    setTimeout(() => {
-        import('./entrance-page-state').then((entrancePageState) => {
-            entrancePageState.createFABToggleButton();
-        });
-    }, 1000);
     
     // すべて読み込みボタンの自動クリック処理
     const load_more_auto = async () => {

@@ -21,12 +21,6 @@ export const init_entrance_page = (dependencies: Dependencies = {}): void => {
         restoreFromCacheFn
     } = dependencies;
     
-    // ヘッダーにFAB切替ボタンを追加（DOM構築完了を待つ）
-    setTimeout(() => {
-        import('./entrance-page-state').then((entrancePageState) => {
-            entrancePageState.createFABToggleButton();
-        });
-    }, 1000);
     
     // 入場予約機能の設定
     const entranceReservationConfig = {

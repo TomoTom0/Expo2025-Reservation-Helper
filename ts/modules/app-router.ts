@@ -21,8 +21,6 @@
 import { init_page, judge_init } from './pavilion-search-page';
 // 入場予約ページ初期化モジュール
 import { judge_entrance_init, init_entrance_page } from './entrance-page-init';
-// FAB状態管理
-import { createFABToggleButton } from './entrance-page-state';
 // キャッシュ管理システム
 import { createCacheManager } from './cache-manager';
 import { setCacheManager } from './entrance-page-core';
@@ -269,8 +267,6 @@ const trigger_init = (url_record: string): void => {
             if (document.body && (document.readyState === 'complete' || document.readyState === 'interactive')) {
                 clearInterval(interval_companion);
                 logger.info('ページを初期化', { page_type });
-                // ヘッダートグルボタンを作成
-                createFABToggleButton();
                 
                 // ページタイプ別初期化
                 if (page_type === 'ticket_selection') {
