@@ -18,7 +18,7 @@
       </div>
       
       <div class="ytomo-setting-item">
-        <label class="ytomo-setting-label">入場時間更新目標時間</label>
+        <label class="ytomo-setting-label">入場予約実行目標秒時間</label>
         <input 
           type="number"
           class="ytomo-input-inline"
@@ -33,7 +33,7 @@
     </div>
     
     <!-- 調査機能セクション -->
-    <div class="ytomo-section">
+    <div v-if="apiUsageMode !== 'none'" class="ytomo-section">
       <h3 class="ytomo-section-title">タイミング調査</h3>
       
       <div class="ytomo-investigation-section">

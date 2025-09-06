@@ -1,14 +1,14 @@
 // ==UserScript==
 // @name         yt-Expo2025-Reservation-Helper
 // @namespace    http://staybrowser.com/
-// @version      1.0.0-alpha
+// @version      1.0.0
 // @description  大阪万博2025予約支援ツール: パビリオン検索・予約・監視・同行者管理・入場予約の自動化
 // @author       TomoTom0 https://github.com/TomoTom0
 // @match        https://ticket.expo2025.or.jp/*
 // @run-at       document-end
 // ==/UserScript==
 
-// Built: 2025/09/06 09:12:12
+// Built: 2025/09/06 11:46:15
 
 
 (function webpackUniversalModuleDefinition(root, factory) {
@@ -695,17 +695,12 @@ ___CSS_LOADER_EXPORT___.push([module.id, `.ytomo-ticket-tab[data-v-b8f71124]{pad
 /***/ 241:
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
-__webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   calendarWatchState: () => (/* binding */ calendarWatchState),
-/* harmony export */   createFABToggleButton: () => (/* binding */ createFABToggleButton),
-/* harmony export */   entranceReservationState: () => (/* binding */ entranceReservationState),
-/* harmony export */   fabVisibilityState: () => (/* binding */ fabVisibilityState),
-/* harmony export */   loadFABVisibility: () => (/* binding */ loadFABVisibility),
-/* harmony export */   saveFABVisibility: () => (/* binding */ saveFABVisibility),
-/* harmony export */   toggleFABVisibility: () => (/* binding */ toggleFABVisibility),
-/* harmony export */   updateFABVisibility: () => (/* binding */ updateFABVisibility)
+/* harmony export */   Q2: () => (/* binding */ loadFABVisibility),
+/* harmony export */   p4: () => (/* binding */ updateFABVisibility),
+/* harmony export */   ri: () => (/* binding */ calendarWatchState)
 /* harmony export */ });
+/* unused harmony exports entranceReservationState, fabVisibilityState, saveFABVisibility, toggleFABVisibility */
 /* harmony import */ var _utils_logger__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(911);
 // ============================================================================
 // 【2. 状態管理オブジェクト】
@@ -769,115 +764,6 @@ function updateFABVisibility() {
     const ticketSelectionFabContainer = document.getElementById('ytomo-ticket-selection-fab-container');
     if (ticketSelectionFabContainer) {
         ticketSelectionFabContainer.classList.toggle('js-hide', !fabVisibilityState.isVisible);
-    }
-}
-// ヘッダーにFAB表示切替ボタンを追加
-function createFABToggleButton() {
-    // 既存のボタンがあるかチェック
-    const existingButton = document.getElementById('ytomo-fab-toggle-btn');
-    if (existingButton) {
-        return; // 既に存在する場合は何もしない
-    }
-    // 買い物アイコンを探す（HTMLから判明した安定セレクタ使用）
-    const shoppingIcon = document.querySelector('li[data-type="cart"]');
-    // 買い物アイコンが見つからない場合、ヘッダー内の右端要素を探す
-    let targetElement = shoppingIcon;
-    if (!targetElement) {
-        logger.debug('買い物アイコンが見つかりません。ヘッダー右端要素を探索中');
-        // ヘッダー要素を探す
-        const headerSelectors = [
-            '.style_sp_title_box__oK11Q',
-            '.pc-none',
-            'div[class*="style_sp_title_box"]',
-            'div[class*="title_box"]',
-            'header',
-            'div:has(.style_site_heading__W80I0)',
-            '.style_site_heading__W80I0'
-        ];
-        let headerElement = null;
-        for (const selector of headerSelectors) {
-            try {
-                headerElement = document.querySelector(selector);
-                if (headerElement) {
-                    logger.debug('ヘッダー要素発見', { selector });
-                    break;
-                }
-            }
-            catch (e) {
-                continue;
-            }
-        }
-        if (headerElement) {
-            // ヘッダー内の右端にありそうな要素を探す
-            const rightElements = headerElement.querySelectorAll('a, button, span, div');
-            for (let i = rightElements.length - 1; i >= 0; i--) {
-                const el = rightElements[i];
-                const rect = el.getBoundingClientRect();
-                if (rect.width > 20 && rect.height > 20) {
-                    targetElement = el;
-                    logger.debug('右端要素を買い物アイコン候補として使用', { tagName: el.tagName });
-                    break;
-                }
-            }
-        }
-    }
-    if (!targetElement) {
-        logger.warn('買い物アイコンまたは配置基準要素が見つかりません');
-        return;
-    }
-    // 既存のアイコンデザインに合わせたli要素を作成
-    const toggleLi = document.createElement('li');
-    toggleLi.id = 'ytomo-fab-toggle-li';
-    const toggleButton = document.createElement('button');
-    toggleButton.id = 'ytomo-fab-toggle-btn';
-    toggleButton.type = 'button';
-    toggleButton.tabIndex = 0;
-    const toggleFigure = document.createElement('div');
-    toggleFigure.className = 'style_header_shortcut__figure__gNkUJ';
-    // 既存のヘッダーアイコン構造に合わせてDOM要素を作成
-    // 既存のヘッダーアイコンのスタイルを継承
-    toggleLi.className = 'fab-toggle-li';
-    toggleButton.className = 'fab-toggle-button';
-    toggleFigure.className = 'fab-toggle-figure style_header_shortcut__figure__gNkUJ';
-    // DOM構造を組み立て
-    toggleFigure.appendChild(toggleButton);
-    toggleLi.appendChild(toggleFigure);
-    // YT背景 + 前景アイコンの重ね表示
-    function updateButtonIcon() {
-        const iconSvg = fabVisibilityState.isVisible
-            ? `<svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
-                 <path d="M12,9A3,3 0 0,0 9,12A3,3 0 0,0 12,15A3,3 0 0,0 15,12A3,3 0 0,0 12,9M12,17A5,5 0 0,1 7,12A5,5 0 0,1 12,7A5,5 0 0,1 17,12A5,5 0 0,1 12,17M12,4.5C7,4.5 2.73,7.61 1,12C2.73,16.39 7,19.5 12,19.5C17,19.5 21.27,16.39 23,12C21.27,7.61 17,4.5 12,4.5Z" />
-               </svg>` // eye
-            : `<svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
-                 <path d="M11.83,9L15,12.16C15,12.11 15,12.05 15,12A3,3 0 0,0 12,9C11.94,9 11.89,9 11.83,9M7.53,9.8L9.08,11.35C9.03,11.56 9,11.77 9,12A3,3 0 0,0 12,15C12.22,15 12.44,14.97 12.65,14.92L14.2,16.47C13.53,16.8 12.79,17 12,17A5,5 0 0,1 7,12C7,11.21 7.2,10.47 7.53,9.8M2,4.27L4.28,6.55L4.73,7C3.08,8.3 1.78,10 1,12C2.73,16.39 7,19.5 12,19.5C13.55,19.5 15.03,19.2 16.38,18.66L16.81,19.09L19.73,22L21,20.73L3.27,3M12,7A5,5 0 0,1 17,12C17,12.64 16.87,13.26 16.64,13.82L19.57,16.75C21.07,15.5 22.27,13.86 23,12C21.27,7.61 17,4.5 12,4.5C10.6,4.5 9.26,4.75 8,5.2L10.17,7.35C10.76,7.13 11.37,7 12,7Z" />
-               </svg>`; // eye-off
-        toggleButton.innerHTML = `
-            <div class="ytomo-flex-column-center">
-                ${iconSvg}
-                <span class="ytomo-brand-text">YTomo</span>
-            </div>
-        `;
-        toggleButton.title = fabVisibilityState.isVisible ? 'FABを非表示にする' : 'FABを表示する';
-    }
-    updateButtonIcon();
-    // クリックイベント
-    toggleButton.addEventListener('click', (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        toggleFABVisibility();
-        updateButtonIcon();
-    });
-    // 買い物アイコンの親ul要素を取得してその中に挿入
-    const parentUl = targetElement.parentElement;
-    if (parentUl && parentUl.tagName.toLowerCase() === 'ul') {
-        // YTomoヘッダークラスを追加
-        parentUl.classList.add('ytomo-header');
-        // 買い物アイコンの直前に挿入
-        parentUl.insertBefore(toggleLi, targetElement);
-    }
-    else {
-        logger.warn('ul要素が見つかりません。body直下に追加します');
-        document.body.appendChild(toggleLi);
     }
 }
 // エクスポート
@@ -993,28 +879,6 @@ module.exports = function (cssWithMappingToString) {
   };
   return list;
 };
-
-/***/ }),
-
-/***/ 348:
-/***/ ((module, __webpack_exports__, __webpack_require__) => {
-
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   A: () => (__WEBPACK_DEFAULT_EXPORT__)
-/* harmony export */ });
-/* harmony import */ var _node_modules_css_loader_dist_runtime_noSourceMaps_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(601);
-/* harmony import */ var _node_modules_css_loader_dist_runtime_noSourceMaps_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_css_loader_dist_runtime_noSourceMaps_js__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(314);
-/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1__);
-// Imports
-
-
-var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1___default()((_node_modules_css_loader_dist_runtime_noSourceMaps_js__WEBPACK_IMPORTED_MODULE_0___default()));
-// Module
-___CSS_LOADER_EXPORT___.push([module.id, `.ytomo-others-tab[data-v-38f47683]{padding:12px}.ytomo-others-tab .ytomo-section[data-v-38f47683]{margin-bottom:20px}.ytomo-others-tab .ytomo-section .ytomo-section-title[data-v-38f47683]{font-size:16px;font-weight:600;color:#1f2937;margin-bottom:12px;padding-bottom:8px;border-bottom:2px solid #e5e7eb}.ytomo-others-tab .ytomo-setting-item[data-v-38f47683]{display:flex;align-items:center;gap:8px;margin-bottom:12px}.ytomo-others-tab .ytomo-setting-item .ytomo-setting-label[data-v-38f47683]{font-size:14px;color:#374151;min-width:160px}.ytomo-others-tab .ytomo-setting-item .ytomo-input-inline[data-v-38f47683]{padding:4px 8px;border:1px solid #d1d5db;border-radius:4px;font-size:14px;text-align:center}.ytomo-others-tab .ytomo-setting-item .ytomo-input-inline[data-v-38f47683]:focus{outline:none;border-color:#2563eb;box-shadow:0 0 0 1px #2563eb}.ytomo-others-tab .ytomo-setting-item .ytomo-select-inline[data-v-38f47683]{padding:4px 8px;border:1px solid #d1d5db;border-radius:4px;font-size:14px;background-color:#fff;min-width:80px}.ytomo-others-tab .ytomo-setting-item .ytomo-select-inline[data-v-38f47683]:focus{outline:none;border-color:#2563eb;box-shadow:0 0 0 1px #2563eb}.ytomo-others-tab .ytomo-setting-item .ytomo-select-inline[data-v-38f47683]:hover{background-color:#f9fafb}.ytomo-others-tab .ytomo-setting-item .ytomo-setting-unit[data-v-38f47683]{font-size:14px;color:#6b7280}.ytomo-others-tab .ytomo-investigation-section .ytomo-description[data-v-38f47683]{font-size:14px;color:#6b7280;margin-bottom:16px;line-height:1.4}.ytomo-others-tab .ytomo-investigation-section .ytomo-investigation-controls[data-v-38f47683]{display:flex;gap:8px;margin-bottom:16px}.ytomo-others-tab .ytomo-investigation-section .ytomo-investigation-controls .ytomo-investigate-button[data-v-38f47683]{background:#059669;color:#fff;padding:8px 16px;border:none;border-radius:4px;font-size:14px;font-weight:500;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:4px}.ytomo-others-tab .ytomo-investigation-section .ytomo-investigation-controls .ytomo-investigate-button[data-v-38f47683]:hover:not(.disabled){background:#047857}.ytomo-others-tab .ytomo-investigation-section .ytomo-investigation-controls .ytomo-investigate-button.disabled[data-v-38f47683]{background:#9ca3af;color:#d1d5db;cursor:not-allowed}.ytomo-others-tab .ytomo-investigation-section .ytomo-investigation-controls .ytomo-investigate-button.cancel-mode[data-v-38f47683]{background:#dc2626}.ytomo-others-tab .ytomo-investigation-section .ytomo-investigation-controls .ytomo-investigate-button.cancel-mode[data-v-38f47683]:hover{background:#b91c1c}.ytomo-others-tab .ytomo-investigation-section .ytomo-investigation-controls .ytomo-investigate-button .ytomo-loading-icon[data-v-38f47683]{animation:pulse-38f47683 1.5s ease-in-out infinite}.ytomo-others-tab .ytomo-investigation-section .ytomo-investigation-controls .ytomo-clear-button[data-v-38f47683]{background:#f3f4f6;color:#374151;border:1px solid #d1d5db;padding:8px 16px;border-radius:4px;font-size:14px;cursor:pointer;transition:all .2s}.ytomo-others-tab .ytomo-investigation-section .ytomo-investigation-controls .ytomo-clear-button[data-v-38f47683]:hover{background:#e5e7eb}.ytomo-others-tab .ytomo-investigation-section .ytomo-investigation-status[data-v-38f47683]{background:linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);border:1px solid #16a34a;border-radius:8px;padding:12px}.ytomo-others-tab .ytomo-investigation-section .ytomo-investigation-status .ytomo-status-content[data-v-38f47683]{display:flex;align-items:flex-start;gap:12px}.ytomo-others-tab .ytomo-investigation-section .ytomo-investigation-status .ytomo-status-content .ytomo-status-icon[data-v-38f47683]{width:20px;height:20px;flex-shrink:0;margin-top:2px}.ytomo-others-tab .ytomo-investigation-section .ytomo-investigation-status .ytomo-status-content .ytomo-status-icon svg[data-v-38f47683]{width:100%;height:100%;fill:#16a34a}.ytomo-others-tab .ytomo-investigation-section .ytomo-investigation-status .ytomo-status-content .ytomo-status-icon.spinning[data-v-38f47683]{animation:spin-38f47683 1s linear infinite}.ytomo-others-tab .ytomo-investigation-section .ytomo-investigation-status .ytomo-status-content .ytomo-status-details[data-v-38f47683]{flex:1}.ytomo-others-tab .ytomo-investigation-section .ytomo-investigation-status .ytomo-status-content .ytomo-status-details .ytomo-phase-info[data-v-38f47683]{font-size:13px;margin-bottom:4px;display:flex;align-items:center;gap:8px}.ytomo-others-tab .ytomo-investigation-section .ytomo-investigation-status .ytomo-status-content .ytomo-status-details .ytomo-phase-info .phase-label[data-v-38f47683]{font-weight:600;color:#059669;padding:2px 6px;background:#d1fae5;border-radius:3px;flex-shrink:0}.ytomo-others-tab .ytomo-investigation-section .ytomo-investigation-status .ytomo-status-content .ytomo-status-details .ytomo-phase-info .detection-info[data-v-38f47683]{font-weight:500;color:#374151;font-family:"Consolas","Monaco",monospace;min-width:200px}.ytomo-others-tab .ytomo-investigation-section .ytomo-investigation-status .ytomo-status-content .ytomo-status-details .ytomo-waiting-info[data-v-38f47683]{font-size:12px;color:#6b7280;margin-bottom:4px;font-style:italic;min-height:18px;line-height:18px}.ytomo-others-tab .ytomo-investigation-section .ytomo-investigation-status .ytomo-status-content .ytomo-status-details .ytomo-status-current[data-v-38f47683]{font-size:14px;font-weight:500;color:#166534;margin-bottom:8px}.ytomo-others-tab .ytomo-investigation-section .ytomo-investigation-status .ytomo-status-content .ytomo-status-details .ytomo-investigation-results .ytomo-results-title[data-v-38f47683]{font-size:13px;font-weight:600;color:#166534;margin-bottom:4px}.ytomo-others-tab .ytomo-investigation-section .ytomo-investigation-status .ytomo-status-content .ytomo-status-details .ytomo-investigation-results .ytomo-result-item[data-v-38f47683]{font-size:12px;color:#166534;padding:2px 0;font-family:monospace}@keyframes spin-38f47683{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}@keyframes pulse-38f47683{0%,100%{opacity:1}50%{opacity:.5}}`, ""]);
-// Exports
-/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
-
 
 /***/ }),
 
@@ -30391,8 +30255,8 @@ function createEntranceReservationUI() {
         }
     });
     // FAB表示状態を初期化・適用
-    (0,entrance_page_state.loadFABVisibility)();
-    (0,entrance_page_state.updateFABVisibility)();
+    (0,entrance_page_state/* loadFABVisibility */.Q2)();
+    (0,entrance_page_state/* updateFABVisibility */.p4)();
     // 初期状態を判定してFABを更新
     waitForTimeSlotTable(() => {
         checkInitialState();
@@ -30480,18 +30344,18 @@ function checkInitialState() {
 }
 // カレンダー変更を検知してボタンを再設置
 function startCalendarWatcher() {
-    if (entrance_page_state.calendarWatchState.isWatching)
+    if (entrance_page_state/* calendarWatchState */.ri.isWatching)
         return;
-    entrance_page_state.calendarWatchState.isWatching = true;
-    entrance_page_state.calendarWatchState.currentSelectedDate = (0,entrance_page_core/* getCurrentSelectedCalendarDate */.rY)();
+    entrance_page_state/* calendarWatchState */.ri.isWatching = true;
+    entrance_page_state/* calendarWatchState */.ri.currentSelectedDate = (0,entrance_page_core/* getCurrentSelectedCalendarDate */.rY)();
     // 初期化時に入場予約状態管理にも現在の選択日付を設定
-    if (entrance_page_state.calendarWatchState.currentSelectedDate) {
-        entrance_reservation_state_manager/* entranceReservationStateManager */.xx.setSelectedCalendarDate(entrance_page_state.calendarWatchState.currentSelectedDate);
-        entrance_page_fab_logger.debug('初期化時の選択日付を設定', { selectedDate: entrance_page_state.calendarWatchState.currentSelectedDate });
+    if (entrance_page_state/* calendarWatchState */.ri.currentSelectedDate) {
+        entrance_reservation_state_manager/* entranceReservationStateManager */.xx.setSelectedCalendarDate(entrance_page_state/* calendarWatchState */.ri.currentSelectedDate);
+        entrance_page_fab_logger.debug('初期化時の選択日付を設定', { selectedDate: entrance_page_state/* calendarWatchState */.ri.currentSelectedDate });
     }
     entrance_page_fab_logger.debug('カレンダー変更検知を開始');
     // MutationObserverでカレンダー変更・時間帯選択・ボタン状態変更を検出
-    entrance_page_state.calendarWatchState.observer = new MutationObserver((mutations) => {
+    entrance_page_state/* calendarWatchState */.ri.observer = new MutationObserver((mutations) => {
         let shouldUpdate = false;
         mutations.forEach((mutation) => {
             // 1. カレンダーのaria-pressed属性の変更を検出
@@ -30512,7 +30376,7 @@ function startCalendarWatcher() {
                     const ariaPressed = element.getAttribute('aria-pressed');
                     entrance_page_fab_logger.debug('時間帯選択変更検出', { ariaPressed });
                     // 入場予約状態管理システムの同期（初期化中は除外）
-                    if (ariaPressed === 'true' && !entrance_page_state.calendarWatchState.isInitializing) {
+                    if (ariaPressed === 'true' && !entrance_page_state/* calendarWatchState */.ri.isInitializing) {
                         // 選択状態変更を検出 - DOM状態から予約対象を同期
                         entrance_page_fab_logger.debug('時間帯選択状態を検出');
                         setTimeout(() => {
@@ -30542,7 +30406,7 @@ function startCalendarWatcher() {
     });
     // カレンダー要素全体を検知
     const observeTarget = document.body;
-    entrance_page_state.calendarWatchState.observer.observe(observeTarget, {
+    entrance_page_state/* calendarWatchState */.ri.observer.observe(observeTarget, {
         attributes: true,
         subtree: true,
         attributeFilter: ['aria-pressed', 'class', 'disabled']
@@ -30552,13 +30416,13 @@ function startCalendarWatcher() {
 async function handleCalendarChange() {
     // 動的待機で日付を取得（遷移中の場合は適切に待機）
     const newSelectedDate = await (0,entrance_page_core/* waitForValidCalendarDate */.p4)(3000, 100);
-    const calendarDateChanged = newSelectedDate !== entrance_page_state.calendarWatchState.currentSelectedDate;
+    const calendarDateChanged = newSelectedDate !== entrance_page_state/* calendarWatchState */.ri.currentSelectedDate;
     // 入場予約状態管理の管理している日付とも比較
     const stateManagerSelectedDate = entrance_reservation_state_manager/* entranceReservationStateManager */.xx.getSelectedCalendarDate();
     const actualDateChanged = newSelectedDate !== stateManagerSelectedDate;
     if (calendarDateChanged) {
-        entrance_page_fab_logger.debug('カレンダー日付変更を検出', { oldDate: entrance_page_state.calendarWatchState.currentSelectedDate, newDate: newSelectedDate });
-        entrance_page_state.calendarWatchState.currentSelectedDate = newSelectedDate;
+        entrance_page_fab_logger.debug('カレンダー日付変更を検出', { oldDate: entrance_page_state/* calendarWatchState */.ri.currentSelectedDate, newDate: newSelectedDate });
+        entrance_page_state/* calendarWatchState */.ri.currentSelectedDate = newSelectedDate;
         // 入場予約状態管理にも日付を設定
         if (newSelectedDate) {
             entrance_reservation_state_manager/* entranceReservationStateManager */.xx.setSelectedCalendarDate(newSelectedDate);
@@ -32415,6 +32279,28 @@ const entranceReservationStateManager = new EntranceReservationStateManager();
 
 /***/ }),
 
+/***/ 635:
+/***/ ((module, __webpack_exports__, __webpack_require__) => {
+
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   A: () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _node_modules_css_loader_dist_runtime_noSourceMaps_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(601);
+/* harmony import */ var _node_modules_css_loader_dist_runtime_noSourceMaps_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_css_loader_dist_runtime_noSourceMaps_js__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(314);
+/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1__);
+// Imports
+
+
+var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1___default()((_node_modules_css_loader_dist_runtime_noSourceMaps_js__WEBPACK_IMPORTED_MODULE_0___default()));
+// Module
+___CSS_LOADER_EXPORT___.push([module.id, `.ytomo-others-tab[data-v-122dbbfa]{padding:12px}.ytomo-others-tab .ytomo-section[data-v-122dbbfa]{margin-bottom:20px}.ytomo-others-tab .ytomo-section .ytomo-section-title[data-v-122dbbfa]{font-size:16px;font-weight:600;color:#1f2937;margin-bottom:12px;padding-bottom:8px;border-bottom:2px solid #e5e7eb}.ytomo-others-tab .ytomo-setting-item[data-v-122dbbfa]{display:flex;align-items:center;gap:8px;margin-bottom:12px}.ytomo-others-tab .ytomo-setting-item .ytomo-setting-label[data-v-122dbbfa]{font-size:14px;color:#374151;min-width:160px}.ytomo-others-tab .ytomo-setting-item .ytomo-input-inline[data-v-122dbbfa]{padding:4px 8px;border:1px solid #d1d5db;border-radius:4px;font-size:14px;text-align:center}.ytomo-others-tab .ytomo-setting-item .ytomo-input-inline[data-v-122dbbfa]:focus{outline:none;border-color:#2563eb;box-shadow:0 0 0 1px #2563eb}.ytomo-others-tab .ytomo-setting-item .ytomo-select-inline[data-v-122dbbfa]{padding:4px 8px;border:1px solid #d1d5db;border-radius:4px;font-size:14px;background-color:#fff;min-width:80px}.ytomo-others-tab .ytomo-setting-item .ytomo-select-inline[data-v-122dbbfa]:focus{outline:none;border-color:#2563eb;box-shadow:0 0 0 1px #2563eb}.ytomo-others-tab .ytomo-setting-item .ytomo-select-inline[data-v-122dbbfa]:hover{background-color:#f9fafb}.ytomo-others-tab .ytomo-setting-item .ytomo-setting-unit[data-v-122dbbfa]{font-size:14px;color:#6b7280}.ytomo-others-tab .ytomo-investigation-section .ytomo-description[data-v-122dbbfa]{font-size:14px;color:#6b7280;margin-bottom:16px;line-height:1.4}.ytomo-others-tab .ytomo-investigation-section .ytomo-investigation-controls[data-v-122dbbfa]{display:flex;gap:8px;margin-bottom:16px}.ytomo-others-tab .ytomo-investigation-section .ytomo-investigation-controls .ytomo-investigate-button[data-v-122dbbfa]{background:#059669;color:#fff;padding:8px 16px;border:none;border-radius:4px;font-size:14px;font-weight:500;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:4px}.ytomo-others-tab .ytomo-investigation-section .ytomo-investigation-controls .ytomo-investigate-button[data-v-122dbbfa]:hover:not(.disabled){background:#047857}.ytomo-others-tab .ytomo-investigation-section .ytomo-investigation-controls .ytomo-investigate-button.disabled[data-v-122dbbfa]{background:#9ca3af;color:#d1d5db;cursor:not-allowed}.ytomo-others-tab .ytomo-investigation-section .ytomo-investigation-controls .ytomo-investigate-button.cancel-mode[data-v-122dbbfa]{background:#dc2626}.ytomo-others-tab .ytomo-investigation-section .ytomo-investigation-controls .ytomo-investigate-button.cancel-mode[data-v-122dbbfa]:hover{background:#b91c1c}.ytomo-others-tab .ytomo-investigation-section .ytomo-investigation-controls .ytomo-investigate-button .ytomo-loading-icon[data-v-122dbbfa]{animation:pulse-122dbbfa 1.5s ease-in-out infinite}.ytomo-others-tab .ytomo-investigation-section .ytomo-investigation-controls .ytomo-clear-button[data-v-122dbbfa]{background:#f3f4f6;color:#374151;border:1px solid #d1d5db;padding:8px 16px;border-radius:4px;font-size:14px;cursor:pointer;transition:all .2s}.ytomo-others-tab .ytomo-investigation-section .ytomo-investigation-controls .ytomo-clear-button[data-v-122dbbfa]:hover{background:#e5e7eb}.ytomo-others-tab .ytomo-investigation-section .ytomo-investigation-status[data-v-122dbbfa]{background:linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);border:1px solid #16a34a;border-radius:8px;padding:12px}.ytomo-others-tab .ytomo-investigation-section .ytomo-investigation-status .ytomo-status-content[data-v-122dbbfa]{display:flex;align-items:flex-start;gap:12px}.ytomo-others-tab .ytomo-investigation-section .ytomo-investigation-status .ytomo-status-content .ytomo-status-icon[data-v-122dbbfa]{width:20px;height:20px;flex-shrink:0;margin-top:2px}.ytomo-others-tab .ytomo-investigation-section .ytomo-investigation-status .ytomo-status-content .ytomo-status-icon svg[data-v-122dbbfa]{width:100%;height:100%;fill:#16a34a}.ytomo-others-tab .ytomo-investigation-section .ytomo-investigation-status .ytomo-status-content .ytomo-status-icon.spinning[data-v-122dbbfa]{animation:spin-122dbbfa 1s linear infinite}.ytomo-others-tab .ytomo-investigation-section .ytomo-investigation-status .ytomo-status-content .ytomo-status-details[data-v-122dbbfa]{flex:1}.ytomo-others-tab .ytomo-investigation-section .ytomo-investigation-status .ytomo-status-content .ytomo-status-details .ytomo-phase-info[data-v-122dbbfa]{font-size:13px;margin-bottom:4px;display:flex;align-items:center;gap:8px}.ytomo-others-tab .ytomo-investigation-section .ytomo-investigation-status .ytomo-status-content .ytomo-status-details .ytomo-phase-info .phase-label[data-v-122dbbfa]{font-weight:600;color:#059669;padding:2px 6px;background:#d1fae5;border-radius:3px;flex-shrink:0}.ytomo-others-tab .ytomo-investigation-section .ytomo-investigation-status .ytomo-status-content .ytomo-status-details .ytomo-phase-info .detection-info[data-v-122dbbfa]{font-weight:500;color:#374151;font-family:"Consolas","Monaco",monospace;min-width:200px}.ytomo-others-tab .ytomo-investigation-section .ytomo-investigation-status .ytomo-status-content .ytomo-status-details .ytomo-waiting-info[data-v-122dbbfa]{font-size:12px;color:#6b7280;margin-bottom:4px;font-style:italic;min-height:18px;line-height:18px}.ytomo-others-tab .ytomo-investigation-section .ytomo-investigation-status .ytomo-status-content .ytomo-status-details .ytomo-status-current[data-v-122dbbfa]{font-size:14px;font-weight:500;color:#166534;margin-bottom:8px}.ytomo-others-tab .ytomo-investigation-section .ytomo-investigation-status .ytomo-status-content .ytomo-status-details .ytomo-investigation-results .ytomo-results-title[data-v-122dbbfa]{font-size:13px;font-weight:600;color:#166534;margin-bottom:4px}.ytomo-others-tab .ytomo-investigation-section .ytomo-investigation-status .ytomo-status-content .ytomo-status-details .ytomo-investigation-results .ytomo-result-item[data-v-122dbbfa]{font-size:12px;color:#166534;padding:2px 0;font-family:monospace}@keyframes spin-122dbbfa{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}@keyframes pulse-122dbbfa{0%,100%{opacity:1}50%{opacity:.5}}`, ""]);
+// Exports
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
+
+
+/***/ }),
+
 /***/ 657:
 /***/ ((module, __webpack_exports__, __webpack_require__) => {
 
@@ -34079,12 +33965,6 @@ const prepare_filter = (val_search) => {
 };
 // ページ初期化処理
 const init_page = () => {
-    // ヘッダーにFAB切替ボタンを追加（DOM構築完了を待つ）
-    setTimeout(() => {
-        Promise.resolve(/* import() */).then(__webpack_require__.bind(__webpack_require__, 241)).then((entrancePageState) => {
-            entrancePageState.createFABToggleButton();
-        });
-    }, 1000);
     // すべて読み込みボタンの自動クリック処理
     const load_more_auto = async () => {
         const scrollX = window.scrollX;
@@ -34843,12 +34723,6 @@ const judge_entrance_init = () => {
 // 入場予約ページ初期化処理
 const init_entrance_page = (dependencies = {}) => {
     const { setPageLoadingStateFn, createEntranceReservationUIFn, restoreFromCacheFn } = dependencies;
-    // ヘッダーにFAB切替ボタンを追加（DOM構築完了を待つ）
-    setTimeout(() => {
-        Promise.resolve(/* import() */).then(__webpack_require__.bind(__webpack_require__, 241)).then((entrancePageState) => {
-            entrancePageState.createFABToggleButton();
-        });
-    }, 1000);
     // 入場予約機能の設定
     const entranceReservationConfig = {
         selectors: {
@@ -46215,7 +46089,10 @@ const OthersTabvue_type_script_setup_true_lang_ts_hoisted_1 = { class: "ytomo-ot
 const OthersTabvue_type_script_setup_true_lang_ts_hoisted_2 = { class: "ytomo-section" };
 const OthersTabvue_type_script_setup_true_lang_ts_hoisted_3 = { class: "ytomo-setting-item" };
 const OthersTabvue_type_script_setup_true_lang_ts_hoisted_4 = { class: "ytomo-setting-item" };
-const OthersTabvue_type_script_setup_true_lang_ts_hoisted_5 = { class: "ytomo-section" };
+const OthersTabvue_type_script_setup_true_lang_ts_hoisted_5 = {
+    key: 0,
+    class: "ytomo-section"
+};
 const OthersTabvue_type_script_setup_true_lang_ts_hoisted_6 = { class: "ytomo-investigation-section" };
 const OthersTabvue_type_script_setup_true_lang_ts_hoisted_7 = { class: "ytomo-investigation-controls" };
 const OthersTabvue_type_script_setup_true_lang_ts_hoisted_8 = {
@@ -46652,7 +46529,7 @@ const OthersTabvue_type_script_setup_true_lang_ts_hoisted_17 = { class: "ytomo-s
                         ])
                     ]),
                     (0,vue_esm_bundler/* createElementVNode */.Lk)("div", OthersTabvue_type_script_setup_true_lang_ts_hoisted_4, [
-                        _cache[4] || (_cache[4] = (0,vue_esm_bundler/* createElementVNode */.Lk)("label", { class: "ytomo-setting-label" }, "入場時間更新目標時間", -1 /* CACHED */)),
+                        _cache[4] || (_cache[4] = (0,vue_esm_bundler/* createElementVNode */.Lk)("label", { class: "ytomo-setting-label" }, "入場予約実行目標秒時間", -1 /* CACHED */)),
                         (0,vue_esm_bundler/* withDirectives */.bo)((0,vue_esm_bundler/* createElementVNode */.Lk)("input", {
                             type: "number",
                             class: "ytomo-input-inline",
@@ -46673,49 +46550,51 @@ const OthersTabvue_type_script_setup_true_lang_ts_hoisted_17 = { class: "ytomo-s
                     ])
                 ]),
                 (0,vue_esm_bundler/* createCommentVNode */.Q3)(" 調査機能セクション "),
-                (0,vue_esm_bundler/* createElementVNode */.Lk)("div", OthersTabvue_type_script_setup_true_lang_ts_hoisted_5, [
-                    _cache[9] || (_cache[9] = (0,vue_esm_bundler/* createElementVNode */.Lk)("h3", { class: "ytomo-section-title" }, "タイミング調査", -1 /* CACHED */)),
-                    (0,vue_esm_bundler/* createElementVNode */.Lk)("div", OthersTabvue_type_script_setup_true_lang_ts_hoisted_6, [
-                        _cache[8] || (_cache[8] = (0,vue_esm_bundler/* createElementVNode */.Lk)("p", { class: "ytomo-description" }, " 入場予約システムの空き情報更新タイミングを調査し、最適な予約実行時間を見つけます。 ", -1 /* CACHED */)),
-                        (0,vue_esm_bundler/* createElementVNode */.Lk)("div", OthersTabvue_type_script_setup_true_lang_ts_hoisted_7, [
-                            (0,vue_esm_bundler/* createElementVNode */.Lk)("button", {
-                                class: (0,vue_esm_bundler/* normalizeClass */.C4)(["ytomo-investigate-button", { 'cancel-mode': (0,vue_esm_bundler/* unref */.R1)(othersStore).isInvestigationRunning }]),
-                                onClick: executeInvestigation
-                            }, [
-                                ((0,vue_esm_bundler/* unref */.R1)(othersStore).isInvestigationRunning)
-                                    ? ((0,vue_esm_bundler/* openBlock */.uX)(), (0,vue_esm_bundler/* createElementBlock */.CE)("span", OthersTabvue_type_script_setup_true_lang_ts_hoisted_8, "⏳"))
-                                    : (0,vue_esm_bundler/* createCommentVNode */.Q3)("v-if", true),
-                                (0,vue_esm_bundler/* createTextVNode */.eW)(" " + (0,vue_esm_bundler/* toDisplayString */.v_)((0,vue_esm_bundler/* unref */.R1)(othersStore).isInvestigationRunning ? '調査中断' : '調査'), 1 /* TEXT */)
-                            ], 2 /* CLASS */)
-                        ]),
-                        (0,vue_esm_bundler/* createCommentVNode */.Q3)(" 調査状況表示 "),
-                        ((0,vue_esm_bundler/* unref */.R1)(othersStore).isInvestigationRunning || (0,vue_esm_bundler/* unref */.R1)(othersStore).investigationStatusText)
-                            ? ((0,vue_esm_bundler/* openBlock */.uX)(), (0,vue_esm_bundler/* createElementBlock */.CE)("div", OthersTabvue_type_script_setup_true_lang_ts_hoisted_9, [
-                                (0,vue_esm_bundler/* createElementVNode */.Lk)("div", OthersTabvue_type_script_setup_true_lang_ts_hoisted_10, [
+                (apiUsageMode.value !== 'none')
+                    ? ((0,vue_esm_bundler/* openBlock */.uX)(), (0,vue_esm_bundler/* createElementBlock */.CE)("div", OthersTabvue_type_script_setup_true_lang_ts_hoisted_5, [
+                        _cache[9] || (_cache[9] = (0,vue_esm_bundler/* createElementVNode */.Lk)("h3", { class: "ytomo-section-title" }, "タイミング調査", -1 /* CACHED */)),
+                        (0,vue_esm_bundler/* createElementVNode */.Lk)("div", OthersTabvue_type_script_setup_true_lang_ts_hoisted_6, [
+                            _cache[8] || (_cache[8] = (0,vue_esm_bundler/* createElementVNode */.Lk)("p", { class: "ytomo-description" }, " 入場予約システムの空き情報更新タイミングを調査し、最適な予約実行時間を見つけます。 ", -1 /* CACHED */)),
+                            (0,vue_esm_bundler/* createElementVNode */.Lk)("div", OthersTabvue_type_script_setup_true_lang_ts_hoisted_7, [
+                                (0,vue_esm_bundler/* createElementVNode */.Lk)("button", {
+                                    class: (0,vue_esm_bundler/* normalizeClass */.C4)(["ytomo-investigate-button", { 'cancel-mode': (0,vue_esm_bundler/* unref */.R1)(othersStore).isInvestigationRunning }]),
+                                    onClick: executeInvestigation
+                                }, [
                                     ((0,vue_esm_bundler/* unref */.R1)(othersStore).isInvestigationRunning)
-                                        ? ((0,vue_esm_bundler/* openBlock */.uX)(), (0,vue_esm_bundler/* createElementBlock */.CE)("div", OthersTabvue_type_script_setup_true_lang_ts_hoisted_11, [...(_cache[7] || (_cache[7] = [
-                                                (0,vue_esm_bundler/* createElementVNode */.Lk)("svg", { viewBox: "0 0 24 24" }, [
-                                                    (0,vue_esm_bundler/* createElementVNode */.Lk)("path", { d: "M12,4V2A10,10 0 0,0 2,12H4A8,8 0 0,1 12,4Z" })
-                                                ], -1 /* CACHED */)
-                                            ]))]))
+                                        ? ((0,vue_esm_bundler/* openBlock */.uX)(), (0,vue_esm_bundler/* createElementBlock */.CE)("span", OthersTabvue_type_script_setup_true_lang_ts_hoisted_8, "⏳"))
                                         : (0,vue_esm_bundler/* createCommentVNode */.Q3)("v-if", true),
-                                    (0,vue_esm_bundler/* createElementVNode */.Lk)("div", OthersTabvue_type_script_setup_true_lang_ts_hoisted_12, [
-                                        ((0,vue_esm_bundler/* unref */.R1)(othersStore).phaseLabel)
-                                            ? ((0,vue_esm_bundler/* openBlock */.uX)(), (0,vue_esm_bundler/* createElementBlock */.CE)("div", OthersTabvue_type_script_setup_true_lang_ts_hoisted_13, [
-                                                (0,vue_esm_bundler/* createElementVNode */.Lk)("span", OthersTabvue_type_script_setup_true_lang_ts_hoisted_14, (0,vue_esm_bundler/* toDisplayString */.v_)((0,vue_esm_bundler/* unref */.R1)(othersStore).phaseLabel), 1 /* TEXT */),
-                                                (0,vue_esm_bundler/* createElementVNode */.Lk)("span", OthersTabvue_type_script_setup_true_lang_ts_hoisted_15, (0,vue_esm_bundler/* toDisplayString */.v_)((0,vue_esm_bundler/* unref */.R1)(othersStore).detectionDisplay), 1 /* TEXT */)
-                                            ]))
+                                    (0,vue_esm_bundler/* createTextVNode */.eW)(" " + (0,vue_esm_bundler/* toDisplayString */.v_)((0,vue_esm_bundler/* unref */.R1)(othersStore).isInvestigationRunning ? '調査中断' : '調査'), 1 /* TEXT */)
+                                ], 2 /* CLASS */)
+                            ]),
+                            (0,vue_esm_bundler/* createCommentVNode */.Q3)(" 調査状況表示 "),
+                            ((0,vue_esm_bundler/* unref */.R1)(othersStore).isInvestigationRunning || (0,vue_esm_bundler/* unref */.R1)(othersStore).investigationStatusText)
+                                ? ((0,vue_esm_bundler/* openBlock */.uX)(), (0,vue_esm_bundler/* createElementBlock */.CE)("div", OthersTabvue_type_script_setup_true_lang_ts_hoisted_9, [
+                                    (0,vue_esm_bundler/* createElementVNode */.Lk)("div", OthersTabvue_type_script_setup_true_lang_ts_hoisted_10, [
+                                        ((0,vue_esm_bundler/* unref */.R1)(othersStore).isInvestigationRunning)
+                                            ? ((0,vue_esm_bundler/* openBlock */.uX)(), (0,vue_esm_bundler/* createElementBlock */.CE)("div", OthersTabvue_type_script_setup_true_lang_ts_hoisted_11, [...(_cache[7] || (_cache[7] = [
+                                                    (0,vue_esm_bundler/* createElementVNode */.Lk)("svg", { viewBox: "0 0 24 24" }, [
+                                                        (0,vue_esm_bundler/* createElementVNode */.Lk)("path", { d: "M12,4V2A10,10 0 0,0 2,12H4A8,8 0 0,1 12,4Z" })
+                                                    ], -1 /* CACHED */)
+                                                ]))]))
                                             : (0,vue_esm_bundler/* createCommentVNode */.Q3)("v-if", true),
-                                        ((0,vue_esm_bundler/* unref */.R1)(othersStore).investigationWaitingText)
-                                            ? ((0,vue_esm_bundler/* openBlock */.uX)(), (0,vue_esm_bundler/* createElementBlock */.CE)("div", OthersTabvue_type_script_setup_true_lang_ts_hoisted_16, (0,vue_esm_bundler/* toDisplayString */.v_)((0,vue_esm_bundler/* unref */.R1)(othersStore).investigationWaitingText), 1 /* TEXT */))
-                                            : (0,vue_esm_bundler/* createCommentVNode */.Q3)("v-if", true),
-                                        (0,vue_esm_bundler/* createElementVNode */.Lk)("div", OthersTabvue_type_script_setup_true_lang_ts_hoisted_17, (0,vue_esm_bundler/* toDisplayString */.v_)((0,vue_esm_bundler/* unref */.R1)(othersStore).investigationStatusText), 1 /* TEXT */)
+                                        (0,vue_esm_bundler/* createElementVNode */.Lk)("div", OthersTabvue_type_script_setup_true_lang_ts_hoisted_12, [
+                                            ((0,vue_esm_bundler/* unref */.R1)(othersStore).phaseLabel)
+                                                ? ((0,vue_esm_bundler/* openBlock */.uX)(), (0,vue_esm_bundler/* createElementBlock */.CE)("div", OthersTabvue_type_script_setup_true_lang_ts_hoisted_13, [
+                                                    (0,vue_esm_bundler/* createElementVNode */.Lk)("span", OthersTabvue_type_script_setup_true_lang_ts_hoisted_14, (0,vue_esm_bundler/* toDisplayString */.v_)((0,vue_esm_bundler/* unref */.R1)(othersStore).phaseLabel), 1 /* TEXT */),
+                                                    (0,vue_esm_bundler/* createElementVNode */.Lk)("span", OthersTabvue_type_script_setup_true_lang_ts_hoisted_15, (0,vue_esm_bundler/* toDisplayString */.v_)((0,vue_esm_bundler/* unref */.R1)(othersStore).detectionDisplay), 1 /* TEXT */)
+                                                ]))
+                                                : (0,vue_esm_bundler/* createCommentVNode */.Q3)("v-if", true),
+                                            ((0,vue_esm_bundler/* unref */.R1)(othersStore).investigationWaitingText)
+                                                ? ((0,vue_esm_bundler/* openBlock */.uX)(), (0,vue_esm_bundler/* createElementBlock */.CE)("div", OthersTabvue_type_script_setup_true_lang_ts_hoisted_16, (0,vue_esm_bundler/* toDisplayString */.v_)((0,vue_esm_bundler/* unref */.R1)(othersStore).investigationWaitingText), 1 /* TEXT */))
+                                                : (0,vue_esm_bundler/* createCommentVNode */.Q3)("v-if", true),
+                                            (0,vue_esm_bundler/* createElementVNode */.Lk)("div", OthersTabvue_type_script_setup_true_lang_ts_hoisted_17, (0,vue_esm_bundler/* toDisplayString */.v_)((0,vue_esm_bundler/* unref */.R1)(othersStore).investigationStatusText), 1 /* TEXT */)
+                                        ])
                                     ])
-                                ])
-                            ]))
-                            : (0,vue_esm_bundler/* createCommentVNode */.Q3)("v-if", true)
-                    ])
-                ])
+                                ]))
+                                : (0,vue_esm_bundler/* createCommentVNode */.Q3)("v-if", true)
+                        ])
+                    ]))
+                    : (0,vue_esm_bundler/* createCommentVNode */.Q3)("v-if", true)
             ]));
         };
     }
@@ -46723,9 +46602,9 @@ const OthersTabvue_type_script_setup_true_lang_ts_hoisted_17 = { class: "ytomo-s
 
 ;// ./ts/components/OthersTab.vue?vue&type=script&setup=true&lang=ts
  
-// EXTERNAL MODULE: ./node_modules/css-loader/dist/cjs.js!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/sass-loader/dist/cjs.js!./node_modules/vue-loader/dist/index.js??ruleSet[1].rules[8].use[0]!./ts/components/OthersTab.vue?vue&type=style&index=0&id=38f47683&scoped=true&lang=scss
-var OthersTabvue_type_style_index_0_id_38f47683_scoped_true_lang_scss = __webpack_require__(348);
-;// ./node_modules/style-loader/dist/cjs.js!./node_modules/css-loader/dist/cjs.js!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/sass-loader/dist/cjs.js!./node_modules/vue-loader/dist/index.js??ruleSet[1].rules[8].use[0]!./ts/components/OthersTab.vue?vue&type=style&index=0&id=38f47683&scoped=true&lang=scss
+// EXTERNAL MODULE: ./node_modules/css-loader/dist/cjs.js!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/sass-loader/dist/cjs.js!./node_modules/vue-loader/dist/index.js??ruleSet[1].rules[8].use[0]!./ts/components/OthersTab.vue?vue&type=style&index=0&id=122dbbfa&scoped=true&lang=scss
+var OthersTabvue_type_style_index_0_id_122dbbfa_scoped_true_lang_scss = __webpack_require__(635);
+;// ./node_modules/style-loader/dist/cjs.js!./node_modules/css-loader/dist/cjs.js!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/sass-loader/dist/cjs.js!./node_modules/vue-loader/dist/index.js??ruleSet[1].rules[8].use[0]!./ts/components/OthersTab.vue?vue&type=style&index=0&id=122dbbfa&scoped=true&lang=scss
 
       
       
@@ -46737,22 +46616,22 @@ var OthersTabvue_type_style_index_0_id_38f47683_scoped_true_lang_scss = __webpac
       
       
 
-var OthersTabvue_type_style_index_0_id_38f47683_scoped_true_lang_scss_options = {};
+var OthersTabvue_type_style_index_0_id_122dbbfa_scoped_true_lang_scss_options = {};
 
-OthersTabvue_type_style_index_0_id_38f47683_scoped_true_lang_scss_options.styleTagTransform = (styleTagTransform_default());
-OthersTabvue_type_style_index_0_id_38f47683_scoped_true_lang_scss_options.setAttributes = (setAttributesWithoutAttributes_default());
-OthersTabvue_type_style_index_0_id_38f47683_scoped_true_lang_scss_options.insert = insertBySelector_default().bind(null, "head");
-OthersTabvue_type_style_index_0_id_38f47683_scoped_true_lang_scss_options.domAPI = (styleDomAPI_default());
-OthersTabvue_type_style_index_0_id_38f47683_scoped_true_lang_scss_options.insertStyleElement = (insertStyleElement_default());
+OthersTabvue_type_style_index_0_id_122dbbfa_scoped_true_lang_scss_options.styleTagTransform = (styleTagTransform_default());
+OthersTabvue_type_style_index_0_id_122dbbfa_scoped_true_lang_scss_options.setAttributes = (setAttributesWithoutAttributes_default());
+OthersTabvue_type_style_index_0_id_122dbbfa_scoped_true_lang_scss_options.insert = insertBySelector_default().bind(null, "head");
+OthersTabvue_type_style_index_0_id_122dbbfa_scoped_true_lang_scss_options.domAPI = (styleDomAPI_default());
+OthersTabvue_type_style_index_0_id_122dbbfa_scoped_true_lang_scss_options.insertStyleElement = (insertStyleElement_default());
 
-var OthersTabvue_type_style_index_0_id_38f47683_scoped_true_lang_scss_update = injectStylesIntoStyleTag_default()(OthersTabvue_type_style_index_0_id_38f47683_scoped_true_lang_scss/* default */.A, OthersTabvue_type_style_index_0_id_38f47683_scoped_true_lang_scss_options);
-
-
+var OthersTabvue_type_style_index_0_id_122dbbfa_scoped_true_lang_scss_update = injectStylesIntoStyleTag_default()(OthersTabvue_type_style_index_0_id_122dbbfa_scoped_true_lang_scss/* default */.A, OthersTabvue_type_style_index_0_id_122dbbfa_scoped_true_lang_scss_options);
 
 
-       /* harmony default export */ const components_OthersTabvue_type_style_index_0_id_38f47683_scoped_true_lang_scss = (OthersTabvue_type_style_index_0_id_38f47683_scoped_true_lang_scss/* default */.A && OthersTabvue_type_style_index_0_id_38f47683_scoped_true_lang_scss/* default */.A.locals ? OthersTabvue_type_style_index_0_id_38f47683_scoped_true_lang_scss/* default */.A.locals : undefined);
 
-;// ./ts/components/OthersTab.vue?vue&type=style&index=0&id=38f47683&scoped=true&lang=scss
+
+       /* harmony default export */ const components_OthersTabvue_type_style_index_0_id_122dbbfa_scoped_true_lang_scss = (OthersTabvue_type_style_index_0_id_122dbbfa_scoped_true_lang_scss/* default */.A && OthersTabvue_type_style_index_0_id_122dbbfa_scoped_true_lang_scss/* default */.A.locals ? OthersTabvue_type_style_index_0_id_122dbbfa_scoped_true_lang_scss/* default */.A.locals : undefined);
+
+;// ./ts/components/OthersTab.vue?vue&type=style&index=0&id=122dbbfa&scoped=true&lang=scss
 
 ;// ./ts/components/OthersTab.vue
 
@@ -46761,7 +46640,7 @@ var OthersTabvue_type_style_index_0_id_38f47683_scoped_true_lang_scss_update = i
 ;
 
 
-const OthersTab_exports_ = /*#__PURE__*/(0,exportHelper/* default */.A)(OthersTabvue_type_script_setup_true_lang_ts, [['__scopeId',"data-v-38f47683"]])
+const OthersTab_exports_ = /*#__PURE__*/(0,exportHelper/* default */.A)(OthersTabvue_type_script_setup_true_lang_ts, [['__scopeId',"data-v-122dbbfa"]])
 
 /* harmony default export */ const OthersTab = (OthersTab_exports_);
 ;// ./node_modules/ts-loader/index.js??clonedRuleSet-1.use!./node_modules/vue-loader/dist/index.js??ruleSet[1].rules[8].use[0]!./ts/components/MainDialog.vue?vue&type=script&setup=true&lang=ts
@@ -48355,8 +48234,6 @@ var entrance_reservation_state_manager = __webpack_require__(608);
 
 // 入場予約ページ初期化モジュール
 
-// FAB状態管理
-
 // キャッシュ管理システム
 
 
@@ -48559,8 +48436,6 @@ const trigger_init = (url_record) => {
             if (document.body && (document.readyState === 'complete' || document.readyState === 'interactive')) {
                 clearInterval(interval_companion);
                 app_router_logger.info('ページを初期化', { page_type });
-                // ヘッダートグルボタンを作成
-                (0,entrance_page_state.createFABToggleButton)();
                 // ページタイプ別初期化
                 if (page_type === 'ticket_selection') {
                     initializeTicketSelectionPage();
