@@ -8,7 +8,7 @@
 // @run-at       document-end
 // ==/UserScript==
 
-// Built: 2025/09/05 21:20:49
+// Built: 2025/09/06 09:12:12
 
 
 (function webpackUniversalModuleDefinition(root, factory) {
@@ -33178,7 +33178,7 @@ const LOG_PRIORITIES = {
 };
 // ビルド時のログレベル設定（環境変数で制御、デフォルト: WARN）
 // WARN以上（WARN, ERROR）のみが出力される
-const BUILD_LOG_LEVEL = "INFO" || 0;
+const BUILD_LOG_LEVEL = "WARN" || 0;
 // グローバルログ設定（ビルド時設定で初期化）
 let globalLogLevel = (/* unused pure expression or super */ null && (BUILD_LOG_LEVEL));
 let globalEnabled = true;
@@ -33921,7 +33921,7 @@ class AuthManager {
 }
 const authManager = AuthManager.getInstance();
 // fetch をオーバーライドして自動的に認証チェックを適用
-const authenticatedFetch = authManager.authenticatedFetch.bind(authManager);
+const authManager_authenticatedFetch = authManager.authenticatedFetch.bind(authManager);
 // デフォルトエクスポート
 /* harmony default export */ const utils_authManager = ((/* unused pure expression or super */ null && (authManager)));
 
@@ -37419,6 +37419,7 @@ var mainDialog = __webpack_require__(447);
  * verified-api-analysis.mdの実証結果を基に実装
  */
 
+
 const entranceReservationService_logger = utils_logger/* loggers */.C$.entranceReservation;
 /**
  * 入場予約スケジュール取得（月単位）
@@ -37441,7 +37442,7 @@ async function getEntranceSchedules(year, month, ticketIds) {
         ticketIdsProvided: !!ticketIds && ticketIds.length > 0
     });
     try {
-        const response = await fetch(url, {
+        const response = await authManager_authenticatedFetch(url, {
             method: 'GET',
             headers: {
                 'Accept': 'application/json',
@@ -37478,7 +37479,7 @@ async function getEntranceSchedules(year, month, ticketIds) {
 async function getUserReservations() {
     entranceReservationService_logger.info('ユーザー入場予約取得開始');
     try {
-        const response = await fetch('/api/d/my/tickets/?count=1', {
+        const response = await authManager_authenticatedFetch('/api/d/my/tickets/?count=1', {
             method: 'GET',
             headers: {
                 'Accept': 'application/json',
@@ -37509,7 +37510,7 @@ async function getUserReservations() {
 async function createReservation(params) {
     entranceReservationService_logger.info('入場予約作成開始', params);
     try {
-        const response = await fetch('/api/d/user_visiting_reservations', {
+        const response = await authenticatedFetch('/api/d/user_visiting_reservations', {
             method: 'POST',
             headers: {
                 'Accept': 'application/json',
@@ -37543,7 +37544,7 @@ async function createReservation(params) {
 async function updateReservation(params) {
     entranceReservationService_logger.info('入場予約変更申請開始', params);
     try {
-        const response = await fetch('/api/d/user_visiting_reservations', {
+        const response = await authenticatedFetch('/api/d/user_visiting_reservations', {
             method: 'PUT',
             headers: {
                 'Accept': 'application/json',
@@ -37577,7 +37578,7 @@ async function updateReservation(params) {
 async function deleteReservation(reservationId) {
     entranceReservationService_logger.info('入場予約削除開始', { reservationId });
     try {
-        const response = await fetch(`/api/d/user_visiting_reservations/${reservationId}`, {
+        const response = await authenticatedFetch(`/api/d/user_visiting_reservations/${reservationId}`, {
             method: 'DELETE',
             headers: {
                 'Accept': 'application/json',
@@ -37609,7 +37610,7 @@ async function deleteReservation(reservationId) {
 async function validateReservation(ticketIds) {
     entranceReservationService_logger.info('予約可能性バリデーション開始', { ticketIds });
     try {
-        const response = await fetch('/api/d/user_visiting_reservations', {
+        const response = await authenticatedFetch('/api/d/user_visiting_reservations', {
             method: 'POST',
             headers: {
                 'Accept': 'application/json',
@@ -38243,7 +38244,7 @@ const useTicketsStore = (0,pinia/* defineStore */.nY)('tickets', () => {
      */
     const loadOwnTickets = async () => {
         try {
-            const response = await authenticatedFetch('/api/d/my/tickets/?count=1', {
+            const response = await authManager_authenticatedFetch('/api/d/my/tickets/?count=1', {
                 method: 'GET',
                 headers: {
                     'Accept': 'application/json',
@@ -38327,7 +38328,7 @@ const useTicketsStore = (0,pinia/* defineStore */.nY)('tickets', () => {
                     for (const schedule of ticket.schedules) {
                         // 抽選カレンダー情報を取得
                         try {
-                            const calendarResponse = await authenticatedFetch(`/api/d/lottery_calendars?entrance_date=${schedule.entrance_date}`, {
+                            const calendarResponse = await authManager_authenticatedFetch(`/api/d/lottery_calendars?entrance_date=${schedule.entrance_date}`, {
                                 method: 'GET',
                                 headers: {
                                     'Accept': 'application/json',
@@ -38404,7 +38405,7 @@ const useTicketsStore = (0,pinia/* defineStore */.nY)('tickets', () => {
             const channels = channel ? [channel] : ['5', '4', '3', '2'];
             for (const testChannel of channels) {
                 try {
-                    const response = await authenticatedFetch(`/api/d/proxy_tickets/${ticketId}/add_check?registered_channel=${testChannel}`);
+                    const response = await authManager_authenticatedFetch(`/api/d/proxy_tickets/${ticketId}/add_check?registered_channel=${testChannel}`);
                     if (response.ok) {
                         const data = await response.json();
                         const ticketData = {
@@ -38742,7 +38743,7 @@ const useTicketsStore = (0,pinia/* defineStore */.nY)('tickets', () => {
     const updateTicketFromAPI = async (ticketId) => {
         try {
             tickets_logger.info('チケット単体情報更新開始', { ticketId });
-            const response = await authenticatedFetch(`/api/d/user_visiting_reservations?ticket_id=${ticketId}`);
+            const response = await authManager_authenticatedFetch(`/api/d/user_visiting_reservations?ticket_id=${ticketId}`);
             if (!response.ok) {
                 tickets_logger.error('チケット情報取得失敗', { ticketId, status: response.status });
                 return null;
@@ -39006,6 +39007,7 @@ const useTicketsStore = (0,pinia/* defineStore */.nY)('tickets', () => {
 
 
 
+
 const pavilions_logger = utils_logger/* loggers */.C$.pavilions;
 const usePavilionsStore = (0,pinia/* defineStore */.nY)('pavilions', () => {
     // State
@@ -39090,7 +39092,7 @@ const usePavilionsStore = (0,pinia/* defineStore */.nY)('pavilions', () => {
             }
             params.set('count', '1');
             const timeslotUrl = `/api/d/events/${pavilionId}?${params.toString()}&channel=4`;
-            const response = await fetch(timeslotUrl, {
+            const response = await authManager_authenticatedFetch(timeslotUrl, {
                 method: 'GET',
                 headers: {
                     'Accept': 'application/json, text/plain, */*',
@@ -39172,7 +39174,7 @@ const usePavilionsStore = (0,pinia/* defineStore */.nY)('pavilions', () => {
         try {
             const apiUrl = buildAPIUrl(query, ticketIds, entranceDate);
             pavilions_logger.debug('API URL', { url: apiUrl });
-            const response = await fetch(apiUrl, {
+            const response = await authManager_authenticatedFetch(apiUrl, {
                 method: 'GET',
                 headers: {
                     'Accept': 'application/json, text/plain, */*',
@@ -39481,7 +39483,7 @@ const usePavilionsStore = (0,pinia/* defineStore */.nY)('pavilions', () => {
                 registered_channel: registeredChannel
             };
             pavilions_logger.debug('予約API呼び出し', requestBody);
-            const response = await fetch('/api/d/user_event_reservations', {
+            const response = await authManager_authenticatedFetch('/api/d/user_event_reservations', {
                 method: 'POST',
                 headers: {
                     'Accept': 'application/json, text/plain, */*',
@@ -40175,7 +40177,7 @@ const _hoisted_41 = ["disabled"];
             ticketsStore.addTicket(externalTicket);
             // API呼び出しを試行（成否は結果表示のみに使用）
             try {
-                const response = await authenticatedFetch(`/api/d/proxy_tickets/${ticketId}/add_check?registered_channel=${channel}`);
+                const response = await authManager_authenticatedFetch(`/api/d/proxy_tickets/${ticketId}/add_check?registered_channel=${channel}`);
                 if (response.ok) {
                     const data = await response.json();
                     // API成功時は入場予約データで更新
@@ -43397,6 +43399,7 @@ const PavilionTab_exports_ = /*#__PURE__*/(0,exportHelper/* default */.A)(Pavili
 
 
 
+
 const entrance_reservation_api_manager_logger = utils_logger/* loggers */.C$.entranceReservation;
 class EntranceReservationApiManager {
     // 設定から目標時間を取得
@@ -43955,7 +43958,7 @@ class EntranceReservationApiManager {
                     entrance_date: entranceDate
                 };
             }
-            const response = await fetch('/api/d/user_visiting_reservations', {
+            const response = await authManager_authenticatedFetch('/api/d/user_visiting_reservations', {
                 method,
                 headers: {
                     'Content-Type': 'application/json',
@@ -44057,7 +44060,7 @@ class EntranceReservationApiManager {
     async confirmReservationSuccess(reservationIds) {
         try {
             entrance_reservation_api_manager_logger.info('予約確認開始', { reservationIds });
-            const response = await fetch('/api/d/my/tickets/', {
+            const response = await authManager_authenticatedFetch('/api/d/my/tickets/', {
                 method: 'GET',
                 headers: {
                     'Accept': 'application/json',
@@ -47960,10 +47963,13 @@ else {
 
 
 
+
 const waiting_room_page_logger = utils_logger/* loggers */.C$.ui;
 // ytomoコンテンツの表示状態を管理
 let isYtomoContentVisible = false;
 let ytomoApp = null;
+// 承認ボタン監視用
+let buttonCheckInterval = null;
 /**
  * 待機室ページの初期化可能判定
  */
@@ -48149,13 +48155,67 @@ function updateButtonTexts() {
     }
 }
 /**
+ * 承認ボタンの監視と自動押下
+ */
+function setupAutoConfirmButton() {
+    const checkForConfirmButton = () => {
+        const confirmButton = document.getElementById('buttonConfirmRedirect');
+        if (confirmButton && !confirmButton.disabled && confirmButton.offsetParent !== null) {
+            waiting_room_page_logger.info('承認ボタン検出 - 自動押下を実行', {
+                buttonText: confirmButton.textContent?.trim(),
+                buttonVisible: confirmButton.offsetParent !== null,
+                buttonDisabled: confirmButton.disabled
+            });
+            // ボタンをクリック
+            confirmButton.click();
+            // 監視を停止（一度押したら終了）
+            if (buttonCheckInterval) {
+                clearInterval(buttonCheckInterval);
+                buttonCheckInterval = null;
+                waiting_room_page_logger.info('承認ボタン自動押下完了 - 監視停止');
+            }
+        }
+    };
+    // 初回チェック
+    setTimeout(checkForConfirmButton, 1000);
+    // 定期チェック（1分間隔で最大300回 = 5時間）
+    let checkCount = 0;
+    const maxChecks = 300;
+    buttonCheckInterval = setInterval(() => {
+        // 待機室ページから移動していたら監視を停止
+        if (!page_utils/* PageChecker */.v.isWaitingRoomPage()) {
+            if (buttonCheckInterval) {
+                clearInterval(buttonCheckInterval);
+                buttonCheckInterval = null;
+            }
+            waiting_room_page_logger.info('待機室ページから移動したため承認ボタン監視停止');
+            return;
+        }
+        checkCount++;
+        checkForConfirmButton();
+        // 最大チェック回数に達したら停止
+        if (checkCount >= maxChecks && buttonCheckInterval) {
+            clearInterval(buttonCheckInterval);
+            buttonCheckInterval = null;
+            waiting_room_page_logger.info('承認ボタン監視タイムアウト', { checkCount });
+        }
+    }, 60000); // 1分間隔
+    waiting_room_page_logger.info('承認ボタン自動押下監視開始', { maxChecks, interval: '1分' });
+}
+/**
  * 待機室ページの初期化処理
  *
- * 【仕様変更】待機画面では何も処理を実行しない
+ * 【機能】承認ボタン自動押下のみ実行
  */
 function init_waiting_room_page() {
-    waiting_room_page_logger.info('待機室ページ: 仕様変更により処理をスキップ');
-    return;
+    waiting_room_page_logger.info('待機室ページ: 承認ボタン自動押下機能を開始');
+    // DOM読み込み完了を待つ
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', setupAutoConfirmButton);
+    }
+    else {
+        setupAutoConfirmButton();
+    }
 }
 
 ;// ./ts/modules/ytomo-menu-enhancer.ts
@@ -50813,6 +50873,7 @@ if (typeof window !== 'undefined') {
 
 
 
+
 const monitoring_service_logger = utils_logger/* loggers */.C$.monitoring;
 class MonitoringService {
     constructor() {
@@ -50968,7 +51029,7 @@ class MonitoringService {
         try {
             const url = `https://expo.ebii.net/data?pavilion=${pavilionCode}`;
             this.logger.debug('API呼び出し', { url });
-            const response = await fetch(url, {
+            const response = await authManager_authenticatedFetch(url, {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',

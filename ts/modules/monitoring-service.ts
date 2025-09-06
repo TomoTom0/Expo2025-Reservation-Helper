@@ -7,6 +7,7 @@ import { getMonitoringScheduler, ScheduleConfig } from './monitoring-scheduler';
 import { MonitoringCacheManager, MonitoringTarget } from './monitoring-cache';
 import { PavilionReservationCache } from './pavilion-reservation-cache';
 import { loggers } from '../utils/logger';
+import { authenticatedFetch } from '../utils/authManager';
 const logger = loggers.monitoring;
 
 // API応答の型定義
@@ -216,7 +217,7 @@ export class MonitoringService {
             
             this.logger.debug('API呼び出し', { url });
             
-            const response = await fetch(url, {
+            const response = await authenticatedFetch(url, {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',

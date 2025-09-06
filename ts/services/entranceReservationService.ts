@@ -4,6 +4,7 @@
  */
 
 import { loggers } from '@/utils/logger'
+import { authenticatedFetch } from '@/utils/authManager'
 
 const logger = loggers.entranceReservation
 
@@ -67,7 +68,7 @@ export async function getEntranceSchedules(
   })
   
   try {
-    const response = await fetch(url, {
+    const response = await authenticatedFetch(url, {
       method: 'GET',
       headers: {
         'Accept': 'application/json',
@@ -108,7 +109,7 @@ export async function getUserReservations(): Promise<TicketData[]> {
   logger.info('ユーザー入場予約取得開始')
   
   try {
-    const response = await fetch('/api/d/my/tickets/?count=1', {
+    const response = await authenticatedFetch('/api/d/my/tickets/?count=1', {
       method: 'GET',
       headers: {
         'Accept': 'application/json',
@@ -149,7 +150,7 @@ export async function createReservation(params: {
   logger.info('入場予約作成開始', params)
   
   try {
-    const response = await fetch('/api/d/user_visiting_reservations', {
+    const response = await authenticatedFetch('/api/d/user_visiting_reservations', {
       method: 'POST',
       headers: {
         'Accept': 'application/json',
@@ -192,7 +193,7 @@ export async function updateReservation(params: {
   logger.info('入場予約変更申請開始', params)
   
   try {
-    const response = await fetch('/api/d/user_visiting_reservations', {
+    const response = await authenticatedFetch('/api/d/user_visiting_reservations', {
       method: 'PUT',
       headers: {
         'Accept': 'application/json',
@@ -230,7 +231,7 @@ export async function deleteReservation(reservationId: number): Promise<{ doing:
   logger.info('入場予約削除開始', { reservationId })
   
   try {
-    const response = await fetch(`/api/d/user_visiting_reservations/${reservationId}`, {
+    const response = await authenticatedFetch(`/api/d/user_visiting_reservations/${reservationId}`, {
       method: 'DELETE',
       headers: {
         'Accept': 'application/json',
@@ -266,7 +267,7 @@ export async function validateReservation(ticketIds: string[]): Promise<boolean>
   logger.info('予約可能性バリデーション開始', { ticketIds })
   
   try {
-    const response = await fetch('/api/d/user_visiting_reservations', {
+    const response = await authenticatedFetch('/api/d/user_visiting_reservations', {
       method: 'POST',
       headers: {
         'Accept': 'application/json',

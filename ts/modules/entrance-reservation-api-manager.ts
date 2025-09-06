@@ -1,6 +1,7 @@
 import { ref, type Ref } from 'vue'
 import { loggers } from '@/utils/logger'
 import { useTicketsStore } from '@/stores/tickets'
+import { authenticatedFetch } from '@/utils/authManager'
 
 const logger = loggers.entranceReservation
 
@@ -683,7 +684,7 @@ export class EntranceReservationApiManager {
       }
 
 
-      const response = await fetch('/api/d/user_visiting_reservations', {
+      const response = await authenticatedFetch('/api/d/user_visiting_reservations', {
         method,
         headers: {
           'Content-Type': 'application/json',
@@ -788,7 +789,7 @@ export class EntranceReservationApiManager {
     try {
       logger.info('予約確認開始', { reservationIds })
       
-      const response = await fetch('/api/d/my/tickets/', {
+      const response = await authenticatedFetch('/api/d/my/tickets/', {
         method: 'GET',
         headers: {
           'Accept': 'application/json',

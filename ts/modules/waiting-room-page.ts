@@ -12,12 +12,16 @@ import { loggers } from '../utils/logger';
 import { createApp } from 'vue';
 import { createPinia } from 'pinia';
 import MainDialog from '../components/MainDialog.vue';
+import { PageChecker } from './page-utils';
 
 const logger = loggers.ui;
 
 // ytomoコンテンツの表示状態を管理
 let isYtomoContentVisible = false;
 let ytomoApp: any = null;
+
+// 承認ボタン監視用
+let buttonCheckInterval: NodeJS.Timeout | null = null;
 
 /**
  * 待機室ページの初期化可能判定
@@ -238,11 +242,76 @@ function updateButtonTexts(): void {
 }
 
 /**
+ * 承認ボタンの監視と自動押下
+ */
+function setupAutoConfirmButton(): void {
+    const checkForConfirmButton = () => {
+        const confirmButton = document.getElementById('buttonConfirmRedirect') as HTMLButtonElement;
+        
+        if (confirmButton && !confirmButton.disabled && confirmButton.offsetParent !== null) {
+            logger.info('承認ボタン検出 - 自動押下を実行', {
+                buttonText: confirmButton.textContent?.trim(),
+                buttonVisible: confirmButton.offsetParent !== null,
+                buttonDisabled: confirmButton.disabled
+            });
+            
+            // ボタンをクリック
+            confirmButton.click();
+            
+            // 監視を停止（一度押したら終了）
+            if (buttonCheckInterval) {
+                clearInterval(buttonCheckInterval);
+                buttonCheckInterval = null;
+                logger.info('承認ボタン自動押下完了 - 監視停止');
+            }
+        }
+    };
+    
+    // 初回チェック
+    setTimeout(checkForConfirmButton, 1000);
+    
+    // 定期チェック（1分間隔で最大300回 = 5時間）
+    let checkCount = 0;
+    const maxChecks = 300;
+    
+    buttonCheckInterval = setInterval(() => {
+        // 待機室ページから移動していたら監視を停止
+        if (!PageChecker.isWaitingRoomPage()) {
+            if (buttonCheckInterval) {
+                clearInterval(buttonCheckInterval);
+                buttonCheckInterval = null;
+            }
+            logger.info('待機室ページから移動したため承認ボタン監視停止');
+            return;
+        }
+        
+        checkCount++;
+        checkForConfirmButton();
+        
+        // 最大チェック回数に達したら停止
+        if (checkCount >= maxChecks && buttonCheckInterval) {
+            clearInterval(buttonCheckInterval);
+            buttonCheckInterval = null;
+            logger.info('承認ボタン監視タイムアウト', { checkCount });
+        }
+    }, 60000); // 1分間隔
+    
+    logger.info('承認ボタン自動押下監視開始', { maxChecks, interval: '1分' });
+}
+
+
+/**
  * 待機室ページの初期化処理
  * 
- * 【仕様変更】待機画面では何も処理を実行しない
+ * 【機能】承認ボタン自動押下のみ実行
  */
 export function init_waiting_room_page(): void {
-    logger.info('待機室ページ: 仕様変更により処理をスキップ');
-    return;
+    logger.info('待機室ページ: 承認ボタン自動押下機能を開始');
+    
+    // DOM読み込み完了を待つ
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', setupAutoConfirmButton);
+    } else {
+        setupAutoConfirmButton();
+    }
 }

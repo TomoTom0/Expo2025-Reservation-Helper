@@ -7,6 +7,7 @@ import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import type { PavilionData, TimeSlotSelection, TimeSlotData, ReservationResult } from '@/types/api'
 import { loggers } from '@/utils/logger'
+import { authenticatedFetch } from '@/utils/authManager'
 
 const logger = loggers.pavilions
 
@@ -116,7 +117,7 @@ export const usePavilionsStore = defineStore('pavilions', () => {
       
       const timeslotUrl = `/api/d/events/${pavilionId}?${params.toString()}&channel=4`
       
-      const response = await fetch(timeslotUrl, {
+      const response = await authenticatedFetch(timeslotUrl, {
         method: 'GET',
         headers: {
           'Accept': 'application/json, text/plain, */*',
@@ -214,7 +215,7 @@ export const usePavilionsStore = defineStore('pavilions', () => {
       const apiUrl = buildAPIUrl(query, ticketIds, entranceDate)
       logger.debug('API URL', { url: apiUrl })
       
-      const response = await fetch(apiUrl, {
+      const response = await authenticatedFetch(apiUrl, {
         method: 'GET',
         headers: {
           'Accept': 'application/json, text/plain, */*',
@@ -574,7 +575,7 @@ export const usePavilionsStore = defineStore('pavilions', () => {
       
       logger.debug('予約API呼び出し', requestBody)
       
-      const response = await fetch('/api/d/user_event_reservations', {
+      const response = await authenticatedFetch('/api/d/user_event_reservations', {
         method: 'POST',
         headers: {
           'Accept': 'application/json, text/plain, */*',
