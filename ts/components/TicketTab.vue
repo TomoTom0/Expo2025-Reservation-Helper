@@ -73,7 +73,6 @@
           selected: hasSelectedReservations(ticket)
         }"
         :data-ticket-id="ticket.ticket_id"
-        @click="handleTicketSelection(ticket)"
       >
         <!-- 上半分: チケットID、Tip -->
         <div class="ytomo-ticket-upper">
@@ -465,42 +464,6 @@ const handleDateSelection = (date: string) => {
   })
 }
 
-const handleTicketSelection = (ticket: TicketData) => {
-  logger.info('チケット選択', { ticketId: ticket.ticket_id })
-  
-  // このチケットに関連する全予約の選択状態をトグル
-  const hasSelected = hasSelectedReservations(ticket)
-  
-  if (ticket.schedules && ticket.schedules.length > 0) {
-    ticket.schedules.forEach(schedule => {
-      const reservationId = schedule.user_visiting_reservation_id?.toString()
-      if (reservationId) {
-        const reservationData = ticketsStore.getReservationManagement(reservationId)
-        if (reservationData) {
-          // 現在選択されている予約があれば全て解除、なければ最初の予約を選択
-          if (hasSelected) {
-            if (reservationData.isSelected) {
-              ticketsStore.toggleSelection(reservationId)
-            }
-          }
-        }
-      }
-    })
-    
-    // 選択されていなかった場合は最初の有効な予約を選択
-    if (!hasSelected && ticket.schedules.length > 0) {
-      const firstValidSchedule = ticket.schedules.find(schedule => 
-        schedule.user_visiting_reservation_id
-      )
-      if (firstValidSchedule) {
-        const reservationId = firstValidSchedule.user_visiting_reservation_id?.toString()
-        if (reservationId) {
-          ticketsStore.toggleSelection(reservationId)
-        }
-      }
-    }
-  }
-}
 
 const handleTicketDelete = (ticket: TicketData) => {
   logger.info('チケット削除', { ticketId: ticket.ticket_id })
@@ -1355,11 +1318,6 @@ onUnmounted(() => {
 }
 
 .ytomo-ticket-item {
-    &:hover {
-        border-color: #cbd5e1;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    }
-
     &.selected {
         border-color: #2c5aa0;
         box-shadow: 0 0 0 2px rgba(44, 90, 160, 0.2);
