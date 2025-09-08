@@ -177,7 +177,6 @@ export const useTicketsStore = defineStore('tickets', () => {
    * スケジュールデータに有効フラグとパビリオン予約種類情報を付与
    */
   const processSchedules = (schedules: any[]): ScheduleData[] => {
-    logger.temp('processSchedules実行開始', { schedulesCount: schedules.length })
     if (!Array.isArray(schedules)) return []
     
     const result = schedules.map(schedule => {
@@ -233,15 +232,6 @@ export const useTicketsStore = defineStore('tickets', () => {
       return dateTimeA.localeCompare(dateTimeB)
     })
     
-    logger.temp('processSchedules実行完了', {
-      processedCount: result.length,
-      sample: result.slice(0, 2).map(s => ({
-        entrance_date: s.entrance_date,
-        use_state: s.use_state,
-        isEffective: s.isEffective,
-        schedule_name: s.schedule_name
-      }))
-    })
     
     return result
   }
@@ -278,10 +268,6 @@ export const useTicketsStore = defineStore('tickets', () => {
       // 旧チケット情報を保存（選択状態等の保持用）
       const previousTickets = new Map(tickets.value)
       
-      logger.temp('チケット復元開始', {
-        previousTicketsCount: previousTickets.size,
-        previousTicketIds: Array.from(previousTickets.keys())
-      })
       
       // 新チケット情報を一時変数に取得
       let newOwnTickets: TicketData[] = []
@@ -295,12 +281,6 @@ export const useTicketsStore = defineStore('tickets', () => {
         for (const newTicket of newOwnTickets) {
           const previousTicket = previousTickets.get(newTicket.ticket_id)
           
-          logger.temp('チケット処理', {
-            ticketId: newTicket.ticket_id,
-            hasPrevious: !!previousTicket,
-            newSchedulesCount: newTicket.schedules?.length || 0,
-            previousSchedulesCount: previousTicket?.schedules?.length || 0
-          })
           
           // 通期パス（Season Pass）の場合は追加予約可能性をチェック
           if (newTicket.item_name?.includes('Season Pass')) {
@@ -349,13 +329,6 @@ export const useTicketsStore = defineStore('tickets', () => {
                   logger.debug(`予約ID ${newSchedule.user_visiting_reservation_id} のselected状態を継承`)
                 }
                 
-                // デバッグ: isEffective値の確認
-                logger.temp('状態継承後のisEffective確認', {
-                  ticketId: newTicket.ticket_id,
-                  reservationId: newSchedule.user_visiting_reservation_id,
-                  newIsEffective: newSchedule.isEffective,
-                  previousIsEffective: previousSchedule.isEffective
-                })
               }
             }
           }
@@ -674,15 +647,6 @@ export const useTicketsStore = defineStore('tickets', () => {
       const processedSchedules = processSchedules(ticket.schedules)
       ticket.schedules = processedSchedules
       
-      logger.temp('addTicket: スケジュール処理完了', {
-        ticketId: ticket.ticket_id,
-        schedulesCount: processedSchedules.length,
-        sample: processedSchedules.slice(0, 2).map(s => ({
-          entrance_date: s.entrance_date,
-          use_state: s.use_state,
-          isEffective: s.isEffective
-        }))
-      })
     }
     
     tickets.value.set(ticket.ticket_id, ticket)

@@ -8,7 +8,7 @@
 // @run-at       document-end
 // ==/UserScript==
 
-// Built: 2025/09/08 21:05:54
+// Built: 2025/09/09 08:50:35
 
 
 (function webpackUniversalModuleDefinition(root, factory) {
@@ -37917,7 +37917,6 @@ const useTicketsStore = (0,pinia/* defineStore */.nY)('tickets', () => {
      * スケジュールデータに有効フラグとパビリオン予約種類情報を付与
      */
     const processSchedules = (schedules) => {
-        tickets_logger.temp('processSchedules実行開始', { schedulesCount: schedules.length });
         if (!Array.isArray(schedules))
             return [];
         const result = schedules.map(schedule => {
@@ -37966,15 +37965,6 @@ const useTicketsStore = (0,pinia/* defineStore */.nY)('tickets', () => {
             const dateTimeB = `${b.entrance_date}${b.time_start || '0000'}`;
             return dateTimeA.localeCompare(dateTimeB);
         });
-        tickets_logger.temp('processSchedules実行完了', {
-            processedCount: result.length,
-            sample: result.slice(0, 2).map(s => ({
-                entrance_date: s.entrance_date,
-                use_state: s.use_state,
-                isEffective: s.isEffective,
-                schedule_name: s.schedule_name
-            }))
-        });
         return result;
     };
     /**
@@ -38004,10 +37994,6 @@ const useTicketsStore = (0,pinia/* defineStore */.nY)('tickets', () => {
         try {
             // 旧チケット情報を保存（選択状態等の保持用）
             const previousTickets = new Map(tickets.value);
-            tickets_logger.temp('チケット復元開始', {
-                previousTicketsCount: previousTickets.size,
-                previousTicketIds: Array.from(previousTickets.keys())
-            });
             // 新チケット情報を一時変数に取得
             let newOwnTickets = [];
             try {
@@ -38017,12 +38003,6 @@ const useTicketsStore = (0,pinia/* defineStore */.nY)('tickets', () => {
                 const processedTickets = new Map();
                 for (const newTicket of newOwnTickets) {
                     const previousTicket = previousTickets.get(newTicket.ticket_id);
-                    tickets_logger.temp('チケット処理', {
-                        ticketId: newTicket.ticket_id,
-                        hasPrevious: !!previousTicket,
-                        newSchedulesCount: newTicket.schedules?.length || 0,
-                        previousSchedulesCount: previousTicket?.schedules?.length || 0
-                    });
                     // 通期パス（Season Pass）の場合は追加予約可能性をチェック
                     if (newTicket.item_name?.includes('Season Pass')) {
                         // 現在の予約数をチェック（最大3件）
@@ -38063,13 +38043,6 @@ const useTicketsStore = (0,pinia/* defineStore */.nY)('tickets', () => {
                                 if (newSchedule.selected) {
                                     tickets_logger.debug(`予約ID ${newSchedule.user_visiting_reservation_id} のselected状態を継承`);
                                 }
-                                // デバッグ: isEffective値の確認
-                                tickets_logger.temp('状態継承後のisEffective確認', {
-                                    ticketId: newTicket.ticket_id,
-                                    reservationId: newSchedule.user_visiting_reservation_id,
-                                    newIsEffective: newSchedule.isEffective,
-                                    previousIsEffective: previousSchedule.isEffective
-                                });
                             }
                         }
                     }
@@ -38349,15 +38322,6 @@ const useTicketsStore = (0,pinia/* defineStore */.nY)('tickets', () => {
         if (ticket.schedules && Array.isArray(ticket.schedules)) {
             const processedSchedules = processSchedules(ticket.schedules);
             ticket.schedules = processedSchedules;
-            tickets_logger.temp('addTicket: スケジュール処理完了', {
-                ticketId: ticket.ticket_id,
-                schedulesCount: processedSchedules.length,
-                sample: processedSchedules.slice(0, 2).map(s => ({
-                    entrance_date: s.entrance_date,
-                    use_state: s.use_state,
-                    isEffective: s.isEffective
-                }))
-            });
         }
         tickets.value.set(ticket.ticket_id, ticket);
     };
