@@ -35,9 +35,8 @@ function createYtomoMenuItem(): HTMLLIElement {
         e.preventDefault();
         e.stopPropagation();
         
-        const targetUrl = `${window.location.protocol}//${window.location.hostname}/ytomo`;
-        logger.info('YTomoメニューから移動', { targetUrl });
-        window.location.href = targetUrl;
+        logger.info('YTomoメニューから移動', { targetUrl: '/ytomo' });
+        window.location.href = '/ytomo';
     });
     
     return li;

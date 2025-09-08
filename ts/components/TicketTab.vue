@@ -35,6 +35,7 @@
           :class="{ selected: isDateSelected(date) }"
           :data-date="date"
           @click="handleDateSelection(date)"
+          @touchend.prevent="handleDateSelection(date)"
         >
           {{ formatDate(date) }}
         </button>
@@ -133,6 +134,7 @@
                   :data-available-types="getReservationStatus(schedule, ticket).availableTypes.join(',')"
                   :disabled="getReservationStatus(schedule, ticket).availableTypes.length === 0"
                   @click="handleEntranceDateSelection(schedule, ticket, $event)"
+                  @touchend.prevent="handleEntranceDateSelection(schedule, ticket, $event)"
                 >
                   <div class="ytomo-schedule-line">
                     {{ schedule.entrance_date === '' ? '+ 新規入場予約' : formatEntranceDateTimeWithLocation(schedule) }}
@@ -149,6 +151,7 @@
                   }"
                   :disabled="!ticket.isOwn"
                   @click="handlePavilionReservationAction(schedule, ticket, $event)"
+                  @touchend.prevent="handlePavilionReservationAction(schedule, ticket, $event)"
                   :title="!ticket.isOwn ? 'パビリオン予約は自分のチケットのみ操作可能' : 'パビリオン予約詳細・追加'"
                 >
                   <div class="ytomo-schedule-line ytomo-reservation-line">
@@ -1180,6 +1183,23 @@ onUnmounted(() => {
     
     * {
         pointer-events: none;
+        -webkit-touch-callout: none;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+    }
+    
+    // モバイルでのタッチ操作改善
+    & {
+        -webkit-tap-highlight-color: rgba(0, 0, 0, 0.1);
+        -webkit-touch-callout: none;
+    }
+    
+    @media (pointer: coarse) {
+        min-height: 44px;
+        padding: 8px 12px;
+        -webkit-tap-highlight-color: rgba(44, 90, 160, 0.3);
     }
 
     &:focus {
