@@ -8,7 +8,7 @@
 // @run-at       document-end
 // ==/UserScript==
 
-// Built: 2025/09/09 08:50:35
+// Built: 2025/09/09 08:53:39
 
 
 (function webpackUniversalModuleDefinition(root, factory) {
@@ -33636,12 +33636,14 @@ class AuthManager {
         // API利用なしモードではエラーを即座に返す
         if (isApiUsageDisabled()) {
             const error = new Error('API利用が無効化されています');
+            error.isApiDisabled = true;
             authManager_logger.info('API利用なしモードのためAPI呼び出しを拒否', { url: input.toString() });
             throw error;
         }
         // API利用抑制モードかつytomoページ以外では呼び出しを拒否
         if (isApiUsageSuppressed() && !page_utils/* PageChecker */.v.isYtomoPage()) {
             const error = new Error('API利用が抑制されています（ytomoページ以外）');
+            error.isApiSuppressed = true;
             authManager_logger.info('API利用抑制モードかつytomoページ以外のためAPI呼び出しを拒否', { url: input.toString() });
             throw error;
         }
@@ -38053,7 +38055,13 @@ const useTicketsStore = (0,pinia/* defineStore */.nY)('tickets', () => {
                 tickets_logger.info('チケット情報を一括更新', { ticketCount: processedTickets.size });
             }
             catch (error) {
-                tickets_logger.error('自分のチケット取得エラー', error);
+                // API利用制限の場合は情報ログとして記録
+                if (error?.isApiDisabled || error?.isApiSuppressed) {
+                    tickets_logger.info('API利用制限のためチケット取得をスキップ');
+                }
+                else {
+                    tickets_logger.error('自分のチケット取得エラー', error);
+                }
             }
             // 日付を最新に更新
             updateTodayString();
@@ -38115,6 +38123,11 @@ const useTicketsStore = (0,pinia/* defineStore */.nY)('tickets', () => {
             }));
         }
         catch (error) {
+            // API利用制限の場合は情報ログとして記録
+            if (error?.isApiDisabled || error?.isApiSuppressed) {
+                tickets_logger.info('API利用制限のためチケット取得をスキップ');
+                return [];
+            }
             tickets_logger.error('自分のチケット取得API エラー', error);
             return [];
         }
@@ -38232,7 +38245,13 @@ const useTicketsStore = (0,pinia/* defineStore */.nY)('tickets', () => {
             tickets_logger.info('✅ パビリオン予約当選情報取得完了');
         }
         catch (error) {
-            tickets_logger.error('❌ パビリオン予約当選情報取得エラー:', error);
+            // API利用制限の場合は情報ログとして記録
+            if (error?.isApiDisabled || error?.isApiSuppressed) {
+                tickets_logger.info('API利用制限のためパビリオン予約当選情報取得をスキップ');
+            }
+            else {
+                tickets_logger.error('❌ パビリオン予約当選情報取得エラー:', error);
+            }
         }
     };
     /**
@@ -38279,7 +38298,13 @@ const useTicketsStore = (0,pinia/* defineStore */.nY)('tickets', () => {
             };
         }
         catch (error) {
-            tickets_logger.error('外部チケット取得エラー', { ticketId, error });
+            // API利用制限の場合は情報ログとして記録
+            if (error?.isApiDisabled || error?.isApiSuppressed) {
+                tickets_logger.info('API利用制限のため外部チケット取得をスキップ', { ticketId });
+            }
+            else {
+                tickets_logger.error('外部チケット取得エラー', { ticketId, error });
+            }
             return null;
         }
     };
@@ -38367,8 +38392,14 @@ const useTicketsStore = (0,pinia/* defineStore */.nY)('tickets', () => {
             }
         }
         catch (error) {
-            tickets_logger.error('個別チケット情報更新エラー', { ticketId, error });
-            throw error;
+            // API利用制限の場合は情報ログとして記録
+            if (error?.isApiDisabled || error?.isApiSuppressed) {
+                tickets_logger.info('API利用制限のため個別チケット情報更新をスキップ', { ticketId });
+            }
+            else {
+                tickets_logger.error('個別チケット情報更新エラー', { ticketId, error });
+                throw error;
+            }
         }
     };
     const removeTicket = (ticketId) => {
@@ -38480,7 +38511,13 @@ const useTicketsStore = (0,pinia/* defineStore */.nY)('tickets', () => {
             return scheduleData;
         }
         catch (error) {
-            tickets_logger.error('入場スケジュール取得エラー', { year, month, error });
+            // API利用制限の場合は情報ログとして記録
+            if (error?.isApiDisabled || error?.isApiSuppressed) {
+                tickets_logger.info('API利用制限のため入場スケジュール取得をスキップ', { year, month });
+            }
+            else {
+                tickets_logger.error('入場スケジュール取得エラー', { year, month, error });
+            }
             return null;
         }
     };

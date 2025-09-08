@@ -106,14 +106,16 @@ class AuthManager {
   public async authenticatedFetch(input: RequestInfo | URL, init?: RequestInit): Promise<Response> {
     // API利用なしモードではエラーを即座に返す
     if (isApiUsageDisabled()) {
-      const error = new Error('API利用が無効化されています')
+      const error = new Error('API利用が無効化されています') as any
+      error.isApiDisabled = true
       logger.info('API利用なしモードのためAPI呼び出しを拒否', { url: input.toString() })
       throw error
     }
     
     // API利用抑制モードかつytomoページ以外では呼び出しを拒否
     if (isApiUsageSuppressed() && !PageChecker.isYtomoPage()) {
-      const error = new Error('API利用が抑制されています（ytomoページ以外）')
+      const error = new Error('API利用が抑制されています（ytomoページ以外）') as any
+      error.isApiSuppressed = true
       logger.info('API利用抑制モードかつytomoページ以外のためAPI呼び出しを拒否', { url: input.toString() })
       throw error
     }

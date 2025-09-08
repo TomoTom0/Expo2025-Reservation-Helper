@@ -339,8 +339,13 @@ export const useTicketsStore = defineStore('tickets', () => {
         // 最後に一括でstoreに反映
         tickets.value = processedTickets
         logger.info('チケット情報を一括更新', { ticketCount: processedTickets.size })
-      } catch (error) {
-        logger.error('自分のチケット取得エラー', error)
+      } catch (error: any) {
+        // API利用制限の場合は情報ログとして記録
+        if (error?.isApiDisabled || error?.isApiSuppressed) {
+          logger.info('API利用制限のためチケット取得をスキップ')
+        } else {
+          logger.error('自分のチケット取得エラー', error)
+        }
       }
 
 
@@ -414,7 +419,13 @@ export const useTicketsStore = defineStore('tickets', () => {
         schedules: processSchedules(ticket.schedules || [])
       }))
       
-    } catch (error) {
+    } catch (error: any) {
+      // API利用制限の場合は情報ログとして記録
+      if (error?.isApiDisabled || error?.isApiSuppressed) {
+        logger.info('API利用制限のためチケット取得をスキップ')
+        return []
+      }
+      
       logger.error('自分のチケット取得API エラー', error)
       return []
     }
@@ -543,8 +554,13 @@ export const useTicketsStore = defineStore('tickets', () => {
       
       logger.info('✅ パビリオン予約当選情報取得完了')
       
-    } catch (error) {
-      logger.error('❌ パビリオン予約当選情報取得エラー:', error)
+    } catch (error: any) {
+      // API利用制限の場合は情報ログとして記録
+      if (error?.isApiDisabled || error?.isApiSuppressed) {
+        logger.info('API利用制限のためパビリオン予約当選情報取得をスキップ')
+      } else {
+        logger.error('❌ パビリオン予約当選情報取得エラー:', error)
+      }
     }
   }
 
@@ -596,8 +612,13 @@ export const useTicketsStore = defineStore('tickets', () => {
         schedules: []
       }
       
-    } catch (error) {
-      logger.error('外部チケット取得エラー', { ticketId, error })
+    } catch (error: any) {
+      // API利用制限の場合は情報ログとして記録
+      if (error?.isApiDisabled || error?.isApiSuppressed) {
+        logger.info('API利用制限のため外部チケット取得をスキップ', { ticketId })
+      } else {
+        logger.error('外部チケット取得エラー', { ticketId, error })
+      }
       return null
     }
   }
@@ -701,9 +722,14 @@ export const useTicketsStore = defineStore('tickets', () => {
         logger.warn('指定されたチケットIDが見つかりません', { ticketId })
       }
       
-    } catch (error) {
-      logger.error('個別チケット情報更新エラー', { ticketId, error })
-      throw error
+    } catch (error: any) {
+      // API利用制限の場合は情報ログとして記録
+      if (error?.isApiDisabled || error?.isApiSuppressed) {
+        logger.info('API利用制限のため個別チケット情報更新をスキップ', { ticketId })
+      } else {
+        logger.error('個別チケット情報更新エラー', { ticketId, error })
+        throw error
+      }
     }
   }
 
@@ -833,8 +859,13 @@ export const useTicketsStore = defineStore('tickets', () => {
       })
       
       return scheduleData
-    } catch (error) {
-      logger.error('入場スケジュール取得エラー', { year, month, error })
+    } catch (error: any) {
+      // API利用制限の場合は情報ログとして記録
+      if (error?.isApiDisabled || error?.isApiSuppressed) {
+        logger.info('API利用制限のため入場スケジュール取得をスキップ', { year, month })
+      } else {
+        logger.error('入場スケジュール取得エラー', { year, month, error })
+      }
       return null
     }
   }
