@@ -28,20 +28,20 @@ export const usePavilionsStore = defineStore('pavilions', () => {
   const filteredPavilions = computed(() => {
     const results = allPavilions.value
     if (!isAvailableOnlyFilter.value) {
+      // フィルタオフ時：すべてのパビリオンとすべての時間帯を表示
       return results
     }
-    return results.filter(pavilion => 
-      pavilion.dateStatus !== 2 && // 満員ではない
-      pavilion.timeSlots.some(slot => slot.available) // 利用可能な時間帯がある
+    // フィルタオン時：空きがあるパビリオンのみ表示し、満員時間帯は非表示
+    return results.filter(pavilion =>
+      pavilion.timeSlots.some(slot => slot.available) // 利用可能な時間帯が1つでもあるパビリオンを表示
     )
   })
 
   const selectedTimeSlotsCount = computed(() => selectedTimeSlots.value.length)
 
-  const availablePavilionsCount = computed(() => 
-    allPavilions.value.filter(pavilion => 
-      pavilion.dateStatus !== 2 && // 満員ではない
-      pavilion.timeSlots.some(slot => slot.available) // 利用可能な時間帯がある
+  const availablePavilionsCount = computed(() =>
+    allPavilions.value.filter(pavilion =>
+      pavilion.timeSlots.some(slot => slot.available) // 利用可能な時間帯があるパビリオンの数
     ).length
   )
 
@@ -104,6 +104,12 @@ export const usePavilionsStore = defineStore('pavilions', () => {
    * パビリオンIDから時間帯情報と基本情報を取得（個別API呼び出し）
    */
   const getPavilionTimeSlots = async (pavilionId: string, ticketIds: string[] = [], entranceDate?: string): Promise<{ timeSlots: TimeSlotData[], pavilionName?: string }> => {
+    logger.temp(`${pavilionId} 時間帯取得開始`, {
+      pavilionId,
+      ticketIds,
+      entranceDate
+    })
+
     try {
       // 時間帯取得用の詳細APIを呼び出し
       const params = new URLSearchParams()
@@ -114,8 +120,13 @@ export const usePavilionsStore = defineStore('pavilions', () => {
         params.set('entrance_date', entranceDate)
       }
       params.set('count', '1')
-      
+
       const timeslotUrl = `/api/d/events/${pavilionId}?${params.toString()}&channel=4`
+
+      logger.temp(`${pavilionId} API呼び出し詳細`, {
+        url: timeslotUrl,
+        params: Object.fromEntries(params.entries())
+      })
       
       const response = await authenticatedFetch(timeslotUrl, {
         method: 'GET',
@@ -126,13 +137,68 @@ export const usePavilionsStore = defineStore('pavilions', () => {
         },
         credentials: 'include'
       })
-      
+
+      logger.temp(`${pavilionId} APIレスポンス状況`, {
+        status: response.status,
+        statusText: response.statusText,
+        ok: response.ok,
+        headers: Object.fromEntries(response.headers.entries())
+      })
+
       if (!response.ok) {
-        logger.warn(`時間帯取得失敗 - ${pavilionId}: ${response.status}`)
+        logger.temp(`${pavilionId} 時間帯取得失敗詳細`, {
+          status: response.status,
+          statusText: response.statusText,
+          url: timeslotUrl
+        })
         return { timeSlots: [], pavilionName: undefined }
       }
       
       const data = await response.json()
+
+      // APIレスポンス完全内容を強制出力
+      logger.temp(`${pavilionId} APIレスポンス完全内容`, JSON.stringify(data, null, 2))
+
+      // 時間帯データらしきプロパティを全探索
+      const timeRelatedKeys = Object.keys(data).filter(key =>
+        key.toLowerCase().includes('time') ||
+        key.toLowerCase().includes('schedule') ||
+        key.toLowerCase().includes('slot')
+      )
+      logger.temp(`${pavilionId} 時間関連プロパティ候補`, {
+        timeRelatedKeys,
+        values: timeRelatedKeys.reduce((acc, key) => {
+          acc[key] = data[key]
+          return acc
+        }, {} as any)
+      })
+
+      // APIレスポンス全体構造をデバッグ出力
+      logger.temp(`${pavilionId} 時間帯API全レスポンス`, {
+        responseKeys: Object.keys(data),
+        fullResponse: data,
+        event_schedules_exists: !!data.event_schedules,
+        event_schedules_type: typeof data.event_schedules,
+        event_schedules_keys: data.event_schedules ? Object.keys(data.event_schedules) : null
+      })
+
+      // パビリオン時間帯情報レスポンスをデバッグ出力（データ構造確認のため）
+      if (data.event_schedules) {
+        Object.entries(data.event_schedules).forEach(([time, schedule]: [string, any]) => {
+          logger.temp(`${pavilionId} 時間帯${time}`, {
+            time_status: schedule.time_status,
+            capacity: schedule.capacity,
+            reserved: schedule.reserved,
+            available_判定結果: schedule.time_status !== 2,
+            schedule_全データ: schedule
+          })
+        })
+      } else {
+        logger.temp(`${pavilionId} - event_schedulesが存在しません`, {
+          responseStructure: data
+        })
+      }
+
       logger.debug(`時間帯取得完了 - ${pavilionId}`, data)
       
       // event_schedulesオブジェクトから時間帯情報を抽出
@@ -141,8 +207,9 @@ export const usePavilionsStore = defineStore('pavilions', () => {
         for (const [time, schedule] of Object.entries(data.event_schedules)) {
           const scheduleData = schedule as any
           
-          // time_statusで空き状況を判定（2=満席、1=空きあり等を想定）
-          const isAvailable = scheduleData.time_status !== 2
+          // unavailable_reasonで空き状況を判定（公式サイトの判定ロジックに基づく）
+          // 0=RESERVABLE（予約可能）として扱い、1,2以外は満員とみなす
+          const isAvailable = scheduleData.unavailable_reason !== 1 && scheduleData.unavailable_reason !== 2
           
           timeSlots.push({
             time: time, // キーが時間（例：1040, 1100）
@@ -166,7 +233,15 @@ export const usePavilionsStore = defineStore('pavilions', () => {
       }
       
     } catch (error) {
-      logger.warn('パビリオンの時間帯取得エラー', { pavilionId, error: error instanceof Error ? error.message : String(error) })
+      logger.temp(`${pavilionId} 時間帯取得例外`, {
+        pavilionId,
+        error: error instanceof Error ? {
+          message: error.message,
+          stack: error.stack,
+          name: error.name
+        } : String(error),
+        errorType: typeof error
+      })
       return { timeSlots: [], pavilionName: undefined }
     }
   }
@@ -231,15 +306,25 @@ export const usePavilionsStore = defineStore('pavilions', () => {
       }
 
       const data = await response.json()
+
+      // パビリオン一覧検索レスポンスをデバッグ出力
+      logger.temp('パビリオン一覧検索レスポンス', {
+        url: apiUrl,
+        status: response.status,
+        query: query,
+        responseData: data,
+        listCount: data.list ? data.list.length : 0
+      })
+
       logger.debug('パビリオン検索API応答', data)
       const pavilionResults = parseSearchResults(data)
       logger.info('パビリオン一覧取得完了', { count: pavilionResults.length })
       
-      // Step 2: 満員でないパビリオンのみ時間帯情報を取得
+      // Step 2: 全パビリオンの時間帯情報を取得（date_statusが無効のため一律取得）
       logger.debug('時間帯情報取得開始')
-      const availablePavilions = pavilionResults.filter(p => p.dateStatus !== 2) // 満員を除外
-      const pavilionIds = availablePavilions.map(p => p.id)
-      logger.info(`時間帯取得対象: ${pavilionIds.length}/${pavilionResults.length}件（満員除外）`)
+      // date_statusが存在しないため、満員判定を無効化して全パビリオンを対象とする
+      const pavilionIds = pavilionResults.map(p => p.id)
+      logger.info(`時間帯取得対象: ${pavilionIds.length}/${pavilionResults.length}件（date_status判定無効のため全件取得）`)
       
       const timeSlotsMap = await getTimeSlotsForPavilions(pavilionIds, ticketIds, entranceDate)
       applyTimeSlotsToData(pavilionResults, timeSlotsMap)
@@ -267,35 +352,72 @@ export const usePavilionsStore = defineStore('pavilions', () => {
    */
   const getTimeSlotsForPavilions = async (pavilionIds: string[], ticketIds: string[] = [], entranceDate?: string): Promise<Map<string, { timeSlots: TimeSlotData[], pavilionName?: string }>> => {
     const results = new Map<string, { timeSlots: TimeSlotData[], pavilionName?: string }>()
-    
-    logger.debug('時間帯情報並列取得開始', { pavilionCount: pavilionIds.length })
-    
+
+    logger.temp('getTimeSlotsForPavilions開始', {
+      pavilionCount: pavilionIds.length,
+      pavilionIds: pavilionIds,
+      ticketIds: ticketIds,
+      entranceDate: entranceDate
+    })
+
     // 並列実行でパフォーマンス向上（最大5件同時）
     const concurrency = Math.min(5, pavilionIds.length)
     const chunks: string[][] = []
-    
+
     for (let i = 0; i < pavilionIds.length; i += concurrency) {
       chunks.push(pavilionIds.slice(i, i + concurrency))
     }
-    
-    for (const chunk of chunks) {
+
+    logger.temp('並列処理チャンク設定', {
+      concurrency: concurrency,
+      chunkCount: chunks.length,
+      chunks: chunks
+    })
+
+    for (let chunkIndex = 0; chunkIndex < chunks.length; chunkIndex++) {
+      const chunk = chunks[chunkIndex]
+      logger.temp(`チャンク${chunkIndex + 1}/${chunks.length}処理開始`, {
+        chunkPavilionIds: chunk
+      })
+
       const promises = chunk.map(async (pavilionId) => {
         try {
           const result = await getPavilionTimeSlots(pavilionId, ticketIds, entranceDate)
+          logger.temp(`${pavilionId} 時間帯取得完了`, {
+            timeSlotsCount: result.timeSlots.length,
+            pavilionName: result.pavilionName,
+            timeSlots: result.timeSlots.map(slot => ({ time: slot.time, available: slot.available }))
+          })
           return { pavilionId, timeSlots: result.timeSlots, pavilionName: result.pavilionName }
         } catch (error) {
           logger.warn('パビリオンの時間帯取得に失敗', { pavilionId, error: error instanceof Error ? error.message : String(error) })
           return { pavilionId, timeSlots: [], pavilionName: undefined }
         }
       })
-      
+
       const chunkResults = await Promise.all(promises)
+      logger.temp(`チャンク${chunkIndex + 1}処理完了`, {
+        results: chunkResults.map(r => ({
+          pavilionId: r.pavilionId,
+          timeSlotsCount: r.timeSlots.length,
+          hasTimeSlots: r.timeSlots.length > 0
+        }))
+      })
+
       chunkResults.forEach(({ pavilionId, timeSlots, pavilionName }) => {
         results.set(pavilionId, { timeSlots, pavilionName })
       })
     }
-    
-    logger.debug('時間帯情報並列取得完了', { resultCount: results.size })
+
+    logger.temp('getTimeSlotsForPavilions完了', {
+      resultCount: results.size,
+      resultSummary: Array.from(results.entries()).map(([id, data]) => ({
+        pavilionId: id,
+        timeSlotsCount: data.timeSlots.length,
+        pavilionName: data.pavilionName
+      }))
+    })
+
     return results
   }
 
@@ -303,25 +425,66 @@ export const usePavilionsStore = defineStore('pavilions', () => {
    * 既存のパビリオンデータに時間帯情報を設定する関数
    */
   const applyTimeSlotsToData = (pavilions: PavilionData[], timeSlotsMap: Map<string, { timeSlots: TimeSlotData[], pavilionName?: string }>): void => {
+    logger.temp('applyTimeSlotsToData開始', {
+      pavilionCount: pavilions.length,
+      timeSlotsMapSize: timeSlotsMap.size,
+      timeSlotsMapKeys: Array.from(timeSlotsMap.keys())
+    })
+
     pavilions.forEach(pavilion => {
       const data = timeSlotsMap.get(pavilion.id)
-      const timeSlots = (data?.timeSlots || []).sort((a, b) => a.time.localeCompare(b.time))
+      const rawTimeSlots = data?.timeSlots || []
+      const timeSlots = rawTimeSlots.sort((a, b) => a.time.localeCompare(b.time))
+
+      logger.temp(`${pavilion.id} 時間帯適用プロセス`, {
+        step1_mapからの取得: {
+          dataExists: !!data,
+          rawTimeSlotsLength: rawTimeSlots.length,
+          pavilionName: data?.pavilionName
+        },
+        step2_ソート後: {
+          timeSlotsLength: timeSlots.length,
+          times: timeSlots.map(slot => slot.time)
+        }
+      })
+
       pavilion.timeSlots = timeSlots
-      
+
       // パビリオン名が取得できた場合は更新
       if (data?.pavilionName) {
         pavilion.name = data.pavilionName
       }
-      
+
       // 満員状態を更新
       const hasAvailableSlots = timeSlots.some(slot => slot.available)
-      if (!hasAvailableSlots && timeSlots.length > 0) {
+      const availableSlots = timeSlots.filter(slot => slot.available)
+      const unavailableSlots = timeSlots.filter(slot => !slot.available)
+
+      // 詳細デバッグ用ログ
+      logger.temp(`${pavilion.id} 時間帯適用結果`, {
+        timeSlotsCount: timeSlots.length,
+        hasAvailableSlots,
+        availableCount: availableSlots.length,
+        unavailableCount: unavailableSlots.length,
+        availableSlots: availableSlots.map(slot => ({ time: slot.time, available: slot.available })),
+        unavailableSlots: unavailableSlots.map(slot => ({ time: slot.time, available: slot.available })),
+        原dateStatus: pavilion.dateStatus,
+        最終dateStatus: !hasAvailableSlots && timeSlots.length > 0 ? 2 : timeSlots.length === 0 ? 2 : 1
+      })
+
+      if (timeSlots.length === 0) {
+        // 時間帯情報が取得できない場合は元のdateStatusを保持
+        // pavilion.dateStatus = pavilion.dateStatus（変更しない）
+      } else if (!hasAvailableSlots) {
         pavilion.dateStatus = 2 // 全て満員
-      } else if (timeSlots.length === 0) {
-        pavilion.dateStatus = 2 // 時間帯なし（満員扱い）
       } else {
         pavilion.dateStatus = 1 // 空きあり
       }
+    })
+
+    logger.temp('applyTimeSlotsToData完了', {
+      processedCount: pavilions.length,
+      finalStatuses: pavilions.map(p => ({ id: p.id, dateStatus: p.dateStatus, timeSlotsCount: p.timeSlots.length }))
     })
   }
 

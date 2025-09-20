@@ -338,6 +338,27 @@ export const useTicketsStore = defineStore('tickets', () => {
         
         // 最後に一括でstoreに反映
         tickets.value = processedTickets
+
+        // 全チケットのreservationManagement登録処理
+        processedTickets.forEach(ticket => {
+          ticket.schedules?.forEach(schedule => {
+            if (schedule.user_visiting_reservation_id != null) {
+              const reservationId = schedule.user_visiting_reservation_id.toString()
+              const existing = getReservationManagement(reservationId)
+
+              setReservationManagement(reservationId, {
+                ticketId: ticket.ticket_id,
+                entranceDate: schedule.entrance_date,
+                reservationType: schedule.reservation_type,
+                // 既存の選択状態・ロック状態・ラベルは保持
+                isSelected: existing?.isSelected ?? false,
+                isLocked: existing?.isLocked ?? false,
+                userLabel: existing?.userLabel ?? ''
+              })
+            }
+          })
+        })
+
         logger.info('チケット情報を一括更新', { ticketCount: processedTickets.size })
       } catch (error: any) {
         // API利用制限の場合は情報ログとして記録
@@ -406,7 +427,14 @@ export const useTicketsStore = defineStore('tickets', () => {
       }
 
       const data = await response.json()
-      
+
+      // パビリオン予約レスポンスをデバッグ出力（データ構造確認のため）
+      logger.temp('パビリオン予約レスポンス', {
+        url: '/api/d/my/tickets/',
+        status: response.status,
+        responseData: data
+      })
+
       if (!data.list || !Array.isArray(data.list)) {
         logger.warn('チケットデータが期待する形式ではありません', data)
         return []
@@ -1153,6 +1181,16 @@ export const useTicketsStore = defineStore('tickets', () => {
       await loadEntranceSchedulesRange(true) // 入場スケジュール一括取得
     } else {
       logger.info(`キャッシュが新鮮のためAPI取得をスキップ（${Math.round((Date.now() - lastUpdateTime.value) / (1000 * 60))}分経過）`)
+
+      // API利用ありの場合、最終更新から1時間が経過していれば自動で再取得
+      if (!isApiUsageDisabled() && lastUpdateTime.value > 0) {
+        const now = Date.now()
+        const oneHour = 60 * 60 * 1000
+        if (now - lastUpdateTime.value >= oneHour) {
+          logger.info('1時間が経過したため自動でチケット情報を再取得')
+          await loadAllTickets(true) // 強制更新
+        }
+      }
     }
     
     isInitialized.value = true

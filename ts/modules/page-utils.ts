@@ -47,10 +47,15 @@ export class PageChecker {
 
     /**
      * ytomoページかどうかをチェック
+     * ドメインの次のパス部分が「ytomo」であるかどうかで判定
+     * スマホでのスラッシュ自動追加に対応
      */
     static isYtomoPage(): boolean {
         const pathname = window.location.pathname.toLowerCase();
-        return pathname === '/ytomo' || pathname === '/ytomo/';
+        const pathSegments = pathname.split('/').filter(segment => segment.length > 0);
+
+        // パスの最初のセグメントが「ytomo」であるかチェック
+        return pathSegments.length > 0 && pathSegments[0] === 'ytomo';
     }
 
     /**
@@ -67,7 +72,8 @@ export const identify_page_type = (url: string): string | null => {
         const urlObj = new URL(url);
         const pathname = urlObj.pathname;
         const hostname = urlObj.hostname;
-        
+        const pathSegments = pathname.toLowerCase().split('/').filter(segment => segment.length > 0);
+
         if (hostname === 'tktwaitingroom.expo2025.or.jp') {
             return "waiting_room";
         } else if (pathname === '/ticket_visiting_reservation/') {
@@ -78,10 +84,12 @@ export const identify_page_type = (url: string): string | null => {
             return "ticket_selection";
         } else if (pathname === '/agent_ticket/') {
             return "agent_ticket";
+        } else if (pathSegments.length > 0 && pathSegments[0] === 'ytomo') {
+            return "ytomo_page";
         }
     } catch (error) {
         logger.error('URL解析エラー', error);
     }
-    
+
     return null;
 }

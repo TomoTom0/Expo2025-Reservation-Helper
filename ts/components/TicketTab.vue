@@ -499,11 +499,26 @@ const handlePavilionReservationAction = (schedule: ScheduleData, ticket: TicketD
 const handleEntranceDateSelection = (schedule: ScheduleData, ticket: TicketData, event: Event) => {
   event.stopPropagation()
   const target = event.target as HTMLButtonElement
-  if (target.disabled) return
-  
+
+  // 当日予約のデバッグ情報を出力
+  logger.temp('入場予約選択デバッグ', {
+    ticketId: ticket.ticket_id,
+    schedule: schedule,
+    use_state: schedule.use_state,
+    entrance_date: schedule.entrance_date,
+    user_visiting_reservation_id: schedule.user_visiting_reservation_id,
+    isDisabled: target.disabled,
+    reservationStatus: getReservationStatus(schedule, ticket)
+  })
+
+  if (target.disabled) {
+    logger.warn('ボタンが無効化されているため処理をスキップ', { ticketId: ticket.ticket_id, schedule })
+    return
+  }
+
   const date = schedule.entrance_date
   const reservationId = schedule.user_visiting_reservation_id?.toString()
-  
+
   if (!reservationId) {
     logger.warn('予約IDが存在しません', { ticketId: ticket.ticket_id, schedule })
     return
@@ -516,7 +531,22 @@ const handleEntranceDateSelection = (schedule: ScheduleData, ticket: TicketData,
     scheduleName: schedule.schedule_name
   })
   
-  const reservationData = ticketsStore.getReservationManagement(reservationId)
+  let reservationData = ticketsStore.getReservationManagement(reservationId)
+
+  // reservationManagementに存在しない場合は管理データを初期化
+  if (!reservationData) {
+    ticketsStore.setReservationManagement(reservationId, {
+      ticketId: ticket.ticket_id,
+      entranceDate: schedule.entrance_date,
+      reservationType: schedule.reservation_type,
+      isSelected: false,
+      isLocked: false,
+      userLabel: ''
+    })
+    reservationData = ticketsStore.getReservationManagement(reservationId)
+    logger.info('予約ID管理データを初期化', { reservationId, ticketId: ticket.ticket_id })
+  }
+
   const isCurrentlySelected = !!reservationData?.isSelected
   
   // 入場日付は常に一つに限定される: 他の予約の選択を解除
@@ -728,12 +758,23 @@ const getReservationStatus = (schedule: ScheduleData, ticket: TicketData): Reser
   
   // 既存の入場予約がある場合
   if (ticket.isOwn) {
-    const canChange = schedule.use_state === 0 || 
+    const canChange = schedule.use_state === 0 ||
                      (schedule.use_state === 1 && schedule.entrance_date === getTodayString())
-    
+
+    // ロック状態をチェック（表示のみ、選択は常に可能）
+    const reservationId = schedule.user_visiting_reservation_id?.toString()
+    let statusText = canChange ? '変更可能' : '変更不可'
+    if (reservationId) {
+      const reservationData = ticketsStore.getReservationManagement(reservationId)
+      if (reservationData?.isLocked) {
+        statusText = 'ロック中'
+      }
+    }
+
+    // 選択は常に可能（自分のチケットであれば）
     return {
-      statusText: canChange ? '変更可能' : '変更不可',
-      availableTypes: canChange ? ['change'] : []
+      statusText,
+      availableTypes: ['select'] // 選択は常に可能
     }
   }
   

@@ -260,21 +260,22 @@ const isRefreshing = ref(false) // 手動更新中フラグ
 // 既存の入場日時と重複する時間帯を判定
 const isTimeSlotDisabled = (gate: string, time: string) => {
   if (!selectedDate.value) return false
-  
+
   const selectedDateStr = selectedDate.value! // 内部形式（YYYY-MM-DD）
   const gateType = gate === 'east' ? 1 : 2
-  
+
   // 同じ日付の既存予約があるかチェック
   for (const ticket of ticketsStore.tickets.values()) {
     if (ticket.schedules) {
       for (const schedule of ticket.schedules) {
         // schedule.entrance_date（YYYYMMDD）を内部形式に正規化して比較
         const scheduleDate = dateHelpers.normalize(schedule.entrance_date)
-        
+
         const reservationId = schedule.user_visiting_reservation_id?.toString()
         if (reservationId) {
           const reservationData = ticketsStore.getReservationManagement(reservationId)
-          if (reservationData?.isSelected && 
+          // ロックされている入場予約が選択されている場合のみ時間帯を無効化
+          if (reservationData?.isSelected && reservationData?.isLocked &&
               scheduleDate === selectedDateStr &&
               schedule.gate_type === gateType &&
               schedule.time_start === time) {
@@ -471,10 +472,19 @@ const isReservationButtonEnabled = computed(() => {
   if (selectedTimeSlotCount.value < 1) {
     return false
   }
-  
-  // 新規予約の場合（selectedScheduleがnull）は有効
+
+  // 新規予約の場合（selectedScheduleがnull）: チケットタブで入場予約未設定の予約枠が選択されている場合のみ有効
   if (!selectedSchedule.value) {
-    return true
+    // チケットタブで入場予約未設定（entrance_dateが空）の予約枠が選択されているかチェック
+    const hasUnsetReservation = ticketsStore.selectedTickets.some(ticket =>
+      ticket.schedules?.some(schedule => {
+        const reservationId = schedule.user_visiting_reservation_id?.toString()
+        if (!reservationId) return false
+        const reservationData = ticketsStore.getReservationManagement(reservationId)
+        return reservationData?.isSelected && !schedule.entrance_date
+      })
+    )
+    return hasUnsetReservation
   }
   
   // 既存予約の場合は自分の予約のみ変更可能
