@@ -52,7 +52,8 @@
       "Bash(LOG_LEVEL=INFO mise run build-rsync)",
       "Bash(npx vue-tsc:*)",
       "Read(//mnt/c/Users/nakam/Mine/_chex/src_expo2025-extension/**)",
-      "Bash(git fetch:*)"
+      "Bash(git fetch:*)",
+      "Read(///**)"
     ],
     "deny": []
   }

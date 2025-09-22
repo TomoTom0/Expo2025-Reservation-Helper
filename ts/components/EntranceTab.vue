@@ -178,11 +178,11 @@
     <!-- 下段: 実行情報ブロック -->
     <div class="ytomo-execution-info">
       <!-- 予約情報表示エリア -->
-      <div v-if="reservationInfo.visible" class="ytomo-reservation-info" :class="{ 'completed': reservationInfo.completed }">
+      <div v-if="reservationManager.reservationInfo.value.visible" class="ytomo-reservation-info" :class="{ 'completed': reservationManager.reservationInfo.value.completed }">
         <div class="ytomo-reservation-box">
-          <div class="ytomo-reservation-date">{{ reservationInfo.date }}</div>
+          <div class="ytomo-reservation-date">{{ reservationManager.reservationInfo.value.date }}</div>
           <div class="ytomo-reservation-timeslots">
-            <div v-for="slot in reservationInfo.timeSlots" :key="slot.id" class="ytomo-timeslot">
+            <div v-for="slot in reservationManager.reservationInfo.value.timeSlots" :key="slot.id" class="ytomo-timeslot">
               {{ slot.gate }}{{ slot.time }}
             </div>
           </div>
@@ -190,21 +190,30 @@
       </div>
       
       <!-- 予約実行状態表示エリア -->
-      <div v-if="reservationStatus.visible" class="ytomo-reservation-status" :class="reservationStatus.statusClass">
+      <div v-if="reservationManager.reservationStatus.value.visible" class="ytomo-reservation-status" :class="reservationManager.reservationStatus.value.statusClass">
         <div class="ytomo-status-content">
-          <div v-if="reservationStatus.isActive" class="ytomo-status-icon spinning">
+          <div v-if="reservationManager.reservationStatus.value.isActive" class="ytomo-status-icon spinning">
             <svg viewBox="0 0 24 24">
               <path d="M12,4V2A10,10 0 0,0 2,12H4A8,8 0 0,1 12,4Z"/>
             </svg>
           </div>
           <div class="ytomo-status-details">
-            <div class="ytomo-status-current">{{ reservationStatus.currentAction }}</div>
-            <div v-if="reservationStatus.statusClass === 'success' && reservationStatus.dateChange" class="ytomo-datetime-change">
-              {{ reservationStatus.dateChange }}
+            <div class="ytomo-status-current">
+              {{ isReservationRunning && reservationManager.waitInfo.value.isWaiting
+                  ? `予約待機中 - ${reservationManager.formatTime(reservationManager.waitInfo.value.waitEndTime)}まで`
+                  : reservationManager.reservationStatus.value.currentAction
+              }}
             </div>
-            <div v-if="reservationStatus.isActive" class="ytomo-status-progress">
+            <div v-if="reservationManager.reservationStatus.value.statusClass === 'success' && reservationManager.reservationStatus.value.dateChange" class="ytomo-datetime-change">
+              {{ reservationManager.reservationStatus.value.dateChange }}
+            </div>
+            <div v-if="isReservationRunning && (reservationManager.reservationStatus.value.isActive || reservationManager.waitInfo.value.isWaiting)" class="ytomo-status-progress">
               <div class="ytomo-progress-bar">
-                <div class="ytomo-progress-fill" :style="{ width: reservationStatus.progress + '%' }"></div>
+                <div class="ytomo-progress-fill" :style="{
+                  width: reservationManager.waitInfo.value.isWaiting
+                    ? reservationManager.waitInfo.value.progress + '%'
+                    : reservationManager.reservationStatus.value.progress + '%'
+                }"></div>
               </div>
             </div>
             
@@ -222,6 +231,9 @@
         </div>
       </div>
     </div>
+
+    <!-- 待機機能エリア -->
+    <ReservationWaitControl :reservation-manager="reservationManager" />
   </div>
 </template>
 
@@ -231,6 +243,7 @@ import { loggers } from '@/utils/logger'
 import { useTicketsStore } from '@/stores/tickets'
 import type { ScheduleData } from '@/types/api'
 import { EntranceReservationApiManager } from '@/modules/entrance-reservation-api-manager'
+import ReservationWaitControl from './ReservationWaitControl.vue'
 
 const logger = loggers.ui
 const ticketsStore = useTicketsStore()
@@ -256,6 +269,7 @@ const isCalendarExpanded = ref(true)
 const selectedDate = ref('')
 const currentMonth = ref(new Date()) // 現在の年月
 const isRefreshing = ref(false) // 手動更新中フラグ
+
 
 // 既存の入場日時と重複する時間帯を判定
 const isTimeSlotDisabled = (gate: string, time: string) => {
@@ -1360,11 +1374,12 @@ const clearReservationTimer = () => {
 // サイクルステップを実行（毎分35秒に実行）
 const executeCycleStep = async (selectedTimeSlots: any[]) => {
   try {
-    logger.info('サイクルステップ開始', { 
+
+    logger.info('サイクルステップ開始', {
       time: new Date().toLocaleTimeString(),
-      selectedTimeSlots: selectedTimeSlots.length 
+      selectedTimeSlots: selectedTimeSlots.length
     })
-    
+
     // 1. 並行処理：最優先予約実行 + 空き情報取得
     await executeParallelTasks(selectedTimeSlots)
     
@@ -1657,7 +1672,17 @@ const getApiTimeKey = (displayTime: string): string => {
 
 // 予約実行
 const executeReservation = async () => {
-  if (!isReservationRunning.value && !isReservationButtonEnabled.value) {
+  // 予約実行中の場合は中断処理
+  if (isReservationRunning.value) {
+    logger.info('予約中断が要求されました')
+
+
+    // 予約マネージャーに中断を委譲
+    reservationManager.abortReservation()
+    return
+  }
+
+  if (!isReservationButtonEnabled.value) {
     logger.warn('予約ボタンが無効な状態で実行されました')
     return
   }
@@ -1690,6 +1715,8 @@ const executeReservation = async () => {
     await reservationManager.executeReservation(selectedTimeSlots, selectedDate.value, existingReservationId, originalReservationInfo)
   }
 }
+
+
 
 
 // 新規入場予約作成
@@ -2839,6 +2866,7 @@ onMounted(async () => {
       }
     }
   }
+
 }
 
 // コンパクトなテーブルスタイル

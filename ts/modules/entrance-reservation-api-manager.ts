@@ -14,6 +14,8 @@ export interface ReservationStatus {
   progressText: string
   statusClass: string
   dateChange?: string
+  isWaiting?: boolean
+  waitEndTime?: Date | null
 }
 
 export interface ReservationInfo {
@@ -29,13 +31,27 @@ export interface ReservationResult {
   time: string
 }
 
+// 予約待機情報の型定義
+export interface WaitInfo {
+  isWaiting: boolean
+  waitMinutes: number
+  waitStartTime: Date | null
+  waitEndTime: Date | null
+  remainingMinutes: number
+  progress: number
+}
+
 export class EntranceReservationApiManager {
   // 状態管理
   public reservationStatus: Ref<ReservationStatus>
   public reservationInfo: Ref<ReservationInfo>
   public isReservationRunning: Ref<boolean>
   public reservationHistory: Ref<ReservationResult[]>
-  
+
+  // 予約待機情報
+  public waitInfo: Ref<WaitInfo>
+  private waitTimer: NodeJS.Timeout | null = null
+
   // 選択解除用のコールバック
   private clearSelectionCallback: (() => void) | null = null
   
@@ -61,6 +77,8 @@ export class EntranceReservationApiManager {
   private waitingDuration: number = 0
   private executedReservations = new Set<string>()
   private flag_first = ref(true)
+  // 現在の選択された時間帯（待機終了時の再開用）
+  private selectedTimeSlots: any[] = []
 
   constructor() {
     // tickets storeのインスタンスを取得
@@ -85,6 +103,16 @@ export class EntranceReservationApiManager {
 
     this.isReservationRunning = ref(false)
     this.reservationHistory = ref([])
+
+    // 予約待機情報の初期化
+    this.waitInfo = ref({
+      isWaiting: false,
+      waitMinutes: 60,
+      waitStartTime: null,
+      waitEndTime: null,
+      remainingMinutes: 0,
+      progress: 0
+    })
   }
 
   // 待機時間プログレスバーの開始
@@ -148,6 +176,32 @@ export class EntranceReservationApiManager {
     logger.info('予約履歴をクリアしました')
   }
 
+  // 予約実行を中断（予約情報と履歴は保持）
+  public abortReservation() {
+    logger.temp('中断前のreservationStatus:', this.reservationStatus.value)
+    logger.temp('中断前のreservationInfo:', this.reservationInfo.value)
+
+    this.isReservationRunning.value = false
+    this.clearReservationTimer()
+
+    // 待機中の場合は待機も終了
+    if (this.waitInfo.value.isWaiting) {
+      this.endWait()
+      logger.info('予約中断により待機も終了しました')
+    }
+
+    // 実行中フラグのみ停止（他の状態は保持し、表示はテンプレートの条件分岐で制御）
+    this.reservationStatus.value = {
+      ...this.reservationStatus.value,
+      isActive: false,
+      currentAction: '予約が中断されました'
+    }
+
+    logger.temp('中断後のreservationStatus:', this.reservationStatus.value)
+    logger.temp('中断後のreservationInfo:', this.reservationInfo.value)
+    logger.info('予約実行を中断しました')
+  }
+
   // 設定された目標時間まで待機
   public async waitUntil35Seconds(selectedTimeSlots: any[]) {
     if (!this.isReservationRunning.value) return
@@ -195,6 +249,16 @@ export class EntranceReservationApiManager {
     try {
       if (!this.isReservationRunning.value) {
         logger.info('予約実行がキャンセルされました')
+        return
+      }
+
+      // 待機中の場合はサイクル処理をスキップ
+      if (this.waitInfo.value.isWaiting) {
+        logger.info('待機中のため予約処理をスキップ', {
+          remainingMinutes: this.waitInfo.value.remainingMinutes
+        })
+        // 次のサイクルをスケジュール（待機終了後も正常なサイクルを維持）
+        this.scheduleNextMinuteTargetTime(selectedTimeSlots)
         return
       }
 
@@ -372,6 +436,12 @@ export class EntranceReservationApiManager {
   // 次の分の目標時間まで待機
   private async scheduleNextMinuteTargetTime(selectedTimeSlots: any[]) {
     if (!this.isReservationRunning.value) return
+
+    // 待機中の場合は次のサイクルもスキップ
+    if (this.waitInfo.value.isWaiting) {
+      logger.info('待機中のためscheduleNextMinuteTargetTimeもスキップ')
+      return
+    }
     
     const targetTime = this.getTargetUpdateTime()
     const now = new Date()
@@ -576,6 +646,8 @@ export class EntranceReservationApiManager {
     }
 
     logger.info('入場予約実行開始', { selectedTimeSlots, targetDate })
+    // 選択された時間帯を保存（待機終了時の再開用）
+    this.selectedTimeSlots = selectedTimeSlots
 
     try {
       // 35秒まで待機してから実行開始
@@ -849,30 +921,94 @@ export class EntranceReservationApiManager {
     }
   }
 
-  // 状態リセット
-  public resetState() {
-    this.isReservationRunning.value = false
-    this.clearReservationTimer()
-    this.reservationStatus.value = {
-      visible: false,
-      isActive: false,
-      currentAction: '',
-      progress: 0,
-      progressText: '',
-      statusClass: ''
-    }
-    this.reservationInfo.value = {
-      visible: false,
-      date: '',
-      timeSlots: [],
-      completed: false
-    }
-    this.executedReservations.clear()
-    this.reservationHistory.value = []
-  }
 
   // 選択解除用コールバックを設定
   public setClearSelectionCallback(callback: () => void) {
     this.clearSelectionCallback = callback
+  }
+
+  // 時刻フォーマット用メソッド
+  public formatTime(date: Date | null): string {
+    if (!date) return ''
+    return date.toLocaleTimeString('ja-JP', {
+      hour: '2-digit',
+      minute: '2-digit'
+    })
+  }
+
+  // 予約待機を開始
+  public startWait() {
+    if (this.waitInfo.value.isWaiting || this.waitInfo.value.waitMinutes < 1 || this.waitInfo.value.waitMinutes > 360) {
+      return
+    }
+
+    const now = new Date()
+    const endTime = new Date(now.getTime() + this.waitInfo.value.waitMinutes * 60 * 1000)
+
+    this.waitInfo.value = {
+      ...this.waitInfo.value,
+      isWaiting: true,
+      waitStartTime: now,
+      waitEndTime: endTime
+    }
+
+    logger.info('予約待機開始', {
+      waitMinutes: this.waitInfo.value.waitMinutes,
+      startTime: now,
+      endTime: endTime
+    })
+
+    this.waitTimer = setTimeout(() => {
+      this.endWait()
+    }, this.waitInfo.value.waitMinutes * 60 * 1000)
+
+    this.updateWaitProgress()
+  }
+
+  // 予約待機を終了
+  public endWait() {
+    if (this.waitTimer) {
+      clearTimeout(this.waitTimer)
+      this.waitTimer = null
+    }
+
+    this.waitInfo.value = {
+      ...this.waitInfo.value,
+      isWaiting: false,
+      waitStartTime: null,
+      waitEndTime: null,
+      remainingMinutes: 0,
+      progress: 0
+    }
+
+    logger.info('予約待機終了')
+
+    // 待機終了後、予約実行中であれば即座にサイクルを再開
+    if (this.isReservationRunning.value && this.selectedTimeSlots && this.selectedTimeSlots.length > 0) {
+      logger.info('待機終了により予約サイクルを再開')
+      this.executeCycleStep(this.selectedTimeSlots)
+    }
+  }
+
+  // 待機進捗を更新
+  private updateWaitProgress() {
+    if (!this.waitInfo.value.isWaiting || !this.waitInfo.value.waitStartTime || !this.waitInfo.value.waitEndTime) {
+      return
+    }
+
+    const now = new Date()
+    const totalTime = this.waitInfo.value.waitEndTime.getTime() - this.waitInfo.value.waitStartTime.getTime()
+    const elapsedTime = now.getTime() - this.waitInfo.value.waitStartTime.getTime()
+    const remainingTime = Math.max(0, this.waitInfo.value.waitEndTime.getTime() - now.getTime())
+
+    this.waitInfo.value = {
+      ...this.waitInfo.value,
+      remainingMinutes: Math.ceil(remainingTime / 1000 / 60),
+      progress: Math.min(100, Math.max(0, (elapsedTime / totalTime) * 100))
+    }
+
+    if (this.waitInfo.value.isWaiting && remainingTime > 0) {
+      setTimeout(() => this.updateWaitProgress(), 1000)
+    }
   }
 }
