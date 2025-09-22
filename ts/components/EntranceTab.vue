@@ -475,15 +475,12 @@ const isReservationButtonEnabled = computed(() => {
 
   // 新規予約の場合（selectedScheduleがnull）: チケットタブで入場予約未設定の予約枠が選択されている場合のみ有効
   if (!selectedSchedule.value) {
-    // チケットタブで入場予約未設定（entrance_dateが空）の予約枠が選択されているかチェック
-    const hasUnsetReservation = ticketsStore.selectedTickets.some(ticket =>
-      ticket.schedules?.some(schedule => {
-        const reservationId = schedule.user_visiting_reservation_id?.toString()
-        if (!reservationId) return false
-        const reservationData = ticketsStore.getReservationManagement(reservationId)
-        return reservationData?.isSelected && !schedule.entrance_date
-      })
-    )
+    // 予約管理システムから選択された予約IDをチェック
+    const selectedReservationIds = ticketsStore.getSelectedReservationIds()
+    const hasUnsetReservation = selectedReservationIds.some(reservationId => {
+      const { schedule } = ticketsStore.getScheduleByReservationId(reservationId)
+      return schedule && !schedule.entrance_date
+    })
     return hasUnsetReservation
   }
   
@@ -1666,7 +1663,7 @@ const executeReservation = async () => {
   }
 
   const timeSlotInfo = getSelectedTimeSlotInfo()
-  if (!timeSlotInfo || !selectedSchedule.value) {
+  if (!timeSlotInfo) {
     logger.warn('必要な情報が不足しています', { timeSlotInfo, selectedSchedule: selectedSchedule.value })
     return
   }
