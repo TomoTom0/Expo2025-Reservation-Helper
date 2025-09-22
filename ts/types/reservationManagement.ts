@@ -15,6 +15,8 @@ export interface ReservationManagementData {
   entranceDate: string
   /** 予約種別 */
   reservationType?: string
+  /** 新規予約枠フラグ（通期パスの空き枠） */
+  isNewReservationSlot?: boolean
   /** 作成日時 */
   createdAt: number
   /** 最終更新日時 */

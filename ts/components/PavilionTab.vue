@@ -362,6 +362,7 @@ const mainDialogStore = useMainDialogStore()
 const overlaysStore = useOverlaysStore()
 const sequentialReservationStore = useSequentialReservationStore()
 const scheduledReservationStore = useScheduledReservationStore()
+
 const { allPavilions, filteredPavilions, isLoading, isAvailableOnlyFilter, availablePavilionsCount } = storeToRefs(pavilionsStore)
 const { activeTab } = storeToRefs(mainDialogStore)
 
@@ -418,18 +419,20 @@ const selectedSlotsCount = computed(() => {
   ).length
 })
 
-// 分散状態管理から選択されたスケジュール一覧を取得
+// 予約管理システムから選択されたスケジュール一覧を取得
 const selectedSchedules = computed(() => {
   const selected: ScheduleData[] = []
-  ticketsStore.ticketsArray.forEach((ticket: TicketData) => {
-    ticket.schedules?.forEach((schedule: ScheduleData) => {
-      if (schedule.selected) {
-        selected.push(schedule)
-      }
-    })
+  const selectedReservationIds = ticketsStore.getSelectedReservationIds()
+
+  selectedReservationIds.forEach(reservationId => {
+    const { schedule } = ticketsStore.getScheduleByReservationId(reservationId)
+    if (schedule) {
+      selected.push(schedule)
+    }
   })
   return selected
 })
+
 
 // 分散状態管理から選択された入場日付を取得
 const selectedEntranceDate = computed(() => {
@@ -518,12 +521,25 @@ const handlePavilionSearch = async () => {
   try {
     logger.info('パビリオン検索開始', { query: searchInput.value })
     showProcessingOverlay('パビリオンを検索中...')
-    
+
     // 選択されたチケットIDsを取得
-    const selectedTickets = ticketsStore.ticketsArray.filter(ticket => 
-      ticket.schedules?.some(schedule => schedule.selected)
-    )
-    const ticketIds = selectedTickets.map(t => t.ticket_id)
+    const ticketIds = ticketsStore.selectedTicketIds
+
+    // デバッグ: チケット選択状態を確認
+    logger.temp('チケット選択状態デバッグ', {
+      全チケット数: ticketsStore.ticketsArray.length,
+      全チケット: ticketsStore.ticketsArray.map(t => ({
+        ticket_id: t.ticket_id,
+        label: t.label,
+        schedules: t.schedules?.map(s => ({
+          entrance_date: s.entrance_date,
+          schedule_name: s.schedule_name,
+          selected: s.selected
+        })) || []
+      })),
+      選択済みチケット数: ticketsStore.selectedTicketIds.length,
+      選択済みチケットIDs: ticketIds
+    })
     
     // 選択された入場日付を取得  
     const entranceDate = selectedEntranceDate.value
@@ -566,14 +582,11 @@ const handleLoadFavorites = async () => {
     showProcessingOverlay('お気に入りを読み込み中...')
     
     // 選択されたチケットIDsを取得
-    const selectedTickets = ticketsStore.ticketsArray.filter(ticket => 
-      ticket.schedules?.some(schedule => schedule.selected)
-    )
-    const ticketIds = selectedTickets.map(t => t.ticket_id)
-    
-    // 選択された入場日付を取得  
+    const ticketIds = ticketsStore.selectedTicketIds
+
+    // 選択された入場日付を取得
     const entranceDate = selectedEntranceDate.value
-    
+
     const results = await loadFavoritePavilions(entranceDate || undefined, ticketIds)
     
     // お気に入り読み込み後はフィルターをOFFにして全て表示
@@ -604,14 +617,11 @@ const handleRefresh = async () => {
   try {
     logger.info('データ更新開始（選択リセットなし）')
     showProcessingOverlay('パビリオン情報を更新中...')
-    
+
     // 選択されたチケットIDsを取得
-    const selectedTickets = ticketsStore.ticketsArray.filter(ticket => 
-      ticket.schedules?.some(schedule => schedule.selected)
-    )
-    const ticketIds = selectedTickets.map(t => t.ticket_id)
-    
-    // 選択された入場日付を取得  
+    const ticketIds = ticketsStore.selectedTicketIds
+
+    // 選択された入場日付を取得
     const entranceDate = selectedEntranceDate.value
     
     await refreshPavilionData(ticketIds, entranceDate || undefined)
@@ -757,10 +767,7 @@ const handleReservationExecution = async () => {
     const registeredChannel = pavilionReservationInfo.activeChannel
     
     // 選択されたチケットIDsを取得
-    const selectedTickets = ticketsStore.ticketsArray.filter(ticket => 
-      ticket.schedules?.some(schedule => schedule.selected)
-    )
-    const ticketIds = selectedTickets.map(t => t.ticket_id)
+    const ticketIds = ticketsStore.selectedTicketIds
     
     if (ticketIds.length === 0) {
       throw new Error('チケットが選択されていません')
@@ -844,10 +851,7 @@ const updateTimeSlotInfoAsync = async () => {
     logger.info('予約失敗後の時間帯情報非同期更新を実行中')
     
     // 選択されたチケットIDsを取得
-    const selectedTickets = ticketsStore.ticketsArray.filter(ticket => 
-      ticket.schedules?.some(schedule => schedule.selected)
-    )
-    const ticketIds = selectedTickets.map(t => t.ticket_id)
+    const ticketIds = ticketsStore.selectedTicketIds
     
     if (ticketIds.length === 0) {
       logger.warn('時間帯情報更新: チケットが選択されていません')
@@ -1079,10 +1083,7 @@ const handleScheduleExecuteReservation = async (event: Event) => {
     }))
 
     // 選択されたチケットIDを取得
-    const selectedTickets = ticketsStore.ticketsArray.filter(ticket => 
-      ticket.schedules?.some(schedule => schedule.selected)
-    )
-    const ticketIds = selectedTickets.map(t => t.ticket_id)
+    const ticketIds = ticketsStore.selectedTicketIds
 
     if (ticketIds.length === 0) {
       throw new Error('チケットが選択されていません')

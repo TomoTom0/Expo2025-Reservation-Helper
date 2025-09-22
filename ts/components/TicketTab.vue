@@ -136,7 +136,7 @@
                   @touchend.prevent="handleEntranceDateSelection(schedule, ticket, $event)"
                 >
                   <div class="ytomo-schedule-line">
-                    {{ schedule.entrance_date === '' ? '+ 新規入場予約' : formatEntranceDateTimeWithLocation(schedule) }}
+                    {{ schedule.entrance_date === '' ? 'NEW' : formatEntranceDateTimeWithLocation(schedule) }}
                   </div>
                 </button>
                 
@@ -288,6 +288,7 @@ import { useMainDialogStore } from '@/stores/mainDialog'
 import { useTickets } from '@/composables/useTickets'
 import { loggers } from '@/utils/logger'
 import { authenticatedFetch } from '@/utils/authManager'
+import { isSeasonPass } from '@/utils/ticketUtils'
 // LocationHelper は location_index プロパティが実装されるまで一時的にコメントアウト
 // import { LocationHelper } from '@/modules/entrance-reservation-state-manager'
 import { getLongNameFromShortName, getShortNameFromChannel, getAllPavilionReservationTypes } from '@/utils/pavilionReservationMapping'
@@ -519,32 +520,41 @@ const handleEntranceDateSelection = (schedule: ScheduleData, ticket: TicketData,
   const date = schedule.entrance_date
   const reservationId = schedule.user_visiting_reservation_id?.toString()
 
-  if (!reservationId) {
+  // 新規予約枠の場合は特別なIDを生成
+  const effectiveReservationId = (reservationId && schedule.entrance_date !== '') ? reservationId : `new-reservation-${ticket.ticket_id}`
+
+  if (!reservationId && schedule.entrance_date !== '') {
     logger.warn('予約IDが存在しません', { ticketId: ticket.ticket_id, schedule })
     return
   }
   
   logger.info('入場日時選択', {
     ticketId: ticket.ticket_id,
-    reservationId,
+    reservationId: effectiveReservationId,
     date: date,
-    scheduleName: schedule.schedule_name
+    scheduleName: schedule.schedule_name,
+    isNewReservation: schedule.entrance_date === ''
   })
-  
-  let reservationData = ticketsStore.getReservationManagement(reservationId)
+
+  let reservationData = ticketsStore.getReservationManagement(effectiveReservationId)
 
   // reservationManagementに存在しない場合は管理データを初期化
   if (!reservationData) {
-    ticketsStore.setReservationManagement(reservationId, {
+    ticketsStore.setReservationManagement(effectiveReservationId, {
       ticketId: ticket.ticket_id,
       entranceDate: schedule.entrance_date,
       reservationType: schedule.reservation_type,
       isSelected: false,
       isLocked: false,
-      userLabel: ''
+      userLabel: schedule.entrance_date === '' ? '新規入場予約' : '',
+      isNewReservationSlot: schedule.entrance_date === '' // 新規予約枠フラグ
     })
-    reservationData = ticketsStore.getReservationManagement(reservationId)
-    logger.info('予約ID管理データを初期化', { reservationId, ticketId: ticket.ticket_id })
+    reservationData = ticketsStore.getReservationManagement(effectiveReservationId)
+    logger.info('予約ID管理データを初期化', {
+      reservationId: effectiveReservationId,
+      ticketId: ticket.ticket_id,
+      isNewReservation: schedule.entrance_date === ''
+    })
   }
 
   const isCurrentlySelected = !!reservationData?.isSelected
@@ -559,13 +569,14 @@ const handleEntranceDateSelection = (schedule: ScheduleData, ticket: TicketData,
   }
   
   // この予約の選択状態をトグル
-  ticketsStore.toggleSelection(reservationId)
-  
-  logger.info('入場日時状態変更', { 
-    reservationId, 
-    date, 
-    scheduleName: schedule.schedule_name || '', 
-    状態: !isCurrentlySelected ? '選択' : '選択解除' 
+  ticketsStore.toggleSelection(effectiveReservationId)
+
+  logger.info('入場日時状態変更', {
+    reservationId: effectiveReservationId,
+    date,
+    scheduleName: schedule.schedule_name || '',
+    状態: !isCurrentlySelected ? '選択' : '選択解除',
+    isNewReservation: schedule.entrance_date === ''
   })
 }
 
@@ -682,8 +693,68 @@ const getVisibleSchedules = (ticket: TicketData): ScheduleData[] => {
     logger.debug('getVisibleSchedules: schedulesが配列でない', { ticketId: ticket.ticket_id, schedules: ticket.schedules })
     return []
   }
-  
+
+  // 通期パス判定
+  const isSeasonPassFlag = isSeasonPass(ticket)
+
+  // デバッグログを追加
+  logger.temp('getVisibleSchedules デバッグ', {
+    ticketId: ticket.ticket_id,
+    itemName: ticket.item_name,
+    ticketKeys: Object.keys(ticket),
+    isSeasonPass: isSeasonPassFlag,
+    totalSchedules: ticket.schedules.length,
+    fullTicketData: ticket,
+    schedules: ticket.schedules.map(s => ({
+      entrance_date: s.entrance_date,
+      schedule_name: s.schedule_name,
+      isEffective: s.isEffective,
+      user_visiting_reservation_id: s.user_visiting_reservation_id
+    }))
+  })
+
+  // 有効なスケジュールをフィルター
   const filtered = ticket.schedules.filter(schedule => schedule.isEffective === true)
+
+  // 通期パスの場合、有効な予約が3未満なら空き枠を1つ追加
+  if (isSeasonPassFlag && filtered.length < 3) {
+    filtered.push({
+      user_visiting_reservation_id: -1, // 固定ID
+      use_state: 0,
+      entrance_date: '',
+      gate_type: 0,
+      location_index: 0,
+      schedule_name: 'NEW',
+      time_start: '',
+      selected: false,
+      isEffective: false,
+      pavilionReservationInfo: undefined
+    })
+  }
+
+  // フィルター結果のデバッグログ
+  if (isSeasonPassFlag) {
+    logger.temp('通期パス フィルター結果', {
+      ticketId: ticket.ticket_id,
+      totalSchedules: ticket.schedules.length,
+      filteredCount: filtered.length,
+      allSchedules: ticket.schedules.map(s => ({
+        entrance_date: s.entrance_date,
+        schedule_name: s.schedule_name,
+        isEffective: s.isEffective,
+        user_visiting_reservation_id: s.user_visiting_reservation_id,
+        isEffectiveSchedule: s.isEffective === true,
+        isNewReservationSlot: (isSeasonPassFlag && s.entrance_date === '' && s.schedule_name === 'NEW'),
+        passesFilter: (s.isEffective === true || (isSeasonPassFlag && s.entrance_date === '' && s.schedule_name === 'NEW'))
+      })),
+      filteredSchedules: filtered.map(s => ({
+        entrance_date: s.entrance_date,
+        schedule_name: s.schedule_name,
+        isEffective: s.isEffective,
+        user_visiting_reservation_id: s.user_visiting_reservation_id
+      }))
+    })
+  }
   
   // 頻繁に「利用可能な入場予約取得なし」が出る場合のデバッグ
   if (filtered.length === 0 && ticket.schedules.length > 0) {
@@ -721,38 +792,9 @@ const extractTimeFromSchedule = (schedule: ScheduleData): string => {
 const getReservationStatus = (schedule: ScheduleData, ticket: TicketData): ReservationStatus => {
   // 新規入場予約の場合（entrance_dateが空）
   if (schedule.entrance_date === '') {
-    // 選択されている入場予約が1つだけかつ未使用かつそれが自分のものかチェック
-    const selectedSchedules = ticketsArray.value.filter(t => 
-      t.schedules?.some(s => s.selected && s.entrance_date !== '')
-    )
-    
-    if (selectedSchedules.length !== 1) {
-      return {
-        statusText: '入場予約を1つ選択してください',
-        availableTypes: []
-      }
-    }
-    
-    const selectedTicket = selectedSchedules[0]
-    const selectedSchedule = selectedTicket.schedules?.find(s => s.selected)
-    
-    if (!selectedTicket.isOwn) {
-      return {
-        statusText: '自分の入場予約を選択してください',
-        availableTypes: []
-      }
-    }
-    
-    if (selectedSchedule?.use_state !== 0) {
-      return {
-        statusText: '未使用の入場予約を選択してください',
-        availableTypes: []
-      }
-    }
-    
     return {
-      statusText: '新規予約可能',
-      availableTypes: ['immediate']
+      statusText: 'NEW',
+      availableTypes: ['select']
     }
   }
   
@@ -794,10 +836,24 @@ const getTodayString = (): string => {
 const isScheduleSelected = (schedule: ScheduleData, ticket: TicketData): boolean => {
   // 予約管理の選択状態を確認
   const reservationId = schedule.user_visiting_reservation_id?.toString()
-  if (!reservationId) return false
-  
-  const reservationData = ticketsStore.getReservationManagement(reservationId)
-  return !!reservationData?.isSelected
+  // 新規予約枠の場合は特別なIDを生成（handleEntranceDateSelectionと同じロジック）
+  const effectiveReservationId = (reservationId && schedule.entrance_date !== '') ? reservationId : `new-reservation-${ticket.ticket_id}`
+
+  const reservationData = ticketsStore.getReservationManagement(effectiveReservationId)
+  const isSelected = !!reservationData?.isSelected
+
+  // 空き枠の選択状態をデバッグ
+  if (schedule.entrance_date === '') {
+    logger.temp('空き枠選択状態確認', {
+      ticketId: ticket.ticket_id,
+      reservationId,
+      effectiveReservationId,
+      reservationData,
+      isSelected
+    })
+  }
+
+  return isSelected
 }
 
 const hasSelectedReservations = (ticket: TicketData): boolean => {
@@ -1786,13 +1842,19 @@ onUnmounted(() => {
 }
 
 .ytomo-entrance-date-button {
-    
-    &.selected .ytomo-reservation-status {
-        background: rgba(255, 255, 255, 0.95);
-        color: #0891b2;
-        
-        &:empty {
-            background: transparent;
+
+    &.selected {
+        background: #0284c7;
+        color: white;
+        border-color: #0284c7;
+
+        .ytomo-reservation-status {
+            background: rgba(255, 255, 255, 0.95);
+            color: #0891b2;
+
+            &:empty {
+                background: transparent;
+            }
         }
     }
     

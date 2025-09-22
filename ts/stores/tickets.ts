@@ -10,6 +10,7 @@ import type { ReservationManagementData } from '@/types/reservationManagement'
 import { loggers } from '@/utils/logger'
 import { isApiUsageDisabled } from '@/utils/apiUsageMode'
 import { authenticatedFetch } from '@/utils/authManager'
+import { isSeasonPass } from '@/utils/ticketUtils'
 import { 
   getEntranceSchedules, 
   getUserReservations, 
@@ -22,7 +23,6 @@ import { determinePavilionReservationType, getAllPavilionReservationStatus } fro
 export const useTicketsStore = defineStore('tickets', () => {
   // State
   const tickets = ref<Map<string, TicketData>>(new Map())
-  const selectedTicketIds = ref<Set<string>>(new Set())
   const selectedEntranceDates = ref<Map<string, string>>(new Map()) // ticketId -> scheduleId mapping for persistence
   const isLoading = ref(false)
   const isInitialized = ref(false) // ストア初期化状態
@@ -88,15 +88,21 @@ export const useTicketsStore = defineStore('tickets', () => {
     }))
   })
   
-  const selectedTickets = computed(() => 
-    ticketsArray.value.filter(ticket => 
-      ticket.schedules?.some(schedule => {
-        const reservationId = schedule.user_visiting_reservation_id?.toString()
-        if (!reservationId) return false
-        const reservationData = reservationManagement.value.get(reservationId)
-        return !!reservationData?.isSelected
-      })
-    )
+  const selectedTicketIds = computed(() => {
+    const ticketIds = new Set<string>()
+
+    // 予約管理システムから選択された予約IDを取得し、対応するチケットIDを特定
+    for (const [reservationId, reservationData] of reservationManagement.value) {
+      if (reservationData.isSelected) {
+        ticketIds.add(reservationData.ticketId)
+      }
+    }
+
+    return Array.from(ticketIds)
+  })
+
+  const selectedTickets = computed(() =>
+    ticketsArray.value.filter(ticket => selectedTicketIds.value.includes(ticket.ticket_id))
   )
 
   const selectedTicketCount = computed(() => {
@@ -282,35 +288,6 @@ export const useTicketsStore = defineStore('tickets', () => {
           const previousTicket = previousTickets.get(newTicket.ticket_id)
           
           
-          // 通期パス（Season Pass）の場合は追加予約可能性をチェック
-          if (newTicket.item_name?.includes('Season Pass')) {
-            // 現在の予約数をチェック（最大3件）
-            const currentReservationCount = newTicket.schedules?.length || 0
-            if (currentReservationCount < 3) {
-              // 日付空欄の入場予約データを追加
-              const emptyReservation: ScheduleData = {
-                user_visiting_reservation_id: -1, // 仮のID
-                use_state: 0,
-                entrance_date: '', // 空欄
-                gate_type: 0,
-                location_index: 0,
-                schedule_name: '新規予約',
-                time_start: '',
-                selected: false,
-                isEffective: false, // 新規予約なので無効
-                pavilionReservationInfo: undefined
-              }
-              
-              // schedulesが未初期化の場合は初期化
-              if (!newTicket.schedules) {
-                newTicket.schedules = []
-              }
-              
-              // 空欄の入場予約データを追加
-              newTicket.schedules.push(emptyReservation)
-              logger.info(`通期パス ${newTicket.ticket_id} に新規予約枠を追加`)
-            }
-          }
           
           // 旧情報からselected状態を継承
           if (previousTicket && newTicket.schedules && previousTicket.schedules) {
@@ -721,6 +698,14 @@ export const useTicketsStore = defineStore('tickets', () => {
         // スケジュールデータを正しく処理してからパビリオン予約情報を追加
         const processedSchedules = processSchedules(updatedTicketData.schedules || [])
         
+        // APIレスポンスのデバッグログ
+        logger.temp('チケットAPI レスポンス詳細', {
+          ticketId: updatedTicketData.ticket_id,
+          item_name: updatedTicketData.item_name,
+          responseKeys: Object.keys(updatedTicketData),
+          fullResponseData: updatedTicketData
+        })
+
         const ticketWithPavilionInfo: TicketData = {
           ticket_id: updatedTicketData.ticket_id,
           item_name: updatedTicketData.item_name,
@@ -767,21 +752,18 @@ export const useTicketsStore = defineStore('tickets', () => {
   }
 
   const selectTicket = (ticketId: string, selected: boolean) => {
-    if (selected) {
-      selectedTicketIds.value.add(ticketId)
-    } else {
-      selectedTicketIds.value.delete(ticketId)
-    }
+    // 廃止予定: 新しい予約管理システムを使用してください
+    logger.warn('selectTicket is deprecated, use reservation management system instead', { ticketId, selected })
   }
 
   const selectAllTickets = () => {
-    ticketsArray.value.forEach(ticket => {
-      selectedTicketIds.value.add(ticket.ticket_id)
-    })
+    // 廃止予定: 新しい予約管理システムを使用してください
+    logger.warn('selectAllTickets is deprecated, use reservation management system instead')
   }
 
   const deselectAllTickets = () => {
-    selectedTicketIds.value.clear()
+    // 廃止予定: 新しい予約管理システムを使用してください
+    logger.warn('deselectAllTickets is deprecated, use reservation management system instead')
   }
 
   const setAvailableDates = (dates: string[]) => {
@@ -1000,6 +982,18 @@ export const useTicketsStore = defineStore('tickets', () => {
       .map(([reservationId, _]) => reservationId)
   }
 
+  // 新規予約枠が選択されているかチェック
+  const hasSelectedNewReservationSlot = (): boolean => {
+    return Array.from(reservationManagement.value.values())
+      .some(data => data.isSelected && data.isNewReservationSlot)
+  }
+
+  // 選択された新規予約枠の情報を取得
+  const getSelectedNewReservationSlot = (): ReservationManagementData | undefined => {
+    return Array.from(reservationManagement.value.values())
+      .find(data => data.isSelected && data.isNewReservationSlot)
+  }
+
   const removeReservationManagement = (reservationId: string): void => {
     reservationManagement.value.delete(reservationId)
     logger.debug('予約ID管理データ削除', { reservationId })
@@ -1197,10 +1191,53 @@ export const useTicketsStore = defineStore('tickets', () => {
     logger.info('チケットストア初期化完了')
   }
 
+  /**
+   * 予約IDから入場予約情報（チケット・スケジュール）を取得
+   * @param reservationId 予約ID（実際の予約IDまたは新規予約用の特別ID）
+   * @returns チケットと対応するスケジュール、または新規予約の場合は基本情報
+   */
+  function getScheduleByReservationId(reservationId: string): { ticket: TicketData | null, schedule: ScheduleData | null, isNewReservation: boolean } {
+    // 新規予約IDパターンの場合
+    if (reservationId.startsWith('new-reservation-')) {
+      const ticketId = reservationId.replace('new-reservation-', '')
+      const ticket = tickets.value.get(ticketId)
+      if (ticket) {
+        // 新規予約の場合はスケジュールは空データを返す
+        const newSchedule: ScheduleData = {
+          user_visiting_reservation_id: -1,
+          entrance_date: '',
+          schedule_name: 'NEW',
+          use_state: 0,
+          gate_type: 0,
+          location_index: 0,
+          time_start: '',
+          selected: false,
+          isEffective: false,
+          pavilionReservationInfo: undefined
+        }
+        return { ticket, schedule: newSchedule, isNewReservation: true }
+      }
+      return { ticket: null, schedule: null, isNewReservation: true }
+    }
+
+    // 既存の予約IDの場合
+    for (const ticket of tickets.value.values()) {
+      if (ticket.schedules) {
+        const schedule = ticket.schedules.find(s =>
+          s.user_visiting_reservation_id?.toString() === reservationId
+        )
+        if (schedule) {
+          return { ticket, schedule, isNewReservation: false }
+        }
+      }
+    }
+
+    return { ticket: null, schedule: null, isNewReservation: false }
+  }
+
   return {
     // State
     tickets,
-    selectedTicketIds,
     selectedEntranceDates,
     isLoading,
     isInitialized,
@@ -1214,6 +1251,7 @@ export const useTicketsStore = defineStore('tickets', () => {
     // Getters
     ticketsArray,
     selectedTickets,
+    selectedTicketIds,
     selectedTicketCount,
     ownTickets,
     externalTickets,
@@ -1250,9 +1288,14 @@ export const useTicketsStore = defineStore('tickets', () => {
     updateLabel,
     getSelectedReservationIds,
     getLockedReservationIds,
+    hasSelectedNewReservationSlot,
+    getSelectedNewReservationSlot,
     removeReservationManagement,
     clearAllReservationManagement,
-    
+
+    // ヘルパーメソッド
+    getScheduleByReservationId,
+
     // チケット単体更新
     updateTicketFromAPI,
     updateTicketFromData
