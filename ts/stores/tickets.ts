@@ -405,12 +405,6 @@ export const useTicketsStore = defineStore('tickets', () => {
 
       const data = await response.json()
 
-      // パビリオン予約レスポンスをデバッグ出力（データ構造確認のため）
-      logger.temp('パビリオン予約レスポンス', {
-        url: '/api/d/my/tickets/',
-        status: response.status,
-        responseData: data
-      })
 
       if (!data.list || !Array.isArray(data.list)) {
         logger.warn('チケットデータが期待する形式ではありません', data)
@@ -698,13 +692,6 @@ export const useTicketsStore = defineStore('tickets', () => {
         // スケジュールデータを正しく処理してからパビリオン予約情報を追加
         const processedSchedules = processSchedules(updatedTicketData.schedules || [])
         
-        // APIレスポンスのデバッグログ
-        logger.temp('チケットAPI レスポンス詳細', {
-          ticketId: updatedTicketData.ticket_id,
-          item_name: updatedTicketData.item_name,
-          responseKeys: Object.keys(updatedTicketData),
-          fullResponseData: updatedTicketData
-        })
 
         const ticketWithPavilionInfo: TicketData = {
           ticket_id: updatedTicketData.ticket_id,

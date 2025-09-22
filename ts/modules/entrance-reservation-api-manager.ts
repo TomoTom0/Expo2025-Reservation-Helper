@@ -178,8 +178,6 @@ export class EntranceReservationApiManager {
 
   // 予約実行を中断（予約情報と履歴は保持）
   public abortReservation() {
-    logger.temp('中断前のreservationStatus:', this.reservationStatus.value)
-    logger.temp('中断前のreservationInfo:', this.reservationInfo.value)
 
     this.isReservationRunning.value = false
     this.clearReservationTimer()
@@ -197,8 +195,6 @@ export class EntranceReservationApiManager {
       currentAction: '予約が中断されました'
     }
 
-    logger.temp('中断後のreservationStatus:', this.reservationStatus.value)
-    logger.temp('中断後のreservationInfo:', this.reservationInfo.value)
     logger.info('予約実行を中断しました')
   }
 
@@ -732,13 +728,6 @@ export class EntranceReservationApiManager {
       let body: any
       if (isChangeReservation) {
         // 変更予約（PUT）のパラメータ
-        logger.temp('変更予約リクエスト送信', {
-          existingReservationId: this.existingReservationId,
-          slot: slot.time,
-          convertedTime: this.convertTimeToAPIFormat(slot.time),
-          gateType,
-          entranceDate
-        })
         body = {
           user_visiting_reservation_ids: [this.existingReservationId],
           start_time: this.convertTimeToAPIFormat(slot.time),

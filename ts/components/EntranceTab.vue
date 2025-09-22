@@ -1969,14 +1969,26 @@ onMounted(async () => {
   flex-direction: row;
   gap: 16px;
   justify-content: center;
-  
+
   // 実行情報内の予約情報と実行状態を横並びに配置
   .ytomo-reservation-info,
   .ytomo-reservation-status {
     flex: 1 1 0;
     max-width: 300px;
   }
-  
+
+  // 横幅不足時は縦並びに変更
+  @media (max-width: 720px) {
+    flex-direction: column;
+    gap: 12px;
+
+    .ytomo-reservation-info,
+    .ytomo-reservation-status {
+      flex: none;
+      max-width: none;
+    }
+  }
+
   // 予約情報のスタイル
   .ytomo-reservation-info {
     margin-top: 0;

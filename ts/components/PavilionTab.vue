@@ -2043,7 +2043,23 @@ onUnmounted(() => {
     display: flex;
     flex-direction: column;
     gap: 2px;
-    min-width: 120px;
+    min-width: 100px;
+
+    // 時間入力は横幅を狭く
+    &:has(.ytomo-time-input) {
+        min-width: 80px;
+    }
+
+    // 間隔と回数を隣り合わせに配置するため横幅を削減
+    &:has(.ytomo-number-input) {
+        min-width: 80px;
+        flex: 0 0 auto;
+    }
+
+    // 状態ボタンの横幅を削減
+    &:has(.ytomo-toggle-button) {
+        min-width: 60px;
+    }
 
     &:last-of-type {
         margin-left: auto;
@@ -2156,8 +2172,8 @@ onUnmounted(() => {
     }
 
     &.ytomo-dialog-button {
-        background: white;
-        border-color: #d1d5db;
+        background: #f3f4f6;
+        border-color: #9ca3af;
         color: #374151;
 
         &:hover {

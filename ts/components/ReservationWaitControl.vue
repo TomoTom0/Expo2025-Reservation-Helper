@@ -36,18 +36,9 @@ const isReservationRunning = computed(() => props.reservationManager.isReservati
 
 const handleStartWait = () => {
   try {
-    logger.temp('予約待機ボタン押下前', {
-      isWaiting: props.reservationManager.waitInfo.value.isWaiting,
-      waitMinutes: props.reservationManager.waitInfo.value.waitMinutes
-    })
     props.reservationManager.startWait()
-    logger.temp('予約待機ボタン押下後', {
-      isWaiting: props.reservationManager.waitInfo.value.isWaiting,
-      waitStartTime: props.reservationManager.waitInfo.value.waitStartTime,
-      waitEndTime: props.reservationManager.waitInfo.value.waitEndTime
-    })
   } catch (error) {
-    logger.temp('予約待機ボタンでエラー', { error })
+    logger.error('予約待機開始エラー', { error })
   }
 }
 

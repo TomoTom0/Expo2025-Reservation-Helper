@@ -74,7 +74,6 @@ export const useOthersStore = defineStore('others', () => {
       detectionCounts.value[phase][key] = 0
     }
     detectionCounts.value[phase][key]++
-    logger.temp(`Phase${phase}: 検出カウント更新 ${key} = ${detectionCounts.value[phase][key]}回`)
   }
   
   // 最多検出時間帯の判定（2回以上の差があるか）
@@ -129,11 +128,6 @@ export const useOthersStore = defineStore('others', () => {
     const avgStart = Math.round(totalWeightStart / totalCount)
     const avgEnd = Math.round(totalWeightEnd / totalCount)
     
-    logger.temp(`Phase${phase}: 重み付き平均計算`, {
-      検出データ: counts,
-      重み付き平均: `${avgStart}-${avgEnd}秒`,
-      計算詳細: { totalWeightStart, totalWeightEnd, totalCount }
-    })
     
     return [avgStart, avgEnd]
   }
