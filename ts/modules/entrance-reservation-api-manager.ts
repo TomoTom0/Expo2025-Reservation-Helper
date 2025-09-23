@@ -979,6 +979,42 @@ export class EntranceReservationApiManager {
     }
   }
 
+  // 待機時間を延長
+  public extendWaitTime(additionalMinutes: number) {
+    if (!this.waitInfo.value.isWaiting || !this.waitInfo.value.waitEndTime) {
+      return
+    }
+
+    // 現在の終了時間に指定した分数を追加
+    const newEndTime = new Date(this.waitInfo.value.waitEndTime.getTime() + additionalMinutes * 60 * 1000)
+
+    this.waitInfo.value = {
+      ...this.waitInfo.value,
+      waitEndTime: newEndTime
+    }
+
+    logger.info('待機時間を延長', {
+      additionalMinutes,
+      newEndTime: newEndTime
+    })
+
+    // 既存のタイマーをクリアして新しいタイマーをセット
+    if (this.waitTimer) {
+      clearTimeout(this.waitTimer)
+    }
+
+    const now = new Date()
+    const remainingMs = newEndTime.getTime() - now.getTime()
+
+    if (remainingMs > 0) {
+      this.waitTimer = setTimeout(() => {
+        this.endWait()
+      }, remainingMs)
+    }
+
+    this.updateWaitProgress()
+  }
+
   // 待機進捗を更新
   private updateWaitProgress() {
     if (!this.waitInfo.value.isWaiting || !this.waitInfo.value.waitStartTime || !this.waitInfo.value.waitEndTime) {

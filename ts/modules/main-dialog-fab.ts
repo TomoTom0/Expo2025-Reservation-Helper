@@ -146,8 +146,8 @@ export class MainDialogFabImpl implements MainDialogFab {
      * ytomoページの即座処理（mainタグクリア）
      */
     private handleYtomoPageImmediate(): void {
-        // ytomoページ判定
-        if (window.location.pathname !== '/ytomo') {
+        // ytomoページ判定（PageChecker統一）
+        if (!PageChecker.isYtomoPage()) {
             return;
         }
         

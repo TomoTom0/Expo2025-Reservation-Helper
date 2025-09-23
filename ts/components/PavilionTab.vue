@@ -88,63 +88,23 @@
       class="ytomo-schedule-controls"
     >
       <div class="ytomo-schedule-form">
-        <div class="ytomo-form-row">
-          <div class="ytomo-form-group">
-            <label class="ytomo-form-label">実行日時</label>
-            <div class="ytomo-datetime-inputs">
-              <input 
-                type="date" 
-                v-model="scheduleFormData.executeDate"
-                class="ytomo-form-input ytomo-date-input"
-                :min="minScheduleDate"
-              >
-              <input 
-                type="time" 
-                v-model="scheduleFormData.executeTime"
-                class="ytomo-form-input ytomo-time-input"
-              >
-            </div>
-          </div>
-          
-          <div class="ytomo-form-group ytomo-interval-retries-group">
-            <div class="ytomo-interval-input">
-              <label class="ytomo-form-label">間隔(秒)</label>
+        <!-- 上段: ラベル、状態、保存ボタン、ダイアログボタン -->
+        <div class="ytomo-form-row ytomo-header-row">
+          <div class="ytomo-form-group ytomo-label-group">
+            <div class="ytomo-input-with-label">
+              <label class="ytomo-input-label">ラベル</label>
               <input
-                type="number"
-                v-model.number="scheduleFormData.interval"
-                class="ytomo-form-input ytomo-number-input"
-                min="5"
-                max="300"
-                placeholder="15"
-              >
-            </div>
-            <div class="ytomo-retries-input">
-              <label class="ytomo-form-label">回数</label>
-              <input
-                type="number"
-                v-model.number="scheduleFormData.maxRetries"
-                class="ytomo-form-input ytomo-number-input"
-                min="1"
-                max="200"
-                placeholder="10"
+                type="text"
+                v-model="scheduleFormData.label"
+                class="ytomo-form-input ytomo-text-input"
+                placeholder="予約名"
+                maxlength="50"
               >
             </div>
           </div>
 
-          <div class="ytomo-form-group">
-            <label class="ytomo-form-label">ラベル</label>
-            <input
-              type="text"
-              v-model="scheduleFormData.label"
-              class="ytomo-form-input ytomo-text-input"
-              placeholder="予約名"
-              maxlength="50"
-            >
-          </div>
-          
-          <div class="ytomo-form-group">
-            <label class="ytomo-form-label">状態</label>
-            <button 
+          <div class="ytomo-form-group ytomo-status-group">
+            <button
               class="ytomo-toggle-button"
               :class="{ active: scheduleFormData.isEnabled }"
               @click="scheduleFormData.isEnabled = !scheduleFormData.isEnabled"
@@ -152,21 +112,75 @@
               {{ scheduleFormData.isEnabled ? '有効' : '無効' }}
             </button>
           </div>
-          
+
           <div class="ytomo-form-actions">
-            <button 
+            <button
               class="ytomo-action-button ytomo-save-button"
               @click="handleSaveSchedule"
               :disabled="!canSaveSchedule"
             >
               保存
             </button>
-            <button 
+            <button
               class="ytomo-action-button ytomo-dialog-button"
               @click="handleOpenScheduleDialog"
             >
               ダイアログ
             </button>
+          </div>
+        </div>
+
+        <!-- 下段: 実行日時、間隔、回数を1行に -->
+        <div class="ytomo-form-row ytomo-main-row">
+          <div class="ytomo-form-group">
+            <div class="ytomo-datetime-inputs">
+              <div class="ytomo-input-with-label">
+                <label class="ytomo-input-label">日付</label>
+                <input
+                  type="date"
+                  v-model="scheduleFormData.executeDate"
+                  class="ytomo-form-input ytomo-date-input"
+                  :min="minScheduleDate"
+                >
+              </div>
+              <div class="ytomo-input-with-label">
+                <label class="ytomo-input-label">時刻</label>
+                <input
+                  type="time"
+                  v-model="scheduleFormData.executeTime"
+                  class="ytomo-form-input ytomo-time-input"
+                >
+              </div>
+            </div>
+          </div>
+
+          <div class="ytomo-form-group ytomo-interval-retries-group">
+            <div class="ytomo-interval-input">
+              <div class="ytomo-input-with-label">
+                <label class="ytomo-input-label">間隔(秒)</label>
+                <input
+                  type="number"
+                  v-model.number="scheduleFormData.interval"
+                  class="ytomo-form-input ytomo-number-input"
+                  min="5"
+                  max="300"
+                  placeholder="15"
+                >
+              </div>
+            </div>
+            <div class="ytomo-retries-input">
+              <div class="ytomo-input-with-label">
+                <label class="ytomo-input-label">回数</label>
+                <input
+                  type="number"
+                  v-model.number="scheduleFormData.maxRetries"
+                  class="ytomo-form-input ytomo-number-input"
+                  min="1"
+                  max="200"
+                  placeholder="10"
+                >
+              </div>
+            </div>
           </div>
         </div>
         
@@ -248,7 +262,19 @@
 
     <!-- ENDLESSトグルボタン -->
     <Teleport to="body">
-      <button 
+      <button
+        v-if="isPavilionTabActive"
+        id="floating-schedule-dialog-button"
+        class="ytomo-floating-schedule-dialog"
+        title="スケジュール管理ダイアログを開く"
+        @click="handleOpenScheduleDialog"
+      >
+        📅
+      </button>
+    </Teleport>
+
+    <Teleport to="body">
+      <button
         v-if="isPavilionTabActive"
         id="endless-toggle-button"
         class="ytomo-endless-toggle"
@@ -1957,6 +1983,42 @@ onUnmounted(() => {
     }
 }
 
+/* フローティングスケジュールダイアログボタン */
+.ytomo-floating-schedule-dialog {
+    position: fixed;
+    bottom: 196px;
+    right: 20px;
+    width: 40px;
+    height: 32px;
+    background: #3b82f6;
+    border: none;
+    border-radius: 16px;
+    color: white;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    transition: all 0.2s ease;
+    z-index: 10003;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    font-weight: bold;
+
+    &:hover {
+        background: #2563eb;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+    }
+
+    &:active {
+        transform: translateY(0);
+    }
+
+    &:focus {
+        outline: none;
+    }
+}
+
 /* ENDLESSトグルボタン */
 .ytomo-endless-toggle {
     position: fixed;
@@ -2027,16 +2089,48 @@ onUnmounted(() => {
     display: flex;
     align-items: end;
     gap: 10px;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
+    overflow: visible;
 
-    @media (max-width: 1200px) {
-        gap: 8px;
-    }
-
+    // 狭い画面でのみ改行を許可
     @media (max-width: 800px) {
         flex-direction: column;
         align-items: stretch;
         gap: 12px;
+    }
+
+    &.ytomo-header-row {
+        display: block;
+        white-space: nowrap;
+
+        > * {
+            display: inline-block;
+            vertical-align: bottom;
+            margin-right: 16px;
+
+            &:last-child {
+                margin-right: 0;
+            }
+        }
+    }
+
+    &.ytomo-main-row {
+        display: block;
+        white-space: nowrap;
+
+        .ytomo-form-group {
+            display: inline-block;
+            vertical-align: bottom;
+            margin-right: 12px;
+            white-space: nowrap;
+
+            &:last-child {
+                margin-right: 0;
+            }
+        }
+
+        // 狭い画面でもスケジュール設定は1行維持
+        // @media設定を削除 - 常に横並び表示
     }
 }
 
@@ -2044,7 +2138,7 @@ onUnmounted(() => {
     display: flex;
     flex-direction: column;
     gap: 2px;
-    min-width: 100px;
+    flex: 0 0 auto;
 
     // 時間入力は横幅を狭く
     &:has(.ytomo-time-input) {
@@ -2054,13 +2148,11 @@ onUnmounted(() => {
     // 数値入力の横幅を削減
     &:has(.ytomo-number-input) {
         min-width: 60px;
-        flex: 0 0 auto;
     }
 
     // 状態ボタンの横幅を大幅削減
     &:has(.ytomo-toggle-button) {
         min-width: 50px;
-        flex: 0 0 auto;
     }
 
     // テキスト入力の横幅を削減
@@ -2070,16 +2162,19 @@ onUnmounted(() => {
 
     // 間隔と回数を隣り合わせに配置
     &.ytomo-interval-retries-group {
-        flex-direction: row;
-        gap: 6px;
-        min-width: 100px;
+        display: inline-block;
+        white-space: nowrap;
 
         .ytomo-interval-input,
         .ytomo-retries-input {
-            display: flex;
-            flex-direction: column;
-            gap: 2px;
-            flex: 1;
+            display: inline-block;
+            vertical-align: top;
+            margin-right: 8px;
+            width: 60px;
+
+            &:last-child {
+                margin-right: 0;
+            }
         }
     }
 
@@ -2092,6 +2187,32 @@ onUnmounted(() => {
     }
 }
 
+// 入力欄内部ラベル
+.ytomo-input-with-label {
+    position: relative;
+    display: inline-block;
+
+    .ytomo-input-label {
+        position: absolute;
+        top: 2px;
+        left: 4px;
+        font-size: 9px;
+        font-weight: 600;
+        color: #6b7280;
+        background: white;
+        padding: 0 2px;
+        z-index: 1;
+        pointer-events: none;
+    }
+
+    .ytomo-form-input {
+        padding-top: 16px;
+        padding-bottom: 4px;
+    }
+
+}
+
+// 廃止予定の外部ラベル
 .ytomo-form-label {
     font-size: 11px;
     font-weight: 600;
@@ -2134,7 +2255,7 @@ onUnmounted(() => {
 }
 
 .ytomo-toggle-button {
-    padding: 4px 8px;
+    padding: 6px 12px;
     border: 1px solid #d1d5db;
     border-radius: 4px;
     background: white;
@@ -2162,8 +2283,15 @@ onUnmounted(() => {
 }
 
 .ytomo-form-actions {
-    display: flex;
-    gap: 8px;
+    display: inline-block;
+
+    .ytomo-action-button {
+        margin-right: 16px;
+
+        &:last-child {
+            margin-right: 0;
+        }
+    }
 }
 
 .ytomo-action-button {
@@ -2198,13 +2326,13 @@ onUnmounted(() => {
     }
 
     &.ytomo-dialog-button {
-        background: #f3f4f6;
-        border-color: #9ca3af;
-        color: #374151;
+        background: #3b82f6;
+        border-color: #3b82f6;
+        color: white;
 
         &:hover {
-            background: #e5e7eb;
-            border-color: #6b7280;
+            background: #2563eb;
+            border-color: #2563eb;
         }
     }
 }

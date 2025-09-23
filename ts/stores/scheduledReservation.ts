@@ -126,9 +126,10 @@ export const useScheduledReservationStore = defineStore('scheduledReservation', 
       const stored = localStorage.getItem(UI_STATE_KEY)
       if (stored) {
         const loaded = JSON.parse(stored)
-        // ダイアログ状態は復元しない（起動時は必ず閉じた状態）
+        // ダイアログ状態とスケジュール展開状態は復元しない（起動時は必ず閉じた状態）
         uiState.value = {
           ...loaded,
+          showScheduleRow: false,
           showScheduleDialog: false,
           editingSchedule: null
         }

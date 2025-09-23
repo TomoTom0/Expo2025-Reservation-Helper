@@ -31,8 +31,8 @@ const isYtomoPage = computed(() => PageChecker.isYtomoPage())
 const shouldShowFab = computed(() => {
   const pathname = window.location.pathname.toLowerCase()
   const allowedPages = ['/', '/invalid']
-  // ytomoページでは FABボタンを表示しない
-  return allowedPages.includes(pathname) && !isYtomoPage.value
+  // ytomoページでは FABボタンを表示しない（PageChecker統一）
+  return allowedPages.includes(pathname) && !PageChecker.isYtomoPage()
 })
 </script>
 

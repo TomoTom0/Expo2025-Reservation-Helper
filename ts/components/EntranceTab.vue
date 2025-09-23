@@ -163,8 +163,8 @@
         
         <!-- 予約操作ボタン -->
         <div v-if="selectedDate" class="ytomo-reservation-actions">
-          <button 
-            class="ytomo-reserve-button" 
+          <button
+            class="ytomo-reserve-button"
             :class="{ 'disabled': !isReservationButtonEnabled, 'cancel-mode': isReservationRunning }"
             :disabled="!isReservationButtonEnabled"
             @click="executeReservation"
@@ -199,10 +199,15 @@
           </div>
           <div class="ytomo-status-details">
             <div class="ytomo-status-current">
-              {{ isReservationRunning && reservationManager.waitInfo.value.isWaiting
-                  ? `予約待機中 - ${reservationManager.formatTime(reservationManager.waitInfo.value.waitEndTime)}まで`
-                  : reservationManager.reservationStatus.value.currentAction
-              }}
+              <template v-if="isReservationRunning && reservationManager.waitInfo.value.isWaiting">
+                予約待機中 - {{ reservationManager.formatTime(reservationManager.waitInfo.value.waitEndTime) }}まで
+              </template>
+              <template v-else-if="isReservationRunning">
+                {{ reservationManager.reservationStatus.value.currentAction }}
+              </template>
+              <template v-else>
+                {{ reservationManager.reservationStatus.value.currentAction }}
+              </template>
             </div>
             <div v-if="reservationManager.reservationStatus.value.statusClass === 'success' && reservationManager.reservationStatus.value.dateChange" class="ytomo-datetime-change">
               {{ reservationManager.reservationStatus.value.dateChange }}
@@ -2093,6 +2098,18 @@ onMounted(async () => {
           color: #92400e;
           margin-bottom: 8px;
           font-weight: 500;
+
+          .ytomo-wait-time-info {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+          }
+
+          .ytomo-wait-text {
+            flex-shrink: 0;
+          }
+
         }
         
         .ytomo-datetime-change {

@@ -15,6 +15,12 @@
         max="360"
         step="1"
       />分
+      <!-- 時間調整ボタン -->
+      <div class="ytomo-time-adjust-buttons">
+        <button @click="adjustWaitTime(5)" class="ytomo-time-adjust-btn" :disabled="reservationManager.waitInfo.value.isWaiting" title="5分追加">+5</button>
+        <button @click="adjustWaitTime(15)" class="ytomo-time-adjust-btn" :disabled="reservationManager.waitInfo.value.isWaiting" title="15分追加">+15</button>
+        <button @click="adjustWaitTime(60)" class="ytomo-time-adjust-btn" :disabled="reservationManager.waitInfo.value.isWaiting" title="60分追加">+60</button>
+      </div>
     </div>
   </div>
 </template>
@@ -39,6 +45,19 @@ const handleStartWait = () => {
     props.reservationManager.startWait()
   } catch (error) {
     logger.error('予約待機開始エラー', { error })
+  }
+}
+
+// 待機時間調整メソッド
+const adjustWaitTime = (minutes: number) => {
+  if (!props.reservationManager.waitInfo.value.isWaiting) {
+    // 待機中でない場合は待機時間を変更
+    const currentMinutes = props.reservationManager.waitInfo.value.waitMinutes
+    const newMinutes = Math.max(1, Math.min(360, currentMinutes + minutes))
+    props.reservationManager.waitInfo.value.waitMinutes = newMinutes
+  } else {
+    // 待機中の場合は待機時間を延長
+    props.reservationManager.extendWaitTime(minutes)
   }
 }
 
@@ -84,6 +103,39 @@ const handleStartWait = () => {
       &:disabled {
         background: #f9fafb;
         color: #9ca3af;
+      }
+    }
+  }
+
+  .ytomo-time-adjust-buttons {
+    display: flex;
+    gap: 4px;
+
+    .ytomo-time-adjust-btn {
+      background: #f59e0b;
+      color: white;
+      border: none;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      min-width: 28px;
+
+      &:hover {
+        background: #d97706;
+        transform: translateY(-1px);
+      }
+
+      &:active {
+        transform: translateY(0);
+      }
+
+      &:disabled {
+        background: #9ca3af;
+        cursor: not-allowed;
+        transform: none;
       }
     }
   }
