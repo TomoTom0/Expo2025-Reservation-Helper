@@ -16,21 +16,16 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { computed, onMounted } from 'vue'
 import MainFab from './components/MainFab.vue'
 import MainDialog from './components/MainDialog.vue'
 import ProcessingOverlay from './components/ProcessingOverlay.vue'
 import SequentialReservationOverlay from './components/SequentialReservationOverlay.vue'
 import YtomoPageContent from './components/YtomoPageContent.vue'
+import { PageChecker } from './modules/page-utils'
 
-// 現在のページが/ytomoかどうかを判定
-const isYtomoPage = ref(false)
-
-// URLチェック関数
-const checkUrl = () => {
-  const pathname = window.location.pathname.toLowerCase()
-  isYtomoPage.value = pathname === '/ytomo' || pathname === '/ytomo/'
-}
+// 現在のページが/ytomoかどうかを判定（PageCheckerに統一）
+const isYtomoPage = computed(() => PageChecker.isYtomoPage())
 
 // YTFABボタンを表示すべきページかどうか判定（ytomoページでは非表示）
 const shouldShowFab = computed(() => {
@@ -38,14 +33,6 @@ const shouldShowFab = computed(() => {
   const allowedPages = ['/', '/invalid']
   // ytomoページでは FABボタンを表示しない
   return allowedPages.includes(pathname) && !isYtomoPage.value
-})
-
-// マウント時とURL変更時にチェック
-onMounted(() => {
-  checkUrl()
-  
-  // URLが変更された際の検知（SPA対応）
-  window.addEventListener('popstate', checkUrl)
 })
 </script>
 

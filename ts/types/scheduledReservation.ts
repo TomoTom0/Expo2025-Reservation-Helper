@@ -19,6 +19,11 @@ export interface ScheduledReservation {
   selectedTimeSlots: ScheduledTimeSlot[] // 選択された時間帯
   createdAt: Date
   updatedAt: Date
+  // 順次予約統合用
+  isSequential?: boolean            // 順次予約かどうか
+  endlessMode?: boolean             // 無限モード（900回上限）
+  monitoringMode?: boolean          // 監視モード
+  currentAttempts?: number          // 現在の実行回数
 }
 
 export interface ScheduleUIState {

@@ -106,38 +106,39 @@
             </div>
           </div>
           
-          <div class="ytomo-form-group">
-            <label class="ytomo-form-label">間隔(秒)</label>
-            <input 
-              type="number" 
-              v-model.number="scheduleFormData.interval"
-              class="ytomo-form-input ytomo-number-input"
-              min="5"
-              max="300"
-              placeholder="15"
-            >
+          <div class="ytomo-form-group ytomo-interval-retries-group">
+            <div class="ytomo-interval-input">
+              <label class="ytomo-form-label">間隔(秒)</label>
+              <input
+                type="number"
+                v-model.number="scheduleFormData.interval"
+                class="ytomo-form-input ytomo-number-input"
+                min="5"
+                max="300"
+                placeholder="15"
+              >
+            </div>
+            <div class="ytomo-retries-input">
+              <label class="ytomo-form-label">回数</label>
+              <input
+                type="number"
+                v-model.number="scheduleFormData.maxRetries"
+                class="ytomo-form-input ytomo-number-input"
+                min="1"
+                max="200"
+                placeholder="10"
+              >
+            </div>
           </div>
-          
+
           <div class="ytomo-form-group">
             <label class="ytomo-form-label">ラベル</label>
-            <input 
-              type="text" 
+            <input
+              type="text"
               v-model="scheduleFormData.label"
               class="ytomo-form-input ytomo-text-input"
               placeholder="予約名"
               maxlength="50"
-            >
-          </div>
-          
-          <div class="ytomo-form-group">
-            <label class="ytomo-form-label">回数</label>
-            <input 
-              type="number" 
-              v-model.number="scheduleFormData.maxRetries"
-              class="ytomo-form-input ytomo-number-input"
-              min="1"
-              max="200"
-              placeholder="10"
             >
           </div>
           
@@ -2050,15 +2051,36 @@ onUnmounted(() => {
         min-width: 80px;
     }
 
-    // 間隔と回数を隣り合わせに配置するため横幅を削減
+    // 数値入力の横幅を削減
     &:has(.ytomo-number-input) {
-        min-width: 80px;
+        min-width: 60px;
         flex: 0 0 auto;
     }
 
-    // 状態ボタンの横幅を削減
+    // 状態ボタンの横幅を大幅削減
     &:has(.ytomo-toggle-button) {
-        min-width: 60px;
+        min-width: 50px;
+        flex: 0 0 auto;
+    }
+
+    // テキスト入力の横幅を削減
+    &:has(.ytomo-text-input) {
+        min-width: 120px;
+    }
+
+    // 間隔と回数を隣り合わせに配置
+    &.ytomo-interval-retries-group {
+        flex-direction: row;
+        gap: 6px;
+        min-width: 100px;
+
+        .ytomo-interval-input,
+        .ytomo-retries-input {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            flex: 1;
+        }
     }
 
     &:last-of-type {
@@ -2089,16 +2111,20 @@ onUnmounted(() => {
         border-color: #2c5aa0;
     }
 
-    &.ytomo-date-input, &.ytomo-time-input {
+    &.ytomo-date-input {
         width: 140px;
     }
 
-    &.ytomo-number-input {
+    &.ytomo-time-input {
         width: 80px;
     }
 
+    &.ytomo-number-input {
+        width: 60px;
+    }
+
     &.ytomo-text-input {
-        width: 160px;
+        width: 120px;
     }
 }
 
@@ -2108,16 +2134,16 @@ onUnmounted(() => {
 }
 
 .ytomo-toggle-button {
-    padding: 6px 12px;
+    padding: 4px 8px;
     border: 1px solid #d1d5db;
     border-radius: 4px;
     background: white;
     color: #374151;
-    font-size: 13px;
+    font-size: 12px;
     font-weight: 500;
     cursor: pointer;
     transition: all 0.2s;
-    min-width: 50px;
+    width: 50px;
 
     &.active {
         background: #22c55e;
@@ -2177,8 +2203,8 @@ onUnmounted(() => {
         color: #374151;
 
         &:hover {
-            background: #f3f4f6;
-            border-color: #9ca3af;
+            background: #e5e7eb;
+            border-color: #6b7280;
         }
     }
 }

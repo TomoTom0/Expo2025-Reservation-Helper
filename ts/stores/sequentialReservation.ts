@@ -4,6 +4,8 @@
 
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
+import { useScheduledReservationStore } from './scheduledReservation'
+import type { ScheduledTimeSlot } from '@/types/scheduledReservation'
 
 interface ReservationTarget {
   pavilionId: string
@@ -38,6 +40,7 @@ interface SequentialReservationState {
   // 実行状態
   isRunning: boolean
   shouldShowOverlay: boolean      // オーバーレイ表示制御フラグ
+  currentScheduleId?: string      // スケジュール予約ID
 }
 
 export const useSequentialReservationStore = defineStore('sequentialReservation', () => {
@@ -72,11 +75,41 @@ export const useSequentialReservationStore = defineStore('sequentialReservation'
       isRunning: true,
       shouldShowOverlay: showOverlay
     }
+
+    // スケジュール予約システムに登録
+    const scheduledStore = useScheduledReservationStore()
+
+    // ReservationTargetをScheduledTimeSlotに変換
+    const scheduledTimeSlots: ScheduledTimeSlot[] = targets.map(target => ({
+      pavilionId: target.pavilionId,
+      pavilionName: target.pavilionName,
+      timeSlot: target.timeSlot,
+      entranceDate: target.entranceDate
+    }))
+
+    const scheduleId = scheduledStore.createSequentialReservation(
+      `順次予約 ${new Date().toLocaleTimeString()}`,
+      scheduledTimeSlots,
+      state.value.nextIntervalTime,
+      endlessMode,
+      state.value.nextMonitoringMode
+    )
+
+    // スケジュールIDを保存（停止時に使用）
+    state.value.currentScheduleId = scheduleId
   }
 
   // 継続予約停止
   const stopSequentialReservation = () => {
     state.value.isRunning = false
+
+    // スケジュール予約も停止
+    if (state.value.currentScheduleId) {
+      const scheduledStore = useScheduledReservationStore()
+      scheduledStore.stopScheduleExecution(state.value.currentScheduleId)
+      state.value.currentScheduleId = undefined
+    }
+
     if (countdownTimerId) {
       clearTimeout(countdownTimerId)
       countdownTimerId = null

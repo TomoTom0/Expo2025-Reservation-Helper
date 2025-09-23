@@ -6,7 +6,7 @@
  */
 
 import { entranceReservationStateManager, ExecutionState } from './entrance-reservation-state-manager';
-import { identify_page_type } from './page-utils';
+import { PageChecker } from './page-utils';
 import { loggers } from '../utils/logger';
 
 const logger = loggers.ui;
@@ -232,8 +232,7 @@ export class ProcessingOverlay {
         }
         
         // 通知音トグルボタンが存在しない場合は追加（入場予約画面でのみ）
-        const currentPageType = identify_page_type(window.location.href);
-        if (processType === 'reservation' && currentPageType === 'entrance_reservation') {
+        if (processType === 'reservation' && PageChecker.isEntranceReservationPage()) {
             const existingNotificationToggle = this.overlayElement.querySelector('#ytomo-notification-toggle');
             if (!existingNotificationToggle) {
                 logger.debug('show()で通知音トグルボタンを追加中');

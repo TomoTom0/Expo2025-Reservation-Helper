@@ -466,16 +466,87 @@ export const useScheduledReservationStore = defineStore('scheduledReservation', 
     })
   }
 
+  // 順次予約をスケジュール予約として登録
+  const createSequentialReservation = (
+    label: string,
+    selectedTimeSlots: ScheduledTimeSlot[],
+    interval: number,
+    endlessMode: boolean,
+    monitoringMode: boolean
+  ): string => {
+    const id = `seq-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
+    const now = new Date()
+
+    const sequentialReservation: ScheduledReservation = {
+      id,
+      label: `[順次] ${label}`,
+      executeAt: now, // 即座に開始
+      interval,
+      maxRetries: endlessMode ? 900 : 1, // 無限モードなら900回、そうでなければ1回
+      isEnabled: true,
+      selectedTimeSlots: [...selectedTimeSlots],
+      createdAt: now,
+      updatedAt: now,
+      // 順次予約統合用
+      isSequential: true,
+      endlessMode,
+      monitoringMode,
+      currentAttempts: 0
+    }
+
+    scheduledReservations.value.set(id, sequentialReservation)
+    saveToStorage()
+
+    logger.info('順次予約をスケジュール予約として登録', {
+      id,
+      label,
+      endlessMode,
+      monitoringMode,
+      maxRetries: sequentialReservation.maxRetries
+    })
+
+    return id
+  }
+
+  // 順次予約の実行回数を更新
+  const updateSequentialAttempts = (id: string): boolean => {
+    const reservation = scheduledReservations.value.get(id)
+    if (!reservation || !reservation.isSequential) {
+      return false
+    }
+
+    const newAttempts = (reservation.currentAttempts || 0) + 1
+
+    // 900回上限チェック
+    if (reservation.endlessMode && newAttempts >= 900) {
+      logger.info('順次予約が900回上限に達したため停止', { id, attempts: newAttempts })
+      stopScheduleExecution(id)
+      return false
+    }
+
+    // 実行回数を更新
+    const updated: ScheduledReservation = {
+      ...reservation,
+      currentAttempts: newAttempts,
+      updatedAt: new Date()
+    }
+
+    scheduledReservations.value.set(id, updated)
+    saveToStorage()
+
+    return true
+  }
+
   // 初期化
   const initialize = () => {
     loadFromStorage()
     loadUIState()
-    
+
     // 有効なスケジュールを自動開始
     startEnabledSchedules()
-    
-    logger.info('スケジュール予約ストアを初期化', { 
-      schedulesCount: scheduledReservations.value.size 
+
+    logger.info('スケジュール予約ストアを初期化', {
+      schedulesCount: scheduledReservations.value.size
     })
   }
 
@@ -513,6 +584,10 @@ export const useScheduledReservationStore = defineStore('scheduledReservation', 
     // Actions - 実行結果管理
     updateScheduleExecutionResult,
     startEnabledSchedules,
+
+    // Actions - 順次予約統合
+    createSequentialReservation,
+    updateSequentialAttempts,
 
     // Actions - 初期化
     initialize

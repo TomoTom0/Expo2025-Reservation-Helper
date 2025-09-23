@@ -177,41 +177,41 @@ setEntranceReservationHelper(entranceReservationHelper);
 
 // 各モジュールで直接インポートを使用
 
-// URL判定とページタイプ識別（共通utilityに移動）
-import { identify_page_type } from './page-utils';
+import { PageChecker } from './page-utils';
 
 // ページ遷移時の初期化トリガー
 const trigger_init = (url_record: string): void => {
-    const page_type = identify_page_type(url_record);
-    
+    // PageCheckerを使用してページタイプを判定
+    const current_page_type = PageChecker.getPageType(url_record);
+
     // 同じページタイプで初期化中の場合はスキップ
-    if (currentPageType === page_type && isPageInitializing) {
+    if (currentPageType === current_page_type && isPageInitializing) {
         return;
     }
-    
+
     // 同じページタイプでもFABが消えている場合は再作成
-    if (currentPageType === page_type && !isPageInitializing) {
-        if (page_type === 'ticket_selection') {
+    if (currentPageType === current_page_type && !isPageInitializing) {
+        if (current_page_type === 'ticket_selection') {
             const ticketSelectionFab = document.getElementById('ytomo-ticket-selection-fab-container');
             if (!ticketSelectionFab) {
-                logger.debug('チケット選択FABが消失しているため再作成', { page_type });
+                logger.debug('チケット選択FABが消失しているため再作成', { page_type: current_page_type });
             } else {
-                logger.debug('チケット選択FABが既に存在します、スキップ', { page_type });
+                logger.debug('チケット選択FABが既に存在します、スキップ', { page_type: current_page_type });
                 return;
             }
         }
     }
-    
+
     // 前回と異なるページタイプの場合は状態をリセット
-    if (currentPageType !== page_type) {
-        currentPageType = page_type;
+    if (currentPageType !== current_page_type) {
+        currentPageType = current_page_type;
         isPageInitializing = false;
-        
+
         // ページ遷移時に既存のFABボタンをクリーンアップ
         cleanupAllFABs();
     }
-    
-    if (page_type === "pavilion_reservation") {
+
+    if (current_page_type === "pavilion_reservation") {
         if (isPageInitializing) return;
         isPageInitializing = true;
         
@@ -223,7 +223,7 @@ const trigger_init = (url_record: string): void => {
                 logger.info('ytomo extension loaded (pavilion reservation)');
             }
         }, 500);
-    } else if (page_type === "entrance_reservation") {
+    } else if (current_page_type === "entrance_reservation") {
         if (isPageInitializing) return;
         isPageInitializing = true;
         
@@ -258,7 +258,7 @@ const trigger_init = (url_record: string): void => {
                 logger.info('ytomo extension loaded (entrance reservation)');
             }
         }, 500);
-    } else if (page_type === "ticket_selection" || page_type === "agent_ticket") {
+    } else if (current_page_type === "ticket_selection" || current_page_type === "agent_ticket") {
         if (isPageInitializing) return;
         isPageInitializing = true;
         
@@ -266,22 +266,22 @@ const trigger_init = (url_record: string): void => {
         const interval_companion = setInterval(() => {
             if (document.body && (document.readyState === 'complete' || document.readyState === 'interactive')) {
                 clearInterval(interval_companion);
-                logger.info('ページを初期化', { page_type });
-                
+                logger.info('ページを初期化', { page_type: current_page_type });
+
                 // ページタイプ別初期化
-                if (page_type === 'ticket_selection') {
+                if (current_page_type === 'ticket_selection') {
                     initializeTicketSelectionPage();
-                } else if (page_type === 'agent_ticket') {
+                } else if (current_page_type === 'agent_ticket') {
                     initializeAgentTicketPage();
                 } else {
                     // フォールバック（旧方式）
                     initCompanionTicketFeature();
                 }
                 isPageInitializing = false;
-                logger.info('ytomo extension loaded', { page_type });
+                logger.info('ytomo extension loaded', { page_type: current_page_type });
             }
         }, 500);
-    } else if (page_type === "waiting_room") {
+    } else if (current_page_type === "waiting_room") {
         if (isPageInitializing) return;
         isPageInitializing = true;
         
