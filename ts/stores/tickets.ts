@@ -107,14 +107,22 @@ export const useTicketsStore = defineStore('tickets', () => {
 
   const selectedTicketCount = computed(() => {
     // 入場予約が選択されているチケットの数
-    return ticketsArray.value.filter(ticket => 
-      ticket.schedules?.some(schedule => {
+    return ticketsArray.value.filter(ticket => {
+      // 既存の予約で選択されているかチェック
+      const hasSelectedSchedule = ticket.schedules?.some(schedule => {
         const reservationId = schedule.user_visiting_reservation_id?.toString()
         if (!reservationId) return false
         const reservationData = reservationManagement.value.get(reservationId)
         return !!reservationData?.isSelected
       })
-    ).length
+
+      // NEW予約枠で選択されているかチェック
+      const newReservationId = `new-reservation-${ticket.ticket_id}`
+      const newReservationData = reservationManagement.value.get(newReservationId)
+      const hasSelectedNewSlot = !!newReservationData?.isSelected
+
+      return hasSelectedSchedule || hasSelectedNewSlot
+    }).length
   })
 
   const ownTickets = computed(() => 
@@ -262,7 +270,7 @@ export const useTicketsStore = defineStore('tickets', () => {
   /**
    * 全チケット情報を初期化・取得
    */
-  const loadAllTickets = async (forceUpdate: boolean = false): Promise<TicketData[]> => {
+  const loadAllTickets = async (): Promise<TicketData[]> => {
     
     logger.info('全チケット情報取得開始')
     setLoading(true)
@@ -286,9 +294,22 @@ export const useTicketsStore = defineStore('tickets', () => {
         
         for (const newTicket of newOwnTickets) {
           const previousTicket = previousTickets.get(newTicket.ticket_id)
-          
-          
-          
+
+          // パビリオン予約情報を付与
+          if (newTicket.schedules) {
+            newTicket.schedules = await Promise.all(newTicket.schedules.map(async (schedule: any) => {
+              const pavilionType = determinePavilionReservationType(schedule)
+              const pavilionStatus = await getAllPavilionReservationStatus(schedule)
+
+              return {
+                ...schedule,
+                pavilionReservationType: pavilionType,
+                pavilionReservationActive: pavilionType !== null,
+                pavilionReservationStatus: pavilionStatus
+              }
+            }))
+          }
+
           // 旧情報からselected状態を継承
           if (previousTicket && newTicket.schedules && previousTicket.schedules) {
             for (const newSchedule of newTicket.schedules) {
@@ -298,18 +319,18 @@ export const useTicketsStore = defineStore('tickets', () => {
                 s.schedule_name === newSchedule.schedule_name &&
                 s.gate_type === newSchedule.gate_type
               )
-              
+
               // 同じ予約が見つかった場合はselected状態を継承
               if (previousSchedule) {
                 newSchedule.selected = previousSchedule.selected
                 if (newSchedule.selected) {
                   logger.debug(`予約ID ${newSchedule.user_visiting_reservation_id} のselected状態を継承`)
                 }
-                
+
               }
             }
           }
-          
+
           processedTickets.set(newTicket.ticket_id, newTicket)
         }
         
@@ -1135,47 +1156,92 @@ export const useTicketsStore = defineStore('tickets', () => {
 
   // 初期化メソッド - キャッシュ復元と新鮮さ判定を担当
   const init = async (): Promise<void> => {
+    logger.info('チケットストア初期化開始', {
+      isApiDisabled: isApiUsageDisabled(),
+      isInitialized: isInitialized.value,
+      lastUpdateTime: lastUpdateTime.value,
+      isFresh: isFresh.value
+    })
+
     // API利用なしモードでは初期化をスキップ
     if (isApiUsageDisabled()) {
       logger.info('API利用なしモードのためチケットストア初期化をスキップ')
       isInitialized.value = true
       return
     }
-    
+
+    // 既に初期化済みの場合は時間経過判定
     if (isInitialized.value) {
-      logger.debug('既に初期化済みのためスキップ')
+      logger.info('既に初期化済み - 時間経過判定を実行', {
+        isFresh: isFresh.value,
+        timeSinceUpdate: lastUpdateTime.value > 0 ? Math.round((Date.now() - lastUpdateTime.value) / (1000 * 60)) : 'N/A'
+      })
+
+      // 時間経過していれば更新
+      if (!isFresh.value) {
+        logger.info('データが古いため再取得を実行')
+        judgmentTime.value = new Date()
+        await loadAllTickets()
+        await loadEntranceSchedulesRange(true)
+      }
       return
     }
-    
-    logger.info('チケットストア初期化開始')
-    
-    // 初期化時に判定時刻を更新
-    judgmentTime.value = new Date()
-    
-    // 1. 旧システムの復元処理は削除（reservationManagementで管理）
-    // restoreSelectedEntranceDates() - 削除済み
-    
-    // 2. データの新鮮さをチェック
-    if (!isFresh.value) {
-      logger.info('データが古いためチケット情報を更新')
-      await loadAllTickets(true) // 強制更新
-      await loadEntranceSchedulesRange(true) // 入場スケジュール一括取得
-    } else {
-      logger.info(`キャッシュが新鮮のためAPI取得をスキップ（${Math.round((Date.now() - lastUpdateTime.value) / (1000 * 60))}分経過）`)
 
-      // API利用ありの場合、最終更新から1時間が経過していれば自動で再取得
-      if (!isApiUsageDisabled() && lastUpdateTime.value > 0) {
-        const now = Date.now()
-        const oneHour = 60 * 60 * 1000
-        if (now - lastUpdateTime.value >= oneHour) {
-          logger.info('1時間が経過したため自動でチケット情報を再取得')
-          await loadAllTickets(true) // 強制更新
-        }
-      }
+    // 初回初期化時も時間経過判定
+    logger.info('初回初期化 - 時間経過判定を実行', {
+      isFresh: isFresh.value,
+      timeSinceUpdate: lastUpdateTime.value > 0 ? Math.round((Date.now() - lastUpdateTime.value) / (1000 * 60)) : 'N/A'
+    })
+
+    // データが古い場合のみ取得
+    if (!isFresh.value) {
+      logger.info('データが古いためチケット情報を取得')
+      judgmentTime.value = new Date()
+      await loadAllTickets()
+      await loadEntranceSchedulesRange(true)
+    } else {
+      logger.info('データが新鮮のため取得をスキップ')
     }
-    
+
     isInitialized.value = true
     logger.info('チケットストア初期化完了')
+  }
+
+  /**
+   * チケットタブ移動時のリフレッシュ
+   */
+  const refreshOnTabActivation = async (): Promise<void> => {
+    logger.info('チケットタブ移動によるリフレッシュ開始', {
+      lastUpdateTime: lastUpdateTime.value,
+      isFresh: isFresh.value,
+      timeSinceUpdate: lastUpdateTime.value > 0 ? Math.round((Date.now() - lastUpdateTime.value) / (1000 * 60)) : 'N/A'
+    })
+
+    // API利用なしモードではスキップ
+    if (isApiUsageDisabled()) {
+      logger.info('API利用なしモードのためリフレッシュをスキップ')
+      return
+    }
+
+    // 時間経過判定：1時間以上経過している場合のみ取得
+    if (isFresh.value) {
+      logger.info('データが新鮮のため取得をスキップ', {
+        timeSinceUpdate: Math.round((Date.now() - lastUpdateTime.value) / (1000 * 60))
+      })
+      return
+    }
+
+    // 判定時刻を更新
+    judgmentTime.value = new Date()
+
+    try {
+      await loadAllTickets()
+      await loadEntranceSchedulesRange(true)
+      logger.info('チケットタブ移動によるリフレッシュ完了')
+    } catch (error) {
+      logger.error('チケットタブ移動時リフレッシュエラー', error)
+      throw error
+    }
   }
 
   /**
@@ -1246,6 +1312,7 @@ export const useTicketsStore = defineStore('tickets', () => {
     
     // Actions
     init,
+    refreshOnTabActivation,
     loadAllTickets,
     loadOwnTickets,
     fetchPavilionWinningInfo,

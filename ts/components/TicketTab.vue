@@ -405,7 +405,7 @@ const handleRefreshTickets = async () => {
   logger.info('チケット情報手動更新開始')
   
   try {
-    await ticketsStore.loadAllTickets(true) // 強制更新
+    await ticketsStore.loadAllTickets()
     logger.info('チケット情報手動更新完了')
   } catch (error) {
     logger.error('チケット情報更新エラー:', error)
@@ -1078,13 +1078,21 @@ const getSecondLineStatusClassFromPeriod = (periodStatus: string, submissionStat
 }
 
 // ライフサイクル
-onMounted(() => {
+onMounted(async () => {
   logger.info('TicketTab mounted', {
     現在のチケット数: ticketsArray.value.length,
     ticketsArrayサイズ: ticketsArray.value.length,
     filteredTicketsサイズ: filteredTickets.value.length,
     設定: {}
   })
+
+  // チケットタブ初期化時の時間経過判定
+  try {
+    await ticketsStore.refreshOnTabActivation()
+    logger.info('TicketTab初期化時リフレッシュ完了')
+  } catch (error) {
+    logger.error('TicketTab初期化時リフレッシュエラー', error)
+  }
 })
 
 onUnmounted(() => {

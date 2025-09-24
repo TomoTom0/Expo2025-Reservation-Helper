@@ -3,7 +3,7 @@
     <div class="ytomo-wait-controls">
       <button
         @click="handleStartWait"
-        :disabled="reservationManager.waitInfo.value.isWaiting || reservationManager.waitInfo.value.waitMinutes < 1 || reservationManager.waitInfo.value.waitMinutes > 360"
+        :disabled="reservationManager.waitInfo.value.isWaiting || reservationManager.waitInfo.value.waitMinutes < 1 || reservationManager.waitInfo.value.waitMinutes > 720"
       >
         予約待機
       </button>
@@ -12,7 +12,7 @@
         v-model="reservationManager.waitInfo.value.waitMinutes"
         :disabled="reservationManager.waitInfo.value.isWaiting"
         min="1"
-        max="360"
+        max="720"
         step="1"
       />分
       <!-- 時間調整ボタン -->
@@ -53,7 +53,7 @@ const adjustWaitTime = (minutes: number) => {
   if (!props.reservationManager.waitInfo.value.isWaiting) {
     // 待機中でない場合は待機時間を変更
     const currentMinutes = props.reservationManager.waitInfo.value.waitMinutes
-    const newMinutes = Math.max(1, Math.min(360, currentMinutes + minutes))
+    const newMinutes = Math.max(1, Math.min(720, currentMinutes + minutes))
     props.reservationManager.waitInfo.value.waitMinutes = newMinutes
   } else {
     // 待機中の場合は待機時間を延長

@@ -618,7 +618,7 @@ export const useEntranceReservationStore = defineStore('entranceReservation', ()
       // 2秒待機してからチケット情報を再取得して確認
       await new Promise(resolve => setTimeout(resolve, 2000))
 
-      const ticketsData = await ticketsStore.loadAllTickets(true)
+      const ticketsData = await ticketsStore.loadAllTickets()
       logger.info('予約成功確認完了', {
         reservationIds,
         ticketsCount: Array.from(ticketsStore.tickets.values()).length
@@ -654,6 +654,15 @@ export const useEntranceReservationStore = defineStore('entranceReservation', ()
     if (!isButtonEnabled) {
       logger.warn('予約ボタンが無効な状態で実行されました')
       return
+    }
+
+    // ロック状態チェック
+    if (existingId && existingId > 0) {
+      const lockedIds = ticketsStore.getLockedReservationIds()
+      if (lockedIds.includes(existingId.toString())) {
+        logger.warn('ロックされた予約のため実行をブロック', { existingId })
+        return
+      }
     }
 
     if (!timeSlotInfo) {

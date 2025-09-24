@@ -929,7 +929,7 @@ export class EntranceReservationApiManager {
 
   // 予約待機を開始
   public startWait() {
-    if (this.waitInfo.value.isWaiting || this.waitInfo.value.waitMinutes < 1 || this.waitInfo.value.waitMinutes > 360) {
+    if (this.waitInfo.value.isWaiting || this.waitInfo.value.waitMinutes < 1 || this.waitInfo.value.waitMinutes > 720) {
       return
     }
 
