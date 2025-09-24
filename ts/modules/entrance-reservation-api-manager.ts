@@ -268,8 +268,10 @@ export class EntranceReservationApiManager {
       
       if (!this.isReservationRunning.value) return
 
-      // 3. 次の分の目標時間まで待機
-      this.scheduleNextMinuteTargetTime(selectedTimeSlots)
+      // 3. 次の分の目標時間まで待機（予約実行中の場合のみ）
+      if (this.isReservationRunning.value) {
+        this.scheduleNextMinuteTargetTime(selectedTimeSlots)
+      }
 
       
     } catch (error) {

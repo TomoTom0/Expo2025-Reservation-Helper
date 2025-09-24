@@ -483,14 +483,9 @@ const getLatestEntranceTime = (): string => {
   // time_startをHH:MM形式に変換
   let timeStr = latest.time_start || ''
   
-  // 時間に10分を追加
+  // 時間をそのまま使用（10分後→ちょうど以降に変更）
   if (timeStr && timeStr.includes(':')) {
-    const [hours, minutes] = timeStr.split(':').map(Number)
-    const totalMinutes = hours * 60 + minutes + 10
-    const newHours = Math.floor(totalMinutes / 60)
-    const newMinutes = totalMinutes % 60
-    const result = `${newHours.toString().padStart(2, '0')}:${newMinutes.toString().padStart(2, '0')}`
-    return result
+    return timeStr
   }
   
   return ''
