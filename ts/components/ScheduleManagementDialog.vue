@@ -8,8 +8,15 @@
       <div class="ytomo-schedule-dialog" @click.stop>
         <!-- ヘッダー -->
         <div class="ytomo-dialog-header">
+          <button
+            class="ytomo-hamburger-button"
+            @click="toggleSidebar"
+            v-if="isNarrowScreen"
+          >
+            ☰
+          </button>
           <h2 class="ytomo-dialog-title">スケジュール予約管理</h2>
-          <button 
+          <button
             class="ytomo-close-button"
             @click="handleCloseDialog"
           >
@@ -30,7 +37,7 @@
         <!-- メインコンテンツエリア -->
         <div class="ytomo-dialog-content">
           <!-- 左サイドバー -->
-          <div class="ytomo-schedule-list">
+          <div class="ytomo-schedule-list" :class="{ 'sidebar-hidden': isNarrowScreen && !sidebarVisible }">
             <div class="ytomo-list-header">
               <h3>スケジュール一覧</h3>
               <span class="ytomo-list-count">{{ scheduledReservationsArray.length }}件</span>
@@ -177,15 +184,26 @@
               </div>
               
               <div class="ytomo-timeslots-grid">
-                <div 
+                <div
                   v-for="timeSlot in selectedSchedule?.selectedTimeSlots || []"
                   :key="`${timeSlot.pavilionId}-${timeSlot.timeSlot}`"
                   class="ytomo-timeslot-card"
                   :class="{
-                    running: isSelectedScheduleRunning
+                    running: isSelectedScheduleRunning,
+                    [`execution-${pavilionsStore.getTimeSlotExecutionState(timeSlot.pavilionId, timeSlot.timeSlot)}`]: pavilionsStore.getTimeSlotExecutionState(timeSlot.pavilionId, timeSlot.timeSlot)
                   }"
                 >
-                  <div class="ytomo-pavilion-name">{{ timeSlot.pavilionName }}</div>
+                  <div class="ytomo-timeslot-header">
+                    <div class="ytomo-pavilion-name">{{ timeSlot.pavilionName }}</div>
+                    <span
+                      v-if="pavilionsStore.getTimeSlotExecutionState(timeSlot.pavilionId, timeSlot.timeSlot)"
+                      class="ytomo-execution-icon"
+                    >
+                      <span v-if="pavilionsStore.getTimeSlotExecutionState(timeSlot.pavilionId, timeSlot.timeSlot) === 'executing'">⏳</span>
+                      <span v-else-if="pavilionsStore.getTimeSlotExecutionState(timeSlot.pavilionId, timeSlot.timeSlot) === 'success'">✅</span>
+                      <span v-else-if="pavilionsStore.getTimeSlotExecutionState(timeSlot.pavilionId, timeSlot.timeSlot) === 'failed'">❌</span>
+                    </span>
+                  </div>
                   <div class="ytomo-timeslot-time">{{ formatTimeSlot(timeSlot.timeSlot) }}</div>
                   <div class="ytomo-entrance-date">{{ formatEntranceDate(timeSlot.entranceDate) }}</div>
                 </div>
@@ -234,7 +252,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue'
+import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useScheduledReservationStore } from '@/stores/scheduledReservation'
 import { usePavilionsStore } from '@/stores/pavilions'
@@ -263,6 +281,10 @@ const editFormData = ref<ScheduleFormData>({
   isEnabled: true
 })
 
+// 画面幅とサイドバー表示状態
+const isNarrowScreen = ref(false)
+const sidebarVisible = ref(true)
+
 // 計算プロパティ
 const minScheduleDate = computed(() => {
   const today = new Date()
@@ -290,6 +312,48 @@ const selectedScheduleExecutionHistory = computed(() => {
 // 選択されたスケジュールの監視
 watch(selectedScheduleId, (newId) => {
   scheduledReservationStore.selectSchedule(newId)
+})
+
+// 画面幅の監視
+const checkScreenSize = () => {
+  const wasNarrowScreen = isNarrowScreen.value
+  isNarrowScreen.value = window.innerWidth <= 768
+
+  if (!isNarrowScreen.value) {
+    sidebarVisible.value = true // デスクトップではサイドバーを常に表示
+  } else {
+    // ナロースクリーンでは初期状態で非表示にする
+    if (!wasNarrowScreen) {
+      sidebarVisible.value = false
+    }
+  }
+
+  logger.debug('画面サイズ変更', {
+    width: window.innerWidth,
+    isNarrowScreen: isNarrowScreen.value,
+    sidebarVisible: sidebarVisible.value,
+    wasNarrowScreen
+  })
+}
+
+onMounted(() => {
+  // 初期状態でナロースクリーンかどうかを判定
+  const initialIsNarrow = window.innerWidth <= 768
+  isNarrowScreen.value = initialIsNarrow
+  sidebarVisible.value = !initialIsNarrow // ナロースクリーンの場合は非表示、デスクトップの場合は表示
+
+  window.addEventListener('resize', checkScreenSize)
+
+  // 初期状態をログに出力
+  logger.temp('スケジュールダイアログ初期化', {
+    isNarrowScreen: isNarrowScreen.value,
+    sidebarVisible: sidebarVisible.value,
+    screenWidth: window.innerWidth
+  })
+})
+
+onUnmounted(() => {
+  window.removeEventListener('resize', checkScreenSize)
 })
 
 watch(selectedSchedule, (newSchedule) => {
@@ -487,6 +551,18 @@ const handleStartSchedule = (scheduleId: string) => {
     logger.warn('スケジュール開始失敗', { scheduleId })
   }
 }
+
+// サイドバー表示切り替え
+const toggleSidebar = () => {
+  const oldValue = sidebarVisible.value
+  sidebarVisible.value = !sidebarVisible.value
+  logger.temp('サイドバー表示切り替え', {
+    oldValue,
+    newValue: sidebarVisible.value,
+    isNarrowScreen: isNarrowScreen.value,
+    shouldHide: isNarrowScreen.value && !sidebarVisible.value
+  })
+}
 </script>
 
 <style scoped lang="scss">
@@ -556,6 +632,36 @@ const handleStartSchedule = (scheduleId: string) => {
   
   @media (max-width: 480px) {
     font-size: 16px;
+  }
+}
+
+.ytomo-hamburger-button {
+  background: none;
+  border: none;
+  font-size: 18px;
+  color: #6b7280;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 4px;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+
+  &:hover {
+    background: #f3f4f6;
+    color: #374151;
+  }
+
+  &:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(44, 90, 160, 0.2);
+  }
+
+  @media (min-width: 769px) {
+    display: none;
   }
 }
 
@@ -868,13 +974,21 @@ const handleStartSchedule = (scheduleId: string) => {
   display: flex;
   flex-direction: column;
   flex-shrink: 0;
-  
+  transition: transform 0.3s ease;
+
   @media (max-width: 768px) {
     width: 250px;
     min-width: 250px;
     max-width: 250px;
+    position: relative;
+    z-index: 10;
+    background: white;
+
+    &.sidebar-hidden {
+      transform: translateX(-100%);
+    }
   }
-  
+
   @media (max-width: 640px) {
     display: none; /* モバイルでは非表示 */
   }
@@ -1179,6 +1293,38 @@ const handleStartSchedule = (scheduleId: string) => {
       font-weight: 600;
     }
   }
+
+  /* 実行状態スタイル */
+  &.execution-executing {
+    border: 2px solid #3b82f6;
+    animation: executionPulse 1.5s ease-in-out infinite;
+  }
+
+  &.execution-success {
+    border: 2px solid #10b981;
+    box-shadow: 0 0 8px rgba(16, 185, 129, 0.4);
+  }
+
+  &.execution-failed {
+    border: 2px solid #ef4444;
+    box-shadow: 0 0 8px rgba(239, 68, 68, 0.4);
+  }
+}
+
+.ytomo-timeslot-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 4px;
+
+  .ytomo-execution-icon {
+    font-size: 16px;
+    line-height: 1;
+
+    &:has([data-state="executing"]) {
+      animation: spin 1s linear infinite;
+    }
+  }
 }
 
 .ytomo-pavilion-name {
@@ -1349,5 +1495,19 @@ const handleStartSchedule = (scheduleId: string) => {
   to {
     transform: scale(1);
   }
+}
+
+@keyframes executionPulse {
+  0%, 100% {
+    box-shadow: 0 0 4px rgba(59, 130, 246, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 12px rgba(59, 130, 246, 0.8);
+  }
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
 }
 </style>

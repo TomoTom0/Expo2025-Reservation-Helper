@@ -697,22 +697,6 @@ const getVisibleSchedules = (ticket: TicketData): ScheduleData[] => {
   // 通期パス判定
   const isSeasonPassFlag = isSeasonPass(ticket)
 
-  // デバッグログを追加
-  logger.temp('getVisibleSchedules デバッグ', {
-    ticketId: ticket.ticket_id,
-    itemName: ticket.item_name,
-    ticketKeys: Object.keys(ticket),
-    isSeasonPass: isSeasonPassFlag,
-    totalSchedules: ticket.schedules.length,
-    fullTicketData: ticket,
-    schedules: ticket.schedules.map(s => ({
-      entrance_date: s.entrance_date,
-      schedule_name: s.schedule_name,
-      isEffective: s.isEffective,
-      user_visiting_reservation_id: s.user_visiting_reservation_id
-    }))
-  })
-
   // 有効なスケジュールをフィルター
   const filtered = ticket.schedules.filter(schedule => schedule.isEffective === true)
 
@@ -729,44 +713,6 @@ const getVisibleSchedules = (ticket: TicketData): ScheduleData[] => {
       selected: false,
       isEffective: false,
       pavilionReservationInfo: undefined
-    })
-  }
-
-  // フィルター結果のデバッグログ
-  if (isSeasonPassFlag) {
-    logger.temp('通期パス フィルター結果', {
-      ticketId: ticket.ticket_id,
-      totalSchedules: ticket.schedules.length,
-      filteredCount: filtered.length,
-      allSchedules: ticket.schedules.map(s => ({
-        entrance_date: s.entrance_date,
-        schedule_name: s.schedule_name,
-        isEffective: s.isEffective,
-        user_visiting_reservation_id: s.user_visiting_reservation_id,
-        isEffectiveSchedule: s.isEffective === true,
-        isNewReservationSlot: (isSeasonPassFlag && s.entrance_date === '' && s.schedule_name === 'NEW'),
-        passesFilter: (s.isEffective === true || (isSeasonPassFlag && s.entrance_date === '' && s.schedule_name === 'NEW'))
-      })),
-      filteredSchedules: filtered.map(s => ({
-        entrance_date: s.entrance_date,
-        schedule_name: s.schedule_name,
-        isEffective: s.isEffective,
-        user_visiting_reservation_id: s.user_visiting_reservation_id
-      }))
-    })
-  }
-  
-  // 頻繁に「利用可能な入場予約取得なし」が出る場合のデバッグ
-  if (filtered.length === 0 && ticket.schedules.length > 0) {
-    logger.temp('getVisibleSchedules: 全スケジュールが無効', {
-      ticketId: ticket.ticket_id,
-      totalSchedules: ticket.schedules.length,
-      schedules: ticket.schedules.map(s => ({
-        entrance_date: s.entrance_date,
-        use_state: s.use_state,
-        isEffective: s.isEffective,
-        schedule_name: s.schedule_name
-      }))
     })
   }
   

@@ -15,8 +15,8 @@
         <div v-if="isEntranceReservationRunning" class="ytomo-target-time-control">
           <div class="ytomo-target-time-label">目標時間 (次周期から適用)</div>
           <div class="ytomo-target-time-selector">
-            <select 
-              v-model="selectedTargetSecond" 
+            <select
+              v-model="selectedTargetSecond"
               @change="updateTargetSecond"
               class="ytomo-target-second-select"
             >
@@ -25,6 +25,16 @@
               </option>
             </select>
           </div>
+        </div>
+
+        <!-- キャンセルボタン -->
+        <div v-if="overlaysStore.processingCancelCallback" class="ytomo-cancel-button-container">
+          <button
+            @click="handleCancel"
+            class="ytomo-cancel-button"
+          >
+            キャンセル
+          </button>
         </div>
       </div>
     </div>
@@ -79,6 +89,10 @@ onMounted(() => {
 const handleClick = (e: Event) => {
   e.preventDefault()
   e.stopPropagation()
+}
+
+const handleCancel = () => {
+  overlaysStore.cancelProcessing()
 }
 </script>
 
@@ -166,6 +180,38 @@ const handleClick = (e: Event) => {
       option {
         padding: 8px;
       }
+    }
+  }
+}
+
+.ytomo-cancel-button-container {
+  margin-top: 20px;
+  display: flex;
+  justify-content: center;
+
+  .ytomo-cancel-button {
+    background: #ef4444;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    padding: 8px 16px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+
+    &:hover {
+      background: #dc2626;
+      transform: translateY(-1px);
+    }
+
+    &:active {
+      transform: translateY(0);
+    }
+
+    &:focus {
+      outline: none;
+      box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.2);
     }
   }
 }

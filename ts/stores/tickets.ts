@@ -426,18 +426,38 @@ export const useTicketsStore = defineStore('tickets', () => {
 
       const data = await response.json()
 
+      // APIレスポンス全体をログ出力してevent_schedulesの有無を確認
+      logger.temp('チケットAPI応答内容', {
+        dataKeys: Object.keys(data),
+        listLength: data.list?.length,
+        firstTicketKeys: data.list?.[0] ? Object.keys(data.list[0]) : [],
+        hasEventSchedules: data.list?.[0]?.event_schedules !== undefined,
+        eventSchedulesLength: data.list?.[0]?.event_schedules?.length
+      })
 
       if (!data.list || !Array.isArray(data.list)) {
         logger.warn('チケットデータが期待する形式ではありません', data)
         return []
       }
 
-      return data.list.map((ticket: any) => ({
-        ticket_id: ticket.ticket_id || ticket.simple_ticket_id || '',
-        isOwn: true,
-        label: ticket.item_name || 'チケット',
-        schedules: processSchedules(ticket.schedules || [])
-      }))
+      return data.list.map((ticket: any) => {
+        // 各チケットのevent_schedulesの存在をログ
+        if (ticket.event_schedules) {
+          logger.temp(`チケット ${ticket.ticket_id} にevent_schedules発見`, {
+            eventSchedulesCount: ticket.event_schedules.length,
+            eventSchedules: ticket.event_schedules
+          })
+        }
+
+        return {
+          ticket_id: ticket.ticket_id || ticket.simple_ticket_id || '',
+          isOwn: true,
+          label: ticket.item_name || 'チケット',
+          schedules: processSchedules(ticket.schedules || []),
+          // event_schedulesをチケットデータに追加保存
+          event_schedules: ticket.event_schedules || []
+        }
+      })
       
     } catch (error: any) {
       // API利用制限の場合は情報ログとして記録
@@ -1208,6 +1228,50 @@ export const useTicketsStore = defineStore('tickets', () => {
   }
 
   /**
+   * 入場予約の変更可能性を判定
+   * @param reservationId 予約ID
+   * @returns 変更可能な場合true
+   */
+  const canModifyReservation = (reservationId: string): boolean => {
+    // NEWスロット（新規予約用）の場合は常に変更可能
+    if (reservationId.startsWith('new-reservation-')) {
+      return true
+    }
+
+    // 既存予約の場合
+    const reservationManagement = getReservationManagement(reservationId)
+
+    // ロックされている場合は変更不可
+    if (reservationManagement?.isLocked) {
+      return false
+    }
+
+    // 予約情報を取得
+    const { ticket, schedule } = getScheduleByReservationId(reservationId)
+
+    // チケットが見つからない場合は変更不可
+    if (!ticket || !schedule) {
+      return false
+    }
+
+    // 自分のチケットでない場合は変更不可
+    if (!ticket.isOwn) {
+      return false
+    }
+
+    return true
+  }
+
+  /**
+   * 複数の入場予約の変更可能性を判定
+   * @param reservationIds 予約IDの配列
+   * @returns 少なくとも1つが変更可能な場合true
+   */
+  const canModifyAnyReservation = (reservationIds: string[]): boolean => {
+    return reservationIds.some(id => canModifyReservation(id))
+  }
+
+  /**
    * チケットタブ移動時のリフレッシュ
    */
   const refreshOnTabActivation = async (): Promise<void> => {
@@ -1346,6 +1410,8 @@ export const useTicketsStore = defineStore('tickets', () => {
     getSelectedNewReservationSlot,
     removeReservationManagement,
     clearAllReservationManagement,
+    canModifyReservation,
+    canModifyAnyReservation,
 
     // ヘルパーメソッド
     getScheduleByReservationId,

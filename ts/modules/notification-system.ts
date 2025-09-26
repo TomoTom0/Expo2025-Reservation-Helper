@@ -8,6 +8,7 @@ const logger = loggers.ui;
 export interface NotificationOptions {
     type: 'success' | 'error' | 'warning' | 'info';
     message: string;
+    reason?: string;  // 失敗理由（満席/無効/その他）
     autoHide?: boolean;
     duration?: number;
 }
@@ -15,6 +16,7 @@ export interface NotificationOptions {
 class GlobalNotificationSystem {
     private notificationContainer: HTMLElement | null = null;
     private activeNotifications: Map<string, HTMLElement> = new Map();
+    private recentNotifications: Map<string, number> = new Map(); // 重複チェック用
 
     /**
      * 通知システムを初期化
@@ -41,6 +43,28 @@ class GlobalNotificationSystem {
     show(options: NotificationOptions): string {
         if (!this.notificationContainer) {
             this.initialize();
+        }
+
+        // パビリオン予約結果は重複チェックをスキップ（異なる時間帯の結果を個別に表示するため）
+        if (!options.message.includes('の予約が完了') && !options.message.includes('の予約に失敗')) {
+            // 重複チェック（パビリオン予約以外の同じメッセージが短時間で複数回表示されることを防ぐ）
+            const messageKey = `${options.type}:${options.message}`;
+            const now = Date.now();
+            const lastShown = this.recentNotifications.get(messageKey);
+
+            if (lastShown && (now - lastShown) < 1000) { // 1秒以内の重複を防ぐ
+                logger.debug('重複通知をスキップ', { message: options.message });
+                return '';
+            }
+
+            this.recentNotifications.set(messageKey, now);
+
+            // 古いエントリーをクリーンアップ（10秒以上古いものを削除）
+            for (const [key, timestamp] of this.recentNotifications.entries()) {
+                if (now - timestamp > 10000) {
+                    this.recentNotifications.delete(key);
+                }
+            }
         }
 
         const notificationId = `notification-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
@@ -113,7 +137,15 @@ class GlobalNotificationSystem {
         const messageElement = document.createElement('span');
         messageElement.className = 'notification-message';
         messageElement.textContent = options.message;
-        
+
+        // 理由要素（エラー時のみ）
+        let reasonElement: HTMLElement | null = null;
+        if (options.reason && options.type === 'error') {
+            reasonElement = document.createElement('div');
+            reasonElement.className = 'notification-reason';
+            reasonElement.textContent = `理由: ${options.reason}`;
+        }
+
         // 閉じるボタン
         const closeButton = document.createElement('button');
         closeButton.className = 'notification-close';
@@ -121,10 +153,13 @@ class GlobalNotificationSystem {
         closeButton.addEventListener('click', () => {
             this.hide(notificationId);
         });
-        
+
         // 内容を組み立て
         notification.appendChild(document.createTextNode(icon + ' '));
         notification.appendChild(messageElement);
+        if (reasonElement) {
+            notification.appendChild(reasonElement);
+        }
         notification.appendChild(closeButton);
         
         return notification;
@@ -158,6 +193,37 @@ export { globalNotificationSystem };
 // 既存の関数名でも使用可能にする
 (window as any).showReservationNotification = (type: 'success' | 'error' | 'warning' | 'info', message: string, autoHide: boolean = true) => {
     return globalNotificationSystem.show({ type, message, autoHide });
+};
+
+// パビリオン予約結果専用関数
+(window as any).showPavilionReservationResult = (success: boolean, pavilionName: string, timeSlot: string, errorMessage?: string) => {
+    logger.temp('パビリオン予約結果通知表示', { success, pavilionName, timeSlot, errorMessage });
+
+    if (success) {
+        return globalNotificationSystem.show({
+            type: 'success',
+            message: `${pavilionName} ${timeSlot} の予約が完了しました`,
+            autoHide: true,
+            duration: 5000
+        });
+    } else {
+        // 失敗理由を判定
+        let reason = 'その他';
+        if (errorMessage) {
+            if (errorMessage.includes('満席') || errorMessage.includes('定員') || errorMessage.includes('売り切れ')) {
+                reason = '満席';
+            } else if (errorMessage.includes('無効') || errorMessage.includes('期限') || errorMessage.includes('expired')) {
+                reason = '無効';
+            }
+        }
+
+        return globalNotificationSystem.show({
+            type: 'error',
+            message: `${pavilionName} ${timeSlot} の予約に失敗しました`,
+            reason: reason,
+            autoHide: false  // エラーは手動で閉じるまで表示
+        });
+    }
 };
 
 // ページ読み込み時に自動初期化

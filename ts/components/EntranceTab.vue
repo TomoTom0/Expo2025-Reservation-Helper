@@ -225,9 +225,9 @@
             <!-- 実行履歴表示 -->
             <div v-if="reservationManager.reservationHistory.value.length > 0" class="ytomo-execution-history">
               <div class="ytomo-history-items">
-                <div v-for="(result, index) in reservationManager.reservationHistory.value" :key="index" 
+                <div v-for="(result, index) in reservationManager.reservationHistory.value" :key="index"
                      class="ytomo-history-item" :class="result.success ? 'success' : 'failure'">
-                  <span class="ytomo-history-result">{{ result.success ? '成功' : '' }}</span>
+                  <span class="ytomo-history-result">{{ result.success ? '成功' : (result.failureReason || '') }}</span>
                   <span class="ytomo-history-detail">{{ result.gate }}{{ result.time }}</span>
                 </div>
               </div>
@@ -496,33 +496,36 @@ const isReservationButtonEnabled = computed(() => {
   if (!selectedSchedule.value) {
     // 予約管理システムから選択された予約IDをチェック
     const selectedReservationIds = ticketsStore.getSelectedReservationIds()
-    const hasUnsetReservation = selectedReservationIds.some(reservationId => {
+    const hasModifiableReservation = selectedReservationIds.some(reservationId => {
+      // NEWスロットの場合は常に有効
+      if (reservationId.startsWith('new-reservation-')) {
+        return true
+      }
+
+      // 既存予約の場合は入場日未設定 かつ 変更可能な予約のみ対象
       const { schedule } = ticketsStore.getScheduleByReservationId(reservationId)
-      return schedule && !schedule.entrance_date
+      return schedule && !schedule.entrance_date && ticketsStore.canModifyReservation(reservationId)
     })
-    return hasUnsetReservation
+    return hasModifiableReservation
   }
-  
-  // 既存予約の場合は自分の予約のみ変更可能
-  // selectedScheduleのuser_visiting_reservation_idで親チケットを探す
-  const selectedTickets = ticketsStore.selectedTickets
-  const parentTicket = selectedTickets.find(ticket => 
-    ticket.schedules?.some(s => 
-      s.user_visiting_reservation_id === selectedSchedule.value?.user_visiting_reservation_id
-    )
-  )
-  
+
+  // 既存予約の場合
+  const reservationId = selectedSchedule.value?.user_visiting_reservation_id?.toString()
+  if (!reservationId) {
+    return false
+  }
+
+  const canModify = ticketsStore.canModifyReservation(reservationId)
+
   // デバッグ用ログ
   logger.info('予約ボタン有効性判定', {
     selectedSchedule: selectedSchedule.value,
-    hasSchedule: !!selectedSchedule.value,
-    reservationId: selectedSchedule.value?.user_visiting_reservation_id,
-    parentTicketFound: !!parentTicket,
-    isOwn: parentTicket?.isOwn,
+    reservationId: reservationId,
+    canModify: canModify,
     timeSlotCount: selectedTimeSlotCount.value
   })
-  
-  return parentTicket?.isOwn === true
+
+  return canModify
 })
 
 // 予約ボタンテキストの動的決定

@@ -22,6 +22,10 @@ export const usePavilionsStore = defineStore('pavilions', () => {
   const lastSearchResults = ref<PavilionData[]>([])
   const favoriteIds = ref<Set<string>>(new Set())
 
+  // パビリオン予約実行状態管理
+  const executionStates = ref<Map<string, 'executing' | 'success' | 'failed'>>(new Map())
+  const executionTimeouts = ref<Map<string, NodeJS.Timeout>>(new Map())
+
   // Getters (computed)
   const allPavilions = computed(() => Array.from(pavilions.value.values()))
   
@@ -131,6 +135,19 @@ export const usePavilionsStore = defineStore('pavilions', () => {
 
 
       if (!response.ok) {
+        if (response.status === 502) {
+          logger.warn(`パビリオン時間帯取得でサーバーエラー - ${pavilionId}`, {
+            status: response.status,
+            statusText: response.statusText,
+            url: timeslotUrl
+          })
+        } else {
+          logger.error(`パビリオン時間帯取得エラー - ${pavilionId}`, {
+            status: response.status,
+            statusText: response.statusText,
+            url: timeslotUrl
+          })
+        }
         return { timeSlots: [], pavilionName: undefined }
       }
       
@@ -147,9 +164,20 @@ export const usePavilionsStore = defineStore('pavilions', () => {
           const scheduleData = schedule as any
           
           // unavailable_reasonで空き状況を判定（公式サイトの判定ロジックに基づく）
-          // 0=RESERVABLE（予約可能）として扱い、1,2以外は満員とみなす
-          const isAvailable = scheduleData.unavailable_reason !== 1 && scheduleData.unavailable_reason !== 2
-          
+          // 0=RESERVABLE（予約可能）、1=STOCK_NONE（満員）、2=STOCK_NOT_ENOUGH（残りわずか）
+          const unavailableReason = scheduleData.unavailable_reason || 0
+          const isAvailable = unavailableReason !== 1
+
+          // 詳細な空き状況を判定
+          let availabilityStatus: 'available' | 'limited' | 'full'
+          if (unavailableReason === 1) {
+            availabilityStatus = 'full'  // STOCK_NONE = 満員
+          } else if (unavailableReason === 2) {
+            availabilityStatus = 'limited'  // STOCK_NOT_ENOUGH = 残りわずか
+          } else {
+            availabilityStatus = 'available'  // RESERVABLE = 空きあり
+          }
+
           timeSlots.push({
             time: time, // キーが時間（例：1040, 1100）
             endTime: scheduleData.end_time || '',
@@ -158,7 +186,9 @@ export const usePavilionsStore = defineStore('pavilions', () => {
             capacity: scheduleData.capacity || 0,
             reserved: scheduleData.reserved || 0,
             reservationType: scheduleData.reservation_type || '1日券',
-            timeSlotId: scheduleData.schedule_code || time
+            timeSlotId: scheduleData.schedule_code || time,
+            availabilityStatus: availabilityStatus,
+            unavailableReason: unavailableReason
           })
         }
       }
@@ -608,7 +638,10 @@ export const usePavilionsStore = defineStore('pavilions', () => {
     ticketIds: string[] = []
   ): Promise<ReservationResult> => {
     logger.info('予約実行開始', { pavilionId, timeSlot: timeSlot.time, entranceDate, registeredChannel, ticketCount: ticketIds.length })
-    
+
+    // 実行状態を「実行中」に設定
+    setTimeSlotExecutionState(pavilionId, timeSlot.timeSlotId || timeSlot.time, 'executing')
+
     try {
       const requestBody = {
         ticket_ids: ticketIds,
@@ -635,8 +668,13 @@ export const usePavilionsStore = defineStore('pavilions', () => {
       
       const data = await response.json()
       logger.debug('予約API応答', { status: response.status, data })
-      
+
+      // HTTPステータス200-299が成功判定（response.okの標準実装）
       if (response.ok) {
+        // 成功状態に設定
+        setTimeSlotExecutionState(pavilionId, timeSlot.timeSlotId || timeSlot.time, 'success')
+
+
         return {
           success: true,
           message: '予約に成功しました',
@@ -648,8 +686,12 @@ export const usePavilionsStore = defineStore('pavilions', () => {
           }
         }
       } else if (response.status === 422) {
-        // 満席は正常なビジネスエラー
+        // 満席は正常なビジネスエラー - 失敗状態に設定
+        setTimeSlotExecutionState(pavilionId, timeSlot.timeSlotId || timeSlot.time, 'failed')
+
         const errorMessage = data.error?.message || '予約できませんでした'
+
+
         return {
           success: false,
           message: errorMessage,
@@ -665,11 +707,17 @@ export const usePavilionsStore = defineStore('pavilions', () => {
       }
       
     } catch (error) {
-      logger.error('予約実行エラー', { error: error instanceof Error ? error.message : String(error) })
+      // エラー状態に設定
+      setTimeSlotExecutionState(pavilionId, timeSlot.timeSlotId || timeSlot.time, 'failed')
+
+      const errorMessage = error instanceof Error ? error.message : String(error)
+
+
+      logger.error('予約実行エラー', { error: errorMessage })
       return {
         success: false,
         message: '予約実行エラー',
-        error: error instanceof Error ? error.message : String(error),
+        error: errorMessage,
         details: {
           pavilionName: pavilions.value.get(pavilionId)?.name || '',
           timeSlot: timeSlot.time,
@@ -719,6 +767,52 @@ export const usePavilionsStore = defineStore('pavilions', () => {
     }
   }
 
+  /**
+   * 時間帯の実行状態を設定
+   */
+  const setTimeSlotExecutionState = (pavilionId: string, timeSlotId: string, state: 'executing' | 'success' | 'failed'): void => {
+    const key = `${pavilionId}-${timeSlotId}`
+    executionStates.value.set(key, state)
+    logger.temp('実行状態設定', { pavilionId, timeSlotId, state, key })
+
+    // 既存のタイムアウトをクリア
+    const existingTimeout = executionTimeouts.value.get(key)
+    if (existingTimeout) {
+      clearTimeout(existingTimeout)
+    }
+
+    // 10秒後に状態をクリアするタイムアウトを設定（executing以外の場合）
+    if (state !== 'executing') {
+      const timeout = setTimeout(() => {
+        executionStates.value.delete(key)
+        executionTimeouts.value.delete(key)
+      }, 10000)
+      executionTimeouts.value.set(key, timeout)
+    }
+  }
+
+  /**
+   * 時間帯の実行状態を取得
+   */
+  const getTimeSlotExecutionState = (pavilionId: string, timeSlotId: string): 'executing' | 'success' | 'failed' | null => {
+    const key = `${pavilionId}-${timeSlotId}`
+    return executionStates.value.get(key) || null
+  }
+
+  /**
+   * 時間帯の実行状態をクリア
+   */
+  const clearTimeSlotExecutionState = (pavilionId: string, timeSlotId: string): void => {
+    const key = `${pavilionId}-${timeSlotId}`
+    executionStates.value.delete(key)
+
+    const existingTimeout = executionTimeouts.value.get(key)
+    if (existingTimeout) {
+      clearTimeout(existingTimeout)
+      executionTimeouts.value.delete(key)
+    }
+  }
+
   return {
     // State
     pavilions,
@@ -729,6 +823,7 @@ export const usePavilionsStore = defineStore('pavilions', () => {
     searchQuery,
     lastSearchResults,
     favoriteIds,
+    executionStates,
 
     // Computed
     allPavilions,
@@ -751,7 +846,10 @@ export const usePavilionsStore = defineStore('pavilions', () => {
     deselectAllTimeSlotsForPavilion,
     executeReservation,
     refreshPavilions,
-    
+    setTimeSlotExecutionState,
+    getTimeSlotExecutionState,
+    clearTimeSlotExecutionState,
+
     // Internal methods (for composable)
     buildAPIUrl,
     parseSearchResults,

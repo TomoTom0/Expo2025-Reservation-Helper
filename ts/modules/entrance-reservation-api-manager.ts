@@ -29,6 +29,7 @@ export interface ReservationResult {
   success: boolean
   gate: string
   time: string
+  failureReason?: '満席' | '無効' | 'その他'
 }
 
 // 予約待機情報の型定義
@@ -314,7 +315,7 @@ export class EntranceReservationApiManager {
       // 予約成功時の処理
       await this.handleReservationSuccess(topPrioritySlot, reservationResult)
     } else if (reservationResult?.error) {
-      this.addToHistory(false, topPrioritySlot.gate, topPrioritySlot.time)
+      this.addToHistory(false, topPrioritySlot.gate, topPrioritySlot.time, reservationResult.errorDetail)
     }
     
     // 空き情報を返す
@@ -545,7 +546,7 @@ export class EntranceReservationApiManager {
           await this.handleReservationSuccess(slot, result)
           return
         } else {
-          this.addToHistory(false, slot.gate, slot.time)
+          this.addToHistory(false, slot.gate, slot.time, result.errorDetail)
           logger.warn('予約失敗', { 
             日時: `${this.selectedDate} ${slot.gate}ゲート ${slot.time}`,
             理由: result.error || '予約実行に失敗しました'
@@ -561,14 +562,35 @@ export class EntranceReservationApiManager {
   }
 
 
+  // エラーレスポンスから失敗理由を判定
+  private determineFailureReason(errorDetail: any): '満席' | '無効' | 'その他' {
+    if (!errorDetail || !errorDetail.error?.name) {
+      return 'その他'
+    }
+
+    const errorName = errorDetail.error.name
+    if (errorName === 'stock_not_available') {
+      return '満席'
+    } else if (errorName === 'th_error') {
+      return '無効'
+    } else {
+      return 'その他'
+    }
+  }
+
   // 予約結果を履歴に追加
-  private addToHistory(success: boolean, gate: string, time: string) {
+  private addToHistory(success: boolean, gate: string, time: string, errorDetail?: any) {
     const result: ReservationResult = {
       success,
       gate,
       time
     }
-    
+
+    // 失敗の場合は理由を判定して追加
+    if (!success && errorDetail) {
+      result.failureReason = this.determineFailureReason(errorDetail)
+    }
+
     // 最新の結果を先頭に追加し、3つまでに制限
     this.reservationHistory.value.unshift(result)
     if (this.reservationHistory.value.length > 3) {
@@ -699,7 +721,7 @@ export class EntranceReservationApiManager {
   }
 
   // 実際の万博予約API呼び出し
-  private async callActualReservationAPI(slot: any): Promise<{ success: boolean; date?: string; error?: string; reservationIds?: number[]; ticketsData?: any }> {
+  private async callActualReservationAPI(slot: any): Promise<{ success: boolean; date?: string; error?: string; reservationIds?: number[]; ticketsData?: any; errorDetail?: any }> {
     try {
       // 選択されたチケットIDを取得
       const selectedTickets = Array.from(this.getSelectedTicketIds())
@@ -808,9 +830,14 @@ export class EntranceReservationApiManager {
       } else {
         let errorDetail
         try {
-          errorDetail = await response.json()
+          const textResponse = await response.text()
+          try {
+            errorDetail = JSON.parse(textResponse)
+          } catch (e) {
+            errorDetail = textResponse
+          }
         } catch (e) {
-          errorDetail = await response.text()
+          errorDetail = { error: 'レスポンスの読み込みに失敗しました' }
         }
         
         logger.warn('予約失敗', { 
@@ -827,9 +854,10 @@ export class EntranceReservationApiManager {
         await new Promise(resolve => setTimeout(resolve, 1000))
         logger.info('エラー後待機完了')
         
-        return { 
-          success: false, 
-          error: errorDetail?.message || errorDetail?.error || '予約に失敗しました' 
+        return {
+          success: false,
+          error: errorDetail?.message || errorDetail?.error || '予約に失敗しました',
+          errorDetail: errorDetail
         }
       }
     } catch (error) {

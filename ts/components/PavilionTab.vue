@@ -44,6 +44,21 @@
           </svg>
           <span id="available-count" class="ytomo-count-badge">{{ availablePavilionsCount }}</span>
         </button>
+        <button
+          id="clear-selection-button"
+          class="ytomo-icon-button"
+          :disabled="selectedSlotsCount === 0"
+          title="選択解除"
+          @click="handleClearAllSelections"
+        >
+          <span>✕</span>
+          <span
+            v-if="selectedSlotsCount > 0"
+            class="ytomo-count-badge"
+          >
+            {{ selectedSlotsCount }}
+          </span>
+        </button>
         <button 
           id="schedule-button" 
           class="ytomo-icon-button ytomo-schedule-button" 
@@ -253,7 +268,15 @@
               :disabled="isTimeSlotDisabledByEntranceTime(timeSlot) && !scheduledReservationStore.uiState.showScheduleRow"
               @click="handleTimeSlotClick(pavilion.id, timeSlot)"
             >
-              {{ formatTimeSlot(timeSlot.time) }}
+              <span class="ytomo-time-slot-text">{{ formatTimeSlot(timeSlot.time) }}</span>
+              <span
+                v-if="pavilionsStore.getTimeSlotExecutionState(pavilion.id, timeSlot.timeSlotId || timeSlot.time)"
+                class="ytomo-execution-icon"
+              >
+                <span v-if="pavilionsStore.getTimeSlotExecutionState(pavilion.id, timeSlot.timeSlotId || timeSlot.time) === 'executing'">⏳</span>
+                <span v-else-if="pavilionsStore.getTimeSlotExecutionState(pavilion.id, timeSlot.timeSlotId || timeSlot.time) === 'success'">✅</span>
+                <span v-else-if="pavilionsStore.getTimeSlotExecutionState(pavilion.id, timeSlot.timeSlotId || timeSlot.time) === 'failed'">❌</span>
+              </span>
             </button>
           </div>
         </div>
@@ -261,18 +284,6 @@
     </div>
 
     <!-- ENDLESSトグルボタン -->
-    <Teleport to="body">
-      <button
-        v-if="isPavilionTabActive"
-        id="floating-schedule-dialog-button"
-        class="ytomo-floating-schedule-dialog"
-        title="スケジュール管理ダイアログを開く"
-        @click="handleOpenScheduleDialog"
-      >
-        📅
-      </button>
-    </Teleport>
-
     <Teleport to="body">
       <button
         v-if="isPavilionTabActive"
@@ -284,6 +295,63 @@
       >
         ∞
       </button>
+    </Teleport>
+
+    <!-- 予約情報エリア -->
+    <Teleport to="body">
+      <div
+        v-if="isPavilionTabActive && shouldShowReservationInfoPanel"
+        class="ytomo-reservation-info-panel"
+        :class="[
+          { collapsed: !reservationInfoExpanded },
+          `status-${getCurrentStatusClass()}`
+        ]"
+      >
+        <!-- 折りたたみ時の表示 -->
+        <div v-if="!reservationInfoExpanded" class="ytomo-info-collapsed" @click="reservationInfoExpanded = true">
+          <span class="ytomo-collapsed-icon">📋</span>
+        </div>
+
+        <!-- 展開時の表示 -->
+        <div v-else class="ytomo-info-expanded">
+          <!-- 上段 -->
+          <div class="ytomo-info-top-row">
+            <button
+              class="ytomo-endless-button"
+              :class="{ active: sequentialReservationStore.state.endlessMode }"
+              @click="handleEndlessToggle"
+              title="ENDLESSモード切替"
+            >
+              ∞
+            </button>
+            <div class="ytomo-current-time">
+              {{ getCurrentTimeSlot() }}
+            </div>
+            <button
+              class="ytomo-collapse-button"
+              @click="reservationInfoExpanded = false"
+              title="折り畳み"
+            >
+              ▼
+            </button>
+          </div>
+
+          <!-- 中央：パビリオン名 -->
+          <div class="ytomo-pavilion-name-area">
+            {{ getCurrentPavilionName() }}
+          </div>
+
+          <!-- 下段 -->
+          <div class="ytomo-info-bottom-row">
+            <div class="ytomo-progress">
+              {{ getCurrentProgress() }}
+            </div>
+            <div class="ytomo-status">
+              {{ getCurrentStatus() }}
+            </div>
+          </div>
+        </div>
+      </div>
     </Teleport>
 
     <!-- 予約実行/中断FABボタン -->
@@ -344,7 +412,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
 import { storeToRefs } from 'pinia'
 import ScheduleManagementDialog from '@/components/ScheduleManagementDialog.vue'
 import { usePavilionsStore } from '@/stores/pavilions'
@@ -354,24 +422,9 @@ import { useOverlaysStore } from '@/stores/overlays'
 import { useSequentialReservationStore } from '@/stores/sequentialReservation'
 import { useScheduledReservationStore } from '@/stores/scheduledReservation'
 import { usePavilions } from '@/composables/usePavilions'
-import type { ScheduleData, TicketData } from '@/types/api'
+import type { ScheduleData, TicketData, TimeSlotData, PavilionData } from '@/types/api'
 import type { ScheduleFormData, ScheduledTimeSlot } from '@/types/scheduledReservation'
 import { loggers } from '@/utils/logger'
-
-// 型定義
-interface TimeSlotData {
-  time: string
-  available: boolean
-  status?: string
-  reservationType?: string
-}
-
-interface PavilionData {
-  id: string
-  name: string
-  timeSlots: TimeSlotData[]
-  availableSlots: number
-}
 
 // Logger setup
 const logger = loggers.ui
@@ -381,6 +434,63 @@ const handleEndlessToggle = () => {
   sequentialReservationStore.setEndlessMode(!sequentialReservationStore.state.endlessMode)
   logger.info('ENDLESSモード切り替え', { enabled: sequentialReservationStore.state.endlessMode })
 }
+
+// 予約情報エリア関連関数
+const getCurrentTimeSlot = () => {
+  const currentIndex = sequentialReservationStore.state.currentTargetIndex
+  const targets = sequentialReservationStore.state.reservationTargets
+  const currentTarget = targets[currentIndex]
+  return currentTarget?.timeSlot || '待機中'
+}
+
+const getCurrentPavilionName = () => {
+  const currentIndex = sequentialReservationStore.state.currentTargetIndex
+  const targets = sequentialReservationStore.state.reservationTargets
+  const currentTarget = targets[currentIndex]
+  return currentTarget?.pavilionName || 'パビリオン名'
+}
+
+const getCurrentProgress = () => {
+  const currentIndex = sequentialReservationStore.state.currentTargetIndex
+  const totalCount = sequentialReservationStore.state.reservationTargets.length
+  if (totalCount === 0) return '[0/0]'
+  return `[${currentIndex + 1}/${totalCount}]`
+}
+
+const getCurrentStatus = () => {
+  const isRunning = sequentialReservationStore.state.isRunning
+  const countdownText = sequentialReservationStore.state.countdownText
+  const currentIndex = sequentialReservationStore.state.currentTargetIndex
+  const targets = sequentialReservationStore.state.reservationTargets
+  const currentTarget = targets[currentIndex]
+
+  if (!isRunning && !currentTarget) return 'Stopped'
+  if (!isRunning && lastReservationResults.value.length > 0) {
+    // 予約完了後の状態判定
+    const hasSuccess = lastReservationResults.value.some(result => result.success === true)
+    return hasSuccess ? 'Succeeded' : 'Failed'
+  }
+  if (!isRunning) return 'Stopped'
+  if (countdownText) return `Waiting in ${countdownText}`
+  return 'Executing'
+}
+
+const getCurrentStatusClass = () => {
+  const status = getCurrentStatus()
+  if (status === 'Executing') return 'executing'
+  if (status === 'Succeeded') return 'success'
+  if (status.includes('Failed') || status.includes('failed')) return 'failed'
+  if (status.includes('Waiting')) return 'waiting'
+  return 'stopped'
+}
+
+const shouldShowReservationInfoPanel = computed(() => {
+  return (
+    sequentialReservationStore.state.isRunning ||
+    reservationInfoExpanded.value ||
+    lastReservationResults.value.length > 0
+  )
+})
 
 // Store アクセス
 const pavilionsStore = usePavilionsStore()
@@ -410,6 +520,26 @@ const {
 // ローカル状態
 const searchInput = ref('')
 const resultDisplayVisible = ref(false)
+
+// 予約情報エリアの状態
+const reservationInfoExpanded = ref(false)
+let collapseTimeout: NodeJS.Timeout | null = null
+
+// 予約実行結果の管理
+const lastReservationResults = ref<any[]>([])
+const wasManuallyAborted = ref(false)
+
+// 予約実行時の自動展開制御
+watch(() => sequentialReservationStore.state.isRunning, (isRunning) => {
+  if (isRunning) {
+    // 予約実行時に自動展開（自動折り畳みは行わない）
+    reservationInfoExpanded.value = true
+    if (collapseTimeout) {
+      clearTimeout(collapseTimeout)
+      collapseTimeout = null
+    }
+  }
+})
 
 // スケジュールフォームデータ
 const scheduleFormData = ref<ScheduleFormData>({
@@ -598,11 +728,28 @@ const handlePavilionSearch = async () => {
   }
 }
 
+// キャンセル制御
+let currentAbortController: AbortController | null = null
+
 const handleLoadFavorites = async () => {
   try {
     logger.info('お気に入り読み込み開始')
-    showProcessingOverlay('お気に入りを読み込み中...')
-    
+
+    // 前回の処理をキャンセル
+    if (currentAbortController) {
+      currentAbortController.abort()
+    }
+
+    // 新しいAbortControllerを作成
+    currentAbortController = new AbortController()
+
+    overlaysStore.showProcessingOverlay('お気に入りを読み込み中...', () => {
+      if (currentAbortController) {
+        currentAbortController.abort()
+        currentAbortController = null
+      }
+    })
+
     // 選択されたチケットIDsを取得
     const ticketIds = ticketsStore.selectedTicketIds
 
@@ -610,23 +757,35 @@ const handleLoadFavorites = async () => {
     const entranceDate = selectedEntranceDate.value
 
     const results = await loadFavoritePavilions(entranceDate || undefined, ticketIds)
-    
+
+    // キャンセルされた場合は処理を中断
+    if (currentAbortController.signal.aborted) {
+      logger.info('お気に入り読み込みがキャンセルされました')
+      return
+    }
+
     // お気に入り読み込み後はフィルターをOFFにして全て表示
     if (isAvailableOnlyFilter.value) {
       toggleAvailableOnlyFilter()
       logger.info('お気に入り読み込み後にフィルターOFF')
     }
-    
+
     logger.info('お気に入り読み込み完了', {
       loadedCount: results.length,
       displayCount: allPavilions.value.length,
       favoriteNames: results.map(p => p.name)
     })
-    
+
     hideProcessingOverlay()
-  } catch (error) {
-    logger.error('お気に入り読み込みエラー', error)
+  } catch (error: any) {
+    if (error.name === 'AbortError') {
+      logger.info('お気に入り読み込みがキャンセルされました')
+    } else {
+      logger.error('お気に入り読み込みエラー', error)
+    }
     hideProcessingOverlay()
+  } finally {
+    currentAbortController = null
   }
 }
 
@@ -694,13 +853,17 @@ const getFilteredTimeSlots = (pavilion: any) => {
 
 const getTimeSlotClasses = (pavilionId: string, timeSlot: TimeSlotData) => {
   const classes = []
-  
+
   if (timeSlot.available) {
     classes.push('available')
+    // 残りわずかの場合はlimitedクラスも追加
+    if (timeSlot.availabilityStatus === 'limited') {
+      classes.push('limited')
+    }
   } else {
     classes.push('unavailable', 'full')
   }
-  
+
   // スケジュールモードの場合はスケジュール選択状態をチェック
   if (scheduledReservationStore.uiState.showScheduleRow) {
     const slotKey = `${pavilionId}-${timeSlot.time}`
@@ -713,7 +876,13 @@ const getTimeSlotClasses = (pavilionId: string, timeSlot: TimeSlotData) => {
       classes.push('selected')
     }
   }
-  
+
+  // 実行状態に応じたクラスを追加
+  const executionState = pavilionsStore.getTimeSlotExecutionState(pavilionId, timeSlot.timeSlotId || timeSlot.time)
+  if (executionState) {
+    classes.push(`execution-${executionState}`)
+  }
+
   return classes
 }
 
@@ -761,6 +930,7 @@ const handleTimeSlotClick = (pavilionId: string, timeSlot: TimeSlotData) => {
 const handleReservationExecution = async () => {
   // 順次予約実行中の場合は中断処理
   if (sequentialReservationStore.state.isRunning) {
+    wasManuallyAborted.value = true // 手動中断フラグを設定
     sequentialReservationStore.stopSequentialReservation()
     logger.info('順次予約を中断しました')
     return
@@ -772,6 +942,10 @@ const handleReservationExecution = async () => {
   }
   
   try {
+    // 予約実行フラグをリセット
+    wasManuallyAborted.value = false
+    lastReservationResults.value = []
+
     logger.info('予約実行開始', { selectedCount: selectedSlotsCount.value })
     
     // 現在表示されているパビリオンの選択時間帯のみを取得
@@ -816,11 +990,14 @@ const handleReservationExecution = async () => {
       formatTimeSlot,                     // フォーマット関数
       logger                              // ログ出力用
     )
-    
+
+    // 結果を保存（自動折り畳み判定用）
+    lastReservationResults.value = results
+
     // 成功した予約数をカウント
     const successCount = results.filter(r => r.success).length
     const failureCount = results.length - successCount
-    
+
     logger.info('予約実行完了', { successCount, failureCount })
     
     // 結果詳細をログ出力
@@ -1035,6 +1212,22 @@ const handleOpenScheduleDialog = () => {
   scheduledReservationStore.showScheduleDialog()
 }
 
+// すべての選択解除
+const handleClearAllSelections = () => {
+  const beforeCount = pavilionsStore.selectedTimeSlots.length
+
+  // pavilionsStoreの選択状態をクリア
+  pavilionsStore.clearSelectedTimeSlots()
+
+  // スケジュール選択スロットもクリア
+  scheduleSelectedSlots.value.clear()
+
+  logger.info('すべての時間帯選択を解除しました', {
+    clearedSlots: beforeCount,
+    remainingSlots: pavilionsStore.selectedTimeSlots.length
+  })
+}
+
 // ヘルパー関数
 const formatDate = (dateStr: string | null): string => {
   // YYYYMMDD形式（例：20250826）をパース
@@ -1052,19 +1245,36 @@ const formatDate = (dateStr: string | null): string => {
 const isTimeSlotDisabledByEntranceTime = (timeSlot: TimeSlotData): boolean => {
   const latestEntranceTime = getLatestEntranceTime()
   if (!latestEntranceTime) return false
-  
+
   // 時間帯の開始時間をHH:MM形式に変換
   const slotStartTime = formatTimeSlot(timeSlot.time)
   if (!slotStartTime) return false
-  
-  // デバッグログ
-  const isDisabled = slotStartTime <= latestEntranceTime
+
+  // 時刻を分単位に変換して正確な比較を行う
+  const slotMinutes = convertTimeToMinutes(slotStartTime)
+  const entranceMinutes = convertTimeToMinutes(latestEntranceTime)
+
+  // パビリオン体験は入場時刻より後でないといけない（入場してから体験するため）
+  const isDisabled = slotMinutes <= entranceMinutes
+
+  // 具体的な数値でデバッグ
   if (isDisabled) {
-    logger.debug('時間帯disabled', { slotStartTime, latestEntranceTime })
+    logger.temp('時間帯無効化判定（無効）', {
+      slotStartTime,
+      latestEntranceTime,
+      slotMinutes,
+      entranceMinutes,
+      reason: '入場時刻以前のため無効'
+    })
   }
-  
-  // 時間比較（HH:MM形式で辞書順比較）
+
   return isDisabled
+}
+
+// 時刻文字列（HH:MM）を分単位の数値に変換
+const convertTimeToMinutes = (timeStr: string): number => {
+  const [hours, minutes] = timeStr.split(':').map(Number)
+  return hours * 60 + minutes
 }
 
 const formatTimeSlot = (timeStr: string): string => {
@@ -1578,8 +1788,12 @@ onUnmounted(() => {
     border: 1px solid;
     min-width: 70px;
     text-align: center;
-    display: inline-block;
-    
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    position: relative;
+
     /* 子要素のポインターイベントを無効化してボタン全体をクリック可能にする */
     * {
         pointer-events: none;
@@ -1590,17 +1804,35 @@ onUnmounted(() => {
         border-color: #22c55e;
         color: #166534;
 
+        &.limited {
+            background: #fed7aa;  // オレンジ色（残りわずか）
+            border-color: #f97316;
+            color: #c2410c;
+        }
+
         &:hover {
             background: #bbf7d0;  // 選択より薄い色
             color: #166534;
             transform: translateY(-1px);
             box-shadow: 0 2px 8px rgba(34, 197, 94, 0.3);
+
+            &.limited {
+                background: #fdba74;  // オレンジのホバー色
+                color: #c2410c;
+                box-shadow: 0 2px 8px rgba(249, 115, 22, 0.3);
+            }
         }
 
         &.selected {
             background: #22c55e;  // しっかりとした濃い色
             color: white;
             box-shadow: 0 2px 8px rgba(34, 197, 94, 0.3);
+
+            &.limited {
+                background: #f97316;  // オレンジの選択色
+                color: white;
+                box-shadow: 0 2px 8px rgba(249, 115, 22, 0.3);
+            }
         }
     }
 
@@ -1668,6 +1900,55 @@ onUnmounted(() => {
     &.hidden {
         display: none;
     }
+
+    /* 実行状態スタイル */
+    &.execution-executing {
+        border: 2px solid #3b82f6;
+        animation: executionPulse 1.5s ease-in-out infinite;
+
+        .ytomo-execution-icon {
+            animation: spin 1s linear infinite;
+        }
+    }
+
+    &.execution-success {
+        border: 2px solid #10b981;
+        box-shadow: 0 0 8px rgba(16, 185, 129, 0.4);
+
+        .ytomo-execution-icon {
+            color: #10b981;
+            font-size: 14px;
+        }
+    }
+
+    &.execution-failed {
+        border: 2px solid #ef4444;
+        box-shadow: 0 0 8px rgba(239, 68, 68, 0.4);
+
+        .ytomo-execution-icon {
+            color: #ef4444;
+            font-size: 14px;
+        }
+    }
+}
+
+.ytomo-execution-icon {
+    font-size: 12px;
+    line-height: 1;
+}
+
+@keyframes executionPulse {
+    0%, 100% {
+        box-shadow: 0 0 4px rgba(59, 130, 246, 0.4);
+    }
+    50% {
+        box-shadow: 0 0 12px rgba(59, 130, 246, 0.8);
+    }
+}
+
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
 }
 
 /* 予約コントロールエリア */
@@ -1907,6 +2188,175 @@ onUnmounted(() => {
     }
 }
 
+/* 予約情報エリア */
+.ytomo-reservation-info-panel {
+    position: fixed;
+    bottom: 150px;
+    right: 20px;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+    border: 2px solid #2c5aa0;
+    z-index: 1000;
+    transition: all 0.3s ease;
+
+    /* ステータス別背景色 */
+    &.status-executing {
+        background: #eff6ff; /* 薄い青 */
+        border-color: #3b82f6;
+    }
+
+    &.status-success {
+        background: #f0fdf4; /* 薄い緑 */
+        border-color: #10b981;
+    }
+
+    &.status-failed {
+        background: #fef2f2; /* 薄い赤 */
+        border-color: #ef4444;
+    }
+
+    &.status-waiting {
+        background: #fffbeb; /* 薄い黄 */
+        border-color: #f59e0b;
+    }
+
+    &.status-stopped {
+        background: #f9fafb; /* 薄いグレー */
+        border-color: #6b7280;
+    }
+
+    &.collapsed {
+        width: 56px;
+        height: 56px;
+    }
+}
+
+.ytomo-info-collapsed {
+    width: 52px;
+    height: 52px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    border-radius: 10px;
+
+    &:hover {
+        background: #f8fafc;
+    }
+
+    .ytomo-collapsed-icon {
+        font-size: 24px;
+    }
+}
+
+.ytomo-info-expanded {
+    width: 240px;
+    padding: 16px;
+}
+
+.ytomo-info-top-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+}
+
+.ytomo-endless-button {
+    background: none;
+    border: 2px solid #d1d5db;
+    border-radius: 6px;
+    width: 32px;
+    height: 32px;
+    font-size: 16px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+
+    &.active {
+        background: #2c5aa0;
+        border-color: #2c5aa0;
+        color: white;
+    }
+
+    &:hover {
+        border-color: #9ca3af;
+    }
+}
+
+.ytomo-current-time {
+    font-size: 16px;
+    font-weight: 600;
+    color: #2c5aa0;
+}
+
+.ytomo-collapse-button {
+    background: none;
+    border: none;
+    font-size: 12px;
+    color: #6b7280;
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 4px;
+
+    &:hover {
+        background: #f3f4f6;
+    }
+}
+
+.ytomo-pavilion-name-area {
+    text-align: center;
+    margin: 12px 0;
+    font-size: 14px;
+    font-weight: 600;
+    color: #374151;
+    line-height: 1.4;
+    min-height: 38px;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    overflow: hidden;
+    word-break: break-word;
+}
+
+.ytomo-info-bottom-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 12px;
+    color: #6b7280;
+}
+
+.ytomo-progress {
+    font-weight: 600;
+}
+
+.ytomo-status {
+    font-weight: 500;
+
+    &:has-text("Executing") {
+        color: #3b82f6;
+    }
+
+    &:has-text("Failed") {
+        color: #ef4444;
+    }
+
+    &:has-text("Succeeded") {
+        color: #10b981;
+    }
+
+    &:has-text("Waiting") {
+        color: #f59e0b;
+    }
+
+    &:has-text("Stopped") {
+        color: #6b7280;
+    }
+}
+
 /* 予約実行FABボタン */
 .ytomo-reservation-fab {
     position: fixed;
@@ -1978,81 +2428,7 @@ onUnmounted(() => {
     }
 }
 
-/* フローティングスケジュールダイアログボタン */
-.ytomo-floating-schedule-dialog {
-    position: fixed;
-    bottom: 196px;
-    right: 20px;
-    width: 40px;
-    height: 32px;
-    background: #3b82f6;
-    border: none;
-    border-radius: 16px;
-    color: white;
-    cursor: pointer;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-    transition: all 0.2s ease;
-    z-index: 10003;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 16px;
-    font-weight: bold;
-
-    &:hover {
-        background: #2563eb;
-        transform: translateY(-1px);
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
-    }
-
-    &:active {
-        transform: translateY(0);
-    }
-
-    &:focus {
-        outline: none;
-    }
-}
-
-/* ENDLESSトグルボタン */
-.ytomo-endless-toggle {
-    position: fixed;
-    bottom: 156px;
-    right: 20px;
-    width: 40px;
-    height: 32px;
-    background: #6b7280;
-    border: none;
-    border-radius: 16px;
-    color: white;
-    cursor: pointer;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-    transition: all 0.2s ease;
-    z-index: 10003;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 18px;
-    font-weight: bold;
-
-    &.active {
-        background: #ff8c00;
-        box-shadow: 0 2px 8px rgba(255, 140, 0, 0.4);
-    }
-
-    &:hover {
-        transform: translateY(-1px);
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
-    }
-
-    &:active {
-        transform: translateY(0);
-    }
-
-    &:focus {
-        outline: none;
-    }
-}
+/* 選択解除ボタン */
 
 /* ボタン間の縦線セパレータ */
 .ytomo-button-separator {

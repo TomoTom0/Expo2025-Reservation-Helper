@@ -60,6 +60,8 @@ export interface TimeSlotData {
     reserved?: number;            // 予約済み人数
     reservationType: string;      // "normal", "lottery", "priority"
     timeSlotId?: string;          // 時間帯ID
+    availabilityStatus?: 'available' | 'limited' | 'full';  // 空き状況: 空きあり、残りわずか、満員
+    unavailableReason?: number;   // APIから取得した空き状況コード
 }
 
 // 後方互換性のため
