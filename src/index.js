@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         yt-Expo2025-Reservation-Helper
 // @namespace    http://staybrowser.com/
-// @version      1.0.0
+// @version      1.1.0
 // @description  大阪万博2025予約支援ツール: パビリオン検索・予約・監視・同行者管理・入場予約の自動化
 // @author       TomoTom0 https://github.com/TomoTom0
 // @match        https://ticket.expo2025.or.jp/*
