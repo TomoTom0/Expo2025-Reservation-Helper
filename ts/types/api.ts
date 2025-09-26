@@ -95,6 +95,7 @@ export interface ReservationResult {
     data?: any;
     reservationId?: string;
     error?: string;
+    failureReason?: '満席' | '無効' | 'その他';
     details?: {
         pavilionName: string;
         timeSlot: string;

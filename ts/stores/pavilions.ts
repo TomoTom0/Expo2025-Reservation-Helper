@@ -692,9 +692,21 @@ export const usePavilionsStore = defineStore('pavilions', () => {
         const errorMessage = data.error?.message || '予約できませんでした'
 
 
+        // 失敗理由を判定（公式JSのエラー名に基づく）
+        let failureReason: '満席' | '無効' | 'その他' = 'その他'
+        const errorName = data.error?.name
+        if (errorName === 'fetch_remainder_failed') {
+          failureReason = '満席'
+        } else if (errorName === 'th_error') {
+          failureReason = '無効'
+        } else if (errorMessage.includes('select ticket valid error')) {
+          failureReason = '無効'
+        }
+
         return {
           success: false,
           message: errorMessage,
+          failureReason: failureReason,
           data: data,
           details: {
             pavilionName: pavilions.value.get(pavilionId)?.name || '',
@@ -712,11 +724,17 @@ export const usePavilionsStore = defineStore('pavilions', () => {
 
       const errorMessage = error instanceof Error ? error.message : String(error)
 
+      // 失敗理由を判定（catch節では詳細なエラー構造が取得できないためその他とする）
+      let failureReason: '満席' | '無効' | 'その他' = 'その他'
+      if (errorMessage.includes('select ticket valid error')) {
+        failureReason = '無効'
+      }
 
       logger.error('予約実行エラー', { error: errorMessage })
       return {
         success: false,
         message: '予約実行エラー',
+        failureReason: failureReason,
         error: errorMessage,
         details: {
           pavilionName: pavilions.value.get(pavilionId)?.name || '',

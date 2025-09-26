@@ -269,14 +269,12 @@
               @click="handleTimeSlotClick(pavilion.id, timeSlot)"
             >
               <span class="ytomo-time-slot-text">{{ formatTimeSlot(timeSlot.time) }}</span>
+              <!-- 実行状態を右上角の色で表示 -->
               <span
                 v-if="pavilionsStore.getTimeSlotExecutionState(pavilion.id, timeSlot.timeSlotId || timeSlot.time)"
-                class="ytomo-execution-icon"
-              >
-                <span v-if="pavilionsStore.getTimeSlotExecutionState(pavilion.id, timeSlot.timeSlotId || timeSlot.time) === 'executing'">⏳</span>
-                <span v-else-if="pavilionsStore.getTimeSlotExecutionState(pavilion.id, timeSlot.timeSlotId || timeSlot.time) === 'success'">✅</span>
-                <span v-else-if="pavilionsStore.getTimeSlotExecutionState(pavilion.id, timeSlot.timeSlotId || timeSlot.time) === 'failed'">❌</span>
-              </span>
+                class="ytomo-execution-corner"
+                :class="`status-${pavilionsStore.getTimeSlotExecutionState(pavilion.id, timeSlot.timeSlotId || timeSlot.time)}`"
+              ></span>
             </button>
           </div>
         </div>
@@ -377,17 +375,20 @@
     
     <!-- 予約結果FAB（予約FABの左側に配置） -->
     <Teleport to="body">
-      <button 
-        v-if="reservationResult"
-        id="reservation-result-fab" 
-        class="ytomo-reservation-result-fab" 
-        :class="{ 
-          'success': reservationResult?.success, 
-          'error': reservationResult && !reservationResult.success 
+      <button
+        v-if="reservationResult && !reservationInfoExpanded"
+        id="reservation-result-fab"
+        class="ytomo-reservation-result-fab"
+        :class="{
+          'success': reservationResult?.success,
+          'error': reservationResult && !reservationResult.success
         }"
       >
         <div class="ytomo-result-status">
           {{ reservationResult.success ? '予約成功' : `予約失敗` }}
+          <span v-if="!reservationResult.success && reservationResult.failureReason" class="ytomo-failure-reason">
+            ({{ reservationResult.failureReason }})
+          </span>
         </div>
         <div class="ytomo-result-pavilion">{{ reservationResult.pavilionName }}</div>
         <div class="ytomo-result-time">{{ reservationResult.datetime }}</div>
@@ -437,6 +438,11 @@ const handleEndlessToggle = () => {
 
 // 予約情報エリア関連関数
 const getCurrentTimeSlot = () => {
+  // 結果表示中は完了した予約の情報を表示
+  if (lastReservationResults.value.length > 0 && lastCompletedReservation.value) {
+    return lastCompletedReservation.value.timeSlot
+  }
+
   const currentIndex = sequentialReservationStore.state.currentTargetIndex
   const targets = sequentialReservationStore.state.reservationTargets
   const currentTarget = targets[currentIndex]
@@ -444,6 +450,11 @@ const getCurrentTimeSlot = () => {
 }
 
 const getCurrentPavilionName = () => {
+  // 結果表示中は完了した予約の情報を表示
+  if (lastReservationResults.value.length > 0 && lastCompletedReservation.value) {
+    return lastCompletedReservation.value.pavilionName
+  }
+
   const currentIndex = sequentialReservationStore.state.currentTargetIndex
   const targets = sequentialReservationStore.state.reservationTargets
   const currentTarget = targets[currentIndex]
@@ -451,6 +462,12 @@ const getCurrentPavilionName = () => {
 }
 
 const getCurrentProgress = () => {
+  // 結果表示中は完了した予約の進捗情報を表示
+  if (lastReservationResults.value.length > 0 && lastCompletedReservation.value) {
+    const { index, totalCount } = lastCompletedReservation.value
+    return `[${index + 1}/${totalCount}]`
+  }
+
   const currentIndex = sequentialReservationStore.state.currentTargetIndex
   const totalCount = sequentialReservationStore.state.reservationTargets.length
   if (totalCount === 0) return '[0/0]'
@@ -471,6 +488,22 @@ const getCurrentStatus = () => {
     return hasSuccess ? 'Succeeded' : 'Failed'
   }
   if (!isRunning) return 'Stopped'
+
+  // 予約結果がある場合は、結果表示を優先（10秒間の結果表示期間中）
+  if (lastReservationResults.value.length > 0) {
+    const hasSuccess = lastReservationResults.value.some(result => result.success === true)
+    if (hasSuccess) {
+      return 'Succeeded'
+    } else {
+      // 失敗理由を含めて表示
+      const firstFailure = lastReservationResults.value.find(result => !result.success)
+      if (firstFailure?.failureReason) {
+        return `Failed (${firstFailure.failureReason})`
+      }
+      return 'Failed'
+    }
+  }
+
   if (countdownText) return `Waiting in ${countdownText}`
   return 'Executing'
 }
@@ -528,6 +561,7 @@ let collapseTimeout: NodeJS.Timeout | null = null
 // 予約実行結果の管理
 const lastReservationResults = ref<any[]>([])
 const wasManuallyAborted = ref(false)
+const lastCompletedReservation = ref<{pavilionName: string, timeSlot: string, index: number, totalCount: number} | null>(null)
 
 // 予約実行時の自動展開制御
 watch(() => sequentialReservationStore.state.isRunning, (isRunning) => {
@@ -558,6 +592,7 @@ const scheduleSelectedSlots = ref<Map<string, ScheduledTimeSlot>>(new Map())
 interface ReservationResult {
   success: boolean
   reason?: string
+  failureReason?: '満席' | '無効' | 'その他'
   pavilionName: string
   datetime: string
 }
@@ -993,6 +1028,31 @@ const handleReservationExecution = async () => {
 
     // 結果を保存（自動折り畳み判定用）
     lastReservationResults.value = results
+
+    // 現在の予約情報を保存（結果表示用）
+    const currentIndex = sequentialReservationStore.state.currentTargetIndex
+    const targets = sequentialReservationStore.state.reservationTargets
+    const totalCount = targets.length
+
+    if (currentIndex < totalCount) {
+      const completedTarget = targets[currentIndex - 1] // 完了したのは一つ前のターゲット
+      const completedIndex = currentIndex - 1 // 完了したターゲットのindex
+
+      if (completedTarget && completedIndex >= 0) {
+        lastCompletedReservation.value = {
+          pavilionName: completedTarget.pavilionName,
+          timeSlot: completedTarget.timeSlot,
+          index: completedIndex,
+          totalCount: totalCount
+        }
+
+        // 10秒後にクリア
+        setTimeout(() => {
+          lastCompletedReservation.value = null
+          lastReservationResults.value = []
+        }, 10000)
+      }
+    }
 
     // 成功した予約数をカウント
     const successCount = results.filter(r => r.success).length
@@ -1897,44 +1957,35 @@ onUnmounted(() => {
         }
     }
 
+    /* 実行状態は右上角で表示するため境界線変更は削除 */
+    position: relative; /* 右上角表示のため */
+
     &.hidden {
         display: none;
     }
-
-    /* 実行状態スタイル */
-    &.execution-executing {
-        border: 2px solid #3b82f6;
-        animation: executionPulse 1.5s ease-in-out infinite;
-
-        .ytomo-execution-icon {
-            animation: spin 1s linear infinite;
-        }
-    }
-
-    &.execution-success {
-        border: 2px solid #10b981;
-        box-shadow: 0 0 8px rgba(16, 185, 129, 0.4);
-
-        .ytomo-execution-icon {
-            color: #10b981;
-            font-size: 14px;
-        }
-    }
-
-    &.execution-failed {
-        border: 2px solid #ef4444;
-        box-shadow: 0 0 8px rgba(239, 68, 68, 0.4);
-
-        .ytomo-execution-icon {
-            color: #ef4444;
-            font-size: 14px;
-        }
-    }
 }
 
-.ytomo-execution-icon {
-    font-size: 12px;
-    line-height: 1;
+/* 実行状態表示用の右上角 */
+.ytomo-execution-corner {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 8px;
+    height: 8px;
+    border-radius: 0 4px 0 0;
+
+    &.status-executing {
+        background: #3b82f6;
+        animation: executionPulse 1.5s ease-in-out infinite;
+    }
+
+    &.status-success {
+        background: #10b981;
+    }
+
+    &.status-failed {
+        background: #ef4444;
+    }
 }
 
 @keyframes executionPulse {
@@ -2240,13 +2291,23 @@ onUnmounted(() => {
     justify-content: center;
     cursor: pointer;
     border-radius: 10px;
+    background: inherit; /* 親の背景色を継承 */
+    transition: all 0.2s ease;
 
     &:hover {
-        background: #f8fafc;
+        opacity: 0.8;
     }
 
     .ytomo-collapsed-icon {
         font-size: 24px;
+        background: white;
+        border-radius: 50%;
+        width: 32px;
+        height: 32px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
     }
 }
 
@@ -2945,6 +3006,12 @@ onUnmounted(() => {
         font-weight: 600;
         font-size: 11px;
         margin-bottom: 2px;
+
+        .ytomo-failure-reason {
+            font-size: 9px;
+            font-weight: 500;
+            opacity: 0.9;
+        }
     }
     
     .ytomo-result-pavilion {
