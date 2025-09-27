@@ -1030,28 +1030,30 @@ const handleReservationExecution = async () => {
     lastReservationResults.value = results
 
     // 現在の予約情報を保存（結果表示用）
-    const currentIndex = sequentialReservationStore.state.currentTargetIndex
     const targets = sequentialReservationStore.state.reservationTargets
     const totalCount = targets.length
 
-    if (currentIndex < totalCount) {
-      const completedTarget = targets[currentIndex - 1] // 完了したのは一つ前のターゲット
-      const completedIndex = currentIndex - 1 // 完了したターゲットのindex
+    // 最後に実行された予約の情報を保存（一種類選択時と二週目に対応）
+    if (results.length > 0) {
+      // 実際に実行された予約の最後の結果から情報を取得
+      const lastResult = results[results.length - 1]
 
-      if (completedTarget && completedIndex >= 0) {
-        lastCompletedReservation.value = {
-          pavilionName: completedTarget.pavilionName,
-          timeSlot: completedTarget.timeSlot,
-          index: completedIndex,
-          totalCount: totalCount
-        }
+      // 結果から直接パビリオン名と時間帯を取得（ENDLESSモード二週目対応）
+      const pavilionName = lastResult.details?.pavilionName || lastResult.pavilionName || 'パビリオン名'
+      const timeSlot = lastResult.details?.timeSlot || lastResult.timeSlot || '時間帯'
 
-        // 10秒後にクリア
-        setTimeout(() => {
-          lastCompletedReservation.value = null
-          lastReservationResults.value = []
-        }, 10000)
+      lastCompletedReservation.value = {
+        pavilionName: pavilionName,
+        timeSlot: timeSlot,
+        index: results.length - 1, // 実際に実行された予約の最後のインデックス
+        totalCount: reservationTargets.length
       }
+
+      // 10秒後にクリア
+      setTimeout(() => {
+        lastCompletedReservation.value = null
+        lastReservationResults.value = []
+      }, 10000)
     }
 
     // 成功した予約数をカウント

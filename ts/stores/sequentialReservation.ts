@@ -315,9 +315,8 @@ export const useSequentialReservationStore = defineStore('sequentialReservation'
       state.value.isRunning = false
       return
     }
-    
-    
-    // 次の予約を再帰呼び出し
+
+    // 失敗時のみ次の予約を再帰呼び出し
     nextReservationTimerId = setTimeout(async () => {
       nextReservationTimerId = null // タイマークリア
       if (!state.value.isRunning) return // 中断チェック

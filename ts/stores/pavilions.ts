@@ -695,6 +695,16 @@ export const usePavilionsStore = defineStore('pavilions', () => {
         // 失敗理由を判定（公式JSのエラー名に基づく）
         let failureReason: '満席' | '無効' | 'その他' = 'その他'
         const errorName = data.error?.name
+
+        // エラーレスポンス構造を詳細ログ出力（失敗理由判定改善のため）
+        logger.temp('パビリオン予約失敗エラー詳細', {
+          status: response.status,
+          errorName: errorName,
+          errorMessage: errorMessage,
+          errorData: data.error,
+          fullResponse: data
+        })
+
         if (errorName === 'fetch_remainder_failed') {
           failureReason = '満席'
         } else if (errorName === 'th_error') {
