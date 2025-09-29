@@ -322,6 +322,15 @@
             >
               ∞
             </button>
+            <select
+              class="ytomo-mode-selector"
+              v-model="executionMode"
+              title="実行モード選択"
+            >
+              <option value="sequential">順次</option>
+              <option value="confirm">確認</option>
+              <option value="fast">高速</option>
+            </select>
             <div class="ytomo-current-time">
               {{ getCurrentTimeSlot() }}
             </div>
@@ -348,30 +357,33 @@
               {{ getCurrentStatus() }}
             </div>
           </div>
+
         </div>
       </div>
     </Teleport>
 
+
     <!-- 予約実行/中断FABボタン -->
     <Teleport to="body">
-      <button 
+      <button
         v-if="isPavilionTabActive"
-        id="reservation-button" 
-        class="ytomo-reservation-fab" 
+        id="reservation-button"
+        class="ytomo-reservation-fab"
         :class="{ 'abort-mode': sequentialReservationStore.state.isRunning }"
         :disabled="!sequentialReservationStore.state.isRunning && selectedSlotsCount === 0"
         :title="sequentialReservationStore.state.isRunning ? '順次予約を中断' : `予約実行 (${selectedSlotsCount}件選択中)`"
         @click="handleReservationExecution"
       >
         {{ sequentialReservationStore.state.isRunning ? '中断' : '📋' }}
-        <span 
-          v-if="!sequentialReservationStore.state.isRunning && selectedSlotsCount > 0" 
+        <span
+          v-if="!sequentialReservationStore.state.isRunning && selectedSlotsCount > 0"
           class="ytomo-count-badge"
         >
           {{ selectedSlotsCount }}
         </span>
       </button>
     </Teleport>
+
     
     <!-- 予約結果FAB（予約FABの左側に配置） -->
     <Teleport to="body">
@@ -436,6 +448,105 @@ const handleEndlessToggle = () => {
   logger.info('ENDLESSモード切り替え', { enabled: sequentialReservationStore.state.endlessMode })
 }
 
+// 確認モード実行関数
+const executeConfirmMode = async (reservationTargets: any[], selectedSlots: any[], entranceDate: string, registeredChannel: string, ticketIds: string[]) => {
+  logger.info('確認モード実行開始', { totalTargets: reservationTargets.length })
+
+  // 最大5個まで実行（空き状況の再確認は実際の予約実行時に行う）
+  const targetsToExecute = reservationTargets.slice(0, 5)
+  logger.info('確認モード：実行対象', { count: targetsToExecute.length })
+
+  // 2秒間隔で非同期実行
+  return await executeTargetsWithInterval(targetsToExecute, selectedSlots, 2000)
+}
+
+// 高速モード実行関数
+const executeFastMode = async (reservationTargets: any[], selectedSlots: any[], entranceDate: string, registeredChannel: string, ticketIds: string[]) => {
+  logger.info('高速モード実行開始', { totalTargets: reservationTargets.length })
+
+  const batchSize = 5
+  let currentIndex = 0
+  const allResults = []
+
+  while (currentIndex < reservationTargets.length) {
+    // 現在のバッチを取得（最大5個）
+    const currentBatch = reservationTargets.slice(currentIndex, currentIndex + batchSize)
+    logger.info('高速モード：バッチ実行', { batchIndex: Math.floor(currentIndex / batchSize), batchSize: currentBatch.length })
+
+    // 2秒間隔で非同期実行
+    const batchResults = await executeTargetsWithInterval(currentBatch, selectedSlots, 2000)
+    allResults.push(...batchResults)
+
+    currentIndex += batchSize
+
+    // 次のバッチがある場合は少し待機
+    if (currentIndex < reservationTargets.length) {
+      await new Promise(resolve => setTimeout(resolve, 1000))
+    }
+  }
+
+  return allResults
+}
+
+// 対象を指定間隔で実行する共通関数
+const executeTargetsWithInterval = async (targets: any[], selectedSlots: any[], intervalMs: number) => {
+  const results = []
+
+  for (let i = 0; i < targets.length; i++) {
+    const target = targets[i]
+
+    try {
+      const targetSlot = selectedSlots.find(slot =>
+        slot.pavilionId === target.pavilionId &&
+        formatTimeSlot(slot.timeSlot.time) === target.timeSlot
+      )
+
+      if (!targetSlot) {
+        logger.warn('対象スロットが見つかりません', target)
+        continue
+      }
+
+      logger.info('予約実行中', { pavilionName: target.pavilionName, timeSlot: target.timeSlot, index: i + 1, total: targets.length })
+
+      const result = await pavilionsStore.executeReservation(
+        target.pavilionId,
+        targetSlot.timeSlot,
+        target.entranceDate,
+        target.registeredChannel,
+        target.ticketIds
+      )
+
+      results.push({
+        ...result,
+        pavilionName: target.pavilionName,
+        timeSlot: target.timeSlot
+      })
+
+      // 成功した場合は終了
+      if (result.success) {
+        logger.info('予約成功により実行終了', { pavilionName: target.pavilionName })
+        break
+      }
+
+    } catch (error) {
+      logger.error('個別予約実行エラー', { target, error })
+      results.push({
+        success: false,
+        message: error instanceof Error ? error.message : '予約に失敗しました',
+        pavilionName: target.pavilionName,
+        timeSlot: target.timeSlot
+      })
+    }
+
+    // 最後以外は間隔を空ける
+    if (i < targets.length - 1) {
+      await new Promise(resolve => setTimeout(resolve, intervalMs))
+    }
+  }
+
+  return results
+}
+
 // 予約情報エリア関連関数
 const getCurrentTimeSlot = () => {
   // 結果表示中は完了した予約の情報を表示
@@ -460,6 +571,7 @@ const getCurrentPavilionName = () => {
   const currentTarget = targets[currentIndex]
   return currentTarget?.pavilionName || 'パビリオン名'
 }
+
 
 const getCurrentProgress = () => {
   // 結果表示中は完了した予約の進捗情報を表示
@@ -557,6 +669,9 @@ const resultDisplayVisible = ref(false)
 // 予約情報エリアの状態
 const reservationInfoExpanded = ref(false)
 let collapseTimeout: NodeJS.Timeout | null = null
+
+// 実行モード管理
+const executionMode = ref<'sequential' | 'confirm' | 'fast'>('sequential')
 
 // 予約実行結果の管理
 const lastReservationResults = ref<any[]>([])
@@ -1003,7 +1118,7 @@ const handleReservationExecution = async () => {
     if (ticketIds.length === 0) {
       throw new Error('チケットが選択されていません')
     }
-    
+
     // 予約対象をReservationTarget形式に変換
     const reservationTargets = selectedSlots.map(selection => ({
       pavilionId: selection.pavilionId,
@@ -1013,18 +1128,34 @@ const handleReservationExecution = async () => {
       registeredChannel,
       ticketIds
     }))
-    
-    // 継続予約開始 - 必要な情報を渡して継続予約storeに委譲（オーバーレイ非表示）
+
+    let results: any[] = []
+
+    // 実行モードに応じて処理を分岐
     const endlessMode = sequentialReservationStore.state.endlessMode
-    sequentialReservationStore.startSequentialReservation(reservationTargets, endlessMode, false)
-    
-    // 継続予約storeに予約実行を完全委譲
-    const results = await sequentialReservationStore.executeSequentialReservation(
-      pavilionsStore.executeReservation, // 予約実行関数
-      selectedSlots,                      // TimeSlotData検索用
-      formatTimeSlot,                     // フォーマット関数
-      logger                              // ログ出力用
-    )
+
+    switch (executionMode.value) {
+      case 'sequential':
+        // 従来の順次実行
+        sequentialReservationStore.startSequentialReservation(reservationTargets, endlessMode, false)
+        results = await sequentialReservationStore.executeSequentialReservation(
+          pavilionsStore.executeReservation,
+          selectedSlots,
+          formatTimeSlot,
+          logger
+        )
+        break
+
+      case 'confirm':
+        // 確認モード：空きがある対象を最大5個まで2秒間隔で非同期実行
+        results = await executeConfirmMode(reservationTargets, selectedSlots, entranceDate, registeredChannel, ticketIds)
+        break
+
+      case 'fast':
+        // 高速モード：最大5個まで2秒間隔で非同期実行、次周期で次の優先度
+        results = await executeFastMode(reservationTargets, selectedSlots, entranceDate, registeredChannel, ticketIds)
+        break
+    }
 
     // 結果を保存（自動折り畳み判定用）
     lastReservationResults.value = results
@@ -1093,7 +1224,7 @@ const handleReservationExecution = async () => {
           pavilionName: result.details.pavilionName || '',
           datetime: `${formatDate(entranceDate)} ${result.details.timeSlot || ''}`
         }
-        
+
         showReservationResult(formattedResult)
       }
     })
@@ -1105,6 +1236,7 @@ const handleReservationExecution = async () => {
     sequentialReservationStore.stopSequentialReservation()
   }
 }
+
 
 // ENDLESS OFF時の予約失敗後時間帯情報非同期更新
 const updateTimeSlotInfoAsync = async () => {
@@ -2322,7 +2454,7 @@ onUnmounted(() => {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-bottom: 12px;
+    margin-bottom: 8px;
 }
 
 .ytomo-endless-button {
@@ -2353,6 +2485,33 @@ onUnmounted(() => {
     font-size: 16px;
     font-weight: 600;
     color: #2c5aa0;
+    display: flex;
+    align-items: center;
+    height: 32px;
+}
+
+.ytomo-mode-selector {
+    padding: 4px 8px;
+    font-size: 11px;
+    border: 1px solid #d1d5db;
+    border-radius: 4px;
+    background: white;
+    color: #374151;
+    cursor: pointer;
+    min-width: 60px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+
+    &:focus {
+        outline: none;
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 1px #3b82f6;
+    }
+
+    option {
+        padding: 4px;
+    }
 }
 
 .ytomo-collapse-button {
@@ -2363,6 +2522,9 @@ onUnmounted(() => {
     cursor: pointer;
     padding: 4px;
     border-radius: 4px;
+    display: flex;
+    align-items: center;
+    height: 32px;
 
     &:hover {
         background: #f3f4f6;
@@ -2371,15 +2533,15 @@ onUnmounted(() => {
 
 .ytomo-pavilion-name-area {
     text-align: center;
-    margin: 12px 0;
+    margin: 8px 0;
     font-size: 14px;
     font-weight: 600;
     color: #374151;
     line-height: 1.4;
-    min-height: 38px;
-    display: -webkit-box;
-    -webkit-box-orient: vertical;
-    -webkit-line-clamp: 2;
+    min-height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     overflow: hidden;
     word-break: break-word;
 }
@@ -2490,6 +2652,7 @@ onUnmounted(() => {
         }
     }
 }
+
 
 /* 選択解除ボタン */
 

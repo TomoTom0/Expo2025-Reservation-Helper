@@ -3,23 +3,23 @@
     <div class="ytomo-wait-controls">
       <button
         @click="handleStartWait"
-        :disabled="reservationManager.waitInfo.value.isWaiting || reservationManager.waitInfo.value.waitMinutes < 1 || reservationManager.waitInfo.value.waitMinutes > 720"
+        :disabled="entranceStore.waitInfo.isWaiting || entranceStore.waitInfo.waitMinutes < 1 || entranceStore.waitInfo.waitMinutes > 720"
       >
         予約待機
       </button>
       <input
         type="number"
-        v-model="reservationManager.waitInfo.value.waitMinutes"
-        :disabled="reservationManager.waitInfo.value.isWaiting"
+        v-model="entranceStore.waitInfo.waitMinutes"
+        :disabled="entranceStore.waitInfo.isWaiting"
         min="1"
         max="720"
         step="1"
       />分
       <!-- 時間調整ボタン -->
       <div class="ytomo-time-adjust-buttons">
-        <button @click="adjustWaitTime(5)" class="ytomo-time-adjust-btn" :disabled="reservationManager.waitInfo.value.isWaiting" title="5分追加">+5</button>
-        <button @click="adjustWaitTime(15)" class="ytomo-time-adjust-btn" :disabled="reservationManager.waitInfo.value.isWaiting" title="15分追加">+15</button>
-        <button @click="adjustWaitTime(60)" class="ytomo-time-adjust-btn" :disabled="reservationManager.waitInfo.value.isWaiting" title="60分追加">+60</button>
+        <button @click="adjustWaitTime(5)" class="ytomo-time-adjust-btn" :disabled="entranceStore.waitInfo.isWaiting" title="5分追加">+5</button>
+        <button @click="adjustWaitTime(15)" class="ytomo-time-adjust-btn" :disabled="entranceStore.waitInfo.isWaiting" title="15分追加">+15</button>
+        <button @click="adjustWaitTime(60)" class="ytomo-time-adjust-btn" :disabled="entranceStore.waitInfo.isWaiting" title="60分追加">+60</button>
       </div>
     </div>
   </div>
@@ -27,22 +27,21 @@
 
 <script setup lang="ts">
 import { computed } from 'vue'
-import type { EntranceReservationApiManager } from '@/modules/entrance-reservation-api-manager'
+import { useEntranceReservationStore } from '@/stores/entranceReservation'
 import { loggers } from '@/utils/logger'
 
 const logger = loggers.ui
 
-interface Props {
-  reservationManager: EntranceReservationApiManager
-}
+const props = defineProps<{
+  isReservationRunning: boolean
+}>()
 
-const props = defineProps<Props>()
-
-const isReservationRunning = computed(() => props.reservationManager.isReservationRunning.value)
+const entranceStore = useEntranceReservationStore()
+const isReservationRunning = computed(() => props.isReservationRunning)
 
 const handleStartWait = () => {
   try {
-    props.reservationManager.startWait()
+    entranceStore.startWait()
   } catch (error) {
     logger.error('予約待機開始エラー', { error })
   }
@@ -50,14 +49,14 @@ const handleStartWait = () => {
 
 // 待機時間調整メソッド
 const adjustWaitTime = (minutes: number) => {
-  if (!props.reservationManager.waitInfo.value.isWaiting) {
+  if (!entranceStore.waitInfo.isWaiting) {
     // 待機中でない場合は待機時間を変更
-    const currentMinutes = props.reservationManager.waitInfo.value.waitMinutes
+    const currentMinutes = entranceStore.waitInfo.waitMinutes
     const newMinutes = Math.max(1, Math.min(720, currentMinutes + minutes))
-    props.reservationManager.waitInfo.value.waitMinutes = newMinutes
+    entranceStore.waitInfo.waitMinutes = newMinutes
   } else {
     // 待機中の場合は待機時間を延長
-    props.reservationManager.extendWaitTime(minutes)
+    entranceStore.extendWaitTime(minutes)
   }
 }
 

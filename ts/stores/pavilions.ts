@@ -168,6 +168,16 @@ export const usePavilionsStore = defineStore('pavilions', () => {
           const unavailableReason = scheduleData.unavailable_reason || 0
           const isAvailable = unavailableReason !== 1
 
+          // デバッグ用：残り僅か判定の詳細ログ
+          if (unavailableReason === 2) {
+            logger.temp('残り僅か判定デバッグ', {
+              pavilionName: data.name,
+              timeSlot: time,
+              unavailableReason,
+              scheduleData: scheduleData
+            })
+          }
+
           // 詳細な空き状況を判定
           let availabilityStatus: 'available' | 'limited' | 'full'
           if (unavailableReason === 1) {

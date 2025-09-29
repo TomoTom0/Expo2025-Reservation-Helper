@@ -48,7 +48,9 @@
                   'today': date.isToday,
                   'disabled': date.disabled,
                   'has-reservation': hasReservationForDate(date.dateString),
-                  'special-lottery-date': date.isSpecialLotteryDate
+                  'has-time-selections': datesWithSelections.has(date.dateString),
+                  'special-lottery-date': date.isSpecialLotteryDate,
+                  'all-full': isAllTimeSlotsFull(date.dateString)
                 }"
                 :data-date="date.dateString"
                 @click="selectDate"
@@ -112,7 +114,7 @@
                     role="button" 
                     class="ytomo-time-button"
                     :class="[
-                      { 'selected': timeSlot.east.selected },
+                      { 'selected': isTimeSlotSelected(timeSlot.time, 'east') },
                       { 'disabled': isTimeSlotDisabled('east', timeSlot.time) },
                       `status-${timeSlot.east.status}`
                     ]"
@@ -126,7 +128,9 @@
                     </span>
                     <span class="ytomo-time-text">{{ timeSlot.time }}-</span>
                     <span class="ytomo-selection-area">
-                      <span v-if="timeSlot.east.selected" class="ytomo-selection-number">{{ getSelectionNumber(timeSlot.time, 'east') }}</span>
+                      <span v-if="isTimeSlotSelected(timeSlot.time, 'east')"
+                            class="ytomo-selection-number"
+                            :class="{ 'priority-first': getSelectionNumber(timeSlot.time, 'east') === 1 }">{{ getSelectionNumber(timeSlot.time, 'east') }}</span>
                     </span>
                   </div>
                 </td>
@@ -135,7 +139,7 @@
                     role="button" 
                     class="ytomo-time-button"
                     :class="[
-                      { 'selected': timeSlot.west.selected },
+                      { 'selected': isTimeSlotSelected(timeSlot.time, 'west') },
                       { 'disabled': isTimeSlotDisabled('west', timeSlot.time) },
                       `status-${timeSlot.west.status}`
                     ]"
@@ -149,7 +153,9 @@
                     </span>
                     <span class="ytomo-time-text">{{ timeSlot.time }}-</span>
                     <span class="ytomo-selection-area">
-                      <span v-if="timeSlot.west.selected" class="ytomo-selection-number">{{ getSelectionNumber(timeSlot.time, 'west') }}</span>
+                      <span v-if="isTimeSlotSelected(timeSlot.time, 'west')"
+                            class="ytomo-selection-number"
+                            :class="{ 'priority-first': getSelectionNumber(timeSlot.time, 'west') === 1 }">{{ getSelectionNumber(timeSlot.time, 'west') }}</span>
                     </span>
                   </div>
                 </td>
@@ -165,11 +171,19 @@
         <div v-if="selectedDate" class="ytomo-reservation-actions">
           <button
             class="ytomo-reserve-button"
-            :class="{ 'disabled': !isReservationButtonEnabled, 'cancel-mode': isReservationRunning }"
-            :disabled="!isReservationButtonEnabled"
+            :class="{ 'disabled': !entranceStore.isReservationEnabled, 'cancel-mode': entranceStore.isReservationRunning }"
+            :disabled="!entranceStore.isReservationEnabled"
             @click="executeReservation"
           >
-            {{ isReservationRunning ? '予約中断' : reservationButtonText }}
+            {{ entranceStore.isReservationRunning ? '予約中断' : reservationButtonText }}
+          </button>
+          <button
+            class="ytomo-clear-selection-button"
+            :disabled="displayReservationInfoArray.length === 0"
+            @click="handleClearAllSelections"
+            title="全日付の選択を解除"
+          >
+            選択解除
           </button>
         </div>
       </div>
@@ -177,68 +191,84 @@
     
     <!-- 下段: 実行情報ブロック -->
     <div class="ytomo-execution-info">
-      <!-- 予約情報表示エリア -->
-      <div v-if="reservationManager.reservationInfo.value.visible" class="ytomo-reservation-info" :class="{ 'completed': reservationManager.reservationInfo.value.completed }">
+      <!-- 予約情報表示エリア（日付ごとに複数ブロック） -->
+
+      <!-- 実際の予約情報 -->
+      <div v-if="displayReservationInfoArray.length > 0" class="ytomo-reservation-info">
         <div class="ytomo-reservation-box">
-          <div class="ytomo-reservation-date">{{ reservationManager.reservationInfo.value.date }}</div>
           <div class="ytomo-reservation-timeslots">
-            <div v-for="slot in reservationManager.reservationInfo.value.timeSlots" :key="slot.id" class="ytomo-timeslot">
-              {{ slot.gate }}{{ slot.time }}
+            <div
+              v-for="(info, index) in displayReservationInfoArray"
+              :key="index"
+              class="ytomo-timeslot"
+              :class="{ 'priority-first': index === 0 }"
+            >
+              <span class="ytomo-date">{{ formatDateFromString(info.date) }}</span>
+              <span class="ytomo-gate">{{ info.gate === 'east' ? '東' : '西' }}</span>
+              <span class="ytomo-time">{{ formatTimeForDisplay(info.time) }}</span>
             </div>
           </div>
         </div>
       </div>
       
       <!-- 予約実行状態表示エリア -->
-      <div v-if="reservationManager.reservationStatus.value.visible" class="ytomo-reservation-status" :class="reservationManager.reservationStatus.value.statusClass">
+      <div v-if="entranceStore.reservationStatus?.visible" class="ytomo-reservation-status" :class="entranceStore.reservationStatus?.statusClass">
         <div class="ytomo-status-content">
-          <div v-if="reservationManager.reservationStatus.value.isActive" class="ytomo-status-icon spinning">
+          <div v-if="entranceStore.reservationStatus?.isActive" class="ytomo-status-icon spinning">
             <svg viewBox="0 0 24 24">
               <path d="M12,4V2A10,10 0 0,0 2,12H4A8,8 0 0,1 12,4Z"/>
             </svg>
           </div>
           <div class="ytomo-status-details">
             <div class="ytomo-status-current">
-              <template v-if="isReservationRunning && reservationManager.waitInfo.value.isWaiting">
-                予約待機中 - {{ reservationManager.formatTime(reservationManager.waitInfo.value.waitEndTime) }}まで
+              <template v-if="entranceStore.isReservationRunning && entranceStore.waitInfo?.isWaiting">
+                予約待機中 - {{ formatTime(entranceStore.waitInfo?.waitEndTime) }}まで
               </template>
-              <template v-else-if="isReservationRunning">
-                {{ reservationManager.reservationStatus.value.currentAction }}
+              <template v-else-if="entranceStore.isReservationRunning">
+                {{ entranceStore.reservationStatus?.currentAction }}
               </template>
               <template v-else>
-                {{ reservationManager.reservationStatus.value.currentAction }}
+                {{ entranceStore.reservationStatus?.currentAction }}
               </template>
             </div>
-            <div v-if="reservationManager.reservationStatus.value.statusClass === 'success' && reservationManager.reservationStatus.value.dateChange" class="ytomo-datetime-change">
-              {{ reservationManager.reservationStatus.value.dateChange }}
+            <div v-if="entranceStore.reservationStatus?.statusClass === 'success' && entranceStore.reservationStatus?.dateChange" class="ytomo-datetime-change">
+              {{ entranceStore.reservationStatus?.dateChange }}
             </div>
-            <div v-if="isReservationRunning && (reservationManager.reservationStatus.value.isActive || reservationManager.waitInfo.value.isWaiting)" class="ytomo-status-progress">
+            <div v-if="entranceStore.isReservationRunning && (entranceStore.reservationStatus?.isActive || entranceStore.waitInfo?.isWaiting)" class="ytomo-status-progress">
               <div class="ytomo-progress-bar">
                 <div class="ytomo-progress-fill" :style="{
-                  width: reservationManager.waitInfo.value.isWaiting
-                    ? reservationManager.waitInfo.value.progress + '%'
-                    : reservationManager.reservationStatus.value.progress + '%'
+                  width: entranceStore.waitInfo?.isWaiting
+                    ? entranceStore.waitInfo?.progress + '%'
+                    : entranceStore.reservationStatus?.progress + '%'
                 }"></div>
               </div>
             </div>
             
             <!-- 実行履歴表示 -->
-            <div v-if="reservationManager.reservationHistory.value.length > 0" class="ytomo-execution-history">
+            <div v-if="displayReservationHistoryArray.length > 0" class="ytomo-execution-history">
               <div class="ytomo-history-items">
-                <div v-for="(result, index) in reservationManager.reservationHistory.value" :key="index"
-                     class="ytomo-history-item" :class="result.success ? 'success' : 'failure'">
+                <div v-for="(result, index) in displayReservationHistoryArray" :key="index"
+                     class="ytomo-history-item"
+                     :class="[
+                       result.success ? 'success' : 'failure',
+                       { 'current-cycle': isCurrentCycleReservation(index) }
+                     ]">
                   <span class="ytomo-history-result">{{ result.success ? '成功' : (result.failureReason || '') }}</span>
-                  <span class="ytomo-history-detail">{{ result.gate }}{{ result.time }}</span>
+                  <span class="ytomo-history-detail">
+                    <template v-if="result.date">{{ formatDateForHistory(result.date) }} </template>{{ result.gate }}{{ result.time }}
+                  </span>
                 </div>
               </div>
             </div>
           </div>
         </div>
       </div>
+
+
     </div>
 
     <!-- 待機機能エリア -->
-    <ReservationWaitControl :reservation-manager="reservationManager" />
+    <ReservationWaitControl :is-reservation-running="entranceStore.isReservationRunning" />
   </div>
 </template>
 
@@ -246,28 +276,31 @@
 import { ref, computed, onMounted, watch } from 'vue'
 import { loggers } from '@/utils/logger'
 import { useTicketsStore } from '@/stores/tickets'
+import { useEntranceReservationStore } from '@/stores/entranceReservation'
 import type { ScheduleData } from '@/types/api'
-import { EntranceReservationApiManager } from '@/modules/entrance-reservation-api-manager'
 import ReservationWaitControl from './ReservationWaitControl.vue'
+import { formatDateForDisplay, formatDateSlash } from '../utils/dateFormat'
 
 const logger = loggers.ui
 const ticketsStore = useTicketsStore()
+const entranceStore = useEntranceReservationStore()
 
-// 予約管理インスタンス
-const reservationManager = new EntranceReservationApiManager()
+// 入場予約storeを使用
 
 // 選択解除関数
 const clearTimeSlotSelection = (): void => {
-  selectionOrder.value = []
-  timeSlots.value.forEach(slot => {
-    slot.east.selected = false
-    slot.west.selected = false
-  })
+  // reservationInfoをクリアするだけでOK（表示はreservationInfoベースなので）
+  entranceStore.reservationInfo = []
   logger.info('予約成功により時間帯選択を解除しました', {})
 }
 
-// 選択解除コールバックを設定  
-reservationManager.setClearSelectionCallback(clearTimeSlotSelection)
+// 選択解除コールバックを設定
+entranceStore.setClearSelectionCallback(clearTimeSlotSelection)
+
+// 予約情報配列に追加
+// 新仕様では不要 - 時間帯選択時に直接reservationInfoを更新
+
+// 新仕様では不要 - 個別削除は×ボタンで行う
 
 // カレンダー状態
 const isCalendarExpanded = ref(true)
@@ -338,8 +371,7 @@ const selectedSchedule = computed(() => {
   return null
 })
 
-// 時間帯選択順を管理（選択順序を記録）
-const selectionOrder = ref<{ key: string; order: number }[]>([])
+// selectionOrderは不要（reservationInfoベースで管理）
 
 // 入場日時選択変更時の連動処理
 watch(selectedSchedule, (newSchedule, oldSchedule) => {
@@ -383,11 +415,12 @@ watch(selectedSchedule, (newSchedule, oldSchedule) => {
     }
     
     // 時間帯選択を解除（disabled状態になった選択も含めて全解除）
-    selectionOrder.value = []
-    timeSlots.value.forEach(slot => {
-      slot.east.selected = false
-      slot.west.selected = false
-    })
+    // 新しい日付での選択をクリア
+    if (selectedDate.value) {
+      entranceStore.reservationInfo = entranceStore.reservationInfo.filter(
+        info => info.date !== selectedDate.value
+      )
+    }
     
     // 選択日の時間帯データを再読み込み（内部形式で呼び出し）
     if (selectedDate.value) {
@@ -403,23 +436,16 @@ watch(selectedSchedule, (newSchedule, oldSchedule) => {
 
 // 優先度1の時間帯を取得（カレンダー空き表示用）
 const selectedTimeSlot = computed(() => {
-  const selectedSlots = selectionOrder.value.filter(item => {
-    const [time, gate] = item.key.split('-')
-    const timeSlot = timeSlots.value.find(slot => slot.time === time)
-    if (!timeSlot) return false
-    
-    const gateKey = gate as 'east' | 'west'
-    return timeSlot[gateKey].selected
-  })
-  
-  if (selectedSlots.length === 0) return null
-  
-  // 最も早く選択された時間帯を返す
-  const earliestSlot = selectedSlots.reduce((earliest, current) => 
-    current.order < earliest.order ? current : earliest
-  )
-  
-  return earliestSlot.key.split('-')[0] // 時間部分のみ返す
+  const formattedDate = getFormattedSelectedDate()
+  if (!formattedDate) return null
+
+  const selectedItems = entranceStore.reservationInfo
+    .filter(info => info.date === formattedDate)
+
+  if (selectedItems.length === 0) return null
+
+  // 最初の選択された時間帯を返す
+  return selectedItems[0].time
 })
 
 // カレンダー空き状況をcomputedで自動計算
@@ -465,68 +491,63 @@ const calendarAvailabilityCache = computed(() => {
   return cache
 })
 
-// 選択順序の数字を取得
+// selectedDate.value（YYYY-MM-DD）をそのまま返す（統一のため）
+const getFormattedSelectedDate = (): string => {
+  return selectedDate.value || ''
+}
+
+// 時間帯の選択状態を確認（reservationInfoベース）
+const isTimeSlotSelected = (time: string, gate: 'east' | 'west'): boolean => {
+  const formattedDate = getFormattedSelectedDate()
+  if (!formattedDate) return false
+  return entranceStore.reservationInfo.some(
+    info => info.date === formattedDate && info.time === time && info.gate === gate
+  )
+}
+
+// 選択順序の数字を取得（reservationInfoベース、全体で通算）
 const getSelectionNumber = (timeSlot: string, gate: 'east' | 'west'): number | null => {
-  const key = `${timeSlot}-${gate}`
-  const orderItem = selectionOrder.value.find(item => item.key === key)
-  return orderItem ? orderItem.order : null
+  const formattedDate = getFormattedSelectedDate()
+  if (!formattedDate) return null
+
+  // 全体のreservationInfo配列から該当する項目のインデックスを取得
+  const targetIndex = entranceStore.reservationInfo.findIndex(
+    info => info.date === formattedDate && info.time === timeSlot && info.gate === gate
+  )
+
+  return targetIndex >= 0 ? targetIndex + 1 : null
 }
 
 // 予約状態をマネージャーから取得
-const reservationInfo = reservationManager.reservationInfo
-const reservationStatus = reservationManager.reservationStatus
-const isReservationRunning = reservationManager.isReservationRunning
+const reservationInfo = entranceStore.reservationInfo
+const reservationStatus = entranceStore.reservationStatus
+// isReservationRunningはstoreから直接使用
 
 
 // 選択されている時間帯の数を計算
 const selectedTimeSlotCount = computed(() => {
-  return timeSlots.value.reduce((count, slot) => {
-    return count + (slot.east.selected ? 1 : 0) + (slot.west.selected ? 1 : 0)
-  }, 0)
+  return entranceStore.reservationInfo.length
 })
 
-// 予約ボタンの有効性判定
-const isReservationButtonEnabled = computed(() => {
-  // 条件: 時間帯が1つ以上選択されている かつ（新規予約 または 自分の予約を変更）
-  if (selectedTimeSlotCount.value < 1) {
-    return false
-  }
-
-  // 新規予約の場合（selectedScheduleがnull）: チケットタブで入場予約未設定の予約枠が選択されている場合のみ有効
-  if (!selectedSchedule.value) {
-    // 予約管理システムから選択された予約IDをチェック
-    const selectedReservationIds = ticketsStore.getSelectedReservationIds()
-    const hasModifiableReservation = selectedReservationIds.some(reservationId => {
-      // NEWスロットの場合は常に有効
-      if (reservationId.startsWith('new-reservation-')) {
-        return true
-      }
-
-      // 既存予約の場合は入場日未設定 かつ 変更可能な予約のみ対象
-      const { schedule } = ticketsStore.getScheduleByReservationId(reservationId)
-      return schedule && !schedule.entrance_date && ticketsStore.canModifyReservation(reservationId)
-    })
-    return hasModifiableReservation
-  }
-
-  // 既存予約の場合
-  const reservationId = selectedSchedule.value?.user_visiting_reservation_id?.toString()
-  if (!reservationId) {
-    return false
-  }
-
-  const canModify = ticketsStore.canModifyReservation(reservationId)
-
-  // デバッグ用ログ
-  logger.info('予約ボタン有効性判定', {
-    selectedSchedule: selectedSchedule.value,
-    reservationId: reservationId,
-    canModify: canModify,
-    timeSlotCount: selectedTimeSlotCount.value
-  })
-
-  return canModify
+// 表示用予約情報配列（空の場合は非表示）
+const displayReservationInfoArray = computed(() => {
+  return entranceStore.reservationInfo || []
 })
+
+// 表示用履歴配列（現在実行中と直近の二つの周期の予約だけ表示）
+const displayReservationHistoryArray = computed(() => {
+  const history = entranceStore.reservationHistory || []
+  // 現在実行中と直近の二つの周期分だけ表示（最大3件）
+  return history.slice(-3)
+})
+
+// 現在の周期の予約かどうかを判定（最新の1件を現在の周期とする）
+const isCurrentCycleReservation = (index: number): boolean => {
+  const displayHistory = displayReservationHistoryArray.value
+  return displayHistory.length > 0 && index === displayHistory.length - 1
+}
+
+// 予約ボタンの有効性判定はstoreのcomputedを使用
 
 // 予約ボタンテキストの動的決定
 const reservationButtonText = computed(() => {
@@ -620,56 +641,53 @@ const getToDateTimeText = () => {
   return `${date} ${gate}${time}`
 }
 
-// 選択された時間帯情報を取得（選択順1番の要素を返す）
+// 選択された時間帯情報を取得（最初の要素を返す）
 const getSelectedTimeSlotInfo = () => {
-  if (selectionOrder.value.length === 0) {
-    return null
-  }
-  
-  // 選択順1番の要素を取得
-  const firstSelection = selectionOrder.value.find(item => item.order === 1)
-  if (!firstSelection) {
-    logger.warn('選択順1番の要素が見つかりません', { 
-      selectionOrder: selectionOrder.value,
-      allOrders: selectionOrder.value.map(item => item.order)
-    })
-    return null
-  }
-  
-  const [time, gate] = firstSelection.key.split('-')
-  const gateType = gate === 'east' ? 1 : 2
-  const gateText = gate === 'east' ? '東' : '西'
-  
-  logger.debug('選択時間帯情報取得', { 
-    firstSelection, 
-    time, 
-    gate: gateText, 
+  const formattedDate = getFormattedSelectedDate()
+  if (!formattedDate) return null
+
+  const selectedItems = entranceStore.reservationInfo
+    .filter(info => info.date === formattedDate)
+
+  if (selectedItems.length === 0) return null
+
+  const firstSelection = selectedItems[0]
+  const gateType = firstSelection.gate === 'east' ? 1 : 2
+  const gateText = firstSelection.gate === 'east' ? '東' : '西'
+
+  logger.debug('選択時間帯情報取得', {
+    firstSelection,
+    time: firstSelection.time,
+    gate: gateText,
     gateType,
-    totalSelections: selectionOrder.value.length
+    totalSelections: selectedItems.length
   })
-  
-  return { 
-    time: formatTimeForDisplay(time), // 表示用時間
-    timeInternal: time, // API用内部形式時間
-    gate: gateText, 
-    gateType 
+
+  return {
+    time: formatTimeForDisplay(firstSelection.time), // 表示用時間
+    timeInternal: firstSelection.time, // API用内部形式時間
+    gate: gateText,
+    gateType
   }
 }
 
 // 選択された時間帯を優先度順に取得
 const getSelectedTimeSlotsInPriorityOrder = () => {
-  // 選択順序でソート
-  const sortedSelections = [...selectionOrder.value].sort((a, b) => a.order - b.order)
-  
-  return sortedSelections.map((selection, index) => {
-    const [time, gate] = selection.key.split('-')
-    const gateText = gate === 'east' ? '東' : '西'
-    
+  const formattedDate = getFormattedSelectedDate()
+  if (!formattedDate) return []
+
+  const selectedItems = entranceStore.reservationInfo
+    .filter(info => info.date === formattedDate)
+
+  return selectedItems.map((info, index) => {
+    const gateText = info.gate === 'east' ? '東' : '西'
+
     return {
-      id: selection.key,
-      time: time,
+      id: `${info.time}-${info.gate}`,
+      time: info.time,
       gate: gateText,
-      priority: index + 1
+      priority: index + 1,
+      date: info.date
     }
   })
 }
@@ -716,13 +734,20 @@ const currentMonthDisplay = computed(() => {
 
 // カレンダーが表示している空き情報の対象時間（優先度1位の時間帯）
 const availabilityDisplayTime = computed(() => {
-  const priority1Selection = selectionOrder.value.find(item => item.order === 1)
-  if (!priority1Selection) {
+  const formattedDate = getFormattedSelectedDate()
+  if (!formattedDate) {
+    return "9:00"
+  }
+
+  const selectedItems = entranceStore.reservationInfo
+    .filter(info => info.date === formattedDate)
+
+  if (selectedItems.length === 0) {
     // 時間帯未選択時は9時の情報をデフォルト表示
     return "9:00"
   }
-  const internalTimeFormat = priority1Selection.key.split('-')[0]
-  return formatTimeForDisplay(internalTimeFormat)
+
+  return formatTimeForDisplay(selectedItems[0].time)
 })
 
 
@@ -863,7 +888,7 @@ const nextMonth = async () => {
 }
 
 const selectDate = async (event: Event) => {
-  const target = event.target as HTMLElement
+  const target = event.currentTarget as HTMLElement
   const dateString = target.getAttribute('data-date')
   const isDisabled = target.classList.contains('disabled')
   const isOtherMonth = target.classList.contains('other-month')
@@ -880,7 +905,7 @@ const selectDate = async (event: Event) => {
   })
   
   selectedDate.value = dateString
-  
+
   // カレンダーの月を選択日付に連動させる
   const selectedDateObj = new Date(dateString + 'T00:00:00')
   const currentCalendarMonth = currentMonth.value.getMonth()
@@ -904,32 +929,10 @@ const selectDate = async (event: Event) => {
 
 // 指定日の時間帯データを読み込み（選択状態を保持）
 const loadTimeSlotsForDateWithSelection = async (date: string) => {
-  // 既存の選択状態を保存
-  const existingSelections = new Map<string, { east: boolean, west: boolean }>()
-  timeSlots.value.forEach(slot => {
-    if (slot.east.selected || slot.west.selected) {
-      existingSelections.set(slot.time, {
-        east: slot.east.selected,
-        west: slot.west.selected
-      })
-    }
-  })
-  
-  // 時間帯データを再構築
+  // 時間帯データを再構築（reservationInfoは自動的に保持される）
   await loadTimeSlotsForDate(date)
   
-  // 選択状態を復元
-  timeSlots.value.forEach(slot => {
-    const saved = existingSelections.get(slot.time)
-    if (saved) {
-      slot.east.selected = saved.east
-      slot.west.selected = saved.west
-    }
-  })
-  
-  logger.info('時間帯選択状態を復元', { 
-    復元した選択: Array.from(existingSelections.entries()).map(([time, selection]) => ({ time, ...selection }))
-  })
+  logger.info('時間帯データを再構築', { date })
 }
 
 // 指定日の時間帯データを読み込み
@@ -1107,6 +1110,11 @@ const getStatusAlt = (status: string): string => {
   }
 }
 
+// 指定日に時間帯選択があるかチェック
+const hasTimeSlotSelectionForDate = (dateString: string): boolean => {
+  return entranceStore.reservationInfo.some(info => info.date === dateString)
+}
+
 // 指定日に予約があるかチェック
 const hasReservationForDate = (dateString: string): boolean => {
   const selectedTickets = ticketsStore.selectedTickets
@@ -1124,16 +1132,30 @@ const hasReservationForDate = (dateString: string): boolean => {
   return false
 }
 
-// 日付の有効性チェック（今日〜2025年10月）
+// 日付の有効性チェック（今日〜2025年10月、追加済み日付除外）
 const isDateDisabled = (date: Date): boolean => {
   const today = new Date()
   today.setHours(0, 0, 0, 0) // 時刻をリセットして日付のみで比較
   const targetDate = new Date(date)
   targetDate.setHours(0, 0, 0, 0)
-  
+
   const maxDate = new Date(2025, 9, 13) // 2025年10月13日（万博最終日）
-  
-  return targetDate < today || targetDate > maxDate
+
+  // 基本的な日付範囲チェック
+  if (targetDate < today || targetDate > maxDate) {
+    return true
+  }
+
+  // 追加済み日付は選択不可
+  const year = targetDate.getFullYear()
+  const month = String(targetDate.getMonth() + 1).padStart(2, '0')
+  const day = String(targetDate.getDate()).padStart(2, '0')
+  const dateString = `${year}-${month}-${day}`
+  if (disabledDates.value.has(dateString)) {
+    return true
+  }
+
+  return false
 }
 
 // 抽選期間特別日付の判定
@@ -1357,7 +1379,7 @@ const startReservationCycle = (selectedTimeSlots: any[]) => {
     (35 - currentSeconds) * 1000 : 
     (60 + 35 - currentSeconds) * 1000
   
-  reservationStatus.value = {
+  entranceStore.reservationStatus = {
     visible: true,
     isActive: true,
     currentAction: `次回実行待機中（${Math.ceil(waitTime / 1000)}秒）`,
@@ -1374,9 +1396,15 @@ const startReservationCycle = (selectedTimeSlots: any[]) => {
   // }, waitTime)
 }
 
-// サイクル処理を停止
+// 時間フォーマット関数
+const formatTime = (date: Date | null): string => {
+  if (!date) return ''
+  return `${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}`
+}
+
+// サイクル処理を停止（storeのメソッドを使用）
 const clearReservationTimer = () => {
-  reservationManager.clearReservationTimer()
+  entranceStore.clearReservationTimer()
 }
 
 // サイクルステップを実行（毎分35秒に実行）
@@ -1399,7 +1427,7 @@ const executeCycleStep = async (selectedTimeSlots: any[]) => {
     
   } catch (error) {
     logger.error('サイクルステップエラー', error)
-    reservationStatus.value = {
+    entranceStore.reservationStatus = {
       visible: true,
       isActive: false,
       currentAction: 'エラーが発生しました',
@@ -1412,11 +1440,11 @@ const executeCycleStep = async (selectedTimeSlots: any[]) => {
 
 // 次のサイクルをスケジュール
 const scheduleNextCycle = (selectedTimeSlots: any[]) => {
-  if (!isReservationRunning.value) return
+  if (!entranceStore.isReservationRunning) return
   
   const waitTime = 60 * 1000 // 60秒後
   
-  reservationStatus.value = {
+  entranceStore.reservationStatus = {
     visible: true,
     isActive: true,
     currentAction: '次回実行待機中（60秒）',
@@ -1440,7 +1468,7 @@ const executeParallelTasks = async (selectedTimeSlots: any[]) => {
   
   const topPriorityKey = `${topPrioritySlot.gate}-${topPrioritySlot.time}`
   
-  reservationStatus.value = {
+  entranceStore.reservationStatus = {
     visible: true,
     isActive: true,
     currentAction: '並行処理実行中...',
@@ -1468,9 +1496,9 @@ const executeParallelTasks = async (selectedTimeSlots: any[]) => {
     logger.info('最優先予約成功', { slot: topPrioritySlot, result: reservationResult })
     
     // 予約成功時の処理
-    isReservationRunning.value = false
+    // isReservationRunningはstoreで管理
     clearReservationTimer()
-    reservationStatus.value = {
+    entranceStore.reservationStatus = {
       visible: true,
       isActive: false,
       currentAction: `予約成功しました - ${topPrioritySlot.gate}${topPrioritySlot.time}`,
@@ -1478,7 +1506,7 @@ const executeParallelTasks = async (selectedTimeSlots: any[]) => {
       progressText: '成功',
       statusClass: 'success'
     }
-    reservationInfo.value = { ...reservationInfo.value, completed: true }
+    // 新仕様では不要
     
     // 成功時はチケット情報を更新
     setTimeout(async () => {
@@ -1539,7 +1567,7 @@ const getAvailabilityInfo = async () => {
 
 // 条件付き追加実行
 const executeAdditionalReservations = async (selectedTimeSlots: any[]) => {
-  reservationStatus.value = {
+  entranceStore.reservationStatus = {
     visible: true,
     isActive: true,
     currentAction: '追加実行判定中...',
@@ -1585,7 +1613,7 @@ const executeAdditionalReservations = async (selectedTimeSlots: any[]) => {
   const slotsToExecute = availableSlots.slice(0, 2)
   
   for (const [index, slot] of slotsToExecute.entries()) {
-    reservationStatus.value = {
+    entranceStore.reservationStatus = {
       visible: true,
       isActive: true,
       currentAction: `追加実行中: ${slot.gate}${slot.time}`,
@@ -1603,9 +1631,9 @@ const executeAdditionalReservations = async (selectedTimeSlots: any[]) => {
         logger.info('追加実行成功', { slot, result })
         
         // 予約成功時の処理
-        isReservationRunning.value = false
+        // isReservationRunningはstoreで管理
         clearReservationTimer()
-        reservationStatus.value = {
+        entranceStore.reservationStatus = {
           visible: true,
           isActive: false,
           currentAction: `予約成功しました - ${slot.gate}${slot.time}`,
@@ -1613,7 +1641,7 @@ const executeAdditionalReservations = async (selectedTimeSlots: any[]) => {
           progressText: '成功',
           statusClass: 'success'
         }
-        reservationInfo.value = { ...reservationInfo.value, completed: true }
+        // 新仕様では不要
         
         // 成功時はチケット情報を更新
         setTimeout(async () => {
@@ -1635,6 +1663,143 @@ const executeAdditionalReservations = async (selectedTimeSlots: any[]) => {
   }
 }
 
+// 複数日付対応予約情報管理
+interface DateGroup {
+  id: string
+  date: string
+  timeSlots: Array<{
+    id: string
+    gate: string
+    time: string
+  }>
+  visible: boolean
+  completed: boolean
+}
+
+const dateGroups = ref<DateGroup[]>([])
+
+// 選択不可な日付（現在は無効化なし - 予約情報がある日付でも選択可能にする）
+const disabledDates = computed(() => {
+  const dates = new Set<string>()
+  // TODO: 必要に応じて、確定済み予約など本当に選択不可な日付のみを追加
+  return dates
+})
+
+// 選択時間帯がある日付（薄い青色表示用）
+const datesWithSelections = computed(() => {
+  const dates = new Set<string>()
+  entranceStore.reservationInfo.forEach(info => {
+    if (info.date) {
+      dates.add(info.date)
+    }
+  })
+  return dates
+})
+
+// 現在選択されている時間帯から日付グループを作成または更新
+const updateCurrentDateGroup = () => {
+  if (!selectedDate.value || selectedTimeSlotCount.value === 0) {
+    // 選択がない場合は空のグループも削除
+    const existingIndex = dateGroups.value.findIndex(g => g.date === (selectedDate.value || ''))
+    if (existingIndex !== -1) {
+      dateGroups.value.splice(existingIndex, 1)
+    }
+    return
+  }
+
+  const dateDisplay = formatDisplayDate(selectedDate.value)
+  const currentTimeSlots = entranceStore.reservationInfo
+    .filter(info => info.date === getFormattedSelectedDate())
+    .map((info, index) => ({
+      id: `${info.time}-${info.gate}-${index}`,
+      gate: info.gate === 'east' ? 'E' : 'W',
+      time: info.time
+    }))
+
+  const existingIndex = dateGroups.value.findIndex(g => g.date === selectedDate.value)
+  if (existingIndex !== -1) {
+    // 既存グループを更新
+    dateGroups.value[existingIndex].timeSlots = currentTimeSlots
+  } else {
+    // 新しいグループを作成
+    dateGroups.value.push({
+      id: `group-${Date.now()}`,
+      date: dateDisplay,
+      timeSlots: currentTimeSlots,
+      visible: true,
+      completed: false
+    })
+  }
+}
+
+// 時間帯選択の変更を監視してグループを更新
+// 日付変更時の処理（reservationInfoベースなので選択状態復元は不要）
+
+// 関数を他の場所に移動
+
+// 既存のformatTimeForDisplayを使用
+
+watch(selectedDate, (newDate, oldDate) => {
+  if (newDate !== oldDate) {
+    // reservationInfoベースなので選択状態復元は不要
+  }
+  updateCurrentDateGroup()
+}, { immediate: false })
+
+
+// 選択解除ボタンのハンドラー（全日付の選択をクリア）
+const handleClearAllSelections = () => {
+  // reservationInfoをクリア（時間帯テーブルはreservationInfoベースなので自動更新される）
+  entranceStore.reservationInfo = []
+
+  logger.temp('全選択解除実行', {
+    clearedDate: selectedDate.value
+  })
+
+  // 日付グループを更新
+  updateCurrentDateGroup()
+}
+
+// 新仕様では不要 - 時間帯選択時に即座にreservationInfoを更新
+
+// 日付グループを削除
+const removeDateGroup = (groupId: string) => {
+  const groupIndex = dateGroups.value.findIndex(g => g.id === groupId)
+  if (groupIndex !== -1) {
+    const group = dateGroups.value[groupIndex]
+
+    // グループを削除
+    dateGroups.value.splice(groupIndex, 1)
+
+    logger.info('日付グループ削除', {
+      groupId,
+      remainingGroups: dateGroups.value.length
+    })
+  }
+}
+
+// 日付表示フォーマット
+const formatDisplayDate = (dateString: string): string => {
+  if (!dateString) return ''
+  const date = new Date(dateString + 'T00:00:00')
+  if (isNaN(date.getTime())) return dateString
+  return `${date.getMonth() + 1}/${date.getDate()}`
+}
+
+// 履歴表示用の日付フォーマット
+const formatDateForHistory = (dateString: string): string => {
+  if (!dateString) return ''
+
+  // YYYY-MM-DD形式の場合はM/D形式に変換
+  if (dateString.includes('-') && dateString.length === 10) {
+    const date = new Date(dateString + 'T00:00:00')
+    if (!isNaN(date.getTime())) {
+      return formatDateSlash(date)
+    }
+  }
+
+  return dateString
+}
 
 // 日付形式変換ヘルパー関数群
 const dateHelpers = {
@@ -1660,6 +1825,16 @@ const dateHelpers = {
   }
 }
 
+// YYYY-MM-DD形式の文字列をM/D形式に変換
+const formatDateFromString = (dateString: string): string => {
+  if (!dateString) return ''
+  const parts = dateString.split('-')
+  if (parts.length !== 3) return dateString
+  const month = parseInt(parts[1])
+  const day = parseInt(parts[2])
+  return `${month}/${day}`
+}
+
 // 表示時間からAPI時間キーを取得（共通関数）
 const getApiTimeKey = (displayTime: string): string => {
   switch (displayTime) {
@@ -1681,47 +1856,33 @@ const getApiTimeKey = (displayTime: string): string => {
 // 予約実行
 const executeReservation = async () => {
   // 予約実行中の場合は中断処理
-  if (isReservationRunning.value) {
+  if (entranceStore.isReservationRunning) {
     logger.info('予約中断が要求されました')
 
 
-    // 予約マネージャーに中断を委譲
-    reservationManager.abortReservation()
+    // 予約マネージャーに中断を委謗
+    entranceStore.abortReservation()
     return
   }
 
-  if (!isReservationButtonEnabled.value) {
+  if (!entranceStore.isReservationEnabled) {
     logger.warn('予約ボタンが無効な状態で実行されました')
     return
   }
 
-  const timeSlotInfo = getSelectedTimeSlotInfo()
-  if (!timeSlotInfo) {
-    logger.warn('必要な情報が不足しています', { timeSlotInfo, selectedSchedule: selectedSchedule.value })
+  // 新仕様: reservationInfo配列を直接使用
+  if (entranceStore.reservationInfo.length === 0) {
+    logger.warn('選択された時間帯がありません')
     return
   }
-  
-  // 選択された時間帯を優先度順に取得
-  const selectedTimeSlots = getSelectedTimeSlotsInPriorityOrder()
-  
-  logger.info('予約実行開始', { 
-    selectedDate: selectedDate.value, 
-    timeSlot: timeSlotInfo,
-    schedule: selectedSchedule.value,
-    selectedTimeSlots 
+
+  logger.info('予約実行開始', {
+    reservationInfo: entranceStore.reservationInfo,
+    schedule: selectedSchedule.value
   })
-  
-  // マネージャーに処理を委譲（選択日付、既存予約ID、元の予約情報を渡す）
-  const existingReservationId = selectedSchedule.value?.user_visiting_reservation_id || null
-  const originalReservationInfo = selectedSchedule.value ? {
-    gate: selectedSchedule.value.gate_type === 1 ? '東' : '西',
-    time: selectedSchedule.value.schedule_name?.replace('-', '') || '',
-    date: selectedDate.value
-  } : null
-  
-  if (selectedDate.value && selectedDate.value.trim() !== '') {
-    await reservationManager.executeReservation(selectedTimeSlots, selectedDate.value, existingReservationId, originalReservationInfo)
-  }
+
+  // storeの予約実行を呼び出し（reservationInfoから必要な情報を内部で取得）
+  await entranceStore.executeReservation()
 }
 
 
@@ -1791,19 +1952,19 @@ const simulateReservationProgress = () => {
   
   stages.forEach((stage, index) => {
     setTimeout(() => {
-      if (reservationStatus.value.visible) {
-        reservationStatus.value.currentAction = stage.action
-        reservationStatus.value.progress = stage.progress
-        reservationStatus.value.progressText = stage.progressText
+      if (reservationStatus.visible) {
+        reservationStatus.currentAction = stage.action
+        reservationStatus.progress = stage.progress
+        reservationStatus.progressText = stage.progressText
         
         if (index === stages.length - 1) {
           // 最後のステージ後、待機状態に戻る
           setTimeout(() => {
-            if (reservationStatus.value.visible) {
-              reservationStatus.value.currentAction = '次回実行待機中（35秒まで待機）'
-              reservationStatus.value.isActive = false
-              reservationStatus.value.progress = 0
-              reservationStatus.value.progressText = '0/3'
+            if (reservationStatus.visible) {
+              reservationStatus.currentAction = '次回実行待機中（35秒まで待機）'
+              reservationStatus.isActive = false
+              reservationStatus.progress = 0
+              reservationStatus.progressText = '0/3'
             }
           }, 2000)
         }
@@ -1861,68 +2022,126 @@ const getSelectedTimeSlotAvailability = (dateString: string, selectedTime: strin
 
 // 選択クリア
 const clearSelection = () => {
-  timeSlots.value.forEach(slot => {
-    slot.east.selected = false
-    slot.west.selected = false
-  })
-  selectionOrder.value = []
+  // reservationInfoから現在の日付の選択をクリア
+  if (selectedDate.value) {
+    entranceStore.reservationInfo = entranceStore.reservationInfo.filter(
+      info => info.date !== selectedDate.value
+    )
+  }
   logger.info('選択をクリア', { selectedDate: selectedDate.value })
+}
+
+// 指定日付のすべての時間帯が満員かどうかを判定
+const isAllTimeSlotsFull = (dateString: string) => {
+  // 入場予約データから該当日付の時間帯情報を取得
+  const entranceSchedules = ticketsStore.entranceSchedules
+  if (entranceSchedules.size === 0) {
+    return false
+  }
+
+  // YYYY-MM-DD形式からDD形式に変換（既存コードと同じ形式）
+  const day = dateString.substring(8, 10)
+  const year = dateString.substring(0, 4)
+  const month = dateString.substring(5, 7)
+  const scheduleKey = `${year}-${month}`
+
+  let hasAnyAvailable = false
+  let hasAnyTimeSlot = false
+
+  // 該当月のスケジュールデータを取得
+  const scheduleData = entranceSchedules.get(scheduleKey)
+  if (!scheduleData || !scheduleData.states?.[day]) {
+    return false
+  }
+
+  const dayData = scheduleData.states[day]
+  const eastGate = dayData['1']
+  const westGate = dayData['2']
+
+  // 東ゲートの時間帯をチェック
+  if (eastGate) {
+    for (const timeKey in eastGate) {
+      hasAnyTimeSlot = true
+      const timeState = eastGate[timeKey].time_state
+      if (timeState === 0 || timeState === 1) {
+        hasAnyAvailable = true
+        break
+      }
+    }
+  }
+
+  // 西ゲートの時間帯をチェック（東で空きが見つからなかった場合）
+  if (!hasAnyAvailable && westGate) {
+    for (const timeKey in westGate) {
+      hasAnyTimeSlot = true
+      const timeState = westGate[timeKey].time_state
+      if (timeState === 0 || timeState === 1) {
+        hasAnyAvailable = true
+        break
+      }
+    }
+  }
+
+  const isFull = hasAnyTimeSlot && !hasAnyAvailable
+
+  // 時間帯データが存在し、かつすべて満員の場合のみtrueを返す
+  return isFull
 }
 
 // 時間帯選択の切り替え（満員時間帯も選択可能、複数選択可）
 const toggleTimeSlot = (gate: 'east' | 'west', time: string) => {
+  if (!selectedDate.value) {
+    logger.warn('日付が選択されていないため時間帯選択をスキップ', { gate, time })
+    return
+  }
+
   const slot = timeSlots.value.find(s => s.time === time)
   if (!slot) return
-  
+
   const gateData = slot[gate]
   if (!gateData) return
-  
+
   // 無効な時間帯は選択不可
   if (gateData.status === 'disabled') {
     logger.warn('無効な時間帯の選択を試行', { gate, time })
     return
   }
-  
-  const key = `${time}-${gate}`
-  
-  // 変更前の優先度1の時間帯を取得
-  const previousPriority1Time = selectionOrder.value.find(item => item.order === 1)?.key?.split('-')[0] || null
-  
-  // 選択状態を切り替え
-  if (gateData.selected) {
-    // 選択解除：順序から削除
-    gateData.selected = false
-    selectionOrder.value = selectionOrder.value.filter(item => item.key !== key)
-    // 残りの順序を再調整
-    selectionOrder.value.forEach((item, index) => {
-      item.order = index + 1
+
+  // reservationInfoから該当項目を検索
+  const formattedDate = getFormattedSelectedDate()
+  const existingIndex = entranceStore.reservationInfo.findIndex(
+    info => info.date === formattedDate && info.gate === gate && info.time === time
+  )
+
+  if (existingIndex >= 0) {
+    // 選択解除：配列から削除
+    entranceStore.reservationInfo.splice(existingIndex, 1)
+
+    logger.temp('時間帯選択解除', {
+      date: selectedDate.value,
+      gate,
+      time,
+      remainingCount: entranceStore.reservationInfo.length
     })
   } else {
-    // 選択：順序に追加
-    gateData.selected = true
-    const nextOrder = Math.max(...selectionOrder.value.map(item => item.order), 0) + 1
-    selectionOrder.value.push({ key, order: nextOrder })
+    // 選択：配列に追加
+    // selectedDate.value（YYYY-MM-DD）をそのまま使用
+    entranceStore.reservationInfo.push({
+      date: selectedDate.value || '',
+      gate,
+      time
+    })
+
+    logger.temp('時間帯選択追加', {
+      date: selectedDate.value,
+      gate,
+      time,
+      totalCount: entranceStore.reservationInfo.length
+    })
   }
-  
-  // 変更後の優先度1の時間帯を取得
-  const currentPriority1Time = selectionOrder.value.find(item => item.order === 1)?.key?.split('-')[0] || null
-  
-  // 優先度1の時間帯が変わった場合はキャッシュを更新
-  if (previousPriority1Time !== currentPriority1Time) {
-    if (currentPriority1Time) {
-      // computedで自動更新されるため手動更新は不要
-    } else {
-      // computedで自動更新されるためキャッシュクリアは不要
-    }
-  }
-  
-  logger.info('時間帯選択切り替え', { 
-    gate, 
-    time, 
-    status: gateData.status, 
-    selected: gateData.selected,
-    selectionOrder: selectionOrder.value
-  })
+
+  // 日付グループを更新
+  updateCurrentDateGroup()
 }
 
 
@@ -1966,6 +2185,9 @@ onMounted(async () => {
   justify-content: center; // 全体を中央揃え
   align-items: flex-start;
   margin-bottom: 16px; // 下段との間隔
+  max-width: 800px; // 最大幅を制限して中央配置を有効にする
+  margin-left: auto;
+  margin-right: auto;
 }
 
 // 第3ブロック: 実行情報（下段独立配置）
@@ -2000,6 +2222,7 @@ onMounted(async () => {
   // 予約情報のスタイル
   .ytomo-reservation-info {
     margin-top: 0;
+    margin-bottom: 4px;
     
     &.completed {
       opacity: 0.6;
@@ -2019,9 +2242,33 @@ onMounted(async () => {
       background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
       border: 1px solid #0891b2;
       border-radius: 8px;
-      padding: 16px;
+      padding: 20px 16px 16px 16px;
       position: relative;
-      
+      margin-top: 8px;
+
+      .ytomo-remove-button {
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 20px;
+        height: 20px;
+        background: #dc2626;
+        color: white;
+        border: none;
+        border-radius: 0 8px 0 8px;
+        font-size: 12px;
+        font-weight: bold;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        line-height: 1;
+
+        &:hover {
+          background: #b91c1c;
+        }
+      }
+
       .ytomo-reservation-date {
         position: absolute;
         top: -8px;
@@ -2050,6 +2297,29 @@ onMounted(async () => {
           font-size: 10px;
           font-weight: 500;
           color: #0c4a6e;
+          display: flex;
+          align-items: center;
+          gap: 4px;
+
+          &.priority-first {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid #ef4444;
+            color: #dc2626;
+          }
+
+          .ytomo-date {
+            font-size: 11px;
+            font-weight: 600;
+          }
+
+          .ytomo-gate {
+            font-weight: 600;
+          }
+
+          .ytomo-time {
+            font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Fira Code', 'Droid Sans Mono', 'Source Code Pro', monospace;
+            font-weight: 500;
+          }
         }
       }
     }
@@ -2187,6 +2457,10 @@ onMounted(async () => {
               &.failure {
                 background-color: rgba(220, 38, 38, 0.1);
                 border-left: 3px solid #dc2626;
+              }
+
+              &.current-cycle {
+                font-weight: 700;
               }
               
               .ytomo-history-result {
@@ -2424,6 +2698,27 @@ onMounted(async () => {
         border-radius: 3px;
         transition: all 0.2s;
         min-height: 20px;
+
+        // 今日の日付：装飾なし（何も追加しない）
+
+        // 時間帯選択がある場合：青背景
+        &.has-time-selections {
+          background: rgba(8, 145, 178, 0.15);
+        }
+
+        // 日付選択されている場合：青枠
+        &.selected {
+          border: 2px solid #0891b2;
+        }
+
+        // 満員の日付：赤太字下線
+        &.all-full {
+          .ytomo-day-number {
+            color: #dc2626;
+            font-weight: 700;
+            text-decoration: underline;
+          }
+        }
         
         // 子要素のクリックイベントを無効にして、親要素のクリックを確実に実行
         * {
@@ -2434,28 +2729,33 @@ onMounted(async () => {
           background: #f3f4f6;
         }
         
+        &.has-selections {
+          background: rgba(59, 130, 246, 0.1);
+          border: 1px solid rgba(59, 130, 246, 0.3);
+        }
+
         &.selected {
-          background: white;
           color: #0c4a6e;
           border: 2px solid #0891b2;
-          font-weight: 600;
-        }
-        
-        &.today {
-          background: #dbeafe;
-          color: #1e40af;
           font-weight: 600;
         }
         
         &.has-reservation {
           background: #f0fdf4;
           color: #166534;
-          
+
           &.selected {
-            background: white;
             color: #0c4a6e;
             border: 2px solid #0891b2;
             font-weight: 600;
+          }
+        }
+
+        &.all-full {
+          .ytomo-day-number {
+            color: #dc2626;
+            font-weight: 700;
+            text-decoration: underline;
           }
         }
         
@@ -2534,6 +2834,7 @@ onMounted(async () => {
 
 .ytomo-entrance-reservations {
   flex: 1;
+  max-width: 400px; /* 最大幅を制限 */
   min-width: 0;
   overflow: hidden;
   display: flex;
@@ -2623,8 +2924,9 @@ onMounted(async () => {
   
   .ytomo-reservation-actions {
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     align-items: center;
+    justify-content: center;
     gap: 8px;
     margin-top: 8px;
     padding-top: 8px;
@@ -2695,7 +2997,7 @@ onMounted(async () => {
       transition: all 0.2s;
       
       &.ytomo-reserve-button {
-        width: 120px;
+        width: 90px;
         background: #2c5aa0;
         color: white;
         padding: 8px 12px;
@@ -2729,7 +3031,34 @@ onMounted(async () => {
           }
         }
       }
-      
+
+      &.ytomo-add-reservation-button {
+        width: 90px;
+        background: #16a34a;
+        color: white;
+        padding: 8px 12px;
+        border: none;
+        border-radius: 4px;
+        font-size: 12px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s;
+
+        &:hover:not(:disabled) {
+          background: #15803d;
+        }
+
+        &:disabled {
+          background: #9ca3af;
+          color: #d1d5db;
+          cursor: not-allowed;
+
+          &:hover {
+            background: #9ca3af;
+          }
+        }
+      }
+
       &.ytomo-clear-button {
         background: #f3f4f6;
         color: #374151;
@@ -2753,7 +3082,7 @@ onMounted(async () => {
     // 予約情報表示エリア
     .ytomo-reservation-info {
       width: 100%;
-      margin-top: 12px;
+      margin-top: 8px;
       
       &.completed {
         opacity: 0.6;
@@ -2804,6 +3133,12 @@ onMounted(async () => {
             font-size: 10px;
             font-weight: 500;
             color: #0c4a6e;
+
+            &.priority-first {
+              background: rgba(239, 68, 68, 0.1);
+              border: 1px solid #ef4444;
+              color: #dc2626;
+            }
           }
         }
       }
@@ -3020,6 +3355,12 @@ onMounted(async () => {
       align-items: center;
       justify-content: center;
       border: 1px solid #059669;
+
+      &.priority-first {
+        color: #dc2626;
+        background: rgba(220, 38, 38, 0.1);
+        border: 1px solid #dc2626;
+      }
     }
     
     .ytomo-time-text {
@@ -3117,6 +3458,7 @@ onMounted(async () => {
   
   .ytomo-entrance-reservations {
     flex: 1 1 auto;
+    max-width: none; /* スマホでは最大幅制限を解除 */
     min-height: 200px;
   }
   
@@ -3210,5 +3552,80 @@ onMounted(async () => {
       font-size: 12px;
     }
   }
+}
+
+/* 複数日付グループ表示 */
+.ytomo-multi-date-groups {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid #e5e7eb;
+}
+
+.ytomo-groups-title {
+  font-size: 12px;
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: 8px;
+}
+
+.ytomo-date-group {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  padding: 8px;
+  margin-bottom: 6px;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+.ytomo-group-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 6px;
+}
+
+.ytomo-group-date {
+  font-size: 13px;
+  font-weight: 600;
+  color: #1e40af;
+}
+
+.ytomo-remove-group-button {
+  background: none;
+  border: none;
+  color: #6b7280;
+  font-size: 14px;
+  cursor: pointer;
+  padding: 2px 4px;
+  border-radius: 3px;
+  transition: all 0.2s;
+
+  &:hover {
+    background: #fee2e2;
+    color: #dc2626;
+  }
+
+  &:focus {
+    outline: none;
+  }
+}
+
+.ytomo-group-timeslots {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.ytomo-timeslot-item {
+  background: #dbeafe;
+  color: #1e40af;
+  font-size: 11px;
+  font-weight: 500;
+  padding: 2px 6px;
+  border-radius: 3px;
+  border: 1px solid #bfdbfe;
 }
 </style>

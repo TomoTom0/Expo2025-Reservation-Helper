@@ -4,10 +4,11 @@
  */
 
 import { defineStore } from 'pinia'
-import { ref, type Ref } from 'vue'
+import { ref, computed, type Ref } from 'vue'
 import { loggers } from '@/utils/logger'
 import { authenticatedFetch } from '@/utils/authManager'
 import { useTicketsStore } from '@/stores/tickets'
+import { formatDateSlash } from '@/utils/dateFormat'
 
 const logger = loggers.entranceReservation
 
@@ -25,16 +26,17 @@ export interface ReservationStatus {
 }
 
 export interface ReservationInfo {
-  visible: boolean
   date: string
-  timeSlots: Array<{ id: string, time: string, gate: string, priority: number }>
-  completed: boolean
+  time: string
+  gate: string
 }
 
 export interface ReservationResult {
   success: boolean
+  date: string
   gate: string
   time: string
+  failureReason?: '満席' | '無効' | 'その他'
 }
 
 export interface WaitInfo {
@@ -61,12 +63,7 @@ export const useEntranceReservationStore = defineStore('entranceReservation', ()
     dateChange: undefined
   })
 
-  const reservationInfo = ref<ReservationInfo>({
-    visible: false,
-    date: '',
-    timeSlots: [],
-    completed: false
-  })
+  const reservationInfo = ref<ReservationInfo[]>([])
 
   const isReservationRunning = ref(false)
   const reservationHistory = ref<ReservationResult[]>([])
@@ -85,7 +82,7 @@ export const useEntranceReservationStore = defineStore('entranceReservation', ()
   const waitTimer = ref<NodeJS.Timeout | null>(null)
   const clearSelectionCallback = ref<(() => void) | null>(null)
   const existingReservationId = ref<number | null>(null)
-  const selectedDate = ref('')
+  // selectedDate削除 - 複数日付対応のためreservationInfoを直接使用
   const reservationTimer = ref<NodeJS.Timeout | null>(null)
   const waitingProgressTimer = ref<NodeJS.Timeout | null>(null)
   const waitingStartTime = ref<number | null>(null)
@@ -106,23 +103,82 @@ export const useEntranceReservationStore = defineStore('entranceReservation', ()
     clearSelectionCallback.value = callback
   }
 
-  // ヘルパー関数
-  const formatDateForDisplay = (date: Date): string => {
-    const month = date.getMonth() + 1
-    const day = date.getDate()
-    return `${month}/${day}`
-  }
 
   const clearReservationHistory = () => {
     reservationHistory.value = []
   }
 
-  const clearReservationTimer = () => {
-    if (reservationTimer.value) {
-      clearTimeout(reservationTimer.value)
-      reservationTimer.value = null
+  // 予約ボタンの有効性判定
+  const isReservationEnabled = computed(() => {
+    // 基本条件：時間帯が1つ以上選択されている
+    if (reservationInfo.value.length === 0) {
+      return false
     }
-  }
+
+    // 選択している既存の入場予約のチェック
+    const selectedTickets = ticketsStore.selectedTickets
+
+    // チケットが選択されていない場合は無効
+    if (selectedTickets.length === 0) {
+      return false
+    }
+
+    // 複数チケット選択は無効
+    if (selectedTickets.length !== 1) {
+      return false
+    }
+
+    const ticket = selectedTickets[0]
+
+    // 自分の所有かチェック
+    if (!ticket.isOwn) {
+      return false
+    }
+
+    // 選択されたスケジュールを取得
+    const selectedSchedules = ticket.schedules?.filter(schedule => {
+      const reservationId = schedule.user_visiting_reservation_id?.toString()
+      if (!reservationId) return false
+      const reservationData = ticketsStore.getReservationManagement(reservationId)
+      return !!reservationData?.isSelected
+    }) || []
+
+    // 新規予約の場合（selectedScheduleがない、または既存予約がない）
+    if (selectedSchedules.length === 0) {
+      return true // 新規予約は時間帯選択があれば予約可能
+    }
+
+    // 既存予約変更の場合
+    if (selectedSchedules.length !== 1) {
+      return false
+    }
+
+    const selectedSchedule = selectedSchedules[0]
+
+    // 既存予約の条件チェック
+    const hasExistingReservation = selectedSchedule.user_visiting_reservation_id != null &&
+                                  selectedSchedule.user_visiting_reservation_id > 0 &&
+                                  selectedSchedule.entrance_date
+
+    // 新規予約の場合（既存予約データがない）
+    if (!hasExistingReservation) {
+      return true
+    }
+
+    // 既存予約変更の場合：ロックされていないかチェック
+    const reservationId = selectedSchedule.user_visiting_reservation_id?.toString()
+    if (!reservationId) {
+      return false
+    }
+
+    const reservationData = ticketsStore.getReservationManagement(reservationId)
+    if (reservationData?.isLocked) {
+      return false
+    }
+
+    return true
+  })
+
 
   // 目標時間を取得
   const getTargetUpdateTime = (): number => {
@@ -195,19 +251,28 @@ export const useEntranceReservationStore = defineStore('entranceReservation', ()
         return
       }
 
-      // 1. 並行実行：最優先の予約実行 と 空き情報取得
-      const availabilityData = await executeParallelTasks(selectedTimeSlots)
+      // 1. 並行実行：最優先予約実行 + 月スケジュール取得
+      const [primaryResult, dateAvailabilityMap] = await Promise.all([
+        executePrimaryReservation(selectedTimeSlots),
+        fetchMonthSchedules(selectedTimeSlots)
+      ])
 
       if (!isReservationRunning.value) return
 
-      // 2. 条件付き追加実行（最大2つの目標）
-      await executeAdditionalReservations(selectedTimeSlots, availabilityData)
+      // 最優先予約が成功した場合は即座に終了
+      if (primaryResult?.success) {
+        return
+      }
 
-      // 次の分の目標時間まで待機（予約実行中の場合のみ）
+      // 2. 追加予約実行（空きがあれば最大2つ）
+      await executeAdditionalReservations(selectedTimeSlots, dateAvailabilityMap)
+
+      if (!isReservationRunning.value) return
+
+      // 3. 次の分の目標時間まで待機（予約実行中の場合のみ）
       if (isReservationRunning.value) {
         scheduleNextMinuteTargetTime(selectedTimeSlots)
       }
-
 
     } catch (error) {
       logger.error('サイクルステップエラー', error)
@@ -229,107 +294,196 @@ export const useEntranceReservationStore = defineStore('entranceReservation', ()
     const currentSeconds = now.getSeconds()
     const waitTime = (60 + targetTime - currentSeconds) * 1000
 
+    // 次のサイクルまでの待機表示を設定
+    reservationStatus.value = {
+      visible: true,
+      isActive: true,
+      currentAction: `待機中 ${Math.ceil(waitTime / 1000)}秒`,
+      progress: 0,
+      progressText: '待機中',
+      statusClass: ''
+    }
+
+    // 待機時間のプログレスバーを開始
+    startWaitingProgress(waitTime, `待機中 ${Math.ceil(waitTime / 1000)}秒`)
+
     reservationTimer.value = setTimeout(() => {
       waitUntil35Seconds(selectedTimeSlots)
     }, waitTime)
   }
 
-  // 待機時間のプログレスバーを開始
+  // 待機時間のプログレスバーを開始（元のAPIManagerと同じ実装）
   const startWaitingProgress = (totalWaitTime: number, actionText: string) => {
     waitingStartTime.value = Date.now()
     waitingDuration.value = totalWaitTime
 
-    const updateProgress = () => {
+    // 待機中プログレスタイマーをクリア
+    if (waitingProgressTimer.value) {
+      clearInterval(waitingProgressTimer.value)
+    }
+
+    // 500msごとに進捗を更新
+    waitingProgressTimer.value = setInterval(() => {
       const now = Date.now()
       const elapsed = now - (waitingStartTime.value || now)
       const progress = Math.min((elapsed / totalWaitTime) * 100, 100)
+      const remainingTime = Math.max(0, Math.ceil((totalWaitTime - elapsed) / 1000))
 
       reservationStatus.value.progress = progress
+      reservationStatus.value.currentAction = `${actionText.split(' ')[0]} ${remainingTime}秒`
 
-      if (progress < 100) {
-        setTimeout(updateProgress, 100)
+      if (progress >= 100) {
+        clearInterval(waitingProgressTimer.value!)
+        waitingProgressTimer.value = null
       }
-    }
-
-    updateProgress()
+    }, 500) // 500msごと更新（元の実装と同じ）
   }
 
-  // 並行実行：最優先予約実行 と 空き情報取得
-  const executeParallelTasks = async (selectedTimeSlots: any[]) => {
-    const topPrioritySlot = selectedTimeSlots.find(slot =>
-      !executedReservations.value.has(`${slot.gate}-${slot.time}`) &&
-      slot.priority === 1
-    )
-
-    if (!topPrioritySlot) return
-
-    // 並行実行
-    const [reservationResult, availabilityData] = await Promise.all([
-      executeTopPriorityReservation(topPrioritySlot),
-      getAvailabilityInfo()
-    ])
-
-    logger.info('並行実行完了', {
-      reservationSuccess: reservationResult?.success,
-      availabilityDataReceived: !!availabilityData
-    })
-
-    logger.info('空き情報取得完了（store更新済み）', { availabilityDataReceived: !!availabilityData })
-
-    if (reservationResult?.success) {
-      // 予約成功時の処理
-      await handleReservationSuccess(topPrioritySlot, reservationResult)
-    } else if (reservationResult?.error) {
-      addToHistory(false, topPrioritySlot.gate, topPrioritySlot.time)
+  // 最優先予約実行（d1 t1） - 並行処理用
+  const executePrimaryReservation = async (selectedTimeSlots: any[]) => {
+    const primarySlot = selectedTimeSlots.find(slot => slot.priority === 1)
+    if (!primarySlot) {
+      logger.warn('最優先予約対象が見つかりません')
+      return { success: false }
     }
 
-    // 空き情報を返す
-    return availabilityData
-  }
-
-  // 最優先予約の実行
-  const executeTopPriorityReservation = async (slot: any) => {
-    if (!isReservationRunning.value) return null
-
-    const slotKey = `${slot.gate}-${slot.time}`
     reservationStatus.value = {
       visible: true,
       isActive: true,
-      currentAction: `最優先予約実行中 - ${slot.gate}${slot.time}`,
-      progress: 25,
-      progressText: '実行中',
+      currentAction: `最優先予約実行中: ${primarySlot.gate}${primarySlot.time}`,
+      progress: 50,
+      progressText: '1/2',
       statusClass: ''
     }
 
+    logger.info('最優先予約実行開始', { slot: primarySlot })
+
+    // 実際の予約実行
+    const slotKey = `${primarySlot.gate}-${primarySlot.time}`
+    executedReservations.value.add(slotKey)
+
     try {
-      const result = await callActualReservationAPI(slot)
+      // 従来の実際の予約処理を実行
+      const result = await callActualReservationAPI(primarySlot)
 
+      // 結果に応じてステータス更新
       if (result.success) {
-        executedReservations.value.add(slotKey)
-        addToHistory(true, slot.gate, slot.time)
+        // 予約成功時は即座に終了
+        await handleReservationSuccess(primarySlot, result)
+        return { success: true, slot: primarySlot, result }
+      } else {
+        // 失敗時は履歴に追加して継続
+        logger.error('最優先予約失敗', { slot: primarySlot, result })
+        addToHistory(false, primarySlot.date, primarySlot.gate, primarySlot.time, result.failureReason || 'その他')
+        return { success: false, slot: primarySlot, result }
       }
-
-      return result
     } catch (error) {
       logger.error('最優先予約実行エラー', error)
-      return { success: false, error: (error as Error).message }
+      addToHistory(false, primarySlot.date, primarySlot.gate, primarySlot.time, 'その他')
+      return { success: false, slot: primarySlot, error }
+    }
+  }
+
+  // 月スケジュール取得（reservationInfo内のすべての日付情報を返す） - 並行処理用
+  const fetchMonthSchedules = async (selectedTimeSlots: any[]) => {
+    logger.info('月スケジュール取得開始（並行処理）', { slotsCount: selectedTimeSlots.length })
+
+    // 並行処理のためステータス表示なし
+
+    // スロットから必要な月を抽出
+    const monthsNeeded = new Set<string>()
+    selectedTimeSlots.forEach(slot => {
+      if (slot.date) {
+        // YYYY-MM-DD形式から月を取得
+        const month = slot.date.split('-')[1] // YYYY-MM-DD から MM を取得
+        if (month) {
+          monthsNeeded.add(month)
+        }
+      }
+    })
+
+    logger.info('必要な月を抽出完了', { months: Array.from(monthsNeeded) })
+
+    const ticketsStore = useTicketsStore()
+    const currentYear = new Date().getFullYear()
+
+    // 複数月のスケジュール取得を並行実行（タイムアウト付き）
+    const monthResults = new Map<string, any>()
+
+    const schedulePromises = Array.from(monthsNeeded).map(async (month) => {
+      logger.info(`月スケジュール取得開始: ${month}月`)
+      try {
+        const result = await Promise.race([
+          ticketsStore.getEntranceScheduleData(currentYear, parseInt(month), true),
+          new Promise((_, reject) => setTimeout(() => reject(new Error(`タイムアウト: ${month}月`)), 10000))
+        ])
+        logger.info(`月スケジュール取得完了: ${month}月`)
+        monthResults.set(month, result)
+        return { month, result }
+      } catch (error) {
+        logger.error(`月スケジュール取得エラー: ${month}月`, error)
+        monthResults.set(month, null)
+        return { month, result: null }
+      }
+    })
+
+    try {
+      logger.info('Promise.all開始')
+      await Promise.all(schedulePromises)
+      logger.info('月スケジュール取得完了', { months: Array.from(monthsNeeded), resultsCount: monthResults.size })
+
+      // 各日付の空き情報を抽出して返す
+      const dateAvailability: { [date: string]: any } = {}
+
+      selectedTimeSlots.forEach(slot => {
+        if (slot.date) {
+          // YYYY-MM-DD形式から月日を取得
+          const parts = slot.date.split('-')
+          const month = parts[1] // MM（文字列）
+          const dayOfMonth = parts[2].padStart(2, '0') // DD
+
+          // 該当月のスケジュールデータを取得
+          const scheduleData = monthResults.get(month)
+          if (scheduleData && scheduleData !== null) {
+            const dayData = scheduleData?.states?.[dayOfMonth]
+            if (dayData) {
+              dateAvailability[slot.date] = dayData
+            }
+          }
+        }
+      })
+
+      logger.info('日付別空き情報抽出完了', {
+        datesCount: Object.keys(dateAvailability).length,
+        dates: Object.keys(dateAvailability)
+      })
+
+      return dateAvailability
+    } catch (error) {
+      logger.error('月スケジュール取得エラー', error)
+      return {}
+    } finally {
+      logger.info('月スケジュール取得処理終了')
     }
   }
 
   // 空き情報取得
-  const getAvailabilityInfo = async () => {
+  const getAvailabilityInfo = async (targetDate?: string) => {
     try {
-      const targetDate = reservationInfo.value.date // MM/DD形式
-      if (!targetDate) return null
+      // 引数で指定されない場合は空き情報の取得をスキップ（複数日付対応のため）
+      if (!targetDate) {
+        return null
+      }
+      const dateToUse = targetDate
 
-      const month = parseInt(targetDate.split('/')[0])
-      const year = new Date().getFullYear() // MM/DD形式には年がないので現在年を使用
+      // YYYY-MM-DD形式から年月日を抽出
+      const parts = dateToUse.split('-')
+      const year = parseInt(parts[0])
+      const month = parseInt(parts[1])
+      const dayOfMonth = parts[2].padStart(2, '0')
 
       const ticketsStore = useTicketsStore()
       const scheduleData = await ticketsStore.getEntranceScheduleData(year, month, true)
-
-      // 指定日の時間帯情報を取得
-      const dayOfMonth = targetDate.split('/')[1].padStart(2, '0') // MM/DD → DD（0埋め）
       const dayData = scheduleData?.states?.[dayOfMonth]
 
       logger.info('空き情報取得結果', { year, month, dayOfMonth, hasDayData: !!dayData })
@@ -342,11 +496,13 @@ export const useEntranceReservationStore = defineStore('entranceReservation', ()
   }
 
   // 履歴に追加
-  const addToHistory = (success: boolean, gate: string, time: string) => {
+  const addToHistory = (success: boolean, date: string, gate: string, time: string, failureReason?: '満席' | '無効' | 'その他') => {
     reservationHistory.value.push({
       success,
+      date,
       gate,
-      time
+      time,
+      failureReason
     })
   }
 
@@ -355,105 +511,117 @@ export const useEntranceReservationStore = defineStore('entranceReservation', ()
     isReservationRunning.value = false
     clearReservationTimer()
 
-    // 変更前後の情報を正しく設定
-    const originalDateTime = reservationInfo.value.timeSlots.length > 0
-      ? `${reservationInfo.value.date} ${reservationInfo.value.timeSlots[0].gate}${reservationInfo.value.timeSlots[0].time}`
-      : reservationInfo.value.date
+    // slotの情報を直接使用
+    const originalDateTime = `${slot.date} ${slot.gate}${slot.time}`
 
-    // TODO: 変更後の情報処理を完全実装
+    // 変更後の情報処理を実装
+    const newDateTime = result.date && result.reservationTime
+      ? `${result.date} ${slot.gate}${result.reservationTime}`
+      : `${slot.date} ${slot.gate}${slot.time}`
+
+    const dateChangeText = originalDateTime !== newDateTime
+      ? `${originalDateTime} → ${newDateTime}`
+      : ''
 
     reservationStatus.value = {
       visible: true,
       isActive: false,
-      currentAction: '予約に成功しました',
+      currentAction: `予約成功: ${slot.gate}${slot.time}`,
       progress: 100,
       progressText: '成功',
-      statusClass: 'success'
+      statusClass: 'success',
+      dateChange: dateChangeText
     }
+
+    // 予約履歴に追加
+    reservationHistory.value.push({
+      success: true,
+      date: slot.date,
+      gate: slot.gate,
+      time: slot.time
+    })
   }
 
-  // 条件付き追加実行
-  const executeAdditionalReservations = async (selectedTimeSlots: any[], availabilityData: any = null) => {
-    // 未実行の時間帯のうち、満員でない時間帯から優先度の高い順に最大2つを取得（最優先のpriority=1を除く）
-    const unexecutedSlots = selectedTimeSlots
+  // 追加予約実行（空きがあれば最大2つ）
+  const executeAdditionalReservations = async (selectedTimeSlots: any[], dateAvailabilityMap: { [date: string]: any } = {}) => {
+    // 瞬時に判定を完了
+    const availableSlots = selectedTimeSlots
       .filter(slot => {
         // 基本条件：未実行かつ最優先でない
         if (executedReservations.value.has(`${slot.gate}-${slot.time}`) || slot.priority === 1) {
           return false
         }
 
-        // 空き情報がある場合は満員でないかチェック
-        if (availabilityData) {
+        // 該当日付の空き情報をチェック
+        const dayAvailability = dateAvailabilityMap[slot.date]
+        if (dayAvailability) {
           const gateKey = slot.gate === '東' ? '1' : '2'
           const timeKey = convertTimeToAPIFormat(slot.time)
 
-          const timeState = availabilityData[gateKey]?.[timeKey]?.time_state
-          logger.info('空き情報チェック', { slot: `${slot.gate}${slot.time}`, gateKey, timeKey, timeState })
+          const timeState = dayAvailability[gateKey]?.[timeKey]?.time_state
+          logger.info('追加予約空き情報チェック', {
+            slot: `${slot.date} ${slot.gate}${slot.time}`,
+            gateKey,
+            timeKey,
+            timeState
+          })
 
-          // time_state: 0=空きあり, 1=残り少ない, 2=満席, 4=利用不可
-          // 満席(2)と利用不可(4)は除外
-          if (timeState === 2 || timeState === 4) {
-            logger.info('満員/利用不可のため追加実行から除外', { slot, timeState })
-            return false
-          }
-        } else {
-          // 空き情報が取得できない場合は追加実行を行わない（安全のため）
-          logger.warn('空き情報未取得のため追加実行をスキップ', { slot })
-          return false
+          // time_state: 0=空きあり, 1=残り少ない のみ追加実行対象
+          return timeState === 0 || timeState === 1
         }
 
-        return true
+        // 空き情報がない場合は実行しない
+        return false
       })
-      .sort((a, b) => a.priority - b.priority) // 優先度の低い数値が高優先度
+      .sort((a, b) => a.priority - b.priority) // 優先度順
       .slice(0, 2) // 最大2つ
 
-    if (unexecutedSlots.length === 0) {
-      logger.info('追加実行対象の時間帯がありません')
-      return
+    if (availableSlots.length === 0) {
+      logger.info('追加実行対象がありません')
+      // 追加予約がなくても次のサイクルに続行
     }
 
-    logger.info('条件付き追加実行開始', { slots: unexecutedSlots, count: unexecutedSlots.length })
+    logger.info('追加予約実行開始', { slots: availableSlots, count: availableSlots.length })
 
     // 順次実行：予約実行->結果確認->予約実行->結果確認
-    for (const [index, slot] of unexecutedSlots.entries()) {
+    for (const [index, slot] of availableSlots.entries()) {
       if (!isReservationRunning.value) return
 
+      // 実際の予約実行時のみステータス表示
       reservationStatus.value = {
         visible: true,
         isActive: true,
-        currentAction: `追加予約実行中 - ${slot.gate}${slot.time} (${index + 1}/${unexecutedSlots.length})`,
-        progress: 50 + (index / unexecutedSlots.length) * 25,
-        progressText: `追加${index + 1}/${unexecutedSlots.length}`,
+        currentAction: `追加予約実行中 - ${slot.gate}${slot.time} (${index + 1}/${availableSlots.length})`,
+        progress: 75 + ((index + 1) / availableSlots.length) * 25,
+        progressText: `2/2 追加${index + 1}`,
         statusClass: ''
       }
 
       const slotKey = `${slot.gate}-${slot.time}`
+      executedReservations.value.add(slotKey)
 
       try {
         const result = await callActualReservationAPI(slot)
 
         if (result.success) {
-          executedReservations.value.add(slotKey)
-          addToHistory(true, slot.gate, slot.time)
+          addToHistory(true, slot.date, slot.gate, slot.time)
           logger.info('追加予約成功', { slot, result })
           // 予約成功時は即座に処理終了
           await handleReservationSuccess(slot, result)
           return
         } else {
-          executedReservations.value.add(slotKey)
-          addToHistory(false, slot.gate, slot.time)
-          logger.info('追加予約失敗', { slot, error: result.error })
+          addToHistory(false, slot.date, slot.gate, slot.time, result.failureReason || 'その他')
+          logger.error('追加予約失敗', { slot, result })
         }
       } catch (error) {
-        executedReservations.value.add(slotKey)
-        addToHistory(false, slot.gate, slot.time)
+        addToHistory(false, slot.date, slot.gate, slot.time, 'その他')
         logger.error('追加予約エラー', { slot, error })
       }
     }
   }
 
   // 実際の予約API呼び出し - 元のmanagerから完全コピー
-  const callActualReservationAPI = async (slot: any): Promise<{ success: boolean; date?: string; error?: string; reservationIds?: number[]; ticketsData?: any }> => {
+  const callActualReservationAPI = async (slot: any): Promise<{ success: boolean; date?: string; error?: string; failureReason?: '満席' | '無効' | 'その他'; reservationIds?: number[]; ticketsData?: any }> => {
     try {
       // 選択されたチケットIDを取得
       const selectedTickets = Array.from(ticketsStore.selectedTicketIds)
@@ -461,11 +629,18 @@ export const useEntranceReservationStore = defineStore('entranceReservation', ()
         return { success: false, error: '選択されたチケットがありません' }
       }
 
-      // 日付を取得（reservationInfo.dateから）MM/DD形式をYYYYMMDD形式に変換
-      const rawDate = reservationInfo.value.date // MM/DD形式
-      const currentYear = new Date().getFullYear()
-      const [month, day] = rawDate.split('/')
-      const entranceDate = `${currentYear}${month.padStart(2, '0')}${day.padStart(2, '0')}`
+      // slotの日付を直接使用（YYYY-MM-DD形式）
+      const rawDate = slot.date
+      if (!rawDate) {
+        return { success: false, error: 'スロットに日付情報がありません' }
+      }
+
+      // YYYY-MM-DD形式から年月日を抽出
+      const [year, month, day] = rawDate.split('-')
+      if (!year || !month || !day) {
+        return { success: false, error: `日付形式が不正です: ${rawDate}` }
+      }
+      const entranceDate = `${year}${month.padStart(2, '0')}${day.padStart(2, '0')}`
       const gateType = slot.gate === '東' ? 1 : 2
 
       // 新規予約か変更予約かを判定
@@ -564,13 +739,27 @@ export const useEntranceReservationStore = defineStore('entranceReservation', ()
           errorDetail = await response.text()
         }
 
+        // 失敗理由を判定（元のAPIManagerと同じロジック）
+        let failureReason: '満席' | '無効' | 'その他' = 'その他'
+        const errorMessage = errorDetail?.message || errorDetail?.error || 'API呼び出しに失敗しました'
+
+        if (errorDetail?.error?.name) {
+          const errorName = errorDetail.error.name
+          if (errorName === 'stock_not_available') {
+            failureReason = '満席'
+          } else if (errorName === 'th_error') {
+            failureReason = '無効'
+          }
+        }
+
         logger.warn('予約失敗', {
           日時: `${entranceDate} ${slot.gate}ゲート ${slot.time} APIレベル`,
           httpStatus: response.status,
           httpStatusText: response.statusText,
           errorDetail,
           sentBody: body,
-          理由: errorDetail?.message || errorDetail?.error || 'API呼び出しに失敗しました'
+          理由: errorMessage,
+          failureReason
         })
 
         // エラー時も一定時間待機してから次の処理へ
@@ -580,7 +769,8 @@ export const useEntranceReservationStore = defineStore('entranceReservation', ()
 
         return {
           success: false,
-          error: errorDetail?.message || errorDetail?.error || '予約に失敗しました'
+          error: typeof errorMessage === 'string' ? errorMessage : '予約に失敗しました',
+          failureReason
         }
       }
     } catch (error) {
@@ -593,7 +783,8 @@ export const useEntranceReservationStore = defineStore('entranceReservation', ()
 
       return {
         success: false,
-        error: '通信エラーが発生しました'
+        error: '通信エラーが発生しました',
+        failureReason: 'その他' as const
       }
     }
   }
@@ -634,15 +825,7 @@ export const useEntranceReservationStore = defineStore('entranceReservation', ()
     }
   }
 
-  const executeReservation = async (
-    timeSlots: any[],
-    date?: string,
-    existingId?: number | null,
-    originalInfo?: any,
-    isButtonEnabled?: boolean,
-    timeSlotInfo?: any,
-    selectedSchedule?: any
-  ) => {
+  const executeReservation = async () => {
     // 予約実行中の場合は中断処理
     if (isReservationRunning.value) {
       logger.info('予約中断が要求されました')
@@ -650,10 +833,42 @@ export const useEntranceReservationStore = defineStore('entranceReservation', ()
       return
     }
 
-    // バリデーション
-    if (!isButtonEnabled) {
-      logger.warn('予約ボタンが無効な状態で実行されました')
+    // reservationInfoから必要な情報を取得
+    if (reservationInfo.value.length === 0) {
+      logger.warn('選択された時間帯がありません')
       return
+    }
+
+    // 時間帯スロットを変換（各スロットには日付情報も含む）
+    const timeSlots = reservationInfo.value.map((info, index) => ({
+      id: `${info.date}-${info.gate}-${info.time}`,
+      time: info.time,
+      gate: info.gate === 'east' ? '東' : '西',
+      date: info.date,
+      priority: index + 1
+    }))
+
+    // 選択されたスケジュールから既存予約IDを取得
+    const selectedTickets = ticketsStore.selectedTickets
+    let existingId: number | null = null
+    let selectedSchedule: any = null
+
+    if (selectedTickets.length > 0) {
+      for (const ticket of selectedTickets) {
+        if (ticket.schedules) {
+          const schedule = ticket.schedules.find(s => {
+            const reservationId = s.user_visiting_reservation_id?.toString()
+            if (!reservationId) return false
+            const reservationData = ticketsStore.getReservationManagement(reservationId)
+            return !!reservationData?.isSelected
+          })
+          if (schedule) {
+            selectedSchedule = schedule
+            existingId = schedule.user_visiting_reservation_id || null
+            break
+          }
+        }
+      }
     }
 
     // ロック状態チェック
@@ -665,14 +880,15 @@ export const useEntranceReservationStore = defineStore('entranceReservation', ()
       }
     }
 
-    if (!timeSlotInfo) {
-      logger.warn('必要な情報が不足しています', { timeSlotInfo, selectedSchedule })
-      return
-    }
-
-    if (!date || date.trim() === '') {
-      logger.warn('選択日付が無効です')
-      return
+    // 時間帯情報を作成（複数選択対応）
+    const timeSlotInfo = {
+      totalSelections: reservationInfo.value.length,
+      slots: reservationInfo.value.map(info => ({
+        time: info.time,
+        gate: info.gate === 'east' ? '東' : '西',
+        gateType: info.gate === 'east' ? 1 : 2,
+        date: info.date
+      }))
     }
 
     if (timeSlots.length === 0) {
@@ -680,9 +896,8 @@ export const useEntranceReservationStore = defineStore('entranceReservation', ()
       return
     }
 
-    // 既存予約ID、選択日付を保存
+    // 既存予約IDを保存
     existingReservationId.value = existingId || null
-    selectedDate.value = date
 
     // 予約開始時に履歴をクリア
     clearReservationHistory()
@@ -690,13 +905,7 @@ export const useEntranceReservationStore = defineStore('entranceReservation', ()
     // flag_firstを予約開始時にtrueにリセット
     flag_first.value = true
 
-    // 予約情報を表示（実行時情報として表示）
-    reservationInfo.value = {
-      visible: true,
-      date: formatDateForDisplay(new Date(date + 'T00:00:00')),
-      timeSlots: timeSlots,
-      completed: false
-    }
+    // 予約情報はそのまま使用（既にreservationInfo.valueに設定済み）
 
     // 予約実行状態を開始
     isReservationRunning.value = true
@@ -709,7 +918,7 @@ export const useEntranceReservationStore = defineStore('entranceReservation', ()
       statusClass: ''
     }
 
-    logger.info('入場予約実行開始', { timeSlots, date, timeSlotInfo, selectedSchedule })
+    logger.info('入場予約実行開始', { timeSlots, timeSlotInfo, selectedSchedule })
 
     // 選択された時間帯を保存（待機終了時の再開用）
     selectedTimeSlots.value = timeSlots
@@ -750,13 +959,87 @@ export const useEntranceReservationStore = defineStore('entranceReservation', ()
   }
 
   const startWait = () => {
-    logger.info('待機開始')
-    // TODO: 実装
+    logger.info('待機開始', { waitMinutes: waitInfo.value.waitMinutes })
+
+    // 待機状態を開始
+    waitInfo.value.isWaiting = true
+    waitInfo.value.waitStartTime = new Date()
+    waitInfo.value.waitEndTime = new Date(Date.now() + waitInfo.value.waitMinutes * 60 * 1000)
+    waitInfo.value.remainingMinutes = waitInfo.value.waitMinutes
+    waitInfo.value.progress = 0
+
+    // 予約ステータスを待機中に更新
+    reservationStatus.value = {
+      visible: true,
+      isActive: true,
+      currentAction: `待機中 ${waitInfo.value.waitMinutes}分`,
+      progress: 0,
+      progressText: '待機中',
+      statusClass: 'waiting'
+    }
+
+    // 1分ごとの進捗更新タイマー
+    const waitTimer = setInterval(() => {
+      const now = new Date()
+      const remaining = Math.max(0, Math.ceil((waitInfo.value.waitEndTime!.getTime() - now.getTime()) / (60 * 1000)))
+
+      waitInfo.value.remainingMinutes = remaining
+      waitInfo.value.progress = ((waitInfo.value.waitMinutes - remaining) / waitInfo.value.waitMinutes) * 100
+
+      if (remaining > 0) {
+        reservationStatus.value.currentAction = `待機中 残り${remaining}分`
+        reservationStatus.value.progress = waitInfo.value.progress
+      } else {
+        // 待機完了
+        clearInterval(waitTimer)
+        waitInfo.value.isWaiting = false
+        reservationStatus.value = {
+          visible: true,
+          isActive: false,
+          currentAction: '待機完了 - 予約実行可能',
+          progress: 100,
+          progressText: '完了',
+          statusClass: 'success'
+        }
+        logger.info('待機完了')
+      }
+    }, 60000) // 1分ごと
+  }
+
+  const clearReservationTimer = () => {
+    if (reservationTimer.value) {
+      clearTimeout(reservationTimer.value)
+      reservationTimer.value = null
+      logger.info('予約サイクルタイマーを停止')
+    }
+    // 待機プログレスタイマーも停止
+    if (waitingProgressTimer.value) {
+      clearInterval(waitingProgressTimer.value)
+      waitingProgressTimer.value = null
+      logger.info('待機プログレスタイマーを停止')
+    }
   }
 
   const extendWaitTime = (minutes: number) => {
     logger.info('待機時間延長', { minutes })
-    // TODO: 実装
+
+    if (waitInfo.value.isWaiting && waitInfo.value.waitEndTime) {
+      // 待機中の場合は終了時間を延長
+      waitInfo.value.waitEndTime = new Date(waitInfo.value.waitEndTime.getTime() + minutes * 60 * 1000)
+      waitInfo.value.waitMinutes += minutes
+
+      logger.info('待機時間延長完了', {
+        新しい終了時間: waitInfo.value.waitEndTime,
+        総待機時間: waitInfo.value.waitMinutes
+      })
+    } else {
+      // 待機中でない場合は設定値のみ変更
+      waitInfo.value.waitMinutes = Math.max(1, Math.min(720, waitInfo.value.waitMinutes + minutes))
+
+      logger.info('待機時間設定変更', {
+        新しい設定時間: waitInfo.value.waitMinutes
+      })
+    }
   }
 
   return {
@@ -766,12 +1049,14 @@ export const useEntranceReservationStore = defineStore('entranceReservation', ()
     isReservationRunning,
     reservationHistory,
     waitInfo,
+    isReservationEnabled,
 
     // Actions
     executeReservation,
     abortReservation,
     startWait,
     extendWaitTime,
+    clearReservationTimer,
     formatTime,
     setClearSelectionCallback,
     getTargetUpdateTime,
