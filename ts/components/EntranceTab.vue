@@ -8,7 +8,7 @@
         <div class="ytomo-calendar-header">
           <div class="ytomo-calendar-title">
             <h3>入場日選択</h3>
-            <span v-if="selectedDate" class="ytomo-selected-date">{{ formatDate(selectedDate) }}</span>
+            <span v-if="entranceStore.selectedDate" class="ytomo-selected-date">{{ formatDate(entranceStore.selectedDate) }}</span>
           </div>
           <div class="ytomo-header-buttons">
             <button class="ytomo-refresh-button" @click="refreshEntranceData" title="入場予約データを更新">
@@ -44,7 +44,7 @@
                 class="ytomo-calendar-day"
                 :class="{
                   'empty-date': !date.isCurrentMonth,
-                  'selected': date.dateString === selectedDate,
+                  'selected': date.dateString === entranceStore.selectedDate,
                   'today': date.isToday,
                   'disabled': date.disabled,
                   'has-reservation': hasReservationForDate(date.dateString),
@@ -81,7 +81,7 @@
       <!-- 右側: 予約状況テーブル -->
       <div class="ytomo-entrance-reservations">
         <!-- 日付表示エリア（既存日時と選択日付を横並び） -->
-        <div v-if="selectedDate" class="ytomo-date-display-container">
+        <div v-if="entranceStore.selectedDate" class="ytomo-date-display-container">
           <!-- 既存入場日時表示（左側）灰色 -->
           <div v-if="getFromDateTimeText()" class="ytomo-existing-datetime-display existing">
             {{ getFromDateTimeText() }}
@@ -96,11 +96,11 @@
           
           <!-- 入場日表示（右側）青色 -->
           <div class="ytomo-selected-date-display selected">
-            {{ formatDate(selectedDate) }}
+            {{ formatDate(entranceStore.selectedDate) }}
           </div>
         </div>
         <div class="ytomo-reservation-table-container">
-          <table class="ytomo-entrance-table" v-if="selectedDate">
+          <table class="ytomo-entrance-table" v-if="entranceStore.selectedDate">
             <thead>
               <tr>
                 <th>東</th>
@@ -168,7 +168,7 @@
         </div>
         
         <!-- 予約操作ボタン -->
-        <div v-if="selectedDate" class="ytomo-reservation-actions">
+        <div v-if="entranceStore.selectedDate" class="ytomo-reservation-actions">
           <button
             class="ytomo-reserve-button"
             :class="{ 'disabled': !entranceStore.isReservationEnabled, 'cancel-mode': entranceStore.isReservationRunning }"
@@ -304,16 +304,15 @@ entranceStore.setClearSelectionCallback(clearTimeSlotSelection)
 
 // カレンダー状態
 const isCalendarExpanded = ref(true)
-const selectedDate = ref('')
 const currentMonth = ref(new Date()) // 現在の年月
 const isRefreshing = ref(false) // 手動更新中フラグ
 
 
 // 既存の入場日時と重複する時間帯を判定
 const isTimeSlotDisabled = (gate: string, time: string) => {
-  if (!selectedDate.value) return false
+  if (!entranceStore.selectedDate) return false
 
-  const selectedDateStr = selectedDate.value! // 内部形式（YYYY-MM-DD）
+  const selectedDateStr = entranceStore.selectedDate! // 内部形式（YYYY-MM-DD）
   const gateType = gate === 'east' ? 1 : 2
 
   // 同じ日付の既存予約があるかチェック
@@ -402,33 +401,33 @@ watch(selectedSchedule, (newSchedule, oldSchedule) => {
     logger.info('入場日時選択変更検知 - 同期実行', { 
       old: oldSchedule?.entrance_date, 
       new: newSchedule.entrance_date,
-      currentSelectedDate: selectedDate.value
+      currentSelectedDate: entranceStore.selectedDate
     })
     
     // カレンダー選択日を新しい入場日に同期（YYYYMMDD→YYYY-MM-DDに正規化）
     if (newSchedule.entrance_date) {
-      selectedDate.value = dateHelpers.normalize(newSchedule.entrance_date)
-      logger.info('selectedDate.value更新完了', { 
+      entranceStore.selectedDate = dateHelpers.normalize(newSchedule.entrance_date)
+      logger.info('entranceStore.selectedDate更新完了', { 
         original: newSchedule.entrance_date, 
-        normalized: selectedDate.value 
+        normalized: entranceStore.selectedDate 
       })
     }
     
     // 時間帯選択を解除（disabled状態になった選択も含めて全解除）
     // 新しい日付での選択をクリア
-    if (selectedDate.value) {
+    if (entranceStore.selectedDate) {
       entranceStore.reservationInfo = entranceStore.reservationInfo.filter(
-        info => info.date !== selectedDate.value
+        info => info.date !== entranceStore.selectedDate
       )
     }
     
     // 選択日の時間帯データを再読み込み（内部形式で呼び出し）
-    if (selectedDate.value) {
-      loadTimeSlotsForDate(selectedDate.value)
+    if (entranceStore.selectedDate) {
+      loadTimeSlotsForDate(entranceStore.selectedDate)
     }
     
     logger.info('入場日時連動処理完了', { 
-      selectedDate: selectedDate.value,
+      selectedDate: entranceStore.selectedDate,
       clearedSelections: true
     })
   }
@@ -491,9 +490,9 @@ const calendarAvailabilityCache = computed(() => {
   return cache
 })
 
-// selectedDate.value（YYYY-MM-DD）をそのまま返す（統一のため）
+// entranceStore.selectedDate（YYYY-MM-DD）をそのまま返す（統一のため）
 const getFormattedSelectedDate = (): string => {
-  return selectedDate.value || ''
+  return entranceStore.selectedDate || ''
 }
 
 // 時間帯の選択状態を確認（reservationInfoベース）
@@ -594,7 +593,7 @@ const dateTimeChangeText = computed(() => {
   const existingTime = selectedSchedule.value.time_start
   const existingGate = selectedSchedule.value.gate_type === 1 ? '東' : '西'
   
-  const newDate = selectedDate.value ? formatDate(selectedDate.value) : ''
+  const newDate = entranceStore.selectedDate ? formatDate(entranceStore.selectedDate) : ''
   const newGate = newTimeSlot.gate
   const newTime = newTimeSlot.time
   
@@ -635,7 +634,7 @@ const getFromDateTimeText = () => {
 const getToDateTimeText = () => {
   const newTimeSlot = getSelectedTimeSlotInfo()
   if (!newTimeSlot) return ''
-  const date = selectedDate.value ? formatDate(selectedDate.value) : ''
+  const date = entranceStore.selectedDate ? formatDate(entranceStore.selectedDate) : ''
   const gate = newTimeSlot.gate
   const time = newTimeSlot.time
   return `${date} ${gate}${time}`
@@ -843,8 +842,8 @@ const previousMonth = async () => {
     })
     
     // 選択日付がある場合は時間帯データを更新（選択状態を保持）
-    if (selectedDate.value) {
-      await loadTimeSlotsForDateWithSelection(selectedDate.value)
+    if (entranceStore.selectedDate) {
+      await loadTimeSlotsForDateWithSelection(entranceStore.selectedDate)
     }
   }
 }
@@ -881,8 +880,8 @@ const nextMonth = async () => {
     })
     
     // 選択日付がある場合は時間帯データを更新（選択状態を保持）
-    if (selectedDate.value) {
-      await loadTimeSlotsForDateWithSelection(selectedDate.value)
+    if (entranceStore.selectedDate) {
+      await loadTimeSlotsForDateWithSelection(entranceStore.selectedDate)
     }
   }
 }
@@ -904,7 +903,7 @@ const selectDate = async (event: Event) => {
     他の月: isOtherMonth
   })
   
-  selectedDate.value = dateString
+  entranceStore.selectedDate = dateString
 
   // カレンダーの月を選択日付に連動させる
   const selectedDateObj = new Date(dateString + 'T00:00:00')
@@ -1195,7 +1194,7 @@ const refreshEntranceData = async () => {
     logger.info('[ENTRANCE:EntranceTab] 入場予約データ更新開始')
     
     // 現在選択中の日付を保持
-    const currentSelectedDate = selectedDate.value
+    const currentSelectedDate = entranceStore.selectedDate
     const currentSelectedSchedule = selectedSchedule.value
     
     logger.info('手動更新前の状態', { 
@@ -1234,13 +1233,13 @@ const refreshEntranceData = async () => {
     })
     
     logger.info('データ更新後の状態', {
-      selectedDateAfterUpdate: selectedDate.value,
+      selectedDateAfterUpdate: entranceStore.selectedDate,
       selectedScheduleAfterUpdate: !!selectedSchedule.value
     })
   
     // 選択日付がある場合は必ず保持（schedule.selectedは自動的に保持される）
     if (currentSelectedDate && currentSelectedDate.trim() !== '') {
-      selectedDate.value = currentSelectedDate
+      entranceStore.selectedDate = currentSelectedDate
       logger.info('既存の選択日付を保持', { date: currentSelectedDate, hasSchedule: !!selectedSchedule.value })
       
       // 選択日の時間帯データを再読み込み（選択状態を保持）
@@ -1257,7 +1256,7 @@ const refreshEntranceData = async () => {
     }
     
     logger.info('入場予約データ更新完了', {
-      finalSelectedDate: selectedDate.value,
+      finalSelectedDate: entranceStore.selectedDate,
       finalSchedule: !!selectedSchedule.value
     })
   } finally {
@@ -1309,7 +1308,7 @@ const initializeDefaultSelection = () => {
         if (reservationId && ticket.isOwn && reservationData?.isSelected) {
             // 選択済みの入場予約がある場合、その日付をデフォルト選択
             const formattedDate = dateHelpers.normalize(schedule.entrance_date)
-            selectedDate.value = formattedDate
+            entranceStore.selectedDate = formattedDate
           
           // カレンダー月も連動
           const selectedDateObj = new Date(formattedDate + 'T00:00:00')
@@ -1343,7 +1342,7 @@ const initializeDefaultSelection = () => {
   const todayDay = String(today.getDate()).padStart(2, '0')
   
   const todayString = `${todayYear}-${todayMonth}-${todayDay}`
-  selectedDate.value = todayString
+  entranceStore.selectedDate = todayString
   // 全ての予約の選択状態をクリア
   const allSelectedReservationIds = ticketsStore.getSelectedReservationIds()
   allSelectedReservationIds.forEach(id => {
@@ -1360,7 +1359,7 @@ const initializeDefaultSelection = () => {
   
   // 最終的なselectedSchedule状態をログ出力
   logger.info('initializeDefaultSelection完了', {
-    finalSelectedDate: selectedDate.value,
+    finalSelectedDate: entranceStore.selectedDate,
     finalSelectedSchedule: selectedSchedule.value,
     hasSelectedSchedule: !!selectedSchedule.value
   })
@@ -1479,7 +1478,7 @@ const executeParallelTasks = async (selectedTimeSlots: any[]) => {
   
   logger.info('並行処理開始', { 
     topPrioritySlot,
-    selectedDate: selectedDate.value 
+    selectedDate: entranceStore.selectedDate 
   })
   
   // 並行実行
@@ -1529,8 +1528,8 @@ const executePriorityReservation = async (slot: any) => {
     } else {
       const selectedTickets = ticketsStore.selectedTickets
       const ticketIds = selectedTickets.map(ticket => ticket.ticket_id)
-      if (selectedDate.value && selectedDate.value.trim() !== '') {
-        result = await createEntranceReservation(ticketIds, selectedDate.value, apiTime, gateType)
+      if (entranceStore.selectedDate && entranceStore.selectedDate.trim() !== '') {
+        result = await createEntranceReservation(ticketIds, entranceStore.selectedDate, apiTime, gateType)
       }
     }
     
@@ -1546,14 +1545,14 @@ const executePriorityReservation = async (slot: any) => {
 // 空き情報を取得
 const getAvailabilityInfo = async () => {
   try {
-    const year = parseInt(selectedDate.value.substring(0, 4))
-    const month = parseInt(selectedDate.value.substring(5, 7))
+    const year = parseInt(entranceStore.selectedDate.substring(0, 4))
+    const month = parseInt(entranceStore.selectedDate.substring(5, 7))
     
     // 月の空き情報を取得
     const scheduleData = await ticketsStore.getEntranceScheduleData(year, month, true)
     
     // 指定日の時間帯情報を取得
-    const dayOfMonth = selectedDate.value.substring(8, 10)
+    const dayOfMonth = entranceStore.selectedDate.substring(8, 10)
     const dayData = scheduleData?.states?.[dayOfMonth]
     
     logger.info('空き情報取得結果', { year, month, dayOfMonth, hasDayData: !!dayData })
@@ -1698,16 +1697,16 @@ const datesWithSelections = computed(() => {
 
 // 現在選択されている時間帯から日付グループを作成または更新
 const updateCurrentDateGroup = () => {
-  if (!selectedDate.value || selectedTimeSlotCount.value === 0) {
+  if (!entranceStore.selectedDate || selectedTimeSlotCount.value === 0) {
     // 選択がない場合は空のグループも削除
-    const existingIndex = dateGroups.value.findIndex(g => g.date === (selectedDate.value || ''))
+    const existingIndex = dateGroups.value.findIndex(g => g.date === (entranceStore.selectedDate || ''))
     if (existingIndex !== -1) {
       dateGroups.value.splice(existingIndex, 1)
     }
     return
   }
 
-  const dateDisplay = formatDisplayDate(selectedDate.value)
+  const dateDisplay = formatDisplayDate(entranceStore.selectedDate)
   const currentTimeSlots = entranceStore.reservationInfo
     .filter(info => info.date === getFormattedSelectedDate())
     .map((info, index) => ({
@@ -1716,7 +1715,7 @@ const updateCurrentDateGroup = () => {
       time: info.time
     }))
 
-  const existingIndex = dateGroups.value.findIndex(g => g.date === selectedDate.value)
+  const existingIndex = dateGroups.value.findIndex(g => g.date === entranceStore.selectedDate)
   if (existingIndex !== -1) {
     // 既存グループを更新
     dateGroups.value[existingIndex].timeSlots = currentTimeSlots
@@ -1739,7 +1738,7 @@ const updateCurrentDateGroup = () => {
 
 // 既存のformatTimeForDisplayを使用
 
-watch(selectedDate, (newDate, oldDate) => {
+watch(() => entranceStore.selectedDate, (newDate, oldDate) => {
   if (newDate !== oldDate) {
     // reservationInfoベースなので選択状態復元は不要
   }
@@ -1753,7 +1752,7 @@ const handleClearAllSelections = () => {
   entranceStore.reservationInfo = []
 
   logger.temp('全選択解除実行', {
-    clearedDate: selectedDate.value
+    clearedDate: entranceStore.selectedDate
   })
 
   // 日付グループを更新
@@ -1929,7 +1928,7 @@ const changeEntranceReservation = async (reservationId: number, startTime: strin
       user_visiting_reservation_ids: [reservationId],
       start_time: startTime,
       gate_type: gateType,
-      entrance_date: dateHelpers.toApiFormat(selectedDate.value)
+      entrance_date: dateHelpers.toApiFormat(entranceStore.selectedDate)
     })
   })
   
@@ -2023,12 +2022,12 @@ const getSelectedTimeSlotAvailability = (dateString: string, selectedTime: strin
 // 選択クリア
 const clearSelection = () => {
   // reservationInfoから現在の日付の選択をクリア
-  if (selectedDate.value) {
+  if (entranceStore.selectedDate) {
     entranceStore.reservationInfo = entranceStore.reservationInfo.filter(
-      info => info.date !== selectedDate.value
+      info => info.date !== entranceStore.selectedDate
     )
   }
-  logger.info('選択をクリア', { selectedDate: selectedDate.value })
+  logger.info('選択をクリア', { selectedDate: entranceStore.selectedDate })
 }
 
 // 指定日付のすべての時間帯が満員かどうかを判定
@@ -2090,7 +2089,7 @@ const isAllTimeSlotsFull = (dateString: string) => {
 
 // 時間帯選択の切り替え（満員時間帯も選択可能、複数選択可）
 const toggleTimeSlot = (gate: 'east' | 'west', time: string) => {
-  if (!selectedDate.value) {
+  if (!entranceStore.selectedDate) {
     logger.warn('日付が選択されていないため時間帯選択をスキップ', { gate, time })
     return
   }
@@ -2118,22 +2117,22 @@ const toggleTimeSlot = (gate: 'east' | 'west', time: string) => {
     entranceStore.reservationInfo.splice(existingIndex, 1)
 
     logger.temp('時間帯選択解除', {
-      date: selectedDate.value,
+      date: entranceStore.selectedDate,
       gate,
       time,
       remainingCount: entranceStore.reservationInfo.length
     })
   } else {
     // 選択：配列に追加
-    // selectedDate.value（YYYY-MM-DD）をそのまま使用
+    // entranceStore.selectedDate（YYYY-MM-DD）をそのまま使用
     entranceStore.reservationInfo.push({
-      date: selectedDate.value || '',
+      date: entranceStore.selectedDate || '',
       gate,
       time
     })
 
     logger.temp('時間帯選択追加', {
-      date: selectedDate.value,
+      date: entranceStore.selectedDate,
       gate,
       time,
       totalCount: entranceStore.reservationInfo.length
@@ -2162,8 +2161,8 @@ onMounted(async () => {
   initializeDefaultSelection()
   
   // 初期日付の時間帯データを読み込み
-  if (selectedDate.value) {
-    await loadTimeSlotsForDate(selectedDate.value)
+  if (entranceStore.selectedDate) {
+    await loadTimeSlotsForDate(entranceStore.selectedDate)
   }
 })
 </script>

@@ -64,6 +64,7 @@ export const useEntranceReservationStore = defineStore('entranceReservation', ()
   })
 
   const reservationInfo = ref<ReservationInfo[]>([])
+  const selectedDate = ref('')
 
   const isReservationRunning = ref(false)
   const reservationHistory = ref<ReservationResult[]>([])
@@ -1046,6 +1047,7 @@ export const useEntranceReservationStore = defineStore('entranceReservation', ()
     // State
     reservationStatus,
     reservationInfo,
+    selectedDate,
     isReservationRunning,
     reservationHistory,
     waitInfo,
