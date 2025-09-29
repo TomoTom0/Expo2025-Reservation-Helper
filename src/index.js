@@ -8,7 +8,7 @@
 // @run-at       document-end
 // ==/UserScript==
 
-// Built: 2025/09/30 02:40:57
+// Built: 2025/09/30 03:03:52
 
 
 (function webpackUniversalModuleDefinition(root, factory) {
@@ -33075,28 +33075,6 @@ module.exports = domAPI;
 
 /***/ }),
 
-/***/ 834:
-/***/ ((module, __webpack_exports__, __webpack_require__) => {
-
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   A: () => (__WEBPACK_DEFAULT_EXPORT__)
-/* harmony export */ });
-/* harmony import */ var _node_modules_css_loader_dist_runtime_noSourceMaps_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(601);
-/* harmony import */ var _node_modules_css_loader_dist_runtime_noSourceMaps_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_css_loader_dist_runtime_noSourceMaps_js__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(314);
-/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1__);
-// Imports
-
-
-var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1___default()((_node_modules_css_loader_dist_runtime_noSourceMaps_js__WEBPACK_IMPORTED_MODULE_0___default()));
-// Module
-___CSS_LOADER_EXPORT___.push([module.id, `.ytomo-wait-area[data-v-6df70976]{margin-top:12px;padding:12px;background:linear-gradient(135deg, #fef3c7 0%, #fed7aa 100%);border:1px solid #f59e0b;border-radius:8px}.ytomo-wait-area .ytomo-wait-controls[data-v-6df70976]{display:flex;align-items:center;gap:8px}.ytomo-wait-area .ytomo-wait-controls button[data-v-6df70976]{padding:6px 12px;background:#2c5aa0;color:#fff;border:none;border-radius:4px;font-size:12px;font-weight:500;cursor:pointer}.ytomo-wait-area .ytomo-wait-controls button[data-v-6df70976]:disabled{background:#9ca3af;cursor:not-allowed}.ytomo-wait-area .ytomo-wait-controls input[data-v-6df70976]{width:60px;padding:4px 8px;border:1px solid #d1d5db;border-radius:4px;font-size:12px;text-align:center}.ytomo-wait-area .ytomo-wait-controls input[data-v-6df70976]:disabled{background:#f9fafb;color:#9ca3af}.ytomo-wait-area .ytomo-time-adjust-buttons[data-v-6df70976]{display:flex;gap:4px}.ytomo-wait-area .ytomo-time-adjust-buttons .ytomo-time-adjust-btn[data-v-6df70976]{background:#f59e0b;color:#fff;border:none;padding:4px 8px;border-radius:4px;font-size:11px;font-weight:600;cursor:pointer;transition:all .2s;min-width:28px}.ytomo-wait-area .ytomo-time-adjust-buttons .ytomo-time-adjust-btn[data-v-6df70976]:hover{background:#d97706;transform:translateY(-1px)}.ytomo-wait-area .ytomo-time-adjust-buttons .ytomo-time-adjust-btn[data-v-6df70976]:active{transform:translateY(0)}.ytomo-wait-area .ytomo-time-adjust-buttons .ytomo-time-adjust-btn[data-v-6df70976]:disabled{background:#9ca3af;cursor:not-allowed;transform:none}`, ""]);
-// Exports
-/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
-
-
-/***/ }),
-
 /***/ 907:
 /***/ ((module, __webpack_exports__, __webpack_require__) => {
 
@@ -33349,6 +33327,28 @@ const loggers = {
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1___default()((_node_modules_css_loader_dist_runtime_noSourceMaps_js__WEBPACK_IMPORTED_MODULE_0___default()));
 // Module
 ___CSS_LOADER_EXPORT___.push([module.id, `.ytomo-sequential-overlay[data-v-0b38ae67]{position:fixed;top:0;left:0;width:100%;height:100%;background-color:rgba(0,0,0,.8);display:flex;align-items:center;justify-content:center;z-index:10002;opacity:0;animation:fadeIn-0b38ae67 .2s ease-out forwards}.ytomo-sequential-content[data-v-0b38ae67]{background:#fff;border-radius:12px;padding:32px;box-shadow:0 20px 60px rgba(0,0,0,.3);text-align:center;min-width:400px;max-width:500px;transform:scale(0.9);animation:dialogAppear-0b38ae67 .2s ease-out forwards}.ytomo-sequential-content .ytomo-header-vertical[data-v-0b38ae67]{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;margin-bottom:24px}.ytomo-sequential-content .ytomo-loading-spinner[data-v-0b38ae67]{width:20px;height:20px;border:2px solid #f3f4f6;border-top:2px solid #2c5aa0;border-radius:50%;animation:spin-0b38ae67 1s linear infinite !important;will-change:transform}.ytomo-sequential-content h3[data-v-0b38ae67]{margin:0 0 12px 0;color:#374151;font-size:20px;font-weight:600}.ytomo-sequential-content h3 .status-text[data-v-0b38ae67]{display:inline-block;font-size:16px;color:#6b7280;font-weight:400;margin-left:8px}.ytomo-sequential-content .ytomo-progress-bar[data-v-0b38ae67]{width:100%;height:8px;background-color:#e5e7eb;border-radius:4px;overflow:hidden;margin-bottom:4px}.ytomo-sequential-content .ytomo-progress-bar .ytomo-progress-fill[data-v-0b38ae67]{height:100%;background:linear-gradient(90deg, #3b82f6, #1d4ed8);border-radius:4px;transition:width .3s ease}.ytomo-sequential-settings-row[data-v-0b38ae67]{display:flex;align-items:center;justify-content:center;gap:16px;margin-bottom:24px}.ytomo-sequential-settings-row .ytomo-mode-buttons[data-v-0b38ae67]{display:flex;gap:8px}.ytomo-sequential-settings-row .ytomo-mode-button[data-v-0b38ae67]{padding:8px 16px;border:1px solid #d1d5db;border-radius:6px;background:#fff;color:#374151;cursor:pointer;transition:all .2s;font-size:14px}.ytomo-sequential-settings-row .ytomo-mode-button[data-v-0b38ae67]:hover{background:#f3f4f6;border-color:#9ca3af}.ytomo-sequential-settings-row .ytomo-mode-button.active[data-v-0b38ae67]{background:#2c5aa0;border-color:#2c5aa0;color:#fff}.ytomo-sequential-settings-row .ytomo-mode-button[data-v-0b38ae67]:focus{outline:none}.ytomo-sequential-settings-row .ytomo-interval-dropdown[data-v-0b38ae67]{padding:8px 12px;border:1px solid #d1d5db;border-radius:6px;background:#fff;font-size:14px;min-width:120px}.ytomo-sequential-settings-row .ytomo-interval-dropdown[data-v-0b38ae67]:focus{outline:none;border-color:#2c5aa0}.ytomo-sequential-progress[data-v-0b38ae67]{margin-bottom:24px;display:flex;align-items:center;justify-content:space-between;gap:16px}.ytomo-sequential-progress .ytomo-sequential-target[data-v-0b38ae67]{flex:1;font-size:14px;color:#374151}.ytomo-sequential-progress .ytomo-sequential-target .current-target[data-v-0b38ae67]{text-align:left}.ytomo-sequential-progress .ytomo-sequential-target .current-target .pavilion-name[data-v-0b38ae67]{font-weight:600;font-size:16px;margin-bottom:8px}.ytomo-sequential-progress .ytomo-sequential-target .current-target .time-slot-button[data-v-0b38ae67]{display:inline-block;padding:4px 8px;background:#2c5aa0;color:#fff;border-radius:4px;font-size:12px;font-weight:500;border:1px solid #2c5aa0}.ytomo-sequential-progress .ytomo-sequential-target .current-target .time-slot-button.time-slot-small[data-v-0b38ae67]{font-size:10px;padding:2px 6px}.ytomo-sequential-progress .ytomo-sequential-status[data-v-0b38ae67]{flex-shrink:0;text-align:right}.ytomo-sequential-progress .ytomo-sequential-status .ytomo-sequential-current[data-v-0b38ae67]{font-size:18px;font-weight:600;color:#2c5aa0}@keyframes fadeIn-0b38ae67{to{opacity:1}}@keyframes dialogAppear-0b38ae67{to{transform:scale(1)}}@keyframes spin-0b38ae67{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}@media(prefers-reduced-motion: reduce){.ytomo-sequential-overlay[data-v-0b38ae67],.ytomo-sequential-content[data-v-0b38ae67]{animation:none;transition:none}.ytomo-loading-spinner[data-v-0b38ae67]{animation:spin-0b38ae67 1s linear infinite !important}}`, ""]);
+// Exports
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
+
+
+/***/ }),
+
+/***/ 993:
+/***/ ((module, __webpack_exports__, __webpack_require__) => {
+
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   A: () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _node_modules_css_loader_dist_runtime_noSourceMaps_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(601);
+/* harmony import */ var _node_modules_css_loader_dist_runtime_noSourceMaps_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_css_loader_dist_runtime_noSourceMaps_js__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(314);
+/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1__);
+// Imports
+
+
+var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1___default()((_node_modules_css_loader_dist_runtime_noSourceMaps_js__WEBPACK_IMPORTED_MODULE_0___default()));
+// Module
+___CSS_LOADER_EXPORT___.push([module.id, `.ytomo-wait-area[data-v-5d1d54d1]{margin-top:12px;padding:12px;background:linear-gradient(135deg, #fef3c7 0%, #fed7aa 100%);border:1px solid #f59e0b;border-radius:8px}.ytomo-wait-area .ytomo-wait-controls[data-v-5d1d54d1]{display:flex;align-items:center;gap:8px}.ytomo-wait-area .ytomo-wait-controls button[data-v-5d1d54d1]{padding:6px 12px;background:#2c5aa0;color:#fff;border:none;border-radius:4px;font-size:12px;font-weight:500;cursor:pointer}.ytomo-wait-area .ytomo-wait-controls button[data-v-5d1d54d1]:disabled{background:#9ca3af;cursor:not-allowed}.ytomo-wait-area .ytomo-wait-controls input[data-v-5d1d54d1]{width:60px;padding:4px 8px;border:1px solid #d1d5db;border-radius:4px;font-size:12px;text-align:center}.ytomo-wait-area .ytomo-wait-controls input[data-v-5d1d54d1]:disabled{background:#f9fafb;color:#9ca3af}.ytomo-wait-area .ytomo-time-adjust-buttons[data-v-5d1d54d1]{display:flex;gap:4px}.ytomo-wait-area .ytomo-time-adjust-buttons .ytomo-time-adjust-btn[data-v-5d1d54d1]{background:#f59e0b;color:#fff;border:none;padding:4px 8px;border-radius:4px;font-size:11px;font-weight:600;cursor:pointer;transition:all .2s;min-width:28px}.ytomo-wait-area .ytomo-time-adjust-buttons .ytomo-time-adjust-btn[data-v-5d1d54d1]:hover{background:#d97706;transform:translateY(-1px)}.ytomo-wait-area .ytomo-time-adjust-buttons .ytomo-time-adjust-btn[data-v-5d1d54d1]:active{transform:translateY(0)}.ytomo-wait-area .ytomo-time-adjust-buttons .ytomo-time-adjust-btn[data-v-5d1d54d1]:disabled{background:#9ca3af;cursor:not-allowed;transform:none}`, ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -45251,6 +45251,7 @@ const ReservationWaitControlvue_type_script_setup_true_lang_ts_hoisted_5 = { cla
 const ReservationWaitControlvue_type_script_setup_true_lang_ts_hoisted_6 = ["disabled"];
 const ReservationWaitControlvue_type_script_setup_true_lang_ts_hoisted_7 = ["disabled"];
 const ReservationWaitControlvue_type_script_setup_true_lang_ts_hoisted_8 = ["disabled"];
+const ReservationWaitControlvue_type_script_setup_true_lang_ts_hoisted_9 = ["disabled"];
 
 
 
@@ -45303,7 +45304,7 @@ const ReservationWaitControlvue_type_script_setup_true_lang_ts_hoisted_8 = ["dis
                         }, null, 8 /* PROPS */, ReservationWaitControlvue_type_script_setup_true_lang_ts_hoisted_4), [
                             [vue_esm_bundler/* vModelText */.Jo, (0,vue_esm_bundler/* unref */.R1)(entranceStore).waitInfo.waitMinutes]
                         ]),
-                        _cache[4] || (_cache[4] = (0,vue_esm_bundler/* createTextVNode */.eW)("分 ", -1 /* CACHED */)),
+                        _cache[5] || (_cache[5] = (0,vue_esm_bundler/* createTextVNode */.eW)("分 ", -1 /* CACHED */)),
                         (0,vue_esm_bundler/* createCommentVNode */.Q3)(" 時間調整ボタン "),
                         (0,vue_esm_bundler/* createElementVNode */.Lk)("div", ReservationWaitControlvue_type_script_setup_true_lang_ts_hoisted_5, [
                             (0,vue_esm_bundler/* createElementVNode */.Lk)("button", {
@@ -45323,7 +45324,13 @@ const ReservationWaitControlvue_type_script_setup_true_lang_ts_hoisted_8 = ["dis
                                 class: "ytomo-time-adjust-btn",
                                 disabled: (0,vue_esm_bundler/* unref */.R1)(entranceStore).waitInfo.isWaiting,
                                 title: "60分追加"
-                            }, "+60", 8 /* PROPS */, ReservationWaitControlvue_type_script_setup_true_lang_ts_hoisted_8)
+                            }, "+60", 8 /* PROPS */, ReservationWaitControlvue_type_script_setup_true_lang_ts_hoisted_8),
+                            (0,vue_esm_bundler/* createElementVNode */.Lk)("button", {
+                                onClick: _cache[4] || (_cache[4] = ($event) => (adjustWaitTime(-30))),
+                                class: "ytomo-time-adjust-btn",
+                                disabled: (0,vue_esm_bundler/* unref */.R1)(entranceStore).waitInfo.isWaiting,
+                                title: "30分短縮"
+                            }, "-30", 8 /* PROPS */, ReservationWaitControlvue_type_script_setup_true_lang_ts_hoisted_9)
                         ])
                     ])
                 ]))
@@ -45334,9 +45341,9 @@ const ReservationWaitControlvue_type_script_setup_true_lang_ts_hoisted_8 = ["dis
 
 ;// ./ts/components/ReservationWaitControl.vue?vue&type=script&setup=true&lang=ts
  
-// EXTERNAL MODULE: ./node_modules/css-loader/dist/cjs.js!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/sass-loader/dist/cjs.js!./node_modules/vue-loader/dist/index.js??ruleSet[1].rules[8].use[0]!./ts/components/ReservationWaitControl.vue?vue&type=style&index=0&id=6df70976&scoped=true&lang=scss
-var ReservationWaitControlvue_type_style_index_0_id_6df70976_scoped_true_lang_scss = __webpack_require__(834);
-;// ./node_modules/style-loader/dist/cjs.js!./node_modules/css-loader/dist/cjs.js!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/sass-loader/dist/cjs.js!./node_modules/vue-loader/dist/index.js??ruleSet[1].rules[8].use[0]!./ts/components/ReservationWaitControl.vue?vue&type=style&index=0&id=6df70976&scoped=true&lang=scss
+// EXTERNAL MODULE: ./node_modules/css-loader/dist/cjs.js!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/sass-loader/dist/cjs.js!./node_modules/vue-loader/dist/index.js??ruleSet[1].rules[8].use[0]!./ts/components/ReservationWaitControl.vue?vue&type=style&index=0&id=5d1d54d1&scoped=true&lang=scss
+var ReservationWaitControlvue_type_style_index_0_id_5d1d54d1_scoped_true_lang_scss = __webpack_require__(993);
+;// ./node_modules/style-loader/dist/cjs.js!./node_modules/css-loader/dist/cjs.js!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/sass-loader/dist/cjs.js!./node_modules/vue-loader/dist/index.js??ruleSet[1].rules[8].use[0]!./ts/components/ReservationWaitControl.vue?vue&type=style&index=0&id=5d1d54d1&scoped=true&lang=scss
 
       
       
@@ -45348,22 +45355,22 @@ var ReservationWaitControlvue_type_style_index_0_id_6df70976_scoped_true_lang_sc
       
       
 
-var ReservationWaitControlvue_type_style_index_0_id_6df70976_scoped_true_lang_scss_options = {};
+var ReservationWaitControlvue_type_style_index_0_id_5d1d54d1_scoped_true_lang_scss_options = {};
 
-ReservationWaitControlvue_type_style_index_0_id_6df70976_scoped_true_lang_scss_options.styleTagTransform = (styleTagTransform_default());
-ReservationWaitControlvue_type_style_index_0_id_6df70976_scoped_true_lang_scss_options.setAttributes = (setAttributesWithoutAttributes_default());
-ReservationWaitControlvue_type_style_index_0_id_6df70976_scoped_true_lang_scss_options.insert = insertBySelector_default().bind(null, "head");
-ReservationWaitControlvue_type_style_index_0_id_6df70976_scoped_true_lang_scss_options.domAPI = (styleDomAPI_default());
-ReservationWaitControlvue_type_style_index_0_id_6df70976_scoped_true_lang_scss_options.insertStyleElement = (insertStyleElement_default());
+ReservationWaitControlvue_type_style_index_0_id_5d1d54d1_scoped_true_lang_scss_options.styleTagTransform = (styleTagTransform_default());
+ReservationWaitControlvue_type_style_index_0_id_5d1d54d1_scoped_true_lang_scss_options.setAttributes = (setAttributesWithoutAttributes_default());
+ReservationWaitControlvue_type_style_index_0_id_5d1d54d1_scoped_true_lang_scss_options.insert = insertBySelector_default().bind(null, "head");
+ReservationWaitControlvue_type_style_index_0_id_5d1d54d1_scoped_true_lang_scss_options.domAPI = (styleDomAPI_default());
+ReservationWaitControlvue_type_style_index_0_id_5d1d54d1_scoped_true_lang_scss_options.insertStyleElement = (insertStyleElement_default());
 
-var ReservationWaitControlvue_type_style_index_0_id_6df70976_scoped_true_lang_scss_update = injectStylesIntoStyleTag_default()(ReservationWaitControlvue_type_style_index_0_id_6df70976_scoped_true_lang_scss/* default */.A, ReservationWaitControlvue_type_style_index_0_id_6df70976_scoped_true_lang_scss_options);
-
-
+var ReservationWaitControlvue_type_style_index_0_id_5d1d54d1_scoped_true_lang_scss_update = injectStylesIntoStyleTag_default()(ReservationWaitControlvue_type_style_index_0_id_5d1d54d1_scoped_true_lang_scss/* default */.A, ReservationWaitControlvue_type_style_index_0_id_5d1d54d1_scoped_true_lang_scss_options);
 
 
-       /* harmony default export */ const components_ReservationWaitControlvue_type_style_index_0_id_6df70976_scoped_true_lang_scss = (ReservationWaitControlvue_type_style_index_0_id_6df70976_scoped_true_lang_scss/* default */.A && ReservationWaitControlvue_type_style_index_0_id_6df70976_scoped_true_lang_scss/* default */.A.locals ? ReservationWaitControlvue_type_style_index_0_id_6df70976_scoped_true_lang_scss/* default */.A.locals : undefined);
 
-;// ./ts/components/ReservationWaitControl.vue?vue&type=style&index=0&id=6df70976&scoped=true&lang=scss
+
+       /* harmony default export */ const components_ReservationWaitControlvue_type_style_index_0_id_5d1d54d1_scoped_true_lang_scss = (ReservationWaitControlvue_type_style_index_0_id_5d1d54d1_scoped_true_lang_scss/* default */.A && ReservationWaitControlvue_type_style_index_0_id_5d1d54d1_scoped_true_lang_scss/* default */.A.locals ? ReservationWaitControlvue_type_style_index_0_id_5d1d54d1_scoped_true_lang_scss/* default */.A.locals : undefined);
+
+;// ./ts/components/ReservationWaitControl.vue?vue&type=style&index=0&id=5d1d54d1&scoped=true&lang=scss
 
 ;// ./ts/components/ReservationWaitControl.vue
 
@@ -45372,7 +45379,7 @@ var ReservationWaitControlvue_type_style_index_0_id_6df70976_scoped_true_lang_sc
 ;
 
 
-const ReservationWaitControl_exports_ = /*#__PURE__*/(0,exportHelper/* default */.A)(ReservationWaitControlvue_type_script_setup_true_lang_ts, [['__scopeId',"data-v-6df70976"]])
+const ReservationWaitControl_exports_ = /*#__PURE__*/(0,exportHelper/* default */.A)(ReservationWaitControlvue_type_script_setup_true_lang_ts, [['__scopeId',"data-v-5d1d54d1"]])
 
 /* harmony default export */ const ReservationWaitControl = (ReservationWaitControl_exports_);
 ;// ./ts/utils/dateFormat.ts

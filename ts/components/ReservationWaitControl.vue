@@ -20,6 +20,7 @@
         <button @click="adjustWaitTime(5)" class="ytomo-time-adjust-btn" :disabled="entranceStore.waitInfo.isWaiting" title="5分追加">+5</button>
         <button @click="adjustWaitTime(15)" class="ytomo-time-adjust-btn" :disabled="entranceStore.waitInfo.isWaiting" title="15分追加">+15</button>
         <button @click="adjustWaitTime(60)" class="ytomo-time-adjust-btn" :disabled="entranceStore.waitInfo.isWaiting" title="60分追加">+60</button>
+        <button @click="adjustWaitTime(-30)" class="ytomo-time-adjust-btn" :disabled="entranceStore.waitInfo.isWaiting" title="30分短縮">-30</button>
       </div>
     </div>
   </div>
