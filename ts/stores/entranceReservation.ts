@@ -1043,6 +1043,38 @@ export const useEntranceReservationStore = defineStore('entranceReservation', ()
     }
   }
 
+  // 日付選択処理
+  const selectDate = async (dateString: string, options: {
+    onMonthChange?: (newMonth: Date) => void,
+    onLoadTimeSlots?: (dateString: string) => Promise<void>
+  } = {}) => {
+    logger.info('カレンダー日付選択詳細', {
+      dateString
+    })
+
+    selectedDate.value = dateString
+
+    // カレンダーの月を選択日付に連動させる
+    const selectedDateObj = new Date(dateString + 'T00:00:00')
+
+    // 月変更のコールバックがあれば実行
+    if (options.onMonthChange) {
+      const newMonth = new Date(selectedDateObj.getFullYear(), selectedDateObj.getMonth(), 1)
+      options.onMonthChange(newMonth)
+      logger.info('カレンダー月を選択日付に同期', {
+        selectedDate: dateString,
+        newMonth: `${selectedDateObj.getFullYear()}年${selectedDateObj.getMonth() + 1}月`
+      })
+    }
+
+    logger.info('日付選択', { date: dateString })
+
+    // 時間帯データ読み込みのコールバックがあれば実行
+    if (options.onLoadTimeSlots) {
+      await options.onLoadTimeSlots(dateString)
+    }
+  }
+
   return {
     // State
     reservationStatus,
@@ -1062,7 +1094,8 @@ export const useEntranceReservationStore = defineStore('entranceReservation', ()
     formatTime,
     setClearSelectionCallback,
     getTargetUpdateTime,
-    setTargetUpdateTime
+    setTargetUpdateTime,
+    selectDate
   }
 }, {
   persist: {

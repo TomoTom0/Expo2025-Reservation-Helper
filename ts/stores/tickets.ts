@@ -1352,6 +1352,85 @@ export const useTicketsStore = defineStore('tickets', () => {
     return { ticket: null, schedule: null, isNewReservation: false }
   }
 
+  // 入場予約データの更新
+  const refreshEntranceData = async (year: number, month: number, options: {
+    onStateRestore?: (selectedDate: string) => void,
+    onLoadTimeSlots?: (dateString: string) => Promise<void>,
+    onInitializeDefault?: () => void
+  } = {}) => {
+    logger.info('[TICKETS:refreshEntranceData] 入場予約データ更新開始')
+
+    // 現在の月の入場スケジュールデータを強制更新
+    logger.info('API呼び出し前のtickets状態', {
+      ticketsSize: tickets.value.size,
+      entranceSchedulesSize: entranceSchedules.value.size
+    })
+
+    await getEntranceScheduleData(year, month, true) // 強制更新
+
+    // API呼び出し後の状態をログ
+    logger.info('API呼び出し後のtickets状態', {
+      ticketsSize: tickets.value.size,
+      entranceSchedulesSize: entranceSchedules.value.size
+    })
+
+    logger.info('入場予約データ更新完了')
+  }
+
+  // 指定日の時間帯データを取得
+  const getTimeSlotsForDate = (date: string) => {
+    logger.info('指定日の時間帯データ取得', { date })
+
+    try {
+      // 日付をYYYYMMDD形式に変換
+      const formattedDate = date.replace(/-/g, '')
+
+      // 入場予約スケジュールを取得
+      const year = parseInt(formattedDate.substring(0, 4))
+      const month = parseInt(formattedDate.substring(4, 6))
+
+      // キャッシュからデータを取得
+      const cacheKey = `${year}-${String(month).padStart(2, '0')}`
+      const scheduleData = entranceSchedules.value.get(cacheKey)
+
+      if (!scheduleData) {
+        logger.warn('入場スケジュールキャッシュがありません', { date, year, month, cacheKey })
+        return null
+      }
+
+      logger.info('キャッシュからデータ取得', { date, year, month, cacheKey })
+
+      // 指定日のスケジュールを検索（0埋め形式）
+      const dayOfMonth = formattedDate.substring(6, 8) // "01", "29"
+      const dayData = scheduleData?.states?.[dayOfMonth]
+
+      logger.info('スケジュールデータ検索', {
+        date,
+        dayOfMonth,
+        hasScheduleData: !!scheduleData,
+        hasDayData: !!dayData,
+        dayDataKeys: dayData ? Object.keys(dayData) : null
+      })
+
+      return dayData || null
+    } catch (error) {
+      logger.error('時間帯データ取得エラー', error)
+      return null
+    }
+  }
+
+  // time_stateから混雑状況を判定
+  const getStatusFromTimeState = (timeState?: number): string => {
+    // 0:空き, 1:残り少ない, 2:満席, 4:利用不可
+    switch (timeState) {
+      case 0: return 'low'   // 空き
+      case 1: return 'high'  // 残り少ない
+      case 2: return 'full'  // 満席
+      case 4: return 'full'  // 利用不可（満席として扱う）
+      default: return 'full' // 不明な場合は満席として扱う
+    }
+  }
+
   return {
     // State
     tickets,
@@ -1382,6 +1461,9 @@ export const useTicketsStore = defineStore('tickets', () => {
     fetchPavilionWinningInfo,
     getEntranceScheduleData,
     loadEntranceSchedulesRange,
+    refreshEntranceData,
+    getTimeSlotsForDate,
+    getStatusFromTimeState,
     setTickets,
     addTicket,
     updateSingleTicket,

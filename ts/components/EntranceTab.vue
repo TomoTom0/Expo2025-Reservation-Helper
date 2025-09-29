@@ -891,37 +891,30 @@ const selectDate = async (event: Event) => {
   const dateString = target.getAttribute('data-date')
   const isDisabled = target.classList.contains('disabled')
   const isOtherMonth = target.classList.contains('other-month')
-  
+
   if (!dateString || isDisabled || isOtherMonth) {
     return
   }
-  
+
   // デバッグ用ログ
   logger.info('カレンダー日付選択詳細', {
     data_date属性: dateString,
     無効: isDisabled,
     他の月: isOtherMonth
   })
-  
-  entranceStore.selectedDate = dateString
 
-  // カレンダーの月を選択日付に連動させる
-  const selectedDateObj = new Date(dateString + 'T00:00:00')
-  const currentCalendarMonth = currentMonth.value.getMonth()
-  const currentCalendarYear = currentMonth.value.getFullYear()
-  
-  if (selectedDateObj.getMonth() !== currentCalendarMonth || selectedDateObj.getFullYear() !== currentCalendarYear) {
-    currentMonth.value = new Date(selectedDateObj.getFullYear(), selectedDateObj.getMonth(), 1)
-    logger.info('カレンダー月を選択日付に同期', { 
-      selectedDate: dateString,
-      newMonth: `${selectedDateObj.getFullYear()}年${selectedDateObj.getMonth() + 1}月`
-    })
-  }
-  
-  logger.info('日付選択', { date: dateString })
-  
-  // 選択された日付の時間帯データを取得（選択状態を保持）
-  await loadTimeSlotsForDateWithSelection(dateString)
+  // entrance storeのselectDateメソッドを使用
+  await entranceStore.selectDate(dateString, {
+    onMonthChange: (newMonth: Date) => {
+      const currentCalendarMonth = currentMonth.value.getMonth()
+      const currentCalendarYear = currentMonth.value.getFullYear()
+
+      if (newMonth.getMonth() !== currentCalendarMonth || newMonth.getFullYear() !== currentCalendarYear) {
+        currentMonth.value = newMonth
+      }
+    },
+    onLoadTimeSlots: loadTimeSlotsForDateWithSelection
+  })
 }
 
 // 時間帯選択のみをクリア（予約選択は保持）- 統合済み
@@ -937,44 +930,11 @@ const loadTimeSlotsForDateWithSelection = async (date: string) => {
 // 指定日の時間帯データを読み込み
 const loadTimeSlotsForDate = async (date: string) => {
   logger.info('指定日の時間帯データ読み込み', { date, stack: new Error().stack?.split('\n')[2]?.trim() })
-  
+
   try {
-    // 日付をYYYYMMDD形式に変換
-    const formattedDate = date.replace(/-/g, '')
-    
-    // 入場予約スケジュールを取得
-    const year = parseInt(formattedDate.substring(0, 4))
-    const month = parseInt(formattedDate.substring(4, 6))
-    
-    // キャッシュからデータを取得（API呼び出しは月変更時と手動更新時のみ）
-    const cacheKey = `${year}-${String(month).padStart(2, '0')}`
-    const scheduleData = ticketsStore.entranceSchedules.get(cacheKey)
-    
-    if (!scheduleData) {
-      logger.warn('入場スケジュールキャッシュがありません（月変更または手動更新が必要）', { date, year, month, cacheKey })
-      timeSlots.value = []
-      return
-    }
-    
-    logger.info('キャッシュからデータ取得', { date, year, month, cacheKey })
-    
-    // 指定日のスケジュールを検索（0埋め形式）
-    const dayOfMonth = formattedDate.substring(6, 8) // "01", "29"
-    const dayData = scheduleData?.states?.[dayOfMonth]
-    
-    // デバッグ用ログ
-    logger.info('スケジュールデータ検索', { 
-      date,
-      dayOfMonth,
-      hasScheduleData: !!scheduleData,
-      scheduleData: scheduleData ? JSON.stringify(scheduleData).substring(0, 200) + '...' : null,
-      availableDates: scheduleData?.states ? Object.keys(scheduleData.states) : [],
-      availableDatesDetail: scheduleData?.states ? Object.keys(scheduleData.states).slice(0, 10) : [],
-      searchKey: dayOfMonth,
-      hasDayData: !!dayData,
-      dayDataKeys: dayData ? Object.keys(dayData) : null
-    })
-    
+    // tickets store から日データを取得
+    const dayData = ticketsStore.getTimeSlotsForDate(date)
+
     if (dayData) {
       // 時間帯データを構築
       const slots: Array<{
@@ -982,11 +942,11 @@ const loadTimeSlotsForDate = async (date: string) => {
         east: { status: string; selected: boolean };
         west: { status: string; selected: boolean };
       }> = []
-      
+
       // 東西ゲートの時間帯データを処理
       const eastGate = dayData['1'] // 1:東ゲート
       const westGate = dayData['2'] // 2:西ゲート
-      
+
       // 利用可能な時間帯を収集（東西ゲート両方から）
       const timeSet = new Set<string>()
       if (eastGate) {
@@ -995,35 +955,35 @@ const loadTimeSlotsForDate = async (date: string) => {
       if (westGate) {
         Object.keys(westGate).forEach(time => timeSet.add(time))
       }
-      
+
       // 時間帯データを構築
       for (const time of Array.from(timeSet).sort()) {
         const eastTimeData = eastGate?.[time]
         const westTimeData = westGate?.[time]
-        
+
         // schedule_nameから表示時間を取得（例: "11:00-" -> "11:00"）
         const displayTime = eastTimeData?.schedule_name || westTimeData?.schedule_name || time
         const cleanTime = displayTime.replace('-', '')
-        
+
         slots.push({
           time: cleanTime,
           east: {
-            status: getStatusFromTimeState(eastTimeData?.time_state),
+            status: ticketsStore.getStatusFromTimeState(eastTimeData?.time_state),
             selected: false
           },
           west: {
-            status: getStatusFromTimeState(westTimeData?.time_state),
+            status: ticketsStore.getStatusFromTimeState(westTimeData?.time_state),
             selected: false
           }
         })
       }
-      
+
       timeSlots.value = slots
       logger.info('時間帯データ読み込み完了', { date, slotsCount: slots.length })
     } else {
       // データがない場合は空配列
       timeSlots.value = []
-      logger.warn('指定日の時間帯データが見つかりません', { date, dayOfMonth })
+      logger.warn('指定日の時間帯データが見つかりません', { date })
     }
   } catch (error) {
     logger.error('時間帯データ読み込みエラー', error)
@@ -1032,17 +992,6 @@ const loadTimeSlotsForDate = async (date: string) => {
   }
 }
 
-// time_stateから混雑状況を判定
-const getStatusFromTimeState = (timeState?: number): string => {
-  // 0:空き, 1:残り少ない, 2:満席, 4:利用不可
-  switch (timeState) {
-    case 0: return 'low'   // 空き
-    case 1: return 'high'  // 残り少ない
-    case 2: return 'full'  // 満席
-    case 4: return 'full'  // 利用不可（満席として扱う）
-    default: return 'full' // 不明な場合は満席として扱う
-  }
-}
 
 // 日付フォーマット（YYYY-MM-DDとYYYYMMDD両対応）
 const formatDate = (dateString: string): string => {
@@ -1192,61 +1141,40 @@ const refreshEntranceData = async () => {
   isRefreshing.value = true
   try {
     logger.info('[ENTRANCE:EntranceTab] 入場予約データ更新開始')
-    
+
     // 現在選択中の日付を保持
     const currentSelectedDate = entranceStore.selectedDate
     const currentSelectedSchedule = selectedSchedule.value
-    
-    logger.info('手動更新前の状態', { 
-      currentSelectedDate, 
+
+    logger.info('手動更新前の状態', {
+      currentSelectedDate,
       currentSelectedDateType: typeof currentSelectedDate,
       currentSelectedDateLength: currentSelectedDate?.length,
-      hasSchedule: !!currentSelectedSchedule 
+      hasSchedule: !!currentSelectedSchedule
     })
-    
+
     // 現在の月の入場スケジュールデータを強制更新
     const year = currentMonth.value.getFullYear()
     const month = currentMonth.value.getMonth() + 1
-    
-    // API呼び出し前の状態をログ
-    logger.info('API呼び出し前のtickets状態', {
-      ticketsSize: ticketsStore.tickets.size,
-      ticketsRef: ticketsStore.tickets,
-      selectedScheduleBefore: selectedSchedule.value ? {
-        entrance_date: selectedSchedule.value.entrance_date,
-        user_visiting_reservation_id: selectedSchedule.value.user_visiting_reservation_id,
-        ref: selectedSchedule.value
-      } : null
-    })
-    
-    await ticketsStore.getEntranceScheduleData(year, month, true) // 強制更新
-    
-    // API呼び出し後の状態をログ
-    logger.info('API呼び出し後のtickets状態', {
-      ticketsSize: ticketsStore.tickets.size,
-      ticketsRef: ticketsStore.tickets,
-      selectedScheduleAfter: selectedSchedule.value ? {
-        entrance_date: selectedSchedule.value.entrance_date,
-        user_visiting_reservation_id: selectedSchedule.value.user_visiting_reservation_id,
-        ref: selectedSchedule.value
-      } : null
-    })
-    
+
+    // tickets store の refreshEntranceData を使用
+    await ticketsStore.refreshEntranceData(year, month)
+
     logger.info('データ更新後の状態', {
       selectedDateAfterUpdate: entranceStore.selectedDate,
       selectedScheduleAfterUpdate: !!selectedSchedule.value
     })
-  
+
     // 選択日付がある場合は必ず保持（schedule.selectedは自動的に保持される）
     if (currentSelectedDate && currentSelectedDate.trim() !== '') {
       entranceStore.selectedDate = currentSelectedDate
       logger.info('既存の選択日付を保持', { date: currentSelectedDate, hasSchedule: !!selectedSchedule.value })
-      
+
       // 選択日の時間帯データを再読み込み（選択状態を保持）
       await loadTimeSlotsForDateWithSelection(currentSelectedDate)
     } else {
-      logger.info('選択日付が無効なためデフォルト選択を実行', { 
-        currentSelectedDate, 
+      logger.info('選択日付が無効なためデフォルト選択を実行', {
+        currentSelectedDate,
         isEmpty: !currentSelectedDate,
         isEmptyString: currentSelectedDate === '',
         isTrimEmpty: currentSelectedDate?.trim() === ''
@@ -1254,7 +1182,7 @@ const refreshEntranceData = async () => {
       // 選択日付がない場合のみデフォルト選択を実行
       initializeDefaultSelection()
     }
-    
+
     logger.info('入場予約データ更新完了', {
       finalSelectedDate: entranceStore.selectedDate,
       finalSchedule: !!selectedSchedule.value
