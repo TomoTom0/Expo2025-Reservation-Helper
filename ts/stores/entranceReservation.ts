@@ -188,7 +188,7 @@ export const useEntranceReservationStore = defineStore('entranceReservation', ()
 
   // 目標時間を設定
   const setTargetUpdateTime = (time: number): void => {
-    if (time >= 5 && time <= 59) {
+    if (time >= 0 && time <= 59) {
       targetUpdateTime.value = time
     }
   }
@@ -220,14 +220,14 @@ export const useEntranceReservationStore = defineStore('entranceReservation', ()
     reservationStatus.value = {
       visible: true,
       isActive: true,
-      currentAction: `待機中 ${Math.ceil(waitTime / 1000)}秒`,
+      currentAction: `次の${targetUpdateTime.value}秒まで待機中 ${Math.ceil(waitTime / 1000)}秒`,
       progress: 0,
       progressText: '待機中',
       statusClass: ''
     }
 
     // 待機時間のプログレスバーを開始
-    startWaitingProgress(waitTime, `待機中 ${Math.ceil(waitTime / 1000)}秒`)
+    startWaitingProgress(waitTime, `次の${targetUpdateTime.value}秒まで待機中 ${Math.ceil(waitTime / 1000)}秒`)
 
     reservationTimer.value = setTimeout(() => {
       executeCycleStep(selectedTimeSlots)
@@ -299,14 +299,14 @@ export const useEntranceReservationStore = defineStore('entranceReservation', ()
     reservationStatus.value = {
       visible: true,
       isActive: true,
-      currentAction: `待機中 ${Math.ceil(waitTime / 1000)}秒`,
+      currentAction: `次の${targetUpdateTime.value}秒まで待機中 ${Math.ceil(waitTime / 1000)}秒`,
       progress: 0,
       progressText: '待機中',
       statusClass: ''
     }
 
     // 待機時間のプログレスバーを開始
-    startWaitingProgress(waitTime, `待機中 ${Math.ceil(waitTime / 1000)}秒`)
+    startWaitingProgress(waitTime, `次の${targetUpdateTime.value}秒まで待機中 ${Math.ceil(waitTime / 1000)}秒`)
 
     reservationTimer.value = setTimeout(() => {
       waitUntil35Seconds(selectedTimeSlots)
@@ -1080,6 +1080,7 @@ export const useEntranceReservationStore = defineStore('entranceReservation', ()
     reservationStatus,
     reservationInfo,
     selectedDate,
+    targetUpdateTime,
     isReservationRunning,
     reservationHistory,
     waitInfo,
@@ -1100,6 +1101,6 @@ export const useEntranceReservationStore = defineStore('entranceReservation', ()
 }, {
   persist: {
     key: 'ytomo-entrance-reservation-store',
-    pick: ['targetUpdateTime']
+    pick: ['targetUpdateTime', 'reservationInfo']
   }
 })

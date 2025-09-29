@@ -546,6 +546,19 @@ const isCurrentCycleReservation = (index: number): boolean => {
   return displayHistory.length > 0 && index === displayHistory.length - 1
 }
 
+// 目標時間までの残り秒数を計算
+const secondsUntilTarget = computed(() => {
+  const now = new Date()
+  const currentSeconds = now.getSeconds()
+  const targetSeconds = entranceStore.getTargetUpdateTime()
+
+  if (currentSeconds <= targetSeconds) {
+    return targetSeconds - currentSeconds
+  } else {
+    return 60 + targetSeconds - currentSeconds
+  }
+})
+
 // 予約ボタンの有効性判定はstoreのcomputedを使用
 
 // 予約ボタンテキストの動的決定

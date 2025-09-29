@@ -60,7 +60,26 @@
 - **問題**: 現在console.logを直接使用しているため、LOG LEVELの変更が困難で表示形式も統一されていない
 - **対応**: customのloggerを導入してログレベル制御と統一された出力形式を実現
 - **優先度**: 中
-- **実装予定**: 
+- **実装予定**:
   - [ ] logger utility作成
   - [ ] 全console.logをcustom loggerに置き換え
   - [ ] ログレベル設定機能の追加
+
+### 待機表示の重複解消 🔧
+- **問題**: 待機中の表示を設定する箇所が複数存在し、保守性が悪い
+- **現状**:
+  - `reservationStatus.currentAction` - 直接設定
+  - `startWaitingProgress` - 関数の引数として渡される文字列
+  - EntranceTab.vue内の複数箇所
+- **対応**: 待機表示のフォーマットを1箇所で定義し、他の箇所はその関数を呼び出すように統一
+- **優先度**: 中
+
+### localStorage直接操作の整理 💾
+- **問題**: ytomoページでlocalStorageを直接操作している箇所をPinia storeの永続化機能に移行
+- **確認済み箇所**:
+  - `OthersTab.vue` - API利用モード (`ytomo-api-usage-mode`)
+  - `utils/apiUsageMode.ts` - API利用モード (`ytomo-api-usage-mode`)
+- **要調査**:
+  - `entrance-reservation-state-manager.ts`がytomoページのコードか公式サイト側のコードかを明確化
+- **注意**: 公式サイト側で動作するコードのlocalStorage操作は対象外
+- **優先度**: 中

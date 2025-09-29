@@ -22,8 +22,7 @@
         <input 
           type="number"
           class="ytomo-input-inline"
-          v-model.number="othersStore.targetUpdateTime"
-          @change="handleTargetTimeChange"
+          v-model.number="entranceStore.targetUpdateTime"
           min="0"
           max="59"
           style="width: 60px;"
@@ -80,12 +79,14 @@
 import { ref, computed, onMounted } from 'vue'
 import { useOthersStore } from '@/stores/others'
 import { useTicketsStore } from '@/stores/tickets'
+import { useEntranceReservationStore } from '@/stores/entranceReservation'
 import { loggers } from '@/utils/logger'
 import { logApiUsageModeChange, type ApiUsageMode } from '@/utils/apiUsageMode'
 
 const logger = loggers.ui
 const othersStore = useOthersStore()
 const ticketsStore = useTicketsStore()
+const entranceStore = useEntranceReservationStore()
 
 // API利用設定
 const apiUsageMode = ref('none')
@@ -110,10 +111,7 @@ const handleApiUsageChange = () => {
   window.dispatchEvent(event)
 }
 
-// 目標時間変更ハンドラ
-const handleTargetTimeChange = () => {
-  othersStore.saveTargetTime(othersStore.targetUpdateTime)
-}
+// 目標時間は直接entrance storeを使用
 
 // 結果クリア
 
@@ -181,7 +179,7 @@ const performTimeInvestigation = async () => {
   const finalResult = await phase4FinalConfirmation(phase3Result)
   
   if (finalResult) {
-    othersStore.saveTargetTime(finalResult.end) // 変更区間の終了時間を更新目標時間にする
+    entranceStore.setTargetUpdateTime(finalResult.end) // 変更区間の終了時間を更新目標時間にする
     othersStore.lastComparison = `調査完了: ${finalResult.start}-${finalResult.end}秒に設定されました`
     logger.info('4段階調査完了', { finalResult })
   } else {
@@ -523,7 +521,7 @@ const getAvailabilityInfo = async () => {
 
 // コンポーネント初期化
 onMounted(() => {
-  othersStore.loadSettings()
+  // entrance storeで初期化済み
   
   // API利用設定を読み込み
   const storedApiUsageMode = localStorage.getItem('ytomo-api-usage-mode')
@@ -535,7 +533,7 @@ onMounted(() => {
   }
   
   logger.info('OthersTabコンポーネント初期化完了', {
-    targetUpdateTime: othersStore.targetUpdateTime,
+    targetUpdateTime: entranceStore.targetUpdateTime,
     apiUsageMode: apiUsageMode.value
   })
 })
