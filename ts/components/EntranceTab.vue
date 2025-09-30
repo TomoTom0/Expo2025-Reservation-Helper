@@ -294,18 +294,19 @@ const logger = loggers.ui
 const ticketsStore = useTicketsStore()
 const entranceStore = useEntranceReservationStore()
 
-// 予約モード（謙虚/貪欲）
-const reservationMode = ref<'humble' | 'greedy'>('humble')
+// 予約モード（謙虚/貪欲）- storeベース
+const reservationMode = computed(() => entranceStore.getReservationMode())
 
 // 予約モード切り替え
 const toggleReservationMode = () => {
-  reservationMode.value = reservationMode.value === 'humble' ? 'greedy' : 'humble'
+  const currentMode = entranceStore.getReservationMode()
+  const newMode = currentMode === 'humble' ? 'greedy' : 'humble'
 
-  // ローカルストレージに保存
-  localStorage.setItem('ytomo-reservation-mode', reservationMode.value)
+  entranceStore.setReservationMode(newMode)
 
   logger.info('予約モード切り替え', {
-    newMode: reservationMode.value
+    oldMode: currentMode,
+    newMode: newMode
   })
 }
 
@@ -557,11 +558,16 @@ const displayReservationInfoArray = computed(() => {
   return entranceStore.reservationInfo || []
 })
 
-// 表示用履歴配列（現在実行中と直近の二つの周期の予約だけ表示）
+// 表示用履歴配列（謙虚モード: 最大3件、貪欲モード: 全件表示）
 const displayReservationHistoryArray = computed(() => {
   const history = entranceStore.reservationHistory || []
-  // 現在実行中と直近の二つの周期分だけ表示（最大3件）
-  return history.slice(-3)
+  const mode = entranceStore.getReservationMode()
+
+  if (mode === 'greedy') {
+    return history // 貪欲モードは全件表示
+  } else {
+    return history.slice(-3) // 謙虚モードは最大3件
+  }
 })
 
 // 現在の周期の予約かどうかを判定（最新の1件を現在の周期とする）
@@ -2111,12 +2117,6 @@ const toggleTimeSlot = (gate: 'east' | 'west', time: string) => {
 
 // コンポーネントマウント時の初期化
 onMounted(async () => {
-  // 予約モードをローカルストレージから読み込み
-  const storedMode = localStorage.getItem('ytomo-reservation-mode')
-  if (storedMode === 'humble' || storedMode === 'greedy') {
-    reservationMode.value = storedMode
-  }
-
   // 事前初期化完了を待機
   while (!ticketsStore.isInitialized) {
     await new Promise(resolve => setTimeout(resolve, 50)) // 50ms間隔でポーリング

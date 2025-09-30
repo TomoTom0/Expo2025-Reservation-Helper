@@ -18,12 +18,10 @@
       </div>
       
       <div class="ytomo-setting-item ytomo-target-time-setting">
-        <label class="ytomo-setting-label">入場予約実行目標秒時間</label>
-
-        <!-- 1行目：既存の目標時間設定 -->
-        <div class="ytomo-main-target-row">
+        <div class="ytomo-target-time-row">
+          <label class="ytomo-setting-label">入場予約実行目標秒時間</label>
           <input
-            type="number"
+            inputmode="numeric"
             class="ytomo-input-inline"
             v-model.number="mainTargetTime"
             @input="updateMainTargetTime"
@@ -47,19 +45,31 @@
           <input
             v-for="(time, index) in additionalTimes"
             :key="index"
-            type="number"
+            inputmode="numeric"
             class="ytomo-input-inline ytomo-additional-time"
             v-model.number="additionalTimes[index]"
             @input="updateAdditionalTimes"
-            min="0"
             max="59"
-            :placeholder="`+${index + 1}`"
             style="width: 50px;"
           >
         </div>
       </div>
+
+      <div class="ytomo-setting-item">
+        <label class="ytomo-setting-label">貪欲待機時間</label>
+        <input
+          inputmode="numeric"
+          class="ytomo-input-inline"
+          v-model.number="greedyWaitTime"
+          min="1"
+          max="60"
+          placeholder="待機時間"
+          style="width: 60px;"
+        >
+        <span class="ytomo-setting-unit">秒</span>
+      </div>
     </div>
-    
+
     <!-- 調査機能セクション -->
     <div v-if="apiUsageMode !== 'none'" class="ytomo-section">
       <h3 class="ytomo-section-title">タイミング調査</h3>
@@ -125,6 +135,9 @@ const mainTargetTime = ref<number>(entranceStore.targetUpdateTime || 35)
 
 // 追加時間（3個）
 const additionalTimes = ref<number[]>([0, 0, 0])
+
+// 貪欲待機時間
+const greedyWaitTime = entranceStore.greedyWaitTime
 
 // 調査開始可能かどうか
 const canStartInvestigation = computed(() => {
@@ -696,52 +709,48 @@ onMounted(() => {
     }
 
     &.ytomo-target-time-setting {
+      display: flex;
       flex-direction: column;
-      align-items: stretch;
+      align-items: flex-start;
+      gap: 8px;
+    }
+  }
 
-      .ytomo-setting-label {
-        margin-bottom: 8px;
-        min-width: auto;
+  .ytomo-target-time-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .ytomo-additional-target-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    .ytomo-auto-btn {
+      background: #10b981;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      padding: 4px 12px;
+      font-size: 12px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.2s;
+      min-width: 50px;
+
+      &:hover {
+        background: #059669;
       }
+    }
 
-      .ytomo-main-target-row {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        margin-bottom: 8px;
-      }
+    .ytomo-additional-time {
+      background: white;
+      border: 1px solid #e5e7eb;
 
-      .ytomo-additional-target-row {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-
-        .ytomo-auto-btn {
-          background: #10b981;
-          color: white;
-          border: none;
-          border-radius: 4px;
-          padding: 4px 12px;
-          font-size: 12px;
-          font-weight: 500;
-          cursor: pointer;
-          transition: background 0.2s;
-          min-width: 50px;
-
-          &:hover {
-            background: #059669;
-          }
-        }
-
-        .ytomo-additional-time {
-          background: #f8f9fa;
-          border: 1px solid #e5e7eb;
-
-          &:focus {
-            border-color: #10b981;
-            box-shadow: 0 0 0 1px #10b981;
-          }
-        }
+      &:focus {
+        border-color: #10b981;
+        box-shadow: 0 0 0 1px #10b981;
       }
     }
   }

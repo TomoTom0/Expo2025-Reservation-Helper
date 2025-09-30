@@ -132,8 +132,8 @@
                   <div class="ytomo-settings-compact">
                     <span class="ytomo-setting-item">
                       <span class="ytomo-setting-label">回数</span>
-                      <input 
-                        type="number" 
+                      <input
+                        inputmode="numeric"
                         v-model.number="editFormData.maxRetries"
                         class="ytomo-number-input"
                         min="1" max="200"
@@ -141,8 +141,8 @@
                     </span>
                     <span class="ytomo-setting-item">
                       <span class="ytomo-setting-label">間隔</span>
-                      <input 
-                        type="number" 
+                      <input
+                        inputmode="numeric"
                         v-model.number="editFormData.interval"
                         class="ytomo-number-input"
                         min="5" max="300"

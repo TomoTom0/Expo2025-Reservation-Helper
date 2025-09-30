@@ -174,7 +174,7 @@
               <div class="ytomo-input-with-label">
                 <label class="ytomo-input-label">間隔(秒)</label>
                 <input
-                  type="number"
+                  inputmode="numeric"
                   v-model.number="scheduleFormData.interval"
                   class="ytomo-form-input ytomo-number-input"
                   min="5"
@@ -187,7 +187,7 @@
               <div class="ytomo-input-with-label">
                 <label class="ytomo-input-label">回数</label>
                 <input
-                  type="number"
+                  inputmode="numeric"
                   v-model.number="scheduleFormData.maxRetries"
                   class="ytomo-form-input ytomo-number-input"
                   min="1"

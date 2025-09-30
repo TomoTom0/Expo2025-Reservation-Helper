@@ -8,7 +8,7 @@
         予約待機
       </button>
       <input
-        type="number"
+        inputmode="numeric"
         v-model="entranceStore.waitInfo.waitMinutes"
         :disabled="entranceStore.waitInfo.isWaiting"
         min="1"
