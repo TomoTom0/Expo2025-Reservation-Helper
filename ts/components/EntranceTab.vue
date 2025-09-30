@@ -2651,12 +2651,38 @@ onMounted(async () => {
           border: 2px solid #0891b2;
         }
 
-        // 満員の日付：赤太字下線
+        // 満員の日付：赤太字下線 + バツ印背景
         &.all-full {
+          position: relative;
+
+          // バツ印を疑似要素で表示（下半分に横長）
+          &::before,
+          &::after {
+            content: '';
+            position: absolute;
+            top: 75%;
+            left: 50%;
+            width: 18px;
+            height: 2px;
+            background: rgba(220, 38, 38, 0.5);
+            transform-origin: center;
+            z-index: 0;
+          }
+
+          &::before {
+            transform: translate(-50%, -50%) rotate(30deg);
+          }
+
+          &::after {
+            transform: translate(-50%, -50%) rotate(-30deg);
+          }
+
           .ytomo-day-number {
             color: #dc2626;
             font-weight: 700;
             text-decoration: underline;
+            position: relative;
+            z-index: 1;
           }
         }
         
@@ -2688,14 +2714,6 @@ onMounted(async () => {
             color: #0c4a6e;
             border: 2px solid #0891b2;
             font-weight: 600;
-          }
-        }
-
-        &.all-full {
-          .ytomo-day-number {
-            color: #dc2626;
-            font-weight: 700;
-            text-decoration: underline;
           }
         }
         

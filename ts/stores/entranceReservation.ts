@@ -351,7 +351,7 @@ export const useEntranceReservationStore = defineStore('entranceReservation', ()
     reservationStatus.value = {
       visible: true,
       isActive: true,
-      currentAction: `最優先予約実行中: ${primarySlot.gate}${primarySlot.time}`,
+      currentAction: `最優先予約実行中: ${formatDateSlash(new Date(primarySlot.date + 'T00:00:00'))} ${primarySlot.gate === 'east' ? '東' : '西'}${primarySlot.time}`,
       progress: 50,
       progressText: '1/2',
       statusClass: ''
@@ -592,7 +592,7 @@ export const useEntranceReservationStore = defineStore('entranceReservation', ()
       reservationStatus.value = {
         visible: true,
         isActive: true,
-        currentAction: `追加予約実行中 - ${slot.gate}${slot.time} (${index + 1}/${availableSlots.length})`,
+        currentAction: `追加予約実行中 - ${formatDateSlash(new Date(slot.date + 'T00:00:00'))} ${slot.gate === 'east' ? '東' : '西'}${slot.time} (${index + 1}/${availableSlots.length})`,
         progress: 75 + ((index + 1) / availableSlots.length) * 25,
         progressText: `2/2 追加${index + 1}`,
         statusClass: ''
