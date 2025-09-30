@@ -170,6 +170,15 @@
         <!-- 予約操作ボタン -->
         <div v-if="entranceStore.selectedDate" class="ytomo-reservation-actions">
           <button
+            class="ytomo-mode-toggle-button"
+            :class="{ 'greedy': reservationMode === 'greedy' }"
+            :disabled="entranceStore.isReservationRunning"
+            @click="toggleReservationMode"
+            title="予約実行モード切り替え"
+          >
+            {{ reservationMode === 'humble' ? '謙虚' : '貪欲' }}
+          </button>
+          <button
             class="ytomo-reserve-button"
             :class="{ 'disabled': !entranceStore.isReservationEnabled, 'cancel-mode': entranceStore.isReservationRunning }"
             :disabled="!entranceStore.isReservationEnabled"
@@ -183,7 +192,7 @@
             @click="handleClearAllSelections"
             title="全日付の選択を解除"
           >
-            選択解除
+            解除
           </button>
         </div>
       </div>
@@ -284,6 +293,21 @@ import { formatDateForDisplay, formatDateSlash } from '../utils/dateFormat'
 const logger = loggers.ui
 const ticketsStore = useTicketsStore()
 const entranceStore = useEntranceReservationStore()
+
+// 予約モード（謙虚/貪欲）
+const reservationMode = ref<'humble' | 'greedy'>('humble')
+
+// 予約モード切り替え
+const toggleReservationMode = () => {
+  reservationMode.value = reservationMode.value === 'humble' ? 'greedy' : 'humble'
+
+  // ローカルストレージに保存
+  localStorage.setItem('ytomo-reservation-mode', reservationMode.value)
+
+  logger.info('予約モード切り替え', {
+    newMode: reservationMode.value
+  })
+}
 
 // 入場予約storeを使用
 
@@ -2087,24 +2111,34 @@ const toggleTimeSlot = (gate: 'east' | 'west', time: string) => {
 
 // コンポーネントマウント時の初期化
 onMounted(async () => {
+  // 予約モードをローカルストレージから読み込み
+  const storedMode = localStorage.getItem('ytomo-reservation-mode')
+  if (storedMode === 'humble' || storedMode === 'greedy') {
+    reservationMode.value = storedMode
+  }
+
   // 事前初期化完了を待機
   while (!ticketsStore.isInitialized) {
     await new Promise(resolve => setTimeout(resolve, 50)) // 50ms間隔でポーリング
   }
   logger.info('事前初期化完了を確認')
-  
+
   // 初期読み込み: 現在月のスケジュールデータを取得
   const year = currentMonth.value.getFullYear()
   const month = currentMonth.value.getMonth() + 1
   await ticketsStore.getEntranceScheduleData(year, month, false)
   logger.info('初期読み込み完了', { year, month })
-  
+
   initializeDefaultSelection()
-  
+
   // 初期日付の時間帯データを読み込み
   if (entranceStore.selectedDate) {
     await loadTimeSlotsForDate(entranceStore.selectedDate)
   }
+
+  logger.info('EntranceTabコンポーネント初期化完了', {
+    reservationMode: reservationMode.value
+  })
 })
 </script>
 
@@ -2955,10 +2989,10 @@ onMounted(async () => {
       transition: all 0.2s;
       
       &.ytomo-reserve-button {
-        width: 90px;
+        min-width: 100px;
         background: #2c5aa0;
         color: white;
-        padding: 8px 12px;
+        padding: 8px 16px;
         border: none;
         border-radius: 4px;
         font-size: 12px;
@@ -2985,6 +3019,38 @@ onMounted(async () => {
           color: white;
           
           &:hover {
+            background: #b91c1c;
+          }
+        }
+      }
+
+      &.ytomo-mode-toggle-button {
+        background: #0891b2;
+        color: white;
+        padding: 8px 6px;
+        border: none;
+        border-radius: 4px;
+        font-size: 12px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s;
+        min-width: 32px;
+
+        &:hover:not(:disabled) {
+          background: #0e7490;
+        }
+
+        &:disabled {
+          background: #9ca3af;
+          color: #d1d5db;
+          cursor: not-allowed;
+        }
+
+        &.greedy {
+          background: #dc2626;
+          color: white;
+
+          &:hover:not(:disabled) {
             background: #b91c1c;
           }
         }
@@ -3017,18 +3083,36 @@ onMounted(async () => {
         }
       }
 
+      &.ytomo-clear-selection-button {
+        background: #f3f4f6;
+        color: #374151;
+        border: 1px solid #d1d5db;
+        padding: 8px 6px;
+        min-width: 32px;
+
+        &:hover {
+          background: #e5e7eb;
+        }
+
+        &:disabled {
+          background: #9ca3af;
+          color: #d1d5db;
+          cursor: not-allowed;
+        }
+      }
+
       &.ytomo-clear-button {
         background: #f3f4f6;
         color: #374151;
         border: 1px solid #d1d5db;
-        
+
         &:hover {
           background: #e5e7eb;
         }
         &.cancel-mode {
           background: #dc2626;
           border-color: #dc2626;
-          
+
           &:hover {
             background: #b91c1c;
             border-color: #b91c1c;
