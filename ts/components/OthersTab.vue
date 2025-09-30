@@ -17,17 +17,46 @@
         </select>
       </div>
       
-      <div class="ytomo-setting-item">
+      <div class="ytomo-setting-item ytomo-target-time-setting">
         <label class="ytomo-setting-label">入場予約実行目標秒時間</label>
-        <input 
-          type="number"
-          class="ytomo-input-inline"
-          v-model.number="entranceStore.targetUpdateTime"
-          min="0"
-          max="59"
-          style="width: 60px;"
-        >
-        <span class="ytomo-setting-unit">秒</span>
+
+        <!-- 1行目：既存の目標時間設定 -->
+        <div class="ytomo-main-target-row">
+          <input
+            type="number"
+            class="ytomo-input-inline"
+            v-model.number="mainTargetTime"
+            @input="updateMainTargetTime"
+            min="0"
+            max="59"
+            placeholder="目標時間"
+            style="width: 60px;"
+          >
+          <span class="ytomo-setting-unit">秒</span>
+        </div>
+
+        <!-- 2行目：自動ボタン + 3つの追加時間 -->
+        <div class="ytomo-additional-target-row">
+          <button
+            @click="generateAutoTimes"
+            class="ytomo-auto-btn"
+            title="目標時間から15秒ずつずれた時間を自動生成"
+          >
+            自動
+          </button>
+          <input
+            v-for="(time, index) in additionalTimes"
+            :key="index"
+            type="number"
+            class="ytomo-input-inline ytomo-additional-time"
+            v-model.number="additionalTimes[index]"
+            @input="updateAdditionalTimes"
+            min="0"
+            max="59"
+            :placeholder="`+${index + 1}`"
+            style="width: 50px;"
+          >
+        </div>
       </div>
     </div>
     
@@ -91,6 +120,12 @@ const entranceStore = useEntranceReservationStore()
 // API利用設定
 const apiUsageMode = ref('none')
 
+// メイン目標時間
+const mainTargetTime = ref<number>(entranceStore.targetUpdateTime || 35)
+
+// 追加時間（3個）
+const additionalTimes = ref<number[]>([0, 0, 0])
+
 // 調査開始可能かどうか
 const canStartInvestigation = computed(() => {
   return !othersStore.isInvestigationRunning
@@ -111,9 +146,42 @@ const handleApiUsageChange = () => {
   window.dispatchEvent(event)
 }
 
-// 目標時間は直接entrance storeを使用
+// メイン目標時間更新
+const updateMainTargetTime = () => {
+  entranceStore.setTargetUpdateTime(mainTargetTime.value)
+  localStorage.setItem('ytomo-main-target-time', mainTargetTime.value.toString())
 
-// 結果クリア
+  logger.info('メイン目標時間更新', {
+    mainTargetTime: mainTargetTime.value
+  })
+}
+
+// 追加時間更新
+const updateAdditionalTimes = () => {
+  // 入場予約storeに追加時間を保存
+  entranceStore.setAdditionalTargetTimes(additionalTimes.value)
+  localStorage.setItem('ytomo-additional-times', JSON.stringify(additionalTimes.value))
+
+  logger.info('追加時間更新', {
+    additionalTimes: additionalTimes.value
+  })
+}
+
+// 自動時間生成
+const generateAutoTimes = () => {
+  const baseTime = mainTargetTime.value
+  additionalTimes.value = [
+    (baseTime + 15) % 60,
+    (baseTime + 30) % 60,
+    (baseTime + 45) % 60
+  ]
+  updateAdditionalTimes()
+
+  logger.info('自動時間生成', {
+    baseTime,
+    generatedTimes: additionalTimes.value
+  })
+}
 
 // 調査実行
 const executeInvestigation = async () => {
@@ -521,8 +589,28 @@ const getAvailabilityInfo = async () => {
 
 // コンポーネント初期化
 onMounted(() => {
-  // entrance storeで初期化済み
-  
+  // メイン目標時間をローカルストレージから読み込み
+  const storedMainTarget = localStorage.getItem('ytomo-main-target-time')
+  if (storedMainTarget) {
+    const parsed = parseInt(storedMainTarget)
+    if (!isNaN(parsed)) {
+      mainTargetTime.value = parsed
+    }
+  }
+
+  // 追加時間をローカルストレージから読み込み
+  const storedAdditionalTimes = localStorage.getItem('ytomo-additional-times')
+  if (storedAdditionalTimes) {
+    try {
+      const parsed = JSON.parse(storedAdditionalTimes)
+      if (Array.isArray(parsed) && parsed.length === 3) {
+        additionalTimes.value = parsed
+      }
+    } catch (error) {
+      logger.warn('追加時間の読み込みエラー', error)
+    }
+  }
+
   // API利用設定を読み込み
   const storedApiUsageMode = localStorage.getItem('ytomo-api-usage-mode')
   if (storedApiUsageMode) {
@@ -531,9 +619,10 @@ onMounted(() => {
     // デフォルト値'none'をlocalStorageに保存
     localStorage.setItem('ytomo-api-usage-mode', 'none')
   }
-  
+
   logger.info('OthersTabコンポーネント初期化完了', {
-    targetUpdateTime: entranceStore.targetUpdateTime,
+    mainTargetTime: mainTargetTime.value,
+    additionalTimes: additionalTimes.value,
     apiUsageMode: apiUsageMode.value
   })
 })
@@ -604,6 +693,56 @@ onMounted(() => {
     .ytomo-setting-unit {
       font-size: 14px;
       color: #6b7280;
+    }
+
+    &.ytomo-target-time-setting {
+      flex-direction: column;
+      align-items: stretch;
+
+      .ytomo-setting-label {
+        margin-bottom: 8px;
+        min-width: auto;
+      }
+
+      .ytomo-main-target-row {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 8px;
+      }
+
+      .ytomo-additional-target-row {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+
+        .ytomo-auto-btn {
+          background: #10b981;
+          color: white;
+          border: none;
+          border-radius: 4px;
+          padding: 4px 12px;
+          font-size: 12px;
+          font-weight: 500;
+          cursor: pointer;
+          transition: background 0.2s;
+          min-width: 50px;
+
+          &:hover {
+            background: #059669;
+          }
+        }
+
+        .ytomo-additional-time {
+          background: #f8f9fa;
+          border: 1px solid #e5e7eb;
+
+          &:focus {
+            border-color: #10b981;
+            box-shadow: 0 0 0 1px #10b981;
+          }
+        }
+      }
     }
   }
   

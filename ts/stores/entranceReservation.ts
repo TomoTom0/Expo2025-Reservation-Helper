@@ -95,6 +95,9 @@ export const useEntranceReservationStore = defineStore('entranceReservation', ()
   // 目標時間をstoreのattributeとして管理
   const targetUpdateTime = ref<number>(35)
 
+  // 追加目標時間（3個）
+  const additionalTargetTimes = ref<number[]>([0, 0, 0])
+
   // ユーティリティメソッド
   const formatTime = (date: Date): string => {
     return date.toLocaleTimeString('ja-JP', { hour: '2-digit', minute: '2-digit', second: '2-digit' })
@@ -190,6 +193,18 @@ export const useEntranceReservationStore = defineStore('entranceReservation', ()
   const setTargetUpdateTime = (time: number): void => {
     if (time >= 0 && time <= 59) {
       targetUpdateTime.value = time
+    }
+  }
+
+  // 追加目標時間を取得
+  const getAdditionalTargetTimes = (): number[] => {
+    return additionalTargetTimes.value
+  }
+
+  // 追加目標時間を設定
+  const setAdditionalTargetTimes = (times: number[]): void => {
+    if (Array.isArray(times) && times.length === 3) {
+      additionalTargetTimes.value = times.map(time => Math.max(0, Math.min(59, time)))
     }
   }
 
@@ -1081,6 +1096,7 @@ export const useEntranceReservationStore = defineStore('entranceReservation', ()
     reservationInfo,
     selectedDate,
     targetUpdateTime,
+    additionalTargetTimes,
     isReservationRunning,
     reservationHistory,
     waitInfo,
@@ -1096,11 +1112,13 @@ export const useEntranceReservationStore = defineStore('entranceReservation', ()
     setClearSelectionCallback,
     getTargetUpdateTime,
     setTargetUpdateTime,
+    getAdditionalTargetTimes,
+    setAdditionalTargetTimes,
     selectDate
   }
 }, {
   persist: {
     key: 'ytomo-entrance-reservation-store',
-    pick: ['targetUpdateTime', 'reservationInfo']
+    pick: ['targetUpdateTime', 'reservationInfo', 'additionalTargetTimes']
   }
 })
