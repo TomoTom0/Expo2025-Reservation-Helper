@@ -3,7 +3,7 @@
     <div class="ytomo-wait-controls">
       <button
         @click="handleStartWait"
-        :disabled="entranceStore.waitInfo.isWaiting || entranceStore.waitInfo.waitMinutes < 1 || entranceStore.waitInfo.waitMinutes > 720"
+        :disabled="entranceStore.waitInfo.isWaiting || entranceStore.waitInfo.waitMinutes === 0 || entranceStore.waitInfo.waitMinutes > 720"
       >
         予約待機
       </button>
@@ -11,7 +11,7 @@
         inputmode="numeric"
         v-model="entranceStore.waitInfo.waitMinutes"
         :disabled="entranceStore.waitInfo.isWaiting"
-        min="1"
+        min="0"
         max="720"
         step="1"
       />分
@@ -53,7 +53,7 @@ const adjustWaitTime = (minutes: number) => {
   if (!entranceStore.waitInfo.isWaiting) {
     // 待機中でない場合は待機時間を変更
     const currentMinutes = entranceStore.waitInfo.waitMinutes
-    const newMinutes = Math.max(1, Math.min(720, currentMinutes + minutes))
+    const newMinutes = Math.max(0, Math.min(720, currentMinutes + minutes))
     entranceStore.waitInfo.waitMinutes = newMinutes
   } else {
     // 待機中の場合は待機時間を延長

@@ -1511,7 +1511,7 @@ export const useEntranceReservationStore = defineStore('entranceReservation', ()
       })
     } else {
       // 待機中でない場合は設定値のみ変更
-      waitInfo.value.waitMinutes = Math.max(1, Math.min(720, waitInfo.value.waitMinutes + minutes))
+      waitInfo.value.waitMinutes = Math.max(0, Math.min(720, waitInfo.value.waitMinutes + minutes))
 
       logger.info('待機時間設定変更', {
         新しい設定時間: waitInfo.value.waitMinutes
