@@ -259,10 +259,14 @@
                 <div v-for="(result, index) in displayReservationHistoryArray" :key="index"
                      class="ytomo-history-item"
                      :class="[
-                       result.success ? 'success' : 'failure',
+                       result.status === 'success' ? 'success' : (result.status === 'pending' ? 'pending' : 'failure'),
                        { 'current-cycle': isCurrentCycleReservation(index) }
                      ]">
-                  <span class="ytomo-history-result">{{ result.success ? '成功' : (result.failureReason || '') }}</span>
+                  <span class="ytomo-history-result">{{
+                    result.status === 'success' ? '成功' :
+                    result.status === 'pending' ? '実行' :
+                    (result.failureReason || '')
+                  }}</span>
                   <span class="ytomo-history-detail">
                     <template v-if="result.date">{{ formatDateForHistory(result.date) }} </template>{{ result.gate }}{{ result.time }}
                   </span>
@@ -2427,7 +2431,12 @@ onMounted(async () => {
                 background-color: rgba(5, 150, 105, 0.1);
                 border-left: 3px solid #059669;
               }
-              
+
+              &.pending {
+                background-color: rgba(245, 158, 11, 0.1);
+                border-left: 3px solid #f59e0b;
+              }
+
               &.failure {
                 background-color: rgba(220, 38, 38, 0.1);
                 border-left: 3px solid #dc2626;
@@ -2439,11 +2448,15 @@ onMounted(async () => {
               
               .ytomo-history-result {
                 font-weight: 600;
-                
+
                 .success & {
                   color: #059669;
                 }
-                
+
+                .pending & {
+                  color: #f59e0b;
+                }
+
                 .failure & {
                   color: #dc2626;
                 }

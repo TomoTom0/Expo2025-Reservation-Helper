@@ -68,6 +68,19 @@
         >
         <span class="ytomo-setting-unit">秒</span>
       </div>
+
+      <div class="ytomo-setting-item">
+        <label class="ytomo-setting-label">
+          <input
+            type="checkbox"
+            v-model="greedyCycleEnabled"
+            @change="handleGreedyCycleChange"
+            class="ytomo-checkbox"
+          >
+          貪欲巡回
+        </label>
+        <span class="ytomo-setting-description">目標時間で優先度を1にリセット</span>
+      </div>
     </div>
 
     <!-- 調査機能セクション -->
@@ -139,6 +152,9 @@ const additionalTimes = ref<number[]>([0, 0, 0])
 // 貪欲待機時間
 const greedyWaitTime = entranceStore.greedyWaitTime
 
+// 貪欲巡回設定
+const greedyCycleEnabled = ref<boolean>(entranceStore.getGreedyCycle())
+
 // 調査開始可能かどうか
 const canStartInvestigation = computed(() => {
   return !othersStore.isInvestigationRunning
@@ -177,6 +193,14 @@ const updateAdditionalTimes = () => {
 
   logger.info('追加時間更新', {
     additionalTimes: additionalTimes.value
+  })
+}
+
+// 貪欲巡回設定変更
+const handleGreedyCycleChange = () => {
+  entranceStore.setGreedyCycle(greedyCycleEnabled.value)
+  logger.info('貪欲巡回設定変更', {
+    enabled: greedyCycleEnabled.value
   })
 }
 
@@ -691,16 +715,27 @@ onMounted(() => {
       font-size: 14px;
       background-color: white;
       min-width: 80px;
-      
+
       &:focus {
         outline: none;
         border-color: #2563eb;
         box-shadow: 0 0 0 1px #2563eb;
       }
-      
+
       &:hover {
         background-color: #f9fafb;
       }
+    }
+
+    .ytomo-checkbox {
+      margin-right: 8px;
+      cursor: pointer;
+    }
+
+    .ytomo-setting-description {
+      font-size: 12px;
+      color: #6b7280;
+      margin-left: 8px;
     }
     
     .ytomo-setting-unit {

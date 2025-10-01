@@ -12,6 +12,15 @@ import { formatDateSlash } from '@/utils/dateFormat'
 
 const logger = loggers.entranceReservation
 
+// UUID生成関数
+const generateUUID = (): string => {
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+    const r = Math.random() * 16 | 0
+    const v = c == 'x' ? r : (r & 0x3 | 0x8)
+    return v.toString(16)
+  })
+}
+
 // 元のmanagerから型定義をコピー
 export interface ReservationStatus {
   visible: boolean
@@ -32,7 +41,8 @@ export interface ReservationInfo {
 }
 
 export interface ReservationResult {
-  success: boolean
+  id: string // UUID for tracking
+  status: 'pending' | 'success' | 'failed' // execution status
   date: string
   gate: string
   time: string
@@ -107,6 +117,9 @@ export const useEntranceReservationStore = defineStore('entranceReservation', ()
 
   // 貪欲待機時間（秒）
   const greedyWaitTime = ref<number>(5)
+
+  // 貪欲巡回（目標時間での優先度リセット）
+  const greedyCycle = ref<boolean>(true)
 
   // ユーティリティメソッド
   const formatTime = (date: Date): string => {
@@ -238,6 +251,15 @@ export const useEntranceReservationStore = defineStore('entranceReservation', ()
     logger.info('予約モード変更', { mode })
   }
 
+  const getGreedyCycle = (): boolean => {
+    return greedyCycle.value
+  }
+
+  const setGreedyCycle = (enabled: boolean): void => {
+    greedyCycle.value = enabled
+    logger.info('貪欲巡回設定', { enabled })
+  }
+
 
   // 貪欲モード用：統合目標時間リストを生成（5秒未満間隔除外、基準時間は必須）
   const generateTargetTimesList = (): number[] => {
@@ -276,7 +298,7 @@ export const useEntranceReservationStore = defineStore('entranceReservation', ()
     // 最終的に時間順に並び替え
     filteredTimes.sort((a, b) => a - b)
 
-    logger.info('貪欲モード目標時間リスト生成', {
+    logger.temp('貪欲モード目標時間リスト生成', {
       基準時間: mainTime,
       追加時間: additionalTimes,
       フィルタ後: filteredTimes
@@ -386,9 +408,10 @@ export const useEntranceReservationStore = defineStore('entranceReservation', ()
       const targetTimes = generateTargetTimesList()
       let currentPriority = 1
 
-      logger.info('貪欲モード予約実行開始', {
+      logger.temp('貪欲モード予約実行開始', {
         targetTimes,
-        timeSlots: selectedTimeSlots.length
+        timeSlots: selectedTimeSlots.length,
+        現在時刻秒: Math.floor(Date.now() / 1000) % 60
       })
 
       // 10秒ルール：開始時チェック
@@ -423,7 +446,7 @@ export const useEntranceReservationStore = defineStore('entranceReservation', ()
 
   // 貪欲モードのメインサイクル（目標時間ベース）
   const executeGreedyCycle = async (selectedTimeSlots: any[], targetTimes: number[], initialPriority: number) => {
-    let currentPriority = initialPriority
+    let currentPriority = 1 // 常に優先度1から開始
     let lastExecutionTime = Date.now()
 
     logger.temp('executeGreedyCycle開始', { targetTimes, initialPriority })
@@ -459,7 +482,19 @@ export const useEntranceReservationStore = defineStore('entranceReservation', ()
         lastExecutionTime = Date.now()
 
         if (result.success) return
-        currentPriority++
+
+        // 次の優先度は実行した優先度の最大値+1
+        const targets = selectedTimeSlots
+          .filter(slot => slot.priority >= currentPriority)
+          .sort((a, b) => a.priority - b.priority)
+          .slice(0, 3)
+
+        if (targets.length > 0) {
+          const maxPriority = Math.max(...targets.map(t => t.priority))
+          currentPriority = maxPriority + 1
+        } else {
+          currentPriority = 1 // リセット
+        }
 
         // 貪欲待機時間による実行間隔制御
         const timeSinceLastExecution = Date.now() - lastExecutionTime
@@ -467,7 +502,8 @@ export const useEntranceReservationStore = defineStore('entranceReservation', ()
         if (timeSinceLastExecution < waitTimeMs) {
           await new Promise(resolve => setTimeout(resolve, waitTimeMs - timeSinceLastExecution))
         }
-        continue
+
+        // 10秒ルール適用後も目標時間での処理を続行（continue削除）
       }
 
       // 目標時間まで待機
@@ -477,9 +513,25 @@ export const useEntranceReservationStore = defineStore('entranceReservation', ()
         if (!isReservationRunning.value) return
       }
 
-      // 目標時間到達：優先度リセット
-      currentPriority = 1
-      logger.info('目標時間到達：優先度リセット', { targetTime })
+      // 目標時間到達：必ず優先度リセット処理を実行
+      const oldPriority = currentPriority
+      if (greedyCycle.value) {
+        currentPriority = 1
+        logger.temp('目標時間到達：優先度リセット', {
+          targetTime,
+          前の優先度: oldPriority,
+          新しい優先度: currentPriority,
+          現在時刻秒: Math.floor(Date.now() / 1000) % 60,
+          targetIndex: currentTargetIndex
+        })
+      } else {
+        logger.temp('目標時間到達：優先度継続', {
+          targetTime,
+          currentPriority,
+          現在時刻秒: Math.floor(Date.now() / 1000) % 60,
+          targetIndex: currentTargetIndex
+        })
+      }
 
       // 目標時間での実行（待機チェック）
       if (!waitInfo.value.isWaiting) {
@@ -487,42 +539,37 @@ export const useEntranceReservationStore = defineStore('entranceReservation', ()
         lastExecutionTime = Date.now()
 
         if (targetResult.success) return
-        currentPriority = 2
+
+        // 目標時間実行後に五秒待機
+        const waitTimeMs = greedyWaitTime.value * 1000
+        await new Promise(resolve => setTimeout(resolve, waitTimeMs))
+        if (!isReservationRunning.value) return
+
+        // 次の優先度は実行した優先度の最大値+1
+        const targets = selectedTimeSlots
+          .filter(slot => slot.priority >= currentPriority)
+          .sort((a, b) => a.priority - b.priority)
+          .slice(0, 3)
+
+        if (targets.length > 0) {
+          const maxPriority = Math.max(...targets.map(t => t.priority))
+          currentPriority = maxPriority + 1
+        } else {
+          currentPriority = 1 // リセット
+        }
       }
 
       // 次の目標時間まで継続実行
+      logger.temp('継続実行開始', {
+        currentTargetIndex,
+        currentPriority,
+        nextTargetTime: targetTimes[(currentTargetIndex + 1) % targetTimes.length]
+      })
       while (isReservationRunning.value) {
         // 待機中チェック：待機中の場合は実行をスキップ
         if (waitInfo.value.isWaiting) {
           await new Promise(resolve => setTimeout(resolve, 1000))
           continue
-        }
-
-        // 貪欲待機時間による実行間隔制御
-        const timeSinceLastExecution = Date.now() - lastExecutionTime
-        const waitTimeMs = greedyWaitTime.value * 1000
-        if (timeSinceLastExecution < waitTimeMs) {
-          await new Promise(resolve => setTimeout(resolve, waitTimeMs - timeSinceLastExecution))
-        }
-        if (!isReservationRunning.value) return
-
-        // 次の目標時間との距離チェック
-        const nextTargetIndex = (currentTargetIndex + 1) % targetTimes.length
-        const nextTargetTime = targetTimes[nextTargetIndex]
-        const nowForCheck = Math.floor(Date.now() / 1000)
-        const currentSecondForCheck = nowForCheck % 60
-
-        let timeToNextTarget: number
-        if (nextTargetIndex === 0) {
-          // 次の分の最初の目標時間
-          timeToNextTarget = (60 + nextTargetTime - currentSecondForCheck) % 60
-        } else {
-          // 同じ分内の次の目標時間
-          timeToNextTarget = calculateTimeToTarget(currentSecondForCheck, nextTargetTime)
-        }
-
-        if (timeToNextTarget < 5) {
-          break // 次の目標時間に移行
         }
 
         // 実行（待機チェック）
@@ -531,12 +578,62 @@ export const useEntranceReservationStore = defineStore('entranceReservation', ()
           lastExecutionTime = Date.now()
 
           if (result.success) return
-          currentPriority++
+
+          // 予約実行完了後に五秒待機
+          const waitTimeMs = greedyWaitTime.value * 1000
+          await new Promise(resolve => setTimeout(resolve, waitTimeMs))
+          if (!isReservationRunning.value) return
+
+          // 五秒待機完了後に時間判定
+          const nextTargetIndex = (currentTargetIndex + 1) % targetTimes.length
+          const nextTargetTimeSecond = targetTimes[nextTargetIndex]
+          const nextTargetTimeUnix = calculateNextTargetTimeUnix(nextTargetTimeSecond)
+          const nowForCheck = Math.floor(Date.now() / 1000)
+          const timeToNextTarget = nextTargetTimeUnix - nowForCheck
+
+          // 次の目標時間まで5秒未満または過ぎている場合は継続実行を終了
+          if (timeToNextTarget < 5) {
+            logger.temp('五秒待機後の時間チェック：次の目標時間が近いため継続実行終了', {
+              nextTargetTimeSecond,
+              nextTargetTimeUnix,
+              nowForCheck,
+              timeToNextTarget,
+              判定基準: '5秒未満'
+            })
+            break // 次の目標時間に移行
+          }
+
+          // 次の優先度は実行した優先度の最大値+1
+          const targets = selectedTimeSlots
+            .filter(slot => slot.priority >= currentPriority)
+            .sort((a, b) => a.priority - b.priority)
+            .slice(0, 3)
+
+          if (targets.length > 0) {
+            const maxPriority = Math.max(...targets.map(t => t.priority))
+            currentPriority = maxPriority + 1
+          } else {
+            currentPriority = 1 // リセット
+          }
+
         }
       }
 
-      // 次の目標時間へ移行
+      // 継続実行終了後、次の目標時間まで待機
+      const oldIndex = currentTargetIndex
       currentTargetIndex = (currentTargetIndex + 1) % targetTimes.length
+      const nextTargetTime = targetTimes[currentTargetIndex]
+
+      logger.temp('継続実行終了、次の目標時間まで待機', {
+        前のIndex: oldIndex,
+        新しいIndex: currentTargetIndex,
+        前の時間: targetTimes[oldIndex],
+        新しい時間: nextTargetTime
+      })
+
+      // 次の目標時間まで待機
+      await waitUntilTargetTime(nextTargetTime)
+      if (!isReservationRunning.value) return
     }
   }
 
@@ -592,12 +689,23 @@ export const useEntranceReservationStore = defineStore('entranceReservation', ()
       startPriority
     })
 
-    // 予約実行中の表示を更新
-    const targetDisplays = targets.map(slot => formatReservationTarget(slot))
+    // 予約実行中の表示を更新（モード別表示）
+    const mode = getReservationMode()
+    let displayAction = '予約実行中'
+    if (mode === 'greedy') {
+      const minPriority = Math.min(...targets.map(t => t.priority))
+      const maxPriority = Math.max(...targets.map(t => t.priority))
+      displayAction = `予約実行中 (${minPriority}-${maxPriority})`
+    } else {
+      // 謙虚モードでは実行対象の詳細表示
+      const targetDisplays = targets.map(slot => formatReservationTarget(slot))
+      displayAction = `予約実行中 ${targetDisplays.join(' ')}`
+    }
+
     reservationStatus.value = {
       visible: true,
       isActive: true,
-      currentAction: `予約中 ${targetDisplays.join(' ')}`,
+      currentAction: displayAction,
       progress: 50,
       progressText: '実行中',
       statusClass: ''
@@ -627,7 +735,7 @@ export const useEntranceReservationStore = defineStore('entranceReservation', ()
         reservationStatus.value = {
           visible: true,
           isActive: false,
-          currentAction: `予約成功 ${formatReservationTarget(successSlot)}`,
+          currentAction: '予約成功',
           progress: 100,
           progressText: '成功',
           statusClass: 'success'
@@ -676,6 +784,23 @@ export const useEntranceReservationStore = defineStore('entranceReservation', ()
     } else {
       return (60 + targetSecond - currentSecond)
     }
+  }
+
+  // 次の目標時間のunixtime計算
+  const calculateNextTargetTimeUnix = (targetSecond: number): number => {
+    const now = Math.floor(Date.now() / 1000)
+    const currentMinute = Math.floor(now / 60) * 60
+    const currentSecond = now % 60
+
+    // 今の分での目標時間
+    let targetTime = currentMinute + targetSecond
+
+    // 既に過ぎている場合は次の分
+    if (targetSecond <= currentSecond) {
+      targetTime += 60
+    }
+
+    return targetTime
   }
 
   // 次の分まで待機
@@ -759,7 +884,7 @@ export const useEntranceReservationStore = defineStore('entranceReservation', ()
     reservationStatus.value = {
       visible: true,
       isActive: true,
-      currentAction: `最優先予約実行中: ${formatDateSlash(new Date(primarySlot.date + 'T00:00:00'))} ${primarySlot.gate === 'east' ? '東' : '西'}${primarySlot.time}`,
+      currentAction: '最優先予約実行中',
       progress: 50,
       progressText: '1/2',
       statusClass: ''
@@ -783,12 +908,12 @@ export const useEntranceReservationStore = defineStore('entranceReservation', ()
       } else {
         // 失敗時は履歴に追加して継続
         logger.error('最優先予約失敗', { slot: primarySlot, result })
-        addToHistory(false, primarySlot.date, primarySlot.gate, primarySlot.time, result.failureReason || 'その他')
+        addCompletedToHistory(false, primarySlot.date, primarySlot.gate, primarySlot.time, result.failureReason || 'その他')
         return { success: false, slot: primarySlot, result }
       }
     } catch (error) {
       logger.error('最優先予約実行エラー', error)
-      addToHistory(false, primarySlot.date, primarySlot.gate, primarySlot.time, 'その他')
+      addCompletedToHistory(false, primarySlot.date, primarySlot.gate, primarySlot.time, 'その他')
       return { success: false, slot: primarySlot, error }
     }
   }
@@ -904,12 +1029,69 @@ export const useEntranceReservationStore = defineStore('entranceReservation', ()
     }
   }
 
-  // 履歴に追加（1分後自動削除付き）
-  const addToHistory = (success: boolean, date: string, gate: string, time: string, failureReason?: '満席' | '無効' | 'その他') => {
+  // 予約開始時に「実行中」エントリを追加
+  const addPendingToHistory = (date: string, gate: string, time: string): string => {
+    const id = generateUUID()
     const timestamp = Math.floor(Date.now() / 1000)
 
-    reservationHistory.value.push({
-      success,
+    reservationHistory.value.unshift({ // 新しいものを上に
+      id,
+      status: 'pending',
+      date,
+      gate,
+      time,
+      timestamp
+    })
+
+    logger.info('実行中履歴追加', { id, date, gate, time, timestamp })
+    return id
+  }
+
+  // 予約完了時にエントリを更新
+  const updateHistoryResult = (id: string, success: boolean, failureReason?: '満席' | '無効' | 'その他') => {
+    const entry = reservationHistory.value.find(item => item.id === id)
+    if (entry) {
+      entry.status = success ? 'success' : 'failed'
+      entry.failureReason = failureReason
+
+      logger.info('履歴結果更新', { id, success, failureReason })
+
+      // 履歴自動削除タイマーを開始（1分後）
+      setTimeout(() => {
+        removeExpiredHistory(entry.timestamp)
+      }, 60000) // 60秒後
+    } else {
+      logger.warn('履歴更新対象が見つからない', { id })
+    }
+  }
+
+  // 新しいパターンでの予約実行（履歴管理付き）
+  const executeReservationSlot = async (slot: any): Promise<{ success: boolean; result?: any }> => {
+    // 実行開始時に履歴追加
+    const historyId = addPendingToHistory(slot.date, slot.gate, slot.time)
+
+    try {
+      const result = await callActualReservationAPI(slot)
+
+      // 結果に応じて履歴を更新
+      updateHistoryResult(historyId, result.success, result.failureReason)
+
+      return result
+    } catch (error) {
+      // エラー時は失敗として履歴を更新
+      updateHistoryResult(historyId, false, 'その他')
+      throw error
+    }
+  }
+
+  // 旧形式の直接履歴追加（予約結果確定時のみ使用）
+  const addCompletedToHistory = (success: boolean, date: string, gate: string, time: string, failureReason?: '満席' | '無効' | 'その他') => {
+    const id = generateUUID()
+    const timestamp = Math.floor(Date.now() / 1000)
+
+    reservationHistory.value.unshift({ // 新しいものを上に
+      id,
+      status: success ? 'success' : 'failed',
       date,
       gate,
       time,
@@ -922,7 +1104,7 @@ export const useEntranceReservationStore = defineStore('entranceReservation', ()
       removeExpiredHistory(timestamp)
     }, 60000) // 60秒後
 
-    logger.temp('履歴追加', { success, date, gate, time, timestamp, 現在の履歴数: reservationHistory.value.length })
+    logger.info('履歴追加（直接完了）', { success, date, gate, time, timestamp, 現在の履歴数: reservationHistory.value.length })
   }
 
   // 期限切れ履歴を削除
@@ -964,7 +1146,7 @@ export const useEntranceReservationStore = defineStore('entranceReservation', ()
     }
 
     // 予約履歴に追加
-    addToHistory(true, slot.date, slot.gate, slot.time)
+    addCompletedToHistory(true, slot.date, slot.gate, slot.time)
   }
 
   // 追加予約実行（空きがあれば最大2つ）
@@ -1016,7 +1198,7 @@ export const useEntranceReservationStore = defineStore('entranceReservation', ()
       reservationStatus.value = {
         visible: true,
         isActive: true,
-        currentAction: `追加予約実行中 - ${formatDateSlash(new Date(slot.date + 'T00:00:00'))} ${slot.gate === 'east' ? '東' : '西'}${slot.time} (${index + 1}/${availableSlots.length})`,
+        currentAction: `追加予約実行中 (${index + 1}/${availableSlots.length})`,
         progress: 75 + ((index + 1) / availableSlots.length) * 25,
         progressText: `2/2 追加${index + 1}`,
         statusClass: ''
@@ -1029,36 +1211,22 @@ export const useEntranceReservationStore = defineStore('entranceReservation', ()
         const result = await callActualReservationAPI(slot)
 
         if (result.success) {
-          addToHistory(true, slot.date, slot.gate, slot.time)
+          addCompletedToHistory(true, slot.date, slot.gate, slot.time)
           logger.info('追加予約成功', { slot, result })
           // 予約成功時は即座に処理終了
           await handleReservationSuccess(slot, result)
           return
         } else {
-          addToHistory(false, slot.date, slot.gate, slot.time, result.failureReason || 'その他')
+          addCompletedToHistory(false, slot.date, slot.gate, slot.time, result.failureReason || 'その他')
           logger.error('追加予約失敗', { slot, result })
         }
       } catch (error) {
-        addToHistory(false, slot.date, slot.gate, slot.time, 'その他')
+        addCompletedToHistory(false, slot.date, slot.gate, slot.time, 'その他')
         logger.error('追加予約エラー', { slot, error })
       }
     }
   }
 
-  // 共通予約実行関数：スロット情報を受け取って予約実行し結果を履歴に収める
-  const executeReservationSlot = async (slot: any): Promise<{ success: boolean; result?: any }> => {
-    // callActualReservationAPIを呼び出して結果を取得
-    const result = await callActualReservationAPI(slot)
-
-    // 結果に基づいて履歴に追加
-    if (result.success) {
-      addToHistory(true, slot.date, slot.gate, slot.time)
-    } else {
-      addToHistory(false, slot.date, slot.gate, slot.time, result.failureReason || 'その他')
-    }
-
-    return result
-  }
 
   // 実際の予約API呼び出し - 元のmanagerから完全コピー
   const callActualReservationAPI = async (slot: any): Promise<{ success: boolean; date?: string; error?: string; failureReason?: '満席' | '無効' | 'その他'; reservationIds?: number[]; ticketsData?: any }> => {
@@ -1577,13 +1745,18 @@ export const useEntranceReservationStore = defineStore('entranceReservation', ()
     setAdditionalTargetTimes,
     getReservationMode,
     setReservationMode,
+    getGreedyCycle,
+    setGreedyCycle,
     greedyWaitTime,
     generateTargetTimesList,
-    selectDate
+    selectDate,
+    addPendingToHistory,
+    updateHistoryResult,
+    executeReservationSlot
   }
 }, {
   persist: {
     key: 'ytomo-entrance-reservation-store',
-    pick: ['targetUpdateTime', 'reservationInfo', 'additionalTargetTimes', 'reservationMode']
+    pick: ['targetUpdateTime', 'reservationInfo', 'additionalTargetTimes', 'reservationMode', 'greedyCycle']
   }
 })
