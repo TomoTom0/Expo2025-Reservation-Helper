@@ -8,7 +8,7 @@
 // @run-at       document-end
 // ==/UserScript==
 
-// Built: 2025/10/02 14:36:51
+// Built: 2025/10/02 15:08:52
 
 
 (function webpackUniversalModuleDefinition(root, factory) {
@@ -44509,11 +44509,6 @@ const useEntranceReservationStore = (0,pinia/* defineStore */.nY)('entranceReser
         }
         // 最終的に時間順に並び替え
         filteredTimes.sort((a, b) => a - b);
-        entranceReservation_logger.temp('貪欲モード目標時間リスト生成', {
-            基準時間: mainTime,
-            追加時間: additionalTimes,
-            フィルタ後: filteredTimes
-        });
         return filteredTimes;
     };
     // 設定された目標時間まで待機
@@ -44603,11 +44598,6 @@ const useEntranceReservationStore = (0,pinia/* defineStore */.nY)('entranceReser
         try {
             const targetTimes = generateTargetTimesList();
             let currentPriority = 1;
-            entranceReservation_logger.temp('貪欲モード予約実行開始', {
-                targetTimes,
-                timeSlots: selectedTimeSlots.length,
-                現在時刻秒: Math.floor(Date.now() / 1000) % 60
-            });
             // 10秒ルール：開始時チェック
             const now = Math.floor(Date.now() / 1000);
             const currentSecond = now % 60;
@@ -44638,7 +44628,6 @@ const useEntranceReservationStore = (0,pinia/* defineStore */.nY)('entranceReser
     const executeGreedyCycle = async (selectedTimeSlots, targetTimes, initialPriority) => {
         let currentPriority = 1; // 常に優先度1から開始
         let lastExecutionTime = Date.now();
-        entranceReservation_logger.temp('executeGreedyCycle開始', { targetTimes, initialPriority });
         // 最初に現在時刻に最も近い目標時間のインデックスを取得
         const now = Math.floor(Date.now() / 1000);
         const currentSecond = now % 60;
@@ -44646,7 +44635,6 @@ const useEntranceReservationStore = (0,pinia/* defineStore */.nY)('entranceReser
         if (!firstTargetTime)
             return;
         let currentTargetIndex = targetTimes.indexOf(firstTargetTime);
-        entranceReservation_logger.temp('開始目標時間決定', { currentSecond, firstTargetTime, currentTargetIndex });
         while (isReservationRunning.value) {
             // 待機中チェック：待機中の場合は予約実行をスキップ
             if (waitInfo.value.isWaiting) {
@@ -44658,7 +44646,6 @@ const useEntranceReservationStore = (0,pinia/* defineStore */.nY)('entranceReser
             const nowInLoop = Math.floor(Date.now() / 1000);
             const currentSecondInLoop = nowInLoop % 60;
             const timeToTarget = calculateTimeToTarget(currentSecondInLoop, targetTime);
-            entranceReservation_logger.temp('目標時間処理', { currentTargetIndex, targetTime, timeToTarget });
             // 10秒ルール：10秒以上待機時間がある場合は即座に実行
             if (timeToTarget >= 10) {
                 entranceReservation_logger.info('10秒ルール適用：即座に実行', { timeToTarget });
@@ -44691,7 +44678,6 @@ const useEntranceReservationStore = (0,pinia/* defineStore */.nY)('entranceReser
             }
             // 目標時間まで待機
             if (timeToTarget > 0) {
-                entranceReservation_logger.temp('目標時間まで待機', { targetTime, timeToTarget });
                 await waitUntilTargetTime(targetTime);
                 if (!isReservationRunning.value)
                     return;
@@ -44700,21 +44686,8 @@ const useEntranceReservationStore = (0,pinia/* defineStore */.nY)('entranceReser
             const oldPriority = currentPriority;
             if (greedyCycle.value) {
                 currentPriority = 1;
-                entranceReservation_logger.temp('目標時間到達：優先度リセット', {
-                    targetTime,
-                    前の優先度: oldPriority,
-                    新しい優先度: currentPriority,
-                    現在時刻秒: Math.floor(Date.now() / 1000) % 60,
-                    targetIndex: currentTargetIndex
-                });
             }
             else {
-                entranceReservation_logger.temp('目標時間到達：優先度継続', {
-                    targetTime,
-                    currentPriority,
-                    現在時刻秒: Math.floor(Date.now() / 1000) % 60,
-                    targetIndex: currentTargetIndex
-                });
             }
             // 目標時間での実行（待機チェック）
             if (!waitInfo.value.isWaiting) {
@@ -44741,11 +44714,6 @@ const useEntranceReservationStore = (0,pinia/* defineStore */.nY)('entranceReser
                 }
             }
             // 次の目標時間まで継続実行
-            entranceReservation_logger.temp('継続実行開始', {
-                currentTargetIndex,
-                currentPriority,
-                nextTargetTime: targetTimes[(currentTargetIndex + 1) % targetTimes.length]
-            });
             while (isReservationRunning.value) {
                 // 待機中チェック：待機中の場合は実行をスキップ
                 if (waitInfo.value.isWaiting) {
@@ -44774,13 +44742,6 @@ const useEntranceReservationStore = (0,pinia/* defineStore */.nY)('entranceReser
                     const timeToNextTarget = nextTargetTimeUnix - nowForCheck;
                     // 次の目標時間まで5秒未満または過ぎている場合は継続実行を終了
                     if (timeToNextTarget < 5) {
-                        entranceReservation_logger.temp('五秒待機後の時間チェック：次の目標時間が近いため継続実行終了', {
-                            nextTargetTimeSecond,
-                            nextTargetTimeUnix,
-                            nowForCheck,
-                            timeToNextTarget,
-                            判定基準: '5秒未満'
-                        });
                         break; // 次の目標時間に移行
                     }
                     // 次の優先度は実行した優先度の最大値+1
@@ -44801,12 +44762,6 @@ const useEntranceReservationStore = (0,pinia/* defineStore */.nY)('entranceReser
             const oldIndex = currentTargetIndex;
             currentTargetIndex = (currentTargetIndex + 1) % targetTimes.length;
             const nextTargetTime = targetTimes[currentTargetIndex];
-            entranceReservation_logger.temp('継続実行終了、次の目標時間まで待機', {
-                前のIndex: oldIndex,
-                新しいIndex: currentTargetIndex,
-                前の時間: targetTimes[oldIndex],
-                新しい時間: nextTargetTime
-            });
             // 次の目標時間まで待機
             await waitUntilTargetTime(nextTargetTime);
             if (!isReservationRunning.value)
@@ -44815,12 +44770,10 @@ const useEntranceReservationStore = (0,pinia/* defineStore */.nY)('entranceReser
     };
     // 特定の目標時間まで待機
     const waitUntilTargetTime = async (targetTime) => {
-        entranceReservation_logger.temp('waitUntilTargetTime開始', { targetTime });
         while (isReservationRunning.value) {
             const now = Math.floor(Date.now() / 1000);
             const currentSecond = now % 60;
             const timeToTarget = calculateTimeToTarget(currentSecond, targetTime);
-            entranceReservation_logger.temp('待機計算', { currentSecond, targetTime, timeToTarget });
             if (timeToTarget <= 0) {
                 // 目標時間到達
                 break;
@@ -44907,11 +44860,17 @@ const useEntranceReservationStore = (0,pinia/* defineStore */.nY)('entranceReser
                 catch (error) {
                     entranceReservation_logger.warn('予約成功後のチケット情報再取得失敗', error);
                 }
-                // 予約成功時の表示を更新
+                // 予約成功時の表示を更新（成功時間も表示）
+                const successTime = new Date().toLocaleTimeString('ja-JP', {
+                    hour12: false,
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    second: '2-digit'
+                });
                 reservationStatus.value = {
                     visible: true,
                     isActive: false,
-                    currentAction: `予約成功 ${slot.date} ${slot.gate} ${slot.time}`,
+                    currentAction: `予約成功 ${slot.date} ${slot.gate} ${slot.time} (${successTime})`,
                     progress: 100,
                     progressText: '成功',
                     statusClass: 'success'
