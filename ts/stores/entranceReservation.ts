@@ -481,7 +481,11 @@ export const useEntranceReservationStore = defineStore('entranceReservation', ()
         const result = await executeReservationsByPriority(selectedTimeSlots, currentPriority)
         lastExecutionTime = Date.now()
 
-        if (result.success) return
+        if (result.success) {
+          // 予約成功時は停止
+          isReservationRunning.value = false
+          return
+        }
 
         // 次の優先度は実行した優先度の最大値+1
         const targets = selectedTimeSlots
@@ -577,7 +581,11 @@ export const useEntranceReservationStore = defineStore('entranceReservation', ()
           const result = await executeReservationsByPriority(selectedTimeSlots, currentPriority)
           lastExecutionTime = Date.now()
 
-          if (result.success) return
+          if (result.success) {
+          // 予約成功時は停止
+          isReservationRunning.value = false
+          return
+        }
 
           // 予約実行完了後に五秒待機
           const waitTimeMs = greedyWaitTime.value * 1000
@@ -731,11 +739,30 @@ export const useEntranceReservationStore = defineStore('entranceReservation', ()
         successSlot = slot
         logger.info('予約成功検出', { result: result.value, slot: successSlot })
 
+        // 予約成功時の履歴を追加
+        reservationHistory.value.unshift({
+          id: generateUUID(),
+          status: 'success',
+          date: slot.date,
+          gate: slot.gate,
+          time: slot.time,
+          timestamp: Date.now()
+        })
+
+        // 予約成功時にチケット情報を再取得
+        const ticketsStore = useTicketsStore()
+        try {
+          await ticketsStore.loadAllTickets()
+          logger.info('予約成功後のチケット情報再取得完了')
+        } catch (error) {
+          logger.warn('予約成功後のチケット情報再取得失敗', error)
+        }
+
         // 予約成功時の表示を更新
         reservationStatus.value = {
           visible: true,
           isActive: false,
-          currentAction: '予約成功',
+          currentAction: `予約成功 ${slot.date} ${slot.gate} ${slot.time}`,
           progress: 100,
           progressText: '成功',
           statusClass: 'success'

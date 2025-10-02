@@ -8,7 +8,7 @@
 // @run-at       document-end
 // ==/UserScript==
 
-// Built: 2025/10/01 14:18:18
+// Built: 2025/10/02 14:36:51
 
 
 (function webpackUniversalModuleDefinition(root, factory) {
@@ -44664,8 +44664,11 @@ const useEntranceReservationStore = (0,pinia/* defineStore */.nY)('entranceReser
                 entranceReservation_logger.info('10秒ルール適用：即座に実行', { timeToTarget });
                 const result = await executeReservationsByPriority(selectedTimeSlots, currentPriority);
                 lastExecutionTime = Date.now();
-                if (result.success)
+                if (result.success) {
+                    // 予約成功時は停止
+                    isReservationRunning.value = false;
                     return;
+                }
                 // 次の優先度は実行した優先度の最大値+1
                 const targets = selectedTimeSlots
                     .filter(slot => slot.priority >= currentPriority)
@@ -44753,8 +44756,11 @@ const useEntranceReservationStore = (0,pinia/* defineStore */.nY)('entranceReser
                 if (!waitInfo.value.isWaiting) {
                     const result = await executeReservationsByPriority(selectedTimeSlots, currentPriority);
                     lastExecutionTime = Date.now();
-                    if (result.success)
+                    if (result.success) {
+                        // 予約成功時は停止
+                        isReservationRunning.value = false;
                         return;
+                    }
                     // 予約実行完了後に五秒待機
                     const waitTimeMs = greedyWaitTime.value * 1000;
                     await new Promise(resolve => setTimeout(resolve, waitTimeMs));
@@ -44883,11 +44889,29 @@ const useEntranceReservationStore = (0,pinia/* defineStore */.nY)('entranceReser
                 hasSuccess = true;
                 successSlot = slot;
                 entranceReservation_logger.info('予約成功検出', { result: result.value, slot: successSlot });
+                // 予約成功時の履歴を追加
+                reservationHistory.value.unshift({
+                    id: generateUUID(),
+                    status: 'success',
+                    date: slot.date,
+                    gate: slot.gate,
+                    time: slot.time,
+                    timestamp: Date.now()
+                });
+                // 予約成功時にチケット情報を再取得
+                const ticketsStore = useTicketsStore();
+                try {
+                    await ticketsStore.loadAllTickets();
+                    entranceReservation_logger.info('予約成功後のチケット情報再取得完了');
+                }
+                catch (error) {
+                    entranceReservation_logger.warn('予約成功後のチケット情報再取得失敗', error);
+                }
                 // 予約成功時の表示を更新
                 reservationStatus.value = {
                     visible: true,
                     isActive: false,
-                    currentAction: '予約成功',
+                    currentAction: `予約成功 ${slot.date} ${slot.gate} ${slot.time}`,
                     progress: 100,
                     progressText: '成功',
                     statusClass: 'success'
