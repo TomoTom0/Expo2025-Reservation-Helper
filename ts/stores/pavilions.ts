@@ -292,9 +292,10 @@ export const usePavilionsStore = defineStore('pavilions', () => {
 
       // クエリが半角英数字4文字の場合、event_idとして個別検索を追加実行
       if (query && /^[a-zA-Z0-9]{4}$/.test(query.trim())) {
-        logger.info('半角英数字4文字クエリ検出 - event_idとして個別検索実行', { eventId: query.trim() })
+        logger.temp('半角英数字4文字クエリ検出 - event_idとして個別検索実行', { eventId: query.trim() })
         try {
           const eventIdResult = await getPavilionTimeSlots(query.trim(), ticketIds, entranceDate)
+          logger.temp('event_id個別検索結果', { eventId: query.trim(), pavilionName: eventIdResult.pavilionName, timeSlotsCount: eventIdResult.timeSlots.length })
           if (eventIdResult.pavilionName && eventIdResult.timeSlots.length > 0) {
             // 既に検索結果に含まれていなければ追加
             const eventId = query.trim()
@@ -309,15 +310,15 @@ export const usePavilionsStore = defineStore('pavilions', () => {
                 dateStatus: eventIdResult.timeSlots.some(slot => slot.available) ? 1 : 2
               }
               pavilionResults.push(pavilion)
-              logger.info('event_id検索でパビリオン追加', { eventId, name: eventIdResult.pavilionName })
+              logger.temp('event_id検索でパビリオン追加', { eventId, name: eventIdResult.pavilionName })
             } else {
-              logger.debug('event_id検索結果は既に一覧に含まれている', { eventId })
+              logger.temp('event_id検索結果は既に一覧に含まれている', { eventId })
             }
           } else {
-            logger.debug('event_id検索で結果なし', { eventId: query.trim() })
+            logger.temp('event_id検索で結果なし', { eventId: query.trim() })
           }
         } catch (error) {
-          logger.warn('event_id個別検索エラー（スキップ）', { eventId: query.trim(), error: error instanceof Error ? error.message : String(error) })
+          logger.temp('event_id個別検索エラー（スキップ）', { eventId: query.trim(), error: error instanceof Error ? error.message : String(error) })
         }
       }
 

@@ -1451,17 +1451,6 @@ const isTimeSlotDisabledByEntranceTime = (timeSlot: TimeSlotData): boolean => {
   // パビリオン体験は入場時刻より後でないといけない（入場してから体験するため）
   const isDisabled = slotMinutes <= entranceMinutes
 
-  // 具体的な数値でデバッグ
-  if (isDisabled) {
-    logger.temp('時間帯無効化判定（無効）', {
-      slotStartTime,
-      latestEntranceTime,
-      slotMinutes,
-      entranceMinutes,
-      reason: '入場時刻以前のため無効'
-    })
-  }
-
   return isDisabled
 }
 
