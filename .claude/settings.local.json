@@ -54,7 +54,9 @@
       "Read(//mnt/c/Users/nakam/Mine/_chex/src_expo2025-extension/**)",
       "Bash(git fetch:*)",
       "Read(///**)",
-      "Bash(gh release create:*)"
+      "Bash(gh release create:*)",
+      "Bash(gh release edit:*)",
+      "Bash(git ls-tree:*)"
     ],
     "deny": []
   }

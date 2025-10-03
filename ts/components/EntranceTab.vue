@@ -647,34 +647,30 @@ const dateTimeChangeText = computed(() => {
   return `${existingDate} ${existingGate}${existingTime} → ${newDate} ${newGate}${newTime}`
 })
 
+// 表示用の元予約情報（予約実行中はスナップショット、それ以外は選択チケット）
+const displayOriginalReservation = computed(() => {
+  if (entranceStore.isReservationRunning && entranceStore.reservationSnapshot?.originalReservation) {
+    return entranceStore.reservationSnapshot.originalReservation
+  }
+  return selectedSchedule.value
+})
+
 // 変更前の日時テキストを取得
 const getFromDateTimeText = () => {
-  if (!selectedSchedule.value) {
-    logger.debug('getFromDateTimeText: selectedScheduleがnull')
+  const reservation = displayOriginalReservation.value
+  if (!reservation) {
     return ''
   }
-  
+
   // 必要なプロパティが存在するかチェック
-  if (!selectedSchedule.value.entrance_date || !selectedSchedule.value.time_start || selectedSchedule.value.gate_type == null) {
-    logger.debug('getFromDateTimeText: 必要なプロパティが不足', {
-      entrance_date: selectedSchedule.value.entrance_date,
-      time_start: selectedSchedule.value.time_start,
-      gate_type: selectedSchedule.value.gate_type
-    })
+  if (!reservation.entrance_date || !reservation.time_start || reservation.gate_type == null) {
     return ''
   }
-  
-  const date = selectedSchedule.value.entrance_date ? formatDate(selectedSchedule.value.entrance_date) : ''
-  const time = selectedSchedule.value.time_start
-  const gate = selectedSchedule.value.gate_type === 1 ? '東' : '西'
-  const result = `${date} ${gate}${time}`
-  
-  logger.debug('getFromDateTimeText: 結果', {
-    selectedSchedule: selectedSchedule.value,
-    result
-  })
-  
-  return result
+
+  const date = reservation.entrance_date ? formatDate(reservation.entrance_date) : ''
+  const time = reservation.time_start
+  const gate = reservation.gate_type === 1 ? '東' : '西'
+  return `${date} ${gate}${time}`
 }
 
 // 変更後の日時テキストを取得
