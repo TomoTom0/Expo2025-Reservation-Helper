@@ -8,7 +8,7 @@
 // @run-at       document-end
 // ==/UserScript==
 
-// Built: 2025/10/02 15:08:52
+// Built: 2025/10/04 05:48:10
 
 
 (function webpackUniversalModuleDefinition(root, factory) {
@@ -39222,7 +39222,7 @@ const usePavilionsStore = (0,pinia/* defineStore */.nY)('pavilions', () => {
         params.set('entrance_date', defaultEntranceDate);
         // ページネーション・フィルタ設定
         params.set('count', '1');
-        params.set('limit', '999');
+        params.set('limit', '20'); // 公式と同じ値に修正（999だと一部のパビリオンが取得できない）
         params.set('event_type', '0');
         params.set('next_token', '');
         params.set('channel', defaultChannel);
@@ -39387,6 +39387,39 @@ const usePavilionsStore = (0,pinia/* defineStore */.nY)('pavilions', () => {
             pavilions_logger.debug('パビリオン検索API応答', data);
             const pavilionResults = parseSearchResults(data);
             pavilions_logger.info('パビリオン一覧取得完了', { count: pavilionResults.length });
+            // クエリが半角英数字4文字の場合、event_idとして個別検索を追加実行
+            if (query && /^[a-zA-Z0-9]{4}$/.test(query.trim())) {
+                pavilions_logger.info('半角英数字4文字クエリ検出 - event_idとして個別検索実行', { eventId: query.trim() });
+                try {
+                    const eventIdResult = await getPavilionTimeSlots(query.trim(), ticketIds, entranceDate);
+                    if (eventIdResult.pavilionName && eventIdResult.timeSlots.length > 0) {
+                        // 既に検索結果に含まれていなければ追加
+                        const eventId = query.trim();
+                        if (!pavilionResults.find(p => p.id === eventId)) {
+                            const pavilion = {
+                                id: eventId,
+                                name: eventIdResult.pavilionName,
+                                description: '',
+                                isFavorite: favoriteIds.value.has(eventId),
+                                timeSlots: eventIdResult.timeSlots.sort((a, b) => a.time.localeCompare(b.time)),
+                                reservationStatus: 'available',
+                                dateStatus: eventIdResult.timeSlots.some(slot => slot.available) ? 1 : 2
+                            };
+                            pavilionResults.push(pavilion);
+                            pavilions_logger.info('event_id検索でパビリオン追加', { eventId, name: eventIdResult.pavilionName });
+                        }
+                        else {
+                            pavilions_logger.debug('event_id検索結果は既に一覧に含まれている', { eventId });
+                        }
+                    }
+                    else {
+                        pavilions_logger.debug('event_id検索で結果なし', { eventId: query.trim() });
+                    }
+                }
+                catch (error) {
+                    pavilions_logger.warn('event_id個別検索エラー（スキップ）', { eventId: query.trim(), error: error instanceof Error ? error.message : String(error) });
+                }
+            }
             // Step 2: 時間帯情報を取得（空欄検索時のみdate_status=2をスキップ）
             pavilions_logger.debug('時間帯情報取得開始');
             // 空欄検索時のみdate_status=2（満員）のパビリオンをスキップ
