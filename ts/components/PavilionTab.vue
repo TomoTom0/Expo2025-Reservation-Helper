@@ -234,7 +234,7 @@
           :data-pavilion-id="pavilion.id"
         >
           <div class="ytomo-pavilion-header">
-            <button 
+            <button
               class="ytomo-star-button"
               :class="{ active: isFavorite(pavilion.id) }"
               @click="toggleFavorite(pavilion)"
@@ -242,8 +242,15 @@
               {{ isFavorite(pavilion.id) ? '⭐' : '☆' }}
             </button>
             <span class="ytomo-pavilion-name">{{ pavilion.name }}</span>
+            <button
+              class="ytomo-official-link-button"
+              @click="openOfficialPavilionPage(pavilion.id)"
+              title="公式ページを開く"
+            >
+              🔗
+            </button>
             <div class="ytomo-pavilion-status">
-              <span 
+              <span
                 v-if="(pavilion.timeSlots?.filter(slot => slot.available).length || 0) > 0"
                 class="ytomo-status-available"
               >
@@ -312,7 +319,7 @@
 
         <!-- 展開時の表示 -->
         <div v-else class="ytomo-info-expanded">
-          <!-- 上段 -->
+          <!-- 上段：コントロールボタン -->
           <div class="ytomo-info-top-row">
             <button
               class="ytomo-endless-button"
@@ -331,9 +338,6 @@
               <option value="confirm">確認</option>
               <option value="fast">高速</option>
             </select>
-            <div class="ytomo-current-time">
-              {{ getCurrentTimeSlot() }}
-            </div>
             <button
               class="ytomo-collapse-button"
               @click="reservationInfoExpanded = false"
@@ -343,15 +347,13 @@
             </button>
           </div>
 
-          <!-- 中央：パビリオン名 -->
-          <div class="ytomo-pavilion-name-area">
-            {{ getCurrentPavilionName() }}
-          </div>
-
-          <!-- 下段 -->
+          <!-- 下段：予約情報（時間帯 | パビリオン名 | 状態） -->
           <div class="ytomo-info-bottom-row">
-            <div class="ytomo-progress">
-              {{ getCurrentProgress() }}
+            <div class="ytomo-current-time">
+              {{ getCurrentTimeSlot() }}
+            </div>
+            <div class="ytomo-pavilion-name-truncated">
+              {{ truncatePavilionName(getCurrentPavilionName(), 20) }}
             </div>
             <div class="ytomo-status">
               {{ getCurrentStatus() }}
@@ -595,6 +597,14 @@ const getCurrentProgress = () => {
   return `[${currentIndex + 1}/${totalCount}]`
 }
 
+// パビリオン名を指定文字数で切り詰める
+const truncatePavilionName = (name: string, maxLength: number): string => {
+  if (name.length <= maxLength) {
+    return name
+  }
+  return name.substring(0, maxLength) + '...'
+}
+
 const getCurrentStatus = () => {
   const isRunning = sequentialReservationStore.state.isRunning
   const countdownText = sequentialReservationStore.state.countdownText
@@ -606,7 +616,16 @@ const getCurrentStatus = () => {
   if (!isRunning && lastReservationResults.value.length > 0) {
     // 予約完了後の状態判定
     const hasSuccess = lastReservationResults.value.some(result => result.success === true)
-    return hasSuccess ? 'Succeeded' : 'Failed'
+    if (hasSuccess) {
+      return 'Succeeded'
+    } else {
+      // 失敗理由を含めて表示
+      const firstFailure = lastReservationResults.value.find(result => !result.success)
+      if (firstFailure?.failureReason) {
+        return `Failed with ${firstFailure.failureReason}`
+      }
+      return 'Failed with その他'
+    }
   }
   if (!isRunning) return 'Stopped'
 
@@ -619,19 +638,19 @@ const getCurrentStatus = () => {
       // 失敗理由を含めて表示
       const firstFailure = lastReservationResults.value.find(result => !result.success)
       if (firstFailure?.failureReason) {
-        return `Failed (${firstFailure.failureReason})`
+        return `Failed with ${firstFailure.failureReason}`
       }
-      return 'Failed'
+      return 'Failed with その他'
     }
   }
 
   if (countdownText) return `Waiting in ${countdownText}`
-  return 'Executing'
+  return 'Running'
 }
 
 const getCurrentStatusClass = () => {
   const status = getCurrentStatus()
-  if (status === 'Executing') return 'executing'
+  if (status === 'Running' || status === 'Executing') return 'executing'
   if (status === 'Succeeded') return 'success'
   if (status.includes('Failed') || status.includes('failed')) return 'failed'
   if (status.includes('Waiting')) return 'waiting'
@@ -998,8 +1017,28 @@ const toggleFavorite = (pavilion: any) => {
     removeFromFavorites(pavilion.id)
     logger.info('お気に入り削除', { pavilionName: pavilion.name })
   } else {
-    addToFavorites(pavilion.id, pavilion.name)  
+    addToFavorites(pavilion.id, pavilion.name)
     logger.info('お気に入り追加', { pavilionName: pavilion.name })
+  }
+}
+
+// 公式パビリオンページを開く
+const openOfficialPavilionPage = (pavilionId: string) => {
+  logger.info('公式パビリオンページを開く', { pavilionId })
+
+  // TODO: 具体的なURLは後で指定される
+  // 現在はプレースホルダーとして待機室ページを開く
+  const ytomoUrl = 'https://ticket.expo2025.or.jp/route/queue'
+
+  // 新しいタブでytomoページを開く
+  const newTab = window.open(ytomoUrl, '_blank')
+
+  if (newTab) {
+    // TODO: 公式のrouterで指定したURLへの移動処理を追加
+    // newTab.location.href = `具体的なURL/${pavilionId}`
+    logger.info('新しいタブでytomoページを開きました', { pavilionId })
+  } else {
+    logger.warn('新しいタブを開けませんでした（ポップアップブロック？）', { pavilionId })
   }
 }
 
@@ -1893,6 +1932,35 @@ onUnmounted(() => {
     }
 }
 
+.ytomo-official-link-button {
+    background: none;
+    border: 1px solid #cbd5e1;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.2s;
+    padding: 4px 6px;
+    border-radius: 4px;
+    height: 26px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+
+    &:hover {
+        background: #f1f5f9;
+        border-color: #94a3b8;
+        transform: scale(1.05);
+    }
+
+    &:active {
+        transform: scale(0.95);
+    }
+
+    &:focus {
+        outline: none;
+    }
+}
+
 .ytomo-pavilion-checkbox-container {
     display: flex;
     align-items: center;
@@ -2457,7 +2525,8 @@ onUnmounted(() => {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-bottom: 8px;
+    margin-bottom: 12px;
+    gap: 8px;
 }
 
 .ytomo-endless-button {
@@ -2482,15 +2551,6 @@ onUnmounted(() => {
     &:hover {
         border-color: #9ca3af;
     }
-}
-
-.ytomo-current-time {
-    font-size: 16px;
-    font-weight: 600;
-    color: #2c5aa0;
-    display: flex;
-    align-items: center;
-    height: 32px;
 }
 
 .ytomo-mode-selector {
@@ -2534,27 +2594,30 @@ onUnmounted(() => {
     }
 }
 
-.ytomo-pavilion-name-area {
-    text-align: center;
-    margin: 8px 0;
-    font-size: 14px;
-    font-weight: 600;
-    color: #374151;
-    line-height: 1.4;
-    min-height: 32px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    overflow: hidden;
-    word-break: break-word;
-}
-
 .ytomo-info-bottom-row {
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    font-size: 12px;
-    color: #6b7280;
+    gap: 8px;
+    font-size: 11px;
+    color: #374151;
+}
+
+.ytomo-current-time {
+    font-size: 11px;
+    font-weight: 600;
+    color: #2c5aa0;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.ytomo-pavilion-name-truncated {
+    flex: 1;
+    font-size: 11px;
+    font-weight: 500;
+    color: #374151;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .ytomo-progress {
@@ -2563,6 +2626,13 @@ onUnmounted(() => {
 
 .ytomo-status {
     font-weight: 500;
+    font-size: 11px;
+    white-space: nowrap;
+    flex-shrink: 0;
+
+    &:has-text("Running") {
+        color: #3b82f6;
+    }
 
     &:has-text("Executing") {
         color: #3b82f6;
