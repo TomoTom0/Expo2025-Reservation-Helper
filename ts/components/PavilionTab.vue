@@ -374,6 +374,15 @@
         :title="sequentialReservationStore.state.isRunning ? '順次予約を中断' : `予約実行 (${selectedSlotsCount}件選択中)`"
         @click="handleReservationExecution"
       >
+        <!-- 未使用パビリオン予約警告バッジ -->
+        <span
+          v-if="hasUnusedPavilionReservations"
+          class="ytomo-reservation-warning-badge"
+          title="選択中の入場予約に未使用のパビリオン予約があります"
+        >
+          予約あり
+        </span>
+
         {{ sequentialReservationStore.state.isRunning ? '中断' : '📋' }}
         <span
           v-if="!sequentialReservationStore.state.isRunning && selectedSlotsCount > 0"
@@ -721,9 +730,14 @@ const isPavilionTabActive = computed(() => activeTab.value === 'pavilion')
 // 現在表示されているパビリオンの選択時間帯数のみを計算
 const selectedSlotsCount = computed(() => {
   const filteredPavilionIds = new Set(pavilionsStore.filteredPavilions.map(p => p.id))
-  return pavilionsStore.selectedTimeSlots.filter(slot => 
+  return pavilionsStore.selectedTimeSlots.filter(slot =>
     filteredPavilionIds.has(slot.pavilionId)
   ).length
+})
+
+// 選択中の入場予約に未使用のパビリオン予約があるかチェック
+const hasUnusedPavilionReservations = computed(() => {
+  return ticketsStore.hasUnusedPavilionReservationsInSelected()
 })
 
 // 予約管理システムから選択されたスケジュール一覧を取得
@@ -2608,6 +2622,23 @@ onUnmounted(() => {
         z-index: 10;
     }
 
+    .ytomo-reservation-warning-badge {
+        position: absolute;
+        top: -8px;
+        left: -8px;
+        background: #f59e0b;
+        color: white;
+        border-radius: 8px;
+        padding: 2px 6px;
+        font-size: 9px;
+        font-weight: bold;
+        white-space: nowrap;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        pointer-events: none;
+        z-index: 10;
+        animation: pulse 2s ease-in-out infinite;
+    }
+
     &:hover:not(:disabled) {
         background: linear-gradient(135deg, #1a365d 0%, #2c5aa0 100%);
         transform: translateY(-2px);
@@ -3119,6 +3150,15 @@ onUnmounted(() => {
 @keyframes spin {
     to {
         transform: rotate(360deg);
+    }
+}
+
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.7;
     }
 }
 

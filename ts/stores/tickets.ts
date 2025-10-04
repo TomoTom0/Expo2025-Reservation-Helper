@@ -1431,6 +1431,46 @@ export const useTicketsStore = defineStore('tickets', () => {
     }
   }
 
+  /**
+   * 選択中の入場予約に未使用のパビリオンの当日予約または三日前予約があるかチェック
+   */
+  const hasUnusedPavilionReservationsInSelected = (): boolean => {
+    const selectedReservationIds = getSelectedReservationIds()
+
+    for (const reservationId of selectedReservationIds) {
+      const reservationData = reservationManagement.value.get(reservationId)
+      if (!reservationData) continue
+
+      const ticketId = reservationData.ticketId
+      const ticket = tickets.value.get(ticketId)
+      if (!ticket || !ticket.schedules) continue
+
+      // 選択中の入場予約を探す
+      const schedule = ticket.schedules.find(s =>
+        s.user_visiting_reservation_id?.toString() === reservationId
+      )
+
+      if (!schedule || !schedule.pavilionReservationStatus) continue
+
+      // パビリオン予約ステータスをチェック（当日予約'1'または三日前予約'3'のみ）
+      for (const [type, status] of Object.entries(schedule.pavilionReservationStatus)) {
+        // 当日予約('1')または三日前予約('3')で、当選済み（winningInfo）があり、未使用（useState === 0）の予約があるかチェック
+        if ((type === '1' || type === '3') && status.winningInfo && status.winningInfo.useState === 0) {
+          logger.temp('未使用パビリオンの当日/三日前予約検出', {
+            ticketId,
+            reservationId,
+            type: type === '1' ? '当日予約' : '三日前予約',
+            pavilionName: status.winningInfo.eventName,
+            time: status.winningInfo.startTime
+          })
+          return true
+        }
+      }
+    }
+
+    return false
+  }
+
   return {
     // State
     tickets,
@@ -1497,6 +1537,7 @@ export const useTicketsStore = defineStore('tickets', () => {
 
     // ヘルパーメソッド
     getScheduleByReservationId,
+    hasUnusedPavilionReservationsInSelected,
 
     // チケット単体更新
     updateTicketFromAPI,
