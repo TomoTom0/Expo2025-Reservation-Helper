@@ -96,7 +96,7 @@ export const usePavilionsStore = defineStore('pavilions', () => {
     
     // ページネーション・フィルタ設定
     params.set('count', '1')
-    params.set('limit', '20')  // 公式と同じ値に修正（999だと一部のパビリオンが取得できない）
+    params.set('limit', '999')
     params.set('event_type', '0')
     params.set('next_token', '')
     params.set('channel', defaultChannel)

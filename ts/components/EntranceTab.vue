@@ -205,6 +205,15 @@
       <!-- 実際の予約情報 -->
       <div v-if="displayReservationInfoArray.length > 0" class="ytomo-reservation-info">
         <div class="ytomo-reservation-box">
+          <!-- 変更/新規ラベル -->
+          <div class="ytomo-reservation-label">
+            <template v-if="displayOriginalReservation">
+              変更 From {{ getFromDateTimeText() }}
+            </template>
+            <template v-else>
+              新規
+            </template>
+          </div>
           <div class="ytomo-reservation-timeslots">
             <div
               v-for="(info, index) in displayReservationInfoArray"
@@ -2243,6 +2252,20 @@ onMounted(async () => {
         }
       }
 
+      .ytomo-reservation-label {
+        position: absolute;
+        top: -8px;
+        left: 12px;
+        font-weight: 600;
+        font-size: 12px;
+        color: #0c4a6e;
+        background: #fff;
+        padding: 4px 8px;
+        border-radius: 4px;
+        border: 1px solid #0891b2;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      }
+
       .ytomo-reservation-date {
         position: absolute;
         top: -8px;
@@ -2256,7 +2279,7 @@ onMounted(async () => {
         border: 1px solid #0891b2;
         box-shadow: 0 1px 3px rgba(0,0,0,0.1);
       }
-      
+
       .ytomo-reservation-timeslots {
         margin-top: 8px;
         display: flex;
