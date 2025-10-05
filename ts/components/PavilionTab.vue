@@ -347,16 +347,23 @@
             </button>
           </div>
 
-          <!-- 下段：予約情報（時間帯 | パビリオン名 | 状態） -->
-          <div class="ytomo-info-bottom-row">
-            <div class="ytomo-current-time">
-              {{ getCurrentTimeSlot() }}
-            </div>
-            <div class="ytomo-pavilion-name-truncated">
-              {{ truncatePavilionName(getCurrentPavilionName(), 20) }}
-            </div>
-            <div class="ytomo-status">
-              {{ getCurrentStatus() }}
+          <!-- 下段：予約履歴リスト（スクロール可能） -->
+          <div class="ytomo-reservation-history-list">
+            <div
+              v-for="item in reservationHistory"
+              :key="`${item.pavilionId}-${item.index}`"
+              class="ytomo-history-item"
+              :class="{ 'item-running': item.status === 'Running' }"
+            >
+              <div class="ytomo-current-time">
+                {{ item.timeSlot }}
+              </div>
+              <div class="ytomo-pavilion-name-truncated">
+                {{ truncatePavilionName(item.pavilionName, 20) }}
+              </div>
+              <div class="ytomo-status" :class="getStatusClass(item.status)">
+                {{ item.status }}
+              </div>
             </div>
           </div>
 
@@ -665,6 +672,15 @@ const shouldShowReservationInfoPanel = computed(() => {
   )
 })
 
+// 予約履歴アイテムのステータスクラスを返す
+const getStatusClass = (status: ReservationHistoryItem['status']): string => {
+  if (status === 'Running') return 'status-running'
+  if (status === 'Succeeded') return 'status-succeeded'
+  if (status === 'Waiting') return 'status-waiting'
+  if (status.includes('Failed')) return 'status-failed'
+  return ''
+}
+
 // Store アクセス
 const pavilionsStore = usePavilionsStore()
 const ticketsStore = useTicketsStore()
@@ -701,7 +717,19 @@ let collapseTimeout: NodeJS.Timeout | null = null
 // 実行モード管理
 const executionMode = ref<'sequential' | 'confirm' | 'fast'>('sequential')
 
-// 予約実行結果の管理
+// 予約履歴管理
+interface ReservationHistoryItem {
+  pavilionId: string
+  pavilionName: string
+  timeSlot: string
+  status: 'Waiting' | 'Running' | 'Succeeded' | 'Failed with 満席' | 'Failed with 無効' | 'Failed with その他'
+  timestamp: number  // 失敗した予約を30秒後に削除するため
+  index: number  // 予約対象のインデックス
+}
+
+const reservationHistory = ref<ReservationHistoryItem[]>([])
+
+// 予約実行結果の管理（後方互換性のため保持）
 const lastReservationResults = ref<any[]>([])
 const wasManuallyAborted = ref(false)
 const lastCompletedReservation = ref<{pavilionName: string, timeSlot: string, index: number, totalCount: number} | null>(null)
@@ -715,6 +743,42 @@ watch(() => sequentialReservationStore.state.isRunning, (isRunning) => {
       clearTimeout(collapseTimeout)
       collapseTimeout = null
     }
+  } else {
+    // 予約停止時に履歴をクリア
+    reservationHistory.value = []
+  }
+})
+
+// 予約実行中のインデックス変化を監視して履歴を更新
+watch(() => sequentialReservationStore.state.currentTargetIndex, (newIndex, oldIndex) => {
+  if (!sequentialReservationStore.state.isRunning) return
+  if (newIndex === oldIndex) return
+
+  // 前の予約を完了状態に更新（lastReservationResultsから取得）
+  if (oldIndex >= 0 && oldIndex < reservationHistory.value.length) {
+    const lastResult = lastReservationResults.value[lastReservationResults.value.length - 1]
+    if (lastResult) {
+      const status: ReservationHistoryItem['status'] = lastResult.success
+        ? 'Succeeded'
+        : lastResult.failureReason
+          ? `Failed with ${lastResult.failureReason}` as ReservationHistoryItem['status']
+          : 'Failed with その他'
+
+      reservationHistory.value[oldIndex].status = status
+      reservationHistory.value[oldIndex].timestamp = Date.now()
+
+      // 失敗した予約は30秒後に削除
+      if (!lastResult.success) {
+        setTimeout(() => {
+          reservationHistory.value = reservationHistory.value.filter(item => item.index !== oldIndex)
+        }, 30000)
+      }
+    }
+  }
+
+  // 現在の予約をRunningに更新
+  if (newIndex >= 0 && newIndex < reservationHistory.value.length) {
+    reservationHistory.value[newIndex].status = 'Running'
   }
 })
 
@@ -1181,6 +1245,21 @@ const handleReservationExecution = async () => {
       registeredChannel,
       ticketIds
     }))
+
+    // 予約履歴を初期化（全てWaitingとして追加）
+    reservationHistory.value = reservationTargets.map((target, index) => ({
+      pavilionId: target.pavilionId,
+      pavilionName: target.pavilionName,
+      timeSlot: target.timeSlot,
+      status: 'Waiting' as const,
+      timestamp: Date.now(),
+      index
+    }))
+
+    // 最初の予約をRunningに変更
+    if (reservationHistory.value.length > 0) {
+      reservationHistory.value[0].status = 'Running'
+    }
 
     let results: any[] = []
 
@@ -2594,12 +2673,30 @@ onUnmounted(() => {
     }
 }
 
-.ytomo-info-bottom-row {
+// 予約履歴リスト
+.ytomo-reservation-history-list {
+    max-height: 200px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.ytomo-history-item {
     display: flex;
     align-items: center;
     gap: 8px;
     font-size: 11px;
     color: #374151;
+    padding: 4px 8px;
+    border-radius: 4px;
+    background: #f9fafb;
+    transition: background 0.2s;
+
+    &.item-running {
+        background: #dbeafe;
+        border: 1px solid #3b82f6;
+    }
 }
 
 .ytomo-current-time {
@@ -2608,6 +2705,7 @@ onUnmounted(() => {
     color: #2c5aa0;
     white-space: nowrap;
     flex-shrink: 0;
+    min-width: 50px;
 }
 
 .ytomo-pavilion-name-truncated {
@@ -2630,6 +2728,23 @@ onUnmounted(() => {
     white-space: nowrap;
     flex-shrink: 0;
 
+    &.status-running {
+        color: #3b82f6;
+    }
+
+    &.status-succeeded {
+        color: #10b981;
+    }
+
+    &.status-failed {
+        color: #ef4444;
+    }
+
+    &.status-waiting {
+        color: #f59e0b;
+    }
+
+    // 旧形式のサポート（後方互換性）
     &:has-text("Running") {
         color: #3b82f6;
     }
