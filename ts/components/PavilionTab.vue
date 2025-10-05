@@ -749,36 +749,56 @@ watch(() => sequentialReservationStore.state.isRunning, (isRunning) => {
   }
 })
 
-// 予約実行中のインデックス変化を監視して履歴を更新
-watch(() => sequentialReservationStore.state.currentTargetIndex, (newIndex, oldIndex) => {
+// 予約結果の変化を監視して履歴を更新
+watch(() => lastReservationResults.value.length, (newLength, oldLength) => {
   if (!sequentialReservationStore.state.isRunning) return
-  if (newIndex === oldIndex) return
+  if (newLength <= oldLength) return
 
-  // 前の予約を完了状態に更新（lastReservationResultsから取得）
-  if (oldIndex >= 0 && oldIndex < reservationHistory.value.length) {
-    const lastResult = lastReservationResults.value[lastReservationResults.value.length - 1]
-    if (lastResult) {
-      const status: ReservationHistoryItem['status'] = lastResult.success
-        ? 'Succeeded'
-        : lastResult.failureReason
-          ? `Failed with ${lastResult.failureReason}` as ReservationHistoryItem['status']
-          : 'Failed with その他'
+  // 最新の結果を取得
+  const lastResult = lastReservationResults.value[lastReservationResults.value.length - 1]
+  if (!lastResult || !lastResult.details) return
 
-      reservationHistory.value[oldIndex].status = status
-      reservationHistory.value[oldIndex].timestamp = Date.now()
+  // RunningをSucceeded/Failedに更新
+  const runningItem = reservationHistory.value.find(item => item.status === 'Running')
+  if (runningItem) {
+    const status: ReservationHistoryItem['status'] = lastResult.success
+      ? 'Succeeded'
+      : lastResult.failureReason
+        ? `Failed with ${lastResult.failureReason}` as ReservationHistoryItem['status']
+        : 'Failed with その他'
 
-      // 失敗した予約は30秒後に削除
-      if (!lastResult.success) {
-        setTimeout(() => {
-          reservationHistory.value = reservationHistory.value.filter(item => item.index !== oldIndex)
-        }, 30000)
-      }
+    runningItem.status = status
+    runningItem.timestamp = Date.now()
+
+    // 失敗なら30秒後に削除
+    if (!lastResult.success) {
+      setTimeout(() => {
+        reservationHistory.value = reservationHistory.value.filter(item => item !== runningItem)
+      }, 30000)
     }
   }
 
-  // 現在の予約をRunningに更新
-  if (newIndex >= 0 && newIndex < reservationHistory.value.length) {
-    reservationHistory.value[newIndex].status = 'Running'
+  // WaitingをRunningに変更
+  const waitingItem = reservationHistory.value.find(item => item.status === 'Waiting')
+  if (waitingItem) {
+    waitingItem.status = 'Running'
+  }
+
+  // 次の次の予約があればWaitingとして追加
+  const targets = sequentialReservationStore.state.reservationTargets
+  const currentIndex = sequentialReservationStore.state.currentTargetIndex
+  const nextNextIndex = currentIndex + 1
+
+  if (nextNextIndex < targets.length && !reservationHistory.value.find(item => item.index === nextNextIndex)) {
+    const nextNextTarget = targets[nextNextIndex]
+    reservationHistory.value.push({
+      pavilionId: nextNextTarget.pavilionId,
+      pavilionName: nextNextTarget.pavilionName,
+      timeSlot: nextNextTarget.timeSlot,
+      status: 'Waiting' as const,
+      timestamp: Date.now(),
+      index: nextNextIndex
+    })
   }
 })
 
@@ -1246,19 +1266,31 @@ const handleReservationExecution = async () => {
       ticketIds
     }))
 
-    // 予約履歴を初期化（全てWaitingとして追加）
-    reservationHistory.value = reservationTargets.map((target, index) => ({
-      pavilionId: target.pavilionId,
-      pavilionName: target.pavilionName,
-      timeSlot: target.timeSlot,
-      status: 'Waiting' as const,
-      timestamp: Date.now(),
-      index
-    }))
+    // 予約履歴を初期化（Running 1つ + Waiting 1つのみ）
+    reservationHistory.value = []
 
-    // 最初の予約をRunningに変更
-    if (reservationHistory.value.length > 0) {
-      reservationHistory.value[0].status = 'Running'
+    // 最初の予約をRunningとして追加
+    if (reservationTargets.length > 0) {
+      reservationHistory.value.push({
+        pavilionId: reservationTargets[0].pavilionId,
+        pavilionName: reservationTargets[0].pavilionName,
+        timeSlot: reservationTargets[0].timeSlot,
+        status: 'Running' as const,
+        timestamp: Date.now(),
+        index: 0
+      })
+    }
+
+    // 2つ目があればWaitingとして追加
+    if (reservationTargets.length > 1) {
+      reservationHistory.value.push({
+        pavilionId: reservationTargets[1].pavilionId,
+        pavilionName: reservationTargets[1].pavilionName,
+        timeSlot: reservationTargets[1].timeSlot,
+        status: 'Waiting' as const,
+        timestamp: Date.now(),
+        index: 1
+      })
     }
 
     let results: any[] = []
