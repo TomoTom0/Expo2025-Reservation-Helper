@@ -411,7 +411,11 @@
         class="ytomo-reservation-result-fab"
         :class="{
           'success': reservationResult?.success,
-          'error': reservationResult && !reservationResult.success
+          'error': reservationResult && !reservationResult.success,
+          'fab-blue': fabOverallColor === 'blue',
+          'fab-green': fabOverallColor === 'green',
+          'fab-red': fabOverallColor === 'red',
+          'fab-yellow': fabOverallColor === 'yellow'
         }"
       >
         <div class="ytomo-result-status">
@@ -722,12 +726,38 @@ interface ReservationHistoryItem {
   pavilionId: string
   pavilionName: string
   timeSlot: string
-  status: 'Waiting' | 'Running' | 'Succeeded' | 'Failed with 満席' | 'Failed with 無効' | 'Failed with その他'
+  status: 'Waiting' | 'Running' | 'Succeeded' | 'Failed with 満席' | 'Failed with 無効' | 'Failed with その他' | 'Canceled'
   timestamp: number  // 失敗した予約を30秒後に削除するため
   index: number  // 予約対象のインデックス
 }
 
 const reservationHistory = ref<ReservationHistoryItem[]>([])
+
+// FAB全体の色を決定
+const fabOverallColor = computed(() => {
+  // 実行中があれば青
+  if (reservationHistory.value.some(item => item.status === 'Running')) {
+    return 'blue'
+  }
+
+  // 成功があれば緑
+  if (reservationHistory.value.some(item => item.status === 'Succeeded')) {
+    return 'green'
+  }
+
+  // 失敗があれば赤（5秒経過していないもの）
+  const now = Date.now()
+  const recentFailed = reservationHistory.value.some(item =>
+    (item.status === 'Failed with 満席' || item.status === 'Failed with 無効' || item.status === 'Failed with その他') &&
+    (now - item.timestamp) < 5000
+  )
+  if (recentFailed) {
+    return 'red'
+  }
+
+  // それ以外は黄色（待機中）
+  return 'yellow'
+})
 
 // 予約実行結果の管理（後方互換性のため保持）
 const lastReservationResults = ref<any[]>([])
@@ -743,63 +773,8 @@ watch(() => sequentialReservationStore.state.isRunning, (isRunning) => {
       clearTimeout(collapseTimeout)
       collapseTimeout = null
     }
-  } else {
-    // 予約停止時に履歴をクリア
-    reservationHistory.value = []
   }
-})
-
-// 予約結果の変化を監視して履歴を更新
-watch(() => lastReservationResults.value.length, (newLength, oldLength) => {
-  if (!sequentialReservationStore.state.isRunning) return
-  if (newLength <= oldLength) return
-
-  // 最新の結果を取得
-  const lastResult = lastReservationResults.value[lastReservationResults.value.length - 1]
-  if (!lastResult || !lastResult.details) return
-
-  // RunningをSucceeded/Failedに更新
-  const runningItem = reservationHistory.value.find(item => item.status === 'Running')
-  if (runningItem) {
-    const status: ReservationHistoryItem['status'] = lastResult.success
-      ? 'Succeeded'
-      : lastResult.failureReason
-        ? `Failed with ${lastResult.failureReason}` as ReservationHistoryItem['status']
-        : 'Failed with その他'
-
-    runningItem.status = status
-    runningItem.timestamp = Date.now()
-
-    // 失敗なら30秒後に削除
-    if (!lastResult.success) {
-      setTimeout(() => {
-        reservationHistory.value = reservationHistory.value.filter(item => item !== runningItem)
-      }, 30000)
-    }
-  }
-
-  // WaitingをRunningに変更
-  const waitingItem = reservationHistory.value.find(item => item.status === 'Waiting')
-  if (waitingItem) {
-    waitingItem.status = 'Running'
-  }
-
-  // 次の次の予約があればWaitingとして追加
-  const targets = sequentialReservationStore.state.reservationTargets
-  const currentIndex = sequentialReservationStore.state.currentTargetIndex
-  const nextNextIndex = currentIndex + 1
-
-  if (nextNextIndex < targets.length && !reservationHistory.value.find(item => item.index === nextNextIndex)) {
-    const nextNextTarget = targets[nextNextIndex]
-    reservationHistory.value.push({
-      pavilionId: nextNextTarget.pavilionId,
-      pavilionName: nextNextTarget.pavilionName,
-      timeSlot: nextNextTarget.timeSlot,
-      status: 'Waiting' as const,
-      timestamp: Date.now(),
-      index: nextNextIndex
-    })
-  }
+  // 予約終了時は履歴を保持（次の予約開始時にリセット）
 })
 
 // スケジュールフォームデータ
@@ -1293,6 +1268,51 @@ const handleReservationExecution = async () => {
       })
     }
 
+    // 予約履歴管理関数
+    const addHistory = (target: any, status: ReservationHistoryItem['status']) => {
+      const exists = reservationHistory.value.find(
+        item => item.pavilionId === target.pavilionId &&
+                item.timeSlot === target.timeSlot &&
+                (item.status === 'Waiting' || item.status === 'Running')
+      )
+      if (!exists) {
+        reservationHistory.value.push({
+          pavilionId: target.pavilionId,
+          pavilionName: target.pavilionName,
+          timeSlot: target.timeSlot,
+          status,
+          timestamp: Date.now(),
+          index: -1
+        })
+      }
+    }
+
+    const updateHistory = (target: any, newStatus: ReservationHistoryItem['status']) => {
+      const item = reservationHistory.value.find(
+        item => item.pavilionId === target.pavilionId &&
+                item.timeSlot === target.timeSlot
+      )
+      if (item) {
+        item.status = newStatus
+        item.timestamp = Date.now()
+      }
+    }
+
+    const deleteHistory = (target: any) => {
+      reservationHistory.value = reservationHistory.value.filter(
+        item => !(item.pavilionId === target.pavilionId && item.timeSlot === target.timeSlot)
+      )
+    }
+
+    const cancelAllWaiting = () => {
+      reservationHistory.value.forEach(item => {
+        if (item.status === 'Waiting') {
+          item.status = 'Canceled'
+          item.timestamp = Date.now()
+        }
+      })
+    }
+
     let results: any[] = []
 
     // 実行モードに応じて処理を分岐
@@ -1306,7 +1326,11 @@ const handleReservationExecution = async () => {
           pavilionsStore.executeReservation,
           selectedSlots,
           formatTimeSlot,
-          logger
+          logger,
+          addHistory,
+          updateHistory,
+          deleteHistory,
+          cancelAllWaiting
         )
         break
 
@@ -3407,10 +3431,30 @@ onUnmounted(() => {
         background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
         box-shadow: 0 4px 12px rgba(34, 197, 94, 0.4);
     }
-    
+
     &.error {
         background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
         box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4);
+    }
+
+    &.fab-blue {
+        background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+        box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+    }
+
+    &.fab-green {
+        background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+        box-shadow: 0 4px 12px rgba(34, 197, 94, 0.4);
+    }
+
+    &.fab-red {
+        background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+        box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4);
+    }
+
+    &.fab-yellow {
+        background: linear-gradient(135deg, #eab308 0%, #ca8a04 100%);
+        box-shadow: 0 4px 12px rgba(234, 179, 8, 0.4);
     }
     
     .ytomo-result-status {
