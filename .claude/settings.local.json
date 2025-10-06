@@ -56,7 +56,8 @@
       "Read(///**)",
       "Bash(gh release create:*)",
       "Bash(gh release edit:*)",
-      "Bash(git ls-tree:*)"
+      "Bash(git ls-tree:*)",
+      "WebSearch"
     ],
     "deny": []
   }
