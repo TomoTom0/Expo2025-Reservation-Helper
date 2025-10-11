@@ -200,7 +200,7 @@ export const useSequentialReservationStore = defineStore('sequentialReservation'
     allResults = []
     
     const targets = state.value.reservationTargets
-    loggerInstance.info('継続予約実行開始（再帰モード）', { totalReservations: targets.length })
+    loggerInstance.temp('継続予約実行開始（再帰モード）', { totalReservations: targets.length })
     
     // 最初の予約から開始
     if (targets.length > 0) {
@@ -233,7 +233,7 @@ export const useSequentialReservationStore = defineStore('sequentialReservation'
     let hasUpdatedToRunning = false
     if (allResults.length > 0) {
       const intervalSeconds = state.value.nextIntervalTime
-      loggerInstance.info('継続予約間隔時間待機開始', {
+      loggerInstance.temp('継続予約間隔時間待機開始', {
         index: state.value.currentTargetIndex,
         intervalSeconds,
         pavilionName: target.pavilionName
@@ -288,7 +288,7 @@ export const useSequentialReservationStore = defineStore('sequentialReservation'
       updateHistoryFn(target, 'Running')
     }
 
-    loggerInstance.info('継続予約1件実行開始', {
+    loggerInstance.temp('継続予約1件実行開始', {
       index: state.value.currentTargetIndex + 1,
       total: targets.length,
       pavilionName: target.pavilionName,
@@ -321,7 +321,7 @@ export const useSequentialReservationStore = defineStore('sequentialReservation'
       allResults.push(result)
       isSuccess = result.success
 
-      loggerInstance.info('継続予約1件実行完了', {
+      loggerInstance.temp('継続予約1件実行完了', {
         index: state.value.currentTargetIndex + 1,
         success: result.success,
         message: result.message,
