@@ -8,7 +8,7 @@
 // @run-at       document-end
 // ==/UserScript==
 
-// Built: 2025/10/11 04:06:13
+// Built: 2025/10/11 04:59:54
 
 
 (function webpackUniversalModuleDefinition(root, factory) {
@@ -39842,7 +39842,7 @@ const usePavilionsStore = (0,pinia/* defineStore */.nY)('pavilions', () => {
                     errorData: data.error,
                     fullResponse: data
                 });
-                if (errorName === 'fetch_remainder_failed') {
+                if (errorName === 'schedule_out_of_stock') {
                     failureReason = '満席';
                 }
                 else if (errorName === 'th_error') {
