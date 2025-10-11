@@ -234,7 +234,7 @@
           :data-pavilion-id="pavilion.id"
         >
           <div class="ytomo-pavilion-header">
-            <button 
+            <button
               class="ytomo-star-button"
               :class="{ active: isFavorite(pavilion.id) }"
               @click="toggleFavorite(pavilion)"
@@ -242,8 +242,15 @@
               {{ isFavorite(pavilion.id) ? '⭐' : '☆' }}
             </button>
             <span class="ytomo-pavilion-name">{{ pavilion.name }}</span>
+            <button
+              class="ytomo-official-link-button"
+              @click="openOfficialPavilionPage(pavilion.id)"
+              title="公式ページを開く"
+            >
+              🔗
+            </button>
             <div class="ytomo-pavilion-status">
-              <span 
+              <span
                 v-if="(pavilion.timeSlots?.filter(slot => slot.available).length || 0) > 0"
                 class="ytomo-status-available"
               >
@@ -312,7 +319,7 @@
 
         <!-- 展開時の表示 -->
         <div v-else class="ytomo-info-expanded">
-          <!-- 上段 -->
+          <!-- 上段：コントロールボタン -->
           <div class="ytomo-info-top-row">
             <button
               class="ytomo-endless-button"
@@ -331,9 +338,6 @@
               <option value="confirm">確認</option>
               <option value="fast">高速</option>
             </select>
-            <div class="ytomo-current-time">
-              {{ getCurrentTimeSlot() }}
-            </div>
             <button
               class="ytomo-collapse-button"
               @click="reservationInfoExpanded = false"
@@ -343,18 +347,23 @@
             </button>
           </div>
 
-          <!-- 中央：パビリオン名 -->
-          <div class="ytomo-pavilion-name-area">
-            {{ getCurrentPavilionName() }}
-          </div>
-
-          <!-- 下段 -->
-          <div class="ytomo-info-bottom-row">
-            <div class="ytomo-progress">
-              {{ getCurrentProgress() }}
-            </div>
-            <div class="ytomo-status">
-              {{ getCurrentStatus() }}
+          <!-- 下段：予約履歴リスト（スクロール可能） -->
+          <div class="ytomo-reservation-history-list">
+            <div
+              v-for="item in reservationHistory"
+              :key="`${item.pavilionId}-${item.index}`"
+              class="ytomo-history-item"
+              :class="{ 'item-running': item.status === 'Running' }"
+            >
+              <div class="ytomo-current-time">
+                {{ item.timeSlot }}
+              </div>
+              <div class="ytomo-pavilion-name-truncated">
+                {{ truncatePavilionName(item.pavilionName, 20) }}
+              </div>
+              <div class="ytomo-status" :class="getStatusClass(item.status)">
+                {{ item.status }}
+              </div>
             </div>
           </div>
 
@@ -374,6 +383,15 @@
         :title="sequentialReservationStore.state.isRunning ? '順次予約を中断' : `予約実行 (${selectedSlotsCount}件選択中)`"
         @click="handleReservationExecution"
       >
+        <!-- 未使用パビリオン予約警告バッジ -->
+        <span
+          v-if="hasUnusedPavilionReservations"
+          class="ytomo-reservation-warning-badge"
+          title="選択中の入場予約に未使用のパビリオン予約があります"
+        >
+          予約あり
+        </span>
+
         {{ sequentialReservationStore.state.isRunning ? '中断' : '📋' }}
         <span
           v-if="!sequentialReservationStore.state.isRunning && selectedSlotsCount > 0"
@@ -393,7 +411,11 @@
         class="ytomo-reservation-result-fab"
         :class="{
           'success': reservationResult?.success,
-          'error': reservationResult && !reservationResult.success
+          'error': reservationResult && !reservationResult.success,
+          'fab-blue': fabOverallColor === 'blue',
+          'fab-green': fabOverallColor === 'green',
+          'fab-red': fabOverallColor === 'red',
+          'fab-yellow': fabOverallColor === 'yellow'
         }"
       >
         <div class="ytomo-result-status">
@@ -586,6 +608,14 @@ const getCurrentProgress = () => {
   return `[${currentIndex + 1}/${totalCount}]`
 }
 
+// パビリオン名を指定文字数で切り詰める
+const truncatePavilionName = (name: string, maxLength: number): string => {
+  if (name.length <= maxLength) {
+    return name
+  }
+  return name.substring(0, maxLength) + '...'
+}
+
 const getCurrentStatus = () => {
   const isRunning = sequentialReservationStore.state.isRunning
   const countdownText = sequentialReservationStore.state.countdownText
@@ -597,7 +627,16 @@ const getCurrentStatus = () => {
   if (!isRunning && lastReservationResults.value.length > 0) {
     // 予約完了後の状態判定
     const hasSuccess = lastReservationResults.value.some(result => result.success === true)
-    return hasSuccess ? 'Succeeded' : 'Failed'
+    if (hasSuccess) {
+      return 'Succeeded'
+    } else {
+      // 失敗理由を含めて表示
+      const firstFailure = lastReservationResults.value.find(result => !result.success)
+      if (firstFailure?.failureReason) {
+        return `Failed with ${firstFailure.failureReason}`
+      }
+      return 'Failed with その他'
+    }
   }
   if (!isRunning) return 'Stopped'
 
@@ -610,19 +649,19 @@ const getCurrentStatus = () => {
       // 失敗理由を含めて表示
       const firstFailure = lastReservationResults.value.find(result => !result.success)
       if (firstFailure?.failureReason) {
-        return `Failed (${firstFailure.failureReason})`
+        return `Failed with ${firstFailure.failureReason}`
       }
-      return 'Failed'
+      return 'Failed with その他'
     }
   }
 
   if (countdownText) return `Waiting in ${countdownText}`
-  return 'Executing'
+  return 'Running'
 }
 
 const getCurrentStatusClass = () => {
   const status = getCurrentStatus()
-  if (status === 'Executing') return 'executing'
+  if (status === 'Running' || status === 'Executing') return 'executing'
   if (status === 'Succeeded') return 'success'
   if (status.includes('Failed') || status.includes('failed')) return 'failed'
   if (status.includes('Waiting')) return 'waiting'
@@ -636,6 +675,15 @@ const shouldShowReservationInfoPanel = computed(() => {
     lastReservationResults.value.length > 0
   )
 })
+
+// 予約履歴アイテムのステータスクラスを返す
+const getStatusClass = (status: ReservationHistoryItem['status']): string => {
+  if (status === 'Running') return 'status-running'
+  if (status === 'Succeeded') return 'status-succeeded'
+  if (status === 'Waiting') return 'status-waiting'
+  if (status.includes('Failed')) return 'status-failed'
+  return ''
+}
 
 // Store アクセス
 const pavilionsStore = usePavilionsStore()
@@ -673,7 +721,45 @@ let collapseTimeout: NodeJS.Timeout | null = null
 // 実行モード管理
 const executionMode = ref<'sequential' | 'confirm' | 'fast'>('sequential')
 
-// 予約実行結果の管理
+// 予約履歴管理
+interface ReservationHistoryItem {
+  pavilionId: string
+  pavilionName: string
+  timeSlot: string
+  status: 'Waiting' | 'Running' | 'Succeeded' | 'Failed with 満席' | 'Failed with 無効' | 'Failed with その他' | 'Canceled'
+  timestamp: number  // 失敗した予約を30秒後に削除するため
+  index: number  // 予約対象のインデックス
+}
+
+const reservationHistory = ref<ReservationHistoryItem[]>([])
+
+// FAB全体の色を決定
+const fabOverallColor = computed(() => {
+  // 実行中があれば青
+  if (reservationHistory.value.some(item => item.status === 'Running')) {
+    return 'blue'
+  }
+
+  // 成功があれば緑
+  if (reservationHistory.value.some(item => item.status === 'Succeeded')) {
+    return 'green'
+  }
+
+  // 失敗があれば赤（5秒経過していないもの）
+  const now = Date.now()
+  const recentFailed = reservationHistory.value.some(item =>
+    (item.status === 'Failed with 満席' || item.status === 'Failed with 無効' || item.status === 'Failed with その他') &&
+    (now - item.timestamp) < 5000
+  )
+  if (recentFailed) {
+    return 'red'
+  }
+
+  // それ以外は黄色（待機中）
+  return 'yellow'
+})
+
+// 予約実行結果の管理（後方互換性のため保持）
 const lastReservationResults = ref<any[]>([])
 const wasManuallyAborted = ref(false)
 const lastCompletedReservation = ref<{pavilionName: string, timeSlot: string, index: number, totalCount: number} | null>(null)
@@ -688,6 +774,7 @@ watch(() => sequentialReservationStore.state.isRunning, (isRunning) => {
       collapseTimeout = null
     }
   }
+  // 予約終了時は履歴を保持（次の予約開始時にリセット）
 })
 
 // スケジュールフォームデータ
@@ -721,9 +808,14 @@ const isPavilionTabActive = computed(() => activeTab.value === 'pavilion')
 // 現在表示されているパビリオンの選択時間帯数のみを計算
 const selectedSlotsCount = computed(() => {
   const filteredPavilionIds = new Set(pavilionsStore.filteredPavilions.map(p => p.id))
-  return pavilionsStore.selectedTimeSlots.filter(slot => 
+  return pavilionsStore.selectedTimeSlots.filter(slot =>
     filteredPavilionIds.has(slot.pavilionId)
   ).length
+})
+
+// 選択中の入場予約に未使用のパビリオン予約があるかチェック
+const hasUnusedPavilionReservations = computed(() => {
+  return ticketsStore.hasUnusedPavilionReservationsInSelected()
 })
 
 // 予約管理システムから選択されたスケジュール一覧を取得
@@ -984,8 +1076,28 @@ const toggleFavorite = (pavilion: any) => {
     removeFromFavorites(pavilion.id)
     logger.info('お気に入り削除', { pavilionName: pavilion.name })
   } else {
-    addToFavorites(pavilion.id, pavilion.name)  
+    addToFavorites(pavilion.id, pavilion.name)
     logger.info('お気に入り追加', { pavilionName: pavilion.name })
+  }
+}
+
+// 公式パビリオンページを開く
+const openOfficialPavilionPage = (pavilionId: string) => {
+  logger.info('公式パビリオンページを開く', { pavilionId })
+
+  // TODO: 具体的なURLは後で指定される
+  // 現在はプレースホルダーとして待機室ページを開く
+  const ytomoUrl = 'https://ticket.expo2025.or.jp/route/queue'
+
+  // 新しいタブでytomoページを開く
+  const newTab = window.open(ytomoUrl, '_blank')
+
+  if (newTab) {
+    // TODO: 公式のrouterで指定したURLへの移動処理を追加
+    // newTab.location.href = `具体的なURL/${pavilionId}`
+    logger.info('新しいタブでytomoページを開きました', { pavilionId })
+  } else {
+    logger.warn('新しいタブを開けませんでした（ポップアップブロック？）', { pavilionId })
   }
 }
 
@@ -1129,6 +1241,78 @@ const handleReservationExecution = async () => {
       ticketIds
     }))
 
+    // 予約履歴を初期化（Running 1つ + Waiting 1つのみ）
+    reservationHistory.value = []
+
+    // 最初の予約をRunningとして追加
+    if (reservationTargets.length > 0) {
+      reservationHistory.value.push({
+        pavilionId: reservationTargets[0].pavilionId,
+        pavilionName: reservationTargets[0].pavilionName,
+        timeSlot: reservationTargets[0].timeSlot,
+        status: 'Running' as const,
+        timestamp: Date.now(),
+        index: 0
+      })
+    }
+
+    // 2つ目があればWaitingとして追加
+    if (reservationTargets.length > 1) {
+      reservationHistory.value.push({
+        pavilionId: reservationTargets[1].pavilionId,
+        pavilionName: reservationTargets[1].pavilionName,
+        timeSlot: reservationTargets[1].timeSlot,
+        status: 'Waiting' as const,
+        timestamp: Date.now(),
+        index: 1
+      })
+    }
+
+    // 予約履歴管理関数
+    const addHistory = (target: any, status: ReservationHistoryItem['status']) => {
+      const exists = reservationHistory.value.find(
+        item => item.pavilionId === target.pavilionId &&
+                item.timeSlot === target.timeSlot &&
+                (item.status === 'Waiting' || item.status === 'Running')
+      )
+      if (!exists) {
+        reservationHistory.value.push({
+          pavilionId: target.pavilionId,
+          pavilionName: target.pavilionName,
+          timeSlot: target.timeSlot,
+          status,
+          timestamp: Date.now(),
+          index: -1
+        })
+      }
+    }
+
+    const updateHistory = (target: any, newStatus: ReservationHistoryItem['status']) => {
+      const item = reservationHistory.value.find(
+        item => item.pavilionId === target.pavilionId &&
+                item.timeSlot === target.timeSlot
+      )
+      if (item) {
+        item.status = newStatus
+        item.timestamp = Date.now()
+      }
+    }
+
+    const deleteHistory = (target: any) => {
+      reservationHistory.value = reservationHistory.value.filter(
+        item => !(item.pavilionId === target.pavilionId && item.timeSlot === target.timeSlot)
+      )
+    }
+
+    const cancelAllWaiting = () => {
+      reservationHistory.value.forEach(item => {
+        if (item.status === 'Waiting') {
+          item.status = 'Canceled'
+          item.timestamp = Date.now()
+        }
+      })
+    }
+
     let results: any[] = []
 
     // 実行モードに応じて処理を分岐
@@ -1142,7 +1326,11 @@ const handleReservationExecution = async () => {
           pavilionsStore.executeReservation,
           selectedSlots,
           formatTimeSlot,
-          logger
+          logger,
+          addHistory,
+          updateHistory,
+          deleteHistory,
+          cancelAllWaiting
         )
         break
 
@@ -1879,6 +2067,35 @@ onUnmounted(() => {
     }
 }
 
+.ytomo-official-link-button {
+    background: none;
+    border: 1px solid #cbd5e1;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.2s;
+    padding: 4px 6px;
+    border-radius: 4px;
+    height: 26px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+
+    &:hover {
+        background: #f1f5f9;
+        border-color: #94a3b8;
+        transform: scale(1.05);
+    }
+
+    &:active {
+        transform: scale(0.95);
+    }
+
+    &:focus {
+        outline: none;
+    }
+}
+
 .ytomo-pavilion-checkbox-container {
     display: flex;
     align-items: center;
@@ -2443,7 +2660,8 @@ onUnmounted(() => {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-bottom: 8px;
+    margin-bottom: 12px;
+    gap: 8px;
 }
 
 .ytomo-endless-button {
@@ -2468,15 +2686,6 @@ onUnmounted(() => {
     &:hover {
         border-color: #9ca3af;
     }
-}
-
-.ytomo-current-time {
-    font-size: 16px;
-    font-weight: 600;
-    color: #2c5aa0;
-    display: flex;
-    align-items: center;
-    height: 32px;
 }
 
 .ytomo-mode-selector {
@@ -2520,27 +2729,49 @@ onUnmounted(() => {
     }
 }
 
-.ytomo-pavilion-name-area {
-    text-align: center;
-    margin: 8px 0;
-    font-size: 14px;
-    font-weight: 600;
-    color: #374151;
-    line-height: 1.4;
-    min-height: 32px;
+// 予約履歴リスト
+.ytomo-reservation-history-list {
+    max-height: 200px;
+    overflow-y: auto;
     display: flex;
-    align-items: center;
-    justify-content: center;
-    overflow: hidden;
-    word-break: break-word;
+    flex-direction: column;
+    gap: 4px;
 }
 
-.ytomo-info-bottom-row {
+.ytomo-history-item {
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    font-size: 12px;
-    color: #6b7280;
+    gap: 8px;
+    font-size: 11px;
+    color: #374151;
+    padding: 4px 8px;
+    border-radius: 4px;
+    background: #f9fafb;
+    transition: background 0.2s;
+
+    &.item-running {
+        background: #dbeafe;
+        border: 1px solid #3b82f6;
+    }
+}
+
+.ytomo-current-time {
+    font-size: 11px;
+    font-weight: 600;
+    color: #2c5aa0;
+    white-space: nowrap;
+    flex-shrink: 0;
+    min-width: 50px;
+}
+
+.ytomo-pavilion-name-truncated {
+    flex: 1;
+    font-size: 11px;
+    font-weight: 500;
+    color: #374151;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .ytomo-progress {
@@ -2549,6 +2780,30 @@ onUnmounted(() => {
 
 .ytomo-status {
     font-weight: 500;
+    font-size: 11px;
+    white-space: nowrap;
+    flex-shrink: 0;
+
+    &.status-running {
+        color: #3b82f6;
+    }
+
+    &.status-succeeded {
+        color: #10b981;
+    }
+
+    &.status-failed {
+        color: #ef4444;
+    }
+
+    &.status-waiting {
+        color: #f59e0b;
+    }
+
+    // 旧形式のサポート（後方互換性）
+    &:has-text("Running") {
+        color: #3b82f6;
+    }
 
     &:has-text("Executing") {
         color: #3b82f6;
@@ -2606,6 +2861,23 @@ onUnmounted(() => {
         line-height: 1.2;
         pointer-events: none;
         z-index: 10;
+    }
+
+    .ytomo-reservation-warning-badge {
+        position: absolute;
+        top: -8px;
+        left: -8px;
+        background: #f59e0b;
+        color: white;
+        border-radius: 8px;
+        padding: 2px 6px;
+        font-size: 9px;
+        font-weight: bold;
+        white-space: nowrap;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        pointer-events: none;
+        z-index: 10;
+        animation: pulse 2s ease-in-out infinite;
     }
 
     &:hover:not(:disabled) {
@@ -3122,6 +3394,15 @@ onUnmounted(() => {
     }
 }
 
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.7;
+    }
+}
+
 /* 予約結果FAB（予約FABの左側に配置） */
 .ytomo-reservation-result-fab {
     position: fixed;
@@ -3150,10 +3431,30 @@ onUnmounted(() => {
         background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
         box-shadow: 0 4px 12px rgba(34, 197, 94, 0.4);
     }
-    
+
     &.error {
         background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
         box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4);
+    }
+
+    &.fab-blue {
+        background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+        box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+    }
+
+    &.fab-green {
+        background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+        box-shadow: 0 4px 12px rgba(34, 197, 94, 0.4);
+    }
+
+    &.fab-red {
+        background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+        box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4);
+    }
+
+    &.fab-yellow {
+        background: linear-gradient(135deg, #eab308 0%, #ca8a04 100%);
+        box-shadow: 0 4px 12px rgba(234, 179, 8, 0.4);
     }
     
     .ytomo-result-status {

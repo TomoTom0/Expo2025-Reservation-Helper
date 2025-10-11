@@ -103,6 +103,11 @@ export const useSequentialReservationStore = defineStore('sequentialReservation'
   const stopSequentialReservation = () => {
     state.value.isRunning = false
 
+    // すべてのWaitingをCanceledに変更
+    if (cancelAllWaitingFn) {
+      cancelAllWaitingFn()
+    }
+
     // スケジュール予約も停止
     if (state.value.currentScheduleId) {
       const scheduledStore = useScheduledReservationStore()
@@ -168,18 +173,30 @@ export const useSequentialReservationStore = defineStore('sequentialReservation'
   let countdownTimerId: NodeJS.Timeout | null = null
   let nextReservationTimerId: NodeJS.Timeout | null = null
   let onCompleteFn: any = null
+  let addHistoryFn: any = null
+  let updateHistoryFn: any = null
+  let deleteHistoryFn: any = null
+  let cancelAllWaitingFn: any = null
 
   const executeSequentialReservation = async (
     pavilionsStoreExecuteReservation: any,
     selectedSlots: any[],
     formatTimeSlot: (timeStr: string) => string,
-    logger: any
+    logger: any,
+    addHistory?: (target: ReservationTarget, status: 'Waiting' | 'Running' | 'Succeeded' | 'Failed with 満席' | 'Failed with 無効' | 'Failed with その他' | 'Canceled') => void,
+    updateHistory?: (target: ReservationTarget, newStatus: 'Waiting' | 'Running' | 'Succeeded' | 'Failed with 満席' | 'Failed with 無効' | 'Failed with その他' | 'Canceled') => void,
+    deleteHistory?: (target: ReservationTarget) => void,
+    cancelAllWaiting?: () => void
   ) => {
     // 実行用のデータを保存
     executeReservationFn = pavilionsStoreExecuteReservation
     selectedSlotsData = selectedSlots
     formatTimeSlotFn = formatTimeSlot
     loggerInstance = logger
+    addHistoryFn = addHistory
+    updateHistoryFn = updateHistory
+    deleteHistoryFn = deleteHistory
+    cancelAllWaitingFn = cancelAllWaiting
     allResults = []
     
     const targets = state.value.reservationTargets
@@ -208,22 +225,23 @@ export const useSequentialReservationStore = defineStore('sequentialReservation'
 
     const currentIndex = state.value.currentTargetIndex
     const targets = state.value.reservationTargets
-    
+
 
     const target = targets[state.value.currentTargetIndex]
-    
+
     // 間隔時間の待機処理（最初の予約以外）
+    let hasUpdatedToRunning = false
     if (allResults.length > 0) {
       const intervalSeconds = state.value.nextIntervalTime
-      loggerInstance.info('継続予約間隔時間待機開始', { 
-        index: state.value.currentTargetIndex, 
-        intervalSeconds, 
-        pavilionName: target.pavilionName 
+      loggerInstance.info('継続予約間隔時間待機開始', {
+        index: state.value.currentTargetIndex,
+        intervalSeconds,
+        pavilionName: target.pavilionName
       })
-      
+
       if (intervalSeconds > 0) {
         const targetTime = new Date(Date.now() + intervalSeconds * 1000)
-        
+
         // カウントダウン待機
         await new Promise<void>((resolve) => {
           const countdown = () => {
@@ -232,10 +250,17 @@ export const useSequentialReservationStore = defineStore('sequentialReservation'
               resolve()
               return
             }
-            
+
             const remaining = Math.max(0, Math.ceil((targetTime.getTime() - Date.now()) / 1000))
             updateCountdown(`${remaining}秒`)
-            
+
+            // 3秒前になったらRunningに変更
+            if (remaining <= 3 && !hasUpdatedToRunning && updateHistoryFn) {
+              updateHistoryFn(target, 'Running')
+              hasUpdatedToRunning = true
+              loggerInstance.debug('3秒前にRunning表示に変更', { index: state.value.currentTargetIndex })
+            }
+
             if (remaining <= 0) {
               updateCountdown('')
               loggerInstance.debug('継続予約間隔時間待機完了', { index: state.value.currentTargetIndex })
@@ -248,38 +273,45 @@ export const useSequentialReservationStore = defineStore('sequentialReservation'
         })
       }
     }
-    
+
     if (!state.value.isRunning) return
-    
+
     // 現在の予約対象を更新
     updateCurrentReservation(
-      state.value.currentTargetIndex, 
-      new Date().toLocaleTimeString(), 
+      state.value.currentTargetIndex,
+      new Date().toLocaleTimeString(),
       state.value.nextMonitoringMode
     )
-    
-    loggerInstance.info('継続予約1件実行開始', { 
-      index: state.value.currentTargetIndex + 1, 
+
+    // 予約開始時：まだRunningになっていなければRunningに変更（最初の予約or間隔0秒の場合）
+    if (updateHistoryFn && !hasUpdatedToRunning) {
+      updateHistoryFn(target, 'Running')
+    }
+
+    loggerInstance.info('継続予約1件実行開始', {
+      index: state.value.currentTargetIndex + 1,
       total: targets.length,
       pavilionName: target.pavilionName,
       timeSlot: target.timeSlot,
       timestamp: new Date().toLocaleTimeString()
     })
-    
+
     // TimeSlotDataを検索
-    const correspondingSlot = selectedSlotsData.find(slot => 
-      slot.pavilionId === target.pavilionId && 
+    const correspondingSlot = selectedSlotsData.find(slot =>
+      slot.pavilionId === target.pavilionId &&
       formatTimeSlotFn(slot.timeSlot.time) === target.timeSlot
     )
-    
+
     let isSuccess = false
-    
+    let result: any = null
+
     if (!correspondingSlot) {
       loggerInstance.error('対応するTimeSlotDataが見つからない', { target })
-      allResults.push({ success: false, message: 'TimeSlotData not found', attempts: 0 })
+      result = { success: false, message: 'TimeSlotData not found', attempts: 0 }
+      allResults.push(result)
     } else {
       // 継続予約store内で予約実行
-      const result = await executeReservationFn(
+      result = await executeReservationFn(
         target.pavilionId,
         correspondingSlot.timeSlot,
         target.entranceDate,
@@ -288,31 +320,76 @@ export const useSequentialReservationStore = defineStore('sequentialReservation'
       )
       allResults.push(result)
       isSuccess = result.success
-      
-      loggerInstance.info('継続予約1件実行完了', { 
-        index: state.value.currentTargetIndex + 1, 
+
+      loggerInstance.info('継続予約1件実行完了', {
+        index: state.value.currentTargetIndex + 1,
         success: result.success,
         message: result.message,
         timestamp: new Date().toLocaleTimeString()
       })
     }
-    
+
+    // 予約完了時：RunningをSucceeded/Failedに更新
+    if (updateHistoryFn && result) {
+      const status = result.success
+        ? 'Succeeded'
+        : result.failureReason
+          ? `Failed with ${result.failureReason}`
+          : 'Failed with その他'
+      updateHistoryFn(target, status)
+
+      // 失敗なら30秒後に削除
+      if (!result.success && deleteHistoryFn) {
+        setTimeout(() => {
+          deleteHistoryFn(target)
+        }, 30000)
+      }
+    }
+
     // 次の予約へ進む（インクリメント前に上限チェック）
+    let nextIndex: number
     if (state.value.currentTargetIndex + 1 >= targets.length && state.value.endlessMode) {
-      state.value.currentTargetIndex = 0
+      nextIndex = 0
       loggerInstance.info('ENDLESSモード: 最初から継続')
     } else if (state.value.currentTargetIndex + 1 >= targets.length && !state.value.endlessMode) {
       loggerInstance.info('継続予約完了（通常モード）')
       state.value.isRunning = false
+      // すべてのWaitingをCanceledに変更
+      if (cancelAllWaitingFn) {
+        cancelAllWaitingFn()
+      }
       return
     } else {
-      state.value.currentTargetIndex++
+      nextIndex = state.value.currentTargetIndex + 1
     }
+
+    // 次の次の予約を取得して履歴に追加（無限モード対応）
+    const nextNextIndex = nextIndex + 1
+    if (state.value.endlessMode) {
+      // 無限モード：循環して次の予約を追加
+      const nextNextTarget = targets[nextNextIndex % targets.length]
+      if (addHistoryFn) {
+        addHistoryFn(nextNextTarget, 'Waiting')
+      }
+    } else if (nextNextIndex < targets.length) {
+      // 通常モード：次の予約が範囲内にある場合のみ追加
+      const nextNextTarget = targets[nextNextIndex]
+      if (addHistoryFn) {
+        addHistoryFn(nextNextTarget, 'Waiting')
+      }
+    }
+
+    // インデックスを更新
+    state.value.currentTargetIndex = nextIndex
     
     // 予約成功時は継続を停止
     if (isSuccess) {
       loggerInstance.info('予約成功により継続予約を終了')
       state.value.isRunning = false
+      // すべてのWaitingをCanceledに変更
+      if (cancelAllWaitingFn) {
+        cancelAllWaitingFn()
+      }
       return
     }
 

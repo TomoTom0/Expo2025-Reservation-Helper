@@ -205,6 +205,15 @@
       <!-- 実際の予約情報 -->
       <div v-if="displayReservationInfoArray.length > 0" class="ytomo-reservation-info">
         <div class="ytomo-reservation-box">
+          <!-- 変更/新規ラベル -->
+          <div class="ytomo-reservation-label">
+            <template v-if="displayOriginalReservation">
+              変更 From {{ getFromDateTimeText() }}
+            </template>
+            <template v-else>
+              新規
+            </template>
+          </div>
           <div class="ytomo-reservation-timeslots">
             <div
               v-for="(info, index) in displayReservationInfoArray"
@@ -647,34 +656,30 @@ const dateTimeChangeText = computed(() => {
   return `${existingDate} ${existingGate}${existingTime} → ${newDate} ${newGate}${newTime}`
 })
 
+// 表示用の元予約情報（予約実行中はスナップショット、それ以外は選択チケット）
+const displayOriginalReservation = computed(() => {
+  if (entranceStore.isReservationRunning && entranceStore.reservationSnapshot?.originalReservation) {
+    return entranceStore.reservationSnapshot.originalReservation
+  }
+  return selectedSchedule.value
+})
+
 // 変更前の日時テキストを取得
 const getFromDateTimeText = () => {
-  if (!selectedSchedule.value) {
-    logger.debug('getFromDateTimeText: selectedScheduleがnull')
+  const reservation = displayOriginalReservation.value
+  if (!reservation) {
     return ''
   }
-  
+
   // 必要なプロパティが存在するかチェック
-  if (!selectedSchedule.value.entrance_date || !selectedSchedule.value.time_start || selectedSchedule.value.gate_type == null) {
-    logger.debug('getFromDateTimeText: 必要なプロパティが不足', {
-      entrance_date: selectedSchedule.value.entrance_date,
-      time_start: selectedSchedule.value.time_start,
-      gate_type: selectedSchedule.value.gate_type
-    })
+  if (!reservation.entrance_date || !reservation.time_start || reservation.gate_type == null) {
     return ''
   }
-  
-  const date = selectedSchedule.value.entrance_date ? formatDate(selectedSchedule.value.entrance_date) : ''
-  const time = selectedSchedule.value.time_start
-  const gate = selectedSchedule.value.gate_type === 1 ? '東' : '西'
-  const result = `${date} ${gate}${time}`
-  
-  logger.debug('getFromDateTimeText: 結果', {
-    selectedSchedule: selectedSchedule.value,
-    result
-  })
-  
-  return result
+
+  const date = reservation.entrance_date ? formatDate(reservation.entrance_date) : ''
+  const time = reservation.time_start
+  const gate = reservation.gate_type === 1 ? '東' : '西'
+  return `${date} ${gate}${time}`
 }
 
 // 変更後の日時テキストを取得
@@ -2247,6 +2252,20 @@ onMounted(async () => {
         }
       }
 
+      .ytomo-reservation-label {
+        position: absolute;
+        top: -8px;
+        left: 12px;
+        font-weight: 600;
+        font-size: 12px;
+        color: #0c4a6e;
+        background: #fff;
+        padding: 4px 8px;
+        border-radius: 4px;
+        border: 1px solid #0891b2;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      }
+
       .ytomo-reservation-date {
         position: absolute;
         top: -8px;
@@ -2260,7 +2279,7 @@ onMounted(async () => {
         border: 1px solid #0891b2;
         box-shadow: 0 1px 3px rgba(0,0,0,0.1);
       }
-      
+
       .ytomo-reservation-timeslots {
         margin-top: 8px;
         display: flex;

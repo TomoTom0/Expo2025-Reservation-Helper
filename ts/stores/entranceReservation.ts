@@ -103,6 +103,17 @@ export const useEntranceReservationStore = defineStore('entranceReservation', ()
   const flag_first = ref(true)
   const selectedTimeSlots = ref<any[]>([])
 
+  // 予約実行時のスナップショット情報
+  const reservationSnapshot = ref<{
+    ticketIds: string[]           // 選択チケットID配列
+    existingReservationId: number | null  // 既存予約ID
+    originalReservation: {        // 元の予約情報
+      entrance_date: string       // YYYYMMDD形式
+      time_start: string          // HH:MM形式
+      gate_type: number           // 1:東, 2:西
+    } | null
+  } | null>(null)
+
   // 履歴自動削除タイマー
   const historyCleanupTimer = ref<NodeJS.Timeout | null>(null)
 
@@ -1133,6 +1144,9 @@ export const useEntranceReservationStore = defineStore('entranceReservation', ()
 
     // 予約履歴に追加
     addCompletedToHistory(true, slot.date, slot.gate, slot.time)
+
+    // スナップショットもクリア
+    reservationSnapshot.value = null
   }
 
   // 追加予約実行（空きがあれば最大2つ）
@@ -1217,8 +1231,8 @@ export const useEntranceReservationStore = defineStore('entranceReservation', ()
   // 実際の予約API呼び出し - 元のmanagerから完全コピー
   const callActualReservationAPI = async (slot: any): Promise<{ success: boolean; date?: string; error?: string; failureReason?: '満席' | '無効' | 'その他'; reservationIds?: number[]; ticketsData?: any }> => {
     try {
-      // 選択されたチケットIDを取得
-      const selectedTickets = Array.from(ticketsStore.selectedTicketIds)
+      // スナップショットからチケットIDを取得（予約実行中にチケット選択が変わっても影響を受けない）
+      const selectedTickets = reservationSnapshot.value?.ticketIds || []
       if (selectedTickets.length === 0) {
         return { success: false, error: '選択されたチケットがありません' }
       }
@@ -1237,8 +1251,9 @@ export const useEntranceReservationStore = defineStore('entranceReservation', ()
       const entranceDate = `${year}${month.padStart(2, '0')}${day.padStart(2, '0')}`
       const gateType = slot.gate === '東' ? 1 : 2
 
-      // 新規予約か変更予約かを判定
-      const isChangeReservation = existingReservationId.value && existingReservationId.value > 0
+      // 新規予約か変更予約かを判定（スナップショットから取得）
+      const snapshotReservationId = reservationSnapshot.value?.existingReservationId
+      const isChangeReservation = snapshotReservationId && snapshotReservationId > 0
 
       logger.info('万博予約API呼び出し開始', {
         ticketIds: selectedTickets.length,
@@ -1246,15 +1261,16 @@ export const useEntranceReservationStore = defineStore('entranceReservation', ()
         entranceDate,
         time: slot.time,
         gateType,
-        method: isChangeReservation ? 'PUT' : 'POST'
+        method: isChangeReservation ? 'PUT' : 'POST',
+        usingSnapshot: true
       })
       const method = isChangeReservation ? 'PUT' : 'POST'
 
       let body: any
       if (isChangeReservation) {
-        // 変更予約（PUT）のパラメータ
+        // 変更予約（PUT）のパラメータ（スナップショットから取得）
         body = {
-          user_visiting_reservation_ids: [existingReservationId.value],
+          user_visiting_reservation_ids: [snapshotReservationId],
           start_time: convertTimeToAPIFormat(slot.time),
           gate_type: gateType,
           entrance_date: entranceDate
@@ -1493,6 +1509,23 @@ export const useEntranceReservationStore = defineStore('entranceReservation', ()
     // 既存予約IDを保存
     existingReservationId.value = existingId || null
 
+    // スナップショット作成（予約実行中にチケット選択が変わっても影響を受けないようにする）
+    const selectedTicketIds = Array.from(ticketsStore.selectedTicketIds)
+    reservationSnapshot.value = {
+      ticketIds: selectedTicketIds,
+      existingReservationId: existingId,
+      originalReservation: selectedSchedule ? {
+        entrance_date: selectedSchedule.entrance_date,
+        time_start: selectedSchedule.time_start,
+        gate_type: selectedSchedule.gate_type
+      } : null
+    }
+    logger.info('予約実行スナップショット作成', {
+      ticketIds: selectedTicketIds.length,
+      existingReservationId: existingId,
+      hasOriginalReservation: !!selectedSchedule
+    })
+
     // 予約開始時に履歴をクリア
     clearReservationHistory()
 
@@ -1573,6 +1606,9 @@ export const useEntranceReservationStore = defineStore('entranceReservation', ()
 
     // 実行済みリストもクリアして完全に初期状態に戻す
     executedReservations.value.clear()
+
+    // スナップショットもクリア
+    reservationSnapshot.value = null
   }
 
   const startWait = () => {
@@ -1716,6 +1752,7 @@ export const useEntranceReservationStore = defineStore('entranceReservation', ()
     reservationHistory,
     waitInfo,
     isReservationEnabled,
+    reservationSnapshot,
 
     // Actions
     executeReservation,

@@ -155,13 +155,10 @@
                 >
                   <div class="ytomo-schedule-line ytomo-reservation-line">
                     <div class="ytomo-reservation-info">
-                      <span v-for="reservationType in getReservationTypesForSecondLine(schedule)" :key="reservationType.type" 
-                            class="ytomo-reservation-type-indicator" 
+                      <span v-for="reservationType in getReservationTypesForSecondLine(schedule)" :key="reservationType.type"
+                            class="ytomo-reservation-type-indicator"
                             :class="reservationType.statusClass">
                         {{ reservationType.shortName }}
-                      </span>
-                      <span v-if="getReservationTypesForSecondLine(schedule).length === 0" class="ytomo-no-reservation">
-                        + パビリオン予約
                       </span>
                     </div>
                     <span v-if="schedule.user_visiting_reservation_id && getReservationManagement(schedule.user_visiting_reservation_id.toString())?.isLocked" 
