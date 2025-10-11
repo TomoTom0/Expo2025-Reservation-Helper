@@ -48,8 +48,31 @@ export const setGlobalLogEnabled = (enabled: boolean): void => {
  */
 export class CustomLogger {
   private timers = new Map<string, number>()
+  private static logEventHandlers: Array<typeof CustomLogger.LogEventHandler> = []
 
   constructor(private config: LoggerConfig) {}
+
+  /**
+   * ログイベントハンドラーの型定義
+   */
+  static LogEventHandler = (level: LogLevel, module: string, message: string, data?: any): void => {}
+  
+  /**
+   * ログイベントハンドラーを追加（ログFAB用）
+   */
+  static addLogEventHandler(handler: typeof CustomLogger.LogEventHandler): void {
+    this.logEventHandlers.push(handler)
+  }
+
+  /**
+   * ログイベントハンドラーを除去
+   */
+  static removeLogEventHandler(handler: typeof CustomLogger.LogEventHandler): void {
+    const index = this.logEventHandlers.indexOf(handler)
+    if (index > -1) {
+      this.logEventHandlers.splice(index, 1)
+    }
+  }
 
   /**
    * ログレベルチェック - 出力すべきかどうか判定
@@ -120,6 +143,15 @@ export class CustomLogger {
     }
 
     const formattedMessage = this.formatMessage(level, message)
+    
+    // ログイベントハンドラーに通知（ログFAB用）
+    CustomLogger.logEventHandlers.forEach(handler => {
+      try {
+        handler(level, this.config.module, message, data)
+      } catch (error) {
+        // ハンドラーエラーは無視（ログが無限ループにならないようにする）
+      }
+    })
     
     switch (level) {
       case 'TEMP':

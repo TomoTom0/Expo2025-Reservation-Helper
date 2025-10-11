@@ -436,15 +436,34 @@
         <div 
           v-if="logFabExpanded" 
           class="ytomo-log-display"
+          :class="{ 'large-size': logDisplayLargeSize }"
           @click.stop
         >
           <div class="ytomo-log-header">
             <span>デバッグログ</span>
-            <button @click="clearLogs" class="ytomo-log-clear-btn">クリア</button>
+            <div class="ytomo-log-controls">
+              <!-- フィルターコントロール -->
+              <select v-model="selectedLogLevel" class="ytomo-log-filter">
+                <option value="">全レベル</option>
+                <option value="TEMP">TEMP</option>
+                <option value="ERROR">ERROR</option>
+                <option value="WARN">WARN</option>
+                <option value="INFO">INFO</option>
+                <option value="DEBUG">DEBUG</option>
+              </select>
+              <select v-model="selectedLogModule" class="ytomo-log-filter">
+                <option value="">全モジュール</option>
+                <option v-for="module in availableModules" :key="module" :value="module">{{ module }}</option>
+              </select>
+              <!-- アクションボタン -->
+              <button @click="copyFilteredLogs" class="ytomo-log-btn" title="フィルタされたログをコピー">📋</button>
+              <button @click="toggleLogDisplaySize" class="ytomo-log-btn" :title="logDisplayLargeSize ? 'サイズを小さく' : 'サイズを大きく'">{{ logDisplayLargeSize ? '🔽' : '🔼' }}</button>
+              <button @click="clearLogs" class="ytomo-log-btn">クリア</button>
+            </div>
           </div>
           <div class="ytomo-log-messages">
             <div 
-              v-for="(log, index) in logMessages.slice().reverse()" 
+              v-for="(log, index) in filteredLogMessages" 
               :key="index"
               class="ytomo-log-message"
               :class="`log-${log.level.toLowerCase()}`"
@@ -455,8 +474,8 @@
               <span class="ytomo-log-text">{{ log.message }}</span>
               <pre v-if="log.data" class="ytomo-log-data">{{ formatLogData(log.data) }}</pre>
             </div>
-            <div v-if="logMessages.length === 0" class="ytomo-log-empty">
-              ログがありません
+            <div v-if="filteredLogMessages.length === 0" class="ytomo-log-empty">
+              {{ logMessages.length === 0 ? 'ログがありません' : 'フィルター条件に一致するログがありません' }}
             </div>
           </div>
         </div>
@@ -464,12 +483,12 @@
         <!-- ログFABボタン -->
         <button
           class="ytomo-log-fab"
-          :class="{ 'expanded': logFabExpanded, 'has-logs': logMessages.length > 0 }"
+          :class="{ 'expanded': logFabExpanded, 'has-logs': filteredLogMessages.length > 0 }"
           @click="toggleLogFab"
           title="デバッグログ"
         >
           <span class="ytomo-log-icon">📋</span>
-          <span v-if="logMessages.length > 0" class="ytomo-log-count">{{ logMessages.length }}</span>
+          <span v-if="filteredLogMessages.length > 0" class="ytomo-log-count">{{ filteredLogMessages.length }}</span>
         </button>
       </div>
     </Teleport>
@@ -509,55 +528,12 @@ import { loggers, CustomLogger } from '@/utils/logger'
 // Logger setup
 const logger = loggers.ui
 
-// ログメッセージをFABに送信するためのグローバル関数を設定
-let logFabHandler: ((level: LogMessage['level'], module: string, message: string, data?: any) => void) | null = null
+// CustomLoggerへのイベントハンドラー登録用関数（型安全）
+let logEventHandler: typeof CustomLogger.LogEventHandler | null = null
 
-// ログメッセージをキャッチするためのConsoleメソッドのオーバーライド
-const originalConsoleLog = console.log
-const originalConsoleError = console.error
-const originalConsoleWarn = console.warn
-
-// Consoleメソッドをオーバーライドしてログをキャッチ
-const overrideConsoleMethods = () => {
-  console.log = (...args) => {
-    originalConsoleLog.apply(console, args)
-    captureLogMessage('INFO', args)
-  }
-  
-  console.error = (...args) => {
-    originalConsoleError.apply(console, args)
-    captureLogMessage('ERROR', args)
-  }
-  
-  console.warn = (...args) => {
-    originalConsoleWarn.apply(console, args)
-    captureLogMessage('WARN', args)
-  }
-}
-
-// ログメッセージをキャッチしてFABに送信
-const captureLogMessage = (level: LogMessage['level'], args: any[]) => {
-  if (logFabHandler && args.length > 0) {
-    const message = args[0]
-    
-    // カスタムロガーのメッセージフォーマットを解析
-    if (typeof message === 'string' && message.includes('[') && message.includes(']')) {
-      const matches = message.match(/\[(\d{2}:\d{2}:\d{2})\]\s+\[(\w+)\]\s+\[([^\]]+)\]\s+(.+)/)
-      if (matches) {
-        const [, timestamp, logLevel, module, logMessage] = matches
-        const data = args.length > 1 ? args[1] : undefined
-        logFabHandler(logLevel as LogMessage['level'], module, logMessage, data)
-        return
-      }
-    }
-    
-    // フォーマットが一致しない場合はそのまま記録
-    const messageStr = args.map(arg => 
-      typeof arg === 'object' ? JSON.stringify(arg) : String(arg)
-    ).join(' ')
-    
-    logFabHandler(level, 'SYSTEM', messageStr)
-  }
+// ログレベルの型ガード
+const isValidLogLevel = (level: string): level is LogMessage['level'] => {
+  return ['TEMP', 'ERROR', 'WARN', 'INFO', 'DEBUG'].includes(level)
 }
 
 // ENDLESSモード切り替えハンドラ
@@ -908,7 +884,32 @@ interface LogMessage {
 
 const logMessages = ref<LogMessage[]>([])
 const logFabExpanded = ref(false)
+const logDisplayLargeSize = ref(false)
+const selectedLogLevel = ref<LogMessage['level'] | ''>('')
+const selectedLogModule = ref<string>('')
 const maxLogMessages = 100 // 最大保持ログ数
+
+// フィルターされたログメッセージ（パフォーマンス最適化）
+const filteredLogMessages = computed(() => {
+  let filtered = logMessages.value
+  
+  if (selectedLogLevel.value) {
+    filtered = filtered.filter(log => log.level === selectedLogLevel.value)
+  }
+  
+  if (selectedLogModule.value) {
+    filtered = filtered.filter(log => log.module === selectedLogModule.value)
+  }
+  
+  // 新しい順に表示（reverseはリアルタイムでのみ実行）
+  return [...filtered].reverse()
+})
+
+// 利用可能なモジュール一覧
+const availableModules = computed(() => {
+  const modules = new Set(logMessages.value.map(log => log.module))
+  return Array.from(modules).sort()
+})
 
 // 計算プロパティ
 // パビリオンタブがアクティブかどうか
@@ -1028,7 +1029,34 @@ const clearLogs = () => {
   logMessages.value = []
 }
 
+const toggleLogDisplaySize = () => {
+  logDisplayLargeSize.value = !logDisplayLargeSize.value
+}
+
+const copyFilteredLogs = async () => {
+  const logText = filteredLogMessages.value.map(log => {
+    let text = `[${log.timestamp}] [${log.level}] [${log.module}] ${log.message}`
+    if (log.data) {
+      text += `\n${formatLogData(log.data)}`
+    }
+    return text
+  }).join('\n')
+  
+  try {
+    await navigator.clipboard.writeText(logText)
+    logger.info('フィルタされたログをコピーしました', { count: filteredLogMessages.value.length })
+  } catch (error) {
+    logger.error('コピーに失敗しました', error)
+  }
+}
+
 const addLogMessage = (level: LogMessage['level'], module: string, message: string, data?: any) => {
+  // ログレベルの型安全性チェック
+  if (!isValidLogLevel(level)) {
+    console.warn(`Invalid log level: ${level}`)
+    return
+  }
+  
   const timestamp = new Date().toLocaleTimeString('ja-JP', {
     hour12: false,
     hour: '2-digit',
@@ -1044,12 +1072,11 @@ const addLogMessage = (level: LogMessage['level'], module: string, message: stri
     data
   }
   
-  logMessages.value.push(logMessage)
-  
-  // 最大数を超えたら古いログを削除
-  if (logMessages.value.length > maxLogMessages) {
-    logMessages.value = logMessages.value.slice(-maxLogMessages)
+  // メモリ効率的な配列操作：最大数を超えた場合は先頭を削除
+  if (logMessages.value.length >= maxLogMessages) {
+    logMessages.value.shift()
   }
+  logMessages.value.push(logMessage)
 }
 
 const formatLogData = (data: any): string => {
@@ -1362,7 +1389,7 @@ const handleReservationExecution = async () => {
     wasManuallyAborted.value = false
     lastReservationResults.value = []
 
-    logger.info('予約実行開始', { selectedCount: selectedSlotsCount.value })
+    logger.temp('予約実行開始', { selectedCount: selectedSlotsCount.value })
     
     // 現在表示されているパビリオンの選択時間帯のみを取得
     const filteredPavilionIds = new Set(pavilionsStore.filteredPavilions.map(p => p.id))
@@ -1533,7 +1560,7 @@ const handleReservationExecution = async () => {
     const successCount = results.filter(r => r.success).length
     const failureCount = results.length - successCount
 
-    logger.info('予約実行完了', { successCount, failureCount })
+    logger.temp('予約実行完了', { successCount, failureCount })
     
     // 結果詳細をログ出力
     results.forEach(result => {
@@ -1968,11 +1995,11 @@ onMounted(() => {
   // スケジュールフォームの初期化
   resetScheduleForm()
   
-  // ログハンドラーを設定
-  logFabHandler = addLogMessage
-  
-  // Consoleメソッドをオーバーライド
-  overrideConsoleMethods()
+  // CustomLoggerのイベントハンドラーを登録
+  logEventHandler = (level, module, message, data) => {
+    addLogMessage(level, module, message, data)
+  }
+  CustomLogger.addLogEventHandler(logEventHandler)
   
   // スケジュール関連イベントリスナーを登録
   window.addEventListener('schedule-execute-reservation', handleScheduleExecuteReservation as EventListener)
@@ -1985,13 +2012,11 @@ onUnmounted(() => {
   window.removeEventListener('schedule-execute-reservation', handleScheduleExecuteReservation as EventListener)
   window.removeEventListener('schedule-duplicate-edit', handleScheduleDuplicateEdit as EventListener)
   
-  // ログハンドラーをリセット
-  logFabHandler = null
-  
-  // Consoleメソッドを復元
-  console.log = originalConsoleLog
-  console.error = originalConsoleError
-  console.warn = originalConsoleWarn
+  // CustomLoggerのイベントハンドラーを除去
+  if (logEventHandler) {
+    CustomLogger.removeLogEventHandler(logEventHandler)
+    logEventHandler = null
+  }
 })
 </script>
 
@@ -3748,6 +3773,25 @@ onUnmounted(() => {
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
     border: 1px solid rgba(255, 255, 255, 0.1);
     backdrop-filter: blur(10px);
+    transition: all 0.3s ease;
+    
+    &.large-size {
+        width: 600px;
+        max-height: 500px;
+        
+        .ytomo-log-messages {
+            max-height: 420px;
+            
+            @media (max-width: 480px) {
+                max-height: 380px;
+            }
+        }
+        
+        @media (max-width: 640px) {
+            width: 90vw;
+            max-height: 70vh;
+        }
+    }
     
     @media (max-width: 480px) {
         width: 320px;
@@ -3763,9 +3807,33 @@ onUnmounted(() => {
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
     font-weight: bold;
     font-size: 14px;
+    flex-wrap: wrap;
+    gap: 8px;
     
-    .ytomo-log-clear-btn {
-        background: #ef4444;
+    .ytomo-log-controls {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        flex-wrap: wrap;
+    }
+    
+    .ytomo-log-filter {
+        background: rgba(255, 255, 255, 0.1);
+        color: white;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 4px;
+        padding: 2px 6px;
+        font-size: 11px;
+        cursor: pointer;
+        
+        option {
+            background: #1f2937;
+            color: white;
+        }
+    }
+    
+    .ytomo-log-btn {
+        background: #6366f1;
         color: white;
         border: none;
         border-radius: 4px;
@@ -3773,9 +3841,18 @@ onUnmounted(() => {
         font-size: 12px;
         cursor: pointer;
         transition: background-color 0.2s;
+        min-width: 24px;
         
         &:hover {
-            background: #dc2626;
+            background: #4f46e5;
+        }
+        
+        &:last-child {
+            background: #ef4444;
+            
+            &:hover {
+                background: #dc2626;
+            }
         }
     }
 }
