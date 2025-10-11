@@ -428,6 +428,51 @@
         <div class="ytomo-result-time">{{ reservationResult.datetime }}</div>
       </button>
     </Teleport>
+
+    <!-- ログFAB（左下に配置） -->
+    <Teleport to="body">
+      <div class="ytomo-log-fab-container">
+        <!-- ログ表示エリア（展開時） -->
+        <div 
+          v-if="logFabExpanded" 
+          class="ytomo-log-display"
+          @click.stop
+        >
+          <div class="ytomo-log-header">
+            <span>デバッグログ</span>
+            <button @click="clearLogs" class="ytomo-log-clear-btn">クリア</button>
+          </div>
+          <div class="ytomo-log-messages">
+            <div 
+              v-for="(log, index) in logMessages.slice().reverse()" 
+              :key="index"
+              class="ytomo-log-message"
+              :class="`log-${log.level.toLowerCase()}`"
+            >
+              <span class="ytomo-log-time">{{ log.timestamp }}</span>
+              <span class="ytomo-log-level">[{{ log.level }}]</span>
+              <span class="ytomo-log-module">[{{ log.module }}]</span>
+              <span class="ytomo-log-text">{{ log.message }}</span>
+              <pre v-if="log.data" class="ytomo-log-data">{{ formatLogData(log.data) }}</pre>
+            </div>
+            <div v-if="logMessages.length === 0" class="ytomo-log-empty">
+              ログがありません
+            </div>
+          </div>
+        </div>
+        
+        <!-- ログFABボタン -->
+        <button
+          class="ytomo-log-fab"
+          :class="{ 'expanded': logFabExpanded, 'has-logs': logMessages.length > 0 }"
+          @click="toggleLogFab"
+          title="デバッグログ"
+        >
+          <span class="ytomo-log-icon">📋</span>
+          <span v-if="logMessages.length > 0" class="ytomo-log-count">{{ logMessages.length }}</span>
+        </button>
+      </div>
+    </Teleport>
     
     <!-- 予約結果表示（非表示） -->
     <div 
@@ -459,10 +504,61 @@ import { useScheduledReservationStore } from '@/stores/scheduledReservation'
 import { usePavilions } from '@/composables/usePavilions'
 import type { ScheduleData, TicketData, TimeSlotData, PavilionData } from '@/types/api'
 import type { ScheduleFormData, ScheduledTimeSlot } from '@/types/scheduledReservation'
-import { loggers } from '@/utils/logger'
+import { loggers, CustomLogger } from '@/utils/logger'
 
 // Logger setup
 const logger = loggers.ui
+
+// ログメッセージをFABに送信するためのグローバル関数を設定
+let logFabHandler: ((level: LogMessage['level'], module: string, message: string, data?: any) => void) | null = null
+
+// ログメッセージをキャッチするためのConsoleメソッドのオーバーライド
+const originalConsoleLog = console.log
+const originalConsoleError = console.error
+const originalConsoleWarn = console.warn
+
+// Consoleメソッドをオーバーライドしてログをキャッチ
+const overrideConsoleMethods = () => {
+  console.log = (...args) => {
+    originalConsoleLog.apply(console, args)
+    captureLogMessage('INFO', args)
+  }
+  
+  console.error = (...args) => {
+    originalConsoleError.apply(console, args)
+    captureLogMessage('ERROR', args)
+  }
+  
+  console.warn = (...args) => {
+    originalConsoleWarn.apply(console, args)
+    captureLogMessage('WARN', args)
+  }
+}
+
+// ログメッセージをキャッチしてFABに送信
+const captureLogMessage = (level: LogMessage['level'], args: any[]) => {
+  if (logFabHandler && args.length > 0) {
+    const message = args[0]
+    
+    // カスタムロガーのメッセージフォーマットを解析
+    if (typeof message === 'string' && message.includes('[') && message.includes(']')) {
+      const matches = message.match(/\[(\d{2}:\d{2}:\d{2})\]\s+\[(\w+)\]\s+\[([^\]]+)\]\s+(.+)/)
+      if (matches) {
+        const [, timestamp, logLevel, module, logMessage] = matches
+        const data = args.length > 1 ? args[1] : undefined
+        logFabHandler(logLevel as LogMessage['level'], module, logMessage, data)
+        return
+      }
+    }
+    
+    // フォーマットが一致しない場合はそのまま記録
+    const messageStr = args.map(arg => 
+      typeof arg === 'object' ? JSON.stringify(arg) : String(arg)
+    ).join(' ')
+    
+    logFabHandler(level, 'SYSTEM', messageStr)
+  }
+}
 
 // ENDLESSモード切り替えハンドラ
 const handleEndlessToggle = () => {
@@ -801,6 +897,19 @@ interface ReservationResult {
 
 const reservationResult = ref<ReservationResult | null>(null)
 
+// ログFAB関連の状態
+interface LogMessage {
+  timestamp: string
+  level: 'TEMP' | 'ERROR' | 'WARN' | 'INFO' | 'DEBUG'
+  module: string
+  message: string
+  data?: any
+}
+
+const logMessages = ref<LogMessage[]>([])
+const logFabExpanded = ref(false)
+const maxLogMessages = 100 // 最大保持ログ数
+
 // 計算プロパティ
 // パビリオンタブがアクティブかどうか
 const isPavilionTabActive = computed(() => activeTab.value === 'pavilion')
@@ -909,6 +1018,51 @@ const availableCount = computed(() => {
     return count + (pavilion.timeSlots?.filter((slot: any) => slot.available).length || 0)
   }, 0)
 })
+
+// ログFAB関連のメソッド
+const toggleLogFab = () => {
+  logFabExpanded.value = !logFabExpanded.value
+}
+
+const clearLogs = () => {
+  logMessages.value = []
+}
+
+const addLogMessage = (level: LogMessage['level'], module: string, message: string, data?: any) => {
+  const timestamp = new Date().toLocaleTimeString('ja-JP', {
+    hour12: false,
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit'
+  })
+  
+  const logMessage: LogMessage = {
+    timestamp,
+    level,
+    module,
+    message,
+    data
+  }
+  
+  logMessages.value.push(logMessage)
+  
+  // 最大数を超えたら古いログを削除
+  if (logMessages.value.length > maxLogMessages) {
+    logMessages.value = logMessages.value.slice(-maxLogMessages)
+  }
+}
+
+const formatLogData = (data: any): string => {
+  if (data === null || data === undefined) {
+    return ''
+  }
+  
+  try {
+    return JSON.stringify(data, null, 2)
+  } catch (error) {
+    return String(data)
+  }
+}
 
 // メソッド
 const handlePavilionSearch = async () => {
@@ -1814,6 +1968,12 @@ onMounted(() => {
   // スケジュールフォームの初期化
   resetScheduleForm()
   
+  // ログハンドラーを設定
+  logFabHandler = addLogMessage
+  
+  // Consoleメソッドをオーバーライド
+  overrideConsoleMethods()
+  
   // スケジュール関連イベントリスナーを登録
   window.addEventListener('schedule-execute-reservation', handleScheduleExecuteReservation as EventListener)
   window.addEventListener('schedule-duplicate-edit', handleScheduleDuplicateEdit as EventListener)
@@ -1824,6 +1984,14 @@ onUnmounted(() => {
   // イベントリスナーを削除
   window.removeEventListener('schedule-execute-reservation', handleScheduleExecuteReservation as EventListener)
   window.removeEventListener('schedule-duplicate-edit', handleScheduleDuplicateEdit as EventListener)
+  
+  // ログハンドラーをリセット
+  logFabHandler = null
+  
+  // Consoleメソッドを復元
+  console.log = originalConsoleLog
+  console.error = originalConsoleError
+  console.warn = originalConsoleWarn
 })
 </script>
 
@@ -3505,5 +3673,213 @@ onUnmounted(() => {
         transition: none;
     }
     
+}
+
+/* ログFAB関連スタイル */
+.ytomo-log-fab-container {
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
+    z-index: 10002;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+    pointer-events: auto;
+}
+
+.ytomo-log-fab {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+    color: white;
+    border: none;
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+    
+    &:hover {
+        transform: scale(1.1);
+        box-shadow: 0 6px 16px rgba(99, 102, 241, 0.5);
+    }
+    
+    &.expanded {
+        background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+        box-shadow: 0 4px 12px rgba(245, 158, 11, 0.4);
+    }
+    
+    &.has-logs {
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
+    }
+    
+    .ytomo-log-icon {
+        font-size: 20px;
+    }
+    
+    .ytomo-log-count {
+        position: absolute;
+        top: -6px;
+        right: -6px;
+        background: #ef4444;
+        color: white;
+        border-radius: 10px;
+        padding: 2px 6px;
+        font-size: 10px;
+        font-weight: bold;
+        min-width: 16px;
+        text-align: center;
+        line-height: 1.2;
+    }
+}
+
+.ytomo-log-display {
+    background: rgba(0, 0, 0, 0.9);
+    color: white;
+    border-radius: 8px;
+    width: 400px;
+    max-height: 300px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    
+    @media (max-width: 480px) {
+        width: 320px;
+        max-height: 250px;
+    }
+}
+
+.ytomo-log-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 16px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    font-weight: bold;
+    font-size: 14px;
+    
+    .ytomo-log-clear-btn {
+        background: #ef4444;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        padding: 4px 8px;
+        font-size: 12px;
+        cursor: pointer;
+        transition: background-color 0.2s;
+        
+        &:hover {
+            background: #dc2626;
+        }
+    }
+}
+
+.ytomo-log-messages {
+    max-height: 220px;
+    overflow-y: auto;
+    padding: 8px;
+    
+    @media (max-width: 480px) {
+        max-height: 180px;
+    }
+}
+
+.ytomo-log-message {
+    margin-bottom: 8px;
+    padding: 6px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    line-height: 1.4;
+    border-left: 3px solid transparent;
+    
+    &.log-temp {
+        background: rgba(168, 85, 247, 0.2);
+        border-left-color: #a855f7;
+    }
+    
+    &.log-error {
+        background: rgba(239, 68, 68, 0.2);
+        border-left-color: #ef4444;
+    }
+    
+    &.log-warn {
+        background: rgba(245, 158, 11, 0.2);
+        border-left-color: #f59e0b;
+    }
+    
+    &.log-info {
+        background: rgba(59, 130, 246, 0.2);
+        border-left-color: #3b82f6;
+    }
+    
+    &.log-debug {
+        background: rgba(107, 114, 128, 0.2);
+        border-left-color: #6b7280;
+    }
+    
+    .ytomo-log-time {
+        color: #9ca3af;
+        font-size: 10px;
+        margin-right: 6px;
+    }
+    
+    .ytomo-log-level {
+        font-weight: bold;
+        margin-right: 6px;
+        font-size: 10px;
+    }
+    
+    .ytomo-log-module {
+        color: #60a5fa;
+        margin-right: 6px;
+        font-size: 10px;
+    }
+    
+    .ytomo-log-text {
+        color: white;
+    }
+    
+    .ytomo-log-data {
+        margin-top: 4px;
+        background: rgba(0, 0, 0, 0.3);
+        padding: 4px 6px;
+        border-radius: 3px;
+        font-size: 10px;
+        color: #d1d5db;
+        white-space: pre-wrap;
+        overflow-x: auto;
+    }
+}
+
+.ytomo-log-empty {
+    text-align: center;
+    color: #9ca3af;
+    padding: 20px;
+    font-style: italic;
+}
+
+/* スクロールバースタイル */
+.ytomo-log-messages::-webkit-scrollbar {
+    width: 6px;
+}
+
+.ytomo-log-messages::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 3px;
+}
+
+.ytomo-log-messages::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 3px;
+}
+
+.ytomo-log-messages::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.5);
 }
 </style>
