@@ -749,6 +749,8 @@ export const usePavilionsStore = defineStore('pavilions', () => {
 
         if (errorName === 'fetch_remainder_failed') {
           failureReason = '満席'
+        } else if (errorName === 'schedule_out_of_stock') {
+          failureReason = '満席'
         } else if (errorName === 'th_error') {
           failureReason = '無効'
         } else if (errorMessage.includes('select ticket valid error')) {
