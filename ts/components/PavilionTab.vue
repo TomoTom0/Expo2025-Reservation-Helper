@@ -1094,10 +1094,27 @@ const formatLogData = (data: any): string => {
 }
 
 // メソッド
+// キャンセル制御
+let currentAbortController: AbortController | null = null
+
 const handlePavilionSearch = async () => {
   try {
     logger.info('パビリオン検索開始', { query: searchInput.value })
-    showProcessingOverlay('パビリオンを検索中...')
+
+    // 前回の処理をキャンセル
+    if (currentAbortController) {
+      currentAbortController.abort()
+    }
+
+    // 新しいAbortControllerを作成
+    currentAbortController = new AbortController()
+
+    overlaysStore.showProcessingOverlay('パビリオンを検索中...', () => {
+      if (currentAbortController) {
+        currentAbortController.abort()
+        currentAbortController = null
+      }
+    })
 
     // 選択されたチケットIDsを取得
     const ticketIds = ticketsStore.selectedTicketIds
@@ -1117,44 +1134,49 @@ const handlePavilionSearch = async () => {
       選択済みチケット数: ticketsStore.selectedTicketIds.length,
       選択済みチケットIDs: ticketIds
     })
-    
-    // 選択された入場日付を取得  
+
+    // 選択された入場日付を取得
     const entranceDate = selectedEntranceDate.value
-    
+
     // 入場予約から正しいパビリオン予約種類を取得
     const pavilionReservationInfo = ticketsStore.selectedPavilionReservationInfo
     const registeredChannel = pavilionReservationInfo?.activeChannel || '4' // デフォルトはfast
-    
-    logger.info('検索パラメータ', { 
-      query: searchInput.value.trim(), 
-      ticketIds: ticketIds.length, 
+
+    logger.info('検索パラメータ', {
+      query: searchInput.value.trim(),
+      ticketIds: ticketIds.length,
       entranceDate,
-      registeredChannel 
+      registeredChannel
     })
-    
+
     // パビリオン検索実行
     const results = await searchPavilions(
       searchInput.value.trim(),
       ticketIds,
       entranceDate || undefined
     )
-    
+
+    // キャンセルされた場合は処理を中断
+    if (currentAbortController.signal.aborted) {
+      logger.info('パビリオン検索がキャンセルされました')
+      return
+    }
+
     // 検索直後は空きのみフィルタを自動ON（旧仕様に合わせる）
     if (!isAvailableOnlyFilter.value) {
       toggleAvailableOnlyFilter()
       logger.info('検索後に空きのみフィルター自動ON')
     }
-    
+
     logger.info('パビリオン検索完了', { count: results.length })
-    hideProcessingOverlay()
+    overlaysStore.hideProcessingOverlay()
+    currentAbortController = null
   } catch (error) {
     logger.error('パビリオン検索エラー', error)
-    hideProcessingOverlay()
+    overlaysStore.hideProcessingOverlay()
+    currentAbortController = null
   }
 }
-
-// キャンセル制御
-let currentAbortController: AbortController | null = null
 
 const handleLoadFavorites = async () => {
   try {
@@ -1201,14 +1223,14 @@ const handleLoadFavorites = async () => {
       favoriteNames: results.map(p => p.name)
     })
 
-    hideProcessingOverlay()
+    overlaysStore.hideProcessingOverlay()
   } catch (error: any) {
     if (error.name === 'AbortError') {
       logger.info('お気に入り読み込みがキャンセルされました')
     } else {
       logger.error('お気に入り読み込みエラー', error)
     }
-    hideProcessingOverlay()
+    overlaysStore.hideProcessingOverlay()
   } finally {
     currentAbortController = null
   }
@@ -1222,32 +1244,45 @@ const handleToggleAvailableOnlyFilter = () => {
 const handleRefresh = async () => {
   try {
     logger.info('データ更新開始（選択リセットなし）')
-    showProcessingOverlay('パビリオン情報を更新中...')
+
+    // 前回の処理をキャンセル
+    if (currentAbortController) {
+      currentAbortController.abort()
+    }
+
+    // 新しいAbortControllerを作成
+    currentAbortController = new AbortController()
+
+    overlaysStore.showProcessingOverlay('パビリオン情報を更新中...', () => {
+      if (currentAbortController) {
+        currentAbortController.abort()
+        currentAbortController = null
+      }
+    })
 
     // 選択されたチケットIDsを取得
     const ticketIds = ticketsStore.selectedTicketIds
 
     // 選択された入場日付を取得
     const entranceDate = selectedEntranceDate.value
-    
+
     await refreshPavilionData(ticketIds, entranceDate || undefined)
-    hideProcessingOverlay()
+
+    // キャンセルされた場合は処理を中断
+    if (currentAbortController.signal.aborted) {
+      logger.info('データ更新がキャンセルされました')
+      return
+    }
+
+    overlaysStore.hideProcessingOverlay()
+    currentAbortController = null
   } catch (error) {
     logger.error('データ更新エラー', error)
-    hideProcessingOverlay()
+    overlaysStore.hideProcessingOverlay()
+    currentAbortController = null
   }
 }
 
-// オーバーレイ制御（ストア連携）
-const showProcessingOverlay = (message: string) => {
-  overlaysStore.showProcessingOverlay(message)
-  logger.debug('誤操作防止オーバーレイ表示', { message })
-}
-
-const hideProcessingOverlay = () => {
-  overlaysStore.hideProcessingOverlay()
-  logger.debug('誤操作防止オーバーレイ非表示')
-}
 
 // お気に入り状態をリアクティブに判定
 const isFavorite = (pavilionId: string) => {
@@ -1598,7 +1633,7 @@ const handleReservationExecution = async () => {
     })
     
     // 継続予約の場合はダイアログは隠さない（sequentialReservationStoreで管理）
-    hideProcessingOverlay()
+    overlaysStore.hideProcessingOverlay()
     
     // 予約結果を直接表示
     results.forEach(result => {

@@ -368,36 +368,24 @@ export const usePavilionsStore = defineStore('pavilions', () => {
   const getTimeSlotsForPavilions = async (pavilionIds: string[], ticketIds: string[] = [], entranceDate?: string): Promise<Map<string, { timeSlots: TimeSlotData[], pavilionName?: string }>> => {
     const results = new Map<string, { timeSlots: TimeSlotData[], pavilionName?: string }>()
 
+    // 全パビリオンを並列実行（制限なし）
+    const promises = pavilionIds.map(async (pavilionId) => {
+      try {
+        const result = await getPavilionTimeSlots(pavilionId, ticketIds, entranceDate)
+        return { pavilionId, timeSlots: result.timeSlots, pavilionName: result.pavilionName }
+      } catch (error) {
+        logger.warn('パビリオンの時間帯取得に失敗', { pavilionId, error: error instanceof Error ? error.message : String(error) })
+        return { pavilionId, timeSlots: [], pavilionName: undefined }
+      }
+    })
 
-    // 並列実行でパフォーマンス向上（最大5件同時）
-    const concurrency = Math.min(5, pavilionIds.length)
-    const chunks: string[][] = []
+    const allResults = await Promise.all(promises)
 
-    for (let i = 0; i < pavilionIds.length; i += concurrency) {
-      chunks.push(pavilionIds.slice(i, i + concurrency))
-    }
+    allResults.forEach(({ pavilionId, timeSlots, pavilionName }) => {
+      results.set(pavilionId, { timeSlots, pavilionName })
+    })
 
-
-    for (let chunkIndex = 0; chunkIndex < chunks.length; chunkIndex++) {
-      const chunk = chunks[chunkIndex]
-
-      const promises = chunk.map(async (pavilionId) => {
-        try {
-          const result = await getPavilionTimeSlots(pavilionId, ticketIds, entranceDate)
-          return { pavilionId, timeSlots: result.timeSlots, pavilionName: result.pavilionName }
-        } catch (error) {
-          logger.warn('パビリオンの時間帯取得に失敗', { pavilionId, error: error instanceof Error ? error.message : String(error) })
-          return { pavilionId, timeSlots: [], pavilionName: undefined }
-        }
-      })
-
-      const chunkResults = await Promise.all(promises)
-
-      chunkResults.forEach(({ pavilionId, timeSlots, pavilionName }) => {
-        results.set(pavilionId, { timeSlots, pavilionName })
-      })
-    }
-
+    logger.info('時間帯情報取得完了', { count: pavilionIds.length, parallel: true })
 
     return results
   }
