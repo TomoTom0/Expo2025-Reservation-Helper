@@ -47,4 +47,7 @@ dist-ts/
 *-backup.*
 *-temp.*
 
+# TypeScriptビルドキャッシュ
+*.tsbuildinfo
+
 _archived/
