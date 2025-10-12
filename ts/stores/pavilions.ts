@@ -749,7 +749,7 @@ export const usePavilionsStore = defineStore('pavilions', () => {
 
         if (errorName === 'schedule_out_of_stock') {
           failureReason = '満席'
-        } else if (errorMessage.includes('select ticket valid error')) {
+        } else if (errorName === 'select_ticket_valid_error') {
           failureReason = '無効'
         }
 
@@ -775,10 +775,7 @@ export const usePavilionsStore = defineStore('pavilions', () => {
       const errorMessage = error instanceof Error ? error.message : String(error)
 
       // 失敗理由を判定（catch節では詳細なエラー構造が取得できないためその他とする）
-      let failureReason: '満席' | '無効' | 'その他' = 'その他'
-      if (errorMessage.includes('select ticket valid error')) {
-        failureReason = '無効'
-      }
+      const failureReason: '満席' | '無効' | 'その他' = 'その他'
 
       logger.error('予約実行エラー', { error: errorMessage })
       return {

@@ -8,7 +8,7 @@
 // @run-at       document-end
 // ==/UserScript==
 
-// Built: 2025/10/12 14:06:35
+// Built: 2025/10/12 14:20:24
 
 
 (function webpackUniversalModuleDefinition(root, factory) {
@@ -39845,7 +39845,7 @@ const usePavilionsStore = (0,pinia/* defineStore */.nY)('pavilions', () => {
                 if (errorName === 'schedule_out_of_stock') {
                     failureReason = '満席';
                 }
-                else if (errorMessage.includes('select ticket valid error')) {
+                else if (errorName === 'select_ticket_valid_error') {
                     failureReason = '無効';
                 }
                 return {
@@ -39869,10 +39869,7 @@ const usePavilionsStore = (0,pinia/* defineStore */.nY)('pavilions', () => {
             setTimeSlotExecutionState(pavilionId, timeSlot.timeSlotId || timeSlot.time, 'failed');
             const errorMessage = error instanceof Error ? error.message : String(error);
             // 失敗理由を判定（catch節では詳細なエラー構造が取得できないためその他とする）
-            let failureReason = 'その他';
-            if (errorMessage.includes('select ticket valid error')) {
-                failureReason = '無効';
-            }
+            const failureReason = 'その他';
             pavilions_logger.error('予約実行エラー', { error: errorMessage });
             return {
                 success: false,
