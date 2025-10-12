@@ -3,23 +3,15 @@ const webpack = require('webpack');
 const fs = require('fs');
 const { VueLoaderPlugin } = require('vue-loader');
 
-// version.datからバージョン番号を読み取り
-const getVersionFromFile = () => {
-  try {
-    const versionPath = path.resolve(__dirname, 'version.dat');
-    return fs.readFileSync(versionPath, 'utf8').trim();
-  } catch (error) {
-    console.warn('version.datの読み取りに失敗しました。デフォルトバージョンを使用します:', error.message);
-    return '0.5.4'; // フォールバック
-  }
-};
+// package.jsonからバージョン番号を読み取り（唯一の真実の源）
+const packageJson = require('./package.json');
+const APP_VERSION = packageJson.version;
 
 // UserScriptヘッダー（ビルド時に動的生成）
 const generateUserScriptHeader = () => {
-  const version = getVersionFromFile();
   const buildTime = new Date().toLocaleString('ja-JP', {
     year: 'numeric',
-    month: '2-digit', 
+    month: '2-digit',
     day: '2-digit',
     hour: '2-digit',
     minute: '2-digit',
@@ -29,7 +21,7 @@ const generateUserScriptHeader = () => {
   return `// ==UserScript==
 // @name         yt-Expo2025-Reservation-Helper
 // @namespace    http://staybrowser.com/
-// @version      ${version}
+// @version      ${APP_VERSION}
 // @description  大阪万博2025予約支援ツール: パビリオン検索・予約・監視・同行者管理・入場予約の自動化
 // @author       TomoTom0 https://github.com/TomoTom0
 // @match        https://ticket.expo2025.or.jp/*
@@ -40,6 +32,33 @@ const generateUserScriptHeader = () => {
 
 `;
 };
+
+// manifest.json生成プラグイン
+class GenerateManifestPlugin {
+  apply(compiler) {
+    compiler.hooks.emit.tapAsync('GenerateManifestPlugin', (compilation, callback) => {
+      try {
+        // テンプレート読み込み
+        const templatePath = path.resolve(__dirname, 'src/manifest.template.json');
+        const template = JSON.parse(fs.readFileSync(templatePath, 'utf8'));
+
+        // バージョン番号を注入
+        template.version = APP_VERSION;
+
+        // manifest.jsonを生成
+        const manifestJson = JSON.stringify(template, null, 2);
+        const outputPath = path.resolve(__dirname, 'src/manifest.json');
+        fs.writeFileSync(outputPath, manifestJson, 'utf8');
+
+        console.log(`✅ manifest.json generated (version: ${APP_VERSION})`);
+      } catch (error) {
+        console.error('❌ manifest.json生成エラー:', error.message);
+      }
+
+      callback();
+    });
+  }
+}
 
 module.exports = {
   entry: './ts/modules/main.ts', // TypeScript完全移行完了
@@ -68,13 +87,15 @@ module.exports = {
   target: 'web', // ブラウザ環境
   devtool: false, // ソースマップ無効化
   plugins: [
+    new GenerateManifestPlugin(), // manifest.json生成
     new webpack.BannerPlugin({
       banner: generateUserScriptHeader(),
       raw: true, // コメント形式として扱わない
       entryOnly: true
     }),
     new webpack.DefinePlugin({
-      'process.env.LOG_LEVEL': JSON.stringify(process.env.LOG_LEVEL || 'WARN')
+      'process.env.LOG_LEVEL': JSON.stringify(process.env.LOG_LEVEL || 'WARN'),
+      'process.env.APP_VERSION': JSON.stringify(APP_VERSION) // バージョン番号をコードに埋め込み
     }),
     new VueLoaderPlugin() // Vue Loader Plugin追加
   ],

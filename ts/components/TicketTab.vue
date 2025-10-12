@@ -285,7 +285,6 @@ import { useMainDialogStore } from '@/stores/mainDialog'
 import { useTickets } from '@/composables/useTickets'
 import { loggers } from '@/utils/logger'
 import { authenticatedFetch } from '@/utils/authManager'
-import { isSeasonPass } from '@/utils/ticketUtils'
 // LocationHelper は location_index プロパティが実装されるまで一時的にコメントアウト
 // import { LocationHelper } from '@/modules/entrance-reservation-state-manager'
 import { getLongNameFromShortName, getShortNameFromChannel, getAllPavilionReservationTypes } from '@/utils/pavilionReservationMapping'
@@ -368,13 +367,15 @@ const filteredTickets = computed(() => {
     if (isOwnOnlyToggle.value && ticket.isOwn === false) {
       return false
     }
-    
-    // 自分のチケット: 有効な入場予約があるもののみ
+
+    // 自分のチケット: 有効な入場予約または空き枠（NEW）があるもののみ
     if (ticket.isOwn === true) {
-      const validSchedules = ticket.schedules?.filter((schedule: ScheduleData) => schedule.isEffective === true) || []
+      const validSchedules = ticket.schedules?.filter((schedule: ScheduleData) =>
+        schedule.isEffective === true || schedule.schedule_name === 'NEW'
+      ) || []
       return validSchedules.length > 0
     }
-    
+
     // 自分以外のチケット: 入場予約がない場合も空白で表示
     return true
   })
@@ -691,28 +692,9 @@ const getVisibleSchedules = (ticket: TicketData): ScheduleData[] => {
     return []
   }
 
-  // 通期パス判定
-  const isSeasonPassFlag = isSeasonPass(ticket)
-
   // 有効なスケジュールをフィルター
   const filtered = ticket.schedules.filter(schedule => schedule.isEffective === true)
 
-  // 通期パスの場合、有効な予約が3未満なら空き枠を1つ追加
-  if (isSeasonPassFlag && filtered.length < 3) {
-    filtered.push({
-      user_visiting_reservation_id: -1, // 固定ID
-      use_state: 0,
-      entrance_date: '',
-      gate_type: 0,
-      location_index: 0,
-      schedule_name: 'NEW',
-      time_start: '',
-      selected: false,
-      isEffective: false,
-      pavilionReservationInfo: undefined
-    })
-  }
-  
   return filtered.sort((a, b) => {
       // 日付順でソート
       const dateA = a.entrance_date

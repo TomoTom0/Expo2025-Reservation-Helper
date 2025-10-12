@@ -49,6 +49,7 @@ export interface TicketData {
     isOwn: boolean;             // 自分のチケットかどうか
     label?: string;             // チケットラベル
     schedules?: ScheduleData[]; // 入場予約情報
+    event_schedules?: any[];    // パビリオン予約情報（API取得時のみ）
 }
 
 export interface TimeSlotData {
