@@ -108,6 +108,7 @@ export const usePavilionsStore = defineStore('pavilions', () => {
    * パビリオンIDから時間帯情報と基本情報を取得（個別API呼び出し）
    */
   const getPavilionTimeSlots = async (pavilionId: string, ticketIds: string[] = [], entranceDate?: string): Promise<{ timeSlots: TimeSlotData[], pavilionName?: string }> => {
+    const startTime = performance.now()
 
     try {
       // 時間帯取得用の詳細APIを呼び出し
@@ -122,7 +123,7 @@ export const usePavilionsStore = defineStore('pavilions', () => {
 
       const timeslotUrl = `/api/d/events/${pavilionId}?${params.toString()}&channel=4`
 
-      
+      const fetchStart = performance.now()
       const response = await authenticatedFetch(timeslotUrl, {
         method: 'GET',
         headers: {
@@ -132,6 +133,8 @@ export const usePavilionsStore = defineStore('pavilions', () => {
         },
         credentials: 'include'
       })
+      const fetchEnd = performance.now()
+      logger.temp(`API応答時間 - ${pavilionId}`, { fetchTime: `${(fetchEnd - fetchStart).toFixed(0)}ms` })
 
 
       if (!response.ok) {
@@ -204,14 +207,19 @@ export const usePavilionsStore = defineStore('pavilions', () => {
       }
       
       logger.debug('パビリオン時間帯パース完了', { pavilionId, timeSlotCount: timeSlots.length })
-      
+
+      const totalTime = performance.now() - startTime
+      logger.temp(`パビリオン取得完了 - ${pavilionId}`, { totalTime: `${totalTime.toFixed(0)}ms` })
+
       // パビリオン名とタイムスロット情報を返す
       return {
         timeSlots,
         pavilionName: data.event_name || undefined
       }
-      
+
     } catch (error) {
+      const totalTime = performance.now() - startTime
+      logger.temp(`パビリオン取得失敗 - ${pavilionId}`, { totalTime: `${totalTime.toFixed(0)}ms`, error })
       return { timeSlots: [], pavilionName: undefined }
     }
   }
@@ -244,22 +252,24 @@ export const usePavilionsStore = defineStore('pavilions', () => {
    * パビリオン検索実行
    */
   const searchPavilions = async (query: string = '', ticketIds: string[] = [], entranceDate?: string): Promise<PavilionData[]> => {
+    const searchStartTime = performance.now()
     logger.info('パビリオン検索開始', { query, ticketIds: ticketIds.length, entranceDate })
     isLoading.value = true
     searchQuery.value = query
-    
+
     // 検索時は選択状態をリセット（旧ソースからの変更仕様）
     clearSelectedTimeSlots()
     logger.debug('検索実行により選択状態をリセット')
-    
+
     // 検索開始時に古い結果をクリア
     pavilions.value.clear()
     lastSearchResults.value = []
-    
+
     try {
       const apiUrl = buildAPIUrl(query, ticketIds, entranceDate)
       logger.debug('API URL', { url: apiUrl })
-      
+
+      const listApiStart = performance.now()
       const response = await authenticatedFetch(apiUrl, {
         method: 'GET',
         headers: {
@@ -276,6 +286,8 @@ export const usePavilionsStore = defineStore('pavilions', () => {
       }
 
       const data = await response.json()
+      const listApiEnd = performance.now()
+      logger.temp('パビリオン一覧API時間', { duration: `${(listApiEnd - listApiStart).toFixed(0)}ms` })
 
       // パビリオン一覧検索レスポンスをデバッグ出力
       logger.temp('パビリオン一覧検索レスポンス', {
@@ -341,15 +353,22 @@ export const usePavilionsStore = defineStore('pavilions', () => {
         logger.info(`時間帯取得対象: ${pavilionIds.length}/${pavilionResults.length}件（非空欄検索のため全件取得）`)
       }
       
+      const timeSlotsStart = performance.now()
       const timeSlotsMap = await getTimeSlotsForPavilions(pavilionIds, ticketIds, entranceDate)
+      const timeSlotsEnd = performance.now()
+      logger.temp('時間帯情報取得時間', { duration: `${(timeSlotsEnd - timeSlotsStart).toFixed(0)}ms` })
+
       applyTimeSlotsToData(pavilionResults, timeSlotsMap)
-      
+
       // メモリに保存
       for (const pavilion of pavilionResults) {
         pavilions.value.set(pavilion.id, pavilion)
       }
-      
+
       lastSearchResults.value = pavilionResults
+
+      const searchTotalTime = performance.now() - searchStartTime
+      logger.temp('パビリオン検索合計時間', { duration: `${searchTotalTime.toFixed(0)}ms` })
       logger.info('パビリオン検索完了', { count: pavilionResults.length, withTimeSlots: true })
       return pavilionResults
     } catch (error) {
@@ -363,29 +382,57 @@ export const usePavilionsStore = defineStore('pavilions', () => {
 
 
   /**
-   * pavilion IDsから時間帯情報をまとめて取得して返す関数（並列化版）
+   * pavilion IDsから時間帯情報をまとめて取得して返す関数（並列化版 - 適切な同時実行制限付き）
    */
   const getTimeSlotsForPavilions = async (pavilionIds: string[], ticketIds: string[] = [], entranceDate?: string): Promise<Map<string, { timeSlots: TimeSlotData[], pavilionName?: string }>> => {
     const results = new Map<string, { timeSlots: TimeSlotData[], pavilionName?: string }>()
 
-    // 全パビリオンを並列実行（制限なし）
-    const promises = pavilionIds.map(async (pavilionId) => {
-      try {
-        const result = await getPavilionTimeSlots(pavilionId, ticketIds, entranceDate)
-        return { pavilionId, timeSlots: result.timeSlots, pavilionName: result.pavilionName }
-      } catch (error) {
-        logger.warn('パビリオンの時間帯取得に失敗', { pavilionId, error: error instanceof Error ? error.message : String(error) })
-        return { pavilionId, timeSlots: [], pavilionName: undefined }
-      }
+    // 同時実行数を制限（ブラウザの接続制限を考慮して10並列）
+    const concurrency = 10
+    const batches: string[][] = []
+
+    // バッチに分割
+    for (let i = 0; i < pavilionIds.length; i += concurrency) {
+      batches.push(pavilionIds.slice(i, i + concurrency))
+    }
+
+    logger.debug('時間帯取得開始', {
+      total: pavilionIds.length,
+      batches: batches.length,
+      concurrency
     })
 
-    const allResults = await Promise.all(promises)
+    // バッチごとに並列実行
+    for (let batchIndex = 0; batchIndex < batches.length; batchIndex++) {
+      const batch = batches[batchIndex]
 
-    allResults.forEach(({ pavilionId, timeSlots, pavilionName }) => {
-      results.set(pavilionId, { timeSlots, pavilionName })
+      const promises = batch.map(async (pavilionId) => {
+        try {
+          const result = await getPavilionTimeSlots(pavilionId, ticketIds, entranceDate)
+          return { pavilionId, timeSlots: result.timeSlots, pavilionName: result.pavilionName }
+        } catch (error) {
+          logger.warn('パビリオンの時間帯取得に失敗', { pavilionId, error: error instanceof Error ? error.message : String(error) })
+          return { pavilionId, timeSlots: [], pavilionName: undefined }
+        }
+      })
+
+      const batchResults = await Promise.all(promises)
+
+      batchResults.forEach(({ pavilionId, timeSlots, pavilionName }) => {
+        results.set(pavilionId, { timeSlots, pavilionName })
+      })
+
+      logger.debug(`バッチ${batchIndex + 1}/${batches.length}完了`, {
+        processed: results.size,
+        total: pavilionIds.length
+      })
+    }
+
+    logger.info('時間帯情報取得完了', {
+      count: pavilionIds.length,
+      batches: batches.length,
+      concurrency
     })
-
-    logger.info('時間帯情報取得完了', { count: pavilionIds.length, parallel: true })
 
     return results
   }

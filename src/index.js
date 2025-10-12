@@ -8,7 +8,7 @@
 // @run-at       document-end
 // ==/UserScript==
 
-// Built: 2025/10/12 16:07:03
+// Built: 2025/10/12 19:28:44
 
 
 (function webpackUniversalModuleDefinition(root, factory) {
@@ -560,28 +560,6 @@ module.exports = setAttributesWithoutAttributes;
 
 /***/ }),
 
-/***/ 61:
-/***/ ((module, __webpack_exports__, __webpack_require__) => {
-
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   A: () => (__WEBPACK_DEFAULT_EXPORT__)
-/* harmony export */ });
-/* harmony import */ var _node_modules_css_loader_dist_runtime_noSourceMaps_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(601);
-/* harmony import */ var _node_modules_css_loader_dist_runtime_noSourceMaps_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_css_loader_dist_runtime_noSourceMaps_js__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(314);
-/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1__);
-// Imports
-
-
-var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1___default()((_node_modules_css_loader_dist_runtime_noSourceMaps_js__WEBPACK_IMPORTED_MODULE_0___default()));
-// Module
-___CSS_LOADER_EXPORT___.push([module.id, `.ytomo-pavilion-tab[data-v-134b074b]{padding:0 8px 20px 8px;height:100%;display:flex;flex-direction:column;gap:16px;overflow-y:auto;color-scheme:light}.ytomo-search-controls[data-v-134b074b]{background:#fff;border-radius:8px;padding:12px;box-shadow:0 1px 3px rgba(0,0,0,.1);border:1px solid #e2e8f0;flex-shrink:0;display:flex;gap:12px;align-items:center}@media(max-width: 600px){.ytomo-search-controls[data-v-134b074b]{flex-direction:column;align-items:stretch;gap:12px}}.ytomo-search-input-container[data-v-134b074b]{flex:1}.ytomo-search-input[data-v-134b074b]{width:100%;padding:10px 16px;border:1px solid #d1d5db;border-radius:8px;font-size:14px;transition:all .2s}.ytomo-search-input[data-v-134b074b]:focus{outline:none;border-color:#2c5aa0}.ytomo-search-input[data-v-134b074b]::placeholder{color:#9ca3af}.ytomo-control-buttons[data-v-134b074b]{display:flex;gap:8px;flex-shrink:0}@media(max-width: 600px){.ytomo-control-buttons[data-v-134b074b]{justify-content:center}}.ytomo-icon-button[data-v-134b074b]{width:40px;height:40px;border:1px solid #d1d5db;border-radius:8px;background:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s;font-size:16px;position:relative}.ytomo-icon-button[data-v-134b074b]:hover{background:#f3f4f6;border-color:#9ca3af;transform:translateY(-1px)}.ytomo-icon-button[data-v-134b074b]:active{transform:translateY(0)}.ytomo-icon-button.active[data-v-134b074b]{background:#2c5aa0;border-color:#2c5aa0;color:#fff}.ytomo-icon-button.active[data-v-134b074b]:hover{background:#1a365d}.ytomo-icon-button .ytomo-count-badge[data-v-134b074b]{position:absolute;top:-8px;right:-8px;background:#f44;color:#fff;border-radius:10px;padding:2px 6px;font-size:10px;font-weight:bold;min-width:16px;text-align:center;line-height:1.2;pointer-events:none;z-index:10}.ytomo-icon-button .ytomo-schedule-button[data-v-134b074b]{position:relative}.ytomo-icon-button .ytomo-schedule-button .ytomo-schedule-icon[data-v-134b074b]{transition:transform .3s ease}.ytomo-icon-button .ytomo-schedule-button .ytomo-count-badge[data-v-134b074b]{background:#00b894}.ytomo-icon-button .ytomo-schedule-button.running[data-v-134b074b]{background:#e17055 !important;border-color:#e17055 !important}.ytomo-icon-button .ytomo-schedule-button.running .ytomo-schedule-icon[data-v-134b074b]{animation:ytomo-schedule-spin-134b074b 2s linear infinite}.ytomo-icon-button .ytomo-schedule-button.running .ytomo-count-badge[data-v-134b074b]{background:#fdcb6e;animation:ytomo-schedule-pulse-134b074b 1.5s ease-in-out infinite}@keyframes ytomo-schedule-spin-134b074b{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}@keyframes ytomo-schedule-pulse-134b074b{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.1);opacity:.8}}.ytomo-icon-button[data-v-134b074b]:focus{outline:none}.ytomo-icon-button span[data-v-134b074b]{display:block;line-height:1}.ytomo-pavilion-list[data-v-134b074b]{flex:1;background:#fff;border-radius:8px;border:1px solid #e2e8f0}.ytomo-pavilion-item[data-v-134b074b]{background:#fff;border-bottom:1px solid #f1f5f9;transition:all .2s;color:#374151}.ytomo-pavilion-item[data-v-134b074b]:last-child{border-bottom:none}.ytomo-pavilion-item[data-v-134b074b]:hover{background:#f8fafc}.ytomo-pavilion-item.hidden[data-v-134b074b]{display:none}.ytomo-pavilion-header[data-v-134b074b]{display:flex;align-items:center;gap:12px;padding:16px;cursor:pointer}.ytomo-star-button[data-v-134b074b]{background:none;border:none;font-size:18px;cursor:pointer;transition:background-color .2s;padding:4px;border-radius:4px;width:26px;height:26px;display:flex;align-items:center;justify-content:center;flex-shrink:0}.ytomo-star-button[data-v-134b074b]:hover{background:rgba(255,193,7,.1)}.ytomo-star-button.favorite[data-v-134b074b]{color:#ffc107}.ytomo-star-button[data-v-134b074b]:focus{outline:none}.ytomo-official-link-button[data-v-134b074b]{background:none;border:1px solid #cbd5e1;font-size:14px;cursor:pointer;transition:all .2s;padding:4px 6px;border-radius:4px;height:26px;display:flex;align-items:center;justify-content:center;flex-shrink:0}.ytomo-official-link-button[data-v-134b074b]:hover{background:#f1f5f9;border-color:#94a3b8;transform:scale(1.05)}.ytomo-official-link-button[data-v-134b074b]:active{transform:scale(0.95)}.ytomo-official-link-button[data-v-134b074b]:focus{outline:none}.ytomo-pavilion-checkbox-container[data-v-134b074b]{display:flex;align-items:center;cursor:pointer}.ytomo-pavilion-checkbox[data-v-134b074b]{width:16px;height:16px;cursor:pointer}.ytomo-pavilion-name[data-v-134b074b]{flex:1;font-size:15px;font-weight:500;color:#374151;line-height:1.4}.ytomo-pavilion-status[data-v-134b074b]{display:flex;align-items:center;gap:8px}.ytomo-status-available[data-v-134b074b]{background:#dcfce7;color:#166534;padding:4px 8px;border-radius:12px;font-size:12px;font-weight:600}.ytomo-status-full[data-v-134b074b]{background:#fef2f2;color:#991b1b;padding:4px 8px;border-radius:12px;font-size:12px;font-weight:600}.ytomo-expand-button[data-v-134b074b]{background:none;border:none;font-size:12px;color:#6b7280;cursor:pointer;padding:4px 8px;border-radius:4px;transition:all .2s}.ytomo-expand-button[data-v-134b074b]:hover{background:#f3f4f6;color:#374151}.ytomo-expand-button.expanded[data-v-134b074b]{background:#e2e8f0;color:#374151}.ytomo-expand-button[data-v-134b074b]:focus{outline:none}.ytomo-time-slots[data-v-134b074b]{padding:0 16px 16px 16px;display:flex;flex-wrap:wrap;gap:8px;transition:all .3s ease}.ytomo-time-slots.hidden[data-v-134b074b]{display:none}.ytomo-time-slot-button[data-v-134b074b]{padding:6px 10px;border-radius:6px;font-size:12px;font-weight:500;cursor:pointer;transition:all .2s;border:1px solid;min-width:70px;text-align:center;display:inline-flex;align-items:center;justify-content:center;gap:4px;position:relative;position:relative}.ytomo-time-slot-button[data-v-134b074b] *{pointer-events:none}.ytomo-time-slot-button.available[data-v-134b074b]{background:#dcfce7;border-color:#22c55e;color:#166534}.ytomo-time-slot-button.available.limited[data-v-134b074b]{background:#fed7aa;border-color:#f97316;color:#c2410c}.ytomo-time-slot-button.available[data-v-134b074b]:hover{background:#bbf7d0;color:#166534;transform:translateY(-1px);box-shadow:0 2px 8px rgba(34,197,94,.3)}.ytomo-time-slot-button.available:hover.limited[data-v-134b074b]{background:#fdba74;color:#c2410c;box-shadow:0 2px 8px rgba(249,115,22,.3)}.ytomo-time-slot-button.available.selected[data-v-134b074b]{background:#22c55e;color:#fff;box-shadow:0 2px 8px rgba(34,197,94,.3)}.ytomo-time-slot-button.available.selected.limited[data-v-134b074b]{background:#f97316;color:#fff;box-shadow:0 2px 8px rgba(249,115,22,.3)}.ytomo-time-slot-button.unavailable[data-v-134b074b]{background:#fef2f2;border-color:#ef4444;color:#991b1b;cursor:pointer;opacity:1}.ytomo-time-slot-button.unavailable[data-v-134b074b]:hover{background:#fecaca;color:#991b1b;transform:translateY(-1px);box-shadow:0 2px 8px rgba(239,68,68,.3)}.ytomo-time-slot-button.unavailable.selected[data-v-134b074b]{background:#ef4444;color:#fff;box-shadow:0 2px 8px rgba(239,68,68,.3)}.ytomo-time-slot-button.rate-limited[data-v-134b074b]{background:#f3f4f6;border-color:#9ca3af;color:#6b7280;cursor:not-allowed;opacity:.6}.ytomo-time-slot-button.rate-limited[data-v-134b074b]:hover{background:#f3f4f6;color:#6b7280;transform:none;box-shadow:none}.ytomo-time-slot-button.rate-limited[data-v-134b074b]:disabled{cursor:not-allowed;pointer-events:none}.ytomo-time-slot-button[data-v-134b074b]:focus{outline:none}.ytomo-time-slot-button[data-v-134b074b]:disabled{background:#f3f4f6;border-color:#d1d5db;color:#9ca3af;cursor:not-allowed;opacity:.6;pointer-events:none}.ytomo-time-slot-button[data-v-134b074b]:disabled:hover{background:#f3f4f6;color:#9ca3af;transform:none;box-shadow:none}.ytomo-time-slot-button.hidden[data-v-134b074b]{display:none}.ytomo-execution-corner[data-v-134b074b]{position:absolute;top:0;right:0;width:8px;height:8px;border-radius:0 4px 0 0}.ytomo-execution-corner.status-executing[data-v-134b074b]{background:#3b82f6;animation:executionPulse-134b074b 1.5s ease-in-out infinite}.ytomo-execution-corner.status-success[data-v-134b074b]{background:#10b981}.ytomo-execution-corner.status-failed[data-v-134b074b]{background:#ef4444}@keyframes executionPulse-134b074b{0%,100%{box-shadow:0 0 4px rgba(59,130,246,.4)}50%{box-shadow:0 0 12px rgba(59,130,246,.8)}}@keyframes spin-134b074b{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}.ytomo-reservation-controls[data-v-134b074b]{background:#fff;border-radius:8px;padding:16px;box-shadow:0 1px 3px rgba(0,0,0,.1);border:1px solid #e2e8f0;flex-shrink:0;display:flex;align-items:center;gap:16px;position:relative}@media(max-width: 600px){.ytomo-reservation-controls[data-v-134b074b]{flex-direction:column;align-items:stretch;gap:12px}}.ytomo-selected-info[data-v-134b074b]{flex:1;font-size:14px;color:#374151;font-weight:500}@media(max-width: 600px){.ytomo-selected-info[data-v-134b074b]{text-align:center}}.ytomo-reservation-controls .ytomo-button[data-v-134b074b]{padding:10px 20px;font-weight:600;white-space:nowrap}@media(max-width: 600px){.ytomo-reservation-controls .ytomo-button[data-v-134b074b]{width:100%}}#ot-sdk-btn-floating[data-v-134b074b]{display:none !important}.ytomo-result-display[data-v-134b074b]{position:fixed;top:20px;right:20px;padding:8px 12px;border-radius:6px;font-size:13px;font-weight:500;opacity:0;transform:translateY(-10px);transition:all .3s;pointer-events:none;max-width:300px;z-index:10001;display:none}.ytomo-result-display.ytomo-visible[data-v-134b074b]{display:block}.ytomo-result-display.show[data-v-134b074b]{opacity:1;transform:translateY(0)}.ytomo-result-display.success[data-v-134b074b]{background:#22c55e;color:#fff}.ytomo-result-display.error[data-v-134b074b]{background:#ef4444;color:#fff}.ytomo-result-display.info[data-v-134b074b]{background:#3b82f6;color:#fff}@media(max-width: 600px){.ytomo-result-display[data-v-134b074b]{position:static;transform:none;margin:8px 0 0 0;text-align:center}}.ytomo-pavilion-tab .ytomo-empty-state[data-v-134b074b],.ytomo-pavilion-tab .ytomo-error[data-v-134b074b]{padding:40px 20px;text-align:center}.ytomo-pavilion-tab .ytomo-empty-state p[data-v-134b074b]{margin:0;color:#6b7280;font-size:14px}.ytomo-pavilion-tab .ytomo-error p[data-v-134b074b]{margin:0;color:#dc2626;font-size:14px}.ytomo-pavilion-tab .ytomo-loading[data-v-134b074b]{height:150px}.ytomo-pavilion-list[data-v-134b074b]::-webkit-scrollbar{width:6px}.ytomo-pavilion-list[data-v-134b074b]::-webkit-scrollbar-track{background:#f1f5f9;border-radius:3px}.ytomo-pavilion-list[data-v-134b074b]::-webkit-scrollbar-thumb{background:#cbd5e1;border-radius:3px}.ytomo-pavilion-list[data-v-134b074b]::-webkit-scrollbar-thumb:hover{background:#94a3b8}.ytomo-selected-dates-display[data-v-134b074b]{background:#fff;border-radius:8px;padding:10px 16px;box-shadow:0 1px 3px rgba(0,0,0,.1);border:1px solid #e2e8f0;flex-shrink:0;min-height:36px;display:flex;align-items:center}.ytomo-selected-dates-content[data-v-134b074b]{display:flex;align-items:center;gap:8px;width:100%}.ytomo-dates-label[data-v-134b074b]{font-size:14px;font-weight:600;color:#374151;flex-shrink:0}.ytomo-dates-text[data-v-134b074b]{font-size:14px;color:#2c5aa0;font-weight:500}.ytomo-dates-text[data-v-134b074b]:empty::before{content:"なし";color:#9ca3af;font-style:italic}.ytomo-status-fab[data-v-134b074b]{position:fixed;bottom:86px;right:20px;min-width:120px;min-height:50px;border:none;border-radius:6px;color:#fff;font-size:11px;font-weight:500;cursor:pointer;box-shadow:0 4px 12px rgba(0,0,0,.3);transition:all .3s ease;z-index:1001;display:none;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:8px 12px;line-height:1.2}.ytomo-status-fab.ytomo-visible[data-v-134b074b]{display:flex}.ytomo-status-fab.success[data-v-134b074b]{background:linear-gradient(135deg, #22c55e 0%, #16a34a 100%);box-shadow:0 4px 12px rgba(34,197,94,.4)}.ytomo-status-fab.error[data-v-134b074b]{background:linear-gradient(135deg, #ef4444 0%, #dc2626 100%);box-shadow:0 4px 12px rgba(239,68,68,.4)}.ytomo-status-fab.info[data-v-134b074b]{background:linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);box-shadow:0 4px 12px rgba(59,130,246,.4)}.ytomo-status-fab[data-v-134b074b]:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 6px 16px rgba(0,0,0,.4)}.ytomo-status-fab[data-v-134b074b]:active:not(:disabled){transform:translateY(0)}.ytomo-status-fab[data-v-134b074b]:focus{outline:none}.ytomo-reservation-info-panel[data-v-134b074b]{position:fixed;bottom:150px;right:20px;background:#fff;border-radius:12px;box-shadow:0 8px 32px rgba(0,0,0,.15);border:2px solid #2c5aa0;z-index:1000;transition:all .3s ease}.ytomo-reservation-info-panel.status-executing[data-v-134b074b]{background:#eff6ff;border-color:#3b82f6}.ytomo-reservation-info-panel.status-success[data-v-134b074b]{background:#f0fdf4;border-color:#10b981}.ytomo-reservation-info-panel.status-failed[data-v-134b074b]{background:#fef2f2;border-color:#ef4444}.ytomo-reservation-info-panel.status-waiting[data-v-134b074b]{background:#fffbeb;border-color:#f59e0b}.ytomo-reservation-info-panel.status-stopped[data-v-134b074b]{background:#f9fafb;border-color:#6b7280}.ytomo-reservation-info-panel.collapsed[data-v-134b074b]{width:56px;height:56px}.ytomo-info-collapsed[data-v-134b074b]{width:52px;height:52px;display:flex;align-items:center;justify-content:center;cursor:pointer;border-radius:10px;background:inherit;transition:all .2s ease}.ytomo-info-collapsed[data-v-134b074b]:hover{opacity:.8}.ytomo-info-collapsed .ytomo-collapsed-icon[data-v-134b074b]{font-size:24px;background:#fff;border-radius:50%;width:32px;height:32px;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 6px rgba(0,0,0,.15)}.ytomo-info-expanded[data-v-134b074b]{width:240px;padding:16px}.ytomo-info-top-row[data-v-134b074b]{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;gap:8px}.ytomo-endless-button[data-v-134b074b]{background:none;border:2px solid #d1d5db;border-radius:6px;width:32px;height:32px;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s}.ytomo-endless-button.active[data-v-134b074b]{background:#2c5aa0;border-color:#2c5aa0;color:#fff}.ytomo-endless-button[data-v-134b074b]:hover{border-color:#9ca3af}.ytomo-mode-selector[data-v-134b074b]{padding:4px 8px;font-size:11px;border:1px solid #d1d5db;border-radius:4px;background:#fff;color:#374151;cursor:pointer;min-width:60px;height:32px;display:flex;align-items:center}.ytomo-mode-selector[data-v-134b074b]:focus{outline:none;border-color:#3b82f6;box-shadow:0 0 0 1px #3b82f6}.ytomo-mode-selector option[data-v-134b074b]{padding:4px}.ytomo-collapse-button[data-v-134b074b]{background:none;border:none;font-size:12px;color:#6b7280;cursor:pointer;padding:4px;border-radius:4px;display:flex;align-items:center;height:32px}.ytomo-collapse-button[data-v-134b074b]:hover{background:#f3f4f6}.ytomo-reservation-history-list[data-v-134b074b]{max-height:200px;overflow-y:auto;display:flex;flex-direction:column;gap:4px}.ytomo-history-item[data-v-134b074b]{display:flex;align-items:center;gap:8px;font-size:11px;color:#374151;padding:4px 8px;border-radius:4px;background:#f9fafb;transition:background .2s}.ytomo-history-item.item-running[data-v-134b074b]{background:#dbeafe;border:1px solid #3b82f6}.ytomo-current-time[data-v-134b074b]{font-size:11px;font-weight:600;color:#2c5aa0;white-space:nowrap;flex-shrink:0;min-width:50px}.ytomo-pavilion-name-truncated[data-v-134b074b]{flex:1;font-size:11px;font-weight:500;color:#374151;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.ytomo-progress[data-v-134b074b]{font-weight:600}.ytomo-status[data-v-134b074b]{font-weight:500;font-size:11px;white-space:nowrap;flex-shrink:0}.ytomo-status.status-running[data-v-134b074b]{color:#3b82f6}.ytomo-status.status-succeeded[data-v-134b074b]{color:#10b981}.ytomo-status.status-failed[data-v-134b074b]{color:#ef4444}.ytomo-status.status-waiting[data-v-134b074b]{color:#f59e0b}.ytomo-status[data-v-134b074b]:has-text("Running"){color:#3b82f6}.ytomo-status[data-v-134b074b]:has-text("Executing"){color:#3b82f6}.ytomo-status[data-v-134b074b]:has-text("Failed"){color:#ef4444}.ytomo-status[data-v-134b074b]:has-text("Succeeded"){color:#10b981}.ytomo-status[data-v-134b074b]:has-text("Waiting"){color:#f59e0b}.ytomo-status[data-v-134b074b]:has-text("Stopped"){color:#6b7280}.ytomo-reservation-fab[data-v-134b074b]{position:fixed;bottom:80px;right:20px;width:56px;height:56px;background:linear-gradient(135deg, #2c5aa0 0%, #1a365d 100%);border:none;border-radius:28px;color:#fff;font-size:24px;cursor:pointer;box-shadow:0 4px 16px rgba(44,90,160,.3);transition:all .3s ease;z-index:10003;display:flex;align-items:center;justify-content:center}.ytomo-reservation-fab .ytomo-count-badge[data-v-134b074b]{position:absolute;top:-8px;right:-8px;background:#f44;color:#fff;border-radius:10px;padding:2px 6px;font-size:10px;font-weight:bold;min-width:16px;text-align:center;line-height:1.2;pointer-events:none;z-index:10}.ytomo-reservation-fab .ytomo-reservation-warning-badge[data-v-134b074b]{position:absolute;top:-8px;left:-8px;background:#f59e0b;color:#fff;border-radius:8px;padding:2px 6px;font-size:9px;font-weight:bold;white-space:nowrap;box-shadow:0 2px 4px rgba(0,0,0,.2);pointer-events:none;z-index:10;animation:pulse-134b074b 2s ease-in-out infinite}.ytomo-reservation-fab[data-v-134b074b]:hover:not(:disabled){background:linear-gradient(135deg, #1a365d 0%, #2c5aa0 100%);transform:translateY(-2px);box-shadow:0 6px 20px rgba(44,90,160,.4)}.ytomo-reservation-fab[data-v-134b074b]:active:not(:disabled){transform:translateY(0);box-shadow:0 2px 8px rgba(44,90,160,.3)}.ytomo-reservation-fab[data-v-134b074b]:disabled{background:#94a3b8;cursor:not-allowed;box-shadow:0 2px 8px rgba(148,163,184,.3);opacity:.8;display:flex}.ytomo-reservation-fab[data-v-134b074b]:focus{outline:none}.ytomo-reservation-fab.abort-mode[data-v-134b074b]{background:linear-gradient(135deg, #dc2626 0%, #991b1b 100%);font-size:14px;font-weight:bold}.ytomo-reservation-fab.abort-mode[data-v-134b074b]:hover:not(:disabled){background:linear-gradient(135deg, #991b1b 0%, #7f1d1d 100%)}.ytomo-button-separator[data-v-134b074b]{width:1px;height:32px;background:#d1d5db;margin:0 6px;align-self:center}.ytomo-schedule-controls[data-v-134b074b]{background:#fff;border-radius:6px;padding:10px 12px;box-shadow:0 1px 3px rgba(0,0,0,.1);border:1px solid #e2e8f0;margin-bottom:12px;flex-shrink:0}.ytomo-schedule-form[data-v-134b074b]{display:flex;flex-direction:column;gap:8px}.ytomo-form-row[data-v-134b074b]{display:flex;align-items:end;gap:10px;flex-wrap:nowrap;overflow:visible}@media(max-width: 800px){.ytomo-form-row[data-v-134b074b]{flex-direction:column;align-items:stretch;gap:12px}}.ytomo-form-row.ytomo-header-row[data-v-134b074b]{display:block;white-space:nowrap}.ytomo-form-row.ytomo-header-row[data-v-134b074b]>*{display:inline-block;vertical-align:bottom;margin-right:16px}.ytomo-form-row.ytomo-header-row[data-v-134b074b]>*:last-child{margin-right:0}.ytomo-form-row.ytomo-main-row[data-v-134b074b]{display:block;white-space:nowrap}.ytomo-form-row.ytomo-main-row .ytomo-form-group[data-v-134b074b]{display:inline-block;vertical-align:bottom;margin-right:12px;white-space:nowrap}.ytomo-form-row.ytomo-main-row .ytomo-form-group[data-v-134b074b]:last-child{margin-right:0}.ytomo-form-group[data-v-134b074b]{display:flex;flex-direction:column;gap:2px;flex:0 0 auto}.ytomo-form-group[data-v-134b074b]:has(.ytomo-time-input){min-width:80px}.ytomo-form-group[data-v-134b074b]:has(.ytomo-number-input){min-width:60px}.ytomo-form-group[data-v-134b074b]:has(.ytomo-toggle-button){min-width:50px}.ytomo-form-group[data-v-134b074b]:has(.ytomo-text-input){min-width:120px}.ytomo-form-group.ytomo-interval-retries-group[data-v-134b074b]{display:inline-block;white-space:nowrap}.ytomo-form-group.ytomo-interval-retries-group .ytomo-interval-input[data-v-134b074b],.ytomo-form-group.ytomo-interval-retries-group .ytomo-retries-input[data-v-134b074b]{display:inline-block;vertical-align:top;margin-right:8px;width:60px}.ytomo-form-group.ytomo-interval-retries-group .ytomo-interval-input[data-v-134b074b]:last-child,.ytomo-form-group.ytomo-interval-retries-group .ytomo-retries-input[data-v-134b074b]:last-child{margin-right:0}.ytomo-form-group[data-v-134b074b]:last-of-type{margin-left:auto}@media(max-width: 800px){.ytomo-form-group[data-v-134b074b]:last-of-type{margin-left:0}}.ytomo-input-with-label[data-v-134b074b]{position:relative;display:inline-block}.ytomo-input-with-label .ytomo-input-label[data-v-134b074b]{position:absolute;top:2px;left:4px;font-size:9px;font-weight:600;color:#6b7280;background:#fff;padding:0 2px;z-index:1;pointer-events:none}.ytomo-input-with-label .ytomo-form-input[data-v-134b074b]{padding-top:16px;padding-bottom:4px}.ytomo-form-label[data-v-134b074b]{font-size:11px;font-weight:600;color:#374151;margin-bottom:2px}.ytomo-form-input[data-v-134b074b]{padding:6px 8px;border:1px solid #d1d5db;border-radius:4px;font-size:13px;transition:all .2s}.ytomo-form-input[data-v-134b074b]:focus{outline:none;border-color:#2c5aa0}.ytomo-form-input.ytomo-date-input[data-v-134b074b]{width:140px}.ytomo-form-input.ytomo-time-input[data-v-134b074b]{width:80px}.ytomo-form-input.ytomo-number-input[data-v-134b074b]{width:60px}.ytomo-form-input.ytomo-text-input[data-v-134b074b]{width:120px}.ytomo-datetime-inputs[data-v-134b074b]{display:flex;gap:6px}.ytomo-toggle-button[data-v-134b074b]{padding:6px 12px;border:1px solid #d1d5db;border-radius:4px;background:#fff;color:#374151;font-size:12px;font-weight:500;cursor:pointer;transition:all .2s;width:50px}.ytomo-toggle-button.active[data-v-134b074b]{background:#22c55e;border-color:#22c55e;color:#fff}.ytomo-toggle-button[data-v-134b074b]:hover{border-color:#9ca3af}.ytomo-toggle-button[data-v-134b074b]:focus{outline:none;border-color:#2c5aa0}.ytomo-form-actions[data-v-134b074b]{display:inline-block}.ytomo-form-actions .ytomo-action-button[data-v-134b074b]{margin-right:16px}.ytomo-form-actions .ytomo-action-button[data-v-134b074b]:last-child{margin-right:0}.ytomo-action-button[data-v-134b074b]{padding:6px 12px;border-radius:4px;font-size:12px;font-weight:500;cursor:pointer;transition:all .2s;border:1px solid}.ytomo-action-button[data-v-134b074b]:focus{outline:none}.ytomo-action-button.ytomo-save-button[data-v-134b074b]{background:#2c5aa0;border-color:#2c5aa0;color:#fff}.ytomo-action-button.ytomo-save-button[data-v-134b074b]:hover:not(:disabled){background:#1a365d;border-color:#1a365d}.ytomo-action-button.ytomo-save-button[data-v-134b074b]:disabled{background:#94a3b8;border-color:#94a3b8;cursor:not-allowed;opacity:.6}.ytomo-action-button.ytomo-dialog-button[data-v-134b074b]{background:#3b82f6;border-color:#3b82f6;color:#fff}.ytomo-action-button.ytomo-dialog-button[data-v-134b074b]:hover{background:#2563eb;border-color:#2563eb}.ytomo-selected-timeslots-info[data-v-134b074b]{display:flex;align-items:center;gap:8px;padding-top:8px;border-top:1px solid #f1f5f9;font-size:12px}.ytomo-info-label[data-v-134b074b]{color:#6b7280;font-weight:500}.ytomo-info-count[data-v-134b074b]{color:#2c5aa0;font-weight:600}.ytomo-selected-slots-preview[data-v-134b074b]{display:flex;gap:8px;flex-wrap:wrap}.ytomo-slot-preview[data-v-134b074b]{background:#f3f4f6;color:#374151;padding:2px 8px;border-radius:12px;font-size:12px;font-weight:500}.ytomo-more-slots[data-v-134b074b]{color:#6b7280;font-size:12px;font-weight:500}.ytomo-time-slot-button.schedule-selected[data-v-134b074b]{background:#3b82f6 !important;border-color:#3b82f6 !important;color:#fff !important;box-shadow:0 2px 8px rgba(59,130,246,.3) !important}.ytomo-time-slot-button.schedule-selected[data-v-134b074b]:hover{background:#2563eb !important;border-color:#2563eb !important}.ytomo-pavilion-item[data-v-134b074b]{animation:slideIn-134b074b .2s ease-out}@keyframes slideIn-134b074b{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}.ytomo-time-slot-button.available[data-v-134b074b]:hover{animation:pulse-134b074b .6s ease-in-out}@keyframes pulse-134b074b{0%{transform:translateY(-1px)}50%{transform:translateY(-2px)}100%{transform:translateY(-1px)}}.ytomo-pavilion-tab input[data-v-134b074b]:focus{outline:none;border-color:#2c5aa0}.ytomo-pavilion-tab button[data-v-134b074b]:focus{outline:none}@media(prefers-reduced-motion: reduce){.ytomo-pavilion-item[data-v-134b074b],.ytomo-time-slot-button[data-v-134b074b],.ytomo-icon-button[data-v-134b074b],.ytomo-result-display[data-v-134b074b],.ytomo-time-slots[data-v-134b074b]{animation:none;transition:none}.ytomo-time-slot-button.available[data-v-134b074b]:hover{animation:none;transform:none}}@media(prefers-contrast: high){.ytomo-pavilion-item[data-v-134b074b]{border-bottom-width:2px}.ytomo-time-slot-button[data-v-134b074b]{border-width:2px}.ytomo-icon-button.active[data-v-134b074b]{border-width:3px}.ytomo-pavilion-tab input[data-v-134b074b]:focus,.ytomo-pavilion-tab button[data-v-134b074b]:focus{outline:3px solid #000}}.ytomo-processing-overlay[data-v-134b074b]{position:fixed;top:0;left:0;width:100%;height:100%;background-color:rgba(0,0,0,.7);display:flex;align-items:center;justify-content:center;z-index:10001;opacity:0;animation:fadeIn .2s ease-out forwards}.ytomo-processing-content[data-v-134b074b]{background:#fff;border-radius:12px;padding:32px;box-shadow:0 20px 60px rgba(0,0,0,.3);text-align:center;min-width:300px;transform:scale(0.9);animation:dialogAppear .2s ease-out forwards}.ytomo-processing-spinner[data-v-134b074b]{width:40px;height:40px;border:3px solid #e2e8f0;border-top-color:#2c5aa0;border-radius:50%;animation:spin-134b074b 1s linear infinite;margin:0 auto 16px}.ytomo-processing-message[data-v-134b074b]{margin:0 0 24px;color:#374151;font-size:16px;font-weight:500}.ytomo-cancel-button[data-v-134b074b]{background:#6b7280;color:#fff;border:none;padding:12px 24px;border-radius:6px;font-size:14px;cursor:pointer;transition:background-color .2s}.ytomo-cancel-button[data-v-134b074b]:hover{background:#4b5563}.ytomo-cancel-button[data-v-134b074b]:focus{outline:2px solid #2c5aa0;outline-offset:2px}@keyframes spin-134b074b{to{transform:rotate(360deg)}}@keyframes pulse-134b074b{0%,100%{opacity:1}50%{opacity:.7}}.ytomo-reservation-result-fab[data-v-134b074b]{position:fixed;bottom:80px;right:84px;min-width:120px;min-height:50px;border:none;border-radius:6px;color:#fff;font-size:11px;font-weight:500;cursor:pointer;box-shadow:0 4px 12px rgba(0,0,0,.3);transition:all .3s ease;z-index:10003;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:8px 12px;line-height:1.2}.ytomo-reservation-result-fab.success[data-v-134b074b]{background:linear-gradient(135deg, #22c55e 0%, #16a34a 100%);box-shadow:0 4px 12px rgba(34,197,94,.4)}.ytomo-reservation-result-fab.error[data-v-134b074b]{background:linear-gradient(135deg, #ef4444 0%, #dc2626 100%);box-shadow:0 4px 12px rgba(239,68,68,.4)}.ytomo-reservation-result-fab.fab-blue[data-v-134b074b]{background:linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);box-shadow:0 4px 12px rgba(59,130,246,.4)}.ytomo-reservation-result-fab.fab-green[data-v-134b074b]{background:linear-gradient(135deg, #22c55e 0%, #16a34a 100%);box-shadow:0 4px 12px rgba(34,197,94,.4)}.ytomo-reservation-result-fab.fab-red[data-v-134b074b]{background:linear-gradient(135deg, #ef4444 0%, #dc2626 100%);box-shadow:0 4px 12px rgba(239,68,68,.4)}.ytomo-reservation-result-fab.fab-yellow[data-v-134b074b]{background:linear-gradient(135deg, #eab308 0%, #ca8a04 100%);box-shadow:0 4px 12px rgba(234,179,8,.4)}.ytomo-reservation-result-fab .ytomo-result-status[data-v-134b074b]{font-weight:600;font-size:11px;margin-bottom:2px}.ytomo-reservation-result-fab .ytomo-result-status .ytomo-failure-reason[data-v-134b074b]{font-size:9px;font-weight:500;opacity:.9}.ytomo-reservation-result-fab .ytomo-result-pavilion[data-v-134b074b]{font-size:12px;opacity:.95;margin-bottom:2px;font-weight:500}.ytomo-reservation-result-fab .ytomo-result-time[data-v-134b074b]{font-size:12px;opacity:.9;font-weight:600}.ytomo-reservation-result-fab[data-v-134b074b]:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 6px 16px rgba(0,0,0,.4)}.ytomo-reservation-result-fab[data-v-134b074b]:active:not(:disabled){transform:translateY(0)}.ytomo-reservation-result-fab[data-v-134b074b]:focus{outline:none}@media(prefers-reduced-motion: reduce){.ytomo-processing-overlay[data-v-134b074b],.ytomo-processing-content[data-v-134b074b],.ytomo-processing-spinner[data-v-134b074b]{animation:none;transition:none}}.ytomo-log-fab-container[data-v-134b074b]{position:fixed;bottom:20px;left:20px;z-index:10002;display:flex;flex-direction:column;align-items:flex-start;gap:12px;pointer-events:auto}.ytomo-log-fab[data-v-134b074b]{width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);color:#fff;border:none;box-shadow:0 4px 12px rgba(99,102,241,.4);display:flex;align-items:center;justify-content:center;font-size:18px;cursor:pointer;transition:all .3s ease;position:relative}.ytomo-log-fab[data-v-134b074b]:hover{transform:scale(1.1);box-shadow:0 6px 16px rgba(99,102,241,.5)}.ytomo-log-fab.expanded[data-v-134b074b]{background:linear-gradient(135deg, #f59e0b 0%, #d97706 100%);box-shadow:0 4px 12px rgba(245,158,11,.4)}.ytomo-log-fab.has-logs[data-v-134b074b]{background:linear-gradient(135deg, #10b981 0%, #059669 100%);box-shadow:0 4px 12px rgba(16,185,129,.4)}.ytomo-log-fab .ytomo-log-icon[data-v-134b074b]{font-size:20px}.ytomo-log-fab .ytomo-log-count[data-v-134b074b]{position:absolute;top:-6px;right:-6px;background:#ef4444;color:#fff;border-radius:10px;padding:2px 6px;font-size:10px;font-weight:bold;min-width:16px;text-align:center;line-height:1.2}.ytomo-log-display[data-v-134b074b]{background:rgba(0,0,0,.9);color:#fff;border-radius:8px;width:400px;max-height:300px;box-shadow:0 8px 24px rgba(0,0,0,.3);border:1px solid hsla(0,0%,100%,.1);backdrop-filter:blur(10px);transition:all .3s ease}.ytomo-log-display.large-size[data-v-134b074b]{width:600px;max-height:500px}.ytomo-log-display.large-size .ytomo-log-messages[data-v-134b074b]{max-height:420px}@media(max-width: 480px){.ytomo-log-display.large-size .ytomo-log-messages[data-v-134b074b]{max-height:380px}}@media(max-width: 640px){.ytomo-log-display.large-size[data-v-134b074b]{width:90vw;max-height:70vh}}@media(max-width: 480px){.ytomo-log-display[data-v-134b074b]{width:320px;max-height:250px}}.ytomo-log-header[data-v-134b074b]{display:flex;justify-content:space-between;align-items:center;padding:12px 16px;border-bottom:1px solid hsla(0,0%,100%,.1);font-weight:bold;font-size:14px;flex-wrap:wrap;gap:8px}.ytomo-log-header .ytomo-log-controls[data-v-134b074b]{display:flex;align-items:center;gap:6px;flex-wrap:wrap}.ytomo-log-header .ytomo-log-filter[data-v-134b074b]{background:hsla(0,0%,100%,.1);color:#fff;border:1px solid hsla(0,0%,100%,.2);border-radius:4px;padding:2px 6px;font-size:11px;cursor:pointer}.ytomo-log-header .ytomo-log-filter option[data-v-134b074b]{background:#1f2937;color:#fff}.ytomo-log-header .ytomo-log-btn[data-v-134b074b]{background:#6366f1;color:#fff;border:none;border-radius:4px;padding:4px 8px;font-size:12px;cursor:pointer;transition:background-color .2s;min-width:24px}.ytomo-log-header .ytomo-log-btn[data-v-134b074b]:hover{background:#4f46e5}.ytomo-log-header .ytomo-log-btn[data-v-134b074b]:last-child{background:#ef4444}.ytomo-log-header .ytomo-log-btn[data-v-134b074b]:last-child:hover{background:#dc2626}.ytomo-log-messages[data-v-134b074b]{max-height:220px;overflow-y:auto;padding:8px}@media(max-width: 480px){.ytomo-log-messages[data-v-134b074b]{max-height:180px}}.ytomo-log-message[data-v-134b074b]{margin-bottom:8px;padding:6px 8px;border-radius:4px;font-size:12px;line-height:1.4;border-left:3px solid rgba(0,0,0,0)}.ytomo-log-message.log-temp[data-v-134b074b]{background:rgba(168,85,247,.2);border-left-color:#a855f7}.ytomo-log-message.log-error[data-v-134b074b]{background:rgba(239,68,68,.2);border-left-color:#ef4444}.ytomo-log-message.log-warn[data-v-134b074b]{background:rgba(245,158,11,.2);border-left-color:#f59e0b}.ytomo-log-message.log-info[data-v-134b074b]{background:rgba(59,130,246,.2);border-left-color:#3b82f6}.ytomo-log-message.log-debug[data-v-134b074b]{background:rgba(107,114,128,.2);border-left-color:#6b7280}.ytomo-log-message .ytomo-log-time[data-v-134b074b]{color:#9ca3af;font-size:10px;margin-right:6px}.ytomo-log-message .ytomo-log-level[data-v-134b074b]{font-weight:bold;margin-right:6px;font-size:10px}.ytomo-log-message .ytomo-log-module[data-v-134b074b]{color:#60a5fa;margin-right:6px;font-size:10px}.ytomo-log-message .ytomo-log-text[data-v-134b074b]{color:#fff}.ytomo-log-message .ytomo-log-data[data-v-134b074b]{margin-top:4px;background:rgba(0,0,0,.3);padding:4px 6px;border-radius:3px;font-size:10px;color:#d1d5db;white-space:pre-wrap;overflow-x:auto}.ytomo-log-empty[data-v-134b074b]{text-align:center;color:#9ca3af;padding:20px;font-style:italic}.ytomo-log-messages[data-v-134b074b]::-webkit-scrollbar{width:6px}.ytomo-log-messages[data-v-134b074b]::-webkit-scrollbar-track{background:hsla(0,0%,100%,.1);border-radius:3px}.ytomo-log-messages[data-v-134b074b]::-webkit-scrollbar-thumb{background:hsla(0,0%,100%,.3);border-radius:3px}.ytomo-log-messages[data-v-134b074b]::-webkit-scrollbar-thumb:hover{background:hsla(0,0%,100%,.5)}`, ""]);
-// Exports
-/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
-
-
-/***/ }),
-
 /***/ 72:
 /***/ ((module) => {
 
@@ -689,6 +667,28 @@ function styleTagTransform(css, styleElement) {
   }
 }
 module.exports = styleTagTransform;
+
+/***/ }),
+
+/***/ 229:
+/***/ ((module, __webpack_exports__, __webpack_require__) => {
+
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   A: () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _node_modules_css_loader_dist_runtime_noSourceMaps_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(601);
+/* harmony import */ var _node_modules_css_loader_dist_runtime_noSourceMaps_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_css_loader_dist_runtime_noSourceMaps_js__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(314);
+/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1__);
+// Imports
+
+
+var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1___default()((_node_modules_css_loader_dist_runtime_noSourceMaps_js__WEBPACK_IMPORTED_MODULE_0___default()));
+// Module
+___CSS_LOADER_EXPORT___.push([module.id, `.ytomo-pavilion-tab[data-v-3d396493]{padding:0 8px 20px 8px;height:100%;display:flex;flex-direction:column;gap:16px;overflow-y:auto;color-scheme:light}.ytomo-search-controls[data-v-3d396493]{background:#fff;border-radius:8px;padding:12px;box-shadow:0 1px 3px rgba(0,0,0,.1);border:1px solid #e2e8f0;flex-shrink:0;display:flex;gap:12px;align-items:center}@media(max-width: 600px){.ytomo-search-controls[data-v-3d396493]{flex-direction:column;align-items:stretch;gap:12px}}.ytomo-search-input-container[data-v-3d396493]{flex:1}.ytomo-search-input[data-v-3d396493]{width:100%;padding:10px 16px;border:1px solid #d1d5db;border-radius:8px;font-size:14px;transition:all .2s}.ytomo-search-input[data-v-3d396493]:focus{outline:none;border-color:#2c5aa0}.ytomo-search-input[data-v-3d396493]::placeholder{color:#9ca3af}.ytomo-control-buttons[data-v-3d396493]{display:flex;gap:8px;flex-shrink:0}@media(max-width: 600px){.ytomo-control-buttons[data-v-3d396493]{justify-content:center}}.ytomo-icon-button[data-v-3d396493]{width:40px;height:40px;border:1px solid #d1d5db;border-radius:8px;background:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s;font-size:16px;position:relative}.ytomo-icon-button[data-v-3d396493]:hover{background:#f3f4f6;border-color:#9ca3af;transform:translateY(-1px)}.ytomo-icon-button[data-v-3d396493]:active{transform:translateY(0)}.ytomo-icon-button.active[data-v-3d396493]{background:#2c5aa0;border-color:#2c5aa0;color:#fff}.ytomo-icon-button.active[data-v-3d396493]:hover{background:#1a365d}.ytomo-icon-button .ytomo-count-badge[data-v-3d396493]{position:absolute;top:-8px;right:-8px;background:#f44;color:#fff;border-radius:10px;padding:2px 6px;font-size:10px;font-weight:bold;min-width:16px;text-align:center;line-height:1.2;pointer-events:none;z-index:10}.ytomo-icon-button .ytomo-schedule-button[data-v-3d396493]{position:relative}.ytomo-icon-button .ytomo-schedule-button .ytomo-schedule-icon[data-v-3d396493]{transition:transform .3s ease}.ytomo-icon-button .ytomo-schedule-button .ytomo-count-badge[data-v-3d396493]{background:#00b894}.ytomo-icon-button .ytomo-schedule-button.running[data-v-3d396493]{background:#e17055 !important;border-color:#e17055 !important}.ytomo-icon-button .ytomo-schedule-button.running .ytomo-schedule-icon[data-v-3d396493]{animation:ytomo-schedule-spin-3d396493 2s linear infinite}.ytomo-icon-button .ytomo-schedule-button.running .ytomo-count-badge[data-v-3d396493]{background:#fdcb6e;animation:ytomo-schedule-pulse-3d396493 1.5s ease-in-out infinite}@keyframes ytomo-schedule-spin-3d396493{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}@keyframes ytomo-schedule-pulse-3d396493{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.1);opacity:.8}}.ytomo-icon-button[data-v-3d396493]:focus{outline:none}.ytomo-icon-button span[data-v-3d396493]{display:block;line-height:1}.ytomo-pavilion-list[data-v-3d396493]{flex:1;background:#fff;border-radius:8px;border:1px solid #e2e8f0}.ytomo-pavilion-item[data-v-3d396493]{background:#fff;border-bottom:1px solid #f1f5f9;transition:all .2s;color:#374151}.ytomo-pavilion-item[data-v-3d396493]:last-child{border-bottom:none}.ytomo-pavilion-item[data-v-3d396493]:hover{background:#f8fafc}.ytomo-pavilion-item.hidden[data-v-3d396493]{display:none}.ytomo-pavilion-header[data-v-3d396493]{display:flex;align-items:center;gap:12px;padding:16px;cursor:pointer}.ytomo-star-button[data-v-3d396493]{background:none;border:none;font-size:18px;cursor:pointer;transition:background-color .2s;padding:4px;border-radius:4px;width:26px;height:26px;display:flex;align-items:center;justify-content:center;flex-shrink:0}.ytomo-star-button[data-v-3d396493]:hover{background:rgba(255,193,7,.1)}.ytomo-star-button.favorite[data-v-3d396493]{color:#ffc107}.ytomo-star-button[data-v-3d396493]:focus{outline:none}.ytomo-official-link-button[data-v-3d396493]{background:none;border:1px solid #cbd5e1;font-size:14px;cursor:pointer;transition:all .2s;padding:4px 6px;border-radius:4px;height:26px;display:flex;align-items:center;justify-content:center;flex-shrink:0}.ytomo-official-link-button[data-v-3d396493]:hover{background:#f1f5f9;border-color:#94a3b8;transform:scale(1.05)}.ytomo-official-link-button[data-v-3d396493]:active{transform:scale(0.95)}.ytomo-official-link-button[data-v-3d396493]:focus{outline:none}.ytomo-pavilion-checkbox-container[data-v-3d396493]{display:flex;align-items:center;cursor:pointer}.ytomo-pavilion-checkbox[data-v-3d396493]{width:16px;height:16px;cursor:pointer}.ytomo-pavilion-name[data-v-3d396493]{flex:1;font-size:15px;font-weight:500;color:#374151;line-height:1.4}.ytomo-pavilion-status[data-v-3d396493]{display:flex;align-items:center;gap:8px}.ytomo-status-available[data-v-3d396493]{background:#dcfce7;color:#166534;padding:4px 8px;border-radius:12px;font-size:12px;font-weight:600}.ytomo-status-full[data-v-3d396493]{background:#fef2f2;color:#991b1b;padding:4px 8px;border-radius:12px;font-size:12px;font-weight:600}.ytomo-expand-button[data-v-3d396493]{background:none;border:none;font-size:12px;color:#6b7280;cursor:pointer;padding:4px 8px;border-radius:4px;transition:all .2s}.ytomo-expand-button[data-v-3d396493]:hover{background:#f3f4f6;color:#374151}.ytomo-expand-button.expanded[data-v-3d396493]{background:#e2e8f0;color:#374151}.ytomo-expand-button[data-v-3d396493]:focus{outline:none}.ytomo-time-slots[data-v-3d396493]{padding:0 16px 16px 16px;display:flex;flex-wrap:wrap;gap:8px;transition:all .3s ease}.ytomo-time-slots.hidden[data-v-3d396493]{display:none}.ytomo-time-slot-button[data-v-3d396493]{padding:6px 10px;border-radius:6px;font-size:12px;font-weight:500;cursor:pointer;transition:all .2s;border:1px solid;min-width:70px;text-align:center;display:inline-flex;align-items:center;justify-content:center;gap:4px;position:relative;position:relative}.ytomo-time-slot-button[data-v-3d396493] *{pointer-events:none}.ytomo-time-slot-button.available[data-v-3d396493]{background:#dcfce7;border-color:#22c55e;color:#166534}.ytomo-time-slot-button.available.limited[data-v-3d396493]{background:#fed7aa;border-color:#f97316;color:#c2410c}.ytomo-time-slot-button.available[data-v-3d396493]:hover{background:#bbf7d0;color:#166534;transform:translateY(-1px);box-shadow:0 2px 8px rgba(34,197,94,.3)}.ytomo-time-slot-button.available:hover.limited[data-v-3d396493]{background:#fdba74;color:#c2410c;box-shadow:0 2px 8px rgba(249,115,22,.3)}.ytomo-time-slot-button.available.selected[data-v-3d396493]{background:#22c55e;color:#fff;box-shadow:0 2px 8px rgba(34,197,94,.3)}.ytomo-time-slot-button.available.selected.limited[data-v-3d396493]{background:#f97316;color:#fff;box-shadow:0 2px 8px rgba(249,115,22,.3)}.ytomo-time-slot-button.unavailable[data-v-3d396493]{background:#fef2f2;border-color:#ef4444;color:#991b1b;cursor:pointer;opacity:1}.ytomo-time-slot-button.unavailable[data-v-3d396493]:hover{background:#fecaca;color:#991b1b;transform:translateY(-1px);box-shadow:0 2px 8px rgba(239,68,68,.3)}.ytomo-time-slot-button.unavailable.selected[data-v-3d396493]{background:#ef4444;color:#fff;box-shadow:0 2px 8px rgba(239,68,68,.3)}.ytomo-time-slot-button.rate-limited[data-v-3d396493]{background:#f3f4f6;border-color:#9ca3af;color:#6b7280;cursor:not-allowed;opacity:.6}.ytomo-time-slot-button.rate-limited[data-v-3d396493]:hover{background:#f3f4f6;color:#6b7280;transform:none;box-shadow:none}.ytomo-time-slot-button.rate-limited[data-v-3d396493]:disabled{cursor:not-allowed;pointer-events:none}.ytomo-time-slot-button[data-v-3d396493]:focus{outline:none}.ytomo-time-slot-button[data-v-3d396493]:disabled{background:#f3f4f6;border-color:#d1d5db;color:#9ca3af;cursor:not-allowed;opacity:.6;pointer-events:none}.ytomo-time-slot-button[data-v-3d396493]:disabled:hover{background:#f3f4f6;color:#9ca3af;transform:none;box-shadow:none}.ytomo-time-slot-button.hidden[data-v-3d396493]{display:none}.ytomo-execution-corner[data-v-3d396493]{position:absolute;top:0;right:0;width:8px;height:8px;border-radius:0 4px 0 0}.ytomo-execution-corner.status-executing[data-v-3d396493]{background:#3b82f6;animation:executionPulse-3d396493 1.5s ease-in-out infinite}.ytomo-execution-corner.status-success[data-v-3d396493]{background:#10b981}.ytomo-execution-corner.status-failed[data-v-3d396493]{background:#ef4444}@keyframes executionPulse-3d396493{0%,100%{box-shadow:0 0 4px rgba(59,130,246,.4)}50%{box-shadow:0 0 12px rgba(59,130,246,.8)}}@keyframes spin-3d396493{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}.ytomo-reservation-controls[data-v-3d396493]{background:#fff;border-radius:8px;padding:16px;box-shadow:0 1px 3px rgba(0,0,0,.1);border:1px solid #e2e8f0;flex-shrink:0;display:flex;align-items:center;gap:16px;position:relative}@media(max-width: 600px){.ytomo-reservation-controls[data-v-3d396493]{flex-direction:column;align-items:stretch;gap:12px}}.ytomo-selected-info[data-v-3d396493]{flex:1;font-size:14px;color:#374151;font-weight:500}@media(max-width: 600px){.ytomo-selected-info[data-v-3d396493]{text-align:center}}.ytomo-reservation-controls .ytomo-button[data-v-3d396493]{padding:10px 20px;font-weight:600;white-space:nowrap}@media(max-width: 600px){.ytomo-reservation-controls .ytomo-button[data-v-3d396493]{width:100%}}#ot-sdk-btn-floating[data-v-3d396493]{display:none !important}.ytomo-result-display[data-v-3d396493]{position:fixed;top:20px;right:20px;padding:8px 12px;border-radius:6px;font-size:13px;font-weight:500;opacity:0;transform:translateY(-10px);transition:all .3s;pointer-events:none;max-width:300px;z-index:10001;display:none}.ytomo-result-display.ytomo-visible[data-v-3d396493]{display:block}.ytomo-result-display.show[data-v-3d396493]{opacity:1;transform:translateY(0)}.ytomo-result-display.success[data-v-3d396493]{background:#22c55e;color:#fff}.ytomo-result-display.error[data-v-3d396493]{background:#ef4444;color:#fff}.ytomo-result-display.info[data-v-3d396493]{background:#3b82f6;color:#fff}@media(max-width: 600px){.ytomo-result-display[data-v-3d396493]{position:static;transform:none;margin:8px 0 0 0;text-align:center}}.ytomo-pavilion-tab .ytomo-empty-state[data-v-3d396493],.ytomo-pavilion-tab .ytomo-error[data-v-3d396493]{padding:40px 20px;text-align:center}.ytomo-pavilion-tab .ytomo-empty-state p[data-v-3d396493]{margin:0;color:#6b7280;font-size:14px}.ytomo-pavilion-tab .ytomo-error p[data-v-3d396493]{margin:0;color:#dc2626;font-size:14px}.ytomo-pavilion-tab .ytomo-loading[data-v-3d396493]{height:150px}.ytomo-pavilion-list[data-v-3d396493]::-webkit-scrollbar{width:6px}.ytomo-pavilion-list[data-v-3d396493]::-webkit-scrollbar-track{background:#f1f5f9;border-radius:3px}.ytomo-pavilion-list[data-v-3d396493]::-webkit-scrollbar-thumb{background:#cbd5e1;border-radius:3px}.ytomo-pavilion-list[data-v-3d396493]::-webkit-scrollbar-thumb:hover{background:#94a3b8}.ytomo-selected-dates-display[data-v-3d396493]{background:#fff;border-radius:8px;padding:10px 16px;box-shadow:0 1px 3px rgba(0,0,0,.1);border:1px solid #e2e8f0;flex-shrink:0;min-height:36px;display:flex;align-items:center}.ytomo-selected-dates-content[data-v-3d396493]{display:flex;align-items:center;gap:8px;width:100%}.ytomo-dates-label[data-v-3d396493]{font-size:14px;font-weight:600;color:#374151;flex-shrink:0}.ytomo-dates-text[data-v-3d396493]{font-size:14px;color:#2c5aa0;font-weight:500}.ytomo-dates-text[data-v-3d396493]:empty::before{content:"なし";color:#9ca3af;font-style:italic}.ytomo-status-fab[data-v-3d396493]{position:fixed;bottom:86px;right:20px;min-width:120px;min-height:50px;border:none;border-radius:6px;color:#fff;font-size:11px;font-weight:500;cursor:pointer;box-shadow:0 4px 12px rgba(0,0,0,.3);transition:all .3s ease;z-index:1001;display:none;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:8px 12px;line-height:1.2}.ytomo-status-fab.ytomo-visible[data-v-3d396493]{display:flex}.ytomo-status-fab.success[data-v-3d396493]{background:linear-gradient(135deg, #22c55e 0%, #16a34a 100%);box-shadow:0 4px 12px rgba(34,197,94,.4)}.ytomo-status-fab.error[data-v-3d396493]{background:linear-gradient(135deg, #ef4444 0%, #dc2626 100%);box-shadow:0 4px 12px rgba(239,68,68,.4)}.ytomo-status-fab.info[data-v-3d396493]{background:linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);box-shadow:0 4px 12px rgba(59,130,246,.4)}.ytomo-status-fab[data-v-3d396493]:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 6px 16px rgba(0,0,0,.4)}.ytomo-status-fab[data-v-3d396493]:active:not(:disabled){transform:translateY(0)}.ytomo-status-fab[data-v-3d396493]:focus{outline:none}.ytomo-reservation-info-panel[data-v-3d396493]{position:fixed;bottom:150px;right:20px;background:#fff;border-radius:12px;box-shadow:0 8px 32px rgba(0,0,0,.15);border:2px solid #2c5aa0;z-index:1000;transition:all .3s ease}.ytomo-reservation-info-panel.status-executing[data-v-3d396493]{background:#eff6ff;border-color:#3b82f6}.ytomo-reservation-info-panel.status-success[data-v-3d396493]{background:#f0fdf4;border-color:#10b981}.ytomo-reservation-info-panel.status-failed[data-v-3d396493]{background:#fef2f2;border-color:#ef4444}.ytomo-reservation-info-panel.status-waiting[data-v-3d396493]{background:#fffbeb;border-color:#f59e0b}.ytomo-reservation-info-panel.status-stopped[data-v-3d396493]{background:#f9fafb;border-color:#6b7280}.ytomo-reservation-info-panel.collapsed[data-v-3d396493]{width:56px;height:56px}.ytomo-info-collapsed[data-v-3d396493]{width:52px;height:52px;display:flex;align-items:center;justify-content:center;cursor:pointer;border-radius:10px;background:inherit;transition:all .2s ease}.ytomo-info-collapsed[data-v-3d396493]:hover{opacity:.8}.ytomo-info-collapsed .ytomo-collapsed-icon[data-v-3d396493]{font-size:24px;background:#fff;border-radius:50%;width:32px;height:32px;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 6px rgba(0,0,0,.15)}.ytomo-info-expanded[data-v-3d396493]{width:240px;padding:16px}.ytomo-info-top-row[data-v-3d396493]{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;gap:8px}.ytomo-endless-button[data-v-3d396493]{background:none;border:2px solid #d1d5db;border-radius:6px;width:32px;height:32px;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s}.ytomo-endless-button.active[data-v-3d396493]{background:#2c5aa0;border-color:#2c5aa0;color:#fff}.ytomo-endless-button[data-v-3d396493]:hover{border-color:#9ca3af}.ytomo-mode-selector[data-v-3d396493]{padding:4px 8px;font-size:11px;border:1px solid #d1d5db;border-radius:4px;background:#fff;color:#374151;cursor:pointer;min-width:60px;height:32px;display:flex;align-items:center}.ytomo-mode-selector[data-v-3d396493]:focus{outline:none;border-color:#3b82f6;box-shadow:0 0 0 1px #3b82f6}.ytomo-mode-selector option[data-v-3d396493]{padding:4px}.ytomo-collapse-button[data-v-3d396493]{background:none;border:none;font-size:12px;color:#6b7280;cursor:pointer;padding:4px;border-radius:4px;display:flex;align-items:center;height:32px}.ytomo-collapse-button[data-v-3d396493]:hover{background:#f3f4f6}.ytomo-reservation-history-list[data-v-3d396493]{max-height:200px;overflow-y:auto;display:flex;flex-direction:column;gap:4px}.ytomo-history-item[data-v-3d396493]{display:flex;align-items:center;gap:8px;font-size:11px;color:#374151;padding:4px 8px;border-radius:4px;background:#f9fafb;transition:background .2s}.ytomo-history-item.item-running[data-v-3d396493]{background:#dbeafe;border:1px solid #3b82f6}.ytomo-current-time[data-v-3d396493]{font-size:11px;font-weight:600;color:#2c5aa0;white-space:nowrap;flex-shrink:0;min-width:50px}.ytomo-pavilion-name-truncated[data-v-3d396493]{flex:1;font-size:11px;font-weight:500;color:#374151;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.ytomo-progress[data-v-3d396493]{font-weight:600}.ytomo-status[data-v-3d396493]{font-weight:500;font-size:11px;white-space:nowrap;flex-shrink:0}.ytomo-status.status-running[data-v-3d396493]{color:#3b82f6}.ytomo-status.status-succeeded[data-v-3d396493]{color:#10b981}.ytomo-status.status-failed[data-v-3d396493]{color:#ef4444}.ytomo-status.status-waiting[data-v-3d396493]{color:#f59e0b}.ytomo-status[data-v-3d396493]:has-text("Running"){color:#3b82f6}.ytomo-status[data-v-3d396493]:has-text("Executing"){color:#3b82f6}.ytomo-status[data-v-3d396493]:has-text("Failed"){color:#ef4444}.ytomo-status[data-v-3d396493]:has-text("Succeeded"){color:#10b981}.ytomo-status[data-v-3d396493]:has-text("Waiting"){color:#f59e0b}.ytomo-status[data-v-3d396493]:has-text("Stopped"){color:#6b7280}.ytomo-reservation-fab[data-v-3d396493]{position:fixed;bottom:80px;right:20px;width:56px;height:56px;background:linear-gradient(135deg, #2c5aa0 0%, #1a365d 100%);border:none;border-radius:28px;color:#fff;font-size:24px;cursor:pointer;box-shadow:0 4px 16px rgba(44,90,160,.3);transition:all .3s ease;z-index:10003;display:flex;align-items:center;justify-content:center}.ytomo-reservation-fab .ytomo-count-badge[data-v-3d396493]{position:absolute;top:-8px;right:-8px;background:#f44;color:#fff;border-radius:10px;padding:2px 6px;font-size:10px;font-weight:bold;min-width:16px;text-align:center;line-height:1.2;pointer-events:none;z-index:10}.ytomo-reservation-fab .ytomo-reservation-warning-badge[data-v-3d396493]{position:absolute;top:-8px;left:-8px;background:#f59e0b;color:#fff;border-radius:8px;padding:2px 6px;font-size:9px;font-weight:bold;white-space:nowrap;box-shadow:0 2px 4px rgba(0,0,0,.2);pointer-events:none;z-index:10;animation:pulse-3d396493 2s ease-in-out infinite}.ytomo-reservation-fab[data-v-3d396493]:hover:not(:disabled){background:linear-gradient(135deg, #1a365d 0%, #2c5aa0 100%);transform:translateY(-2px);box-shadow:0 6px 20px rgba(44,90,160,.4)}.ytomo-reservation-fab[data-v-3d396493]:active:not(:disabled){transform:translateY(0);box-shadow:0 2px 8px rgba(44,90,160,.3)}.ytomo-reservation-fab[data-v-3d396493]:disabled{background:#94a3b8;cursor:not-allowed;box-shadow:0 2px 8px rgba(148,163,184,.3);opacity:.8;display:flex}.ytomo-reservation-fab[data-v-3d396493]:focus{outline:none}.ytomo-reservation-fab.abort-mode[data-v-3d396493]{background:linear-gradient(135deg, #dc2626 0%, #991b1b 100%);font-size:14px;font-weight:bold}.ytomo-reservation-fab.abort-mode[data-v-3d396493]:hover:not(:disabled){background:linear-gradient(135deg, #991b1b 0%, #7f1d1d 100%)}.ytomo-button-separator[data-v-3d396493]{width:1px;height:32px;background:#d1d5db;margin:0 6px;align-self:center}.ytomo-schedule-controls[data-v-3d396493]{background:#fff;border-radius:6px;padding:10px 12px;box-shadow:0 1px 3px rgba(0,0,0,.1);border:1px solid #e2e8f0;margin-bottom:12px;flex-shrink:0}.ytomo-schedule-form[data-v-3d396493]{display:flex;flex-direction:column;gap:8px}.ytomo-form-row[data-v-3d396493]{display:flex;align-items:end;gap:10px;flex-wrap:nowrap;overflow:visible}@media(max-width: 800px){.ytomo-form-row[data-v-3d396493]{flex-direction:column;align-items:stretch;gap:12px}}.ytomo-form-row.ytomo-header-row[data-v-3d396493]{display:block;white-space:nowrap}.ytomo-form-row.ytomo-header-row[data-v-3d396493]>*{display:inline-block;vertical-align:bottom;margin-right:16px}.ytomo-form-row.ytomo-header-row[data-v-3d396493]>*:last-child{margin-right:0}.ytomo-form-row.ytomo-main-row[data-v-3d396493]{display:block;white-space:nowrap}.ytomo-form-row.ytomo-main-row .ytomo-form-group[data-v-3d396493]{display:inline-block;vertical-align:bottom;margin-right:12px;white-space:nowrap}.ytomo-form-row.ytomo-main-row .ytomo-form-group[data-v-3d396493]:last-child{margin-right:0}.ytomo-form-group[data-v-3d396493]{display:flex;flex-direction:column;gap:2px;flex:0 0 auto}.ytomo-form-group[data-v-3d396493]:has(.ytomo-time-input){min-width:80px}.ytomo-form-group[data-v-3d396493]:has(.ytomo-number-input){min-width:60px}.ytomo-form-group[data-v-3d396493]:has(.ytomo-toggle-button){min-width:50px}.ytomo-form-group[data-v-3d396493]:has(.ytomo-text-input){min-width:120px}.ytomo-form-group.ytomo-interval-retries-group[data-v-3d396493]{display:inline-block;white-space:nowrap}.ytomo-form-group.ytomo-interval-retries-group .ytomo-interval-input[data-v-3d396493],.ytomo-form-group.ytomo-interval-retries-group .ytomo-retries-input[data-v-3d396493]{display:inline-block;vertical-align:top;margin-right:8px;width:60px}.ytomo-form-group.ytomo-interval-retries-group .ytomo-interval-input[data-v-3d396493]:last-child,.ytomo-form-group.ytomo-interval-retries-group .ytomo-retries-input[data-v-3d396493]:last-child{margin-right:0}.ytomo-form-group[data-v-3d396493]:last-of-type{margin-left:auto}@media(max-width: 800px){.ytomo-form-group[data-v-3d396493]:last-of-type{margin-left:0}}.ytomo-input-with-label[data-v-3d396493]{position:relative;display:inline-block}.ytomo-input-with-label .ytomo-input-label[data-v-3d396493]{position:absolute;top:2px;left:4px;font-size:9px;font-weight:600;color:#6b7280;background:#fff;padding:0 2px;z-index:1;pointer-events:none}.ytomo-input-with-label .ytomo-form-input[data-v-3d396493]{padding-top:16px;padding-bottom:4px}.ytomo-form-label[data-v-3d396493]{font-size:11px;font-weight:600;color:#374151;margin-bottom:2px}.ytomo-form-input[data-v-3d396493]{padding:6px 8px;border:1px solid #d1d5db;border-radius:4px;font-size:13px;transition:all .2s}.ytomo-form-input[data-v-3d396493]:focus{outline:none;border-color:#2c5aa0}.ytomo-form-input.ytomo-date-input[data-v-3d396493]{width:140px}.ytomo-form-input.ytomo-time-input[data-v-3d396493]{width:80px}.ytomo-form-input.ytomo-number-input[data-v-3d396493]{width:60px}.ytomo-form-input.ytomo-text-input[data-v-3d396493]{width:120px}.ytomo-datetime-inputs[data-v-3d396493]{display:flex;gap:6px}.ytomo-toggle-button[data-v-3d396493]{padding:6px 12px;border:1px solid #d1d5db;border-radius:4px;background:#fff;color:#374151;font-size:12px;font-weight:500;cursor:pointer;transition:all .2s;width:50px}.ytomo-toggle-button.active[data-v-3d396493]{background:#22c55e;border-color:#22c55e;color:#fff}.ytomo-toggle-button[data-v-3d396493]:hover{border-color:#9ca3af}.ytomo-toggle-button[data-v-3d396493]:focus{outline:none;border-color:#2c5aa0}.ytomo-form-actions[data-v-3d396493]{display:inline-block}.ytomo-form-actions .ytomo-action-button[data-v-3d396493]{margin-right:16px}.ytomo-form-actions .ytomo-action-button[data-v-3d396493]:last-child{margin-right:0}.ytomo-action-button[data-v-3d396493]{padding:6px 12px;border-radius:4px;font-size:12px;font-weight:500;cursor:pointer;transition:all .2s;border:1px solid}.ytomo-action-button[data-v-3d396493]:focus{outline:none}.ytomo-action-button.ytomo-save-button[data-v-3d396493]{background:#2c5aa0;border-color:#2c5aa0;color:#fff}.ytomo-action-button.ytomo-save-button[data-v-3d396493]:hover:not(:disabled){background:#1a365d;border-color:#1a365d}.ytomo-action-button.ytomo-save-button[data-v-3d396493]:disabled{background:#94a3b8;border-color:#94a3b8;cursor:not-allowed;opacity:.6}.ytomo-action-button.ytomo-dialog-button[data-v-3d396493]{background:#3b82f6;border-color:#3b82f6;color:#fff}.ytomo-action-button.ytomo-dialog-button[data-v-3d396493]:hover{background:#2563eb;border-color:#2563eb}.ytomo-selected-timeslots-info[data-v-3d396493]{display:flex;align-items:center;gap:8px;padding-top:8px;border-top:1px solid #f1f5f9;font-size:12px}.ytomo-info-label[data-v-3d396493]{color:#6b7280;font-weight:500}.ytomo-info-count[data-v-3d396493]{color:#2c5aa0;font-weight:600}.ytomo-selected-slots-preview[data-v-3d396493]{display:flex;gap:8px;flex-wrap:wrap}.ytomo-slot-preview[data-v-3d396493]{background:#f3f4f6;color:#374151;padding:2px 8px;border-radius:12px;font-size:12px;font-weight:500}.ytomo-more-slots[data-v-3d396493]{color:#6b7280;font-size:12px;font-weight:500}.ytomo-time-slot-button.schedule-selected[data-v-3d396493]{background:#3b82f6 !important;border-color:#3b82f6 !important;color:#fff !important;box-shadow:0 2px 8px rgba(59,130,246,.3) !important}.ytomo-time-slot-button.schedule-selected[data-v-3d396493]:hover{background:#2563eb !important;border-color:#2563eb !important}.ytomo-pavilion-item[data-v-3d396493]{animation:slideIn-3d396493 .2s ease-out}@keyframes slideIn-3d396493{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}.ytomo-time-slot-button.available[data-v-3d396493]:hover{animation:pulse-3d396493 .6s ease-in-out}@keyframes pulse-3d396493{0%{transform:translateY(-1px)}50%{transform:translateY(-2px)}100%{transform:translateY(-1px)}}.ytomo-pavilion-tab input[data-v-3d396493]:focus{outline:none;border-color:#2c5aa0}.ytomo-pavilion-tab button[data-v-3d396493]:focus{outline:none}@media(prefers-reduced-motion: reduce){.ytomo-pavilion-item[data-v-3d396493],.ytomo-time-slot-button[data-v-3d396493],.ytomo-icon-button[data-v-3d396493],.ytomo-result-display[data-v-3d396493],.ytomo-time-slots[data-v-3d396493]{animation:none;transition:none}.ytomo-time-slot-button.available[data-v-3d396493]:hover{animation:none;transform:none}}@media(prefers-contrast: high){.ytomo-pavilion-item[data-v-3d396493]{border-bottom-width:2px}.ytomo-time-slot-button[data-v-3d396493]{border-width:2px}.ytomo-icon-button.active[data-v-3d396493]{border-width:3px}.ytomo-pavilion-tab input[data-v-3d396493]:focus,.ytomo-pavilion-tab button[data-v-3d396493]:focus{outline:3px solid #000}}.ytomo-processing-overlay[data-v-3d396493]{position:fixed;top:0;left:0;width:100%;height:100%;background-color:rgba(0,0,0,.7);display:flex;align-items:center;justify-content:center;z-index:10001;opacity:0;animation:fadeIn .2s ease-out forwards}.ytomo-processing-content[data-v-3d396493]{background:#fff;border-radius:12px;padding:32px;box-shadow:0 20px 60px rgba(0,0,0,.3);text-align:center;min-width:300px;transform:scale(0.9);animation:dialogAppear .2s ease-out forwards}.ytomo-processing-spinner[data-v-3d396493]{width:40px;height:40px;border:3px solid #e2e8f0;border-top-color:#2c5aa0;border-radius:50%;animation:spin-3d396493 1s linear infinite;margin:0 auto 16px}.ytomo-processing-message[data-v-3d396493]{margin:0 0 24px;color:#374151;font-size:16px;font-weight:500}.ytomo-cancel-button[data-v-3d396493]{background:#6b7280;color:#fff;border:none;padding:12px 24px;border-radius:6px;font-size:14px;cursor:pointer;transition:background-color .2s}.ytomo-cancel-button[data-v-3d396493]:hover{background:#4b5563}.ytomo-cancel-button[data-v-3d396493]:focus{outline:2px solid #2c5aa0;outline-offset:2px}@keyframes spin-3d396493{to{transform:rotate(360deg)}}@keyframes pulse-3d396493{0%,100%{opacity:1}50%{opacity:.7}}.ytomo-reservation-result-fab[data-v-3d396493]{position:fixed;bottom:80px;right:84px;min-width:120px;min-height:50px;border:none;border-radius:6px;color:#fff;font-size:11px;font-weight:500;cursor:pointer;box-shadow:0 4px 12px rgba(0,0,0,.3);transition:all .3s ease;z-index:10003;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:8px 12px;line-height:1.2}.ytomo-reservation-result-fab.success[data-v-3d396493]{background:linear-gradient(135deg, #22c55e 0%, #16a34a 100%);box-shadow:0 4px 12px rgba(34,197,94,.4)}.ytomo-reservation-result-fab.error[data-v-3d396493]{background:linear-gradient(135deg, #ef4444 0%, #dc2626 100%);box-shadow:0 4px 12px rgba(239,68,68,.4)}.ytomo-reservation-result-fab.fab-blue[data-v-3d396493]{background:linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);box-shadow:0 4px 12px rgba(59,130,246,.4)}.ytomo-reservation-result-fab.fab-green[data-v-3d396493]{background:linear-gradient(135deg, #22c55e 0%, #16a34a 100%);box-shadow:0 4px 12px rgba(34,197,94,.4)}.ytomo-reservation-result-fab.fab-red[data-v-3d396493]{background:linear-gradient(135deg, #ef4444 0%, #dc2626 100%);box-shadow:0 4px 12px rgba(239,68,68,.4)}.ytomo-reservation-result-fab.fab-yellow[data-v-3d396493]{background:linear-gradient(135deg, #eab308 0%, #ca8a04 100%);box-shadow:0 4px 12px rgba(234,179,8,.4)}.ytomo-reservation-result-fab .ytomo-result-status[data-v-3d396493]{font-weight:600;font-size:11px;margin-bottom:2px}.ytomo-reservation-result-fab .ytomo-result-status .ytomo-failure-reason[data-v-3d396493]{font-size:9px;font-weight:500;opacity:.9}.ytomo-reservation-result-fab .ytomo-result-pavilion[data-v-3d396493]{font-size:12px;opacity:.95;margin-bottom:2px;font-weight:500}.ytomo-reservation-result-fab .ytomo-result-time[data-v-3d396493]{font-size:12px;opacity:.9;font-weight:600}.ytomo-reservation-result-fab[data-v-3d396493]:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 6px 16px rgba(0,0,0,.4)}.ytomo-reservation-result-fab[data-v-3d396493]:active:not(:disabled){transform:translateY(0)}.ytomo-reservation-result-fab[data-v-3d396493]:focus{outline:none}@media(prefers-reduced-motion: reduce){.ytomo-processing-overlay[data-v-3d396493],.ytomo-processing-content[data-v-3d396493],.ytomo-processing-spinner[data-v-3d396493]{animation:none;transition:none}}.ytomo-log-fab-container[data-v-3d396493]{position:fixed;bottom:20px;left:20px;z-index:10002;display:flex;flex-direction:column;align-items:flex-start;gap:12px;pointer-events:auto}.ytomo-log-fab[data-v-3d396493]{width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);color:#fff;border:none;box-shadow:0 4px 12px rgba(99,102,241,.4);display:flex;align-items:center;justify-content:center;font-size:18px;cursor:pointer;transition:all .3s ease;position:relative}.ytomo-log-fab[data-v-3d396493]:hover{transform:scale(1.1);box-shadow:0 6px 16px rgba(99,102,241,.5)}.ytomo-log-fab.expanded[data-v-3d396493]{background:linear-gradient(135deg, #f59e0b 0%, #d97706 100%);box-shadow:0 4px 12px rgba(245,158,11,.4)}.ytomo-log-fab.has-logs[data-v-3d396493]{background:linear-gradient(135deg, #10b981 0%, #059669 100%);box-shadow:0 4px 12px rgba(16,185,129,.4)}.ytomo-log-fab .ytomo-log-icon[data-v-3d396493]{font-size:20px}.ytomo-log-fab .ytomo-log-count[data-v-3d396493]{position:absolute;top:-6px;right:-6px;background:#ef4444;color:#fff;border-radius:10px;padding:2px 6px;font-size:10px;font-weight:bold;min-width:16px;text-align:center;line-height:1.2}.ytomo-log-display[data-v-3d396493]{background:rgba(0,0,0,.9);color:#fff;border-radius:8px;width:400px;max-height:300px;box-shadow:0 8px 24px rgba(0,0,0,.3);border:1px solid hsla(0,0%,100%,.1);backdrop-filter:blur(10px);transition:all .3s ease}.ytomo-log-display.large-size[data-v-3d396493]{width:600px;max-height:500px}.ytomo-log-display.large-size .ytomo-log-messages[data-v-3d396493]{max-height:420px}@media(max-width: 480px){.ytomo-log-display.large-size .ytomo-log-messages[data-v-3d396493]{max-height:380px}}@media(max-width: 640px){.ytomo-log-display.large-size[data-v-3d396493]{width:90vw;max-height:70vh}}@media(max-width: 480px){.ytomo-log-display[data-v-3d396493]{width:320px;max-height:250px}}.ytomo-log-header[data-v-3d396493]{display:flex;justify-content:space-between;align-items:center;padding:12px 16px;border-bottom:1px solid hsla(0,0%,100%,.1);font-weight:bold;font-size:14px;flex-wrap:wrap;gap:8px}.ytomo-log-header .ytomo-log-controls[data-v-3d396493]{display:flex;align-items:center;gap:6px;flex-wrap:wrap}.ytomo-log-header .ytomo-log-filter[data-v-3d396493]{background:hsla(0,0%,100%,.1);color:#fff;border:1px solid hsla(0,0%,100%,.2);border-radius:4px;padding:2px 6px;font-size:11px;cursor:pointer}.ytomo-log-header .ytomo-log-filter option[data-v-3d396493]{background:#1f2937;color:#fff}.ytomo-log-header .ytomo-log-btn[data-v-3d396493]{background:#6366f1;color:#fff;border:none;border-radius:4px;padding:4px 8px;font-size:12px;cursor:pointer;transition:background-color .2s;min-width:24px}.ytomo-log-header .ytomo-log-btn[data-v-3d396493]:hover{background:#4f46e5}.ytomo-log-header .ytomo-log-btn[data-v-3d396493]:last-child{background:#ef4444}.ytomo-log-header .ytomo-log-btn[data-v-3d396493]:last-child:hover{background:#dc2626}.ytomo-log-messages[data-v-3d396493]{max-height:220px;overflow-y:auto;padding:8px}@media(max-width: 480px){.ytomo-log-messages[data-v-3d396493]{max-height:180px}}.ytomo-log-message[data-v-3d396493]{margin-bottom:8px;padding:6px 8px;border-radius:4px;font-size:12px;line-height:1.4;border-left:3px solid rgba(0,0,0,0)}.ytomo-log-message.log-temp[data-v-3d396493]{background:rgba(168,85,247,.2);border-left-color:#a855f7}.ytomo-log-message.log-error[data-v-3d396493]{background:rgba(239,68,68,.2);border-left-color:#ef4444}.ytomo-log-message.log-warn[data-v-3d396493]{background:rgba(245,158,11,.2);border-left-color:#f59e0b}.ytomo-log-message.log-info[data-v-3d396493]{background:rgba(59,130,246,.2);border-left-color:#3b82f6}.ytomo-log-message.log-debug[data-v-3d396493]{background:rgba(107,114,128,.2);border-left-color:#6b7280}.ytomo-log-message .ytomo-log-time[data-v-3d396493]{color:#9ca3af;font-size:10px;margin-right:6px}.ytomo-log-message .ytomo-log-level[data-v-3d396493]{font-weight:bold;margin-right:6px;font-size:10px}.ytomo-log-message .ytomo-log-module[data-v-3d396493]{color:#60a5fa;margin-right:6px;font-size:10px}.ytomo-log-message .ytomo-log-text[data-v-3d396493]{color:#fff}.ytomo-log-message .ytomo-log-data[data-v-3d396493]{margin-top:4px;background:rgba(0,0,0,.3);padding:4px 6px;border-radius:3px;font-size:10px;color:#d1d5db;white-space:pre-wrap;overflow-x:auto}.ytomo-log-empty[data-v-3d396493]{text-align:center;color:#9ca3af;padding:20px;font-style:italic}.ytomo-log-messages[data-v-3d396493]::-webkit-scrollbar{width:6px}.ytomo-log-messages[data-v-3d396493]::-webkit-scrollbar-track{background:hsla(0,0%,100%,.1);border-radius:3px}.ytomo-log-messages[data-v-3d396493]::-webkit-scrollbar-thumb{background:hsla(0,0%,100%,.3);border-radius:3px}.ytomo-log-messages[data-v-3d396493]::-webkit-scrollbar-thumb:hover{background:hsla(0,0%,100%,.5)}`, ""]);
+// Exports
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
+
 
 /***/ }),
 
@@ -879,6 +879,28 @@ module.exports = function (cssWithMappingToString) {
   };
   return list;
 };
+
+/***/ }),
+
+/***/ 325:
+/***/ ((module, __webpack_exports__, __webpack_require__) => {
+
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   A: () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _node_modules_css_loader_dist_runtime_noSourceMaps_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(601);
+/* harmony import */ var _node_modules_css_loader_dist_runtime_noSourceMaps_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_css_loader_dist_runtime_noSourceMaps_js__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(314);
+/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1__);
+// Imports
+
+
+var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1___default()((_node_modules_css_loader_dist_runtime_noSourceMaps_js__WEBPACK_IMPORTED_MODULE_0___default()));
+// Module
+___CSS_LOADER_EXPORT___.push([module.id, `.ytomo-others-tab[data-v-9c444bd0]{padding:12px}.ytomo-others-tab .ytomo-section[data-v-9c444bd0]{margin-bottom:20px}.ytomo-others-tab .ytomo-section .ytomo-section-title[data-v-9c444bd0]{font-size:16px;font-weight:600;color:#1f2937;margin-bottom:12px;padding-bottom:8px;border-bottom:2px solid #e5e7eb}.ytomo-others-tab .ytomo-test-section .ytomo-description[data-v-9c444bd0]{font-size:14px;color:#6b7280;margin-bottom:12px;line-height:1.4}.ytomo-others-tab .ytomo-test-section .ytomo-test-button[data-v-9c444bd0]{background:#2563eb;color:#fff;padding:8px 24px;border:none;border-radius:4px;font-size:14px;font-weight:500;cursor:pointer;transition:background .2s}.ytomo-others-tab .ytomo-test-section .ytomo-test-button[data-v-9c444bd0]:hover{background:#1d4ed8}.ytomo-others-tab .ytomo-test-section .ytomo-test-button[data-v-9c444bd0]:active{background:#1e40af}.ytomo-others-tab .ytomo-setting-item[data-v-9c444bd0]{display:flex;align-items:center;gap:8px;margin-bottom:12px}.ytomo-others-tab .ytomo-setting-item .ytomo-setting-label[data-v-9c444bd0]{font-size:14px;color:#374151;min-width:160px}.ytomo-others-tab .ytomo-setting-item .ytomo-input-inline[data-v-9c444bd0]{padding:4px 8px;border:1px solid #d1d5db;border-radius:4px;font-size:14px;text-align:center}.ytomo-others-tab .ytomo-setting-item .ytomo-input-inline[data-v-9c444bd0]:focus{outline:none;border-color:#2563eb;box-shadow:0 0 0 1px #2563eb}.ytomo-others-tab .ytomo-setting-item .ytomo-select-inline[data-v-9c444bd0]{padding:4px 8px;border:1px solid #d1d5db;border-radius:4px;font-size:14px;background-color:#fff;min-width:80px}.ytomo-others-tab .ytomo-setting-item .ytomo-select-inline[data-v-9c444bd0]:focus{outline:none;border-color:#2563eb;box-shadow:0 0 0 1px #2563eb}.ytomo-others-tab .ytomo-setting-item .ytomo-select-inline[data-v-9c444bd0]:hover{background-color:#f9fafb}.ytomo-others-tab .ytomo-setting-item .ytomo-checkbox[data-v-9c444bd0]{margin-right:8px;cursor:pointer}.ytomo-others-tab .ytomo-setting-item .ytomo-setting-description[data-v-9c444bd0]{font-size:12px;color:#6b7280;margin-left:8px}.ytomo-others-tab .ytomo-setting-item .ytomo-setting-unit[data-v-9c444bd0]{font-size:14px;color:#6b7280}.ytomo-others-tab .ytomo-setting-item.ytomo-target-time-setting[data-v-9c444bd0]{display:flex;flex-direction:column;align-items:flex-start;gap:8px}.ytomo-others-tab .ytomo-target-time-row[data-v-9c444bd0]{display:flex;align-items:center;gap:8px}.ytomo-others-tab .ytomo-additional-target-row[data-v-9c444bd0]{display:flex;align-items:center;gap:8px}.ytomo-others-tab .ytomo-additional-target-row .ytomo-auto-btn[data-v-9c444bd0]{background:#10b981;color:#fff;border:none;border-radius:4px;padding:4px 12px;font-size:12px;font-weight:500;cursor:pointer;transition:background .2s;min-width:50px}.ytomo-others-tab .ytomo-additional-target-row .ytomo-auto-btn[data-v-9c444bd0]:hover{background:#059669}.ytomo-others-tab .ytomo-additional-target-row .ytomo-additional-time[data-v-9c444bd0]{background:#fff;border:1px solid #e5e7eb}.ytomo-others-tab .ytomo-additional-target-row .ytomo-additional-time[data-v-9c444bd0]:focus{border-color:#10b981;box-shadow:0 0 0 1px #10b981}.ytomo-others-tab .ytomo-investigation-section .ytomo-description[data-v-9c444bd0]{font-size:14px;color:#6b7280;margin-bottom:16px;line-height:1.4}.ytomo-others-tab .ytomo-investigation-section .ytomo-investigation-controls[data-v-9c444bd0]{display:flex;gap:8px;margin-bottom:16px}.ytomo-others-tab .ytomo-investigation-section .ytomo-investigation-controls .ytomo-investigate-button[data-v-9c444bd0]{background:#059669;color:#fff;padding:8px 16px;border:none;border-radius:4px;font-size:14px;font-weight:500;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:4px}.ytomo-others-tab .ytomo-investigation-section .ytomo-investigation-controls .ytomo-investigate-button[data-v-9c444bd0]:hover:not(.disabled){background:#047857}.ytomo-others-tab .ytomo-investigation-section .ytomo-investigation-controls .ytomo-investigate-button.disabled[data-v-9c444bd0]{background:#9ca3af;color:#d1d5db;cursor:not-allowed}.ytomo-others-tab .ytomo-investigation-section .ytomo-investigation-controls .ytomo-investigate-button.cancel-mode[data-v-9c444bd0]{background:#dc2626}.ytomo-others-tab .ytomo-investigation-section .ytomo-investigation-controls .ytomo-investigate-button.cancel-mode[data-v-9c444bd0]:hover{background:#b91c1c}.ytomo-others-tab .ytomo-investigation-section .ytomo-investigation-controls .ytomo-investigate-button .ytomo-loading-icon[data-v-9c444bd0]{animation:pulse-9c444bd0 1.5s ease-in-out infinite}.ytomo-others-tab .ytomo-investigation-section .ytomo-investigation-controls .ytomo-clear-button[data-v-9c444bd0]{background:#f3f4f6;color:#374151;border:1px solid #d1d5db;padding:8px 16px;border-radius:4px;font-size:14px;cursor:pointer;transition:all .2s}.ytomo-others-tab .ytomo-investigation-section .ytomo-investigation-controls .ytomo-clear-button[data-v-9c444bd0]:hover{background:#e5e7eb}.ytomo-others-tab .ytomo-investigation-section .ytomo-investigation-status[data-v-9c444bd0]{background:linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);border:1px solid #16a34a;border-radius:8px;padding:12px}.ytomo-others-tab .ytomo-investigation-section .ytomo-investigation-status .ytomo-status-content[data-v-9c444bd0]{display:flex;align-items:flex-start;gap:12px}.ytomo-others-tab .ytomo-investigation-section .ytomo-investigation-status .ytomo-status-content .ytomo-status-icon[data-v-9c444bd0]{width:20px;height:20px;flex-shrink:0;margin-top:2px}.ytomo-others-tab .ytomo-investigation-section .ytomo-investigation-status .ytomo-status-content .ytomo-status-icon svg[data-v-9c444bd0]{width:100%;height:100%;fill:#16a34a}.ytomo-others-tab .ytomo-investigation-section .ytomo-investigation-status .ytomo-status-content .ytomo-status-icon.spinning[data-v-9c444bd0]{animation:spin-9c444bd0 1s linear infinite}.ytomo-others-tab .ytomo-investigation-section .ytomo-investigation-status .ytomo-status-content .ytomo-status-details[data-v-9c444bd0]{flex:1}.ytomo-others-tab .ytomo-investigation-section .ytomo-investigation-status .ytomo-status-content .ytomo-status-details .ytomo-phase-info[data-v-9c444bd0]{font-size:13px;margin-bottom:4px;display:flex;align-items:center;gap:8px}.ytomo-others-tab .ytomo-investigation-section .ytomo-investigation-status .ytomo-status-content .ytomo-status-details .ytomo-phase-info .phase-label[data-v-9c444bd0]{font-weight:600;color:#059669;padding:2px 6px;background:#d1fae5;border-radius:3px;flex-shrink:0}.ytomo-others-tab .ytomo-investigation-section .ytomo-investigation-status .ytomo-status-content .ytomo-status-details .ytomo-phase-info .detection-info[data-v-9c444bd0]{font-weight:500;color:#374151;font-family:"Consolas","Monaco",monospace;min-width:200px}.ytomo-others-tab .ytomo-investigation-section .ytomo-investigation-status .ytomo-status-content .ytomo-status-details .ytomo-waiting-info[data-v-9c444bd0]{font-size:12px;color:#6b7280;margin-bottom:4px;font-style:italic;min-height:18px;line-height:18px}.ytomo-others-tab .ytomo-investigation-section .ytomo-investigation-status .ytomo-status-content .ytomo-status-details .ytomo-status-current[data-v-9c444bd0]{font-size:14px;font-weight:500;color:#166534;margin-bottom:8px}.ytomo-others-tab .ytomo-investigation-section .ytomo-investigation-status .ytomo-status-content .ytomo-status-details .ytomo-investigation-results .ytomo-results-title[data-v-9c444bd0]{font-size:13px;font-weight:600;color:#166534;margin-bottom:4px}.ytomo-others-tab .ytomo-investigation-section .ytomo-investigation-status .ytomo-status-content .ytomo-status-details .ytomo-investigation-results .ytomo-result-item[data-v-9c444bd0]{font-size:12px;color:#166534;padding:2px 0;font-family:monospace}@keyframes spin-9c444bd0{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}@keyframes pulse-9c444bd0{0%,100%{opacity:1}50%{opacity:.5}}`, ""]);
+// Exports
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
+
 
 /***/ }),
 
@@ -33008,28 +33030,6 @@ class PavilionReservationCache {
 
 /***/ }),
 
-/***/ 806:
-/***/ ((module, __webpack_exports__, __webpack_require__) => {
-
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   A: () => (__WEBPACK_DEFAULT_EXPORT__)
-/* harmony export */ });
-/* harmony import */ var _node_modules_css_loader_dist_runtime_noSourceMaps_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(601);
-/* harmony import */ var _node_modules_css_loader_dist_runtime_noSourceMaps_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_css_loader_dist_runtime_noSourceMaps_js__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(314);
-/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1__);
-// Imports
-
-
-var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1___default()((_node_modules_css_loader_dist_runtime_noSourceMaps_js__WEBPACK_IMPORTED_MODULE_0___default()));
-// Module
-___CSS_LOADER_EXPORT___.push([module.id, `.ytomo-others-tab[data-v-dceb789e]{padding:12px}.ytomo-others-tab .ytomo-section[data-v-dceb789e]{margin-bottom:20px}.ytomo-others-tab .ytomo-section .ytomo-section-title[data-v-dceb789e]{font-size:16px;font-weight:600;color:#1f2937;margin-bottom:12px;padding-bottom:8px;border-bottom:2px solid #e5e7eb}.ytomo-others-tab .ytomo-setting-item[data-v-dceb789e]{display:flex;align-items:center;gap:8px;margin-bottom:12px}.ytomo-others-tab .ytomo-setting-item .ytomo-setting-label[data-v-dceb789e]{font-size:14px;color:#374151;min-width:160px}.ytomo-others-tab .ytomo-setting-item .ytomo-input-inline[data-v-dceb789e]{padding:4px 8px;border:1px solid #d1d5db;border-radius:4px;font-size:14px;text-align:center}.ytomo-others-tab .ytomo-setting-item .ytomo-input-inline[data-v-dceb789e]:focus{outline:none;border-color:#2563eb;box-shadow:0 0 0 1px #2563eb}.ytomo-others-tab .ytomo-setting-item .ytomo-select-inline[data-v-dceb789e]{padding:4px 8px;border:1px solid #d1d5db;border-radius:4px;font-size:14px;background-color:#fff;min-width:80px}.ytomo-others-tab .ytomo-setting-item .ytomo-select-inline[data-v-dceb789e]:focus{outline:none;border-color:#2563eb;box-shadow:0 0 0 1px #2563eb}.ytomo-others-tab .ytomo-setting-item .ytomo-select-inline[data-v-dceb789e]:hover{background-color:#f9fafb}.ytomo-others-tab .ytomo-setting-item .ytomo-checkbox[data-v-dceb789e]{margin-right:8px;cursor:pointer}.ytomo-others-tab .ytomo-setting-item .ytomo-setting-description[data-v-dceb789e]{font-size:12px;color:#6b7280;margin-left:8px}.ytomo-others-tab .ytomo-setting-item .ytomo-setting-unit[data-v-dceb789e]{font-size:14px;color:#6b7280}.ytomo-others-tab .ytomo-setting-item.ytomo-target-time-setting[data-v-dceb789e]{display:flex;flex-direction:column;align-items:flex-start;gap:8px}.ytomo-others-tab .ytomo-target-time-row[data-v-dceb789e]{display:flex;align-items:center;gap:8px}.ytomo-others-tab .ytomo-additional-target-row[data-v-dceb789e]{display:flex;align-items:center;gap:8px}.ytomo-others-tab .ytomo-additional-target-row .ytomo-auto-btn[data-v-dceb789e]{background:#10b981;color:#fff;border:none;border-radius:4px;padding:4px 12px;font-size:12px;font-weight:500;cursor:pointer;transition:background .2s;min-width:50px}.ytomo-others-tab .ytomo-additional-target-row .ytomo-auto-btn[data-v-dceb789e]:hover{background:#059669}.ytomo-others-tab .ytomo-additional-target-row .ytomo-additional-time[data-v-dceb789e]{background:#fff;border:1px solid #e5e7eb}.ytomo-others-tab .ytomo-additional-target-row .ytomo-additional-time[data-v-dceb789e]:focus{border-color:#10b981;box-shadow:0 0 0 1px #10b981}.ytomo-others-tab .ytomo-investigation-section .ytomo-description[data-v-dceb789e]{font-size:14px;color:#6b7280;margin-bottom:16px;line-height:1.4}.ytomo-others-tab .ytomo-investigation-section .ytomo-investigation-controls[data-v-dceb789e]{display:flex;gap:8px;margin-bottom:16px}.ytomo-others-tab .ytomo-investigation-section .ytomo-investigation-controls .ytomo-investigate-button[data-v-dceb789e]{background:#059669;color:#fff;padding:8px 16px;border:none;border-radius:4px;font-size:14px;font-weight:500;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:4px}.ytomo-others-tab .ytomo-investigation-section .ytomo-investigation-controls .ytomo-investigate-button[data-v-dceb789e]:hover:not(.disabled){background:#047857}.ytomo-others-tab .ytomo-investigation-section .ytomo-investigation-controls .ytomo-investigate-button.disabled[data-v-dceb789e]{background:#9ca3af;color:#d1d5db;cursor:not-allowed}.ytomo-others-tab .ytomo-investigation-section .ytomo-investigation-controls .ytomo-investigate-button.cancel-mode[data-v-dceb789e]{background:#dc2626}.ytomo-others-tab .ytomo-investigation-section .ytomo-investigation-controls .ytomo-investigate-button.cancel-mode[data-v-dceb789e]:hover{background:#b91c1c}.ytomo-others-tab .ytomo-investigation-section .ytomo-investigation-controls .ytomo-investigate-button .ytomo-loading-icon[data-v-dceb789e]{animation:pulse-dceb789e 1.5s ease-in-out infinite}.ytomo-others-tab .ytomo-investigation-section .ytomo-investigation-controls .ytomo-clear-button[data-v-dceb789e]{background:#f3f4f6;color:#374151;border:1px solid #d1d5db;padding:8px 16px;border-radius:4px;font-size:14px;cursor:pointer;transition:all .2s}.ytomo-others-tab .ytomo-investigation-section .ytomo-investigation-controls .ytomo-clear-button[data-v-dceb789e]:hover{background:#e5e7eb}.ytomo-others-tab .ytomo-investigation-section .ytomo-investigation-status[data-v-dceb789e]{background:linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);border:1px solid #16a34a;border-radius:8px;padding:12px}.ytomo-others-tab .ytomo-investigation-section .ytomo-investigation-status .ytomo-status-content[data-v-dceb789e]{display:flex;align-items:flex-start;gap:12px}.ytomo-others-tab .ytomo-investigation-section .ytomo-investigation-status .ytomo-status-content .ytomo-status-icon[data-v-dceb789e]{width:20px;height:20px;flex-shrink:0;margin-top:2px}.ytomo-others-tab .ytomo-investigation-section .ytomo-investigation-status .ytomo-status-content .ytomo-status-icon svg[data-v-dceb789e]{width:100%;height:100%;fill:#16a34a}.ytomo-others-tab .ytomo-investigation-section .ytomo-investigation-status .ytomo-status-content .ytomo-status-icon.spinning[data-v-dceb789e]{animation:spin-dceb789e 1s linear infinite}.ytomo-others-tab .ytomo-investigation-section .ytomo-investigation-status .ytomo-status-content .ytomo-status-details[data-v-dceb789e]{flex:1}.ytomo-others-tab .ytomo-investigation-section .ytomo-investigation-status .ytomo-status-content .ytomo-status-details .ytomo-phase-info[data-v-dceb789e]{font-size:13px;margin-bottom:4px;display:flex;align-items:center;gap:8px}.ytomo-others-tab .ytomo-investigation-section .ytomo-investigation-status .ytomo-status-content .ytomo-status-details .ytomo-phase-info .phase-label[data-v-dceb789e]{font-weight:600;color:#059669;padding:2px 6px;background:#d1fae5;border-radius:3px;flex-shrink:0}.ytomo-others-tab .ytomo-investigation-section .ytomo-investigation-status .ytomo-status-content .ytomo-status-details .ytomo-phase-info .detection-info[data-v-dceb789e]{font-weight:500;color:#374151;font-family:"Consolas","Monaco",monospace;min-width:200px}.ytomo-others-tab .ytomo-investigation-section .ytomo-investigation-status .ytomo-status-content .ytomo-status-details .ytomo-waiting-info[data-v-dceb789e]{font-size:12px;color:#6b7280;margin-bottom:4px;font-style:italic;min-height:18px;line-height:18px}.ytomo-others-tab .ytomo-investigation-section .ytomo-investigation-status .ytomo-status-content .ytomo-status-details .ytomo-status-current[data-v-dceb789e]{font-size:14px;font-weight:500;color:#166534;margin-bottom:8px}.ytomo-others-tab .ytomo-investigation-section .ytomo-investigation-status .ytomo-status-content .ytomo-status-details .ytomo-investigation-results .ytomo-results-title[data-v-dceb789e]{font-size:13px;font-weight:600;color:#166534;margin-bottom:4px}.ytomo-others-tab .ytomo-investigation-section .ytomo-investigation-status .ytomo-status-content .ytomo-status-details .ytomo-investigation-results .ytomo-result-item[data-v-dceb789e]{font-size:12px;color:#166534;padding:2px 0;font-family:monospace}@keyframes spin-dceb789e{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}@keyframes pulse-dceb789e{0%,100%{opacity:1}50%{opacity:.5}}`, ""]);
-// Exports
-/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
-
-
-/***/ }),
-
 /***/ 825:
 /***/ ((module) => {
 
@@ -39351,6 +39351,7 @@ const usePavilionsStore = (0,pinia/* defineStore */.nY)('pavilions', () => {
      * パビリオンIDから時間帯情報と基本情報を取得（個別API呼び出し）
      */
     const getPavilionTimeSlots = async (pavilionId, ticketIds = [], entranceDate) => {
+        const startTime = performance.now();
         try {
             // 時間帯取得用の詳細APIを呼び出し
             const params = new URLSearchParams();
@@ -39362,6 +39363,7 @@ const usePavilionsStore = (0,pinia/* defineStore */.nY)('pavilions', () => {
             }
             params.set('count', '1');
             const timeslotUrl = `/api/d/events/${pavilionId}?${params.toString()}&channel=4`;
+            const fetchStart = performance.now();
             const response = await authManager_authenticatedFetch(timeslotUrl, {
                 method: 'GET',
                 headers: {
@@ -39371,6 +39373,8 @@ const usePavilionsStore = (0,pinia/* defineStore */.nY)('pavilions', () => {
                 },
                 credentials: 'include'
             });
+            const fetchEnd = performance.now();
+            pavilions_logger.temp(`API応答時間 - ${pavilionId}`, { fetchTime: `${(fetchEnd - fetchStart).toFixed(0)}ms` });
             if (!response.ok) {
                 if (response.status === 502) {
                     pavilions_logger.warn(`パビリオン時間帯取得でサーバーエラー - ${pavilionId}`, {
@@ -39435,6 +39439,8 @@ const usePavilionsStore = (0,pinia/* defineStore */.nY)('pavilions', () => {
                 }
             }
             pavilions_logger.debug('パビリオン時間帯パース完了', { pavilionId, timeSlotCount: timeSlots.length });
+            const totalTime = performance.now() - startTime;
+            pavilions_logger.temp(`パビリオン取得完了 - ${pavilionId}`, { totalTime: `${totalTime.toFixed(0)}ms` });
             // パビリオン名とタイムスロット情報を返す
             return {
                 timeSlots,
@@ -39442,6 +39448,8 @@ const usePavilionsStore = (0,pinia/* defineStore */.nY)('pavilions', () => {
             };
         }
         catch (error) {
+            const totalTime = performance.now() - startTime;
+            pavilions_logger.temp(`パビリオン取得失敗 - ${pavilionId}`, { totalTime: `${totalTime.toFixed(0)}ms`, error });
             return { timeSlots: [], pavilionName: undefined };
         }
     };
@@ -39469,6 +39477,7 @@ const usePavilionsStore = (0,pinia/* defineStore */.nY)('pavilions', () => {
      * パビリオン検索実行
      */
     const searchPavilions = async (query = '', ticketIds = [], entranceDate) => {
+        const searchStartTime = performance.now();
         pavilions_logger.info('パビリオン検索開始', { query, ticketIds: ticketIds.length, entranceDate });
         isLoading.value = true;
         searchQuery.value = query;
@@ -39481,6 +39490,7 @@ const usePavilionsStore = (0,pinia/* defineStore */.nY)('pavilions', () => {
         try {
             const apiUrl = buildAPIUrl(query, ticketIds, entranceDate);
             pavilions_logger.debug('API URL', { url: apiUrl });
+            const listApiStart = performance.now();
             const response = await authManager_authenticatedFetch(apiUrl, {
                 method: 'GET',
                 headers: {
@@ -39495,6 +39505,8 @@ const usePavilionsStore = (0,pinia/* defineStore */.nY)('pavilions', () => {
                 throw new Error(`API Error: ${response.status} ${response.statusText}`);
             }
             const data = await response.json();
+            const listApiEnd = performance.now();
+            pavilions_logger.temp('パビリオン一覧API時間', { duration: `${(listApiEnd - listApiStart).toFixed(0)}ms` });
             // パビリオン一覧検索レスポンスをデバッグ出力
             pavilions_logger.temp('パビリオン一覧検索レスポンス', {
                 url: apiUrl,
@@ -39557,13 +39569,18 @@ const usePavilionsStore = (0,pinia/* defineStore */.nY)('pavilions', () => {
                 pavilionIds = pavilionResults.map(p => p.id);
                 pavilions_logger.info(`時間帯取得対象: ${pavilionIds.length}/${pavilionResults.length}件（非空欄検索のため全件取得）`);
             }
+            const timeSlotsStart = performance.now();
             const timeSlotsMap = await getTimeSlotsForPavilions(pavilionIds, ticketIds, entranceDate);
+            const timeSlotsEnd = performance.now();
+            pavilions_logger.temp('時間帯情報取得時間', { duration: `${(timeSlotsEnd - timeSlotsStart).toFixed(0)}ms` });
             applyTimeSlotsToData(pavilionResults, timeSlotsMap);
             // メモリに保存
             for (const pavilion of pavilionResults) {
                 pavilions.value.set(pavilion.id, pavilion);
             }
             lastSearchResults.value = pavilionResults;
+            const searchTotalTime = performance.now() - searchStartTime;
+            pavilions_logger.temp('パビリオン検索合計時間', { duration: `${searchTotalTime.toFixed(0)}ms` });
             pavilions_logger.info('パビリオン検索完了', { count: pavilionResults.length, withTimeSlots: true });
             return pavilionResults;
         }
@@ -39576,26 +39593,49 @@ const usePavilionsStore = (0,pinia/* defineStore */.nY)('pavilions', () => {
         }
     };
     /**
-     * pavilion IDsから時間帯情報をまとめて取得して返す関数（並列化版）
+     * pavilion IDsから時間帯情報をまとめて取得して返す関数（並列化版 - 適切な同時実行制限付き）
      */
     const getTimeSlotsForPavilions = async (pavilionIds, ticketIds = [], entranceDate) => {
         const results = new Map();
-        // 全パビリオンを並列実行（制限なし）
-        const promises = pavilionIds.map(async (pavilionId) => {
-            try {
-                const result = await getPavilionTimeSlots(pavilionId, ticketIds, entranceDate);
-                return { pavilionId, timeSlots: result.timeSlots, pavilionName: result.pavilionName };
-            }
-            catch (error) {
-                pavilions_logger.warn('パビリオンの時間帯取得に失敗', { pavilionId, error: error instanceof Error ? error.message : String(error) });
-                return { pavilionId, timeSlots: [], pavilionName: undefined };
-            }
+        // 同時実行数を制限（ブラウザの接続制限を考慮して10並列）
+        const concurrency = 10;
+        const batches = [];
+        // バッチに分割
+        for (let i = 0; i < pavilionIds.length; i += concurrency) {
+            batches.push(pavilionIds.slice(i, i + concurrency));
+        }
+        pavilions_logger.debug('時間帯取得開始', {
+            total: pavilionIds.length,
+            batches: batches.length,
+            concurrency
         });
-        const allResults = await Promise.all(promises);
-        allResults.forEach(({ pavilionId, timeSlots, pavilionName }) => {
-            results.set(pavilionId, { timeSlots, pavilionName });
+        // バッチごとに並列実行
+        for (let batchIndex = 0; batchIndex < batches.length; batchIndex++) {
+            const batch = batches[batchIndex];
+            const promises = batch.map(async (pavilionId) => {
+                try {
+                    const result = await getPavilionTimeSlots(pavilionId, ticketIds, entranceDate);
+                    return { pavilionId, timeSlots: result.timeSlots, pavilionName: result.pavilionName };
+                }
+                catch (error) {
+                    pavilions_logger.warn('パビリオンの時間帯取得に失敗', { pavilionId, error: error instanceof Error ? error.message : String(error) });
+                    return { pavilionId, timeSlots: [], pavilionName: undefined };
+                }
+            });
+            const batchResults = await Promise.all(promises);
+            batchResults.forEach(({ pavilionId, timeSlots, pavilionName }) => {
+                results.set(pavilionId, { timeSlots, pavilionName });
+            });
+            pavilions_logger.debug(`バッチ${batchIndex + 1}/${batches.length}完了`, {
+                processed: results.size,
+                total: pavilionIds.length
+            });
+        }
+        pavilions_logger.info('時間帯情報取得完了', {
+            count: pavilionIds.length,
+            batches: batches.length,
+            concurrency
         });
-        pavilions_logger.info('時間帯情報取得完了', { count: pavilionIds.length, parallel: true });
         return results;
     };
     /**
@@ -43121,6 +43161,125 @@ const useOthersStore = (0,pinia/* defineStore */.nY)('others', () => {
     };
 });
 
+;// ./ts/stores/redirect.ts
+/**
+ * Redirect管理Store
+ *
+ * ytomoページ経由でのページ遷移を管理するストア。
+ * redirect_codeを生成し、遷移先情報をキャッシュする。
+ */
+
+
+const redirect_logger = utils_logger/* loggers */.C$.ui;
+const useRedirectStore = (0,pinia/* defineStore */.nY)('redirect', () => {
+    /**
+     * ユニークなredirect_codeを生成
+     * 形式: タイムスタンプ + ランダム文字列
+     */
+    const generateRedirectCode = () => {
+        const timestamp = Date.now().toString(36);
+        const random = Math.random().toString(36).substring(2, 8);
+        return `${timestamp}_${random}`;
+    };
+    /**
+     * Redirect情報をlocalStorageに保存
+     */
+    const saveRedirectInfo = (redirectCode, info) => {
+        try {
+            const key = `redirect_${redirectCode}`;
+            localStorage.setItem(key, JSON.stringify(info));
+            redirect_logger.info('Redirect情報を保存', { redirectCode, targetUrl: info.targetUrl });
+        }
+        catch (error) {
+            redirect_logger.error('Redirect情報保存エラー', error);
+            throw error;
+        }
+    };
+    /**
+     * Redirect情報をlocalStorageから取得
+     */
+    const getRedirectInfo = (redirectCode) => {
+        try {
+            const key = `redirect_${redirectCode}`;
+            const data = localStorage.getItem(key);
+            if (!data) {
+                redirect_logger.warn('Redirect情報が見つかりません', { redirectCode });
+                return null;
+            }
+            const info = JSON.parse(data);
+            // 5分以上古い情報は無効
+            const now = Date.now();
+            if (now - info.timestamp > 5 * 60 * 1000) {
+                redirect_logger.warn('Redirect情報が期限切れです', { redirectCode, age: now - info.timestamp });
+                localStorage.removeItem(key);
+                return null;
+            }
+            redirect_logger.info('Redirect情報を取得', { redirectCode, targetUrl: info.targetUrl });
+            return info;
+        }
+        catch (error) {
+            redirect_logger.error('Redirect情報取得エラー', error);
+            return null;
+        }
+    };
+    /**
+     * Redirect情報を削除（使用後のクリーンアップ）
+     */
+    const clearRedirectInfo = (redirectCode) => {
+        try {
+            const key = `redirect_${redirectCode}`;
+            localStorage.removeItem(key);
+            redirect_logger.info('Redirect情報を削除', { redirectCode });
+        }
+        catch (error) {
+            redirect_logger.error('Redirect情報削除エラー', error);
+        }
+    };
+    /**
+     * 期限切れのRedirect情報をすべてクリーンアップ
+     */
+    const cleanupExpiredRedirects = () => {
+        try {
+            const now = Date.now();
+            const keysToRemove = [];
+            for (let i = 0; i < localStorage.length; i++) {
+                const key = localStorage.key(i);
+                if (key && key.startsWith('redirect_')) {
+                    const data = localStorage.getItem(key);
+                    if (data) {
+                        try {
+                            const info = JSON.parse(data);
+                            if (now - info.timestamp > 5 * 60 * 1000) {
+                                keysToRemove.push(key);
+                            }
+                        }
+                        catch {
+                            // パースエラーの場合も削除対象
+                            keysToRemove.push(key);
+                        }
+                    }
+                }
+            }
+            keysToRemove.forEach(key => localStorage.removeItem(key));
+            if (keysToRemove.length > 0) {
+                redirect_logger.info('期限切れRedirect情報をクリーンアップ', { count: keysToRemove.length });
+            }
+        }
+        catch (error) {
+            redirect_logger.error('Redirectクリーンアップエラー', error);
+        }
+    };
+    // 初期化時にクリーンアップ実行
+    cleanupExpiredRedirects();
+    return {
+        generateRedirectCode,
+        saveRedirectInfo,
+        getRedirectInfo,
+        clearRedirectInfo,
+        cleanupExpiredRedirects
+    };
+});
+
 ;// ./node_modules/ts-loader/index.js??clonedRuleSet-1.use!./node_modules/vue-loader/dist/index.js??ruleSet[1].rules[8].use[0]!./ts/components/PavilionTab.vue?vue&type=script&setup=true&lang=ts
 
 
@@ -43195,7 +43354,7 @@ const PavilionTabvue_type_script_setup_true_lang_ts_hoisted_41 = ["data-pavilion
 const PavilionTabvue_type_script_setup_true_lang_ts_hoisted_42 = { class: "ytomo-pavilion-header" };
 const PavilionTabvue_type_script_setup_true_lang_ts_hoisted_43 = ["onClick"];
 const PavilionTabvue_type_script_setup_true_lang_ts_hoisted_44 = { class: "ytomo-pavilion-name" };
-const PavilionTabvue_type_script_setup_true_lang_ts_hoisted_45 = ["onClick"];
+const PavilionTabvue_type_script_setup_true_lang_ts_hoisted_45 = (/* unused pure expression or super */ null && (["onClick"]));
 const PavilionTabvue_type_script_setup_true_lang_ts_hoisted_46 = { class: "ytomo-pavilion-status" };
 const PavilionTabvue_type_script_setup_true_lang_ts_hoisted_47 = {
     key: 0,
@@ -43255,6 +43414,7 @@ const _hoisted_76 = {
     key: 0,
     class: "ytomo-log-count"
 };
+
 
 
 
@@ -43476,6 +43636,7 @@ const maxLogMessages = 100; // 最大保持ログ数
         const sequentialReservationStore = useSequentialReservationStore();
         const scheduledReservationStore = useScheduledReservationStore();
         const othersStore = useOthersStore();
+        const redirectStore = useRedirectStore();
         const { allPavilions, filteredPavilions, isLoading, isAvailableOnlyFilter, availablePavilionsCount } = (0,pinia/* storeToRefs */.bP)(pavilionsStore);
         const { activeTab } = (0,pinia/* storeToRefs */.bP)(mainDialogStore);
         // Composable使用
@@ -43884,32 +44045,46 @@ const maxLogMessages = 100; // 最大保持ログ数
             }
         };
         // 公式パビリオンページを開く
-        const openOfficialPavilionPage = (pavilionId) => {
-            logger.info('公式パビリオンページを開く', { pavilionId });
+        const openOfficialPavilionPage = (pavilionId, pavilionName) => {
+            logger.info('公式パビリオンページを開く', { pavilionId, pavilionName });
             // 選択されたチケットIDを取得
             const selectedTicketIdList = ticketsStore.selectedTicketIds;
             if (selectedTicketIdList.length === 0) {
-                logger.warn('チケットが選択されていません');
-                alert('チケットを選択してください');
+                logger.warn('パビリオンページを開けません: チケットが選択されていません');
                 return;
             }
             const ticketIds = selectedTicketIdList.join(',');
             // 入場日付を取得
             const entranceDate = selectedEntranceDate.value;
             if (!entranceDate) {
-                logger.warn('入場日付が選択されていません');
-                alert('入場日付を選択してください');
+                logger.warn('パビリオンページを開けません: 入場日付が選択されていません');
                 return;
             }
-            // URLを生成（他のモジュールと同じ形式）
-            const pavilionUrl = `https://ticket.expo2025.or.jp/event_time/?id=${ticketIds}&event_id=${pavilionId}&screen_id=108&lottery=5&entrance_date=${entranceDate}`;
-            // 新しいタブで公式パビリオンページを開く
-            const newTab = window.open(pavilionUrl, '_blank');
+            // パビリオンページのURLを生成
+            const targetUrl = `/event_time/?id=${ticketIds}&event_id=${pavilionId}&screen_id=108&lottery=5&entrance_date=${entranceDate}`;
+            // redirect_codeを生成
+            const redirectCode = redirectStore.generateRedirectCode();
+            // Redirect情報を保存
+            redirectStore.saveRedirectInfo(redirectCode, {
+                targetUrl: targetUrl,
+                timestamp: Date.now(),
+                pavilionId: pavilionId,
+                pavilionName: pavilionName
+            });
+            // ytomoページにredirect_codeパラメータ付きで遷移
+            const ytomoUrl = `/ytomo?redirect_code=${redirectCode}`;
+            logger.info('ytomoページ経由でパビリオンページに遷移', {
+                pavilionId,
+                redirectCode,
+                targetUrl
+            });
+            // 新しいタブでytomoページを開く
+            const newTab = window.open(ytomoUrl, '_blank');
             if (newTab) {
-                logger.info('公式パビリオンページを開きました', { pavilionId, url: pavilionUrl });
+                logger.info('新しいタブでytomoページを開きました', { redirectCode });
             }
             else {
-                logger.warn('新しいタブを開けませんでした（ポップアップブロック？）', { pavilionId });
+                logger.warn('新しいタブを開けませんでした（ポップアップブロック？）', { redirectCode });
             }
         };
         const getFilteredTimeSlots = (pavilion) => {
@@ -44750,11 +44925,9 @@ const maxLogMessages = 100; // 最大保持ログ数
                                                 onClick: ($event) => (toggleFavorite(pavilion))
                                             }, (0,vue_esm_bundler/* toDisplayString */.v_)(isFavorite(pavilion.id) ? '⭐' : '☆'), 11 /* TEXT, CLASS, PROPS */, PavilionTabvue_type_script_setup_true_lang_ts_hoisted_43),
                                             (0,vue_esm_bundler/* createElementVNode */.Lk)("span", PavilionTabvue_type_script_setup_true_lang_ts_hoisted_44, (0,vue_esm_bundler/* toDisplayString */.v_)(pavilion.name), 1 /* TEXT */),
-                                            (0,vue_esm_bundler/* createElementVNode */.Lk)("button", {
-                                                class: "ytomo-official-link-button",
-                                                onClick: ($event) => (openOfficialPavilionPage(pavilion.id)),
-                                                title: "公式ページを開く"
-                                            }, " 🔗 ", 8 /* PROPS */, PavilionTabvue_type_script_setup_true_lang_ts_hoisted_45),
+                                             false
+                                                ? (0)
+                                                : (0,vue_esm_bundler/* createCommentVNode */.Q3)("v-if", true),
                                             (0,vue_esm_bundler/* createElementVNode */.Lk)("div", PavilionTabvue_type_script_setup_true_lang_ts_hoisted_46, [
                                                 ((pavilion.timeSlots?.filter(slot => slot.available).length || 0) > 0)
                                                     ? ((0,vue_esm_bundler/* openBlock */.uX)(), (0,vue_esm_bundler/* createElementBlock */.CE)("span", PavilionTabvue_type_script_setup_true_lang_ts_hoisted_47, (0,vue_esm_bundler/* toDisplayString */.v_)(pavilion.timeSlots?.filter(slot => slot.available).length || 0) + "枠 ", 1 /* TEXT */))
@@ -45025,9 +45198,9 @@ const maxLogMessages = 100; // 最大保持ログ数
 
 ;// ./ts/components/PavilionTab.vue?vue&type=script&setup=true&lang=ts
  
-// EXTERNAL MODULE: ./node_modules/css-loader/dist/cjs.js!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/sass-loader/dist/cjs.js!./node_modules/vue-loader/dist/index.js??ruleSet[1].rules[8].use[0]!./ts/components/PavilionTab.vue?vue&type=style&index=0&id=134b074b&scoped=true&lang=scss
-var PavilionTabvue_type_style_index_0_id_134b074b_scoped_true_lang_scss = __webpack_require__(61);
-;// ./node_modules/style-loader/dist/cjs.js!./node_modules/css-loader/dist/cjs.js!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/sass-loader/dist/cjs.js!./node_modules/vue-loader/dist/index.js??ruleSet[1].rules[8].use[0]!./ts/components/PavilionTab.vue?vue&type=style&index=0&id=134b074b&scoped=true&lang=scss
+// EXTERNAL MODULE: ./node_modules/css-loader/dist/cjs.js!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/sass-loader/dist/cjs.js!./node_modules/vue-loader/dist/index.js??ruleSet[1].rules[8].use[0]!./ts/components/PavilionTab.vue?vue&type=style&index=0&id=3d396493&scoped=true&lang=scss
+var PavilionTabvue_type_style_index_0_id_3d396493_scoped_true_lang_scss = __webpack_require__(229);
+;// ./node_modules/style-loader/dist/cjs.js!./node_modules/css-loader/dist/cjs.js!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/sass-loader/dist/cjs.js!./node_modules/vue-loader/dist/index.js??ruleSet[1].rules[8].use[0]!./ts/components/PavilionTab.vue?vue&type=style&index=0&id=3d396493&scoped=true&lang=scss
 
       
       
@@ -45039,22 +45212,22 @@ var PavilionTabvue_type_style_index_0_id_134b074b_scoped_true_lang_scss = __webp
       
       
 
-var PavilionTabvue_type_style_index_0_id_134b074b_scoped_true_lang_scss_options = {};
+var PavilionTabvue_type_style_index_0_id_3d396493_scoped_true_lang_scss_options = {};
 
-PavilionTabvue_type_style_index_0_id_134b074b_scoped_true_lang_scss_options.styleTagTransform = (styleTagTransform_default());
-PavilionTabvue_type_style_index_0_id_134b074b_scoped_true_lang_scss_options.setAttributes = (setAttributesWithoutAttributes_default());
-PavilionTabvue_type_style_index_0_id_134b074b_scoped_true_lang_scss_options.insert = insertBySelector_default().bind(null, "head");
-PavilionTabvue_type_style_index_0_id_134b074b_scoped_true_lang_scss_options.domAPI = (styleDomAPI_default());
-PavilionTabvue_type_style_index_0_id_134b074b_scoped_true_lang_scss_options.insertStyleElement = (insertStyleElement_default());
+PavilionTabvue_type_style_index_0_id_3d396493_scoped_true_lang_scss_options.styleTagTransform = (styleTagTransform_default());
+PavilionTabvue_type_style_index_0_id_3d396493_scoped_true_lang_scss_options.setAttributes = (setAttributesWithoutAttributes_default());
+PavilionTabvue_type_style_index_0_id_3d396493_scoped_true_lang_scss_options.insert = insertBySelector_default().bind(null, "head");
+PavilionTabvue_type_style_index_0_id_3d396493_scoped_true_lang_scss_options.domAPI = (styleDomAPI_default());
+PavilionTabvue_type_style_index_0_id_3d396493_scoped_true_lang_scss_options.insertStyleElement = (insertStyleElement_default());
 
-var PavilionTabvue_type_style_index_0_id_134b074b_scoped_true_lang_scss_update = injectStylesIntoStyleTag_default()(PavilionTabvue_type_style_index_0_id_134b074b_scoped_true_lang_scss/* default */.A, PavilionTabvue_type_style_index_0_id_134b074b_scoped_true_lang_scss_options);
-
-
+var PavilionTabvue_type_style_index_0_id_3d396493_scoped_true_lang_scss_update = injectStylesIntoStyleTag_default()(PavilionTabvue_type_style_index_0_id_3d396493_scoped_true_lang_scss/* default */.A, PavilionTabvue_type_style_index_0_id_3d396493_scoped_true_lang_scss_options);
 
 
-       /* harmony default export */ const components_PavilionTabvue_type_style_index_0_id_134b074b_scoped_true_lang_scss = (PavilionTabvue_type_style_index_0_id_134b074b_scoped_true_lang_scss/* default */.A && PavilionTabvue_type_style_index_0_id_134b074b_scoped_true_lang_scss/* default */.A.locals ? PavilionTabvue_type_style_index_0_id_134b074b_scoped_true_lang_scss/* default */.A.locals : undefined);
 
-;// ./ts/components/PavilionTab.vue?vue&type=style&index=0&id=134b074b&scoped=true&lang=scss
+
+       /* harmony default export */ const components_PavilionTabvue_type_style_index_0_id_3d396493_scoped_true_lang_scss = (PavilionTabvue_type_style_index_0_id_3d396493_scoped_true_lang_scss/* default */.A && PavilionTabvue_type_style_index_0_id_3d396493_scoped_true_lang_scss/* default */.A.locals ? PavilionTabvue_type_style_index_0_id_3d396493_scoped_true_lang_scss/* default */.A.locals : undefined);
+
+;// ./ts/components/PavilionTab.vue?vue&type=style&index=0&id=3d396493&scoped=true&lang=scss
 
 ;// ./ts/components/PavilionTab.vue
 
@@ -45063,7 +45236,7 @@ var PavilionTabvue_type_style_index_0_id_134b074b_scoped_true_lang_scss_update =
 ;
 
 
-const PavilionTab_exports_ = /*#__PURE__*/(0,exportHelper/* default */.A)(PavilionTabvue_type_script_setup_true_lang_ts, [['__scopeId',"data-v-134b074b"]])
+const PavilionTab_exports_ = /*#__PURE__*/(0,exportHelper/* default */.A)(PavilionTabvue_type_script_setup_true_lang_ts, [['__scopeId',"data-v-3d396493"]])
 
 /* harmony default export */ const PavilionTab = (PavilionTab_exports_);
 ;// ./ts/stores/entranceReservation.ts
@@ -48837,6 +49010,7 @@ const OthersTabvue_type_script_setup_true_lang_ts_hoisted_25 = { class: "ytomo-s
 
 
 
+
 /* harmony default export */ const OthersTabvue_type_script_setup_true_lang_ts = (/*@__PURE__*/(0,vue_esm_bundler/* defineComponent */.pM)({
     __name: 'OthersTab',
     setup(__props) {
@@ -48844,6 +49018,7 @@ const OthersTabvue_type_script_setup_true_lang_ts_hoisted_25 = { class: "ytomo-s
         const othersStore = useOthersStore();
         const ticketsStore = useTicketsStore();
         const entranceStore = useEntranceReservationStore();
+        const redirectStore = useRedirectStore();
         // API利用設定
         const apiUsageMode = (0,vue_esm_bundler/* ref */.KR)('none');
         // メイン目標時間
@@ -48902,6 +49077,34 @@ const OthersTabvue_type_script_setup_true_lang_ts_hoisted_25 = { class: "ytomo-s
             logger.info('デバッグログボタン表示設定変更', {
                 show: showDebugLogButton.value
             });
+        };
+        // Redirect機構の動作確認
+        const testRedirectMechanism = () => {
+            logger.info('Redirect機構テスト開始');
+            // テスト用のURL（入場予約ページ）
+            const targetUrl = '/ticket_visiting_reservation/?id=NCSQCZ9PC6&screen_id=108&lottery=6&entrance_date=';
+            // redirect_codeを生成
+            const redirectCode = redirectStore.generateRedirectCode();
+            // Redirect情報を保存
+            redirectStore.saveRedirectInfo(redirectCode, {
+                targetUrl: targetUrl,
+                timestamp: Date.now()
+            });
+            // ytomoページにredirect_codeパラメータ付きで遷移
+            const ytomoUrl = `/ytomo?redirect_code=${redirectCode}`;
+            logger.info('テスト用redirect実行', {
+                redirectCode,
+                targetUrl,
+                ytomoUrl
+            });
+            // 新しいタブでytomoページを開く
+            const newTab = window.open(ytomoUrl, '_blank');
+            if (newTab) {
+                logger.info('新しいタブでytomoページを開きました（テスト）', { redirectCode });
+            }
+            else {
+                logger.warn('新しいタブを開けませんでした（ポップアップブロック？）', { redirectCode });
+            }
         };
         // 自動時間生成
         const generateAutoTimes = () => {
@@ -49410,12 +49613,23 @@ const OthersTabvue_type_script_setup_true_lang_ts_hoisted_25 = { class: "ytomo-s
                         _cache[14] || (_cache[14] = (0,vue_esm_bundler/* createElementVNode */.Lk)("span", { class: "ytomo-setting-description" }, "左下にデバッグログボタンを表示", -1 /* CACHED */))
                     ])
                 ]),
+                (0,vue_esm_bundler/* createCommentVNode */.Q3)(" Redirect動作確認セクション "),
+                (0,vue_esm_bundler/* createElementVNode */.Lk)("div", { class: "ytomo-section" }, [
+                    _cache[17] || (_cache[17] = (0,vue_esm_bundler/* createElementVNode */.Lk)("h3", { class: "ytomo-section-title" }, "動作確認", -1 /* CACHED */)),
+                    (0,vue_esm_bundler/* createElementVNode */.Lk)("div", { class: "ytomo-test-section" }, [
+                        _cache[16] || (_cache[16] = (0,vue_esm_bundler/* createElementVNode */.Lk)("p", { class: "ytomo-description" }, " Redirect機構の動作確認用ボタンです。 ", -1 /* CACHED */)),
+                        (0,vue_esm_bundler/* createElementVNode */.Lk)("button", {
+                            class: "ytomo-test-button",
+                            onClick: testRedirectMechanism
+                        }, " Try ")
+                    ])
+                ]),
                 (0,vue_esm_bundler/* createCommentVNode */.Q3)(" 調査機能セクション "),
                 (apiUsageMode.value !== 'none')
                     ? ((0,vue_esm_bundler/* openBlock */.uX)(), (0,vue_esm_bundler/* createElementBlock */.CE)("div", OthersTabvue_type_script_setup_true_lang_ts_hoisted_13, [
-                        _cache[18] || (_cache[18] = (0,vue_esm_bundler/* createElementVNode */.Lk)("h3", { class: "ytomo-section-title" }, "タイミング調査", -1 /* CACHED */)),
+                        _cache[20] || (_cache[20] = (0,vue_esm_bundler/* createElementVNode */.Lk)("h3", { class: "ytomo-section-title" }, "タイミング調査", -1 /* CACHED */)),
                         (0,vue_esm_bundler/* createElementVNode */.Lk)("div", OthersTabvue_type_script_setup_true_lang_ts_hoisted_14, [
-                            _cache[17] || (_cache[17] = (0,vue_esm_bundler/* createElementVNode */.Lk)("p", { class: "ytomo-description" }, " 入場予約システムの空き情報更新タイミングを調査し、最適な予約実行時間を見つけます。 ", -1 /* CACHED */)),
+                            _cache[19] || (_cache[19] = (0,vue_esm_bundler/* createElementVNode */.Lk)("p", { class: "ytomo-description" }, " 入場予約システムの空き情報更新タイミングを調査し、最適な予約実行時間を見つけます。 ", -1 /* CACHED */)),
                             (0,vue_esm_bundler/* createElementVNode */.Lk)("div", OthersTabvue_type_script_setup_true_lang_ts_hoisted_15, [
                                 (0,vue_esm_bundler/* createElementVNode */.Lk)("button", {
                                     class: (0,vue_esm_bundler/* normalizeClass */.C4)(["ytomo-investigate-button", { 'cancel-mode': (0,vue_esm_bundler/* unref */.R1)(othersStore).isInvestigationRunning }]),
@@ -49432,7 +49646,7 @@ const OthersTabvue_type_script_setup_true_lang_ts_hoisted_25 = { class: "ytomo-s
                                 ? ((0,vue_esm_bundler/* openBlock */.uX)(), (0,vue_esm_bundler/* createElementBlock */.CE)("div", OthersTabvue_type_script_setup_true_lang_ts_hoisted_17, [
                                     (0,vue_esm_bundler/* createElementVNode */.Lk)("div", OthersTabvue_type_script_setup_true_lang_ts_hoisted_18, [
                                         ((0,vue_esm_bundler/* unref */.R1)(othersStore).isInvestigationRunning)
-                                            ? ((0,vue_esm_bundler/* openBlock */.uX)(), (0,vue_esm_bundler/* createElementBlock */.CE)("div", OthersTabvue_type_script_setup_true_lang_ts_hoisted_19, [...(_cache[16] || (_cache[16] = [
+                                            ? ((0,vue_esm_bundler/* openBlock */.uX)(), (0,vue_esm_bundler/* createElementBlock */.CE)("div", OthersTabvue_type_script_setup_true_lang_ts_hoisted_19, [...(_cache[18] || (_cache[18] = [
                                                     (0,vue_esm_bundler/* createElementVNode */.Lk)("svg", { viewBox: "0 0 24 24" }, [
                                                         (0,vue_esm_bundler/* createElementVNode */.Lk)("path", { d: "M12,4V2A10,10 0 0,0 2,12H4A8,8 0 0,1 12,4Z" })
                                                     ], -1 /* CACHED */)
@@ -49463,9 +49677,9 @@ const OthersTabvue_type_script_setup_true_lang_ts_hoisted_25 = { class: "ytomo-s
 
 ;// ./ts/components/OthersTab.vue?vue&type=script&setup=true&lang=ts
  
-// EXTERNAL MODULE: ./node_modules/css-loader/dist/cjs.js!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/sass-loader/dist/cjs.js!./node_modules/vue-loader/dist/index.js??ruleSet[1].rules[8].use[0]!./ts/components/OthersTab.vue?vue&type=style&index=0&id=dceb789e&scoped=true&lang=scss
-var OthersTabvue_type_style_index_0_id_dceb789e_scoped_true_lang_scss = __webpack_require__(806);
-;// ./node_modules/style-loader/dist/cjs.js!./node_modules/css-loader/dist/cjs.js!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/sass-loader/dist/cjs.js!./node_modules/vue-loader/dist/index.js??ruleSet[1].rules[8].use[0]!./ts/components/OthersTab.vue?vue&type=style&index=0&id=dceb789e&scoped=true&lang=scss
+// EXTERNAL MODULE: ./node_modules/css-loader/dist/cjs.js!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/sass-loader/dist/cjs.js!./node_modules/vue-loader/dist/index.js??ruleSet[1].rules[8].use[0]!./ts/components/OthersTab.vue?vue&type=style&index=0&id=9c444bd0&scoped=true&lang=scss
+var OthersTabvue_type_style_index_0_id_9c444bd0_scoped_true_lang_scss = __webpack_require__(325);
+;// ./node_modules/style-loader/dist/cjs.js!./node_modules/css-loader/dist/cjs.js!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/sass-loader/dist/cjs.js!./node_modules/vue-loader/dist/index.js??ruleSet[1].rules[8].use[0]!./ts/components/OthersTab.vue?vue&type=style&index=0&id=9c444bd0&scoped=true&lang=scss
 
       
       
@@ -49477,22 +49691,22 @@ var OthersTabvue_type_style_index_0_id_dceb789e_scoped_true_lang_scss = __webpac
       
       
 
-var OthersTabvue_type_style_index_0_id_dceb789e_scoped_true_lang_scss_options = {};
+var OthersTabvue_type_style_index_0_id_9c444bd0_scoped_true_lang_scss_options = {};
 
-OthersTabvue_type_style_index_0_id_dceb789e_scoped_true_lang_scss_options.styleTagTransform = (styleTagTransform_default());
-OthersTabvue_type_style_index_0_id_dceb789e_scoped_true_lang_scss_options.setAttributes = (setAttributesWithoutAttributes_default());
-OthersTabvue_type_style_index_0_id_dceb789e_scoped_true_lang_scss_options.insert = insertBySelector_default().bind(null, "head");
-OthersTabvue_type_style_index_0_id_dceb789e_scoped_true_lang_scss_options.domAPI = (styleDomAPI_default());
-OthersTabvue_type_style_index_0_id_dceb789e_scoped_true_lang_scss_options.insertStyleElement = (insertStyleElement_default());
+OthersTabvue_type_style_index_0_id_9c444bd0_scoped_true_lang_scss_options.styleTagTransform = (styleTagTransform_default());
+OthersTabvue_type_style_index_0_id_9c444bd0_scoped_true_lang_scss_options.setAttributes = (setAttributesWithoutAttributes_default());
+OthersTabvue_type_style_index_0_id_9c444bd0_scoped_true_lang_scss_options.insert = insertBySelector_default().bind(null, "head");
+OthersTabvue_type_style_index_0_id_9c444bd0_scoped_true_lang_scss_options.domAPI = (styleDomAPI_default());
+OthersTabvue_type_style_index_0_id_9c444bd0_scoped_true_lang_scss_options.insertStyleElement = (insertStyleElement_default());
 
-var OthersTabvue_type_style_index_0_id_dceb789e_scoped_true_lang_scss_update = injectStylesIntoStyleTag_default()(OthersTabvue_type_style_index_0_id_dceb789e_scoped_true_lang_scss/* default */.A, OthersTabvue_type_style_index_0_id_dceb789e_scoped_true_lang_scss_options);
-
-
+var OthersTabvue_type_style_index_0_id_9c444bd0_scoped_true_lang_scss_update = injectStylesIntoStyleTag_default()(OthersTabvue_type_style_index_0_id_9c444bd0_scoped_true_lang_scss/* default */.A, OthersTabvue_type_style_index_0_id_9c444bd0_scoped_true_lang_scss_options);
 
 
-       /* harmony default export */ const components_OthersTabvue_type_style_index_0_id_dceb789e_scoped_true_lang_scss = (OthersTabvue_type_style_index_0_id_dceb789e_scoped_true_lang_scss/* default */.A && OthersTabvue_type_style_index_0_id_dceb789e_scoped_true_lang_scss/* default */.A.locals ? OthersTabvue_type_style_index_0_id_dceb789e_scoped_true_lang_scss/* default */.A.locals : undefined);
 
-;// ./ts/components/OthersTab.vue?vue&type=style&index=0&id=dceb789e&scoped=true&lang=scss
+
+       /* harmony default export */ const components_OthersTabvue_type_style_index_0_id_9c444bd0_scoped_true_lang_scss = (OthersTabvue_type_style_index_0_id_9c444bd0_scoped_true_lang_scss/* default */.A && OthersTabvue_type_style_index_0_id_9c444bd0_scoped_true_lang_scss/* default */.A.locals ? OthersTabvue_type_style_index_0_id_9c444bd0_scoped_true_lang_scss/* default */.A.locals : undefined);
+
+;// ./ts/components/OthersTab.vue?vue&type=style&index=0&id=9c444bd0&scoped=true&lang=scss
 
 ;// ./ts/components/OthersTab.vue
 
@@ -49501,7 +49715,7 @@ var OthersTabvue_type_style_index_0_id_dceb789e_scoped_true_lang_scss_update = i
 ;
 
 
-const OthersTab_exports_ = /*#__PURE__*/(0,exportHelper/* default */.A)(OthersTabvue_type_script_setup_true_lang_ts, [['__scopeId',"data-v-dceb789e"]])
+const OthersTab_exports_ = /*#__PURE__*/(0,exportHelper/* default */.A)(OthersTabvue_type_script_setup_true_lang_ts, [['__scopeId',"data-v-9c444bd0"]])
 
 /* harmony default export */ const OthersTab = (OthersTab_exports_);
 ;// ./node_modules/ts-loader/index.js??clonedRuleSet-1.use!./node_modules/vue-loader/dist/index.js??ruleSet[1].rules[8].use[0]!./ts/components/MainDialog.vue?vue&type=script&setup=true&lang=ts
@@ -50259,6 +50473,8 @@ const SequentialReservationOverlay_exports_ = /*#__PURE__*/(0,exportHelper/* def
 
 
 
+
+
 /* harmony default export */ const YtomoPageContentvue_type_script_setup_true_lang_ts = (/*@__PURE__*/(0,vue_esm_bundler/* defineComponent */.pM)({
     __name: 'YtomoPageContent',
     setup(__props) {
@@ -50280,6 +50496,46 @@ const SequentialReservationOverlay_exports_ = /*#__PURE__*/(0,exportHelper/* def
             // スタイルは_ytomo-page.scssで管理
             logger.info('/ytomoページでのMainDialog表示完了');
         };
+        // redirect_codeパラメータをチェックし、該当する場合はページ遷移を実行
+        const handleRedirect = () => {
+            try {
+                const urlParams = new URLSearchParams(window.location.search);
+                const redirectCode = urlParams.get('redirect_code');
+                if (!redirectCode) {
+                    logger.info('redirect_codeパラメータなし - 通常のytomoページ表示');
+                    return false;
+                }
+                logger.info('redirect_code検出', { redirectCode });
+                // Redirect情報を取得
+                const redirectStore = useRedirectStore();
+                const redirectInfo = redirectStore.getRedirectInfo(redirectCode);
+                if (!redirectInfo) {
+                    logger.warn('有効なRedirect情報が見つかりません', { redirectCode });
+                    return false;
+                }
+                logger.info('Redirect実行', {
+                    targetUrl: redirectInfo.targetUrl,
+                    pavilionId: redirectInfo.pavilionId
+                });
+                // Router.push()で遷移
+                const success = RouterUtils.push(redirectInfo.targetUrl);
+                if (success) {
+                    // 使用済みのRedirect情報をクリーンアップ
+                    redirectStore.clearRedirectInfo(redirectCode);
+                    logger.info('Redirect完了 - 情報をクリーンアップ', { redirectCode });
+                    return true;
+                }
+                else {
+                    logger.warn('Router.push()失敗 - location.hrefにフォールバック');
+                    window.location.href = redirectInfo.targetUrl;
+                    return true;
+                }
+            }
+            catch (error) {
+                logger.error('Redirect処理エラー', error);
+                return false;
+            }
+        };
         // main-dialog-fab.tsで既に読み込み表示が作成されているので、MainDialogの読み込みのみ実行
         const waitForMainAndLoadDialog = () => {
             const mainElement = document.querySelector('main');
@@ -50287,7 +50543,12 @@ const SequentialReservationOverlay_exports_ = /*#__PURE__*/(0,exportHelper/* def
                 const loadingContainer = mainElement.querySelector('.ytomo-loading-container');
                 if (loadingContainer) {
                     logger.info('ytomoページ - MainDialog読み込み開始');
-                    loadMainDialog(mainElement, loadingContainer);
+                    // redirect_codeがある場合は先に処理
+                    const isRedirecting = handleRedirect();
+                    // Redirect中でなければMainDialogを表示
+                    if (!isRedirecting) {
+                        loadMainDialog(mainElement, loadingContainer);
+                    }
                 }
                 else {
                     // 読み込み表示が見つからない場合は再試行

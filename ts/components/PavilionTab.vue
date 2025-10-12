@@ -243,8 +243,9 @@
             </button>
             <span class="ytomo-pavilion-name">{{ pavilion.name }}</span>
             <button
+              v-if="false"
               class="ytomo-official-link-button"
-              @click="openOfficialPavilionPage(pavilion.id)"
+              @click="openOfficialPavilionPage(pavilion.id, pavilion.name)"
               title="公式ページを開く"
             >
               🔗
@@ -521,6 +522,7 @@ import { useOverlaysStore } from '@/stores/overlays'
 import { useSequentialReservationStore } from '@/stores/sequentialReservation'
 import { useScheduledReservationStore } from '@/stores/scheduledReservation'
 import { useOthersStore } from '@/stores/others'
+import { useRedirectStore } from '@/stores/redirect'
 import { usePavilions } from '@/composables/usePavilions'
 import type { ScheduleData, TicketData, TimeSlotData, PavilionData } from '@/types/api'
 import type { ScheduleFormData, ScheduledTimeSlot } from '@/types/scheduledReservation'
@@ -766,6 +768,7 @@ const overlaysStore = useOverlaysStore()
 const sequentialReservationStore = useSequentialReservationStore()
 const scheduledReservationStore = useScheduledReservationStore()
 const othersStore = useOthersStore()
+const redirectStore = useRedirectStore()
 
 const { allPavilions, filteredPavilions, isLoading, isAvailableOnlyFilter, availablePavilionsCount } = storeToRefs(pavilionsStore)
 const { activeTab } = storeToRefs(mainDialogStore)
@@ -1300,14 +1303,13 @@ const toggleFavorite = (pavilion: any) => {
 }
 
 // 公式パビリオンページを開く
-const openOfficialPavilionPage = (pavilionId: string) => {
-  logger.info('公式パビリオンページを開く', { pavilionId })
+const openOfficialPavilionPage = (pavilionId: string, pavilionName?: string) => {
+  logger.info('公式パビリオンページを開く', { pavilionId, pavilionName })
 
   // 選択されたチケットIDを取得
   const selectedTicketIdList = ticketsStore.selectedTicketIds
   if (selectedTicketIdList.length === 0) {
-    logger.warn('チケットが選択されていません')
-    alert('チケットを選択してください')
+    logger.warn('パビリオンページを開けません: チケットが選択されていません')
     return
   }
   const ticketIds = selectedTicketIdList.join(',')
@@ -1315,21 +1317,40 @@ const openOfficialPavilionPage = (pavilionId: string) => {
   // 入場日付を取得
   const entranceDate = selectedEntranceDate.value
   if (!entranceDate) {
-    logger.warn('入場日付が選択されていません')
-    alert('入場日付を選択してください')
+    logger.warn('パビリオンページを開けません: 入場日付が選択されていません')
     return
   }
 
-  // URLを生成（他のモジュールと同じ形式）
-  const pavilionUrl = `https://ticket.expo2025.or.jp/event_time/?id=${ticketIds}&event_id=${pavilionId}&screen_id=108&lottery=5&entrance_date=${entranceDate}`
+  // パビリオンページのURLを生成
+  const targetUrl = `/event_time/?id=${ticketIds}&event_id=${pavilionId}&screen_id=108&lottery=5&entrance_date=${entranceDate}`
 
-  // 新しいタブで公式パビリオンページを開く
-  const newTab = window.open(pavilionUrl, '_blank')
+  // redirect_codeを生成
+  const redirectCode = redirectStore.generateRedirectCode()
+
+  // Redirect情報を保存
+  redirectStore.saveRedirectInfo(redirectCode, {
+    targetUrl: targetUrl,
+    timestamp: Date.now(),
+    pavilionId: pavilionId,
+    pavilionName: pavilionName
+  })
+
+  // ytomoページにredirect_codeパラメータ付きで遷移
+  const ytomoUrl = `/ytomo?redirect_code=${redirectCode}`
+
+  logger.info('ytomoページ経由でパビリオンページに遷移', {
+    pavilionId,
+    redirectCode,
+    targetUrl
+  })
+
+  // 新しいタブでytomoページを開く
+  const newTab = window.open(ytomoUrl, '_blank')
 
   if (newTab) {
-    logger.info('公式パビリオンページを開きました', { pavilionId, url: pavilionUrl })
+    logger.info('新しいタブでytomoページを開きました', { redirectCode })
   } else {
-    logger.warn('新しいタブを開けませんでした（ポップアップブロック？）', { pavilionId })
+    logger.warn('新しいタブを開けませんでした（ポップアップブロック？）', { redirectCode })
   }
 }
 

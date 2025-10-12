@@ -96,6 +96,24 @@
       </div>
     </div>
 
+    <!-- Redirect動作確認セクション -->
+    <div class="ytomo-section">
+      <h3 class="ytomo-section-title">動作確認</h3>
+
+      <div class="ytomo-test-section">
+        <p class="ytomo-description">
+          Redirect機構の動作確認用ボタンです。
+        </p>
+
+        <button
+          class="ytomo-test-button"
+          @click="testRedirectMechanism"
+        >
+          Try
+        </button>
+      </div>
+    </div>
+
     <!-- 調査機能セクション -->
     <div v-if="apiUsageMode !== 'none'" class="ytomo-section">
       <h3 class="ytomo-section-title">タイミング調査</h3>
@@ -145,6 +163,7 @@ import { ref, computed, onMounted } from 'vue'
 import { useOthersStore } from '@/stores/others'
 import { useTicketsStore } from '@/stores/tickets'
 import { useEntranceReservationStore } from '@/stores/entranceReservation'
+import { useRedirectStore } from '@/stores/redirect'
 import { loggers } from '@/utils/logger'
 import { logApiUsageModeChange, type ApiUsageMode } from '@/utils/apiUsageMode'
 
@@ -152,6 +171,7 @@ const logger = loggers.ui
 const othersStore = useOthersStore()
 const ticketsStore = useTicketsStore()
 const entranceStore = useEntranceReservationStore()
+const redirectStore = useRedirectStore()
 
 // API利用設定
 const apiUsageMode = ref('none')
@@ -226,6 +246,41 @@ const handleShowDebugLogChange = () => {
   logger.info('デバッグログボタン表示設定変更', {
     show: showDebugLogButton.value
   })
+}
+
+// Redirect機構の動作確認
+const testRedirectMechanism = () => {
+  logger.info('Redirect機構テスト開始')
+
+  // テスト用のURL（入場予約ページ）
+  const targetUrl = '/ticket_visiting_reservation/?id=NCSQCZ9PC6&screen_id=108&lottery=6&entrance_date='
+
+  // redirect_codeを生成
+  const redirectCode = redirectStore.generateRedirectCode()
+
+  // Redirect情報を保存
+  redirectStore.saveRedirectInfo(redirectCode, {
+    targetUrl: targetUrl,
+    timestamp: Date.now()
+  })
+
+  // ytomoページにredirect_codeパラメータ付きで遷移
+  const ytomoUrl = `/ytomo?redirect_code=${redirectCode}`
+
+  logger.info('テスト用redirect実行', {
+    redirectCode,
+    targetUrl,
+    ytomoUrl
+  })
+
+  // 新しいタブでytomoページを開く
+  const newTab = window.open(ytomoUrl, '_blank')
+
+  if (newTab) {
+    logger.info('新しいタブでytomoページを開きました（テスト）', { redirectCode })
+  } else {
+    logger.warn('新しいタブを開けませんでした（ポップアップブロック？）', { redirectCode })
+  }
 }
 
 // 自動時間生成
@@ -706,6 +761,35 @@ onMounted(() => {
     }
   }
   
+  .ytomo-test-section {
+    .ytomo-description {
+      font-size: 14px;
+      color: #6b7280;
+      margin-bottom: 12px;
+      line-height: 1.4;
+    }
+
+    .ytomo-test-button {
+      background: #2563eb;
+      color: white;
+      padding: 8px 24px;
+      border: none;
+      border-radius: 4px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.2s;
+
+      &:hover {
+        background: #1d4ed8;
+      }
+
+      &:active {
+        background: #1e40af;
+      }
+    }
+  }
+
   .ytomo-setting-item {
     display: flex;
     align-items: center;
