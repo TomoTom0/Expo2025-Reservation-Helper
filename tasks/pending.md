@@ -627,3 +627,88 @@ function addCustomButton() {
 **症状**: 変化検出したのに「未検出」表示のまま
 **ステータス**: 45秒飛ばし問題修正時に解決
 **修正内容**: detectionDisplay ロジック改善
+
+---
+
+## 🚨 src/index.js merge conflict問題と配布方法の改善 - 2025-10-12
+
+### 問題の詳細
+- **症状**: src/index.jsがGit管理下にあり、ブランチマージ時に毎回conflictが発生
+- **原因**: ビルド成果物（2.3MB）を各ブランチでcommitしているため
+- **影響**:
+  - 開発フロー: 毎回のPRマージでconflict解消が必要
+  - リポジトリサイズ: ビルド成果物でリポジトリが肥大化
+  - 差分の可読性: 巨大なビルドファイルの差分が見づらい
+
+### 現在の配布方法
+- **iOS Safari（Stayアプリ経由）**: GitHubのmainブランチから直接参照
+  ```
+  https://github.com/.../blob/main/src/index.js
+  ```
+- **PC Chrome**: GitHub Releasesからsrc.zipをダウンロード
+
+### 特殊な要件
+- **複数ブランチの同時動作確認**: 開発中の5個のfeatureブランチを同時にスマホで動作確認したい
+- 各ブランチごとに異なるindex.jsを配信する必要がある
+
+### 解決策: Gist活用による配布
+
+#### 構成
+```
+正式版（iOS Safari）: GitHub mainブランチ
+    └─ https://github.com/.../blob/main/src/index.js
+    └─ ※mainだけはconflict頻度が少ないため現状維持
+
+開発版A（featureブランチ）: Gist A
+    └─ https://gist.githubusercontent.com/user/xxx/raw/index.js
+
+開発版B（featureブランチ）: Gist B
+    └─ https://gist.githubusercontent.com/user/yyy/raw/index.js
+
+... (複数の開発版を並行配信)
+```
+
+#### メリット
+1. **mainブランチ以外はsrc/index.jsを.gitignoreに追加** → merge conflict解消
+2. **複数の開発版を同時配信** → featureブランチごとに異なるGistを使用
+3. **更新が簡単** → `gh gist edit <gist-id>` で自動更新可能
+4. **Stayで簡単に切り替え** → 各GistのRaw URLを登録
+
+#### 実装方針
+1. mainブランチ以外は `.gitignore` に `src/index.js` を追加
+2. featureブランチごとにGistを作成
+3. ビルド後に `gh gist edit` でGistを更新
+4. README.mdに開発版の使用方法を記載
+
+#### GitHub CLI での更新例
+```bash
+# ビルド実行
+mise run build-rsync
+
+# Gist更新
+gh gist edit <gist-id> -f index.js < src/index.js
+```
+
+#### GitHub Actions自動化案
+```yaml
+# featureブランチへのpush時に自動でGist更新
+on:
+  push:
+    branches-ignore: [main]
+
+jobs:
+  update-gist:
+    - run: mise run build-rsync
+    - run: gh gist edit ${{ secrets.GIST_ID }} -f index.js < src/index.js
+```
+
+### 優先度
+**中** - 開発効率に影響するが、現状でも対処可能
+
+### 注意事項
+- Gistの利用規約遵守
+- 正式版（main）はGitHub上で管理を継続
+- 各featureブランチ用のGist IDを適切に管理
+
+### ステータス
+**検討中** - 実装方針の確定待ち

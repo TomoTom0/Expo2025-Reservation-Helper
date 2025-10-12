@@ -1,14 +1,14 @@
 // ==UserScript==
 // @name         yt-Expo2025-Reservation-Helper
 // @namespace    http://staybrowser.com/
-// @version      1.1.0
+// @version      1.3.0
 // @description  大阪万博2025予約支援ツール: パビリオン検索・予約・監視・同行者管理・入場予約の自動化
 // @author       TomoTom0 https://github.com/TomoTom0
 // @match        https://ticket.expo2025.or.jp/*
 // @run-at       document-end
 // ==/UserScript==
 
-// Built: 2025/10/11 07:30:21
+// Built: 2025/10/12 14:06:35
 
 
 (function webpackUniversalModuleDefinition(root, factory) {
@@ -29475,7 +29475,7 @@ const useMainDialogStore = (0,pinia__WEBPACK_IMPORTED_MODULE_0__/* .defineStore 
     // State - 初期化時に強制的にfalseに設定（永続化の問題を回避）
     const isVisible = (0,vue__WEBPACK_IMPORTED_MODULE_1__/* .ref */ .KR)(false);
     const activeTab = (0,vue__WEBPACK_IMPORTED_MODULE_1__/* .ref */ .KR)('ticket');
-    const version = (0,vue__WEBPACK_IMPORTED_MODULE_1__/* .ref */ .KR)('0.5.4'); // version.datから動的に読み込む予定
+    const version = (0,vue__WEBPACK_IMPORTED_MODULE_1__/* .ref */ .KR)("1.3.0" || 0); // package.jsonから自動取得
     // selectedEntranceDate は計算プロパティで取得するため削除
     // Getters
     const getIsVisible = () => isVisible.value;
@@ -39844,9 +39844,6 @@ const usePavilionsStore = (0,pinia/* defineStore */.nY)('pavilions', () => {
                 });
                 if (errorName === 'schedule_out_of_stock') {
                     failureReason = '満席';
-                }
-                else if (errorName === 'th_error') {
-                    failureReason = '無効';
                 }
                 else if (errorMessage.includes('select ticket valid error')) {
                     failureReason = '無効';
