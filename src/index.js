@@ -1,14 +1,14 @@
 // ==UserScript==
 // @name         yt-Expo2025-Reservation-Helper
 // @namespace    http://staybrowser.com/
-// @version      1.2.0
+// @version      1.4.0
 // @description  大阪万博2025予約支援ツール: パビリオン検索・予約・監視・同行者管理・入場予約の自動化
 // @author       TomoTom0 https://github.com/TomoTom0
 // @match        https://ticket.expo2025.or.jp/*
 // @run-at       document-end
 // ==/UserScript==
 
-// Built: 2025/10/12 22:17:18
+// Built: 2025/10/12 22:41:22
 
 
 (function webpackUniversalModuleDefinition(root, factory) {
@@ -29497,7 +29497,7 @@ const useMainDialogStore = (0,pinia__WEBPACK_IMPORTED_MODULE_0__/* .defineStore 
     // State - 初期化時に強制的にfalseに設定（永続化の問題を回避）
     const isVisible = (0,vue__WEBPACK_IMPORTED_MODULE_1__/* .ref */ .KR)(false);
     const activeTab = (0,vue__WEBPACK_IMPORTED_MODULE_1__/* .ref */ .KR)('ticket');
-    const version = (0,vue__WEBPACK_IMPORTED_MODULE_1__/* .ref */ .KR)("1.2.0" || 0); // package.jsonから自動取得
+    const version = (0,vue__WEBPACK_IMPORTED_MODULE_1__/* .ref */ .KR)("1.4.0" || 0); // package.jsonから自動取得
     // selectedEntranceDate は計算プロパティで取得するため削除
     // Getters
     const getIsVisible = () => isVisible.value;
