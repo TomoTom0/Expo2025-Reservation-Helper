@@ -105,12 +105,32 @@
           Redirect機構の動作確認用ボタンです。
         </p>
 
-        <button
-          class="ytomo-test-button"
-          @click="testRedirectMechanism"
-        >
-          Try
-        </button>
+        <div class="ytomo-test-buttons">
+          <button
+            class="ytomo-test-button"
+            @click="testRedirectMechanism"
+          >
+            Try
+          </button>
+          <button
+            class="ytomo-test-button"
+            @click="testRedirectMechanism2"
+          >
+            Try2
+          </button>
+          <button
+            class="ytomo-test-button"
+            @click="testRedirectMechanism3"
+          >
+            Try3
+          </button>
+          <button
+            class="ytomo-test-button"
+            @click="testRedirectMechanism4"
+          >
+            Try4
+          </button>
+        </div>
       </div>
     </div>
 
@@ -252,8 +272,15 @@ const handleShowDebugLogChange = () => {
 const testRedirectMechanism = () => {
   logger.info('Redirect機構テスト開始')
 
+  // 今日の日付をYYYYMMDD形式で取得
+  const today = new Date()
+  const year = today.getFullYear()
+  const month = String(today.getMonth() + 1).padStart(2, '0')
+  const day = String(today.getDate()).padStart(2, '0')
+  const entranceDate = `${year}${month}${day}`
+
   // テスト用のURL（入場予約ページ）
-  const targetUrl = '/ticket_visiting_reservation/?id=NCSQCZ9PC6&screen_id=108&lottery=6&entrance_date='
+  const targetUrl = `/ticket_visiting_reservation/?id=NCSQCZ9PC6&screen_id=108&lottery=6&entrance_date=${entranceDate}`
 
   // redirect_codeを生成
   const redirectCode = redirectStore.generateRedirectCode()
@@ -278,6 +305,99 @@ const testRedirectMechanism = () => {
 
   if (newTab) {
     logger.info('新しいタブでytomoページを開きました（テスト）', { redirectCode })
+  } else {
+    logger.warn('新しいタブを開けませんでした（ポップアップブロック？）', { redirectCode })
+  }
+}
+
+// Redirect機構の動作確認2
+const testRedirectMechanism2 = () => {
+  logger.info('Redirect機構テスト2開始')
+
+  const targetUrl = `/message_list/`
+
+  const redirectCode = redirectStore.generateRedirectCode()
+
+  redirectStore.saveRedirectInfo(redirectCode, {
+    targetUrl: targetUrl,
+    timestamp: Date.now()
+  })
+
+  const ytomoUrl = `/ytomo?redirect_code=${redirectCode}`
+
+  logger.info('テスト2用redirect実行', {
+    redirectCode,
+    targetUrl,
+    ytomoUrl
+  })
+
+  const newTab = window.open(ytomoUrl, '_blank')
+
+  if (newTab) {
+    logger.info('新しいタブでytomoページを開きました（テスト2）', { redirectCode })
+  } else {
+    logger.warn('新しいタブを開けませんでした（ポップアップブロック？）', { redirectCode })
+  }
+}
+
+// Redirect機構の動作確認3
+const testRedirectMechanism3 = () => {
+  logger.info('Redirect機構テスト3開始')
+
+  const targetUrl = `/message/?id=79555309`
+
+  const redirectCode = redirectStore.generateRedirectCode()
+
+  redirectStore.saveRedirectInfo(redirectCode, {
+    targetUrl: targetUrl,
+    timestamp: Date.now()
+  })
+
+  const ytomoUrl = `/ytomo?redirect_code=${redirectCode}`
+
+  logger.info('テスト3用redirect実行', {
+    redirectCode,
+    targetUrl,
+    ytomoUrl
+  })
+
+  const newTab = window.open(ytomoUrl, '_blank')
+
+  if (newTab) {
+    logger.info('新しいタブでytomoページを開きました（テスト3）', { redirectCode })
+  } else {
+    logger.warn('新しいタブを開けませんでした（ポップアップブロック？）', { redirectCode })
+  }
+}
+
+// Redirect機構の動作確認4
+const testRedirectMechanism4 = () => {
+  logger.info('Redirect機構テスト4開始')
+
+  const targetUrl1 = `/message_list/`
+  const targetUrl2 = `/message/?id=79555309`
+
+  const redirectCode = redirectStore.generateRedirectCode()
+
+  redirectStore.saveRedirectInfo(redirectCode, {
+    targetUrl: targetUrl1,
+    nextTargetUrl: targetUrl2,  // 2段階目の遷移先
+    timestamp: Date.now()
+  })
+
+  const ytomoUrl = `/ytomo?redirect_code=${redirectCode}`
+
+  logger.info('テスト4用redirect実行(2段階遷移)', {
+    redirectCode,
+    targetUrl1,
+    targetUrl2,
+    ytomoUrl
+  })
+
+  const newTab = window.open(ytomoUrl, '_blank')
+
+  if (newTab) {
+    logger.info('新しいタブでytomoページを開きました（テスト4）', { redirectCode })
   } else {
     logger.warn('新しいタブを開けませんでした（ポップアップブロック？）', { redirectCode })
   }
@@ -767,6 +887,12 @@ onMounted(() => {
       color: #6b7280;
       margin-bottom: 12px;
       line-height: 1.4;
+    }
+
+    .ytomo-test-buttons {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
     }
 
     .ytomo-test-button {

@@ -64,19 +64,25 @@ const handleRedirect = () => {
       pavilionId: redirectInfo.pavilionId
     })
 
-    // Router.push()で遷移
-    const success = RouterUtils.push(redirectInfo.targetUrl)
+    // 使用済みのRedirect情報をクリーンアップ
+    redirectStore.clearRedirectInfo(redirectCode)
 
-    if (success) {
-      // 使用済みのRedirect情報をクリーンアップ
-      redirectStore.clearRedirectInfo(redirectCode)
-      logger.info('Redirect完了 - 情報をクリーンアップ', { redirectCode })
-      return true
-    } else {
-      logger.warn('Router.push()失敗 - location.hrefにフォールバック')
-      window.location.href = redirectInfo.targetUrl
-      return true
+    // 公式サイトのRouterを使用してページ遷移
+    RouterUtils.push(redirectInfo.targetUrl)
+
+    // 2段階目の遷移がある場合
+    if (redirectInfo.nextTargetUrl) {
+      logger.info('2段階目のRedirect実行', { nextTargetUrl: redirectInfo.nextTargetUrl })
+
+      // 1段階目の遷移完了を待ってから2段階目を実行
+      setTimeout(() => {
+        RouterUtils.push(redirectInfo.nextTargetUrl!)
+        logger.info('2段階目のRedirect実行完了', { nextTargetUrl: redirectInfo.nextTargetUrl })
+      }, 1000)
     }
+
+    logger.info('Redirect実行完了', { redirectCode })
+    return true
 
   } catch (error) {
     logger.error('Redirect処理エラー', error)

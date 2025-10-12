@@ -1,14 +1,14 @@
 // ==UserScript==
 // @name         yt-Expo2025-Reservation-Helper
 // @namespace    http://staybrowser.com/
-// @version      1.3.0
+// @version      1.2.0
 // @description  大阪万博2025予約支援ツール: パビリオン検索・予約・監視・同行者管理・入場予約の自動化
 // @author       TomoTom0 https://github.com/TomoTom0
 // @match        https://ticket.expo2025.or.jp/*
 // @run-at       document-end
 // ==/UserScript==
 
-// Built: 2025/10/12 19:28:44
+// Built: 2025/10/12 22:17:18
 
 
 (function webpackUniversalModuleDefinition(root, factory) {
@@ -879,28 +879,6 @@ module.exports = function (cssWithMappingToString) {
   };
   return list;
 };
-
-/***/ }),
-
-/***/ 325:
-/***/ ((module, __webpack_exports__, __webpack_require__) => {
-
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   A: () => (__WEBPACK_DEFAULT_EXPORT__)
-/* harmony export */ });
-/* harmony import */ var _node_modules_css_loader_dist_runtime_noSourceMaps_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(601);
-/* harmony import */ var _node_modules_css_loader_dist_runtime_noSourceMaps_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_css_loader_dist_runtime_noSourceMaps_js__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(314);
-/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1__);
-// Imports
-
-
-var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1___default()((_node_modules_css_loader_dist_runtime_noSourceMaps_js__WEBPACK_IMPORTED_MODULE_0___default()));
-// Module
-___CSS_LOADER_EXPORT___.push([module.id, `.ytomo-others-tab[data-v-9c444bd0]{padding:12px}.ytomo-others-tab .ytomo-section[data-v-9c444bd0]{margin-bottom:20px}.ytomo-others-tab .ytomo-section .ytomo-section-title[data-v-9c444bd0]{font-size:16px;font-weight:600;color:#1f2937;margin-bottom:12px;padding-bottom:8px;border-bottom:2px solid #e5e7eb}.ytomo-others-tab .ytomo-test-section .ytomo-description[data-v-9c444bd0]{font-size:14px;color:#6b7280;margin-bottom:12px;line-height:1.4}.ytomo-others-tab .ytomo-test-section .ytomo-test-button[data-v-9c444bd0]{background:#2563eb;color:#fff;padding:8px 24px;border:none;border-radius:4px;font-size:14px;font-weight:500;cursor:pointer;transition:background .2s}.ytomo-others-tab .ytomo-test-section .ytomo-test-button[data-v-9c444bd0]:hover{background:#1d4ed8}.ytomo-others-tab .ytomo-test-section .ytomo-test-button[data-v-9c444bd0]:active{background:#1e40af}.ytomo-others-tab .ytomo-setting-item[data-v-9c444bd0]{display:flex;align-items:center;gap:8px;margin-bottom:12px}.ytomo-others-tab .ytomo-setting-item .ytomo-setting-label[data-v-9c444bd0]{font-size:14px;color:#374151;min-width:160px}.ytomo-others-tab .ytomo-setting-item .ytomo-input-inline[data-v-9c444bd0]{padding:4px 8px;border:1px solid #d1d5db;border-radius:4px;font-size:14px;text-align:center}.ytomo-others-tab .ytomo-setting-item .ytomo-input-inline[data-v-9c444bd0]:focus{outline:none;border-color:#2563eb;box-shadow:0 0 0 1px #2563eb}.ytomo-others-tab .ytomo-setting-item .ytomo-select-inline[data-v-9c444bd0]{padding:4px 8px;border:1px solid #d1d5db;border-radius:4px;font-size:14px;background-color:#fff;min-width:80px}.ytomo-others-tab .ytomo-setting-item .ytomo-select-inline[data-v-9c444bd0]:focus{outline:none;border-color:#2563eb;box-shadow:0 0 0 1px #2563eb}.ytomo-others-tab .ytomo-setting-item .ytomo-select-inline[data-v-9c444bd0]:hover{background-color:#f9fafb}.ytomo-others-tab .ytomo-setting-item .ytomo-checkbox[data-v-9c444bd0]{margin-right:8px;cursor:pointer}.ytomo-others-tab .ytomo-setting-item .ytomo-setting-description[data-v-9c444bd0]{font-size:12px;color:#6b7280;margin-left:8px}.ytomo-others-tab .ytomo-setting-item .ytomo-setting-unit[data-v-9c444bd0]{font-size:14px;color:#6b7280}.ytomo-others-tab .ytomo-setting-item.ytomo-target-time-setting[data-v-9c444bd0]{display:flex;flex-direction:column;align-items:flex-start;gap:8px}.ytomo-others-tab .ytomo-target-time-row[data-v-9c444bd0]{display:flex;align-items:center;gap:8px}.ytomo-others-tab .ytomo-additional-target-row[data-v-9c444bd0]{display:flex;align-items:center;gap:8px}.ytomo-others-tab .ytomo-additional-target-row .ytomo-auto-btn[data-v-9c444bd0]{background:#10b981;color:#fff;border:none;border-radius:4px;padding:4px 12px;font-size:12px;font-weight:500;cursor:pointer;transition:background .2s;min-width:50px}.ytomo-others-tab .ytomo-additional-target-row .ytomo-auto-btn[data-v-9c444bd0]:hover{background:#059669}.ytomo-others-tab .ytomo-additional-target-row .ytomo-additional-time[data-v-9c444bd0]{background:#fff;border:1px solid #e5e7eb}.ytomo-others-tab .ytomo-additional-target-row .ytomo-additional-time[data-v-9c444bd0]:focus{border-color:#10b981;box-shadow:0 0 0 1px #10b981}.ytomo-others-tab .ytomo-investigation-section .ytomo-description[data-v-9c444bd0]{font-size:14px;color:#6b7280;margin-bottom:16px;line-height:1.4}.ytomo-others-tab .ytomo-investigation-section .ytomo-investigation-controls[data-v-9c444bd0]{display:flex;gap:8px;margin-bottom:16px}.ytomo-others-tab .ytomo-investigation-section .ytomo-investigation-controls .ytomo-investigate-button[data-v-9c444bd0]{background:#059669;color:#fff;padding:8px 16px;border:none;border-radius:4px;font-size:14px;font-weight:500;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:4px}.ytomo-others-tab .ytomo-investigation-section .ytomo-investigation-controls .ytomo-investigate-button[data-v-9c444bd0]:hover:not(.disabled){background:#047857}.ytomo-others-tab .ytomo-investigation-section .ytomo-investigation-controls .ytomo-investigate-button.disabled[data-v-9c444bd0]{background:#9ca3af;color:#d1d5db;cursor:not-allowed}.ytomo-others-tab .ytomo-investigation-section .ytomo-investigation-controls .ytomo-investigate-button.cancel-mode[data-v-9c444bd0]{background:#dc2626}.ytomo-others-tab .ytomo-investigation-section .ytomo-investigation-controls .ytomo-investigate-button.cancel-mode[data-v-9c444bd0]:hover{background:#b91c1c}.ytomo-others-tab .ytomo-investigation-section .ytomo-investigation-controls .ytomo-investigate-button .ytomo-loading-icon[data-v-9c444bd0]{animation:pulse-9c444bd0 1.5s ease-in-out infinite}.ytomo-others-tab .ytomo-investigation-section .ytomo-investigation-controls .ytomo-clear-button[data-v-9c444bd0]{background:#f3f4f6;color:#374151;border:1px solid #d1d5db;padding:8px 16px;border-radius:4px;font-size:14px;cursor:pointer;transition:all .2s}.ytomo-others-tab .ytomo-investigation-section .ytomo-investigation-controls .ytomo-clear-button[data-v-9c444bd0]:hover{background:#e5e7eb}.ytomo-others-tab .ytomo-investigation-section .ytomo-investigation-status[data-v-9c444bd0]{background:linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);border:1px solid #16a34a;border-radius:8px;padding:12px}.ytomo-others-tab .ytomo-investigation-section .ytomo-investigation-status .ytomo-status-content[data-v-9c444bd0]{display:flex;align-items:flex-start;gap:12px}.ytomo-others-tab .ytomo-investigation-section .ytomo-investigation-status .ytomo-status-content .ytomo-status-icon[data-v-9c444bd0]{width:20px;height:20px;flex-shrink:0;margin-top:2px}.ytomo-others-tab .ytomo-investigation-section .ytomo-investigation-status .ytomo-status-content .ytomo-status-icon svg[data-v-9c444bd0]{width:100%;height:100%;fill:#16a34a}.ytomo-others-tab .ytomo-investigation-section .ytomo-investigation-status .ytomo-status-content .ytomo-status-icon.spinning[data-v-9c444bd0]{animation:spin-9c444bd0 1s linear infinite}.ytomo-others-tab .ytomo-investigation-section .ytomo-investigation-status .ytomo-status-content .ytomo-status-details[data-v-9c444bd0]{flex:1}.ytomo-others-tab .ytomo-investigation-section .ytomo-investigation-status .ytomo-status-content .ytomo-status-details .ytomo-phase-info[data-v-9c444bd0]{font-size:13px;margin-bottom:4px;display:flex;align-items:center;gap:8px}.ytomo-others-tab .ytomo-investigation-section .ytomo-investigation-status .ytomo-status-content .ytomo-status-details .ytomo-phase-info .phase-label[data-v-9c444bd0]{font-weight:600;color:#059669;padding:2px 6px;background:#d1fae5;border-radius:3px;flex-shrink:0}.ytomo-others-tab .ytomo-investigation-section .ytomo-investigation-status .ytomo-status-content .ytomo-status-details .ytomo-phase-info .detection-info[data-v-9c444bd0]{font-weight:500;color:#374151;font-family:"Consolas","Monaco",monospace;min-width:200px}.ytomo-others-tab .ytomo-investigation-section .ytomo-investigation-status .ytomo-status-content .ytomo-status-details .ytomo-waiting-info[data-v-9c444bd0]{font-size:12px;color:#6b7280;margin-bottom:4px;font-style:italic;min-height:18px;line-height:18px}.ytomo-others-tab .ytomo-investigation-section .ytomo-investigation-status .ytomo-status-content .ytomo-status-details .ytomo-status-current[data-v-9c444bd0]{font-size:14px;font-weight:500;color:#166534;margin-bottom:8px}.ytomo-others-tab .ytomo-investigation-section .ytomo-investigation-status .ytomo-status-content .ytomo-status-details .ytomo-investigation-results .ytomo-results-title[data-v-9c444bd0]{font-size:13px;font-weight:600;color:#166534;margin-bottom:4px}.ytomo-others-tab .ytomo-investigation-section .ytomo-investigation-status .ytomo-status-content .ytomo-status-details .ytomo-investigation-results .ytomo-result-item[data-v-9c444bd0]{font-size:12px;color:#166534;padding:2px 0;font-family:monospace}@keyframes spin-9c444bd0{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}@keyframes pulse-9c444bd0{0%,100%{opacity:1}50%{opacity:.5}}`, ""]);
-// Exports
-/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
-
 
 /***/ }),
 
@@ -29519,7 +29497,7 @@ const useMainDialogStore = (0,pinia__WEBPACK_IMPORTED_MODULE_0__/* .defineStore 
     // State - 初期化時に強制的にfalseに設定（永続化の問題を回避）
     const isVisible = (0,vue__WEBPACK_IMPORTED_MODULE_1__/* .ref */ .KR)(false);
     const activeTab = (0,vue__WEBPACK_IMPORTED_MODULE_1__/* .ref */ .KR)('ticket');
-    const version = (0,vue__WEBPACK_IMPORTED_MODULE_1__/* .ref */ .KR)("1.3.0" || 0); // package.jsonから自動取得
+    const version = (0,vue__WEBPACK_IMPORTED_MODULE_1__/* .ref */ .KR)("1.2.0" || 0); // package.jsonから自動取得
     // selectedEntranceDate は計算プロパティで取得するため削除
     // Getters
     const getIsVisible = () => isVisible.value;
@@ -29561,6 +29539,28 @@ const useMainDialogStore = (0,pinia__WEBPACK_IMPORTED_MODULE_0__/* .defineStore 
         pick: ['activeTab'] // 永続化したい状態のみ指定
     }
 });
+
+
+/***/ }),
+
+/***/ 449:
+/***/ ((module, __webpack_exports__, __webpack_require__) => {
+
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   A: () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _node_modules_css_loader_dist_runtime_noSourceMaps_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(601);
+/* harmony import */ var _node_modules_css_loader_dist_runtime_noSourceMaps_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_css_loader_dist_runtime_noSourceMaps_js__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(314);
+/* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1__);
+// Imports
+
+
+var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1___default()((_node_modules_css_loader_dist_runtime_noSourceMaps_js__WEBPACK_IMPORTED_MODULE_0___default()));
+// Module
+___CSS_LOADER_EXPORT___.push([module.id, `.ytomo-others-tab[data-v-52ffe72e]{padding:12px}.ytomo-others-tab .ytomo-section[data-v-52ffe72e]{margin-bottom:20px}.ytomo-others-tab .ytomo-section .ytomo-section-title[data-v-52ffe72e]{font-size:16px;font-weight:600;color:#1f2937;margin-bottom:12px;padding-bottom:8px;border-bottom:2px solid #e5e7eb}.ytomo-others-tab .ytomo-test-section .ytomo-description[data-v-52ffe72e]{font-size:14px;color:#6b7280;margin-bottom:12px;line-height:1.4}.ytomo-others-tab .ytomo-test-section .ytomo-test-buttons[data-v-52ffe72e]{display:flex;gap:8px;flex-wrap:wrap}.ytomo-others-tab .ytomo-test-section .ytomo-test-button[data-v-52ffe72e]{background:#2563eb;color:#fff;padding:8px 24px;border:none;border-radius:4px;font-size:14px;font-weight:500;cursor:pointer;transition:background .2s}.ytomo-others-tab .ytomo-test-section .ytomo-test-button[data-v-52ffe72e]:hover{background:#1d4ed8}.ytomo-others-tab .ytomo-test-section .ytomo-test-button[data-v-52ffe72e]:active{background:#1e40af}.ytomo-others-tab .ytomo-setting-item[data-v-52ffe72e]{display:flex;align-items:center;gap:8px;margin-bottom:12px}.ytomo-others-tab .ytomo-setting-item .ytomo-setting-label[data-v-52ffe72e]{font-size:14px;color:#374151;min-width:160px}.ytomo-others-tab .ytomo-setting-item .ytomo-input-inline[data-v-52ffe72e]{padding:4px 8px;border:1px solid #d1d5db;border-radius:4px;font-size:14px;text-align:center}.ytomo-others-tab .ytomo-setting-item .ytomo-input-inline[data-v-52ffe72e]:focus{outline:none;border-color:#2563eb;box-shadow:0 0 0 1px #2563eb}.ytomo-others-tab .ytomo-setting-item .ytomo-select-inline[data-v-52ffe72e]{padding:4px 8px;border:1px solid #d1d5db;border-radius:4px;font-size:14px;background-color:#fff;min-width:80px}.ytomo-others-tab .ytomo-setting-item .ytomo-select-inline[data-v-52ffe72e]:focus{outline:none;border-color:#2563eb;box-shadow:0 0 0 1px #2563eb}.ytomo-others-tab .ytomo-setting-item .ytomo-select-inline[data-v-52ffe72e]:hover{background-color:#f9fafb}.ytomo-others-tab .ytomo-setting-item .ytomo-checkbox[data-v-52ffe72e]{margin-right:8px;cursor:pointer}.ytomo-others-tab .ytomo-setting-item .ytomo-setting-description[data-v-52ffe72e]{font-size:12px;color:#6b7280;margin-left:8px}.ytomo-others-tab .ytomo-setting-item .ytomo-setting-unit[data-v-52ffe72e]{font-size:14px;color:#6b7280}.ytomo-others-tab .ytomo-setting-item.ytomo-target-time-setting[data-v-52ffe72e]{display:flex;flex-direction:column;align-items:flex-start;gap:8px}.ytomo-others-tab .ytomo-target-time-row[data-v-52ffe72e]{display:flex;align-items:center;gap:8px}.ytomo-others-tab .ytomo-additional-target-row[data-v-52ffe72e]{display:flex;align-items:center;gap:8px}.ytomo-others-tab .ytomo-additional-target-row .ytomo-auto-btn[data-v-52ffe72e]{background:#10b981;color:#fff;border:none;border-radius:4px;padding:4px 12px;font-size:12px;font-weight:500;cursor:pointer;transition:background .2s;min-width:50px}.ytomo-others-tab .ytomo-additional-target-row .ytomo-auto-btn[data-v-52ffe72e]:hover{background:#059669}.ytomo-others-tab .ytomo-additional-target-row .ytomo-additional-time[data-v-52ffe72e]{background:#fff;border:1px solid #e5e7eb}.ytomo-others-tab .ytomo-additional-target-row .ytomo-additional-time[data-v-52ffe72e]:focus{border-color:#10b981;box-shadow:0 0 0 1px #10b981}.ytomo-others-tab .ytomo-investigation-section .ytomo-description[data-v-52ffe72e]{font-size:14px;color:#6b7280;margin-bottom:16px;line-height:1.4}.ytomo-others-tab .ytomo-investigation-section .ytomo-investigation-controls[data-v-52ffe72e]{display:flex;gap:8px;margin-bottom:16px}.ytomo-others-tab .ytomo-investigation-section .ytomo-investigation-controls .ytomo-investigate-button[data-v-52ffe72e]{background:#059669;color:#fff;padding:8px 16px;border:none;border-radius:4px;font-size:14px;font-weight:500;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:4px}.ytomo-others-tab .ytomo-investigation-section .ytomo-investigation-controls .ytomo-investigate-button[data-v-52ffe72e]:hover:not(.disabled){background:#047857}.ytomo-others-tab .ytomo-investigation-section .ytomo-investigation-controls .ytomo-investigate-button.disabled[data-v-52ffe72e]{background:#9ca3af;color:#d1d5db;cursor:not-allowed}.ytomo-others-tab .ytomo-investigation-section .ytomo-investigation-controls .ytomo-investigate-button.cancel-mode[data-v-52ffe72e]{background:#dc2626}.ytomo-others-tab .ytomo-investigation-section .ytomo-investigation-controls .ytomo-investigate-button.cancel-mode[data-v-52ffe72e]:hover{background:#b91c1c}.ytomo-others-tab .ytomo-investigation-section .ytomo-investigation-controls .ytomo-investigate-button .ytomo-loading-icon[data-v-52ffe72e]{animation:pulse-52ffe72e 1.5s ease-in-out infinite}.ytomo-others-tab .ytomo-investigation-section .ytomo-investigation-controls .ytomo-clear-button[data-v-52ffe72e]{background:#f3f4f6;color:#374151;border:1px solid #d1d5db;padding:8px 16px;border-radius:4px;font-size:14px;cursor:pointer;transition:all .2s}.ytomo-others-tab .ytomo-investigation-section .ytomo-investigation-controls .ytomo-clear-button[data-v-52ffe72e]:hover{background:#e5e7eb}.ytomo-others-tab .ytomo-investigation-section .ytomo-investigation-status[data-v-52ffe72e]{background:linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);border:1px solid #16a34a;border-radius:8px;padding:12px}.ytomo-others-tab .ytomo-investigation-section .ytomo-investigation-status .ytomo-status-content[data-v-52ffe72e]{display:flex;align-items:flex-start;gap:12px}.ytomo-others-tab .ytomo-investigation-section .ytomo-investigation-status .ytomo-status-content .ytomo-status-icon[data-v-52ffe72e]{width:20px;height:20px;flex-shrink:0;margin-top:2px}.ytomo-others-tab .ytomo-investigation-section .ytomo-investigation-status .ytomo-status-content .ytomo-status-icon svg[data-v-52ffe72e]{width:100%;height:100%;fill:#16a34a}.ytomo-others-tab .ytomo-investigation-section .ytomo-investigation-status .ytomo-status-content .ytomo-status-icon.spinning[data-v-52ffe72e]{animation:spin-52ffe72e 1s linear infinite}.ytomo-others-tab .ytomo-investigation-section .ytomo-investigation-status .ytomo-status-content .ytomo-status-details[data-v-52ffe72e]{flex:1}.ytomo-others-tab .ytomo-investigation-section .ytomo-investigation-status .ytomo-status-content .ytomo-status-details .ytomo-phase-info[data-v-52ffe72e]{font-size:13px;margin-bottom:4px;display:flex;align-items:center;gap:8px}.ytomo-others-tab .ytomo-investigation-section .ytomo-investigation-status .ytomo-status-content .ytomo-status-details .ytomo-phase-info .phase-label[data-v-52ffe72e]{font-weight:600;color:#059669;padding:2px 6px;background:#d1fae5;border-radius:3px;flex-shrink:0}.ytomo-others-tab .ytomo-investigation-section .ytomo-investigation-status .ytomo-status-content .ytomo-status-details .ytomo-phase-info .detection-info[data-v-52ffe72e]{font-weight:500;color:#374151;font-family:"Consolas","Monaco",monospace;min-width:200px}.ytomo-others-tab .ytomo-investigation-section .ytomo-investigation-status .ytomo-status-content .ytomo-status-details .ytomo-waiting-info[data-v-52ffe72e]{font-size:12px;color:#6b7280;margin-bottom:4px;font-style:italic;min-height:18px;line-height:18px}.ytomo-others-tab .ytomo-investigation-section .ytomo-investigation-status .ytomo-status-content .ytomo-status-details .ytomo-status-current[data-v-52ffe72e]{font-size:14px;font-weight:500;color:#166534;margin-bottom:8px}.ytomo-others-tab .ytomo-investigation-section .ytomo-investigation-status .ytomo-status-content .ytomo-status-details .ytomo-investigation-results .ytomo-results-title[data-v-52ffe72e]{font-size:13px;font-weight:600;color:#166534;margin-bottom:4px}.ytomo-others-tab .ytomo-investigation-section .ytomo-investigation-status .ytomo-status-content .ytomo-status-details .ytomo-investigation-results .ytomo-result-item[data-v-52ffe72e]{font-size:12px;color:#166534;padding:2px 0;font-family:monospace}@keyframes spin-52ffe72e{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}@keyframes pulse-52ffe72e{0%,100%{opacity:1}50%{opacity:.5}}`, ""]);
+// Exports
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
 
 /***/ }),
@@ -49081,8 +49081,14 @@ const OthersTabvue_type_script_setup_true_lang_ts_hoisted_25 = { class: "ytomo-s
         // Redirect機構の動作確認
         const testRedirectMechanism = () => {
             logger.info('Redirect機構テスト開始');
+            // 今日の日付をYYYYMMDD形式で取得
+            const today = new Date();
+            const year = today.getFullYear();
+            const month = String(today.getMonth() + 1).padStart(2, '0');
+            const day = String(today.getDate()).padStart(2, '0');
+            const entranceDate = `${year}${month}${day}`;
             // テスト用のURL（入場予約ページ）
-            const targetUrl = '/ticket_visiting_reservation/?id=NCSQCZ9PC6&screen_id=108&lottery=6&entrance_date=';
+            const targetUrl = `/ticket_visiting_reservation/?id=NCSQCZ9PC6&screen_id=108&lottery=6&entrance_date=${entranceDate}`;
             // redirect_codeを生成
             const redirectCode = redirectStore.generateRedirectCode();
             // Redirect情報を保存
@@ -49101,6 +49107,78 @@ const OthersTabvue_type_script_setup_true_lang_ts_hoisted_25 = { class: "ytomo-s
             const newTab = window.open(ytomoUrl, '_blank');
             if (newTab) {
                 logger.info('新しいタブでytomoページを開きました（テスト）', { redirectCode });
+            }
+            else {
+                logger.warn('新しいタブを開けませんでした（ポップアップブロック？）', { redirectCode });
+            }
+        };
+        // Redirect機構の動作確認2
+        const testRedirectMechanism2 = () => {
+            logger.info('Redirect機構テスト2開始');
+            const targetUrl = `/message_list/`;
+            const redirectCode = redirectStore.generateRedirectCode();
+            redirectStore.saveRedirectInfo(redirectCode, {
+                targetUrl: targetUrl,
+                timestamp: Date.now()
+            });
+            const ytomoUrl = `/ytomo?redirect_code=${redirectCode}`;
+            logger.info('テスト2用redirect実行', {
+                redirectCode,
+                targetUrl,
+                ytomoUrl
+            });
+            const newTab = window.open(ytomoUrl, '_blank');
+            if (newTab) {
+                logger.info('新しいタブでytomoページを開きました（テスト2）', { redirectCode });
+            }
+            else {
+                logger.warn('新しいタブを開けませんでした（ポップアップブロック？）', { redirectCode });
+            }
+        };
+        // Redirect機構の動作確認3
+        const testRedirectMechanism3 = () => {
+            logger.info('Redirect機構テスト3開始');
+            const targetUrl = `/message/?id=79555309`;
+            const redirectCode = redirectStore.generateRedirectCode();
+            redirectStore.saveRedirectInfo(redirectCode, {
+                targetUrl: targetUrl,
+                timestamp: Date.now()
+            });
+            const ytomoUrl = `/ytomo?redirect_code=${redirectCode}`;
+            logger.info('テスト3用redirect実行', {
+                redirectCode,
+                targetUrl,
+                ytomoUrl
+            });
+            const newTab = window.open(ytomoUrl, '_blank');
+            if (newTab) {
+                logger.info('新しいタブでytomoページを開きました（テスト3）', { redirectCode });
+            }
+            else {
+                logger.warn('新しいタブを開けませんでした（ポップアップブロック？）', { redirectCode });
+            }
+        };
+        // Redirect機構の動作確認4
+        const testRedirectMechanism4 = () => {
+            logger.info('Redirect機構テスト4開始');
+            const targetUrl1 = `/message_list/`;
+            const targetUrl2 = `/message/?id=79555309`;
+            const redirectCode = redirectStore.generateRedirectCode();
+            redirectStore.saveRedirectInfo(redirectCode, {
+                targetUrl: targetUrl1,
+                nextTargetUrl: targetUrl2, // 2段階目の遷移先
+                timestamp: Date.now()
+            });
+            const ytomoUrl = `/ytomo?redirect_code=${redirectCode}`;
+            logger.info('テスト4用redirect実行(2段階遷移)', {
+                redirectCode,
+                targetUrl1,
+                targetUrl2,
+                ytomoUrl
+            });
+            const newTab = window.open(ytomoUrl, '_blank');
+            if (newTab) {
+                logger.info('新しいタブでytomoページを開きました（テスト4）', { redirectCode });
             }
             else {
                 logger.warn('新しいタブを開けませんでした（ポップアップブロック？）', { redirectCode });
@@ -49618,10 +49696,24 @@ const OthersTabvue_type_script_setup_true_lang_ts_hoisted_25 = { class: "ytomo-s
                     _cache[17] || (_cache[17] = (0,vue_esm_bundler/* createElementVNode */.Lk)("h3", { class: "ytomo-section-title" }, "動作確認", -1 /* CACHED */)),
                     (0,vue_esm_bundler/* createElementVNode */.Lk)("div", { class: "ytomo-test-section" }, [
                         _cache[16] || (_cache[16] = (0,vue_esm_bundler/* createElementVNode */.Lk)("p", { class: "ytomo-description" }, " Redirect機構の動作確認用ボタンです。 ", -1 /* CACHED */)),
-                        (0,vue_esm_bundler/* createElementVNode */.Lk)("button", {
-                            class: "ytomo-test-button",
-                            onClick: testRedirectMechanism
-                        }, " Try ")
+                        (0,vue_esm_bundler/* createElementVNode */.Lk)("div", { class: "ytomo-test-buttons" }, [
+                            (0,vue_esm_bundler/* createElementVNode */.Lk)("button", {
+                                class: "ytomo-test-button",
+                                onClick: testRedirectMechanism
+                            }, " Try "),
+                            (0,vue_esm_bundler/* createElementVNode */.Lk)("button", {
+                                class: "ytomo-test-button",
+                                onClick: testRedirectMechanism2
+                            }, " Try2 "),
+                            (0,vue_esm_bundler/* createElementVNode */.Lk)("button", {
+                                class: "ytomo-test-button",
+                                onClick: testRedirectMechanism3
+                            }, " Try3 "),
+                            (0,vue_esm_bundler/* createElementVNode */.Lk)("button", {
+                                class: "ytomo-test-button",
+                                onClick: testRedirectMechanism4
+                            }, " Try4 ")
+                        ])
                     ])
                 ]),
                 (0,vue_esm_bundler/* createCommentVNode */.Q3)(" 調査機能セクション "),
@@ -49677,9 +49769,9 @@ const OthersTabvue_type_script_setup_true_lang_ts_hoisted_25 = { class: "ytomo-s
 
 ;// ./ts/components/OthersTab.vue?vue&type=script&setup=true&lang=ts
  
-// EXTERNAL MODULE: ./node_modules/css-loader/dist/cjs.js!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/sass-loader/dist/cjs.js!./node_modules/vue-loader/dist/index.js??ruleSet[1].rules[8].use[0]!./ts/components/OthersTab.vue?vue&type=style&index=0&id=9c444bd0&scoped=true&lang=scss
-var OthersTabvue_type_style_index_0_id_9c444bd0_scoped_true_lang_scss = __webpack_require__(325);
-;// ./node_modules/style-loader/dist/cjs.js!./node_modules/css-loader/dist/cjs.js!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/sass-loader/dist/cjs.js!./node_modules/vue-loader/dist/index.js??ruleSet[1].rules[8].use[0]!./ts/components/OthersTab.vue?vue&type=style&index=0&id=9c444bd0&scoped=true&lang=scss
+// EXTERNAL MODULE: ./node_modules/css-loader/dist/cjs.js!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/sass-loader/dist/cjs.js!./node_modules/vue-loader/dist/index.js??ruleSet[1].rules[8].use[0]!./ts/components/OthersTab.vue?vue&type=style&index=0&id=52ffe72e&scoped=true&lang=scss
+var OthersTabvue_type_style_index_0_id_52ffe72e_scoped_true_lang_scss = __webpack_require__(449);
+;// ./node_modules/style-loader/dist/cjs.js!./node_modules/css-loader/dist/cjs.js!./node_modules/vue-loader/dist/stylePostLoader.js!./node_modules/sass-loader/dist/cjs.js!./node_modules/vue-loader/dist/index.js??ruleSet[1].rules[8].use[0]!./ts/components/OthersTab.vue?vue&type=style&index=0&id=52ffe72e&scoped=true&lang=scss
 
       
       
@@ -49691,22 +49783,22 @@ var OthersTabvue_type_style_index_0_id_9c444bd0_scoped_true_lang_scss = __webpac
       
       
 
-var OthersTabvue_type_style_index_0_id_9c444bd0_scoped_true_lang_scss_options = {};
+var OthersTabvue_type_style_index_0_id_52ffe72e_scoped_true_lang_scss_options = {};
 
-OthersTabvue_type_style_index_0_id_9c444bd0_scoped_true_lang_scss_options.styleTagTransform = (styleTagTransform_default());
-OthersTabvue_type_style_index_0_id_9c444bd0_scoped_true_lang_scss_options.setAttributes = (setAttributesWithoutAttributes_default());
-OthersTabvue_type_style_index_0_id_9c444bd0_scoped_true_lang_scss_options.insert = insertBySelector_default().bind(null, "head");
-OthersTabvue_type_style_index_0_id_9c444bd0_scoped_true_lang_scss_options.domAPI = (styleDomAPI_default());
-OthersTabvue_type_style_index_0_id_9c444bd0_scoped_true_lang_scss_options.insertStyleElement = (insertStyleElement_default());
+OthersTabvue_type_style_index_0_id_52ffe72e_scoped_true_lang_scss_options.styleTagTransform = (styleTagTransform_default());
+OthersTabvue_type_style_index_0_id_52ffe72e_scoped_true_lang_scss_options.setAttributes = (setAttributesWithoutAttributes_default());
+OthersTabvue_type_style_index_0_id_52ffe72e_scoped_true_lang_scss_options.insert = insertBySelector_default().bind(null, "head");
+OthersTabvue_type_style_index_0_id_52ffe72e_scoped_true_lang_scss_options.domAPI = (styleDomAPI_default());
+OthersTabvue_type_style_index_0_id_52ffe72e_scoped_true_lang_scss_options.insertStyleElement = (insertStyleElement_default());
 
-var OthersTabvue_type_style_index_0_id_9c444bd0_scoped_true_lang_scss_update = injectStylesIntoStyleTag_default()(OthersTabvue_type_style_index_0_id_9c444bd0_scoped_true_lang_scss/* default */.A, OthersTabvue_type_style_index_0_id_9c444bd0_scoped_true_lang_scss_options);
-
-
+var OthersTabvue_type_style_index_0_id_52ffe72e_scoped_true_lang_scss_update = injectStylesIntoStyleTag_default()(OthersTabvue_type_style_index_0_id_52ffe72e_scoped_true_lang_scss/* default */.A, OthersTabvue_type_style_index_0_id_52ffe72e_scoped_true_lang_scss_options);
 
 
-       /* harmony default export */ const components_OthersTabvue_type_style_index_0_id_9c444bd0_scoped_true_lang_scss = (OthersTabvue_type_style_index_0_id_9c444bd0_scoped_true_lang_scss/* default */.A && OthersTabvue_type_style_index_0_id_9c444bd0_scoped_true_lang_scss/* default */.A.locals ? OthersTabvue_type_style_index_0_id_9c444bd0_scoped_true_lang_scss/* default */.A.locals : undefined);
 
-;// ./ts/components/OthersTab.vue?vue&type=style&index=0&id=9c444bd0&scoped=true&lang=scss
+
+       /* harmony default export */ const components_OthersTabvue_type_style_index_0_id_52ffe72e_scoped_true_lang_scss = (OthersTabvue_type_style_index_0_id_52ffe72e_scoped_true_lang_scss/* default */.A && OthersTabvue_type_style_index_0_id_52ffe72e_scoped_true_lang_scss/* default */.A.locals ? OthersTabvue_type_style_index_0_id_52ffe72e_scoped_true_lang_scss/* default */.A.locals : undefined);
+
+;// ./ts/components/OthersTab.vue?vue&type=style&index=0&id=52ffe72e&scoped=true&lang=scss
 
 ;// ./ts/components/OthersTab.vue
 
@@ -49715,7 +49807,7 @@ var OthersTabvue_type_style_index_0_id_9c444bd0_scoped_true_lang_scss_update = i
 ;
 
 
-const OthersTab_exports_ = /*#__PURE__*/(0,exportHelper/* default */.A)(OthersTabvue_type_script_setup_true_lang_ts, [['__scopeId',"data-v-9c444bd0"]])
+const OthersTab_exports_ = /*#__PURE__*/(0,exportHelper/* default */.A)(OthersTabvue_type_script_setup_true_lang_ts, [['__scopeId',"data-v-52ffe72e"]])
 
 /* harmony default export */ const OthersTab = (OthersTab_exports_);
 ;// ./node_modules/ts-loader/index.js??clonedRuleSet-1.use!./node_modules/vue-loader/dist/index.js??ruleSet[1].rules[8].use[0]!./ts/components/MainDialog.vue?vue&type=script&setup=true&lang=ts
@@ -50517,19 +50609,21 @@ const SequentialReservationOverlay_exports_ = /*#__PURE__*/(0,exportHelper/* def
                     targetUrl: redirectInfo.targetUrl,
                     pavilionId: redirectInfo.pavilionId
                 });
-                // Router.push()で遷移
-                const success = RouterUtils.push(redirectInfo.targetUrl);
-                if (success) {
-                    // 使用済みのRedirect情報をクリーンアップ
-                    redirectStore.clearRedirectInfo(redirectCode);
-                    logger.info('Redirect完了 - 情報をクリーンアップ', { redirectCode });
-                    return true;
+                // 使用済みのRedirect情報をクリーンアップ
+                redirectStore.clearRedirectInfo(redirectCode);
+                // 公式サイトのRouterを使用してページ遷移
+                RouterUtils.push(redirectInfo.targetUrl);
+                // 2段階目の遷移がある場合
+                if (redirectInfo.nextTargetUrl) {
+                    logger.info('2段階目のRedirect実行', { nextTargetUrl: redirectInfo.nextTargetUrl });
+                    // 1段階目の遷移完了を待ってから2段階目を実行
+                    setTimeout(() => {
+                        RouterUtils.push(redirectInfo.nextTargetUrl);
+                        logger.info('2段階目のRedirect実行完了', { nextTargetUrl: redirectInfo.nextTargetUrl });
+                    }, 1000);
                 }
-                else {
-                    logger.warn('Router.push()失敗 - location.hrefにフォールバック');
-                    window.location.href = redirectInfo.targetUrl;
-                    return true;
-                }
+                logger.info('Redirect実行完了', { redirectCode });
+                return true;
             }
             catch (error) {
                 logger.error('Redirect処理エラー', error);

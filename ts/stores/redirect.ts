@@ -16,6 +16,7 @@ export interface RedirectInfo {
   timestamp: number
   pavilionId?: string
   pavilionName?: string
+  nextTargetUrl?: string  // 2段階目の遷移先URL（オプション）
 }
 
 export const useRedirectStore = defineStore('redirect', () => {
