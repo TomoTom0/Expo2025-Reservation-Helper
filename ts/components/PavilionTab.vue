@@ -431,7 +431,7 @@
 
     <!-- ログFAB（左下に配置） -->
     <Teleport to="body">
-      <div class="ytomo-log-fab-container">
+      <div v-if="othersStore.showDebugLogButton" class="ytomo-log-fab-container">
         <!-- ログ表示エリア（展開時） -->
         <div 
           v-if="logFabExpanded" 
@@ -520,6 +520,7 @@ import { useMainDialogStore } from '@/stores/mainDialog'
 import { useOverlaysStore } from '@/stores/overlays'
 import { useSequentialReservationStore } from '@/stores/sequentialReservation'
 import { useScheduledReservationStore } from '@/stores/scheduledReservation'
+import { useOthersStore } from '@/stores/others'
 import { usePavilions } from '@/composables/usePavilions'
 import type { ScheduleData, TicketData, TimeSlotData, PavilionData } from '@/types/api'
 import type { ScheduleFormData, ScheduledTimeSlot } from '@/types/scheduledReservation'
@@ -764,6 +765,7 @@ const mainDialogStore = useMainDialogStore()
 const overlaysStore = useOverlaysStore()
 const sequentialReservationStore = useSequentialReservationStore()
 const scheduledReservationStore = useScheduledReservationStore()
+const othersStore = useOthersStore()
 
 const { allPavilions, filteredPavilions, isLoading, isAvailableOnlyFilter, availablePavilionsCount } = storeToRefs(pavilionsStore)
 const { activeTab } = storeToRefs(mainDialogStore)
@@ -1266,17 +1268,31 @@ const toggleFavorite = (pavilion: any) => {
 const openOfficialPavilionPage = (pavilionId: string) => {
   logger.info('公式パビリオンページを開く', { pavilionId })
 
-  // TODO: 具体的なURLは後で指定される
-  // 現在はプレースホルダーとして待機室ページを開く
-  const ytomoUrl = 'https://ticket.expo2025.or.jp/route/queue'
+  // 選択されたチケットIDを取得
+  const selectedTicketIdList = ticketsStore.selectedTicketIds
+  if (selectedTicketIdList.length === 0) {
+    logger.warn('チケットが選択されていません')
+    alert('チケットを選択してください')
+    return
+  }
+  const ticketIds = selectedTicketIdList.join(',')
 
-  // 新しいタブでytomoページを開く
-  const newTab = window.open(ytomoUrl, '_blank')
+  // 入場日付を取得
+  const entranceDate = selectedEntranceDate.value
+  if (!entranceDate) {
+    logger.warn('入場日付が選択されていません')
+    alert('入場日付を選択してください')
+    return
+  }
+
+  // URLを生成（他のモジュールと同じ形式）
+  const pavilionUrl = `https://ticket.expo2025.or.jp/event_time/?id=${ticketIds}&event_id=${pavilionId}&screen_id=108&lottery=5&entrance_date=${entranceDate}`
+
+  // 新しいタブで公式パビリオンページを開く
+  const newTab = window.open(pavilionUrl, '_blank')
 
   if (newTab) {
-    // TODO: 公式のrouterで指定したURLへの移動処理を追加
-    // newTab.location.href = `具体的なURL/${pavilionId}`
-    logger.info('新しいタブでytomoページを開きました', { pavilionId })
+    logger.info('公式パビリオンページを開きました', { pavilionId, url: pavilionUrl })
   } else {
     logger.warn('新しいタブを開けませんでした（ポップアップブロック？）', { pavilionId })
   }

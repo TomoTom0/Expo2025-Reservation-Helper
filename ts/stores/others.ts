@@ -5,6 +5,9 @@ import { loggers } from '@/utils/logger'
 const logger = loggers.ui
 
 export const useOthersStore = defineStore('others', () => {
+  // ログ表示設定
+  const showDebugLogButton = ref(localStorage.getItem('showDebugLogButton') !== 'false')
+
   // 調査機能の状態
   const isInvestigationRunning = ref(false)
   
@@ -193,8 +196,19 @@ export const useOthersStore = defineStore('others', () => {
   const investigationStatusText = computed(() => {
     return lastComparison.value
   })
-  
+
+  // ログ表示設定の変更
+  const setShowDebugLogButton = (show: boolean) => {
+    showDebugLogButton.value = show
+    localStorage.setItem('showDebugLogButton', String(show))
+    logger.info('ログ表示設定を保存', { show })
+  }
+
   return {
+    // ログ表示設定
+    showDebugLogButton,
+    setShowDebugLogButton,
+
     // 状態
     isInvestigationRunning,
 

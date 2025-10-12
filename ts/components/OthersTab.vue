@@ -81,6 +81,19 @@
         </label>
         <span class="ytomo-setting-description">目標時間で優先度を1にリセット</span>
       </div>
+
+      <div class="ytomo-setting-item">
+        <label class="ytomo-setting-label">
+          <input
+            type="checkbox"
+            v-model="showDebugLogButton"
+            @change="handleShowDebugLogChange"
+            class="ytomo-checkbox"
+          >
+          ログ表示
+        </label>
+        <span class="ytomo-setting-description">左下にデバッグログボタンを表示</span>
+      </div>
     </div>
 
     <!-- 調査機能セクション -->
@@ -155,6 +168,9 @@ const greedyWaitTime = entranceStore.greedyWaitTime
 // 貪欲巡回設定
 const greedyCycleEnabled = ref<boolean>(entranceStore.getGreedyCycle())
 
+// ログ表示設定
+const showDebugLogButton = ref<boolean>(othersStore.showDebugLogButton)
+
 // 調査開始可能かどうか
 const canStartInvestigation = computed(() => {
   return !othersStore.isInvestigationRunning
@@ -201,6 +217,14 @@ const handleGreedyCycleChange = () => {
   entranceStore.setGreedyCycle(greedyCycleEnabled.value)
   logger.info('貪欲巡回設定変更', {
     enabled: greedyCycleEnabled.value
+  })
+}
+
+// ログ表示設定変更
+const handleShowDebugLogChange = () => {
+  othersStore.setShowDebugLogButton(showDebugLogButton.value)
+  logger.info('デバッグログボタン表示設定変更', {
+    show: showDebugLogButton.value
   })
 }
 
