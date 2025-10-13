@@ -745,10 +745,10 @@ const getReservationStatus = (schedule: ScheduleData, ticket: TicketData): Reser
     }
   }
   
-  // 他人の予約は変更不可
+  // 他人の予約でも選択は可能（表示のみ変更不可）
   return {
     statusText: '他人の予約',
-    availableTypes: []
+    availableTypes: ['select']
   }
 }
 

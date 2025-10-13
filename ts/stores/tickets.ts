@@ -305,6 +305,8 @@ export const useTicketsStore = defineStore('tickets', () => {
       // 旧チケット情報を保存（選択状態等の保持用）
       const previousTickets = new Map(tickets.value)
       
+      // 外部チケットを一時保存（後で復元）
+      const externalTickets = Array.from(previousTickets.values()).filter(ticket => !ticket.isOwn)
       
       // 新チケット情報を一時変数に取得
       let newOwnTickets: TicketData[] = []
@@ -356,6 +358,12 @@ export const useTicketsStore = defineStore('tickets', () => {
 
           processedTickets.set(newTicket.ticket_id, newTicket)
         }
+        
+        // 外部チケットを復元
+        externalTickets.forEach(externalTicket => {
+          processedTickets.set(externalTicket.ticket_id, externalTicket)
+          logger.debug('外部チケット復元', { ticketId: externalTicket.ticket_id, label: externalTicket.label })
+        })
         
         // 最後に一括でstoreに反映
         tickets.value = processedTickets
