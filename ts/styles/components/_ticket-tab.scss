@@ -1,0 +1,92 @@
+/**
+ * チケットタブの共通スタイル定義
+ * TicketTab専用スタイルはTicketTab.vueのscoped stylesに移行済み
+ */
+
+/* 入力フィールド（共通） */
+.ytomo-input {
+    flex: 1;
+    padding: 8px 12px;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    font-size: 14px;
+    transition: border-color 0.2s;
+
+    &:focus {
+        outline: none;
+        border-color: #2c5aa0;
+        box-shadow: 0 0 0 3px rgba(44, 90, 160, 0.1);
+    }
+
+    &::placeholder {
+        color: #9ca3af;
+    }
+}
+
+/* ボタンスタイル（共通） */
+.ytomo-button {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    white-space: nowrap;
+
+    &.primary {
+        background: linear-gradient(135deg, #2c5aa0 0%, #1a365d 100%);
+        color: white;
+
+        &:hover {
+            background: linear-gradient(135deg, #1a365d 0%, #2c5aa0 100%);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(44, 90, 160, 0.3);
+        }
+
+        &:active {
+            transform: translateY(0);
+        }
+    }
+
+    &.retry-button {
+        background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+        color: white;
+        margin-top: 12px;
+
+        &:hover {
+            background: linear-gradient(135deg, #d97706 0%, #f59e0b 100%);
+        }
+    }
+
+    &:focus {
+        outline: 2px solid #2c5aa0;
+        outline-offset: 2px;
+    }
+
+    &:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+        transform: none !important;
+    }
+}
+
+/* アクセシビリティ対応（共通） */
+@media (prefers-reduced-motion: reduce) {
+    .ytomo-button,
+    .ytomo-input {
+        animation: none;
+        transition: none;
+    }
+}
+
+/* ハイコントラストモード対応（共通） */
+@media (prefers-contrast: high) {
+    .ytomo-button:focus,
+    .ytomo-input:focus {
+        outline: 3px solid #000;
+    }
+}

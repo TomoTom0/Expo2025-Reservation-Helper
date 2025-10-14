@@ -11,6 +11,7 @@ yarn-error.log*
 # ビルド成果物
 dist/
 build/
+src/manifest.json
 
 # 環境設定ファイル
 .env
@@ -46,3 +47,8 @@ dist-ts/
 *.backup
 *-backup.*
 *-temp.*
+
+# TypeScriptビルドキャッシュ
+*.tsbuildinfo
+
+_archived/

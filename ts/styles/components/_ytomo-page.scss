@@ -1,0 +1,71 @@
+// ytomoページ用スタイル
+
+// 読み込み中表示
+.ytomo-loading-container {
+  width: 100%;
+  max-width: 800px;
+  margin: 20px auto;
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+}
+
+.ytomo-loading-content {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
+
+.ytomo-loading-spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid #f3f4f6;
+  border-top: 3px solid #2c5aa0;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+.ytomo-loading-text {
+  font-size: 16px;
+  color: #6b7280;
+  font-weight: 500;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+// ytomoページのMainDialog表示用
+#ytomo-page-dialog-container .ytomo-dialog-overlay {
+  position: relative !important;
+  background: transparent !important;
+  width: 100% !important;
+  height: auto !important;
+  display: block !important;
+  max-width: 800px;
+  margin: 20px auto;
+  padding: 20px;
+  z-index: auto !important;
+}
+
+#ytomo-page-dialog-container .ytomo-main-dialog {
+  position: relative !important;
+  transform: none !important;
+  margin: 0 !important;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1) !important;
+  border: 1px solid #e2e8f0 !important;
+  min-width: auto !important;
+  width: 100% !important;
+  max-width: none !important;
+  z-index: auto !important;
+}
+
+// ytomoページ内のダイアログ内要素のz-indexを通常レベルに調整
+#ytomo-page-dialog-container * {
+  z-index: auto !important;
+}

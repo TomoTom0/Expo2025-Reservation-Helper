@@ -1,0 +1,664 @@
+// FABステータスバッジのカウントダウン警告スタイル
+#ytomo-status-badge {
+  &.countdown-warning {
+    background: rgba(255, 0, 0, 0.9);
+  }
+}
+
+// 効率モードトグルボタン
+.ytomo-efficiency-toggle {
+  width: 45px;
+  height: 32px;
+  border-radius: 16px;
+  color: white;
+  border: none;
+  font-size: 10px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: auto;
+  margin-bottom: 8px;
+  
+  // 効率モード有効状態
+  &.efficiency-enabled {
+    background: rgba(255, 140, 0, 0.9);
+  }
+  
+  // 効率モード無効状態  
+  &.efficiency-disabled {
+    background: rgba(128, 128, 128, 0.9);
+  }
+  
+  // ホバー効果
+  &:hover {
+    transform: scale(1.1);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+  }
+  
+  &:active {
+    transform: scale(0.95);
+  }
+}
+
+
+// ボタン共通スタイル
+button.ext-ytomo {
+  height: 40px;
+  width: auto;
+  min-width: 60px;
+  padding: 0px 8px;
+  background: rgb(0, 104, 33);
+  color: white;
+
+  &.no-after:after {
+    background: transparent none repeat 0 0 / auto auto padding-box border-box scroll;
+  }
+
+  &.btn-done {
+    background: rgb(74, 76, 74);
+  }
+
+  &:hover {
+    background: rgb(2, 134, 43);
+  }
+}
+
+// FABサブボタンの基本スタイルと状態管理
+.fab-sub-btn {
+  // 基本スタイル（FABボタン共通）
+  color: white;
+  border: none;
+  border-radius: 20px;
+  padding: 8px 16px;
+  font-size: 12px;
+  white-space: nowrap;
+  transition: all 0.2s ease;
+  
+  // 有効状態
+  &.btn-enabled {
+    background: rgb(0, 104, 33);
+    cursor: pointer;
+    opacity: 1;
+
+    &:hover {
+      background: rgb(2, 134, 43);
+      transform: scale(1.05);
+    }
+
+    // 完了状態（空きのみフィルター有効時）
+    &.btn-done {
+      background: rgb(74, 76, 74);
+
+      &:hover {
+        background: rgb(96, 98, 96);
+      }
+    }
+  }
+
+  // 無効状態 - より具体的なセレクターで確実に適用
+  &.btn-disabled,
+  &.btn-loading {
+    background: rgb(128, 128, 128);
+    cursor: not-allowed;
+    opacity: 0.6;
+
+    &:hover {
+      background: rgb(128, 128, 128);
+      transform: scale(1.0);
+    }
+  }
+
+  // disabled属性がある場合も確実に無効化
+  &:disabled {
+    background: rgb(128, 128, 128) !important;
+    cursor: not-allowed !important;
+    opacity: 0.6 !important;
+
+    &:hover {
+      background: rgb(128, 128, 128) !important;
+      transform: scale(1.0) !important;
+    }
+  }
+}
+
+// より具体的な優先度でdisabled/loading状態を強制
+button.ext-ytomo.pavilion-sub-btn {
+  &.btn-disabled,
+  &.btn-loading {
+    background: rgb(128, 128, 128);
+    cursor: not-allowed;
+    opacity: 0.6;
+
+    &:hover {
+      background: rgb(128, 128, 128);
+      transform: scale(1.0);
+    }
+  }
+}
+
+// 非表示クラス
+.safe-none, 
+.ytomo-none, 
+.filter-none {
+  display: none;
+}
+
+
+// FABサブボタン内の数値表示用spanスタイル
+.fab-sub-btn span.button-count {
+  font-family: 'Courier New', 'Monaco', monospace;
+  font-weight: bold;
+  color: #ffeb3b;
+  vertical-align: baseline;
+}
+
+// 日付選択ボタンの選択状態管理
+button.ext-ytomo.pavilion-sub-btn.ytomo-date-button {
+  // 通常状態（基本スタイルを継承）
+  
+  // 選択状態（!important不要）
+  &.date-selected {
+    border: 2px solid #4CAF50;
+    box-shadow: 0 0 8px rgba(76, 175, 80, 0.6);
+  }
+}
+
+// フレックスレイアウト（検索エリア）
+div.div-flex {
+  display: flex;
+  justify-content: center;
+  margin: 5px;
+  
+  // 検索入力フィールド
+  input.ext-tomo.search {
+    flex: 1;
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+    margin-right: 8px;
+    
+    &:focus {
+      outline: none;
+      border-color: rgb(0, 104, 33);
+      box-shadow: 0 0 0 2px rgba(0, 104, 33, 0.2);
+    }
+  }
+  
+  // 絞り込みボタン
+  button.btn-filter-without-load {
+    height: auto;
+    min-height: 40px;
+    width: auto;
+    min-width: 60px;
+    padding: 0px 8px;
+    color: white;
+    margin: 5px;
+    background: rgb(0, 104, 33);
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    
+    &:hover {
+      background: rgb(2, 134, 43);
+    }
+    
+    &:active {
+      background: rgb(0, 84, 23);
+    }
+    
+    &:disabled {
+      background: rgb(128, 128, 128);
+      cursor: not-allowed;
+    }
+  }
+}
+
+// JavaScript制御用の表示・非表示クラス
+.js-show {
+  display: block;
+}
+
+.js-hide {
+  display: none;
+}
+
+.js-visible {
+  visibility: visible;
+}
+
+.js-invisible {
+  visibility: hidden;
+}
+
+// JavaScript制御用の状態クラス  
+.js-enabled {
+  pointer-events: auto;
+  opacity: 1;
+}
+
+.js-disabled {
+  pointer-events: none;
+  opacity: 0.6;
+}
+
+// JavaScript制御用の色・背景クラス
+.js-green {
+  background: rgb(34, 139, 34);
+  color: white;
+}
+
+.js-red {
+  background: rgb(220, 53, 69); 
+  color: white;
+}
+
+.js-gray {
+  background: rgb(128, 128, 128);
+  color: white;
+}
+
+// 成功ハイライトクラス
+.btn-success-highlight {
+  background: rgb(0, 200, 0);
+  color: white;
+}
+
+// ステータスバッジ背景色クラス
+.status-bg-green { background: rgba(0, 128, 0, 0.9); }
+.status-bg-red { background: rgba(255, 0, 0, 0.9); }
+.status-bg-orange { background: rgba(255, 140, 0, 0.9); }
+.status-bg-blue { background: rgba(0, 104, 33, 0.9); }
+.status-bg-default { background: rgba(0, 0, 0, 0.8); }
+
+// ステータスバッジ表示制御
+#ytomo-status-badge {
+  background: linear-gradient(135deg, rgba(0, 0, 0, 0.9), rgba(40, 40, 40, 0.9));
+  color: white;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: bold;
+  white-space: pre-line; // 改行を有効にする
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3), 0 2px 6px rgba(0, 0, 0, 0.2);
+  border: 2px solid rgba(255, 255, 255, 0.15);
+  pointer-events: none;
+  
+  // 状態別スタイル
+  &.ytomo-status-waiting {
+    background: linear-gradient(135deg, rgba(0, 0, 0, 0.9), rgba(40, 40, 40, 0.9));
+  }
+  
+  
+  &.ytomo-status-reservation {
+    background: linear-gradient(135deg, rgba(255, 140, 0, 0.9), rgba(255, 165, 0, 0.9));
+    
+    &.ytomo-status-countdown-warning {
+      background: linear-gradient(135deg, rgba(255, 0, 0, 0.9), rgba(220, 53, 69, 0.9));
+    }
+  }
+  
+  &.ytomo-status-cooldown {
+    background: linear-gradient(135deg, rgba(255, 107, 53, 0.9), rgba(255, 140, 0, 0.9));
+  }
+}
+
+// FABボタン状態管理は _fab.scss に移動済み
+
+// ヘッダートグル関連の階層構造
+.ytomo-header {
+  li.fab-toggle-li {
+    display: inline-block;
+    margin-right: 8px;
+    
+    button.fab-toggle-button {
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 0;
+      color: white;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      
+      &:hover {
+        color: #ddd;
+      }
+      
+      figure.fab-toggle-figure {
+        width: auto;
+        height: 24px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0 4px;
+      }
+    }
+  }
+}
+
+// パビリオンFAB関連の階層構造
+.ytomo-pavilion-fab {
+  // メインFABボタン
+  button.ytomo-fab {
+    position: relative;
+    
+    &:hover {
+      transform: scale(1.15);
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5), 0 4px 12px rgba(0, 0, 0, 0.3);
+      border-width: 4px;
+    }
+  }
+
+  .ytomo-fab-inner-content {
+    .pavilion-fab-expand-icon {
+      font-size: 8px;
+      line-height: 1;
+      margin-bottom: 1px;
+      opacity: 0.8;
+    }
+
+    .pavilion-fab-brand-text {
+      font-size: 7px;
+      font-weight: normal;
+      line-height: 1;
+      margin-bottom: 2px;
+      opacity: 0.7;
+    }
+
+    .pavilion-fab-counts-text {
+      font-size: 12px;
+      font-weight: bold;
+      line-height: 1;
+    }
+  }
+
+  // サブアクションコンテナ
+  .pavilion-sub-actions-container {
+    display: none;
+    flex-direction: column;
+    gap: 8px;
+    align-items: flex-end;
+    margin-bottom: 8px;
+    
+    &.expanded {
+      display: flex;
+    }
+
+    // サブボタンのベーススタイル
+    button.pavilion-sub-btn.base-style {
+      color: white;
+      border: none;
+      border-radius: 20px;
+      padding: 8px 16px;
+      font-size: 12px;
+      white-space: nowrap;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+      transition: all 0.2s ease;
+    }
+  }
+}
+
+// スマホ対応: 同行者管理ダイアログのレスポンシブデザイン
+.ytomo-companion-dialog {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 8999;
+  padding: 20px;
+  box-sizing: border-box;
+
+  .dialog-content {
+    background: white;
+    border-radius: 12px;
+    padding: 24px;
+    width: 100%;
+    max-width: 500px;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+    
+    // スマホ対応
+    @media (max-width: 768px) {
+      max-width: 95vw;
+      max-height: 85vh;
+      padding: 16px;
+      border-radius: 8px;
+    }
+
+    // 入力フィールドのスマホ対応
+    .input-row {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 12px;
+      
+      @media (max-width: 480px) {
+        flex-direction: column;
+        gap: 12px;
+      }
+
+      input {
+        padding: 12px 8px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        font-size: 16px; // iOS zoom防止
+        
+        &:focus {
+          outline: none;
+          border-color: #4CAF50;
+          box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.2);
+        }
+      }
+
+      button {
+        padding: 12px 16px;
+        background: #4CAF50;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 14px;
+        white-space: nowrap;
+        min-width: 60px;
+        
+        &:hover {
+          background: #45a049;
+        }
+        
+        &:active {
+          background: #3d8b40;
+        }
+      }
+    }
+  }
+}
+
+// 中断ボタンスタイル
+.ytomo-abort-button {
+  position: fixed;
+  bottom: 100px;
+  right: 24px;
+  z-index: 9001;
+  background: #f44336;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 64px;
+  height: 64px;
+  font-size: 12px;
+  font-weight: bold;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(244, 67, 54, 0.4);
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  &:hover {
+    transform: scale(1.1);
+    box-shadow: 0 6px 20px rgba(244, 67, 54, 0.6);
+  }
+
+  &:active {
+    transform: scale(0.95);
+  }
+}
+
+// コピーボタンスタイル
+.copy-ticket-btn {
+  margin-left: 8px;
+  padding: 6px;
+  background: #f0f0f0;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 32px;
+  height: 32px;
+  transition: all 0.3s ease;
+
+  &:hover {
+    background: #e0e0e0;
+    border-color: #ccc;
+  }
+
+  &:active {
+    transform: scale(0.95);
+  }
+
+  svg {
+    color: #666;
+    transition: all 0.3s ease;
+  }
+
+  // コピー成功状態
+  &.copy-success {
+    background: rgba(76, 175, 80, 0.1);
+    border-color: #4CAF50;
+    
+    svg {
+      color: #4CAF50;
+    }
+  }
+}
+
+// ダイアログボタンスタイル
+.dialog-btn {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: bold;
+  transition: all 0.2s ease;
+
+  &.btn-cancel {
+    background: #666;
+    color: white;
+
+    &:hover {
+      background: #555;
+    }
+  }
+
+  &.btn-delete {
+    background: #f44336;
+    color: white;
+
+    &:hover {
+      background: #d32f2f;
+    }
+  }
+
+  &.btn-execute {
+    background: #2196F3;
+    color: white;
+
+    &:hover {
+      background: #1976D2;
+    }
+
+    &.btn-disabled {
+      background: #ccc;
+      color: #666;
+      cursor: not-allowed;
+
+      &:hover {
+        background: #ccc;
+      }
+    }
+  }
+}
+
+// チケット行スタイル
+.ticket-row {
+  display: flex;
+  align-items: center;
+  padding: 8px;
+  border-bottom: 1px solid #eee;
+  transition: background-color 0.2s ease;
+  cursor: pointer;
+
+  &:last-child {
+    border-bottom: none;
+  }
+
+  // 追加済みチケットの視覚表現
+  &.already-added {
+    position: relative;
+    opacity: 0.6;
+    background: repeating-linear-gradient(
+      45deg,
+      transparent,
+      transparent 8px,
+      rgba(255, 140, 0, 0.1) 8px,
+      rgba(255, 140, 0, 0.1) 16px
+    );
+
+    &::after {
+      content: "追加済み";
+      position: absolute;
+      top: 4px;
+      right: 40px;
+      background: rgba(255, 140, 0, 0.9);
+      color: white;
+      font-size: 10px;
+      font-weight: bold;
+      padding: 2px 6px;
+      border-radius: 3px;
+      pointer-events: none;
+    }
+
+    // 追加済みの場合はチェックボックスを無効化
+    input[type="checkbox"] {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .copy-ticket-btn {
+      // コピーボタンは追加済みでも通常通り機能することを示す
+      opacity: 1;
+      background: #f8f8f8;
+      border-color: #bbb;
+      
+      &:hover {
+        background: #e8e8e8;
+        border-color: #999;
+      }
+    }
+  }
+}

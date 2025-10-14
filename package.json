@@ -1,12 +1,14 @@
 {
   "name": "expo2025-extension",
-  "version": "0.6.0",
+  "version": "1.4.0",
   "description": "大阪万博Expo2025の予約を補助します",
   "main": "src/index.js",
   "scripts": {
-    "test": "jest",
-    "test:watch": "jest --watch",
-    "test:coverage": "jest --coverage",
+    "test": "NODE_ENV=test jest",
+    "test:watch": "NODE_ENV=test jest --watch",
+    "test:coverage": "NODE_ENV=test jest --coverage",
+    "test:unit": "NODE_ENV=test jest tests/v1.0/unit",
+    "test:integration": "NODE_ENV=test jest tests/v1.0/integration",
     "build": "webpack --mode=production",
     "build:dev": "webpack --mode=development",
     "build:watch": "webpack --mode=development --watch",
@@ -25,36 +27,54 @@
     "@babel/preset-env": "^7.28.0",
     "@jest/globals": "^29.7.0",
     "@types/chrome": "^0.1.1",
-    "@types/jest": "^29.5.12",
+    "@types/jest": "^29.5.14",
     "@types/node": "^24.1.0",
+    "@vue/compiler-sfc": "^3.4.0",
+    "@vue/typescript": "^1.8.0",
     "babel-loader": "^10.0.0",
     "css-loader": "^7.1.2",
     "jest": "^29.7.0",
     "jest-environment-jsdom": "^29.7.0",
+    "pinia": "^3.0.3",
     "sass": "^1.90.0",
     "sass-loader": "^16.0.5",
     "style-loader": "^4.0.0",
+    "ts-jest": "^29.4.1",
     "ts-loader": "^9.5.2",
     "typescript": "^5.9.2",
+    "vue": "^3.4.0",
+    "vue-loader": "^17.4.0",
     "webpack": "^5.101.0",
     "webpack-cli": "^6.0.1"
   },
   "jest": {
     "testEnvironment": "jsdom",
     "setupFilesAfterEnv": [
-      "<rootDir>/tests/setup.js"
+      "<rootDir>/tests/v1.0/setup.js"
     ],
     "testMatch": [
-      "<rootDir>/tests/**/*.test.js"
-    ],
-    "collectCoverageFrom": [
-      "dist/**/*.js",
-      "src-modules/**/*.ts",
-      "!src/manifest.json"
+      "<rootDir>/tests/v1.0/**/*.test.js"
     ],
     "moduleNameMapper": {
-      "^../src/index.js$": "<rootDir>/dist/test-exports-real.js"
+      "^@/(.*)$": "<rootDir>/ts/modules/$1"
     },
-    "transform": {}
+    "transform": {
+      "^.+\\.ts$": "ts-jest"
+    },
+    "collectCoverageFrom": [
+      "ts/modules/**/*.ts",
+      "!ts/modules/test-exports.ts",
+      "!ts/modules/main.ts"
+    ],
+    "coverageReporters": [
+      "text",
+      "lcov",
+      "html"
+    ],
+    "testTimeout": 10000,
+    "preset": "ts-jest/presets/js-with-ts"
+  },
+  "dependencies": {
+    "pinia-plugin-persistedstate": "^4.5.0"
   }
 }

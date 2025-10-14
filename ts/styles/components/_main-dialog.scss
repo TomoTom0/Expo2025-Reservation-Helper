@@ -1,0 +1,56 @@
+/**
+ * 旧実装用メインダイアログのスタイル定義（Vue版では使用しない）
+ * Vue版のスタイルはMainDialog.vueのscoped内に移行済み
+ * 
+ * このファイルは旧実装との互換性維持のために残存
+ * 将来的に旧実装が完全に削除された時点で削除予定
+ */
+
+/* 旧実装でのみ使用されるスタイルを最小限保持 */
+.ytomo-processing-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1001;
+    pointer-events: auto;
+    overflow-y: auto;
+}
+
+.ytomo-processing-content {
+    background: rgba(255, 255, 255, 0.7);
+    border-radius: 12px;
+    padding: 30px;
+    text-align: center;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+    min-width: 200px;
+    pointer-events: auto;
+    backdrop-filter: blur(1px);
+}
+
+.ytomo-processing-spinner {
+    width: 40px;
+    height: 40px;
+    border: 3px solid #e2e8f0;
+    border-top-color: #2c5aa0;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 0 auto 16px;
+}
+
+.ytomo-processing-message {
+    color: #374151;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
