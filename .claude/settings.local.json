@@ -64,7 +64,11 @@
       "Bash(gh issue view:*)",
       "Bash(ls:*)",
       "Bash(alcom status:*)",
-      "Bash(alcom finish:*)"
+      "Bash(alcom finish:*)",
+      "Bash(gh pr create:*)",
+      "Skill(pr-review-response)",
+      "Bash(gh pr view:*)",
+      "Bash(tm new:*)"
     ],
     "deny": []
   }
