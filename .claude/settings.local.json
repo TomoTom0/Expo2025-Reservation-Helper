@@ -61,7 +61,10 @@
       "Bash(git mv:*)",
       "Bash(gh release:*)",
       "Bash(gh issue list:*)",
-      "Bash(gh issue view:*)"
+      "Bash(gh issue view:*)",
+      "Bash(ls:*)",
+      "Bash(alcom status:*)",
+      "Bash(alcom finish:*)"
     ],
     "deny": []
   }
